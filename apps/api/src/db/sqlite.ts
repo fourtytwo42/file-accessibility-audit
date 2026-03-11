@@ -107,4 +107,26 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_queue_items_expires ON queue_items(expires_at);
 `)
 
+function ensureColumn(table: string, column: string, definition: string): void {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>
+  if (columns.some(existing => existing.name === column)) return
+  db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+}
+
+ensureColumn('queue_items', 'original_storage_path', 'TEXT')
+ensureColumn('queue_items', 'remediated_storage_path', 'TEXT')
+ensureColumn('queue_items', 'original_result_json', 'TEXT')
+ensureColumn('queue_items', 'remediated_result_json', 'TEXT')
+ensureColumn('queue_items', 'remediation_status', "TEXT NOT NULL DEFAULT 'pending'")
+ensureColumn('queue_items', 'remediation_error_json', 'TEXT')
+ensureColumn('queue_items', 'original_page_count', 'INTEGER')
+ensureColumn('queue_items', 'original_overall_score', 'INTEGER')
+ensureColumn('queue_items', 'original_grade', 'TEXT')
+ensureColumn('queue_items', 'remediated_page_count', 'INTEGER')
+ensureColumn('queue_items', 'remediated_overall_score', 'INTEGER')
+ensureColumn('queue_items', 'remediated_grade', 'TEXT')
+ensureColumn('queue_items', 'applied_fixes_json', 'TEXT')
+ensureColumn('queue_items', 'skipped_fixes_json', 'TEXT')
+ensureColumn('queue_items', 'manual_review_flags_json', 'TEXT')
+
 export default db

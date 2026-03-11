@@ -1,6 +1,14 @@
 import SparkMD5 from 'spark-md5'
 
 type QueueState = 'uploading' | 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled'
+type RemediationStatus = 'pending' | 'processing' | 'completed' | 'manual_review_required' | 'failed'
+
+interface ManualReviewFlag {
+  code: string
+  label: string
+  severity: 'warning' | 'critical'
+  details: string
+}
 
 export interface QueueItem {
   id: string
@@ -13,11 +21,22 @@ export interface QueueItem {
   uploadProgress: number
   processingProgress: number
   processingStage: string | null
+  remediationStatus: RemediationStatus
   pageCount: number | null
   overallScore: number | null
   grade: string | null
   result: any | null
+  originalResult: any | null
+  remediatedResult: any | null
+  originalScore: number | null
+  originalGrade: string | null
+  remediatedScore: number | null
+  remediatedGrade: string | null
   error: any | null
+  remediationError: any | null
+  appliedFixes: string[]
+  skippedFixes: string[]
+  manualReviewFlags: ManualReviewFlag[]
   createdAt: string
   updatedAt: string
   uploadStartedAt: string | null
@@ -28,6 +47,7 @@ export interface QueueItem {
   canRetry: boolean
   canCancel: boolean
   canDownload: boolean
+  canDownloadRemediated: boolean
 }
 
 const CLIENT_ID_KEY = 'file-accessibility-audit-client-id'
@@ -353,6 +373,37 @@ export function useClientQueue() {
     window.open(`/api/queue/items/${encodeURIComponent(itemId)}/download?clientId=${encodeURIComponent(stableClientId)}`, '_blank')
   }
 
+  async function downloadArchive(url: string, filename: string, body?: Record<string, unknown>) {
+    const blob = await $fetch(url, {
+      method: 'POST',
+      credentials: 'include',
+      headers: withClientHeaders(getOrCreateClientId()),
+      body: {
+        clientId: getOrCreateClientId(),
+        ...(body || {}),
+      },
+      responseType: 'blob',
+    })
+
+    const objectUrl = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = objectUrl
+    anchor.download = filename
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+    URL.revokeObjectURL(objectUrl)
+  }
+
+  async function downloadSelected(itemIds: string[]) {
+    if (!itemIds.length) return
+    await downloadArchive('/api/queue/download-many', 'remediated-selected.zip', { itemIds })
+  }
+
+  async function downloadAllVisible() {
+    await downloadArchive('/api/queue/download-all', 'remediated-all-visible.zip')
+  }
+
   function itemUploadProgress(item: QueueItem): number {
     if (uploadProgressOverrides.value[item.id] !== undefined) return uploadProgressOverrides.value[item.id]
     return item.uploadProgress
@@ -362,17 +413,15 @@ export function useClientQueue() {
     if (item.state === 'complete') return 100
     if (item.state === 'queued') return 0
     if (item.state === 'uploading') {
-      return Math.round(itemUploadProgress(item) * 0.35)
+      return Math.round(itemUploadProgress(item) * 0.2)
     }
     if (item.state === 'processing') {
-      return Math.round(35 + (item.processingProgress * 0.65))
+      return item.processingProgress
     }
     if (item.state === 'failed' || item.state === 'cancelled') {
-      const uploadWeighted = Math.round(itemUploadProgress(item) * 0.35)
-      const processingWeighted = Math.round(35 + (item.processingProgress * 0.65))
-      return Math.max(uploadWeighted, processingWeighted, 0)
+      return Math.max(item.processingProgress, Math.round(itemUploadProgress(item) * 0.2), 0)
     }
-    return Math.round(item.processingProgress * 0.65)
+    return item.processingProgress
   }
 
   onMounted(() => {
@@ -405,6 +454,8 @@ export function useClientQueue() {
     clearNotices,
     loadMoreHistory: () => loadHistory(historyPage.value + 1, true),
     downloadItem,
+    downloadSelected,
+    downloadAllVisible,
     itemOverallProgress,
   }
 }

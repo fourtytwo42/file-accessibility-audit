@@ -15,12 +15,32 @@
             <span v-if="showStatusChip" class="text-xs px-2 py-0.5 rounded-full capitalize" :class="statusClass">
               {{ item.state }}
             </span>
-            <span v-if="item.grade" class="text-xs px-2 py-0.5 rounded-full" :style="{ backgroundColor: gradeColor + '20', color: gradeColor }">
-              Grade {{ item.grade }}
+            <span
+              v-if="item.originalGrade"
+              class="text-xs px-2 py-0.5 rounded-full"
+              :style="{ backgroundColor: originalGradeColor + '20', color: originalGradeColor }"
+            >
+              Original {{ item.originalGrade }}
+            </span>
+            <span
+              v-if="item.remediatedGrade"
+              class="text-xs px-2 py-0.5 rounded-full"
+              :style="{ backgroundColor: remediatedGradeColor + '20', color: remediatedGradeColor }"
+            >
+              Fixed {{ item.remediatedGrade }}
+            </span>
+            <span
+              v-if="item.manualReviewFlags.length"
+              class="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300"
+            >
+              Manual Review
             </span>
           </div>
           <p class="text-xs text-[var(--text-muted)] mt-1">
             {{ formatDate(item.updatedAt) }}
+          </p>
+          <p v-if="remediationLabel" class="text-xs text-[var(--text-muted)] mt-1">
+            {{ remediationLabel }}
           </p>
         </div>
 
@@ -32,13 +52,13 @@
             Cancel
           </UButton>
           <UButton
-            v-if="item.canDownload"
+            v-if="item.canDownloadRemediated"
             size="xs"
             variant="ghost"
             color="neutral"
             square
-            title="Download PDF"
-            aria-label="Download PDF"
+            title="Download fixed PDF"
+            aria-label="Download fixed PDF"
             @click="$emit('download', item.id)"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
@@ -65,7 +85,7 @@
             </svg>
           </UButton>
           <UButton
-            v-if="item.result"
+            v-if="item.originalResult || item.remediatedResult || item.manualReviewFlags.length"
             size="xs"
             variant="ghost"
             color="neutral"
@@ -119,17 +139,69 @@
       <div v-if="item.error" class="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
         {{ item.error.error || item.error.details || 'This item failed.' }}
       </div>
+
+      <div v-if="item.remediationError" class="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+        {{ item.remediationError.error || 'Remediation failed after the original analysis was captured.' }}
+      </div>
     </div>
 
-    <div v-if="expanded && item.result" class="p-5 space-y-5">
-      <div class="rounded-xl border border-[var(--border)] bg-[var(--surface-card-alt)] p-5">
-        <ScoreCard :result="item.result" />
+    <div v-if="expanded" class="p-5 space-y-5">
+      <div v-if="gradeComparisonVisible" class="grid gap-4 lg:grid-cols-2">
+        <div v-if="item.originalResult" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card-alt)] p-5">
+          <p class="text-xs uppercase tracking-wide text-[var(--text-muted)] mb-4">Original</p>
+          <ScoreCard :result="item.originalResult" />
+        </div>
+        <div v-if="item.remediatedResult" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card-alt)] p-5">
+          <p class="text-xs uppercase tracking-wide text-[var(--text-muted)] mb-4">Fixed</p>
+          <ScoreCard :result="item.remediatedResult" />
+        </div>
       </div>
 
-      <div class="space-y-3">
+      <div v-if="item.appliedFixes.length || item.skippedFixes.length || item.manualReviewFlags.length" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card-alt)] p-5 space-y-4">
+        <div v-if="item.appliedFixes.length">
+          <h3 class="text-sm font-semibold text-[var(--text-heading)]">Applied Fixes</h3>
+          <ul class="mt-2 space-y-2 text-sm text-[var(--text-muted)]">
+            <li v-for="fix in item.appliedFixes" :key="fix">• {{ fix }}</li>
+          </ul>
+        </div>
+
+        <div v-if="item.skippedFixes.length">
+          <h3 class="text-sm font-semibold text-[var(--text-heading)]">Skipped Fixes</h3>
+          <ul class="mt-2 space-y-2 text-sm text-[var(--text-muted)]">
+            <li v-for="fix in item.skippedFixes" :key="fix">• {{ fix }}</li>
+          </ul>
+        </div>
+
+        <div v-if="item.manualReviewFlags.length">
+          <h3 class="text-sm font-semibold text-[var(--text-heading)]">Manual Review Required</h3>
+          <ul class="mt-2 space-y-3">
+            <li
+              v-for="flag in item.manualReviewFlags"
+              :key="flag.code"
+              class="rounded-lg border px-4 py-3 text-sm"
+              :class="flag.severity === 'critical' ? 'border-red-500/20 bg-red-500/10 text-red-100' : 'border-amber-500/20 bg-amber-500/10 text-amber-100'"
+            >
+              <p class="font-medium">{{ flag.label }}</p>
+              <p class="mt-1 opacity-90">{{ flag.details }}</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div v-if="item.originalResult" class="space-y-3">
+        <h3 class="text-sm font-semibold text-[var(--text-heading)]">Original Findings</h3>
         <CategoryRow
-          v-for="category in item.result.categories"
-          :key="category.id"
+          v-for="category in item.originalResult.categories"
+          :key="`original-${item.id}-${category.id}`"
+          :category="category"
+        />
+      </div>
+
+      <div v-if="item.remediatedResult" class="space-y-3">
+        <h3 class="text-sm font-semibold text-[var(--text-heading)]">Fixed Findings</h3>
+        <CategoryRow
+          v-for="category in item.remediatedResult.categories"
+          :key="`fixed-${item.id}-${category.id}`"
           :category="category"
         />
       </div>
@@ -157,6 +229,7 @@ defineEmits<{
 const expanded = ref(false)
 
 const showStatusChip = computed(() => props.item.state !== 'complete')
+const gradeComparisonVisible = computed(() => !!props.item.originalResult || !!props.item.remediatedResult)
 
 const gradeColors: Record<string, string> = {
   A: '#22c55e',
@@ -166,7 +239,8 @@ const gradeColors: Record<string, string> = {
   F: '#ef4444',
 }
 
-const gradeColor = computed(() => gradeColors[props.item.grade || ''] || '#94a3b8')
+const originalGradeColor = computed(() => gradeColors[props.item.originalGrade || ''] || '#94a3b8')
+const remediatedGradeColor = computed(() => gradeColors[props.item.remediatedGrade || ''] || '#94a3b8')
 
 const statusClass = computed(() => {
   const map: Record<string, string> = {
@@ -178,6 +252,17 @@ const statusClass = computed(() => {
     cancelled: 'bg-slate-500/15 text-slate-300',
   }
   return map[props.item.state] || 'bg-slate-500/15 text-slate-300'
+})
+
+const remediationLabel = computed(() => {
+  const map: Record<string, string> = {
+    pending: 'Remediation pending',
+    processing: 'Remediation in progress',
+    completed: 'Automatic remediation completed',
+    manual_review_required: 'Automatic remediation completed with manual review required',
+    failed: 'Automatic remediation failed',
+  }
+  return map[props.item.remediationStatus] || ''
 })
 
 const progressLabel = computed(() => {

@@ -30,10 +30,28 @@
             v-if="hasSelection"
             size="sm"
             variant="soft"
+            color="primary"
+            @click="downloadSelected(selectedIds)"
+          >
+            Download Selected
+          </UButton>
+          <UButton
+            v-if="hasSelection"
+            size="sm"
+            variant="soft"
             color="neutral"
             @click="deleteItems(selectedIds)"
           >
             Delete Selected
+          </UButton>
+          <UButton
+            v-if="activeItems.length || historyItems.length"
+            size="sm"
+            variant="soft"
+            color="primary"
+            @click="downloadAllVisible"
+          >
+            Download All Visible
           </UButton>
           <UButton
             v-if="activeItems.length || historyItems.length"
@@ -140,6 +158,8 @@ const {
   clearNotices,
   loadMoreHistory,
   downloadItem,
+  downloadSelected,
+  downloadAllVisible,
   itemOverallProgress,
 } = useClientQueue()
 

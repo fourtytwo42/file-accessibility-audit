@@ -5,6 +5,7 @@ import { Router, type IRouter, type Response } from 'express'
 import multer from 'multer'
 import { BATCH_QUEUE } from '#config'
 import { bootstrapClientSession, ClientSessionRequest, requireClientSession } from '../middleware/clientSession.js'
+import { streamQueueArchive } from '../services/archiveService.js'
 import { emitQueueItemUpsert, registerQueueSse } from '../services/queueEvents.js'
 import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams } from '../services/queueManager.js'
 import {
@@ -19,6 +20,7 @@ import {
   markQueueItemHidden,
   nowIso,
   queueItemDiskPath,
+  QueueItemRecord,
   removeDiskFile,
   restoreHiddenQueueItem,
   sanitizeBasename,
@@ -54,6 +56,12 @@ function queueHousekeeping(): void {
 
 function readItemId(value: string | string[] | undefined): string {
   return Array.isArray(value) ? value[0] : value || ''
+}
+
+function allVisibleItemsForClient(clientId: string): QueueItemRecord[] {
+  const active = listActiveQueueItems(clientId).map(item => getQueueItemById(item.id)).filter(Boolean) as QueueItemRecord[]
+  const history = listHistoryQueueItems(clientId, 1, 10_000).items.map(item => getQueueItemById(item.id)).filter(Boolean) as QueueItemRecord[]
+  return [...active, ...history]
 }
 
 async function fileMd5(filePath: string): Promise<string> {
@@ -162,6 +170,7 @@ router.post('/queue/items/:id/upload', requireClientSession, upload.single('file
     const queued = updateQueueItem(item.id, {
       state: 'queued',
       storage_path: destination,
+      original_storage_path: destination,
       size_bytes: uploaded.size,
       mime_type: uploaded.mimetype,
       upload_progress: 100,
@@ -243,17 +252,27 @@ router.post('/queue/items/:id/retry', requireClientSession, (req: ClientSessionR
     res.status(404).json({ error: 'Queue item not found' })
     return
   }
-  if (item.state !== 'failed' || !item.storage_path) {
+  if (item.state !== 'failed' || !(item.original_storage_path || item.storage_path)) {
     res.status(400).json({ error: 'Only failed uploaded items can be retried' })
     return
   }
 
   const updated = updateQueueItem(item.id, {
     state: 'queued',
+    remediation_status: 'pending',
     processing_progress: 0,
     processing_stage: 'Queued for retry',
+    remediated_storage_path: null,
     result_json: null,
+    remediated_result_json: null,
+    remediation_error_json: null,
+    applied_fixes_json: null,
+    skipped_fixes_json: null,
+    manual_review_flags_json: null,
     error_json: null,
+    remediated_page_count: null,
+    remediated_overall_score: null,
+    remediated_grade: null,
     page_count: null,
     overall_score: null,
     grade: null,
@@ -297,11 +316,34 @@ router.post('/queue/delete-all', requireClientSession, (req: ClientSessionReques
 
 router.get('/queue/items/:id/download', requireClientSession, (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
-  if (!item || item.client_id !== req.clientId || item.hidden || !item.storage_path || !fs.existsSync(item.storage_path)) {
-    res.status(404).json({ error: 'Stored PDF not found' })
+  if (!item || item.client_id !== req.clientId || item.hidden || !item.remediated_storage_path || !fs.existsSync(item.remediated_storage_path)) {
+    res.status(404).json({ error: 'Remediated PDF not found' })
     return
   }
-  res.download(item.storage_path, item.filename)
+  res.download(item.remediated_storage_path, item.filename)
+})
+
+router.post('/queue/download-many', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+  const itemIds = Array.isArray(req.body?.itemIds) ? req.body.itemIds.filter((id: unknown) => typeof id === 'string') : []
+  const items = itemIds
+    .map((itemId: string) => getQueueItemById(itemId))
+    .filter((item: QueueItemRecord | undefined): item is QueueItemRecord => !!item && item.client_id === req.clientId && !item.hidden)
+
+  if (!items.length) {
+    res.status(400).json({ error: 'No visible items selected for download' })
+    return
+  }
+
+  await streamQueueArchive(res, items)
+})
+
+router.post('/queue/download-all', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+  const items = allVisibleItemsForClient(req.clientId!)
+  if (!items.length) {
+    res.status(400).json({ error: 'No visible items available for download' })
+    return
+  }
+  await streamQueueArchive(res, items)
 })
 
 export default router

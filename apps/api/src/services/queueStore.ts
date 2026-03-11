@@ -12,6 +12,20 @@ export type QueueItemState =
   | 'failed'
   | 'cancelled'
 
+export type RemediationStatus =
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'manual_review_required'
+  | 'failed'
+
+export interface ManualReviewFlag {
+  code: string
+  label: string
+  severity: 'warning' | 'critical'
+  details: string
+}
+
 export interface QueueItemRecord {
   id: string
   client_id: string
@@ -21,15 +35,30 @@ export interface QueueItemRecord {
   mime_type: string | null
   state: QueueItemState
   storage_path: string | null
+  original_storage_path: string | null
+  remediated_storage_path: string | null
   upload_progress: number
   processing_progress: number
   processing_stage: string | null
   hidden: number
   result_json: string | null
+  original_result_json: string | null
+  remediated_result_json: string | null
   error_json: string | null
+  remediation_status: RemediationStatus
+  remediation_error_json: string | null
   page_count: number | null
   overall_score: number | null
   grade: string | null
+  original_page_count: number | null
+  original_overall_score: number | null
+  original_grade: string | null
+  remediated_page_count: number | null
+  remediated_overall_score: number | null
+  remediated_grade: string | null
+  applied_fixes_json: string | null
+  skipped_fixes_json: string | null
+  manual_review_flags_json: string | null
   created_at: string
   updated_at: string
   upload_started_at: string | null
@@ -50,11 +79,22 @@ export interface QueueItem {
   uploadProgress: number
   processingProgress: number
   processingStage: string | null
+  remediationStatus: RemediationStatus
   pageCount: number | null
   overallScore: number | null
   grade: string | null
   result: any | null
+  originalResult: any | null
+  remediatedResult: any | null
+  originalScore: number | null
+  originalGrade: string | null
+  remediatedScore: number | null
+  remediatedGrade: string | null
   error: any | null
+  remediationError: any | null
+  appliedFixes: string[]
+  skippedFixes: string[]
+  manualReviewFlags: ManualReviewFlag[]
   createdAt: string
   updatedAt: string
   uploadStartedAt: string | null
@@ -65,23 +105,30 @@ export interface QueueItem {
   canRetry: boolean
   canCancel: boolean
   canDownload: boolean
+  canDownloadRemediated: boolean
 }
 
 const DATA_ROOT = path.resolve(process.cwd(), 'apps/api/data')
 const STORAGE_ROOT = process.env.QUEUE_STORAGE_DIR
   ? path.resolve(process.env.QUEUE_STORAGE_DIR)
   : path.join(DATA_ROOT, 'queue-storage')
-const FILE_ROOT = path.join(STORAGE_ROOT, 'files')
+const ORIGINAL_ROOT = path.join(STORAGE_ROOT, 'originals')
+const REMEDIATED_ROOT = path.join(STORAGE_ROOT, 'remediated')
 const STAGING_ROOT = path.join(STORAGE_ROOT, 'staging')
 
-for (const dir of [STORAGE_ROOT, FILE_ROOT, STAGING_ROOT]) {
+for (const dir of [STORAGE_ROOT, ORIGINAL_ROOT, REMEDIATED_ROOT, STAGING_ROOT]) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true })
   }
 }
 
 export function getQueueStorageRoots() {
-  return { storageRoot: STORAGE_ROOT, fileRoot: FILE_ROOT, stagingRoot: STAGING_ROOT }
+  return {
+    storageRoot: STORAGE_ROOT,
+    originalRoot: ORIGINAL_ROOT,
+    remediatedRoot: REMEDIATED_ROOT,
+    stagingRoot: STAGING_ROOT,
+  }
 }
 
 export function nowIso(): string {
@@ -114,11 +161,22 @@ export function serializeQueueItem(row: QueueItemRecord): QueueItem {
     uploadProgress: row.upload_progress,
     processingProgress: row.processing_progress,
     processingStage: row.processing_stage,
+    remediationStatus: row.remediation_status,
     pageCount: row.page_count,
     overallScore: row.overall_score,
     grade: row.grade,
     result: row.result_json ? JSON.parse(row.result_json) : null,
+    originalResult: row.original_result_json ? JSON.parse(row.original_result_json) : null,
+    remediatedResult: row.remediated_result_json ? JSON.parse(row.remediated_result_json) : null,
+    originalScore: row.original_overall_score,
+    originalGrade: row.original_grade,
+    remediatedScore: row.remediated_overall_score,
+    remediatedGrade: row.remediated_grade,
     error: row.error_json ? JSON.parse(row.error_json) : null,
+    remediationError: row.remediation_error_json ? JSON.parse(row.remediation_error_json) : null,
+    appliedFixes: row.applied_fixes_json ? JSON.parse(row.applied_fixes_json) : [],
+    skippedFixes: row.skipped_fixes_json ? JSON.parse(row.skipped_fixes_json) : [],
+    manualReviewFlags: row.manual_review_flags_json ? JSON.parse(row.manual_review_flags_json) : [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     uploadStartedAt: row.upload_started_at,
@@ -126,9 +184,10 @@ export function serializeQueueItem(row: QueueItemRecord): QueueItem {
     processingStartedAt: row.processing_started_at,
     completedAt: row.completed_at,
     expiresAt: row.expires_at,
-    canRetry: row.state === 'failed' && !!row.storage_path,
+    canRetry: row.state === 'failed' && !!row.original_storage_path,
     canCancel: row.state === 'uploading' || row.state === 'queued' || row.state === 'processing',
-    canDownload: !!row.storage_path,
+    canDownload: !!row.remediated_storage_path,
+    canDownloadRemediated: !!row.remediated_storage_path,
   }
 }
 
@@ -192,9 +251,9 @@ export function createQueueItem(input: {
     INSERT INTO queue_items (
       id, client_id, filename, md5, size_bytes, mime_type, state,
       upload_progress, processing_progress, processing_stage, hidden,
-      created_at, updated_at, upload_started_at, expires_at
+      remediation_status, created_at, updated_at, upload_started_at, expires_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, 'uploading', 0, 0, 'Waiting for upload', 0, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, 'uploading', 0, 0, 'Waiting for upload', 0, 'pending', ?, ?, ?, ?)
   `).run(id, input.clientId, input.filename, input.md5, input.sizeBytes, input.mimeType ?? null, timestamp, timestamp, timestamp, expiresAt)
   return getQueueItemById(id)!
 }
@@ -210,7 +269,13 @@ export function restoreHiddenQueueItem(id: string): QueueItemRecord {
 
 export function updateQueueItem(id: string, patch: Partial<QueueItemRecord> & {
   result_json?: string | null
+  original_result_json?: string | null
+  remediated_result_json?: string | null
   error_json?: string | null
+  remediation_error_json?: string | null
+  applied_fixes_json?: string | null
+  skipped_fixes_json?: string | null
+  manual_review_flags_json?: string | null
 }): QueueItemRecord {
   const row = getQueueItemById(id)
   if (!row) throw new Error(`Queue item not found: ${id}`)
@@ -228,15 +293,30 @@ export function updateQueueItem(id: string, patch: Partial<QueueItemRecord> & {
       mime_type = ?,
       state = ?,
       storage_path = ?,
+      original_storage_path = ?,
+      remediated_storage_path = ?,
       upload_progress = ?,
       processing_progress = ?,
       processing_stage = ?,
       hidden = ?,
       result_json = ?,
+      original_result_json = ?,
+      remediated_result_json = ?,
       error_json = ?,
+      remediation_status = ?,
+      remediation_error_json = ?,
       page_count = ?,
       overall_score = ?,
       grade = ?,
+      original_page_count = ?,
+      original_overall_score = ?,
+      original_grade = ?,
+      remediated_page_count = ?,
+      remediated_overall_score = ?,
+      remediated_grade = ?,
+      applied_fixes_json = ?,
+      skipped_fixes_json = ?,
+      manual_review_flags_json = ?,
       updated_at = ?,
       upload_started_at = ?,
       upload_completed_at = ?,
@@ -251,15 +331,30 @@ export function updateQueueItem(id: string, patch: Partial<QueueItemRecord> & {
     next.mime_type,
     next.state,
     next.storage_path,
+    next.original_storage_path,
+    next.remediated_storage_path,
     next.upload_progress,
     next.processing_progress,
     next.processing_stage,
     next.hidden,
     next.result_json,
+    next.original_result_json,
+    next.remediated_result_json,
     next.error_json,
+    next.remediation_status,
+    next.remediation_error_json,
     next.page_count,
     next.overall_score,
     next.grade,
+    next.original_page_count,
+    next.original_overall_score,
+    next.original_grade,
+    next.remediated_page_count,
+    next.remediated_overall_score,
+    next.remediated_grade,
+    next.applied_fixes_json,
+    next.skipped_fixes_json,
+    next.manual_review_flags_json,
     next.updated_at,
     next.upload_started_at,
     next.upload_completed_at,
@@ -329,7 +424,12 @@ export function sanitizeBasename(filename: string): string {
 
 export function queueItemDiskPath(id: string, filename: string): string {
   const ext = path.extname(filename).toLowerCase() === '.pdf' ? '.pdf' : '.pdf'
-  return path.join(FILE_ROOT, `${id}${ext}`)
+  return path.join(ORIGINAL_ROOT, `${id}${ext}`)
+}
+
+export function queueItemRemediatedDiskPath(id: string, filename: string): string {
+  const ext = path.extname(filename).toLowerCase() === '.pdf' ? '.pdf' : '.pdf'
+  return path.join(REMEDIATED_ROOT, `${id}${ext}`)
 }
 
 export function removeDiskFile(filePath: string | null | undefined): void {
@@ -341,12 +441,19 @@ export function removeDiskFile(filePath: string | null | undefined): void {
 
 export function cleanupExpiredQueueItems(): void {
   const expiredRows = db.prepare(`
-    SELECT id, storage_path FROM queue_items
+    SELECT id, storage_path, original_storage_path, remediated_storage_path FROM queue_items
     WHERE expires_at < datetime('now')
-  `).all() as Array<{ id: string; storage_path: string | null }>
+  `).all() as Array<{
+    id: string
+    storage_path: string | null
+    original_storage_path: string | null
+    remediated_storage_path: string | null
+  }>
 
   for (const row of expiredRows) {
     removeDiskFile(row.storage_path)
+    removeDiskFile(row.original_storage_path)
+    removeDiskFile(row.remediated_storage_path)
   }
 
   db.prepare(`DELETE FROM queue_items WHERE expires_at < datetime('now')`).run()

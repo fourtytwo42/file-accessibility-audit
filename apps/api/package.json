@@ -14,30 +14,32 @@
     "test:scoring": "vitest run --testPathPattern=scoring"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
-    "multer": "^1.4.5-lts.1",
-    "pdfjs-dist": "^4.10.38",
-    "better-sqlite3": "^11.8.1",
-    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.1",
-    "cors": "^2.8.5",
-    "cookie-parser": "^1.4.7"
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38"
   },
   "devDependencies": {
-    "typescript": "^5.8.2",
-    "@types/express": "^5.0.1",
-    "@types/multer": "^1.4.12",
-    "@types/better-sqlite3": "^7.6.12",
     "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/nodemailer": "^6.4.17",
-    "@types/cors": "^2.8.17",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.13.10",
+    "@types/nodemailer": "^6.4.17",
     "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
     "vitest": "^3.0.9"
   }
 }
