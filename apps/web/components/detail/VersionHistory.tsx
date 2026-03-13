@@ -1,4 +1,7 @@
+'use client'
+
 import type { QueueVersionsResponse } from '@/lib/api'
+import { downloadQueueFile } from '@/lib/api'
 import { formatDate } from '@/lib/formatters'
 import { GradeBadge } from '@/components/shared/GradeBadge'
 
@@ -17,9 +20,14 @@ export function VersionHistory({ versions }: { versions: QueueVersionsResponse['
             <div className="flex items-center gap-3">
               <GradeBadge grade={version.grade} />
               {version.downloadUrl ? (
-                <a className="rounded-full border px-3 py-1.5 text-sm" style={{ borderColor: 'var(--border)' }} href={version.downloadUrl}>
+                <button
+                  type="button"
+                  className="rounded-full border px-3 py-1.5 text-sm"
+                  style={{ borderColor: 'var(--border)' }}
+                  onClick={() => downloadQueueFile(version.downloadUrl!, `version-${version.key}.pdf`)}
+                >
                   Download
-                </a>
+                </button>
               ) : null}
             </div>
           </div>

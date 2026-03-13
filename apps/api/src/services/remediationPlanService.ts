@@ -524,9 +524,21 @@ function isOpportunitySelectable(input: {
           || attemptedOrPlanned('repair_cid_symbol_font_maps', actions, selectedActions)
         )
     case 'substitute_legacy_fonts_in_place':
-      return analysis.pageCount >= 10
+      return (
+        (
+          analysis.pageCount >= 10
+          && attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
+        )
+        || (
+          opportunity.derivedFromFailureModeKeys.includes('pdfua.cidset_consistency')
+          && attemptedOrPlanned('repair_cidset_consistency', actions, selectedActions)
+        )
+      )
         && attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
-        && attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
+        && (
+          attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+          || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
+        )
     case 'finalize_substituted_font_conformance':
       return attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
     case 'set_document_title':

@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 export interface QueueFilters {
   search: string
   status: 'all' | 'complete' | 'processing' | 'failed'
@@ -19,22 +21,45 @@ export function FilterBar({
   showing: number
   total: number
 }) {
+  const [mobileExpanded, setMobileExpanded] = useState(false)
+
   return (
-    <div className="sticky top-[5.25rem] z-20 rounded-[1.5rem] border p-4" style={{ borderColor: 'var(--border)', background: 'color-mix(in srgb, var(--surface) 94%, transparent)' }}>
-      <div className="grid gap-3 md:grid-cols-[2fr_1fr_1fr_1fr]">
+    <div className="sticky top-[4.5rem] z-20 rounded-[1.1rem] border px-3 py-2.5 md:top-[5rem] md:rounded-[1.5rem] md:p-4" style={{ borderColor: 'var(--border)', background: 'color-mix(in srgb, var(--surface) 94%, transparent)' }}>
+      <div className="flex items-center gap-2 md:hidden">
         <input
           aria-label="Search PDFs"
           value={filters.search}
           onChange={event => onChange({ search: event.target.value })}
           placeholder="Search by filename"
-          className="rounded-xl border px-3 py-2"
+          className="min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
+        />
+        <button
+          type="button"
+          className="shrink-0 rounded-lg border px-3 py-2 text-sm"
+          style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
+          onClick={() => setMobileExpanded(current => !current)}
+          aria-expanded={mobileExpanded}
+          aria-label="Toggle filters and sort"
+        >
+          {mobileExpanded ? 'Hide' : 'Filter'}
+        </button>
+      </div>
+
+      <div className={`${mobileExpanded ? 'mt-2 grid' : 'hidden'} gap-2 md:mt-0 md:grid md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-3`}>
+        <input
+          aria-label="Search PDFs"
+          value={filters.search}
+          onChange={event => onChange({ search: event.target.value })}
+          placeholder="Search by filename"
+          className="hidden rounded-xl border px-3 py-2 text-sm md:block"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
         />
         <select
           aria-label="Filter by status"
           value={filters.status}
           onChange={event => onChange({ status: event.target.value as QueueFilters['status'] })}
-          className="rounded-xl border px-3 py-2"
+          className="rounded-lg border px-3 py-2 text-sm md:rounded-xl"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
         >
           <option value="all">All statuses</option>
@@ -46,7 +71,7 @@ export function FilterBar({
           aria-label="Filter by grade"
           value={filters.grade}
           onChange={event => onChange({ grade: event.target.value as QueueFilters['grade'] })}
-          className="rounded-xl border px-3 py-2"
+          className="rounded-lg border px-3 py-2 text-sm md:rounded-xl"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
         >
           <option value="all">All grades</option>
@@ -56,7 +81,7 @@ export function FilterBar({
           aria-label="Sort PDFs"
           value={filters.sort}
           onChange={event => onChange({ sort: event.target.value as QueueFilters['sort'] })}
-          className="rounded-xl border px-3 py-2"
+          className="rounded-lg border px-3 py-2 text-sm md:rounded-xl"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
         >
           <option value="created_desc">Last uploaded</option>
@@ -67,15 +92,15 @@ export function FilterBar({
           <option value="name_desc">Name Z-A</option>
         </select>
       </div>
-      <div className="mt-3 flex items-center justify-between gap-3 text-sm" style={{ color: 'var(--text-muted)' }}>
-        <span>Showing {showing} of {total} PDFs</span>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs md:mt-3 md:text-sm" style={{ color: 'var(--text-muted)' }}>
+        <span>Showing {showing} of {total}</span>
         <label className="flex items-center gap-2">
-          <span>Per page</span>
+          <span className="whitespace-nowrap">Per page</span>
           <select
             aria-label="Items per page"
             value={filters.pageSize}
             onChange={event => onChange({ pageSize: Number(event.target.value) as QueueFilters['pageSize'] })}
-            className="rounded-xl border px-3 py-2"
+            className="rounded-lg border px-2.5 py-1.5 text-xs md:rounded-xl md:px-3 md:py-2 md:text-sm"
             style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
           >
             {[25, 50, 100].map(value => <option key={value} value={value}>{value}</option>)}

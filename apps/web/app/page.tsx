@@ -5,7 +5,7 @@ import { BulkActionBar } from '@/components/grid/BulkActionBar'
 import { FilterBar, type QueueFilters } from '@/components/grid/FilterBar'
 import { PdfCard } from '@/components/grid/PdfCard'
 import { DropZone } from '@/components/upload/DropZone'
-import { deleteQueueItems, downloadMany, reanalyzeQueueItems, remediateQueueItems, retryQueueItem } from '@/lib/api'
+import { deleteQueueItems, downloadMany, downloadQueueFile, reanalyzeQueueItems, remediateQueueItems, retryQueueItem } from '@/lib/api'
 import { useQueueEvents } from '@/hooks/useQueueEvents'
 import { useQueueStatus } from '@/hooks/useQueueStatus'
 import { useSelection } from '@/hooks/useSelection'
@@ -62,11 +62,11 @@ export default function QueuePage() {
   }
 
   return (
-    <main className="page-shell space-y-6 pb-28">
-      <section className="space-y-4">
+    <main className="page-shell space-y-4 pb-24 md:space-y-6 md:pb-28">
+      <section className="space-y-3">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Unified PDF queue</h1>
-          <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">Unified PDF queue</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
             Upload, remediate, re-analyze, and inspect standards-aware scoring from a single dashboard.
           </p>
         </div>
@@ -83,8 +83,8 @@ export default function QueuePage() {
         total={total}
       />
 
-      <div className="flex items-center justify-between gap-3">
-        <label className="flex items-center gap-2 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <label className="flex items-center gap-2 text-xs md:text-sm">
           <input
             type="checkbox"
             checked={allPageSelected}
@@ -92,12 +92,12 @@ export default function QueuePage() {
           />
           Select all on page
         </label>
-        <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-          {data?.counts ? `${data.counts.processing} processing · ${data.counts.complete} complete` : 'Loading queue status'}
+        <div className="text-xs md:text-sm" style={{ color: 'var(--text-muted)' }}>
+          {data?.counts ? `${data.counts.processing} processing | ${data.counts.complete} complete` : 'Loading queue status'}
         </div>
       </div>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {cards.map(item => (
           <PdfCard
             key={item.id}
@@ -105,22 +105,22 @@ export default function QueuePage() {
             selected={selection.selectedSet.has(item.id)}
             onToggle={selection.toggle}
             onRetry={id => void retryQueueItem(id).then(() => mutate())}
-            onDownload={id => window.open(`/api/queue/items/${id}/download`, '_blank')}
+            onDownload={id => void downloadQueueFile(`/api/queue/items/${id}/download`, 'remediated.pdf')}
             onDelete={id => void deleteQueueItems([id]).then(() => mutate())}
           />
         ))}
       </section>
 
       {!cards.length ? (
-        <section className="rounded-[1.75rem] border p-10 text-center" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-          <p className="text-lg font-medium">Drop PDFs here to get started.</p>
+        <section className="rounded-[1.2rem] border p-8 text-center md:rounded-[1.75rem] md:p-10" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+          <p className="text-base font-medium md:text-lg">Drop PDFs here to get started.</p>
         </section>
       ) : null}
 
       <div className="flex items-center justify-between gap-3">
-        <button type="button" disabled={page === 1} className="rounded-full border px-4 py-2 text-sm disabled:opacity-50" style={{ borderColor: 'var(--border)' }} onClick={() => setPage(current => Math.max(1, current - 1))}>Previous</button>
-        <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Page {page} of {totalPages}</span>
-        <button type="button" disabled={page >= totalPages} className="rounded-full border px-4 py-2 text-sm disabled:opacity-50" style={{ borderColor: 'var(--border)' }} onClick={() => setPage(current => Math.min(totalPages, current + 1))}>Next</button>
+        <button type="button" disabled={page === 1} className="rounded-full border px-3 py-1.5 text-sm disabled:opacity-50 md:px-4 md:py-2" style={{ borderColor: 'var(--border)' }} onClick={() => setPage(current => Math.max(1, current - 1))}>Previous</button>
+        <span className="text-xs md:text-sm" style={{ color: 'var(--text-muted)' }}>Page {page} of {totalPages}</span>
+        <button type="button" disabled={page >= totalPages} className="rounded-full border px-3 py-1.5 text-sm disabled:opacity-50 md:px-4 md:py-2" style={{ borderColor: 'var(--border)' }} onClick={() => setPage(current => Math.min(totalPages, current + 1))}>Next</button>
       </div>
 
       <BulkActionBar

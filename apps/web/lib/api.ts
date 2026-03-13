@@ -289,6 +289,39 @@ export async function downloadMany(itemIds: string[]): Promise<Blob> {
   return response.blob()
 }
 
+function fileNameFromDisposition(value: string | null, fallback: string): string {
+  if (!value) return fallback
+  const utfMatch = value.match(/filename\*=UTF-8''([^;]+)/i)
+  if (utfMatch?.[1]) return decodeURIComponent(utfMatch[1])
+  const plainMatch = value.match(/filename="([^"]+)"/i) || value.match(/filename=([^;]+)/i)
+  if (plainMatch?.[1]) return plainMatch[1].trim()
+  return fallback
+}
+
+export async function downloadQueueFile(path: string, fallbackFilename: string): Promise<void> {
+  const clientId = await ensureClientSession()
+  const response = await fetch(path, {
+    method: 'GET',
+    credentials: 'include',
+    headers: {
+      'x-client-id': clientId,
+    },
+  })
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null)
+    throw new Error(errorBody?.error || 'Download failed')
+  }
+
+  const blob = await response.blob()
+  const filename = fileNameFromDisposition(response.headers.get('content-disposition'), fallbackFilename)
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
 export function queueEventUrl(clientId: string): string {
   return `/api/queue/events?clientId=${encodeURIComponent(clientId)}`
 }

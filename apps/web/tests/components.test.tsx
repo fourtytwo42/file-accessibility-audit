@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { BulkActionBar } from '@/components/grid/BulkActionBar'
+import { FilterBar } from '@/components/grid/FilterBar'
 import { PdfCard } from '@/components/grid/PdfCard'
 import { DropZone } from '@/components/upload/DropZone'
 import { GradePanel } from '@/components/detail/GradePanel'
@@ -223,5 +224,30 @@ describe('BulkActionBar', () => {
     )
 
     expect(screen.getByText('3 selected')).toBeInTheDocument()
+  })
+})
+
+describe('FilterBar', () => {
+  it('keeps advanced controls collapsed until toggled on compact layouts', () => {
+    const onChange = vi.fn()
+    render(
+      <FilterBar
+        filters={{
+          search: '',
+          status: 'all',
+          grade: 'all',
+          sort: 'created_desc',
+          pageSize: 25,
+        }}
+        onChange={onChange}
+        showing={10}
+        total={24}
+      />,
+    )
+
+    const toggle = screen.getByRole('button', { name: /toggle filters and sort/i })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
   })
 })

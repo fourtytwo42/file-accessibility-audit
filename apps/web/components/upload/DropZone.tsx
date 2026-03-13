@@ -32,7 +32,7 @@ export function DropZone({ onFilesSelected }: { onFilesSelected: (files: File[])
         setDragging(false)
         commit(event.dataTransfer.files)
       }}
-      className="rounded-[2rem] border-2 border-dashed p-6 transition-all"
+      className="rounded-[1.2rem] border-2 border-dashed p-4 transition-all md:rounded-[2rem] md:p-6"
       style={{
         borderColor: dragging ? 'var(--accent)' : 'var(--border)',
         background: dragging ? 'color-mix(in srgb, var(--accent) 10%, var(--surface))' : 'var(--surface)',
@@ -49,12 +49,12 @@ export function DropZone({ onFilesSelected }: { onFilesSelected: (files: File[])
       />
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">Drop PDFs here</h2>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          <h2 className="text-base font-semibold md:text-lg">Drop PDFs here</h2>
+          <p className="text-xs md:text-sm" style={{ color: 'var(--text-muted)' }}>
             Multi-file uploads stay non-blocking and appear in the queue immediately.
           </p>
         </div>
-        <div className="rounded-full px-4 py-2 text-sm font-medium" style={{ background: 'var(--surface-muted)' }}>
+        <div className="rounded-full px-3 py-1.5 text-xs font-medium md:px-4 md:py-2 md:text-sm" style={{ background: 'var(--surface-muted)' }}>
           Browse files
         </div>
       </div>

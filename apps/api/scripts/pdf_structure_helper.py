@@ -1,4 +1,5 @@
 import argparse
+import io
 import json
 import os
 import re
@@ -1076,13 +1077,16 @@ def build_cidset_bytes(cids):
     return bytes(bitset)
 
 
-def truetype_num_glyphs(font_stream):
-    if not isinstance(font_stream, pikepdf.Stream):
+def stream_bytes(stream):
+    if not isinstance(stream, pikepdf.Stream):
         return None
     try:
-        data = font_stream.read_bytes()
+        return stream.read_bytes()
     except Exception:
         return None
+
+
+def truetype_num_glyphs_from_data(data):
     if len(data) < 12:
         return None
     try:
@@ -1105,6 +1109,85 @@ def truetype_num_glyphs(font_stream):
                 return None
         offset += 16
     return None
+
+
+def truetype_num_glyphs(font_stream):
+    data = stream_bytes(font_stream)
+    if data is None:
+        return None
+    return truetype_num_glyphs_from_data(data)
+
+
+def glyph_ids_from_embedded_font(font_stream):
+    data = stream_bytes(font_stream)
+    if not data:
+        return None
+    if TTFont is not None:
+        try:
+            tt = TTFont(io.BytesIO(data), lazy=True)
+            glyph_ids = set(range(len(tt.getGlyphOrder() or [])))
+            tt.close()
+            if glyph_ids:
+                return glyph_ids
+        except Exception:
+            pass
+    num_glyphs = truetype_num_glyphs_from_data(data)
+    if not num_glyphs:
+        return None
+    return set(range(int(num_glyphs)))
+
+
+def cid_to_gid_map(descendant):
+    if not isinstance(descendant, pikepdf.Dictionary):
+        return None
+    cid_to_gid = descendant.get("/CIDToGIDMap")
+    if cid_to_gid is None:
+        return None
+    if str(cid_to_gid) == "/Identity":
+        return "/Identity"
+    data = stream_bytes(cid_to_gid)
+    if not data:
+        return None
+    mapping = {}
+    cid = 0
+    for index in range(0, len(data) - 1, 2):
+        gid = int.from_bytes(data[index:index + 2], "big")
+        if gid:
+            mapping[cid] = gid
+        cid += 1
+    return mapping
+
+
+def cid_system_info_label(descendant):
+    if not isinstance(descendant, pikepdf.Dictionary):
+        return None
+    info = descendant.get("/CIDSystemInfo")
+    if not isinstance(info, pikepdf.Dictionary):
+        return None
+    registry = str(info.get("/Registry") or "").strip("/")
+    ordering = str(info.get("/Ordering") or "").strip("/")
+    supplement = info.get("/Supplement")
+    if not registry and not ordering and supplement is None:
+        return None
+    suffix = f" supplement {supplement}" if supplement is not None else ""
+    return f"{registry}-{ordering}{suffix}".strip("-")
+
+
+def embedded_cids_for_font(font, descendant, font_program):
+    glyph_ids = glyph_ids_from_embedded_font(font_program)
+    if not glyph_ids:
+        return None, None
+    mapping = cid_to_gid_map(descendant)
+    if mapping == "/Identity":
+        return set(glyph_ids), "embedded subset data via /CIDToGIDMap /Identity"
+    if isinstance(mapping, dict) and mapping:
+        cids = {cid for cid, gid in mapping.items() if gid in glyph_ids}
+        if cids:
+            return cids, "embedded subset data via parsed /CIDToGIDMap"
+    system_info = cid_system_info_label(descendant)
+    if system_info and str(font.get("/Encoding")) == "/Identity-H":
+        return set(glyph_ids), f"embedded subset data via {system_info} identity encoding"
+    return None, None
 
 
 def text_strings_for_instruction(instruction):
@@ -2569,6 +2652,10 @@ def mutate_repair_cidset_consistency(pdf, mutation):
     changed = False
     used_cids_by_font = collect_used_cids_by_font(pdf)
     processed_refs = set()
+    inspected_fonts = 0
+    rewritten_fonts = 0
+    unchanged_fonts = 0
+    coverage_sources = []
 
     for page in pdf.pages:
         resources = page.obj.get("/Resources")
@@ -2595,6 +2682,7 @@ def mutate_repair_cidset_consistency(pdf, mutation):
             cidset = descriptor.get("/CIDSet")
             if cidset is None:
                 continue
+            inspected_fonts += 1
             font_program = descriptor.get("/FontFile2") or descriptor.get("/FontFile3") or descriptor.get("/FontFile")
             if not font_program:
                 warnings.append(f"Skipped CIDSet repair for {normalized_base_font_name(font.get('/BaseFont'))} because the font program is not embedded.")
@@ -2602,15 +2690,19 @@ def mutate_repair_cidset_consistency(pdf, mutation):
 
             used_cids = sorted(used_cids_by_font.get(font_ref, set()))
             descendant = descendant_font_for(font)
-            descendant_cid_to_gid = str(descendant.get("/CIDToGIDMap")) if isinstance(descendant, pikepdf.Dictionary) else ""
-            font_program_cids = []
-            num_glyphs = truetype_num_glyphs(font_program)
-            if num_glyphs and descendant_cid_to_gid == "/Identity":
-                font_program_cids = list(range(num_glyphs))
+            embedded_cids, coverage_source = embedded_cids_for_font(font, descendant, font_program)
+            if not embedded_cids:
+                warnings.append(
+                    f"Could not derive a trustworthy embedded CID universe for {normalized_base_font_name(font.get('/BaseFont'))}; left /CIDSet unchanged."
+                )
+                continue
+            coverage_sources.append(coverage_source)
 
-            target_cids = sorted(set(font_program_cids) | set(used_cids))
+            target_cids = sorted(set(embedded_cids) | set(used_cids))
             if not target_cids:
-                warnings.append(f"Could not derive used CID codes for {normalized_base_font_name(font.get('/BaseFont'))}; left /CIDSet unchanged.")
+                warnings.append(
+                    f"Derived no target CID coverage for {normalized_base_font_name(font.get('/BaseFont'))} even though an embedded font program was present; left /CIDSet unchanged."
+                )
                 continue
 
             next_cidset = build_cidset_bytes(target_cids)
@@ -2620,17 +2712,35 @@ def mutate_repair_cidset_consistency(pdf, mutation):
                 existing_bytes = None
 
             if existing_bytes == next_cidset:
+                unchanged_fonts += 1
                 continue
 
             descriptor["/CIDSet"] = pdf.make_stream(next_cidset)
             changed = True
+            rewritten_fonts += 1
             applied.append({
                 "ref": ref_string(descriptor),
                 "before": "/CIDSet",
                 "after": f"{len(target_cids)} CIDs",
-                "details": f"Regenerated /CIDSet for {normalized_base_font_name(font.get('/BaseFont'))} from {len(target_cids)} CIDs present in the embedded subset."
-                  + (f" Parsed {num_glyphs} glyphs from the embedded font program." if num_glyphs else ""),
+                "details": f"Regenerated /CIDSet for {normalized_base_font_name(font.get('/BaseFont'))} from {len(target_cids)} derived CIDs using {coverage_source}"
+                  + (" and used text content." if used_cids else "."),
             })
+
+    if inspected_fonts:
+        distinct_sources = sorted({source for source in coverage_sources if source})
+        coverage_summary = ", ".join(distinct_sources) if distinct_sources else "no trusted embedded CID coverage"
+        summary = f"Inspected {inspected_fonts} CID font(s) with /CIDSet streams and rewrote {rewritten_fonts} stream(s); coverage source: {coverage_summary}."
+        if rewritten_fonts:
+            applied.insert(0, {
+                "ref": "document",
+                "before": None,
+                "after": None,
+                "details": summary,
+            })
+        elif unchanged_fonts and not warnings:
+            warnings.insert(0, summary + f" {unchanged_fonts} trusted stream(s) already matched the derived CID coverage.")
+        elif not warnings:
+            warnings.insert(0, summary + " No trustworthy rewrite target was available.")
 
     return changed, applied, warnings
 

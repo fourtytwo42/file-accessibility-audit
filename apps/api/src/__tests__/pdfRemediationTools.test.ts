@@ -6,6 +6,7 @@ import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFString, Stand
 import { REMEDIATION } from '#config'
 import { analyzePDF } from '../services/pdfAnalyzer.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
+import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
 import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation } from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
@@ -477,6 +478,91 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(['applied', 'no_effect']).toContain(cidsetResult.action.outcome)
     expect(after.verapdf.failedChecks).toBeLessThanOrEqual(beforeFailedChecks)
   }, 120_000)
+
+  it('reports CIDSet inspection coverage and returns no_effect when a second pass finds nothing new to rewrite', async () => {
+    let buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
+    let analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+    let context = await inspectPdfForRemediation(buffer, analysis)
+
+    for (const tool_name of ['embed_missing_fonts_in_place', 'repair_font_unicode_maps', 'repair_cid_symbol_font_maps'] as const) {
+      const result = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name,
+          arguments: { target: 'document' },
+          rationale: `Prepare fonts with ${tool_name}.`,
+          confidence: 0.9,
+        },
+      })
+      buffer = result.buffer
+      analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+      context = await inspectPdfForRemediation(buffer, analysis)
+    }
+
+    const firstPass = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'repair_cidset_consistency',
+        arguments: { target: 'document' },
+        rationale: 'Repair embedded CIDSet streams to match the embedded subset.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(firstPass.action.details).toContain('Inspected')
+
+    const secondAnalysis = await analyzePDF(firstPass.buffer, '11drug seizures_1997-2007.pdf')
+    const secondContext = await inspectPdfForRemediation(firstPass.buffer, secondAnalysis)
+    const secondPass = await executeRemediationTool({
+      buffer: firstPass.buffer,
+      context: secondContext,
+      call: {
+        tool_name: 'repair_cidset_consistency',
+        arguments: { target: 'document' },
+        rationale: 'Confirm CIDSet streams already match the embedded subset.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(secondPass.action.outcome).toBe('no_effect')
+    expect(secondPass.action.details).toContain('Inspected')
+    expect(secondPass.action.details).toContain('rewrote 0 stream')
+  }, 120_000)
+
+  it('surfaces no_effect when CIDSet repair cannot derive a trustworthy embedded CID universe', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'cidset-noeffect.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis)
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
+      status: 'no_effect',
+      changedDocumentBytes: false,
+      appliedMutations: [],
+      warnings: ['Could not derive a trustworthy embedded CID universe for /ExampleCIDFont; left /CIDSet unchanged.'],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+    })
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'repair_cidset_consistency',
+        arguments: { target: 'document' },
+        rationale: 'Attempt CIDSet repair.',
+        confidence: 0.8,
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalled()
+    expect(result.action.outcome).toBe('no_effect')
+    expect(result.action.details).toContain('trustworthy embedded CID universe')
+    expect(result.action.changedDocumentBytes).toBe(false)
+  })
 
   it('creates heading tags in-place and improves heading score', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -1823,6 +1909,56 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(order).toContain('repair_cidset_consistency')
     expect(order.indexOf('repair_cidset_consistency')).toBeGreaterThan(order.indexOf('embed_missing_fonts_in_place'))
     expect(order.indexOf('repair_cidset_consistency')).toBeGreaterThan(order.indexOf('repair_font_unicode_maps'))
+  }, 60_000)
+
+  it('escalates persistent CIDSet failures into font substitution after a prior CIDSet repair attempt', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
+    const analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis)
+
+    const plan = await planRemediationActions({
+      filename: '11drug seizures_1997-2007.pdf',
+      analysis: {
+        ...analysis,
+        isScanned: false,
+        pageCount: 1,
+        verapdf: {
+          ...analysis.verapdf,
+          status: 'failed',
+          executionStatus: 'ok',
+          isCompliant: false,
+          failedChecks: 2,
+          failures: [
+            {
+              ruleId: 'cidset',
+              specification: null,
+              clause: null,
+              testNumber: null,
+              location: null,
+              message: 'A CIDSet entry in the Font descriptor does not correctly identify all glyphs present in the embedded font subset',
+              categoryIds: [],
+            },
+          ],
+          message: 'CIDSet issues remain after direct repair.',
+        },
+      },
+      context,
+      iteration: 3,
+      actions: [
+        makePlannerAction('embed_missing_fonts_in_place'),
+        makePlannerAction('repair_font_unicode_maps'),
+        makePlannerAction('repair_cidset_consistency', 'document', { outcome: 'no_effect' }),
+      ],
+      rejectedActions: [],
+    })
+
+    const order = plan.actions.map(action => action.tool_name)
+    expect(order).toContain('substitute_legacy_fonts_in_place')
+    expect(order.indexOf('substitute_legacy_fonts_in_place')).toBeGreaterThanOrEqual(0)
   }, 60_000)
 
   it('plans Type1 font Unicode recovery after generic font Unicode repair on annual-report style PDFs', async () => {

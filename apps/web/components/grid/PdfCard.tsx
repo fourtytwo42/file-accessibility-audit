@@ -45,7 +45,7 @@ export function PdfCard({
 
   const content = (
     <div
-      className="flex h-full flex-col gap-4 rounded-[1.75rem] border p-5 transition-transform hover:-translate-y-0.5"
+      className="flex h-full flex-col gap-3 rounded-[1.2rem] border p-4 transition-transform hover:-translate-y-0.5 md:rounded-[1.75rem] md:p-5"
       style={{
         borderColor: selected ? 'var(--accent)' : 'var(--border)',
         background: 'var(--surface)',
@@ -62,7 +62,7 @@ export function PdfCard({
             aria-label={`Select ${item.filename}`}
           />
           <div>
-            <h3 className="line-clamp-2 text-base font-semibold">{item.filename}</h3>
+            <h3 className="line-clamp-2 text-sm font-semibold md:text-base">{item.filename}</h3>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{formatDate(local ? new Date().toISOString() : item.updatedAt)}</p>
           </div>
         </label>
@@ -74,21 +74,21 @@ export function PdfCard({
       </div>
       <div className="space-y-2">
         <ProgressBar value={progress} />
-        <p className="line-clamp-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+        <p className="line-clamp-2 text-xs md:text-sm" style={{ color: 'var(--text-muted)' }}>
           Top issue: {topIssue}
         </p>
       </div>
-      <div className="mt-auto flex flex-wrap gap-2 text-sm">
+      <div className="mt-auto flex flex-wrap gap-2 text-xs md:text-sm">
         {!local ? (
           <>
-            <button type="button" className="rounded-full border px-3 py-1.5" style={{ borderColor: 'var(--border)' }} onClick={event => { event.preventDefault(); event.stopPropagation(); onDownload?.(item.id) }}>Download</button>
+            <button type="button" className="rounded-full border px-2.5 py-1 md:px-3 md:py-1.5" style={{ borderColor: 'var(--border)' }} onClick={event => { event.preventDefault(); event.stopPropagation(); onDownload?.(item.id) }}>Download</button>
             {item.canRetry ? (
-              <button type="button" className="rounded-full border px-3 py-1.5" style={{ borderColor: 'var(--border)' }} onClick={event => { event.preventDefault(); event.stopPropagation(); onRetry?.(item.id) }}>Retry</button>
+              <button type="button" className="rounded-full border px-2.5 py-1 md:px-3 md:py-1.5" style={{ borderColor: 'var(--border)' }} onClick={event => { event.preventDefault(); event.stopPropagation(); onRetry?.(item.id) }}>Retry</button>
             ) : null}
-            <button type="button" className="rounded-full border px-3 py-1.5" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={event => { event.preventDefault(); event.stopPropagation(); onDelete?.(item.id) }}>Delete</button>
+            <button type="button" className="rounded-full border px-2.5 py-1 md:px-3 md:py-1.5" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }} onClick={event => { event.preventDefault(); event.stopPropagation(); onDelete?.(item.id) }}>Delete</button>
           </>
         ) : (
-          <span className="rounded-full border px-3 py-1.5" style={{ borderColor: 'var(--border)' }}>Uploading</span>
+          <span className="rounded-full border px-2.5 py-1 md:px-3 md:py-1.5" style={{ borderColor: 'var(--border)' }}>Uploading</span>
         )}
       </div>
     </div>

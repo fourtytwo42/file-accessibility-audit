@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { QueueItem } from '@/lib/api'
-import { createSharedReport, deleteQueueItems, reanalyzeQueueItems, remediateQueueItems } from '@/lib/api'
+import { createSharedReport, deleteQueueItems, downloadQueueFile, reanalyzeQueueItems, remediateQueueItems } from '@/lib/api'
 
 function downloadObject(filename: string, content: string, type: string) {
   const blob = new Blob([content], { type })
@@ -34,8 +34,26 @@ export function DetailControls({ item, onRefresh }: { item: QueueItem; onRefresh
       <div className="mt-4 flex flex-col gap-2">
         <button type="button" disabled={busy} className="inline-flex w-full items-center justify-center rounded-full px-4 py-2 text-sm text-center text-white disabled:opacity-50" style={{ background: 'var(--accent-strong)' }} onClick={() => runAction(() => remediateQueueItems([item.id]))}>Run remediation</button>
         <button type="button" disabled={busy} className={`${actionClassName} disabled:opacity-50`} style={{ borderColor: 'var(--border)' }} onClick={() => runAction(() => reanalyzeQueueItems([item.id]))}>Re-analyze</button>
-        {item.canDownloadRebuilt ? <a className={actionClassName} style={{ borderColor: 'var(--border)' }} href={`/api/queue/items/${item.id}/download`}>Download remediated PDF</a> : null}
-        {item.canDownloadOriginal ? <a className={actionClassName} style={{ borderColor: 'var(--border)' }} href={`/api/queue/items/${item.id}/download-original`}>Download original PDF</a> : null}
+        {item.canDownloadRebuilt ? (
+          <button
+            type="button"
+            className={actionClassName}
+            style={{ borderColor: 'var(--border)' }}
+            onClick={() => downloadQueueFile(`/api/queue/items/${item.id}/download`, item.filename)}
+          >
+            Download remediated PDF
+          </button>
+        ) : null}
+        {item.canDownloadOriginal ? (
+          <button
+            type="button"
+            className={actionClassName}
+            style={{ borderColor: 'var(--border)' }}
+            onClick={() => downloadQueueFile(`/api/queue/items/${item.id}/download-original`, item.filename)}
+          >
+            Download original PDF
+          </button>
+        ) : null}
         <button type="button" className={actionClassName} style={{ borderColor: 'var(--border)' }} onClick={() => downloadObject(`${item.filename}.json`, JSON.stringify(item.result || {}, null, 2), 'application/json')}>Export JSON</button>
         <button type="button" className={actionClassName} style={{ borderColor: 'var(--border)' }} onClick={() => downloadObject(`${item.filename}.md`, `# ${item.filename}\n\nScore: ${item.overallScore ?? '-'}\nGrade: ${item.grade ?? '-'}\n\n${item.standardsDetail?.gradeBasis.summaryText || ''}`, 'text/markdown')}>Export Markdown</button>
         <button

@@ -126,7 +126,7 @@ const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
     key: 'pdfua.cidset_consistency',
     label: 'CIDSet consistency',
     pattern: /cidset stream|cidset entry in the font descriptor|fontdescriptor dictionary of an embedded cid font contains a cidset/i,
-    nativeToolFamilies: ['repair_cidset_consistency'],
+    nativeToolFamilies: ['repair_cidset_consistency', 'substitute_legacy_fonts_in_place', 'finalize_substituted_font_conformance'],
     categoryIds: ['text_extractability', 'pdf_ua_compliance'],
     classification: 'deterministic',
   },
