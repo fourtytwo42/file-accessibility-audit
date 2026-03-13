@@ -62,8 +62,8 @@ export interface HeadingCandidate {
   unsafeReason?: string
 }
 
-const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
-const UNSAFE_HEADING_TAGS = ['/Link', '/Sect', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
+const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
+const UNSAFE_HEADING_TAGS = ['/Link', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
 const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox'] as const
 const UNSAFE_FIGURE_TAGS = ['/TD', '/TH', '/TR', '/Table', '/TOCI', '/TOC', '/Link', '/L', '/LI'] as const
 const WINDOWS_FONT_CANDIDATES = [
@@ -103,7 +103,7 @@ function remapHeadingTarget(
 ): StructureBackendMutationResult['structuralNodes'][number] | null {
   const initial = structuralNodes[startIndex] || null
   if (!initial) return null
-  if (isSafeHeadingTag(initial.tag)) return initial
+  if (isSafeHeadingTag(initial.tag) && initial.tag !== '/Sect') return initial
   if (initial.tag === '/Sect' && initial.ref) {
     for (let index = startIndex + 1; index < structuralNodes.length; index++) {
       const candidate = structuralNodes[index]
@@ -124,7 +124,7 @@ function remapHeadingTarget(
     const previous = structuralNodes[startIndex - offset]
     if (previous && isSafeHeadingTag(previous.tag)) return previous
   }
-  return null
+  return initial.tag === '/Sect' ? initial : null
 }
 
 export const __test_remapHeadingTarget = remapHeadingTarget
@@ -204,6 +204,19 @@ export interface PdfRemediationContext {
   linkCandidates: LinkCandidate[]
 }
 
+export type RemediationInspectMode = 'light' | 'alt_text_deep'
+
+export interface RemediationInspectionCache {
+  qpdf?: QpdfResult
+  pdfjs?: PdfjsResult
+  pages?: RemediationPageFact[]
+}
+
+export interface RemediationInspectOptions {
+  inspectMode?: RemediationInspectMode
+  cache?: RemediationInspectionCache
+}
+
 function clamp(value: number, min = 0, max = 1): number {
   return Math.max(min, Math.min(max, value))
 }
@@ -281,6 +294,30 @@ function textNear(lines: RemediationPageFact['textLines'], index: number): strin
     .slice(index + 1, index + 3)
     .map(line => line.text)
     .filter(Boolean)
+}
+
+export function needsAltTextDeepInspection(analysis: AnalysisResult): boolean {
+  const altTextScore = analysis.categories.find(category => category.id === 'alt_text')?.score
+  if (typeof altTextScore === 'number' && altTextScore < 100) return true
+  if (analysis.verapdf?.status !== 'failed') return false
+  return analysis.verapdf.failures.some(failure =>
+    failure.categoryIds.includes('alt_text')
+    || /alternate text|figure|artifact|decorative image|non-text content/i.test(failure.message),
+  )
+}
+
+function normalizeHeadingLevels(levels: string[]): string[] {
+  let previous = 0
+  return levels.map((level, index) => {
+    const requested = /^H([1-6])$/i.test(level)
+      ? Number(level.slice(1))
+      : 2
+    const normalized = index === 0
+      ? 1
+      : Math.min(6, Math.max(1, Math.min(requested, previous + 1)))
+    previous = normalized
+    return `H${normalized}`
+  })
 }
 
 function buildHeadingCandidates(
@@ -433,7 +470,30 @@ function buildFigureCandidates(
       imageEvidence: 'strong' as const,
     }
   })
-  const explicitRefs = new Set(explicitFigures.map(candidate => candidate.targetRef).filter(Boolean))
+  const explicitImageStructNodes = (structure.imageStructNodes || []).map((node, index) => {
+    const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
+    const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
+    const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
+    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong')
+    return {
+      id: `figure:image-node:${index + 1}`,
+      pageNumber: page?.pageNumber || 1,
+      targetRef: node.ref,
+      bbox: page ? { x: 0, y: 0, width: 1, height: 1 } : null,
+      hasAlt: node.hasAlt,
+      altText: node.altText || null,
+      informativeHint: surroundingText.length > 0 ? 'informative' as const : 'unknown' as const,
+      surroundingText,
+      repairMode: classification.repairMode,
+      targetTag: classification.targetTag,
+      unsafeReason: classification.unsafeReason,
+      parentTagPath: classification.parentTagPath,
+      pageImageCount: page?.imageCount || 0,
+      textDensityHint,
+      imageEvidence: 'strong' as const,
+    }
+  })
+  const explicitRefs = new Set([...explicitFigures, ...explicitImageStructNodes].map(candidate => candidate.targetRef).filter(Boolean))
 
   const fallbackFigures = qpdf.images
     .map((image, index) => ({ image, index }))
@@ -470,8 +530,8 @@ function buildFigureCandidates(
       }
     })
 
-  if (explicitFigures.length || fallbackFigures.length) {
-    return [...explicitFigures, ...fallbackFigures]
+  if (explicitFigures.length || explicitImageStructNodes.length || fallbackFigures.length) {
+    return [...explicitFigures, ...explicitImageStructNodes, ...fallbackFigures]
   }
 
   return imagePages.map((page, index) => {
@@ -611,14 +671,8 @@ function buildTableCandidates(
   })
 }
 
-export async function inspectPdfForRemediation(buffer: Buffer, analysis: AnalysisResult): Promise<PdfRemediationContext> {
-  const [qpdf, pdfjs, structure, pdfjsLib] = await Promise.all([
-    analyzeWithQpdf(buffer),
-    analyzeWithPdfjs(buffer),
-    runPdfStructureBackend({ buffer, mutation: { operation: 'inspect' } }),
-    import('pdfjs-dist/legacy/build/pdf.mjs'),
-  ])
-
+async function buildRemediationPageFacts(buffer: Buffer): Promise<RemediationPageFact[]> {
+  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
   const doc = await pdfjsLib.getDocument({
     data: new Uint8Array(buffer),
     useSystemFonts: true,
@@ -670,6 +724,25 @@ export async function inspectPdfForRemediation(buffer: Buffer, analysis: Analysi
   } finally {
     await doc.destroy()
   }
+
+  return pages
+}
+
+export async function inspectPdfForRemediation(
+  buffer: Buffer,
+  analysis: AnalysisResult,
+  options: RemediationInspectOptions = {},
+): Promise<PdfRemediationContext> {
+  const inspectMode = options.inspectMode || (needsAltTextDeepInspection(analysis) ? 'alt_text_deep' : 'light')
+  const qpdfPromise = options.cache?.qpdf ? Promise.resolve(options.cache.qpdf) : analyzeWithQpdf(buffer)
+  const pdfjsPromise = options.cache?.pdfjs ? Promise.resolve(options.cache.pdfjs) : analyzeWithPdfjs(buffer)
+  const pagesPromise = options.cache?.pages ? Promise.resolve(options.cache.pages) : buildRemediationPageFacts(buffer)
+  const [qpdf, pdfjs, structure, pages] = await Promise.all([
+    qpdfPromise,
+    pdfjsPromise,
+    runPdfStructureBackend({ buffer, mutation: { operation: 'inspect', inspectMode } }),
+    pagesPromise,
+  ])
 
   const readingOrderCandidates = buildReadingOrderCandidates(structure)
 
@@ -1238,9 +1311,13 @@ export async function executeRemediationTool(input: {
                 text: line.text,
               }))
           })
-      const headings = headingCandidates.slice(0, 6).map((candidate, index) => ({
+      const selectedHeadingCandidates = headingCandidates.slice(0, 6)
+      const normalizedHeadingLevels = normalizeHeadingLevels(
+        selectedHeadingCandidates.map((candidate, index) => (candidate.pageNumber === 1 && index === 0) ? 'H1' : 'H2'),
+      )
+      const headings = selectedHeadingCandidates.map((candidate, index) => ({
         text: candidate.text,
-        level: (candidate.pageNumber === 1 && index === 0) ? 'H1' : 'H2',
+        level: normalizedHeadingLevels[index] || 'H2',
         pageNumber: candidate.pageNumber,
       }))
       const figures = context.figureCandidates.slice(0, Math.max(1, context.pages.filter(page => page.imageCount > 0).length)).map(candidate => ({

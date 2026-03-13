@@ -518,7 +518,10 @@ function isOpportunitySelectable(input: {
         || opportunity.derivedFromFailureModeKeys.includes('pdfua.type1_unicode')
     case 'repair_cidset_consistency':
       return attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
-        && attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+        && (
+          !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_font_unicode_maps')
+          || attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+        )
         && (
           !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_cid_symbol_font_maps')
           || attemptedOrPlanned('repair_cid_symbol_font_maps', actions, selectedActions)

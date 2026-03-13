@@ -531,7 +531,7 @@ export const BATCH_QUEUE = {
   /**
    * Maximum number of active processing jobs for a single browser client.
    */
-    MAX_PARALLEL_PER_CLIENT: 10,
+    MAX_PARALLEL_PER_CLIENT: 5,
 
   /**
    * Long-lived browser session duration in days.

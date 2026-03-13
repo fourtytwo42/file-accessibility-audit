@@ -31,6 +31,15 @@ vi.mock('../services/pdfAnalyzer.js', () => ({
 vi.mock('../services/pdfRemediationTools.js', () => ({
   inspectPdfForRemediation,
   executeRemediationTool,
+  needsAltTextDeepInspection: (analysis: any) => {
+    const altTextScore = analysis?.categories?.find((category: any) => category.id === 'alt_text')?.score
+    if (typeof altTextScore === 'number' && altTextScore < 100) return true
+    if (analysis?.verapdf?.status !== 'failed') return false
+    return (analysis?.verapdf?.failures || []).some((failure: any) =>
+      (failure?.categoryIds || []).includes('alt_text')
+      || /alternate text|figure|artifact|decorative image|non-text content/i.test(String(failure?.message || '')),
+    )
+  },
   mergeManualReviewFlags: (existing: any[], next: any[]) => [...existing, ...next],
   toAppliedChange: () => null,
   toSuggestedChange: () => null,
@@ -206,6 +215,223 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.finalResult.overallScore).toBe(90)
   })
 
+  it('uses light inspection for non-alt-text fixes and batches safe document-scoped actions before one refresh', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 4,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'batched.pdf',
+      pageCount: 4,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 72,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 2,
+        failures: [{ ruleId: 'meta', specification: null, clause: null, testNumber: null, location: null, message: 'Metadata issue', categoryIds: [] }],
+      }),
+      categories: [
+        { id: 'title_language', label: 'Document Title & Language', weight: 0.15, score: 50, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const lightContext = {
+      pdfjs: { title: 'Batched', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce(lightContext)
+      .mockResolvedValueOnce({
+        ...lightContext,
+        pdfjs: { title: 'Batched Fixed', lang: 'en' },
+      })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['title_language'],
+        actions: [
+          { tool_name: 'normalize_document_metadata', arguments: { title: 'Batched Fixed', language: 'en' }, rationale: 'Normalize metadata', confidence: 0.9 },
+          { tool_name: 'set_page_tabs', arguments: { target: 'document' }, rationale: 'Set tabs', confidence: 0.8 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-meta'),
+        action: {
+          tool: 'normalize_document_metadata',
+          target: 'document',
+          details: 'metadata normalized',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['title_language'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-tabs'),
+        action: {
+          tool: 'set_page_tabs',
+          target: 'document',
+          details: 'tabs normalized',
+          confidence: 0.8,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF.mockResolvedValue({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        { ...originalResult.categories[1] },
+      ],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'batched.pdf', originalResult)
+
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(2)
+    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light'])
+    expect(analyzePDF).toHaveBeenCalledTimes(1)
+    expect(result.finalResult.grade).toBe('A')
+    expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
+  })
+
+  it('requests deep inspection only when figure or alt-text work remains', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'alt-text.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 61,
+      grade: 'D',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 1,
+        failures: [{ ruleId: 'alt', specification: null, clause: null, testNumber: null, location: null, message: 'Alternate text missing', categoryIds: ['alt_text'] }],
+      }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const deepContext = {
+      pdfjs: { title: 'Alt Text', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [{ id: 'figure:1', targetRef: 'obj:1 0 R' }],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce(deepContext)
+      .mockResolvedValueOnce(deepContext)
+      .mockResolvedValueOnce(deepContext)
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['alt_text'],
+        actions: [
+          { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:1', altText: 'County logo' }, rationale: 'Add alt text', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('figure-fixed'),
+      action: {
+        tool: 'set_figure_alt_text',
+        target: 'page 1',
+        candidateId: 'figure:1',
+        details: 'alt text updated',
+        confidence: 0.9,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['alt_text'],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    analyzePDF.mockResolvedValue({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'alt-text.pdf', originalResult)
+
+    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['alt_text_deep', 'alt_text_deep'])
+    expect(result.finalResult.grade).toBe('A')
+  })
+
   it('keeps scanned documents on the patch path when no actions are available', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
@@ -345,6 +571,152 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.processingPath).toBe('agent_patch')
     expect(result.model.pathFallbacks).toEqual([])
     expect(result.finalResult.grade).toBe('F')
+  })
+
+  it('continues to a second deterministic iteration when CIDSet repair changes bytes but leaves substitution opportunities', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+
+    const originalResult: AnalysisResult = {
+      filename: 'cidset.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 90,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 2,
+        failures: [
+          {
+            ruleId: 'cidset',
+            specification: null,
+            clause: null,
+            testNumber: null,
+            location: null,
+            message: 'A CIDSet entry in the Font descriptor does not correctly identify all glyphs present in the embedded font subset',
+            categoryIds: [],
+          },
+        ],
+      }),
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.18, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.1, score: 85, grade: 'B', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const sameCidsetResult: AnalysisResult = {
+      ...originalResult,
+      executiveSummary: 'CIDSet issues remain after direct repair.',
+    }
+
+    const passedResult: AnalysisResult = {
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      executiveSummary: 'veraPDF passed PDF/UA validation.',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0] },
+        { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    }
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'CIDSet Report', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document', parentRef: null, orderIndex: 0 }] },
+    })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['pdf_ua_compliance'],
+        actions: [
+          { tool_name: 'repair_cidset_consistency', arguments: { target: 'document' }, rationale: 'Repair CIDSet.', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['pdf_ua_compliance'],
+        actions: [
+          { tool_name: 'substitute_legacy_fonts_in_place', arguments: { target: 'document' }, rationale: 'Escalate font repair.', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        done: true,
+        unresolvedIssues: [],
+        actions: [],
+      })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cidset'),
+        action: {
+          tool: 'repair_cidset_consistency',
+          target: 'document',
+          details: 'Regenerated /CIDSet but veraPDF failures remain.',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['text_extractability'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-substituted'),
+        action: {
+          tool: 'substitute_legacy_fonts_in_place',
+          target: 'document',
+          details: 'Substituted legacy CID font.',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: true,
+          changedDocumentBytes: true,
+          categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF
+      .mockResolvedValueOnce(sameCidsetResult)
+      .mockResolvedValueOnce(passedResult)
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'cidset.pdf', originalResult)
+
+    expect(planRemediationActions).toHaveBeenCalledTimes(2)
+    expect((result.model.actions || []).map(action => action.tool)).toEqual([
+      'repair_cidset_consistency',
+      'substitute_legacy_fonts_in_place',
+    ])
+    expect(result.finalResult.grade).toBe('A')
+    expect(result.finalResult.verapdf.status).toBe('passed')
   })
 
   it('exits before semantic AI when native remediation reaches A and veraPDF passes', async () => {

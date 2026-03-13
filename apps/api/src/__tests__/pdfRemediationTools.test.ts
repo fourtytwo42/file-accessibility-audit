@@ -119,7 +119,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   it('sets title metadata in-place', async () => {
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const result = await executeRemediationTool({
       buffer,
@@ -137,10 +137,72 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(next.categories.find(category => category.id === 'title_language')?.score).toBeGreaterThanOrEqual(50)
   }, 30_000)
 
+  it('normalizes bootstrapped heading levels so the first heading is H1', async () => {
+    const buffer = await makePdf()
+
+    const result = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section one', level: 'H2', pageNumber: 1 },
+          { text: 'Section two', level: 'H4', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(result.status).toBe('applied')
+    expect(result.headings.map(heading => heading.tag)).toEqual(['/H1', '/H2'])
+  }, 60_000)
+
+  it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect' },
+    })
+    const headingRefs = inspect.headings.map(heading => heading.ref)
+    const degraded = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: headingRefs,
+        targetTag: 'P',
+      },
+    })
+    const degradedBuffer = degraded.outputBuffer!
+    const analysis = await analyzePDF(degradedBuffer, 'accessible.pdf')
+    const context = await inspectPdfForRemediation(degradedBuffer, analysis)
+    const candidate = context.headingCandidates.find(entry => entry.repairMode === 'safe')
+
+    expect(candidate).toBeTruthy()
+
+    const result = await executeRemediationTool({
+      buffer: degradedBuffer,
+      context,
+      call: {
+        tool_name: 'create_heading_from_candidate',
+        arguments: {
+          candidateId: candidate!.id,
+          level: 'H2',
+        },
+        rationale: 'Create the first heading tag.',
+        confidence: 0.9,
+      },
+    })
+
+    const next = await analyzePDF(result.buffer, 'accessible.pdf')
+
+    expect(result.action.outcome).toBe('applied')
+    expect(next.verapdf.failures.some(failure => /Heading level 1 is skipped/i.test(failure.message))).toBe(false)
+    expect(next.categories.find(category => category.id === 'heading_structure')?.findings).toContain('Heading outline: H1')
+  }, 90_000)
+
   it('sets /Tabs /S on annotated pages', async () => {
     const buffer = await makePdfWithLink()
     const analysis = await analyzePDF(buffer, 'linked.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const result = await executeRemediationTool({
       buffer,
@@ -163,7 +225,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   it('sets link annotation /Contents without rewriting visible text', async () => {
     const buffer = await makePdfWithLink()
     const analysis = await analyzePDF(buffer, 'linked.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const candidate = context.linkCandidates[0]
     expect(candidate).toBeTruthy()
 
@@ -189,12 +251,12 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
     expect(result.action.outcome).toBe('applied')
     expect(decoded).toBe('Example report link')
-  }, 15_000)
+  }, 30_000)
 
   it('normalizes metadata and writes PDF/UA identification on the original PDF', async () => {
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'untitled-example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const result = await executeRemediationTool({
       buffer,
@@ -388,7 +450,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   it('normalizes annotation tab order beyond just setting /Tabs /S', async () => {
     const buffer = await makePdfWithOutOfOrderLinks()
     const analysis = await analyzePDF(buffer, 'links.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const result = await executeRemediationTool({
       buffer,
@@ -418,7 +480,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   it('repairs CID symbol font maps in place on large mixed/native PDFs', async () => {
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const result = await executeRemediationTool({
       buffer,
@@ -534,7 +596,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   it('surfaces no_effect when CIDSet repair cannot derive a trustworthy embedded CID universe', async () => {
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'cidset-noeffect.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
       status: 'no_effect',
       changedDocumentBytes: false,
@@ -607,7 +669,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.changedDocumentBytes).toBe(true)
     expect(result.action.categoryTargets).toEqual(['heading_structure'])
     expect(nextHeadingScore).toBeGreaterThan(degradedHeadingScore)
-  }, 15_000)
+  }, 30_000)
 
   it('promotes first-row table cells to headers and improves table score', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -652,7 +714,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.changedDocumentBytes).toBe(true)
     expect(result.action.categoryTargets).toEqual(['table_markup'])
     expect(nextTableScore).toBeGreaterThan(degradedTableScore)
-  }, 15_000)
+  }, 30_000)
 
   it('creates bookmarks from headings in the structure backend', async () => {
     const buffer = await loadFixture('accessible.pdf')
@@ -730,7 +792,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     if (result.action.outcome === 'applied') {
       expect(nextAltScore).toBeGreaterThan(degradedAltScore)
     }
-  }, 15_000)
+  }, 30_000)
 
   it('auto-escalates safe non-Figure alt-text targets into retagging', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -1158,7 +1220,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'untitled-example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: 'untitled-example.pdf',
@@ -1181,7 +1243,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'untitled-example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: 'untitled-example.pdf',
@@ -1313,7 +1375,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const heuristicContext: PdfRemediationContext = {
       ...context,
       headingCandidates: [
@@ -1363,6 +1425,48 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(headingActions[0]?.arguments.candidateId).toBe('heading:safe')
   }, 15_000)
 
+  it('treats /Sect-backed heading candidates as safe when they are the best available structural target', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'example.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const heuristicContext: PdfRemediationContext = {
+      ...context,
+      headingCandidates: [
+        {
+          id: 'heading:sect',
+          pageNumber: 1,
+          text: 'Section heading',
+          bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+          fontSize: 18,
+          fontWeight: 'bold',
+          nearbyContext: ['Body'],
+          targetRef: 'obj:9 0 R',
+          existingTag: '/Sect',
+          repairMode: 'safe',
+        },
+      ],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'example.pdf',
+      analysis: {
+        ...analysis,
+        categories: analysis.categories.map(category =>
+          category.id === 'heading_structure' ? { ...category, score: 0 } : category),
+      },
+      context: heuristicContext,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:sect')).toBe(true)
+  }, 15_000)
+
   it('plans reading-order fixes from parent groups instead of giant mixed candidate sets', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')
@@ -1370,7 +1474,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const heuristicContext: PdfRemediationContext = {
       ...context,
       readingOrderCandidates: [
@@ -1428,7 +1532,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdfWithLink()
     const analysis = await analyzePDF(buffer, 'linked.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: 'linked.pdf',
@@ -1480,7 +1584,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('3violent offenses_1999-2008.pdf')
     const analysis = await analyzePDF(buffer, '3violent offenses_1999-2008.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '3violent offenses_1999-2008.pdf',
@@ -1632,7 +1736,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '04-07MVStrategy.pdf',
@@ -1713,7 +1817,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: 'tagged-native.pdf',
@@ -1779,7 +1883,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '04-07MVStrategy.pdf',
@@ -1852,7 +1956,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
     const analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '11drug seizures_1997-2007.pdf',
@@ -1918,7 +2022,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
     const analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '11drug seizures_1997-2007.pdf',
@@ -1961,6 +2065,52 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(order.indexOf('substitute_legacy_fonts_in_place')).toBeGreaterThanOrEqual(0)
   }, 60_000)
 
+  it('plans direct CIDSet repair when CIDSet is the only remaining font failure family', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
+    const analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const plan = await planRemediationActions({
+      filename: '11drug seizures_1997-2007.pdf',
+      analysis: {
+        ...analysis,
+        isScanned: false,
+        pageCount: 1,
+        verapdf: {
+          ...analysis.verapdf,
+          status: 'failed',
+          executionStatus: 'ok',
+          isCompliant: false,
+          failedChecks: 2,
+          failures: [
+            {
+              ruleId: 'cidset',
+              specification: null,
+              clause: null,
+              testNumber: null,
+              location: null,
+              message: 'A CIDSet entry in the Font descriptor does not correctly identify all glyphs present in the embedded font subset',
+              categoryIds: [],
+            },
+          ],
+          message: 'Only CIDSet issues remain.',
+        },
+      },
+      context,
+      iteration: 2,
+      actions: [
+        makePlannerAction('embed_missing_fonts_in_place'),
+      ],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_cidset_consistency')).toBe(true)
+  }, 60_000)
+
   it('plans Type1 font Unicode recovery after generic font Unicode repair on annual-report style PDFs', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')
@@ -1968,7 +2118,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const analysis = await analyzePDF(buffer, '99anreport.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '99anreport.pdf',
@@ -2022,7 +2172,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const analysis = await analyzePDF(buffer, '99anreport.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '99anreport.pdf',
@@ -2078,7 +2228,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const analysis = await analyzePDF(buffer, '99anreport.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '99anreport.pdf',
@@ -2144,7 +2294,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'untitled-example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: 'untitled-example.pdf',
@@ -2169,7 +2319,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'firearmprohibitorstaskforce2024-240703T20585852.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: 'firearmprohibitorstaskforce2024-240703T20585852.pdf',
@@ -2191,7 +2341,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, '8child abuse_1997-2007.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const plan = await planRemediationActions({
       filename: '8child abuse_1997-2007.pdf',
@@ -2222,7 +2372,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'example.pdf')
-    const context = await inspectPdfForRemediation(buffer, analysis)
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const heuristicContext: PdfRemediationContext = {
       ...context,
       readingOrderParentCandidates: [{

@@ -49,6 +49,7 @@ export interface StructureBackendMutationRequest {
     | 'retag_as_figure_and_set_alt'
     | 'mark_figure_decorative'
     | 'reorder_structure_children'
+  inspectMode?: 'light' | 'alt_text_deep'
   targets?: string[]
   headingLevels?: string[]
   targetTag?: string
@@ -89,6 +90,7 @@ export interface StructureBackendMutationResult {
     pageNumberHints?: number[]
   }>
   figures: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[] }>
+  imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[] }>
   readingOrderNodes: Array<{ ref: string; tag: string; parentRef?: string | null; orderIndex: number }>
   readingOrderParents: Array<{
     parentRef: string
@@ -156,6 +158,7 @@ export async function runPdfStructureBackend(input: {
       structuralNodes: [],
       tables: [],
       figures: [],
+      imageStructNodes: [],
       readingOrderNodes: [],
       readingOrderParents: [],
     }

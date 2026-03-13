@@ -15,8 +15,12 @@ import {
   executeRemediationTool,
   inspectPdfForRemediation,
   mergeManualReviewFlags,
+  needsAltTextDeepInspection,
   toAppliedChange,
   toSuggestedChange,
+  type PdfRemediationContext,
+  type RemediationInspectMode,
+  type RemediationInspectionCache,
 } from './pdfRemediationTools.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
 import { planRemediationActions } from './remediationPlanService.js'
@@ -169,6 +173,10 @@ function unresolvedIssues(result: AnalysisResult): string[] {
     .map(category => category.label)
 }
 
+function hasRemainingDeterministicOpportunities(model: DocumentModel): boolean {
+  return (model.failureProfile?.toolOpportunities || []).some(opportunity => opportunity.status === 'auto_runnable')
+}
+
 function scoreForCategory(result: AnalysisResult, categoryId: string): number | null {
   const category = result.categories.find(entry => entry.id === categoryId)
   return typeof category?.score === 'number' ? category.score : null
@@ -237,6 +245,135 @@ function hasRemainingSemanticWork(result: AnalysisResult): boolean {
     const score = scoreForCategory(result, categoryId)
     return score !== null && score < 100
   })
+}
+
+type ContextRefreshPolicy = {
+  inspectMode: RemediationInspectMode
+  reuseQpdf: boolean
+  reusePdfjs: boolean
+  reusePages: boolean
+  batchSafe: boolean
+}
+
+const BATCH_SAFE_TOOLS = new Set([
+  'set_document_title',
+  'set_document_language',
+  'normalize_document_metadata',
+  'set_pdfua_identification',
+  'set_page_tabs',
+  'normalize_annotation_tab_order',
+  'set_link_annotation_contents',
+])
+
+const FIGURE_TOOLS = new Set([
+  'set_figure_alt_text',
+  'retag_as_figure_and_set_alt',
+  'mark_figure_decorative',
+  'repair_native_figure_semantics',
+  'artifact_nonsemantic_page_elements',
+])
+
+const HEADING_TOOLS = new Set([
+  'create_heading_tag',
+  'create_heading_from_candidate',
+  'retag_node',
+])
+
+const FONT_TOOLS = new Set([
+  'embed_missing_fonts_in_place',
+  'repair_font_unicode_maps',
+  'repair_type1_font_unicode_maps',
+  'repair_cid_symbol_font_maps',
+  'repair_cidset_consistency',
+  'substitute_legacy_fonts_in_place',
+  'finalize_substituted_font_conformance',
+])
+
+function veraPdfNeedsAltTextAttention(result: AnalysisResult): boolean {
+  return result.verapdf?.status === 'failed'
+    && result.verapdf.failures.some(failure =>
+      failure.categoryIds.includes('alt_text')
+      || /alternate text|figure|artifact|decorative image|non-text content/i.test(failure.message),
+    )
+}
+
+function inspectModeForResult(result: AnalysisResult): RemediationInspectMode {
+  return needsAltTextDeepInspection(result) || veraPdfNeedsAltTextAttention(result)
+    ? 'alt_text_deep'
+    : 'light'
+}
+
+function refreshPolicyForTool(tool: string, currentResult: AnalysisResult): ContextRefreshPolicy {
+  if (FIGURE_TOOLS.has(tool)) {
+    return {
+      inspectMode: 'alt_text_deep',
+      reuseQpdf: true,
+      reusePdfjs: true,
+      reusePages: true,
+      batchSafe: false,
+    }
+  }
+
+  if (HEADING_TOOLS.has(tool)) {
+    return {
+      inspectMode: 'light',
+      reuseQpdf: true,
+      reusePdfjs: true,
+      reusePages: true,
+      batchSafe: false,
+    }
+  }
+
+  if (FONT_TOOLS.has(tool)) {
+    return {
+      inspectMode: 'light',
+      reuseQpdf: true,
+      reusePdfjs: true,
+      reusePages: true,
+      batchSafe: false,
+    }
+  }
+
+  if (BATCH_SAFE_TOOLS.has(tool)) {
+    return {
+      inspectMode: 'light',
+      reuseQpdf: ['set_document_title', 'set_document_language', 'normalize_document_metadata', 'set_pdfua_identification'].includes(tool) ? false : true,
+      reusePdfjs: ['set_document_title', 'set_document_language', 'normalize_document_metadata', 'set_pdfua_identification'].includes(tool) ? false : true,
+      reusePages: true,
+      batchSafe: true,
+    }
+  }
+
+  return {
+    inspectMode: inspectModeForResult(currentResult),
+    reuseQpdf: false,
+    reusePdfjs: false,
+    reusePages: false,
+    batchSafe: false,
+  }
+}
+
+async function refreshInspectionContext(input: {
+  buffer: Buffer
+  analysis: AnalysisResult
+  previousContext: PdfRemediationContext | null
+  policy: ContextRefreshPolicy
+  cache: RemediationInspectionCache
+}): Promise<PdfRemediationContext> {
+  const nextCache: RemediationInspectionCache = {
+    qpdf: input.policy.reuseQpdf ? (input.previousContext?.qpdf || input.cache.qpdf) : undefined,
+    pdfjs: input.policy.reusePdfjs ? (input.previousContext?.pdfjs || input.cache.pdfjs) : undefined,
+    pages: input.policy.reusePages ? (input.previousContext?.pages || input.cache.pages) : undefined,
+  }
+
+  const context = await inspectPdfForRemediation(input.buffer, input.analysis, {
+    inspectMode: input.policy.inspectMode,
+    cache: nextCache,
+  })
+  input.cache.qpdf = context.qpdf
+  input.cache.pdfjs = context.pdfjs
+  input.cache.pages = context.pages
+  return context
 }
 
 function shouldRunSemanticStage(result: AnalysisResult, originalResult: AnalysisResult): boolean {
@@ -595,6 +732,7 @@ export async function remediatePdfWithAgent(
   let shouldStop = false
   let nativeTaggedSafeMode = false
   let latestContext: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null = null
+  const inspectionCache: RemediationInspectionCache = {}
 
   for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     if (options?.signal?.aborted) {
@@ -604,7 +742,13 @@ export async function remediatePdfWithAgent(
     }
 
     options?.onProgress?.({ stage: `Planning remediation iteration ${iteration}`, percent: 20 + ((iteration - 1) * 20) })
-    let context = await inspectPdfForRemediation(workingBuffer, currentResult)
+    let context = await inspectPdfForRemediation(workingBuffer, currentResult, {
+      inspectMode: inspectModeForResult(currentResult),
+      cache: inspectionCache,
+    })
+    inspectionCache.qpdf = context.qpdf
+    inspectionCache.pdfjs = context.pdfjs
+    inspectionCache.pages = context.pages
     latestContext = context
     const bootstrapPreviouslyAttempted = previousActionNames.some(name => name.startsWith('bootstrap_struct_tree:'))
     const iterationNativeTaggedSafeMode = isNativeTaggedSafeContext(context, currentResult) && !bootstrapPreviouslyAttempted
@@ -625,7 +769,8 @@ export async function remediatePdfWithAgent(
     let improvedTargetedCategories = false
     let improvedStandardsValidation = false
 
-    for (const call of plan.actions) {
+    for (let actionIndex = 0; actionIndex < plan.actions.length; actionIndex++) {
+      const call = plan.actions[actionIndex]
       if (options?.signal?.aborted) {
         const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
         error.aborted = true
@@ -633,6 +778,55 @@ export async function remediatePdfWithAgent(
       }
 
       options?.onProgress?.({ stage: `Applying PDF fixes (iteration ${iteration})`, percent: 25 + ((iteration - 1) * 20) })
+      const policy = refreshPolicyForTool(call.tool_name, currentResult)
+
+      if (!iterationNativeTaggedSafeMode && policy.batchSafe) {
+        const batchCalls = [call]
+        while (actionIndex + 1 < plan.actions.length && refreshPolicyForTool(plan.actions[actionIndex + 1].tool_name, currentResult).batchSafe) {
+          batchCalls.push(plan.actions[actionIndex + 1])
+          actionIndex++
+        }
+
+        let batchChangedDocument = false
+        for (const batchedCall of batchCalls) {
+          const outcome = await executeRemediationTool({
+            buffer: workingBuffer,
+            context,
+            call: batchedCall,
+          })
+          workingBuffer = outcome.buffer
+          batchChangedDocument = batchChangedDocument || (!!outcome.action.changedDocumentBytes && outcome.action.outcome !== 'rejected')
+          executedActions.push(outcome.action)
+          actions.push(outcome.action)
+          manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+        }
+
+        changedDocument = changedDocument || batchChangedDocument
+        if (batchChangedDocument) {
+          const batchPolicy = batchCalls.reduce<ContextRefreshPolicy>((current, candidate) => {
+            const nextPolicy = refreshPolicyForTool(candidate.tool_name, currentResult)
+            return {
+              inspectMode: current.inspectMode === 'alt_text_deep' || nextPolicy.inspectMode === 'alt_text_deep' ? 'alt_text_deep' : 'light',
+              reuseQpdf: current.reuseQpdf && nextPolicy.reuseQpdf,
+              reusePdfjs: current.reusePdfjs && nextPolicy.reusePdfjs,
+              reusePages: current.reusePages && nextPolicy.reusePages,
+              batchSafe: true,
+            }
+          }, policy)
+          context = await refreshInspectionContext({
+            buffer: workingBuffer,
+            analysis: currentResult,
+            previousContext: context,
+            policy: batchPolicy,
+            cache: inspectionCache,
+          })
+          latestContext = context
+          currentTitle = context.pdfjs.title || currentTitle
+          currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
+        }
+        continue
+      }
+
       const previousResultForAction = currentResult
       const previousBufferForAction = workingBuffer
       const outcome = await executeRemediationTool({
@@ -688,7 +882,13 @@ export async function remediatePdfWithAgent(
           workingBuffer = adoptedBuffer
           currentResult = adoptedResult
           changedDocument = changedDocument || (!!adoptedAction.changedDocumentBytes && adoptedAction.outcome !== 'rejected')
-          context = await inspectPdfForRemediation(workingBuffer, currentResult)
+          context = await refreshInspectionContext({
+            buffer: workingBuffer,
+            analysis: currentResult,
+            previousContext: context,
+            policy,
+            cache: inspectionCache,
+          })
           latestContext = context
           currentTitle = context.pdfjs.title || currentTitle
           currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
@@ -697,7 +897,13 @@ export async function remediatePdfWithAgent(
         workingBuffer = adoptedBuffer
         changedDocument = changedDocument || (!!adoptedAction.changedDocumentBytes && adoptedAction.outcome !== 'rejected')
         if (adoptedAction.changedDocumentBytes) {
-          context = await inspectPdfForRemediation(workingBuffer, currentResult)
+          context = await refreshInspectionContext({
+            buffer: workingBuffer,
+            analysis: currentResult,
+            previousContext: context,
+            policy,
+            cache: inspectionCache,
+          })
           latestContext = context
           currentTitle = context.pdfjs.title || currentTitle
           currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
@@ -784,13 +990,13 @@ export async function remediatePdfWithAgent(
 
     await options?.onCheckpoint?.(model)
 
-    if (changedDocument && !improvedTargetedCategories && !improvedStandardsValidation) {
-      shouldStop = true
-    }
-
     if (isFullyDone(currentResult)) {
       manualReviewFlags = model.manualReviewFlags
       break
+    }
+
+    if (changedDocument && !improvedTargetedCategories && !improvedStandardsValidation) {
+      shouldStop = !hasRemainingDeterministicOpportunities(model)
     }
 
     if (plan.done || !plan.actions.length || !changedDocument || shouldStop) {
@@ -799,27 +1005,50 @@ export async function remediatePdfWithAgent(
     }
   }
 
-  const semanticStage = await runSemanticEnrichmentStage({
-    buffer: workingBuffer,
-    filename,
-    result: currentResult,
-    context: latestContext || await inspectPdfForRemediation(workingBuffer, currentResult),
-    originalResult,
-    currentTitle,
-    currentLanguage,
-    previousActionNames,
-    signal: options?.signal,
-    onProgress: options?.onProgress,
-    rejectedActions,
-  })
-  if (!semanticStage.buffer.equals(workingBuffer)) {
-    workingBuffer = semanticStage.buffer
-  }
-  currentResult = semanticStage.result
-  actions.push(...semanticStage.actions)
-  manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, semanticStage.manualReviewFlags)
+  let semanticStageChangedDocument = false
+  if (shouldRunSemanticStage(currentResult, originalResult)) {
+    const semanticContext = inspectModeForResult(currentResult) === 'alt_text_deep'
+      ? await inspectPdfForRemediation(workingBuffer, currentResult, {
+        inspectMode: 'alt_text_deep',
+        cache: inspectionCache,
+      })
+      : latestContext || await inspectPdfForRemediation(workingBuffer, currentResult, {
+        inspectMode: 'light',
+        cache: inspectionCache,
+      })
+    latestContext = semanticContext
+    inspectionCache.qpdf = semanticContext.qpdf
+    inspectionCache.pdfjs = semanticContext.pdfjs
+    inspectionCache.pages = semanticContext.pages
 
-  const finalContext = latestContext || await inspectPdfForRemediation(workingBuffer, currentResult)
+    const semanticStage = await runSemanticEnrichmentStage({
+      buffer: workingBuffer,
+      filename,
+      result: currentResult,
+      context: semanticContext,
+      originalResult,
+      currentTitle,
+      currentLanguage,
+      previousActionNames,
+      signal: options?.signal,
+      onProgress: options?.onProgress,
+      rejectedActions,
+    })
+    semanticStageChangedDocument = !semanticStage.buffer.equals(workingBuffer)
+    if (semanticStageChangedDocument) {
+      workingBuffer = semanticStage.buffer
+    }
+    currentResult = semanticStage.result
+    actions.push(...semanticStage.actions)
+    manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, semanticStage.manualReviewFlags)
+  }
+
+  const finalContext = semanticStageChangedDocument || !latestContext
+    ? await inspectPdfForRemediation(workingBuffer, currentResult, {
+      inspectMode: inspectModeForResult(currentResult),
+      cache: inspectionCache,
+    })
+    : latestContext
   const finalProfileArtifacts = buildFailureProfileArtifacts({
     analysis: currentResult,
     context: finalContext,

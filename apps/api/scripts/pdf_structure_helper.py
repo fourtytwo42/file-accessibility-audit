@@ -17,7 +17,7 @@ except Exception:
     UV2AGL = {}
 
 
-HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
+HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Sect", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
 FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct"}
 SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
 UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link", "/L", "/LI"}
@@ -508,6 +508,52 @@ def top_level_heading_candidates(pdf):
     return [candidate for candidate in candidates if candidate["ref"]]
 
 
+def heading_level_number(tag):
+    value = str(tag or "").upper().replace("/", "")
+    if not re.fullmatch(r"H[1-6]", value):
+        return None
+    return int(value[1:])
+
+
+def normalize_heading_sequence(levels):
+    normalized = []
+    previous = None
+    for index, level in enumerate(levels):
+        numeric = heading_level_number(level)
+        if numeric is None:
+            numeric = 2
+        if index == 0:
+            numeric = 1
+        elif previous is not None and numeric > previous + 1:
+            numeric = previous + 1
+        numeric = min(6, max(1, numeric))
+        normalized.append(f"H{numeric}")
+        previous = numeric
+    return normalized
+
+
+def normalized_heading_level_for_target(pdf, target_obj, requested_level):
+    requested = heading_level_number(requested_level) or 2
+    requested = min(6, max(1, requested))
+    target_ref = ref_string(target_obj)
+    target_index = None
+    previous_heading_level = None
+
+    for index, obj in enumerate(iter_struct_elems(pdf)):
+        if ref_string(obj) == target_ref:
+            target_index = index
+            break
+        level = heading_level_number(obj.get("/S"))
+        if level is not None:
+            previous_heading_level = level
+
+    if target_index is None:
+        return f"/H{requested}"
+    if previous_heading_level is None:
+        return "/H1"
+    return f"/H{min(6, max(1, min(requested, previous_heading_level + 1)))}"
+
+
 def table_candidates(pdf):
     tables = []
     page_map = page_ref_map(pdf)
@@ -566,6 +612,83 @@ def figure_candidates(pdf):
     return [figure for figure in figures if figure["ref"]]
 
 
+def page_mcid_usage(page_obj):
+    usage = {}
+    try:
+        instructions = list(pikepdf.parse_content_stream(page_obj))
+    except Exception:
+        return usage
+
+    stack = []
+    for instruction in instructions:
+        operator = str(instruction.operator)
+        operands = list(instruction.operands)
+        if operator in MARKED_CONTENT_START_OPERATORS:
+            mcid = None
+            if len(operands) >= 2 and isinstance(operands[1], pikepdf.Dictionary):
+                try:
+                    raw_mcid = operands[1].get("/MCID")
+                    mcid = int(raw_mcid) if raw_mcid is not None else None
+                except Exception:
+                    mcid = None
+            stack.append(mcid)
+            if mcid is not None:
+                usage.setdefault(mcid, {"hasText": False, "hasGraphics": False})
+            continue
+        if operator == "EMC":
+            if stack:
+                stack.pop()
+            continue
+        active_mcids = [mcid for mcid in stack if mcid is not None]
+        if not active_mcids:
+            continue
+        has_text = operator in TEXT_SHOWING_OPERATORS
+        has_graphics = operator in {"Do", "re", "S", "s", "f", "F", "f*", "B", "B*", "b", "b*", "m", "l", "c", "v", "y", "h", "n"}
+        if not has_text and not has_graphics:
+            continue
+        for mcid in active_mcids:
+            entry = usage.setdefault(mcid, {"hasText": False, "hasGraphics": False})
+            if has_text:
+                entry["hasText"] = True
+            if has_graphics:
+                entry["hasGraphics"] = True
+    return usage
+
+
+def image_struct_candidates(pdf):
+    candidates = []
+    page_usage = {}
+    for obj in iter_struct_elems(pdf):
+        tag = str(obj.get("/S"))
+        if tag == "/Figure":
+            continue
+        mcids = []
+        collect_mcids(obj.get("/K"), mcids)
+        mcids = sorted(set(mcid for mcid in mcids if isinstance(mcid, int)))
+        if not mcids:
+            continue
+        page_obj = page_ref_for_struct_elem(obj)
+        page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
+        if not page_ref or not isinstance(page_obj, pikepdf.Dictionary):
+            continue
+        usage = page_usage.setdefault(page_ref, page_mcid_usage(page_obj))
+        has_graphics = any(usage.get(mcid, {}).get("hasGraphics") for mcid in mcids)
+        has_text = any(usage.get(mcid, {}).get("hasText") for mcid in mcids)
+        if not has_graphics or has_text:
+            continue
+        raw_alt = obj.get("/Alt")
+        alt_text = str(raw_alt).replace("u:", "") if raw_alt is not None else None
+        candidates.append({
+            "ref": ref_string(obj),
+            "tag": tag,
+            "hasAlt": bool(alt_text),
+            "altText": alt_text,
+            "parentTagPath": parent_tag_path(obj),
+            "mcids": mcids,
+        })
+    return [candidate for candidate in candidates if candidate["ref"]]
+
+
 def reading_order_nodes(pdf):
     root = get_struct_tree_root(pdf)
     if not isinstance(root, pikepdf.Dictionary):
@@ -622,7 +745,7 @@ def mutate_create_heading_tag(pdf, mutation):
     target_refs = requested_targets if requested_targets else [candidate["ref"] for candidate in candidates]
     requested_levels = mutation.get("headingLevels") or []
     default_levels = ["H1"] + ["H2"] * max(0, len(target_refs) - 1)
-    heading_levels = requested_levels if requested_levels else default_levels
+    heading_levels = normalize_heading_sequence(requested_levels if requested_levels else default_levels)
 
     applied = []
     for index, ref in enumerate(target_refs):
@@ -684,8 +807,12 @@ def mutate_bootstrap_struct_tree(pdf, mutation):
         "details": f"Created a new structure tree rooted at {ref_string(struct_root)}.",
     }]
 
-    for heading in headings:
-        level = f"/{str(heading.get('level') or 'H2').lstrip('/')}"
+    normalized_heading_levels = normalize_heading_sequence([
+        entry.get("level") or "H2"
+        for entry in headings
+    ])
+    for index, heading in enumerate(headings):
+        level = f"/{str(normalized_heading_levels[index] if index < len(normalized_heading_levels) else 'H2').lstrip('/')}"
         page_obj = page_obj_by_number(pdf, heading.get("pageNumber"))
         element = pdf.make_indirect(pikepdf.Dictionary({
             "/Type": pikepdf.Name("/StructElem"),
@@ -3232,7 +3359,7 @@ def mutate_create_heading_from_candidate(pdf, mutation):
     if before not in HEADING_COMPAT_TAGS:
         return False, [], [f"Target {target_ref} has tag {before} and is not safe to retag as a heading."]
     next_level = str(mutation.get("level") or "H2")
-    after = f"/{next_level.lstrip('/')}"
+    after = normalized_heading_level_for_target(pdf, obj, next_level)
     if before == after:
         return False, [], [f"Target {target_ref} is already tagged as {after}."]
     obj["/S"] = pikepdf.Name(after)
@@ -3519,12 +3646,14 @@ def mutate_reorder_structure_children(pdf, mutation):
     }], []
 
 
-def snapshot(pdf):
+def snapshot(pdf, inspect_mode="light"):
+    include_image_struct_nodes = inspect_mode == "alt_text_deep"
     return {
         "headings": top_level_heading_candidates(pdf),
         "structuralNodes": structural_nodes(pdf),
         "tables": table_candidates(pdf),
         "figures": figure_candidates(pdf),
+        "imageStructNodes": image_struct_candidates(pdf) if include_image_struct_nodes else [],
         "readingOrderNodes": reading_order_nodes(pdf),
         "readingOrderParents": reading_order_parents(pdf),
     }
@@ -3544,6 +3673,8 @@ def main():
     warnings = []
     changed = False
     applied = []
+
+    inspect_mode = str(request.get("inspectMode") or "light")
 
     if operation == "inspect":
         pass
@@ -3604,7 +3735,7 @@ def main():
     elif operation == "reorder_structure_children":
         changed, applied, warnings = mutate_reorder_structure_children(pdf, request)
     else:
-        snap = snapshot(pdf)
+        snap = snapshot(pdf, inspect_mode)
         print(json.dumps({
             "status": "unsupported",
             "changedDocumentBytes": False,
@@ -3617,7 +3748,7 @@ def main():
     if changed:
         pdf.save(args.output)
 
-    snap = snapshot(pdf)
+    snap = snapshot(pdf, inspect_mode)
     print(json.dumps({
         "status": "applied" if changed else "no_effect",
         "changedDocumentBytes": changed,
