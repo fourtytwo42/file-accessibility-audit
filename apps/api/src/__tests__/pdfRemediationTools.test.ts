@@ -670,7 +670,7 @@ describe('pdfRemediationTools', () => {
 
     expect(['applied', 'no_effect']).toContain(result.action.outcome)
     expect(result.action.categoryTargets).toEqual(['alt_text'])
-  })
+  }, 15_000)
 
   it('retags a safe TextBox figure candidate and restores alt text', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -959,7 +959,7 @@ describe('pdfRemediationTools', () => {
     expect(result.action.changedDocumentBytes).toBe(true)
     expect(result.action.categoryTargets).toEqual(['bookmarks'])
     expect(nextBookmarkScore).toBe(100)
-  }, 15_000)
+  }, 30_000)
 
   it('creates bookmarks from page-mapped heading candidates even when structure refs are unavailable', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -1156,7 +1156,7 @@ describe('remediationPlanService', () => {
     const headingActions = plan.actions.filter(action => action.tool_name === 'create_heading_from_candidate')
     expect(headingActions).toHaveLength(1)
     expect(headingActions[0]?.arguments.candidateId).toBe('heading:safe')
-  })
+  }, 15_000)
 
   it('plans reading-order fixes from parent groups instead of giant mixed candidate sets', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {

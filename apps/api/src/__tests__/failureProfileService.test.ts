@@ -1,0 +1,323 @@
+import { describe, expect, it } from 'vitest'
+import { buildFailureProfileArtifacts } from '../services/failureProfileService.js'
+import type { AnalysisResult } from '../services/pdfAnalyzer.js'
+import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
+import type { RemediationActionRecord } from '../services/documentModel.js'
+
+function makeAnalysisResult(overrides: Partial<AnalysisResult> = {}): AnalysisResult {
+  return {
+    filename: 'example.pdf',
+    pageCount: 12,
+    fileType: 'pdf',
+    pdfMetadata: {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 12,
+    },
+    routingSignals: { headingCount: 1, linkCount: 1, rawUrlLinkCount: 1, rawUrlLinkDensity: 1 },
+    overallScore: 72,
+    grade: 'C',
+    isScanned: false,
+    executiveSummary: '',
+    verapdf: {
+      status: 'failed',
+      executionStatus: 'ok',
+      profile: 'PDF/UA-1',
+      flavour: 'ua1',
+      isCompliant: false,
+      passedChecks: 10,
+      failedChecks: 3,
+      failures: [
+        {
+          ruleId: 'tabs',
+          specification: 'PDF/UA-1',
+          clause: null,
+          testNumber: null,
+          location: null,
+          message: 'The page dictionary shall contain the key Tabs with value S.',
+          categoryIds: ['reading_order'],
+        },
+        {
+          ruleId: 'link-contents',
+          specification: 'PDF/UA-1',
+          clause: null,
+          testNumber: null,
+          location: null,
+          message: 'Link annotations shall contain an alternate description via their Contents key.',
+          categoryIds: ['link_quality'],
+        },
+        {
+          ruleId: 'unknown',
+          specification: 'PDF/UA-1',
+          clause: null,
+          testNumber: null,
+          location: null,
+          message: 'Some unmatched PDF/UA failure',
+          categoryIds: [],
+        },
+      ],
+      message: 'veraPDF detected 3 PDF/UA compliance issues.',
+    },
+    categories: [
+      { id: 'title_language', label: 'Document Title & Language', weight: 0.135, score: 50, grade: 'F', severity: 'Moderate', findings: ['No document title found in metadata'], explanation: '', helpLinks: [] },
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.135, score: 60, grade: 'D', severity: 'Moderate', findings: ['Heading hierarchy skip'], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.135, score: 0, grade: 'F', severity: 'Critical', findings: ['Image missing alt text'], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.09, score: null, grade: null, severity: null, findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.045, score: 0, grade: 'F', severity: 'Critical', findings: ['Raw URL link'], explanation: '', helpLinks: [] },
+      { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 40, grade: 'F', severity: 'Critical', findings: ['Bad reading order'], explanation: '', helpLinks: [] },
+      { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.10, score: 70, grade: 'C', severity: 'Minor', findings: ['veraPDF detected issues'], explanation: '', helpLinks: [] },
+    ] as any,
+    warnings: [],
+    ...overrides,
+  }
+}
+
+function makeContext(overrides: Partial<PdfRemediationContext> = {}): PdfRemediationContext {
+  return {
+    analysis: makeAnalysisResult(),
+    qpdf: {
+      hasStructTree: true,
+      hasLang: true,
+      lang: 'en',
+      hasOutlines: false,
+      outlineCount: 0,
+      outlineTitles: [],
+      hasAcroForm: false,
+      formFields: [],
+      images: [],
+      headings: [],
+      tables: [],
+      structTreeDepth: 3,
+      contentOrder: [0, 1],
+      error: null,
+    },
+    pdfjs: {
+      pageCount: 12,
+      hasText: true,
+      textLength: 1000,
+      title: null,
+      author: null,
+      subject: null,
+      lang: 'en',
+      hasOutlines: false,
+      outlineCount: 0,
+      links: [],
+      imageCount: 1,
+      metadata: {
+        creator: null,
+        producer: null,
+        creationDate: null,
+        modDate: null,
+        pdfVersion: '1.7',
+        isEncrypted: false,
+        keywords: null,
+        author: null,
+        subject: null,
+        pageCount: 12,
+      },
+      error: null,
+    },
+    structure: { structuralNodes: [] } as any,
+    pages: [
+      {
+        pageNumber: 1,
+        width: 612,
+        height: 792,
+        imageCount: 1,
+        textLines: [],
+        links: [{ url: 'https://example.com', text: 'https://example.com', bbox: { x: 0, y: 0, width: 0.2, height: 0.03 }, annotationIndex: 0 }],
+      },
+    ],
+    headingCandidates: [
+      {
+        id: 'heading:1',
+        pageNumber: 1,
+        text: 'Executive Summary',
+        bbox: { x: 0, y: 0, width: 0.3, height: 0.05 },
+        fontSize: 18,
+        fontWeight: 'bold',
+        nearbyContext: [],
+        targetRef: 'obj:10 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      },
+      {
+        id: 'heading:2',
+        pageNumber: 1,
+        text: 'Unsafe Heading',
+        bbox: { x: 0, y: 0, width: 0.3, height: 0.05 },
+        fontSize: 18,
+        fontWeight: 'bold',
+        nearbyContext: [],
+        targetRef: null,
+        existingTag: '/Sect',
+        repairMode: 'defer',
+        unsafeReason: 'unsafe_ancestry: Heading candidate resolved to /Sect.',
+      },
+    ],
+    figureCandidates: [
+      {
+        id: 'figure:1',
+        pageNumber: 1,
+        targetRef: 'obj:20 0 R',
+        bbox: { x: 0, y: 0, width: 0.3, height: 0.3 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Chart summary'],
+        repairMode: 'retag_then_set_alt',
+        targetTag: '/P',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      },
+      {
+        id: 'figure:2',
+        pageNumber: 1,
+        targetRef: 'obj:21 0 R',
+        bbox: { x: 0, y: 0, width: 0.3, height: 0.3 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'unknown',
+        surroundingText: ['Dense table'],
+        repairMode: 'defer',
+        targetTag: '/TD',
+        unsafeReason: 'unsafe_ancestry: Target obj:21 0 R is associated with /TD.',
+        parentTagPath: ['/Table'],
+        pageImageCount: 1,
+        textDensityHint: 'high',
+        imageEvidence: 'strong',
+      },
+    ],
+    tableCandidates: [
+      {
+        id: 'table:1',
+        ref: 'obj:30 0 R',
+        pageNumberHints: [1],
+        firstRowCellRefs: ['obj:31 0 R'],
+        headerCellRefs: [],
+        hasHeaders: false,
+        repairMode: 'safe',
+        nearbyContext: ['Table 1'],
+      },
+      {
+        id: 'table:2',
+        ref: 'obj:32 0 R',
+        pageNumberHints: [1],
+        firstRowCellRefs: [],
+        headerCellRefs: [],
+        hasHeaders: false,
+        repairMode: 'defer',
+        nearbyContext: ['Complex table'],
+        unsafeReason: 'Complex merged cells require review.',
+      },
+    ],
+    readingOrderCandidates: [],
+    readingOrderParentCandidates: [
+      {
+        id: 'group:1',
+        parentRef: 'obj:40 0 R',
+        childCandidateIds: ['order:1', 'order:2'],
+        mutableKids: true,
+        mcidDisorderBefore: 2,
+        pageNumberHints: [1],
+        tagMix: ['/P'],
+        suggestedChildCandidateIds: ['order:1', 'order:2'],
+      },
+      {
+        id: 'group:2',
+        parentRef: 'obj:41 0 R',
+        childCandidateIds: ['order:3', 'order:4'],
+        mutableKids: false,
+        mcidDisorderBefore: 3,
+        pageNumberHints: [1],
+        tagMix: ['/P'],
+        suggestedChildCandidateIds: ['order:3', 'order:4'],
+      },
+    ],
+    linkCandidates: [
+      {
+        id: 'link:1',
+        pageNumber: 1,
+        url: 'https://example.com',
+        text: 'https://example.com',
+        bbox: { x: 0, y: 0, width: 0.2, height: 0.03 },
+        annotationIndex: 0,
+        annotationContents: null,
+        rawUrl: true,
+        suggestedText: 'Example resource',
+      },
+    ],
+    ...overrides,
+  } as PdfRemediationContext
+}
+
+function makeAction(overrides: Partial<RemediationActionRecord> = {}): RemediationActionRecord {
+  return {
+    tool: 'set_document_title',
+    target: 'document',
+    details: 'did a thing',
+    confidence: 0.8,
+    autoApplied: true,
+    changedVisibleContent: false,
+    outcome: 'applied',
+    ...overrides,
+  }
+}
+
+describe('failureProfileService', () => {
+  it('groups veraPDF failures into stable family keys and unmatched bucket', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext(),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.page_tabs')).toBe(true)
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.annotation_alt_contents')).toBe(true)
+    const unmatched = result.failureProfile.failureModes.find(mode => mode.key === 'pdfua.unmatched')
+    expect(unmatched?.blocking).toBe(true)
+    expect(unmatched?.classification).toBe('manual_only')
+  })
+
+  it('builds candidate opportunities with auto-runnable and blocked statuses', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext(),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'create_heading_from_candidate' && opportunity.status === 'auto_runnable')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'set_table_header_cells' && opportunity.status === 'blocked')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'retag_as_figure_and_set_alt' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
+  it('marks prior attempts, rejections, and no-effect actions on matching opportunities', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext(),
+      actions: [
+        makeAction({ tool: 'create_heading_from_candidate', target: 'page 1', candidateId: 'heading:1' }),
+        makeAction({ tool: 'set_link_annotation_contents', target: 'page 1', candidateId: 'link:1', outcome: 'no_effect' }),
+      ],
+      rejectedActions: [
+        makeAction({ tool: 'reorder_structure_children', target: 'document', candidateGroupId: 'group:1', outcome: 'rejected', autoApplied: false }),
+      ],
+    })
+
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'create_heading_from_candidate' && opportunity.candidateIds[0] === 'heading:1')?.status).toBe('already_attempted')
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'set_link_annotation_contents' && opportunity.candidateIds[0] === 'link:1')?.status).toBe('no_effect')
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'reorder_structure_children' && opportunity.candidateGroupIds[0] === 'group:1')?.status).toBe('rejected')
+    expect(result.plannerEvidence.rejectedKeys.some(key => key.includes('reorder_structure_children:group:1'))).toBe(true)
+  })
+})
