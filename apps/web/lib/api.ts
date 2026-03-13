@@ -194,6 +194,11 @@ function ensureClientId(): string {
   return next
 }
 
+function setStoredClientId(clientId: string): void {
+  if (typeof window === 'undefined' || !clientId) return
+  window.localStorage.setItem(CLIENT_ID_KEY, clientId)
+}
+
 export async function apiJson<T>(input: string, init?: RequestInit): Promise<T> {
   const response = await fetch(input, {
     credentials: 'include',
@@ -211,13 +216,26 @@ export async function apiJson<T>(input: string, init?: RequestInit): Promise<T> 
 }
 
 export async function ensureClientSession(): Promise<string> {
+  try {
+    const restored = await apiJson<{ clientId: string }>('/api/client/bootstrap', {
+      method: 'POST',
+      headers: {},
+      body: JSON.stringify({}),
+    })
+    if (restored.clientId) {
+      setStoredClientId(restored.clientId)
+      return restored.clientId
+    }
+  } catch {}
+
   const clientId = ensureClientId()
-  await apiJson<{ clientId: string }>('/api/client/bootstrap', {
+  const session = await apiJson<{ clientId: string }>('/api/client/bootstrap', {
     method: 'POST',
     headers: { 'x-client-id': clientId },
     body: JSON.stringify({ clientId }),
   })
-  return clientId
+  setStoredClientId(session.clientId || clientId)
+  return session.clientId || clientId
 }
 
 function withClientHeaders(clientId: string, init?: RequestInit): RequestInit {

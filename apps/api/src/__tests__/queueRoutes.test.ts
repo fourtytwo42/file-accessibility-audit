@@ -32,6 +32,17 @@ async function bootstrap(clientId: string): Promise<{ cookie: string }> {
   return { cookie: cookie! }
 }
 
+async function bootstrapWithoutClientId(cookie?: string): Promise<Response> {
+  return fetch(`${baseUrl}/api/client/bootstrap`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(cookie ? { cookie } : {}),
+    },
+    body: JSON.stringify({}),
+  })
+}
+
 function authHeaders(clientId: string, cookie: string): Record<string, string> {
   return {
     'x-client-id': clientId,
@@ -146,6 +157,46 @@ describe('queue routes', () => {
       complete: 1,
     })
     expect(typeof body.generatedAt).toBe('string')
+  })
+
+  it('restores the existing client session when bootstrap is called without a clientId', async () => {
+    const clientId = randomClientId('restore1')
+    createClient(clientId)
+    createQueueItem({
+      clientId,
+      filename: 'restored.pdf',
+      md5: '0'.repeat(32),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const restoreResponse = await bootstrapWithoutClientId(cookie)
+
+    expect(restoreResponse.status).toBe(200)
+    const restoreBody = await restoreResponse.json()
+    expect(restoreBody.clientId).toBe(clientId)
+    expect(restoreBody.restored).toBe(true)
+
+    const statusResponse = await fetch(`${baseUrl}/api/queue/status`, {
+      headers: authHeaders(clientId, cookie),
+    })
+
+    expect(statusResponse.status).toBe(200)
+    const statusBody = await statusResponse.json()
+    expect(statusBody.items).toHaveLength(1)
+    expect(statusBody.items[0].filename).toBe('restored.pdf')
+  })
+
+  it('creates a new client session when bootstrap is called without a clientId and no cookie', async () => {
+    const response = await bootstrapWithoutClientId()
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(typeof body.clientId).toBe('string')
+    expect(body.clientId).toMatch(/^[a-f0-9-]{20,}$/i)
+    expect(body.restored).toBe(false)
+    expect(response.headers.get('set-cookie')).toBeTruthy()
   })
 
   it('returns original and rebuilt versions with download URLs', async () => {

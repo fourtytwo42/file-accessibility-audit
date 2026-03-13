@@ -45,5 +45,6 @@ export function useQueueStatus(filters: QueueFilters, page: number) {
     visibleItems,
     total: filtered.length,
     counts: swr.data?.counts,
+    loadError: swr.error instanceof Error ? swr.error.message : null,
   }
 }

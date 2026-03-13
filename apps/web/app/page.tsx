@@ -32,7 +32,7 @@ export default function QueuePage() {
   const [filters, setFilters] = useState<QueueFilters>(DEFAULT_FILTERS)
   const [page, setPage] = useState(1)
   const [busy, setBusy] = useState(false)
-  const { data, visibleItems, total, mutate } = useQueueStatus(filters, page)
+  const { data, visibleItems, total, mutate, loadError } = useQueueStatus(filters, page)
   const { uploads, enqueue } = useUploadQueue(() => mutate())
   const selection = useSelection()
 
@@ -97,6 +97,15 @@ export default function QueuePage() {
         </div>
       </div>
 
+      {loadError ? (
+        <section
+          className="rounded-[1rem] border px-4 py-3 text-sm"
+          style={{ borderColor: 'var(--danger)', background: 'color-mix(in srgb, var(--danger) 10%, var(--surface))', color: 'var(--text)' }}
+        >
+          Failed to load your PDF queue. {loadError}
+        </section>
+      ) : null}
+
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {cards.map(item => (
           <PdfCard
@@ -111,7 +120,7 @@ export default function QueuePage() {
         ))}
       </section>
 
-      {!cards.length ? (
+      {!cards.length && !loadError ? (
         <section className="rounded-[1.2rem] border p-8 text-center md:rounded-[1.75rem] md:p-10" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
           <p className="text-base font-medium md:text-lg">Drop PDFs here to get started.</p>
         </section>

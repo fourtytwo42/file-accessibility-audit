@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
+import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import { BATCH_QUEUE } from '#config'
 import {
@@ -24,6 +25,12 @@ interface ClientSessionPayload {
   clientId: string
   sid: string
   exp: number
+}
+
+interface ResolvedSession {
+  clientId: string
+  sessionId: string
+  expiresAt: string
 }
 
 function readClientId(req: Request): string | null {
@@ -53,11 +60,70 @@ function setClientSessionCookie(res: Response, clientId: string, sessionId: stri
   })
 }
 
+function resolveSessionFromCookie(req: Request, res?: Response): ResolvedSession | null {
+  const token = req.cookies?.[CLIENT_SESSION_COOKIE]
+  if (!token) return null
+
+  try {
+    const payload = jwt.verify(token, CLIENT_SESSION_SECRET, { algorithms: ['HS256'] }) as ClientSessionPayload
+    const session = getBrowserSession(payload.sid)
+    if (!session || session.client_id !== payload.clientId || new Date(session.expires_at).getTime() <= Date.now()) {
+      return null
+    }
+
+    const renewThresholdMs = BATCH_QUEUE.AUTO_RENEW_THRESHOLD_DAYS * 24 * 60 * 60 * 1000
+    let nextExpiry = session.expires_at
+    if (new Date(session.expires_at).getTime() - Date.now() < renewThresholdMs) {
+      nextExpiry = sessionExpiryIso()
+      touchBrowserSession(session.id, nextExpiry)
+      if (res) setClientSessionCookie(res, payload.clientId, session.id, nextExpiry)
+    } else {
+      touchBrowserSession(session.id)
+    }
+
+    touchClient(payload.clientId)
+    return {
+      clientId: payload.clientId,
+      sessionId: session.id,
+      expiresAt: nextExpiry,
+    }
+  } catch {
+    return null
+  }
+}
+
 export function bootstrapClientSession(req: ClientSessionRequest, res: Response): void {
   deleteExpiredSessions()
-  const clientId = readClientId(req)
+  const existingSession = resolveSessionFromCookie(req, res)
+  const requestedClientId = readClientId(req)
+  const clientId = requestedClientId || existingSession?.clientId
+
+  if (existingSession && (!requestedClientId || requestedClientId === existingSession.clientId)) {
+    req.clientId = existingSession.clientId
+    req.clientSessionId = existingSession.sessionId
+    res.json({
+      clientId: existingSession.clientId,
+      expiresAt: existingSession.expiresAt,
+      renewedAt: nowIso(),
+      restored: true,
+    })
+    return
+  }
+
   if (!clientId) {
-    res.status(400).json({ error: 'Valid clientId is required' })
+    const generatedClientId = crypto.randomUUID()
+    createClient(generatedClientId)
+    const session = createBrowserSession(generatedClientId)
+    setClientSessionCookie(res, generatedClientId, session.id, session.expiresAt)
+
+    req.clientId = generatedClientId
+    req.clientSessionId = session.id
+    res.json({
+      clientId: generatedClientId,
+      expiresAt: session.expiresAt,
+      renewedAt: nowIso(),
+      restored: false,
+    })
     return
   }
 
@@ -71,47 +137,30 @@ export function bootstrapClientSession(req: ClientSessionRequest, res: Response)
     clientId,
     expiresAt: session.expiresAt,
     renewedAt: nowIso(),
+    restored: false,
   })
 }
 
 export function requireClientSession(req: ClientSessionRequest, res: Response, next: NextFunction): void {
   deleteExpiredSessions()
   const clientId = readClientId(req)
-  const token = req.cookies?.[CLIENT_SESSION_COOKIE]
-
-  if (!clientId || !token) {
+  if (!clientId) {
     res.status(401).json({ error: 'Client session required' })
     return
   }
 
-  try {
-    const payload = jwt.verify(token, CLIENT_SESSION_SECRET, { algorithms: ['HS256'] }) as ClientSessionPayload
-    if (payload.clientId !== clientId) {
-      res.status(401).json({ error: 'Client session mismatch' })
-      return
-    }
-
-    const session = getBrowserSession(payload.sid)
-    if (!session || session.client_id !== clientId || new Date(session.expires_at).getTime() <= Date.now()) {
-      res.status(401).json({ error: 'Client session expired' })
-      return
-    }
-
-    const renewThresholdMs = BATCH_QUEUE.AUTO_RENEW_THRESHOLD_DAYS * 24 * 60 * 60 * 1000
-    let nextExpiry = session.expires_at
-    if (new Date(session.expires_at).getTime() - Date.now() < renewThresholdMs) {
-      nextExpiry = sessionExpiryIso()
-      touchBrowserSession(session.id, nextExpiry)
-      setClientSessionCookie(res, clientId, session.id, nextExpiry)
-    } else {
-      touchBrowserSession(session.id)
-    }
-
-    touchClient(clientId)
-    req.clientId = clientId
-    req.clientSessionId = session.id
-    next()
-  } catch {
+  const session = resolveSessionFromCookie(req, res)
+  if (!session) {
     res.status(401).json({ error: 'Client session expired' })
+    return
   }
+
+  if (session.clientId !== clientId) {
+    res.status(401).json({ error: 'Client session mismatch' })
+    return
+  }
+
+  req.clientId = clientId
+  req.clientSessionId = session.sessionId
+  next()
 }
