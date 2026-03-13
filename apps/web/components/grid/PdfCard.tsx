@@ -35,9 +35,13 @@ export function PdfCard({
       || item.processingStage
       || item.error?.error
       || 'No major issue summary yet'
-  const progress = local ? item.progress : item.state === 'processing' || item.state === 'uploading' || item.state === 'queued'
-    ? Math.max(item.uploadProgress, item.processingProgress)
-    : 100
+  const progress = local
+    ? item.progress
+    : item.state === 'uploading'
+      ? item.uploadProgress
+      : item.state === 'queued' || item.state === 'processing'
+        ? item.processingProgress
+        : 100
 
   const content = (
     <div

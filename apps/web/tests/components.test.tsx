@@ -72,6 +72,55 @@ describe('PdfCard', () => {
     expect(screen.getByText('Top issue: Page tab order metadata')).toBeInTheDocument()
     expect(screen.getByText('91/100')).toBeInTheDocument()
   })
+
+  it('uses processing progress instead of completed upload progress while processing', () => {
+    render(
+      <PdfCard
+        item={{
+          id: '2',
+          clientId: 'c1',
+          filename: 'processing.pdf',
+          md5: 'b'.repeat(32),
+          sizeBytes: 100,
+          mimeType: 'application/pdf',
+          state: 'processing',
+          uploadProgress: 100,
+          processingProgress: 38,
+          processingStage: 'Analyzing original PDF',
+          processingPath: 'agent_patch',
+          pathFallbacks: [],
+          reconstructionStatus: 'processing',
+          documentModelStatus: 'processing',
+          pageCount: null,
+          overallScore: null,
+          grade: null,
+          originalScore: null,
+          originalGrade: null,
+          rebuiltScore: null,
+          rebuiltGrade: null,
+          standardsSummary: null,
+          error: null,
+          reconstructionError: null,
+          createdAt: '2026-03-13T00:00:00.000Z',
+          updatedAt: '2026-03-13T00:00:30.000Z',
+          uploadStartedAt: null,
+          uploadCompletedAt: null,
+          processingStartedAt: null,
+          completedAt: null,
+          expiresAt: '2026-04-13T00:00:00.000Z',
+          canRetry: false,
+          canCancel: false,
+          canDownloadOriginal: false,
+          canDownloadRebuilt: false,
+        }}
+        selected={false}
+        onToggle={() => {}}
+      />,
+    )
+
+    const progressFill = document.querySelector('[style*="width: 38%"]')
+    expect(progressFill).toBeTruthy()
+  })
 })
 
 describe('GradePanel', () => {

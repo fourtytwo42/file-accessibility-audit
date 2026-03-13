@@ -16,8 +16,8 @@ function applyFilters(items: QueueItemSummary[], filters: QueueFilters): QueueIt
 
   return filtered.sort((a, b) => {
     switch (filters.sort) {
-      case 'updated_asc':
-        return a.updatedAt.localeCompare(b.updatedAt)
+      case 'created_asc':
+        return a.createdAt.localeCompare(b.createdAt)
       case 'score_desc':
         return (b.overallScore ?? -1) - (a.overallScore ?? -1)
       case 'score_asc':
@@ -27,7 +27,7 @@ function applyFilters(items: QueueItemSummary[], filters: QueueFilters): QueueIt
       case 'name_desc':
         return b.filename.localeCompare(a.filename)
       default:
-        return b.updatedAt.localeCompare(a.updatedAt)
+        return b.createdAt.localeCompare(a.createdAt)
     }
   })
 }

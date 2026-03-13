@@ -15,7 +15,7 @@ const DEFAULT_FILTERS: QueueFilters = {
   search: '',
   status: 'all',
   grade: 'all',
-  sort: 'updated_desc',
+  sort: 'created_desc',
   pageSize: 25,
 }
 

@@ -4,7 +4,7 @@ export interface QueueFilters {
   search: string
   status: 'all' | 'complete' | 'processing' | 'failed'
   grade: 'all' | 'A' | 'B' | 'C' | 'D' | 'F'
-  sort: 'updated_desc' | 'updated_asc' | 'score_desc' | 'score_asc' | 'name_asc' | 'name_desc'
+  sort: 'created_desc' | 'created_asc' | 'score_desc' | 'score_asc' | 'name_asc' | 'name_desc'
   pageSize: 25 | 50 | 100
 }
 
@@ -59,8 +59,8 @@ export function FilterBar({
           className="rounded-xl border px-3 py-2"
           style={{ borderColor: 'var(--border)', background: 'var(--surface-muted)' }}
         >
-          <option value="updated_desc">Date newest</option>
-          <option value="updated_asc">Date oldest</option>
+          <option value="created_desc">Last uploaded</option>
+          <option value="created_asc">Oldest uploaded</option>
           <option value="score_desc">Score high-low</option>
           <option value="score_asc">Score low-high</option>
           <option value="name_asc">Name A-Z</option>
