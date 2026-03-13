@@ -3,11 +3,13 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFString, StandardFonts } from 'pdf-lib'
+import { REMEDIATION } from '#config'
 import { analyzePDF } from '../services/pdfAnalyzer.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
 import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation } from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
+import type { RemediationActionRecord, RemediationToolName } from '../services/documentModel.js'
 import { planRemediationActions } from '../services/remediationPlanService.js'
 
 const FIXTURES_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
@@ -79,6 +81,23 @@ async function loadFixture(name: string): Promise<Buffer> {
 
 async function loadDownloadFixture(name: string): Promise<Buffer> {
   return fs.promises.readFile(path.join(DOWNLOADS_DIR, name))
+}
+
+function makePlannerAction(
+  tool: RemediationToolName,
+  target = 'document',
+  overrides: Partial<RemediationActionRecord> = {},
+): RemediationActionRecord {
+  return {
+    tool,
+    target,
+    details: 'Previously attempted in planner tests.',
+    confidence: 0.8,
+    autoApplied: true,
+    changedVisibleContent: false,
+    outcome: 'applied',
+    ...overrides,
+  }
 }
 
 afterEach(() => {
@@ -1060,11 +1079,109 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       analysis,
       context,
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'set_document_title')).toBe(true)
     expect(plan.actions.some(action => action.tool_name === 'set_document_language')).toBe(true)
+  })
+
+  it('does not call planner-side AI by default when deterministic routing can act', async () => {
+    const fetchSpy = vi.fn(async () => {
+      throw new Error('planner fetch should not be called')
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'untitled-example.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis)
+
+    const plan = await planRemediationActions({
+      filename: 'untitled-example.pdf',
+      analysis,
+      context,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'set_document_title')).toBe(true)
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it('uses planner-side AI only when fallback flag is enabled and deterministic routing returns no actions', async () => {
+    const original = REMEDIATION.ENABLE_PLANNER_AI_FALLBACK
+    ;(REMEDIATION as { ENABLE_PLANNER_AI_FALLBACK: boolean }).ENABLE_PLANNER_AI_FALLBACK = true
+
+    try {
+      vi.stubGlobal('fetch', vi.fn(async () => ({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'plan_pdf_remediation',
+                  arguments: JSON.stringify({
+                    done: false,
+                    unresolvedIssues: ['form_accessibility'],
+                    actions: [{
+                      tool_name: 'set_form_field_tooltip',
+                      arguments: { target: 'unlabeled form fields' },
+                      rationale: 'Fallback planner selected form tooltip repair.',
+                      confidence: 0.7,
+                    }],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      } as Response)))
+
+      const buffer = await makePdf()
+      const analysis = await analyzePDF(buffer, 'forms.pdf')
+      const context = await inspectPdfForRemediation(buffer, analysis)
+
+      const plan = await planRemediationActions({
+        filename: 'forms.pdf',
+        analysis: {
+          ...analysis,
+          verapdf: {
+            ...analysis.verapdf,
+            status: 'passed',
+            executionStatus: 'ok',
+            isCompliant: true,
+            failedChecks: 0,
+            failures: [],
+          },
+          categories: analysis.categories.map(category => {
+            if (category.id === 'form_accessibility') {
+              return { ...category, score: 20, grade: 'F', severity: 'Critical' }
+            }
+            return typeof category.score === 'number'
+              ? { ...category, score: 100, grade: 'A', severity: 'Pass' }
+              : category
+          }),
+        },
+        context,
+        iteration: 1,
+        actions: [],
+        rejectedActions: [],
+      })
+
+      expect(plan.actions).toEqual([
+        {
+          tool_name: 'set_form_field_tooltip',
+          arguments: { target: 'unlabeled form fields' },
+          rationale: 'Fallback planner selected form tooltip repair.',
+          confidence: 0.7,
+        },
+      ])
+    } finally {
+      ;(REMEDIATION as { ENABLE_PLANNER_AI_FALLBACK: boolean }).ENABLE_PLANNER_AI_FALLBACK = original
+    }
   })
 
   it('returns candidate-specific heading actions in heuristic mode', async () => {
@@ -1095,7 +1212,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       analysis,
       context,
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate')).toBe(true)
@@ -1150,7 +1268,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context: heuristicContext,
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     const headingActions = plan.actions.filter(action => action.tool_name === 'create_heading_from_candidate')
@@ -1208,7 +1327,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context: heuristicContext,
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     const readingAction = plan.actions.find(action => action.tool_name === 'reorder_structure_children')
@@ -1259,7 +1379,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context,
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'set_page_tabs')).toBe(true)
@@ -1334,7 +1455,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
         },
       },
       iteration: 2,
-      previousActions: ['bootstrap_struct_tree:document'],
+      actions: [makePlannerAction('bootstrap_struct_tree')],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'set_pdfua_identification')).toBe(true)
@@ -1487,7 +1609,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
         },
       },
       iteration: 2,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'set_pdfua_identification')).toBe(true)
@@ -1552,7 +1675,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
         },
       },
       iteration: 2,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'repair_note_tag_ids')).toBe(true)
@@ -1626,7 +1750,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context,
       iteration: 3,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'normalize_annotation_tab_order')).toBe(true)
@@ -1688,7 +1813,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context,
       iteration: 2,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     const order = plan.actions.map(action => action.tool_name)
@@ -1744,7 +1870,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context,
       iteration: 2,
-      previousActions: ['repair_font_unicode_maps:document'],
+      actions: [makePlannerAction('repair_font_unicode_maps')],
+      rejectedActions: [],
     })
 
     const order = plan.actions.map(action => action.tool_name)
@@ -1798,7 +1925,11 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context,
       iteration: 2,
-      previousActions: ['embed_missing_fonts_in_place:document', 'repair_type1_font_unicode_maps:document'],
+      actions: [
+        makePlannerAction('embed_missing_fonts_in_place'),
+        makePlannerAction('repair_type1_font_unicode_maps'),
+      ],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'substitute_legacy_fonts_in_place')).toBe(true)
@@ -1859,11 +1990,12 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context,
       iteration: 3,
-      previousActions: [
-        'embed_missing_fonts_in_place:document',
-        'repair_type1_font_unicode_maps:document',
-        'substitute_legacy_fonts_in_place:document',
+      actions: [
+        makePlannerAction('embed_missing_fonts_in_place'),
+        makePlannerAction('repair_type1_font_unicode_maps'),
+        makePlannerAction('substitute_legacy_fonts_in_place'),
       ],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'finalize_substituted_font_conformance')).toBe(true)
@@ -1883,7 +2015,11 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       analysis,
       context,
       iteration: 2,
-      previousActions: ['set_document_title:document', 'set_document_language:document'],
+      actions: [
+        makePlannerAction('set_document_title'),
+        makePlannerAction('set_document_language'),
+      ],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'set_document_title')).toBe(false)
@@ -1904,7 +2040,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       analysis,
       context,
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     const titleAction = plan.actions.find(action => action.tool_name === 'set_document_title')
@@ -1935,7 +2072,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
         },
       },
       iteration: 1,
-      previousActions: [],
+      actions: [],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'set_document_title')).toBe(true)
@@ -1976,7 +2114,8 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
       },
       context: heuristicContext,
       iteration: 2,
-      previousActions: ['reorder_structure_children:order-parent:blocked'],
+      actions: [makePlannerAction('reorder_structure_children', 'document', { candidateGroupId: 'order-parent:blocked' })],
+      rejectedActions: [],
     })
 
     expect(plan.actions.some(action => action.tool_name === 'reorder_structure_children')).toBe(false)

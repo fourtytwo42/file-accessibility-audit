@@ -23,10 +23,37 @@ function makeRow(): QueueItemRecord {
     processing_path: 'agent_patch',
     path_fallbacks_json: '["fallback"]',
     hidden: 0,
-    result_json: '{"score":97}',
-    original_result_json: '{"score":58}',
+    result_json: JSON.stringify({
+      overallScore: 97,
+      grade: 'A',
+      executiveSummary: 'veraPDF passed and no material standards issues remain.',
+      verapdf: {
+        status: 'passed',
+        failedChecks: 0,
+        profile: 'PDF/UA-1',
+        flavour: 'UA',
+        topFailures: [],
+      },
+    }),
+    original_result_json: JSON.stringify({
+      overallScore: 58,
+      grade: 'F',
+      verapdf: {
+        status: 'failed',
+        failedChecks: 12,
+        failures: [{ message: 'Original standards failure' }],
+      },
+    }),
     remediated_result_json: null,
-    rebuilt_result_json: '{"score":97}',
+    rebuilt_result_json: JSON.stringify({
+      overallScore: 97,
+      grade: 'A',
+      verapdf: {
+        status: 'passed',
+        failedChecks: 0,
+        topFailures: [],
+      },
+    }),
     error_json: null,
     remediation_status: 'completed',
     document_model_status: 'completed',
@@ -72,6 +99,9 @@ describe('queueStore serialization', () => {
     const item = serializeQueueItemSummary(makeRow())
 
     expect(item.filename).toBe('example.pdf')
+    expect(item.standardsSummary?.gradeBasis.currentScore).toBe(97)
+    expect(item.standardsSummary?.veraPdf.status).toBe('passed')
+    expect(item.standardsSummary?.failureOverview.topFailureModes).toEqual([])
     expect(existsSpy).not.toHaveBeenCalled()
     expect(readSpy).not.toHaveBeenCalled()
   })
@@ -89,23 +119,63 @@ describe('queueStore serialization', () => {
         analysisScore: 97,
         veraPdfStatus: 'passed',
         veraPdfFailedChecks: 0,
-        failureModes: [],
+        failureModes: [{
+          key: 'pdfua.page_tabs',
+          label: 'Page tab order metadata',
+          source: 'verapdf',
+          count: 2,
+          categoryIds: ['reading_order'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: ['set_page_tabs'],
+          evidence: ['Tabs shall be set to /S'],
+        }],
         toolOpportunities: [],
         summary: {
-          deterministicIssueCount: 0,
+          deterministicIssueCount: 1,
           semanticIssueCount: 0,
           manualOnlyIssueCount: 0,
-          blockedOpportunityCount: 0,
-          autoRunnableOpportunityCount: 0,
+          blockedOpportunityCount: 1,
+          autoRunnableOpportunityCount: 2,
         },
       },
       plannerEvidence: {
-        topFailureModeKeys: [],
-        topAutoRunnableOpportunityKeys: [],
-        skippedReasonCounts: [],
-        attemptedKeys: [],
+        topFailureModeKeys: ['pdfua.page_tabs'],
+        topAutoRunnableOpportunityKeys: ['set_page_tabs:document'],
+        skippedReasonCounts: [{ reason: 'blocked', count: 1 }],
+        attemptedKeys: ['normalize_document_metadata:document'],
         rejectedKeys: [],
         noEffectKeys: [],
+      },
+      finalAudit: {
+        overallScore: 97,
+        grade: 'A',
+        unresolvedIssues: [],
+        veraPdf: {
+          status: 'passed',
+          profile: 'PDF/UA-1',
+          flavour: 'UA',
+          failedChecks: 0,
+          passedChecks: 42,
+          topFailures: [],
+        },
+      },
+      originalVeraPdf: {
+        status: 'failed',
+        profile: 'PDF/UA-1',
+        flavour: 'UA',
+        failedChecks: 12,
+        passedChecks: 30,
+        topFailures: ['Original standards failure'],
+      },
+      remediatedVeraPdf: {
+        status: 'passed',
+        profile: 'PDF/UA-1',
+        flavour: 'UA',
+        failedChecks: 0,
+        passedChecks: 42,
+        topFailures: [],
       },
       aiAppliedChanges: [],
       aiSuggestedChanges: [],
@@ -117,6 +187,38 @@ describe('queueStore serialization', () => {
 
     expect(item.documentModel?.sourceType).toBe('native-text')
     expect(item.documentModel?.failureProfile?.version).toBe('1')
+    expect(item.standardsDetail?.failureModes[0]?.key).toBe('pdfua.page_tabs')
+    expect(item.standardsDetail?.plannerEvidence?.topFailureModeKeys).toEqual(['pdfua.page_tabs'])
+    expect(item.standardsDetail?.remediationSummary.autoRunnableOpportunityCount).toBe(2)
+    expect(item.standardsDetail?.veraPdf.original.status).toBe('failed')
+    expect(item.standardsDetail?.gradeBasis.summaryText).toContain('veraPDF passed')
     expect(item.pathFallbacks).toEqual(['fallback'])
+  })
+
+  it('falls back gracefully when the document model is missing', () => {
+    vi.spyOn(fs, 'existsSync').mockReturnValue(false)
+
+    const row = makeRow()
+    row.grade = 'B'
+    row.overall_score = 99
+    row.result_json = JSON.stringify({
+      overallScore: 99,
+      grade: 'B',
+      verapdf: {
+        status: 'failed',
+        failedChecks: 1,
+        profile: 'PDF/UA-1',
+        flavour: 'UA',
+        failures: [{ message: 'Tabs shall be set to /S' }],
+      },
+    })
+
+    const item = serializeQueueItemDetail(row)
+
+    expect(item.documentModel).toBeNull()
+    expect(item.standardsDetail?.veraPdf.current.status).toBe('failed')
+    expect(item.standardsDetail?.gradeBasis.scoreCappedByStandards).toBe(true)
+    expect(item.standardsDetail?.failureModes).toEqual([])
+    expect(item.standardsDetail?.plannerEvidence).toBeNull()
   })
 })

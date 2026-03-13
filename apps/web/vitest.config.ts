@@ -1,10 +1,17 @@
 import { defineConfig } from 'vitest/config'
-import vue from '@vitejs/plugin-vue'
+import react from '@vitejs/plugin-react'
+import path from 'node:path'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname),
+    },
+  },
   test: {
-    environment: 'happy-dom',
-    include: ['app/__tests__/**/*.test.ts'],
+    environment: 'jsdom',
+    setupFiles: ['./tests/setupTests.ts'],
+    include: ['tests/**/*.test.ts', 'tests/**/*.test.tsx'],
   },
 })

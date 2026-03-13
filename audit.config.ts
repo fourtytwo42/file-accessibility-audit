@@ -357,6 +357,20 @@ export const ANALYSIS = {
 } as const
 
 // ---------------------------------------------------------------------------
+// REMEDIATION
+// ---------------------------------------------------------------------------
+// Runtime toggles for the native remediation pipeline.
+//
+// SAFE TO CHANGE:
+// - ENABLE_PLANNER_AI_FALLBACK: Yes. Default false keeps planning fully
+//   deterministic. Enable only for debugging or emergency fallback behavior.
+// ---------------------------------------------------------------------------
+
+export const REMEDIATION = {
+  ENABLE_PLANNER_AI_FALLBACK: false,
+} as const
+
+// ---------------------------------------------------------------------------
 // AUTHENTICATION
 // ---------------------------------------------------------------------------
 // Controls for the OTP-based auth system. These values are also referenced

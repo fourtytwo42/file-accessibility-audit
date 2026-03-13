@@ -616,7 +616,8 @@ export async function remediatePdfWithAgent(
       analysis: currentResult,
       context,
       iteration,
-      previousActions: previousActionNames,
+      actions,
+      rejectedActions,
     })
 
     const executedActions: RemediationActionRecord[] = []

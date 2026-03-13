@@ -9,8 +9,11 @@ import type {
   ConfidenceSummary,
   DocumentModel,
   DocumentModelStatus,
+  FailureMode,
   ModelReviewFlag,
+  PlannerEvidenceSummary,
   SuggestedChange,
+  VeraPdfSummary,
 } from './documentModel.js'
 
 export type QueueItemState =
@@ -105,6 +108,7 @@ export interface QueueItem {
   result: any | null
   originalResult: any | null
   rebuiltResult: any | null
+  standardsDetail?: QueueItemStandardsDetail | null
   originalScore: number | null
   originalGrade: string | null
   rebuiltScore: number | null
@@ -151,6 +155,7 @@ export interface QueueItemSummary {
   originalGrade: string | null
   rebuiltScore: number | null
   rebuiltGrade: string | null
+  standardsSummary?: QueueItemStandardsSummary | null
   error: any | null
   reconstructionError: any | null
   createdAt: string
@@ -165,6 +170,91 @@ export interface QueueItemSummary {
   canDownloadOriginal: boolean
   canDownloadRebuilt: boolean
 }
+
+export interface QueueFailureModeSummary {
+  key: string
+  label: string
+  count: number
+  classification: 'deterministic' | 'semantic' | 'manual_only'
+  blocking: boolean
+}
+
+export interface QueueGradeBasisSummary {
+  currentGrade: string | null
+  currentScore: number | null
+  gradeReducedByStandards: boolean
+  scoreCappedByStandards: boolean
+}
+
+export interface QueueVeraPdfCompactSummary {
+  status: VeraPdfSummary['status'] | null
+  failedChecks: number | null
+}
+
+export interface QueuePlannerOverview {
+  autoRunnableOpportunityCount: number
+  blockedOpportunityCount: number
+  deterministicIssueCount: number
+  semanticIssueCount: number
+  manualOnlyIssueCount: number
+}
+
+export interface QueueItemStandardsSummary {
+  gradeBasis: QueueGradeBasisSummary
+  veraPdf: QueueVeraPdfCompactSummary
+  failureOverview: {
+    topFailureModes: QueueFailureModeSummary[]
+  }
+  plannerOverview: QueuePlannerOverview
+}
+
+export interface QueueVeraPdfDetailSummary {
+  status: VeraPdfSummary['status'] | null
+  failedChecks: number | null
+  profile: string | null
+  flavour: string | null
+  topFailures: string[]
+}
+
+export interface QueueItemStandardsDetail {
+  gradeBasis: {
+    currentScore: number | null
+    currentGrade: string | null
+    originalScore: number | null
+    originalGrade: string | null
+    rebuiltScore: number | null
+    rebuiltGrade: string | null
+    gradeReducedByStandards: boolean
+    scoreCappedByStandards: boolean
+    summaryText: string
+  }
+  veraPdf: {
+    current: QueueVeraPdfDetailSummary
+    original: QueueVeraPdfDetailSummary
+    rebuilt: QueueVeraPdfDetailSummary
+  }
+  failureModes: FailureMode[]
+  plannerEvidence: PlannerEvidenceSummary | null
+  remediationSummary: QueuePlannerOverview & {
+    manualReviewRequired: boolean
+  }
+}
+
+export interface QueueItemVersion {
+  key: 'original' | 'rebuilt' | 'current'
+  label: string
+  createdAt: string | null
+  score: number | null
+  grade: string | null
+  veraPdfStatus: VeraPdfSummary['status'] | null
+  veraPdfFailedChecks: number | null
+  downloadUrl: string | null
+  kind: 'input' | 'output'
+}
+
+export const INTERNAL_QUEUE_MARKERS = {
+  REANALYZE_ONLY: '__reanalyze_only__',
+} as const
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url))
 const projectRoot = path.resolve(moduleDir, '..', '..')
@@ -199,6 +289,206 @@ function readDocumentModel(modelPath: string | null | undefined): DocumentModel 
     return JSON.parse(fs.readFileSync(modelPath, 'utf8')) as DocumentModel
   } catch {
     return null
+  }
+}
+
+function parseResult(rowValue: string | null | undefined): any | null {
+  return parseJson<any | null>(rowValue, null)
+}
+
+function parsePublicPathFallbacks(rowValue: string | null | undefined): string[] {
+  return parseJson<string[]>(rowValue, []).filter(value => !Object.values(INTERNAL_QUEUE_MARKERS).includes(value as any))
+}
+
+function extractVeraPdfSummary(candidate: any): QueueVeraPdfDetailSummary {
+  const verapdf = candidate?.verapdf
+  if (!verapdf || typeof verapdf !== 'object') {
+    return {
+      status: null,
+      failedChecks: null,
+      profile: null,
+      flavour: null,
+      topFailures: [],
+    }
+  }
+
+  const topFailures = Array.isArray(verapdf.topFailures)
+    ? verapdf.topFailures.filter((entry: unknown): entry is string => typeof entry === 'string')
+    : Array.isArray(verapdf.failures)
+      ? verapdf.failures
+        .map((failure: any) => typeof failure?.message === 'string' ? failure.message : null)
+        .filter((entry: string | null): entry is string => !!entry)
+        .slice(0, 5)
+      : []
+
+  return {
+    status: typeof verapdf.status === 'string' ? verapdf.status as VeraPdfSummary['status'] : null,
+    failedChecks: typeof verapdf.failedChecks === 'number' ? verapdf.failedChecks : null,
+    profile: typeof verapdf.profile === 'string' ? verapdf.profile : null,
+    flavour: typeof verapdf.flavour === 'string' ? verapdf.flavour : null,
+    topFailures,
+  }
+}
+
+function detailSummaryFromModel(candidate: VeraPdfSummary | null | undefined): QueueVeraPdfDetailSummary {
+  if (!candidate) {
+    return {
+      status: null,
+      failedChecks: null,
+      profile: null,
+      flavour: null,
+      topFailures: [],
+    }
+  }
+
+  return {
+    status: candidate.status,
+    failedChecks: candidate.failedChecks,
+    profile: candidate.profile,
+    flavour: candidate.flavour,
+    topFailures: candidate.topFailures || [],
+  }
+}
+
+function compactFailureModes(failureModes: FailureMode[] | null | undefined, limit: number): QueueFailureModeSummary[] {
+  if (!failureModes?.length) return []
+  return [...failureModes]
+    .sort((a, b) => {
+      const blockingDiff = Number(b.blocking) - Number(a.blocking)
+      if (blockingDiff !== 0) return blockingDiff
+      const countDiff = b.count - a.count
+      if (countDiff !== 0) return countDiff
+      return a.label.localeCompare(b.label)
+    })
+    .slice(0, limit)
+    .map(mode => ({
+      key: mode.key,
+      label: mode.label,
+      count: mode.count,
+      classification: mode.classification,
+      blocking: mode.blocking,
+    }))
+}
+
+function gradeReducedByStandards(score: number | null, grade: string | null, verapdfStatus: VeraPdfSummary['status'] | null): boolean {
+  return typeof score === 'number'
+    && score >= 90
+    && grade !== 'A'
+    && !!verapdfStatus
+    && verapdfStatus !== 'passed'
+}
+
+function scoreCappedByStandards(score: number | null, verapdfStatus: VeraPdfSummary['status'] | null): boolean {
+  return score === 99 && !!verapdfStatus && verapdfStatus !== 'passed'
+}
+
+function plannerOverviewFromModel(documentModel: DocumentModel | null | undefined): QueuePlannerOverview {
+  const summary = documentModel?.failureProfile?.summary
+  return {
+    autoRunnableOpportunityCount: summary?.autoRunnableOpportunityCount ?? 0,
+    blockedOpportunityCount: summary?.blockedOpportunityCount ?? 0,
+    deterministicIssueCount: summary?.deterministicIssueCount ?? 0,
+    semanticIssueCount: summary?.semanticIssueCount ?? 0,
+    manualOnlyIssueCount: summary?.manualOnlyIssueCount ?? 0,
+  }
+}
+
+function synthesizeSummaryText(input: {
+  grade: string | null
+  score: number | null
+  verapdfStatus: VeraPdfSummary['status'] | null
+  topFailureMode: QueueFailureModeSummary | null
+}): string {
+  const parts: string[] = []
+  if (input.grade || typeof input.score === 'number') {
+    const scoreText = typeof input.score === 'number' ? `${input.score}/100` : 'unknown score'
+    const gradeText = input.grade ? `grade ${input.grade}` : 'no grade'
+    parts.push(`Current result is ${gradeText} at ${scoreText}.`)
+  }
+  if (input.verapdfStatus) {
+    parts.push(input.verapdfStatus === 'passed'
+      ? 'veraPDF passed.'
+      : `veraPDF status is ${input.verapdfStatus}.`)
+  }
+  if (input.topFailureMode) {
+    parts.push(`Top remaining issue: ${input.topFailureMode.label}.`)
+  }
+  return parts.join(' ').trim() || 'No standards summary is available yet.'
+}
+
+function buildStandardsSummary(row: QueueItemRecord): QueueItemStandardsSummary {
+  const result = parseResult(row.result_json)
+  const veraPdf = extractVeraPdfSummary(result)
+  return {
+    gradeBasis: {
+      currentGrade: row.grade,
+      currentScore: row.overall_score,
+      gradeReducedByStandards: gradeReducedByStandards(row.overall_score, row.grade, veraPdf.status),
+      scoreCappedByStandards: scoreCappedByStandards(row.overall_score, veraPdf.status),
+    },
+    veraPdf: {
+      status: veraPdf.status,
+      failedChecks: veraPdf.failedChecks,
+    },
+    failureOverview: {
+      topFailureModes: [],
+    },
+    plannerOverview: {
+      autoRunnableOpportunityCount: 0,
+      blockedOpportunityCount: 0,
+      deterministicIssueCount: 0,
+      semanticIssueCount: 0,
+      manualOnlyIssueCount: 0,
+    },
+  }
+}
+
+function buildStandardsDetail(row: QueueItemRecord, documentModel: DocumentModel | null): QueueItemStandardsDetail {
+  const currentResult = parseResult(row.result_json)
+  const originalResult = parseResult(row.original_result_json)
+  const rebuiltResult = parseResult(row.rebuilt_result_json || row.remediated_result_json)
+  const currentVeraPdf = documentModel?.finalAudit?.veraPdf
+    ? detailSummaryFromModel(documentModel.finalAudit.veraPdf)
+    : extractVeraPdfSummary(currentResult)
+  const originalVeraPdf = documentModel?.originalVeraPdf
+    ? detailSummaryFromModel(documentModel.originalVeraPdf)
+    : extractVeraPdfSummary(originalResult)
+  const rebuiltVeraPdf = documentModel?.remediatedVeraPdf
+    ? detailSummaryFromModel(documentModel.remediatedVeraPdf)
+    : extractVeraPdfSummary(rebuiltResult)
+  const topFailureModes = compactFailureModes(documentModel?.failureProfile?.failureModes, 1)
+  const overview = plannerOverviewFromModel(documentModel)
+
+  return {
+    gradeBasis: {
+      currentScore: row.overall_score,
+      currentGrade: row.grade,
+      originalScore: row.original_overall_score,
+      originalGrade: row.original_grade,
+      rebuiltScore: row.rebuilt_overall_score ?? row.remediated_overall_score,
+      rebuiltGrade: row.rebuilt_grade ?? row.remediated_grade,
+      gradeReducedByStandards: gradeReducedByStandards(row.overall_score, row.grade, currentVeraPdf.status),
+      scoreCappedByStandards: scoreCappedByStandards(row.overall_score, currentVeraPdf.status),
+      summaryText: typeof currentResult?.executiveSummary === 'string' && currentResult.executiveSummary.trim()
+        ? currentResult.executiveSummary.trim()
+        : synthesizeSummaryText({
+          grade: row.grade,
+          score: row.overall_score,
+          verapdfStatus: currentVeraPdf.status,
+          topFailureMode: topFailureModes[0] || null,
+        }),
+    },
+    veraPdf: {
+      current: currentVeraPdf,
+      original: originalVeraPdf,
+      rebuilt: rebuiltVeraPdf,
+    },
+    failureModes: documentModel?.failureProfile?.failureModes || [],
+    plannerEvidence: documentModel?.plannerEvidence || null,
+    remediationSummary: {
+      ...overview,
+      manualReviewRequired: row.remediation_status === 'manual_review_required',
+    },
   }
 }
 
@@ -244,7 +534,7 @@ export function serializeQueueItemSummary(row: QueueItemRecord): QueueItemSummar
     processingProgress: row.processing_progress,
     processingStage: row.processing_stage,
     processingPath: (row.processing_path as 'ai_html' | 'agent_patch') || 'agent_patch',
-    pathFallbacks: parseJson<string[]>(row.path_fallbacks_json, []),
+    pathFallbacks: parsePublicPathFallbacks(row.path_fallbacks_json),
     reconstructionStatus: row.remediation_status,
     documentModelStatus: row.document_model_status,
     pageCount: row.page_count,
@@ -254,6 +544,7 @@ export function serializeQueueItemSummary(row: QueueItemRecord): QueueItemSummar
     originalGrade: row.original_grade,
     rebuiltScore: row.rebuilt_overall_score ?? row.remediated_overall_score,
     rebuiltGrade: row.rebuilt_grade ?? row.remediated_grade,
+    standardsSummary: buildStandardsSummary(row),
     error: parseJson<any | null>(row.error_json, null),
     reconstructionError: parseJson<any | null>(row.reconstruction_error_json || row.remediation_error_json, null),
     createdAt: row.created_at,
@@ -274,9 +565,10 @@ export function serializeQueueItemDetail(row: QueueItemRecord): QueueItem {
   const documentModel = readDocumentModel(row.document_model_path)
   return {
     ...serializeQueueItemSummary(row),
-    result: parseJson<any | null>(row.result_json, null),
-    originalResult: parseJson<any | null>(row.original_result_json, null),
-    rebuiltResult: parseJson<any | null>(row.rebuilt_result_json || row.remediated_result_json, null),
+    result: parseResult(row.result_json),
+    originalResult: parseResult(row.original_result_json),
+    rebuiltResult: parseResult(row.rebuilt_result_json || row.remediated_result_json),
+    standardsDetail: buildStandardsDetail(row, documentModel),
     documentModel,
     aiAppliedChanges: parseJson<AppliedChange[]>(row.ai_applied_changes_json, documentModel?.aiAppliedChanges || []),
     aiSuggestedChanges: parseJson<SuggestedChange[]>(row.ai_suggested_changes_json, documentModel?.aiSuggestedChanges || []),
@@ -534,6 +826,110 @@ export function getQueueCounts(clientId: string): { active: number; complete: nu
   `).get(clientId) as any).count as number
 
   return { active, complete }
+}
+
+export function getQueueStatusCounts(clientId: string): {
+  active: number
+  history: number
+  processing: number
+  failed: number
+  complete: number
+} {
+  const counts = db.prepare(`
+    SELECT
+      SUM(CASE WHEN hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed') THEN 1 ELSE 0 END) as active,
+      SUM(CASE WHEN hidden = 0 AND state = 'complete' THEN 1 ELSE 0 END) as history,
+      SUM(CASE WHEN hidden = 0 AND state = 'processing' THEN 1 ELSE 0 END) as processing,
+      SUM(CASE WHEN hidden = 0 AND state = 'failed' THEN 1 ELSE 0 END) as failed,
+      SUM(CASE WHEN hidden = 0 AND state = 'complete' THEN 1 ELSE 0 END) as complete
+    FROM queue_items
+    WHERE client_id = ?
+  `).get(clientId) as Record<string, number | null>
+
+  return {
+    active: counts.active ?? 0,
+    history: counts.history ?? 0,
+    processing: counts.processing ?? 0,
+    failed: counts.failed ?? 0,
+    complete: counts.complete ?? 0,
+  }
+}
+
+export function listQueueStatusItems(clientId: string): QueueItemSummary[] {
+  const rows = db.prepare(`
+    SELECT * FROM queue_items
+    WHERE client_id = ? AND hidden = 0
+    ORDER BY updated_at DESC
+  `).all(clientId) as QueueItemRecord[]
+  return rows.map(serializeQueueItemSummary)
+}
+
+export function serializeQueueItemVersions(row: QueueItemRecord): QueueItemVersion[] {
+  const documentModel = readDocumentModel(row.document_model_path)
+  const originalResult = parseResult(row.original_result_json)
+  const rebuiltResult = parseResult(row.rebuilt_result_json || row.remediated_result_json)
+  const currentResult = parseResult(row.result_json)
+  const versions: QueueItemVersion[] = []
+
+  if (row.original_storage_path || row.storage_path) {
+    const originalVeraPdf = documentModel?.originalVeraPdf
+      ? detailSummaryFromModel(documentModel.originalVeraPdf)
+      : extractVeraPdfSummary(originalResult)
+    versions.push({
+      key: 'original',
+      label: 'Original',
+      createdAt: row.upload_completed_at || row.upload_started_at || row.created_at,
+      score: row.original_overall_score ?? originalResult?.overallScore ?? null,
+      grade: row.original_grade ?? originalResult?.grade ?? null,
+      veraPdfStatus: originalVeraPdf.status,
+      veraPdfFailedChecks: originalVeraPdf.failedChecks,
+      downloadUrl: `/api/queue/items/${row.id}/download-original`,
+      kind: 'input',
+    })
+  }
+
+  if (row.rebuilt_storage_path || row.remediated_storage_path) {
+    const rebuiltVeraPdf = documentModel?.remediatedVeraPdf
+      ? detailSummaryFromModel(documentModel.remediatedVeraPdf)
+      : extractVeraPdfSummary(rebuiltResult)
+    versions.push({
+      key: 'rebuilt',
+      label: 'Remediated',
+      createdAt: row.completed_at || row.updated_at,
+      score: row.rebuilt_overall_score ?? row.remediated_overall_score ?? rebuiltResult?.overallScore ?? null,
+      grade: row.rebuilt_grade ?? row.remediated_grade ?? rebuiltResult?.grade ?? null,
+      veraPdfStatus: rebuiltVeraPdf.status,
+      veraPdfFailedChecks: rebuiltVeraPdf.failedChecks,
+      downloadUrl: `/api/queue/items/${row.id}/download`,
+      kind: 'output',
+    })
+  }
+
+  const currentArtifactPath = row.storage_path
+  const rebuiltArtifactPath = row.rebuilt_storage_path || row.remediated_storage_path
+  const originalArtifactPath = row.original_storage_path || row.storage_path
+  const hasDistinctCurrentArtifact = !!currentArtifactPath
+    && currentArtifactPath !== rebuiltArtifactPath
+    && currentArtifactPath !== originalArtifactPath
+
+  if (hasDistinctCurrentArtifact) {
+    const currentVeraPdf = documentModel?.finalAudit?.veraPdf
+      ? detailSummaryFromModel(documentModel.finalAudit.veraPdf)
+      : extractVeraPdfSummary(currentResult)
+    versions.push({
+      key: 'current',
+      label: 'Current',
+      createdAt: row.updated_at,
+      score: row.overall_score ?? currentResult?.overallScore ?? null,
+      grade: row.grade ?? currentResult?.grade ?? null,
+      veraPdfStatus: currentVeraPdf.status,
+      veraPdfFailedChecks: currentVeraPdf.failedChecks,
+      downloadUrl: `/api/queue/items/${row.id}/download`,
+      kind: 'output',
+    })
+  }
+
+  return versions
 }
 
 export function nextQueuedItems(clientId: string, limit: number): QueueItemRecord[] {

@@ -4,6 +4,7 @@ node_modules/
 # Build outputs
 apps/web/.output/
 apps/web/.nuxt/
+apps/web/.next/
 apps/api/dist/
 audit.config.js
 audit.config.js.map
@@ -43,3 +44,8 @@ coverage/
 tmp/
 *.tmp
 .local-tools/
+.claude/
+downloads/
+apps/api/data/
+apps/api/scripts/__pycache__/
+apps/api/tmp-*.pdf

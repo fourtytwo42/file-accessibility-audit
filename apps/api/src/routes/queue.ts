@@ -7,7 +7,7 @@ import { BATCH_QUEUE } from '#config'
 import { bootstrapClientSession, ClientSessionRequest, requireClientSession } from '../middleware/clientSession.js'
 import { streamQueueArchive } from '../services/archiveService.js'
 import { emitQueueItemDeleted, emitQueueItemUpsert, registerQueueSse } from '../services/queueEvents.js'
-import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams } from '../services/queueManager.js'
+import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams, requeueItem } from '../services/queueManager.js'
 import {
   cleanupExpiredQueueItems,
   createQueueItem,
@@ -16,8 +16,10 @@ import {
   getQueueCounts,
   getQueueItemById,
   getQueueItemByMd5,
+  getQueueStatusCounts,
   getQueueStorageRoots,
   listActiveQueueItems,
+  listQueueStatusItems,
   listHistoryQueueItems,
   listSelectableQueueItemIds,
   markQueueItemHidden,
@@ -27,6 +29,7 @@ import {
   removeDiskFile,
   sanitizeBasename,
   serializeQueueItemDetail,
+  serializeQueueItemVersions,
   serializeQueueItemSummary,
   updateQueueItem,
 } from '../services/queueStore.js'
@@ -234,6 +237,15 @@ router.get('/queue/counts', requireClientSession, (req: ClientSessionRequest, re
   res.json(getQueueCounts(req.clientId!))
 })
 
+router.get('/queue/status', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  queueHousekeepingThrottled()
+  res.json({
+    items: listQueueStatusItems(req.clientId!),
+    counts: getQueueStatusCounts(req.clientId!),
+    generatedAt: nowIso(),
+  })
+})
+
 router.get('/queue/selectable-ids', requireClientSession, (req: ClientSessionRequest, res: Response) => {
   queueHousekeepingThrottled()
   const scope = req.query.scope === 'complete' ? 'complete' : req.query.scope === 'active' ? 'active' : null
@@ -251,6 +263,18 @@ router.get('/queue/items/:id', requireClientSession, (req: ClientSessionRequest,
     return
   }
   res.json({ item: serializeQueueItemDetail(item) })
+})
+
+router.get('/queue/items/:id/versions', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  if (!item || item.client_id !== req.clientId || item.hidden) {
+    res.status(404).json({ error: 'Queue item not found' })
+    return
+  }
+  res.json({
+    itemId: item.id,
+    versions: serializeQueueItemVersions(item),
+  })
 })
 
 router.get('/queue/events', requireClientSession, (req: ClientSessionRequest, res: Response) => {
@@ -361,6 +385,41 @@ router.post('/queue/delete-all', requireClientSession, (req: ClientSessionReques
   const history = listHistoryQueueItems(req.clientId!, 1, 10_000).items
   for (const item of [...active, ...history]) hideItemForClient(item.id, req.clientId!)
   res.json({ ok: true })
+})
+
+function visibleOwnedItemIds(clientId: string): Set<string> {
+  return new Set(allVisibleItemsForClient(clientId).map(item => item.id))
+}
+
+function bulkRequeue(req: ClientSessionRequest, res: Response, mode: 'remediate' | 'reanalyze'): void {
+  const requestedIds = Array.isArray(req.body?.itemIds)
+    ? req.body.itemIds.filter((id: unknown): id is string => typeof id === 'string')
+    : []
+  const visibleIds = visibleOwnedItemIds(req.clientId!)
+  const matchingIds = requestedIds.filter((id: string) => visibleIds.has(id))
+
+  if (!matchingIds.length) {
+    res.status(404).json({ error: 'Queue items not found' })
+    return
+  }
+
+  const updated = matchingIds
+    .map((id: string) => requeueItem(id, mode))
+    .filter((item: QueueItemRecord | null): item is QueueItemRecord => !!item)
+
+  res.json({
+    ok: true,
+    count: updated.length,
+    items: updated.map(serializeQueueItemSummary),
+  })
+}
+
+router.post('/queue/remediate-many', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  bulkRequeue(req, res, 'remediate')
+})
+
+router.post('/queue/reanalyze-many', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  bulkRequeue(req, res, 'reanalyze')
 })
 
 router.get('/queue/items/:id/download', requireClientSession, (req: ClientSessionRequest, res: Response) => {

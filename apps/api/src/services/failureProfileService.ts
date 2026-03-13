@@ -45,8 +45,8 @@ const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
   {
     key: 'pdfua.page_tabs',
     label: 'Page tab order metadata',
-    pattern: /\/tabs\b|value shall be s\b|page dictionary.*key tabs|key tabs with value s/i,
-    nativeToolFamilies: ['set_page_tabs'],
+    pattern: /\/tabs\b|value shall be s\b|page dictionary.*key tabs|key tabs with value s|\btab order\b|annotation.*tab order|tabs shall/i,
+    nativeToolFamilies: ['set_page_tabs', 'normalize_annotation_tab_order'],
     categoryIds: ['reading_order', 'pdf_ua_compliance'],
     classification: 'deterministic',
   },
@@ -425,6 +425,55 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
         derivedFromFailureModeKeys: derivedFailureKeys(['category.title_language']),
       })
     }
+  }
+
+  const hasNativeStructure = input.context.qpdf.hasStructTree
+    && input.context.qpdf.structTreeDepth > 0
+    && (input.context.structure.structuralNodes?.length || 0) > 0
+
+  if (hasNativeStructure && issueIds.has('alt_text')) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_native_figure_semantics',
+      reason: 'The document already has a tag tree, so figure semantics can be repaired in place.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['alt_text'],
+      confidence: 0.74,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.alt_text', 'pdfua.figure_alt_or_artifact']),
+    })
+  }
+
+  if (hasNativeStructure && issueIds.has('table_markup')) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_native_table_headers',
+      reason: 'The document already has tagged tables, so table headers can be repaired in place.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['table_markup'],
+      confidence: 0.58,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.table_markup']),
+    })
+  }
+
+  if (hasNativeStructure && issueIds.has('reading_order')) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_native_reading_order',
+      reason: 'The document already has a structure tree, so reading order can be repaired within existing parents.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['reading_order'],
+      confidence: 0.74,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.reading_order']),
+    })
   }
 
   for (const mode of failureModes) {

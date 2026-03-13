@@ -195,6 +195,9 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'example.pdf', originalResult)
 
     expect(inspectPdfForRemediation).toHaveBeenCalledTimes(3)
+    expect(planRemediationActions).toHaveBeenCalled()
+    expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
+    expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
     expect(result.model.actions?.map(action => action.outcome)).toEqual(['applied', 'applied'])
     expect(result.model.failureProfile?.version).toBe('1')
