@@ -156,40 +156,44 @@ export const EMAIL = {
 export const SCORING_WEIGHTS = {
   /** Is the PDF text-based (not scanned) and tagged? Highest weight because
    *  a scanned PDF is fundamentally inaccessible — nothing else matters. */
-  text_extractability: 0.20,
+  text_extractability: 0.18,
 
   /** Does the PDF have a meaningful title and a declared language?
    *  Screen readers announce both on document open. */
-  title_language: 0.15,
+  title_language: 0.135,
 
   /** Are H1–H6 heading tags present with a logical hierarchy?
    *  Headings are the primary navigation mechanism for screen reader users. */
-  heading_structure: 0.15,
+  heading_structure: 0.135,
 
   /** Do images have alternative text descriptions?
    *  Required by WCAG 1.1.1 for all non-decorative images. */
-  alt_text: 0.15,
+  alt_text: 0.135,
 
   /** Does the document have bookmarks/outlines for navigation?
    *  Only assessed for documents with 10+ pages (see ANALYSIS.BOOKMARKS_PAGE_THRESHOLD). */
-  bookmarks: 0.10,
+  bookmarks: 0.09,
 
   /** Are data tables marked up with /Table, /TH, and /TD tags?
    *  Without these, screen readers can't convey table structure. */
-  table_markup: 0.10,
+  table_markup: 0.09,
 
   /** Are hyperlinks descriptive (not raw URLs)?
    *  "Click here" and raw URLs are unhelpful to screen reader users. */
-  link_quality: 0.05,
+  link_quality: 0.045,
 
   /** Do form fields have accessible labels (/TU tooltip)?
    *  Unlabeled form fields are unusable with assistive technology. */
-  form_accessibility: 0.05,
+  form_accessibility: 0.045,
 
   /** Does the structure tree define a correct reading order?
    *  Distinct from text_extractability: this checks ORDER quality, not just
    *  whether the StructTree exists. */
-  reading_order: 0.05,
+  reading_order: 0.045,
+
+  /** Did veraPDF confirm PDF/UA compliance?
+   *  This is a direct standards signal that complements heuristic checks. */
+  pdf_ua_compliance: 0.10,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -264,10 +268,10 @@ export const ANALYSIS = {
    * and the API returns HTTP 504.
    *
    * SAFE TO CHANGE: Yes — increase if legitimate complex PDFs are timing out.
-   * Decrease if you want faster failure on adversarial inputs. 30s is a
+   * Decrease if you want faster failure on adversarial inputs. 60s is a
    * reasonable default; most PDFs finish in under 5s.
    */
-  QPDF_TIMEOUT_MS: 30_000,
+  QPDF_TIMEOUT_MS: 60_000,
 
   /**
    * Maximum stdout buffer for QPDF JSON output, in bytes.
@@ -279,6 +283,33 @@ export const ANALYSIS = {
    * reports with thousands of tagged elements may need more.
    */
   QPDF_MAX_BUFFER: 50 * 1024 * 1024,
+
+  /**
+   * veraPDF subprocess timeout in milliseconds.
+   * veraPDF can take longer than qpdf on structure-heavy PDFs because it
+   * evaluates formal PDF/UA rules rather than just dumping object structure.
+     *
+   * SAFE TO CHANGE: Yes — increase if standards validation times out on
+   * legitimate tagged PDFs. 60s keeps parity with qpdf while remaining bounded.
+   */
+  VERAPDF_TIMEOUT_MS: 60_000,
+
+  /**
+   * Maximum stdout buffer for veraPDF JSON output, in bytes.
+   * Large tagged PDFs can emit detailed rule reports with many failed checks.
+   *
+   * SAFE TO CHANGE: Yes — increase if veraPDF hits maxBuffer on legitimate
+   * documents. 20MB is sufficient for typical PDF/UA reports.
+   */
+  VERAPDF_MAX_BUFFER: 20 * 1024 * 1024,
+
+  /**
+   * Default veraPDF flavour/profile to validate against.
+   * `ua1` corresponds to PDF/UA-1.
+   *
+   * SAFE TO CHANGE: Yes — but downstream scoring assumes PDF/UA validation.
+   */
+  VERAPDF_DEFAULT_FLAVOUR: 'ua1',
 
   /**
    * Maximum number of PDFs being analyzed simultaneously.
@@ -311,6 +342,18 @@ export const ANALYSIS = {
    * 30% out-of-order before penalizing), decrease to be stricter.
    */
   READING_ORDER_DISORDER_THRESHOLD: 0.20,
+
+  /**
+   * Maximum relative glyph-width drift allowed when substituting a missing
+   * legacy font with an approved fallback before the substitution is rejected.
+   *
+   * Example: 0.12 means a substituted glyph width may differ by at most 12%
+   * from the original PDF font dictionary width for the same character code.
+   *
+   * SAFE TO CHANGE: Yes — increase to allow looser fallback substitution when
+   * exact source fonts are unavailable; decrease to keep layout stricter.
+   */
+  LEGACY_FONT_WIDTH_DRIFT_THRESHOLD: 0.35,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -469,12 +512,12 @@ export const BATCH_QUEUE = {
   /**
    * Initial number of history items loaded by the infinite-scroll UI.
    */
-  INITIAL_PAGE_SIZE: 25,
+  INITIAL_PAGE_SIZE: 1000,
 
   /**
    * Maximum number of active processing jobs for a single browser client.
    */
-  MAX_PARALLEL_PER_CLIENT: 5,
+    MAX_PARALLEL_PER_CLIENT: 10,
 
   /**
    * Long-lived browser session duration in days.

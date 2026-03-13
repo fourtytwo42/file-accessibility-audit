@@ -128,9 +128,9 @@ describe('integration: inaccessible PDF', () => {
     expect(result.grade).toBe('F')
   })
 
-  it('text is present but not tagged (score 50)', () => {
+  it('text is present but not tagged and veraPDF evidence can reduce that category further', () => {
     const cat = findCategory(result, 'text_extractability')
-    expect(cat.score).toBe(50)
+    expect(cat.score).toBe(40)
     expect(cat.findings.some(f => f.includes('NOT tagged'))).toBe(true)
   })
 
@@ -151,8 +151,9 @@ describe('integration: inaccessible PDF', () => {
     expect(criticals.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('executive summary mentions critical issues', () => {
-    expect(result.executiveSummary).toContain('critical')
+  it('executive summary foregrounds material PDF/UA non-compliance', () => {
+    expect(result.executiveSummary).toContain('materially non-compliant')
+    expect(result.executiveSummary).toContain('PDF/UA')
   })
 
   it('all categories have explanations and help links', () => {

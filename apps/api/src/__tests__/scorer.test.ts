@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { scoreDocument, type CategoryResult, type ScoringResult } from '../services/scorer.js'
+import { scoreDocument, summarizeLinkTextQuality, type CategoryResult, type ScoringResult } from '../services/scorer.js'
 import type { QpdfResult } from '../services/qpdfService.js'
 import type { PdfjsResult } from '../services/pdfjsService.js'
+import type { VeraPdfResult } from '../services/veraPdfService.js'
 
 // ---------------------------------------------------------------------------
 // Helpers to build mock data
@@ -53,6 +54,21 @@ function makePdfjs(overrides: Partial<PdfjsResult> = {}): PdfjsResult {
       pageCount: 1,
     },
     error: null,
+    ...overrides,
+  }
+}
+
+function makeVeraPdf(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
+  return {
+    status: 'passed',
+    executionStatus: 'ok',
+    profile: 'PDF/UA-1',
+    flavour: 'ua1',
+    isCompliant: true,
+    passedChecks: 10,
+    failedChecks: 0,
+    failures: [],
+    message: 'veraPDF passed PDF/UA validation.',
     ...overrides,
   }
 }
@@ -130,8 +146,8 @@ describe('scoreDocument — fully accessible PDF', () => {
     expect(result.executiveSummary).toContain('ready for publication')
   })
 
-  it('all 9 categories are present', () => {
-    expect(result.categories).toHaveLength(9)
+  it('all 10 categories are present', () => {
+    expect(result.categories).toHaveLength(10)
   })
 
   it('text_extractability scores 100', () => {
@@ -169,6 +185,10 @@ describe('scoreDocument — fully accessible PDF', () => {
   it('reading_order scores 100', () => {
     expect(findCategory(result, 'reading_order').score).toBe(100)
   })
+
+  it('pdf_ua_compliance scores 100', () => {
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(100)
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -184,8 +204,8 @@ describe('scoreDocument — scanned PDF', () => {
     expect(result.isScanned).toBe(true)
   })
 
-  it('overall score is 0', () => {
-    expect(result.overallScore).toBe(0)
+  it('overall score reflects the failing PDF/UA category too', () => {
+    expect(result.overallScore).toBe(17)
   })
 
   it('grade is F', () => {
@@ -326,8 +346,8 @@ describe('weight renormalization', () => {
     // text_extractability = 100, title_language = 100, heading_structure = 0 (F),
     // alt_text = null (no images), bookmarks = null, table_markup = null,
     // link_quality = null, form_accessibility = null, reading_order = 100
-    // Applicable: text(0.20), title(0.15), heading(0.15), reading(0.05)
-    // Total weight = 0.55
+    // Applicable: text(0.18), title(0.135), heading(0.135), reading(0.045), pdf_ua(0.10)
+    // Total weight = 0.595
     const text = findCategory(result, 'text_extractability')
     const title = findCategory(result, 'title_language')
     const heading = findCategory(result, 'heading_structure')
@@ -340,9 +360,9 @@ describe('weight renormalization', () => {
     expect(alt.score).toBeNull() // no images -> N/A
     expect(reading.score).toBe(100)
 
-    // Expected: (100*0.20 + 100*0.15 + 0*0.15 + 100*0.05) / 0.55
-    // = (20 + 15 + 0 + 5) / 0.55 = 40 / 0.55 = 72.72... ≈ 73
-    expect(result.overallScore).toBe(73)
+    // Expected: (100*0.18 + 100*0.135 + 0*0.135 + 100*0.045 + 100*0.10) / 0.595
+    // = 46 / 0.595 = 77.31... ≈ 77
+    expect(result.overallScore).toBe(77)
   })
 
   it('all categories N/A results in score 0', () => {
@@ -764,6 +784,136 @@ describe('scoreLinkQuality edge cases', () => {
     })
     const result = scoreDocument(qpdf, pdfjs)
     expect(findCategory(result, 'link_quality').score).toBe(50)
+  })
+})
+
+describe('scoreDocument — veraPDF integration', () => {
+  it('caps a would-be A when veraPDF reports structural failures', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
+      status: 'failed',
+      isCompliant: false,
+      failedChecks: 2,
+      failures: [
+        {
+          ruleId: 'rule-1',
+          specification: 'PDF/UA-1',
+          clause: '7.1',
+          testNumber: '1',
+          location: 'StructTreeRoot',
+          message: 'Structure tree is invalid.',
+          categoryIds: ['text_extractability', 'reading_order'],
+        },
+      ],
+      message: 'veraPDF detected 2 PDF/UA compliance issues.',
+    }))
+
+    expect(result.grade).toBe('B')
+    expect(result.overallScore).toBeLessThan(100)
+    expect(findCategory(result, 'text_extractability').score).toBeLessThan(100)
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(85)
+    expect(result.executiveSummary).toContain('close to PDF/UA compliant')
+  })
+
+  it('adds a warning when veraPDF is unavailable, keeps heuristic scoring, but blocks A', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
+      status: 'unavailable',
+      executionStatus: 'missing_binary',
+      isCompliant: null,
+      message: 'veraPDF CLI is unavailable.',
+    }))
+
+    expect(result.overallScore).toBeLessThan(100)
+    expect(result.grade).toBe('B')
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(60)
+    expect(result.warnings.some(warning => warning.includes('veraPDF'))).toBe(true)
+    expect(result.executiveSummary).toContain('could not be fully confirmed')
+  })
+
+  it('prevents a perfect score when veraPDF does not pass', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
+      status: 'error',
+      executionStatus: 'error',
+      isCompliant: null,
+      message: 'veraPDF failed unexpectedly.',
+    }))
+
+    expect(result.overallScore).toBeLessThan(100)
+    expect(result.grade).toBe('B')
+  })
+
+  it('reduces the PDF/UA category more heavily for substantial veraPDF failures', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
+      status: 'failed',
+      isCompliant: false,
+      failedChecks: 12,
+      failures: [
+        {
+          ruleId: 'rule-1',
+          specification: 'PDF/UA-1',
+          clause: '7.1',
+          testNumber: '1',
+          location: 'StructTreeRoot',
+          message: 'Structure tree is invalid.',
+          categoryIds: ['text_extractability', 'reading_order'],
+        },
+      ],
+      message: 'veraPDF detected 12 PDF/UA compliance issues.',
+    }))
+
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(40)
+    expect(result.executiveSummary).toContain('materially non-compliant')
+  })
+})
+
+describe('summarizeLinkTextQuality', () => {
+  it('returns zero counts when no links exist', () => {
+    expect(summarizeLinkTextQuality([])).toEqual({
+      linkCount: 0,
+      rawUrlLinkCount: 0,
+      rawUrlLinkDensity: 0,
+      descriptiveLinks: [],
+      rawLinks: [],
+    })
+  })
+
+  it('treats all descriptive links as descriptive', () => {
+    const summary = summarizeLinkTextQuality([
+      { url: 'https://example.com', text: 'View report' },
+      { url: 'https://example.com/faq', text: 'FAQ' },
+    ])
+    expect(summary.linkCount).toBe(2)
+    expect(summary.rawUrlLinkCount).toBe(0)
+    expect(summary.rawUrlLinkDensity).toBe(0)
+    expect(summary.descriptiveLinks).toHaveLength(2)
+    expect(summary.rawLinks).toHaveLength(0)
+  })
+
+  it('treats all raw URL links as raw', () => {
+    const summary = summarizeLinkTextQuality([
+      { url: 'https://example.com', text: 'https://example.com' },
+      { url: 'https://example.com/faq', text: 'www.example.com/faq' },
+    ])
+    expect(summary.linkCount).toBe(2)
+    expect(summary.rawUrlLinkCount).toBe(2)
+    expect(summary.rawUrlLinkDensity).toBe(1)
+    expect(summary.descriptiveLinks).toHaveLength(0)
+    expect(summary.rawLinks).toHaveLength(2)
+  })
+
+  it('reports proportional density for mixed links', () => {
+    const summary = summarizeLinkTextQuality([
+      { url: 'https://example.com', text: 'View report' },
+      { url: 'https://example.com/faq', text: 'https://example.com/faq' },
+    ])
+    expect(summary.linkCount).toBe(2)
+    expect(summary.rawUrlLinkCount).toBe(1)
+    expect(summary.rawUrlLinkDensity).toBe(0.5)
+    expect(summary.descriptiveLinks).toHaveLength(1)
+    expect(summary.rawLinks).toHaveLength(1)
   })
 })
 

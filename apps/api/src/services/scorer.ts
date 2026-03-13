@@ -6,6 +6,7 @@ import {
 } from '#config'
 import type { QpdfResult } from './qpdfService.js'
 import type { PdfjsResult } from './pdfjsService.js'
+import { emptyVeraPdfResult, type VeraPdfFailure, type VeraPdfResult } from './veraPdfService.js'
 
 export interface HelpLink {
   label: string
@@ -29,8 +30,24 @@ export interface ScoringResult {
   grade: string
   isScanned: boolean
   executiveSummary: string
+  verapdf: VeraPdfResult
   categories: CategoryResult[]
   warnings: string[]
+}
+
+export function isRawUrlLinkText(text: string): boolean {
+  return /^(https?:\/\/|www\.)/i.test(text.trim())
+}
+
+export function summarizeLinkTextQuality(links: Array<{ url: string; text: string }>) {
+  const rawLinks = links.filter(link => isRawUrlLinkText(link.text))
+  return {
+    linkCount: links.length,
+    rawUrlLinkCount: rawLinks.length,
+    rawUrlLinkDensity: links.length > 0 ? rawLinks.length / links.length : 0,
+    descriptiveLinks: links.filter(link => !isRawUrlLinkText(link.text)),
+    rawLinks,
+  }
 }
 
 function getGrade(score: number): string {
@@ -48,12 +65,157 @@ function getSeverity(score: number | null): string | null {
   return 'Critical'
 }
 
-export function scoreDocument(qpdf: QpdfResult, pdfjs: PdfjsResult): ScoringResult {
-  const categories: CategoryResult[] = []
+function veraPdfWarning(result: VeraPdfResult): string | null {
+  if (result.status === 'failed') {
+    return `veraPDF detected ${result.failedChecks} PDF/UA compliance issue${result.failedChecks === 1 ? '' : 's'}.`
+  }
+  if (result.status === 'unavailable') return 'veraPDF standards validation could not run because the CLI is unavailable.'
+  if (result.status === 'timeout') return 'veraPDF standards validation timed out before completion.'
+  if (result.status === 'parse_error') return 'veraPDF standards validation returned output that could not be parsed.'
+  if (result.status === 'error') return result.message || 'veraPDF standards validation failed.'
+  return null
+}
+
+function appendVeraPdfFinding(category: CategoryResult, failureCount: number): CategoryResult {
+  const finding = `veraPDF detected ${failureCount} related PDF/UA compliance issue${failureCount === 1 ? '' : 's'}.`
+  if (category.findings.includes(finding)) return category
+  return {
+    ...category,
+    findings: [...category.findings, finding],
+  }
+}
+
+function applyVeraPdfEvidence(categories: CategoryResult[], verapdf: VeraPdfResult): {
+  categories: CategoryResult[]
+  unmatchedFailures: VeraPdfFailure[]
+} {
+  if (verapdf.status !== 'failed' || !verapdf.failures.length) {
+    return { categories, unmatchedFailures: [] }
+  }
+
+  const counts = new Map<string, number>()
+  const unmatchedFailures: VeraPdfFailure[] = []
+  for (const failure of verapdf.failures) {
+    if (!failure.categoryIds.length) {
+      unmatchedFailures.push(failure)
+      continue
+    }
+    for (const categoryId of failure.categoryIds) {
+      counts.set(categoryId, (counts.get(categoryId) || 0) + 1)
+    }
+  }
+
+  const nextCategories = categories.map((category) => {
+    const failureCount = counts.get(category.id) || 0
+    if (!failureCount || category.score === null) return category
+
+    const cappedScore = (() => {
+      if (category.id === 'title_language') return failureCount > 1 ? 50 : 75
+      if (category.id === 'bookmarks') return failureCount > 1 ? 40 : 60
+      return failureCount > 1 ? 40 : 60
+    })()
+
+    const score = Math.min(category.score, cappedScore)
+    return appendVeraPdfFinding({
+      ...category,
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
+    }, failureCount)
+  })
+
+  return {
+    categories: nextCategories,
+    unmatchedFailures,
+  }
+}
+
+function scorePdfUaCompliance(verapdf: VeraPdfResult): CategoryResult {
+  const explanation = 'PDF/UA Compliance reflects veraPDF validation of the final document against PDF/UA requirements. It complements heuristic category scoring by measuring whether the document as a whole satisfies machine-checkable accessibility conformance rules.'
+  const helpLinks: HelpLink[] = [
+    { label: 'veraPDF Project', url: 'https://verapdf.org/home/' },
+    { label: 'W3C: PDF Techniques', url: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/' },
+    { label: 'Adobe: Create and Verify PDF Accessibility', url: 'https://helpx.adobe.com/acrobat/using/create-verify-pdf-accessibility.html' },
+  ]
+
+  if (verapdf.status === 'passed') {
+    return {
+      id: 'pdf_ua_compliance',
+      label: 'PDF/UA Compliance',
+      weight: SCORING_WEIGHTS.pdf_ua_compliance,
+      score: 100,
+      grade: 'A',
+      severity: 'Pass',
+      findings: ['veraPDF passed PDF/UA validation.', 'The document meets the current machine-checkable PDF/UA compliance checks.'],
+      explanation,
+      helpLinks,
+    }
+  }
+
+  const failureCount = verapdf.failedChecks || verapdf.failures.length
+  if (verapdf.status === 'failed') {
+    const score = failureCount <= 2 ? 85 : failureCount <= 10 ? 70 : failureCount <= 25 ? 40 : 20
+    const findings = [
+      `veraPDF reported ${failureCount} PDF/UA compliance issue${failureCount === 1 ? '' : 's'}.`,
+      verapdf.message || 'The document still has standards-level PDF/UA validation failures.',
+    ]
+    if (failureCount <= 2) {
+      findings.push('The document appears close to compliant, but the remaining standards failures still block a full pass.')
+    } else {
+      findings.push('The remaining standards failures are material enough that the document should not be treated as PDF/UA compliant yet.')
+    }
+    return {
+      id: 'pdf_ua_compliance',
+      label: 'PDF/UA Compliance',
+      weight: SCORING_WEIGHTS.pdf_ua_compliance,
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
+      findings,
+      explanation,
+      helpLinks,
+    }
+  }
+
+  return {
+    id: 'pdf_ua_compliance',
+    label: 'PDF/UA Compliance',
+    weight: SCORING_WEIGHTS.pdf_ua_compliance,
+    score: 60,
+    grade: getGrade(60),
+    severity: getSeverity(60),
+    findings: [
+      veraPdfWarning(verapdf) || 'veraPDF standards validation could not be confirmed.',
+      'Heuristic accessibility scoring is available, but standards conformance remains unconfirmed until veraPDF completes successfully.',
+    ],
+    explanation,
+    helpLinks,
+  }
+}
+
+interface SummaryContext {
+  pdfUaScore: number
+  failedChecks: number
+  standardsReducedScore: boolean
+  scoreGateApplied: boolean
+  gradeGateApplied: boolean
+}
+
+export function scoreDocument(qpdf: QpdfResult, pdfjs: PdfjsResult, verapdf: VeraPdfResult = emptyVeraPdfResult({
+  status: 'passed',
+  executionStatus: 'ok',
+  isCompliant: true,
+  message: 'veraPDF passed PDF/UA validation.',
+})): ScoringResult {
+  let categories: CategoryResult[] = []
   const warnings: string[] = []
 
   if (qpdf.error) {
     warnings.push('Some accessibility checks could not be completed. The results below reflect only the checks that succeeded.')
+  }
+  const veraPdfMessage = veraPdfWarning(verapdf)
+  if (veraPdfMessage && verapdf.status !== 'failed') {
+    warnings.push(veraPdfMessage)
   }
 
   // 1. Text Extractability (20%)
@@ -86,21 +248,45 @@ export function scoreDocument(qpdf: QpdfResult, pdfjs: PdfjsResult): ScoringResu
   // 9. Reading Order (5%)
   categories.push(scoreReadingOrder(qpdf))
 
+  const veraPdfAdjusted = applyVeraPdfEvidence(categories, verapdf)
+  categories = veraPdfAdjusted.categories
+  categories.push(scorePdfUaCompliance(verapdf))
+  if (verapdf.status === 'failed') {
+    warnings.push(veraPdfMessage || 'veraPDF detected PDF/UA compliance issues.')
+    if (veraPdfAdjusted.unmatchedFailures.length) {
+      warnings.push('Some veraPDF failures could not be mapped cleanly to an existing category and require manual review.')
+    }
+  }
+
   // Calculate weighted average (N/A categories excluded, weights renormalized)
   const applicable = categories.filter(c => c.score !== null)
   const totalWeight = applicable.reduce((sum, c) => sum + c.weight, 0)
-  const overallScore = totalWeight > 0
+  const computedScore = totalWeight > 0
     ? Math.round(applicable.reduce((sum, c) => sum + (c.score! * (c.weight / totalWeight)), 0))
     : 0
 
-  const grade = getGrade(overallScore)
-  const executiveSummary = generateSummary(overallScore, grade, isScanned, categories)
+  const scoreGateApplied = verapdf.status !== 'passed' && computedScore === 100
+  const overallScore = scoreGateApplied ? 99 : computedScore
+  let grade = getGrade(overallScore)
+  const gradeGateApplied = verapdf.status !== 'passed' && grade === 'A'
+  if (gradeGateApplied) {
+    grade = 'B'
+  }
+  const pdfUaCategory = categories.find(category => category.id === 'pdf_ua_compliance')
+  const executiveSummary = generateSummary(overallScore, grade, isScanned, categories, verapdf, {
+    pdfUaScore: pdfUaCategory?.score ?? 0,
+    failedChecks: verapdf.failedChecks || verapdf.failures.length,
+    standardsReducedScore: computedScore !== 100 && (verapdf.status !== 'passed' || veraPdfAdjusted.unmatchedFailures.length > 0),
+    scoreGateApplied,
+    gradeGateApplied,
+  })
 
   return {
     overallScore,
     grade,
     isScanned,
     executiveSummary,
+    verapdf,
     categories,
     warnings,
   }
@@ -528,8 +714,7 @@ function scoreLinkQuality(pdfjs: PdfjsResult): CategoryResult {
     }
   }
 
-  const rawUrlPattern = /^(https?:\/\/|www\.)/i
-  const descriptive = pdfjs.links.filter(l => !rawUrlPattern.test(l.text.trim()))
+  const { descriptiveLinks: descriptive, rawLinks, rawUrlLinkCount } = summarizeLinkTextQuality(pdfjs.links)
   const score = Math.round((descriptive.length / pdfjs.links.length) * 100)
   const findings: string[] = []
 
@@ -539,9 +724,7 @@ function scoreLinkQuality(pdfjs: PdfjsResult): CategoryResult {
       findings.push(`Link: "${link.text.trim()}"`)
     }
   } else {
-    const rawCount = pdfjs.links.length - descriptive.length
-    findings.push(`${rawCount} of ${pdfjs.links.length} link(s) display raw URLs instead of descriptive text`)
-    const rawLinks = pdfjs.links.filter(l => rawUrlPattern.test(l.text.trim()))
+    findings.push(`${rawUrlLinkCount} of ${pdfjs.links.length} link(s) display raw URLs instead of descriptive text`)
     for (const link of rawLinks) {
       findings.push(`Raw URL link: "${link.text.trim()}"`)
     }
@@ -702,7 +885,14 @@ function scoreReadingOrder(qpdf: QpdfResult): CategoryResult {
   }
 }
 
-function generateSummary(score: number, grade: string, isScanned: boolean, categories: CategoryResult[]): string {
+function generateSummary(
+  score: number,
+  grade: string,
+  isScanned: boolean,
+  categories: CategoryResult[],
+  verapdf: VeraPdfResult,
+  context: SummaryContext,
+): string {
   if (isScanned) {
     return 'This PDF appears to be a scanned image. Screen readers cannot access its content. OCR and full remediation are required before this document can be made accessible.'
   }
@@ -711,8 +901,29 @@ function generateSummary(score: number, grade: string, isScanned: boolean, categ
   const passing = categories.filter(c => c.severity === 'Pass')
   const applicable = categories.filter(c => c.score !== null)
 
-  if (grade === 'A') {
-    return `This PDF meets accessibility standards across all ${applicable.length} assessed categories. It is ready for publication.`
+  if (verapdf.status === 'passed') {
+    if (grade === 'A') {
+      return `This PDF meets accessibility standards across all ${applicable.length} assessed categories and passed veraPDF PDF/UA validation. It is ready for publication.`
+    }
+
+    if (grade === 'B') {
+      return `This PDF passed veraPDF PDF/UA validation and is in good shape overall, but heuristic checks still found minor issues. ${passing.length} of ${applicable.length} categories pass.`
+    }
+  }
+
+  if (verapdf.status === 'failed') {
+    const issueCount = context.failedChecks
+    if (issueCount <= 2) {
+      return `This PDF is close to PDF/UA compliant, but veraPDF still reports ${issueCount} remaining issue${issueCount === 1 ? '' : 's'}. Standards findings lowered the PDF/UA compliance score to ${context.pdfUaScore}/100${context.gradeGateApplied ? ' and keep the overall grade below A' : ''}.`
+    }
+    return `This PDF is materially non-compliant with PDF/UA right now. veraPDF reports ${issueCount} remaining issues, which lowered the PDF/UA compliance score to ${context.pdfUaScore}/100 and should be addressed before publication.`
+  }
+
+  if (verapdf.status !== 'passed') {
+    const gateText = context.gradeGateApplied || context.scoreGateApplied
+      ? ' Because standards validation did not complete, the document cannot receive an A or a 100 score yet.'
+      : ''
+    return `Heuristic accessibility checks completed, but standards validation could not be fully confirmed by veraPDF. The provisional PDF/UA compliance score is ${context.pdfUaScore}/100.${gateText}`
   }
 
   if (grade === 'B') {
@@ -737,5 +948,8 @@ function generateSummary(score: number, grade: string, isScanned: boolean, categ
     return `This PDF has ${moderate.length} moderate accessibility issue${moderate.length > 1 ? 's' : ''}: ${moderateNames}. These should be addressed to improve accessibility.`
   }
 
-  return `This PDF has accessibility issues in ${applicable.length - passing.length} of ${applicable.length} categories. Review the findings below and remediate in Adobe Acrobat.`
+  const standardsText = context.standardsReducedScore
+    ? ' Standards findings also reduced the score.'
+    : ''
+  return `This PDF has accessibility issues in ${applicable.length - passing.length} of ${applicable.length} categories. Review the findings below and remediate in Adobe Acrobat.${standardsText}`
 }
