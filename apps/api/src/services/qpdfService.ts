@@ -45,6 +45,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       maxBuffer: ANALYSIS.QPDF_MAX_BUFFER,
       encoding: 'utf-8',
       signal: options?.signal,
+      windowsHide: true,
     })
 
     const json = JSON.parse(stdout)
@@ -56,9 +57,22 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
     }
     // Check for timeout
     if (err.killed || err.signal === 'SIGTERM') {
-      const error = new Error('QPDF timeout') as any
-      error.killed = true
-      throw error
+      return {
+        hasStructTree: false,
+        hasLang: false,
+        lang: null,
+        hasOutlines: false,
+        outlineCount: 0,
+        outlineTitles: [],
+        hasAcroForm: false,
+        formFields: [],
+        images: [],
+        headings: [],
+        tables: [],
+        structTreeDepth: 0,
+        contentOrder: [],
+        error: 'QPDF timeout',
+      }
     }
     if (err.name === 'AbortError') {
       const error = new Error('QPDF cancelled') as any

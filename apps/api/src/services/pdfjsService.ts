@@ -27,6 +27,20 @@ export interface PdfjsResult {
   error: string | null
 }
 
+function isRawUrlLinkText(text: string): boolean {
+  return /^(https?:\/\/|www\.)/i.test(text.trim())
+}
+
+export function getLinkDisplayText(annotation: any, textItems: any[]): string {
+  const annotationLabel = String(annotation?.contents || annotation?.contentsObj?.str || '').trim()
+  if (annotationLabel && !isRawUrlLinkText(annotationLabel)) {
+    return annotationLabel
+  }
+  const extracted = findLinkText(annotation, textItems)
+  if (extracted) return extracted
+  return String(annotation?.url || '')
+}
+
 export async function analyzeWithPdfjs(
   buffer: Buffer,
   options?: {
@@ -133,8 +147,7 @@ export async function analyzeWithPdfjs(
         const annotations = await page.getAnnotations()
         for (const annot of annotations) {
           if (annot.subtype === 'Link' && annot.url) {
-            // Find the text content near this link's position
-            const linkText = findLinkText(annot, textContent.items) || annot.url
+            const linkText = getLinkDisplayText(annot, textContent.items)
             result.links.push({ url: annot.url, text: linkText })
           }
         }

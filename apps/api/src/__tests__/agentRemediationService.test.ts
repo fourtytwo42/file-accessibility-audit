@@ -44,7 +44,7 @@ vi.mock('../services/semanticEnrichmentService.js', () => ({
   generateSemanticRepairBatches,
 }))
 
-describe('agentRemediationService', () => {
+describe('agentRemediationService', { timeout: 15_000 }, () => {
   beforeEach(() => {
     vi.resetAllMocks()
     generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })

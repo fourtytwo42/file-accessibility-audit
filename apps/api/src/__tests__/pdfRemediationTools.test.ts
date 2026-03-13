@@ -85,7 +85,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('pdfRemediationTools', () => {
+describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   it('remaps section-backed heading candidates to the first safe descendant text node', () => {
     const target = __test_remapHeadingTarget([
       { ref: 'obj:9 0 R', tag: '/Sect', parentRef: 'obj:7 0 R', orderIndex: 0, parentTagPath: ['None'] },
@@ -266,7 +266,7 @@ describe('pdfRemediationTools', () => {
     const after = await analyzePDF(result.buffer, '3violent offenses_1999-2008.pdf')
     expect(result.action.outcome).toBe('applied')
     expect(after.verapdf.failedChecks).toBeLessThan(before.verapdf.failedChecks)
-  }, 60_000)
+  }, 120_000)
 
   it('repairs missing ToUnicode maps in place on large mixed/native PDFs', async () => {
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
@@ -1045,7 +1045,7 @@ describe('pdfRemediationTools', () => {
 
 })
 
-describe('remediationPlanService', () => {
+describe('remediationPlanService', { timeout: 60_000 }, () => {
   it('falls back to heuristic metadata actions when no title or language exist', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')

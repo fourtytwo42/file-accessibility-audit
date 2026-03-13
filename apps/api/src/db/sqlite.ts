@@ -1,8 +1,14 @@
 import Database from 'better-sqlite3'
 import path from 'node:path'
 import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
-const dbPath = process.env.DB_PATH || './data/audit.db'
+const moduleDir = path.dirname(fileURLToPath(import.meta.url))
+const projectRoot = path.resolve(moduleDir, '..', '..')
+const defaultDbPath = path.join(projectRoot, 'data', 'audit.db')
+const dbPath = process.env.DB_PATH
+  ? path.resolve(projectRoot, process.env.DB_PATH)
+  : defaultDbPath
 
 // Ensure the data directory exists
 const dbDir = path.dirname(dbPath)
@@ -115,18 +121,32 @@ function ensureColumn(table: string, column: string, definition: string): void {
 
 ensureColumn('queue_items', 'original_storage_path', 'TEXT')
 ensureColumn('queue_items', 'remediated_storage_path', 'TEXT')
+ensureColumn('queue_items', 'rebuilt_storage_path', 'TEXT')
+ensureColumn('queue_items', 'document_model_path', 'TEXT')
+ensureColumn('queue_items', 'review_assets_dir', 'TEXT')
 ensureColumn('queue_items', 'original_result_json', 'TEXT')
 ensureColumn('queue_items', 'remediated_result_json', 'TEXT')
+ensureColumn('queue_items', 'rebuilt_result_json', 'TEXT')
 ensureColumn('queue_items', 'remediation_status', "TEXT NOT NULL DEFAULT 'pending'")
+ensureColumn('queue_items', 'document_model_status', "TEXT NOT NULL DEFAULT 'pending'")
 ensureColumn('queue_items', 'remediation_error_json', 'TEXT')
+ensureColumn('queue_items', 'reconstruction_error_json', 'TEXT')
 ensureColumn('queue_items', 'original_page_count', 'INTEGER')
 ensureColumn('queue_items', 'original_overall_score', 'INTEGER')
 ensureColumn('queue_items', 'original_grade', 'TEXT')
 ensureColumn('queue_items', 'remediated_page_count', 'INTEGER')
 ensureColumn('queue_items', 'remediated_overall_score', 'INTEGER')
 ensureColumn('queue_items', 'remediated_grade', 'TEXT')
+ensureColumn('queue_items', 'rebuilt_page_count', 'INTEGER')
+ensureColumn('queue_items', 'rebuilt_overall_score', 'INTEGER')
+ensureColumn('queue_items', 'rebuilt_grade', 'TEXT')
 ensureColumn('queue_items', 'applied_fixes_json', 'TEXT')
 ensureColumn('queue_items', 'skipped_fixes_json', 'TEXT')
 ensureColumn('queue_items', 'manual_review_flags_json', 'TEXT')
+ensureColumn('queue_items', 'ai_applied_changes_json', 'TEXT')
+ensureColumn('queue_items', 'ai_suggested_changes_json', 'TEXT')
+ensureColumn('queue_items', 'confidence_summary_json', 'TEXT')
+ensureColumn('queue_items', 'processing_path', "TEXT NOT NULL DEFAULT 'rebuild'")
+ensureColumn('queue_items', 'path_fallbacks_json', 'TEXT')
 
 export default db

@@ -16,8 +16,8 @@ function summarizeJsonArray(raw: string | null | undefined): string {
       return parsed.map(entry => {
         if (typeof entry === 'string') return entry
         if (entry && typeof entry === 'object' && 'label' in entry) {
-          const item = entry as { label?: string; details?: string }
-          return [item.label, item.details].filter(Boolean).join(': ')
+          const item = entry as { label?: string; details?: string; reason?: string }
+          return [item.label, item.details, item.reason].filter(Boolean).join(': ')
         }
         return JSON.stringify(entry)
       }).join(' | ')
@@ -33,11 +33,13 @@ function manifestCsv(items: QueueItemRecord[]): string {
     'md5',
     'original_score',
     'original_grade',
-    'remediated_score',
-    'remediated_grade',
-    'remediation_status',
-    'applied_fixes',
-    'skipped_fixes',
+    'rebuilt_score',
+    'rebuilt_grade',
+    'processing_path',
+    'path_fallbacks',
+    'reconstruction_status',
+    'ai_applied_changes',
+    'ai_suggested_changes',
     'manual_review_flags',
     'failure_reason',
   ].join(',')
@@ -48,13 +50,15 @@ function manifestCsv(items: QueueItemRecord[]): string {
     quoteCsv(item.md5),
     quoteCsv(item.original_overall_score),
     quoteCsv(item.original_grade),
-    quoteCsv(item.remediated_overall_score),
-    quoteCsv(item.remediated_grade),
+    quoteCsv(item.rebuilt_overall_score),
+    quoteCsv(item.rebuilt_grade),
+    quoteCsv(item.processing_path),
+    quoteCsv(summarizeJsonArray(item.path_fallbacks_json)),
     quoteCsv(item.remediation_status),
-    quoteCsv(summarizeJsonArray(item.applied_fixes_json)),
-    quoteCsv(summarizeJsonArray(item.skipped_fixes_json)),
+    quoteCsv(summarizeJsonArray(item.ai_applied_changes_json)),
+    quoteCsv(summarizeJsonArray(item.ai_suggested_changes_json)),
     quoteCsv(summarizeJsonArray(item.manual_review_flags_json)),
-    quoteCsv(item.remediation_error_json ? JSON.parse(item.remediation_error_json)?.error || '' : ''),
+    quoteCsv(item.reconstruction_error_json ? JSON.parse(item.reconstruction_error_json)?.error || '' : ''),
   ])).map(columns => columns.join(','))
 
   return `${header}\n${rows.join('\n')}\n`
@@ -65,7 +69,7 @@ export async function streamQueueArchive(res: Response, items: QueueItemRecord[]
   const archiver = archiverModule.default
 
   res.setHeader('Content-Type', 'application/zip')
-  res.setHeader('Content-Disposition', `attachment; filename="remediated-pdfs-${Date.now()}.zip"`)
+  res.setHeader('Content-Disposition', `attachment; filename="rebuilt-pdfs-${Date.now()}.zip"`)
 
   const archive = archiver('zip', { zlib: { level: 9 } })
   const completion = new Promise<void>((resolve, reject) => {
@@ -79,7 +83,8 @@ export async function streamQueueArchive(res: Response, items: QueueItemRecord[]
 
   const usedNames = new Set<string>()
   for (const item of items) {
-    if (!item.remediated_storage_path || !fs.existsSync(item.remediated_storage_path)) continue
+    const filePath = item.rebuilt_storage_path || item.remediated_storage_path
+    if (!filePath || !fs.existsSync(filePath)) continue
     const ext = path.extname(item.filename) || '.pdf'
     const base = path.basename(item.filename, ext).replace(/[^\w.-]+/g, '_') || item.id
     let archiveName = `${base}${ext}`
@@ -89,7 +94,7 @@ export async function streamQueueArchive(res: Response, items: QueueItemRecord[]
       suffix += 1
     }
     usedNames.add(archiveName)
-    archive.file(item.remediated_storage_path, { name: archiveName })
+    archive.file(filePath, { name: archiveName })
   }
 
   await archive.finalize()

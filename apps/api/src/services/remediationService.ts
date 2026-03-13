@@ -2,7 +2,8 @@ import { PDFDocument } from 'pdf-lib'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import { analyzeWithPdfjs } from './pdfjsService.js'
 import { analyzeWithQpdf } from './qpdfService.js'
-import type { ManualReviewFlag, RemediationStatus } from './queueStore.js'
+import type { ModelReviewFlag as ManualReviewFlag } from './documentModel.js'
+import type { ReconstructionStatus as RemediationStatus } from './queueStore.js'
 
 export interface RemediationOutput {
   buffer: Buffer
@@ -56,7 +57,7 @@ export async function remediatePdf(
 
   const pdfDoc = await PDFDocument.load(originalBuffer, {
     updateMetadata: false,
-    ignoreEncryption: false,
+    ignoreEncryption: true,
   })
 
   const existingTitle = pdfjsResult.title || pdfDoc.getTitle()

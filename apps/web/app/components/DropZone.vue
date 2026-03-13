@@ -5,10 +5,10 @@
       :class="dragging
         ? 'border-green-400 bg-green-400/5 scale-[1.01]'
         : 'border-[var(--border-input)] hover:border-[var(--border-hover)] bg-[var(--surface-card-50)]'"
-      @dragover.prevent
-      @dragenter.prevent="onDragEnter"
-      @dragleave.prevent="onDragLeave"
-      @drop.prevent="handleDrop"
+      @dragover.prevent.stop
+      @dragenter.prevent.stop="onDragEnter"
+      @dragleave.prevent.stop="onDragLeave"
+      @drop.prevent.stop="handleDrop"
       @click="openPicker"
     >
       <div class="text-center space-y-4 p-8">
@@ -61,12 +61,21 @@ function onDragLeave() {
 }
 
 onMounted(() => {
-  const prevent = (e: DragEvent) => e.preventDefault()
-  document.addEventListener('dragover', prevent)
-  document.addEventListener('drop', prevent)
+  const prevent = (e: DragEvent) => {
+    const hasFiles = Array.from(e.dataTransfer?.types || []).includes('Files')
+    if (!hasFiles) return
+    e.preventDefault()
+  }
+
+  window.addEventListener('dragover', prevent, true)
+  window.addEventListener('drop', prevent, true)
+  document.addEventListener('dragover', prevent, true)
+  document.addEventListener('drop', prevent, true)
   onUnmounted(() => {
-    document.removeEventListener('dragover', prevent)
-    document.removeEventListener('drop', prevent)
+    window.removeEventListener('dragover', prevent, true)
+    window.removeEventListener('drop', prevent, true)
+    document.removeEventListener('dragover', prevent, true)
+    document.removeEventListener('drop', prevent, true)
   })
 })
 
@@ -75,6 +84,8 @@ function openPicker() {
 }
 
 async function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  e.stopPropagation()
   dragCounter.value = 0
   dragging.value = false
   const files = await extractDroppedPdfFiles(e.dataTransfer)

@@ -10,11 +10,28 @@ A web tool that scores PDF accessibility readiness against [WCAG 2.1](https://ww
 
 ## Quick Start
 
+### Ubuntu 24.04 VM Bootstrap
+
+For a fresh Ubuntu 24.04 VM, use the repo bootstrap instead of installing dependencies by hand:
+
+```bash
+git clone https://github.com/ICJIA/file-accessibility-audit.git
+cd file-accessibility-audit
+bash ./scripts/bootstrap-ubuntu.sh
+pnpm dev
+```
+
+The bootstrap script installs the remediation runtime too: Python helper packages, qpdf, veraPDF, Java, Playwright Chromium, and the managed legacy font bundle under `.local-tools/`.
+
+Full Ubuntu instructions: [`docs/setup-ubuntu-vm.md`](docs/setup-ubuntu-vm.md)
+
 ### Prerequisites
 
 - **Node.js 22+** (see `.nvmrc`)
 - **pnpm 9+**
 - **QPDF 11+**
+
+For the remediation-capable runtime, also see [`docs/setup-ubuntu-vm.md`](docs/setup-ubuntu-vm.md) for Python, veraPDF, Java, Playwright, and managed font setup.
 
 ```bash
 # macOS
@@ -42,15 +59,24 @@ pnpm dev
 - **Frontend:** http://localhost:5102
 - **API:** http://localhost:5103
 
+### Verify an Existing Environment
+
+```bash
+bash ./scripts/verify-env.sh
+bash ./scripts/verify-env.sh --smoke-api
+```
+
 That's it — the app works immediately with authentication disabled (the default). No email provider or credentials needed.
 
 ### Utility Scripts
 
 ```bash
+pnpm bootstrap:ubuntu  # Bootstrap a fresh Ubuntu 24.04 VM from the repo
 pnpm clean      # Remove .nuxt, .output, Vite cache, and build artifacts
 pnpm test       # Run all tests with summary
 pnpm dev        # Start API + Web dev servers
 pnpm build      # Type-check API + build Nuxt frontend
+pnpm verify:env # Verify the remediation runtime and managed font bundle
 pnpm start:all  # Start both production servers (kills stale ports, API :5103, Web :5102)
 pnpm rebrand    # Regenerate static files after changing BRANDING in audit.config.ts
 ```

@@ -1,6 +1,7 @@
 import { analyzeWithQpdf } from './qpdfService.js'
 import { analyzeWithPdfjs, PdfMetadata } from './pdfjsService.js'
-import { scoreDocument, ScoringResult } from './scorer.js'
+import { scoreDocument, ScoringResult, summarizeLinkTextQuality } from './scorer.js'
+import { analyzeWithVeraPdf, type VeraPdfResult } from './veraPdfService.js'
 import { ANALYSIS } from '#config'
 
 // Simple semaphore for concurrency limiting
@@ -31,6 +32,13 @@ export interface AnalysisResult extends ScoringResult {
   pageCount: number
   fileType: 'pdf'
   pdfMetadata: PdfMetadata
+  verapdf: VeraPdfResult
+  routingSignals: {
+    headingCount: number
+    linkCount: number
+    rawUrlLinkCount: number
+    rawUrlLinkDensity: number
+  }
 }
 
 export async function analyzePDF(
@@ -45,7 +53,10 @@ export async function analyzePDF(
 
   try {
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
-    const qpdfResult = await analyzeWithQpdf(buffer, { signal: options?.signal })
+    const [qpdfResult, veraPdfResult] = await Promise.all([
+      analyzeWithQpdf(buffer, { signal: options?.signal }),
+      analyzeWithVeraPdf(buffer, { signal: options?.signal }),
+    ])
 
     if (options?.signal?.aborted) {
       const error = new Error('Analysis cancelled') as any
@@ -65,9 +76,11 @@ export async function analyzePDF(
       },
     })
 
+    const linkSummary = summarizeLinkTextQuality(pdfjsResult.links)
+
     // Score the document
     options?.onProgress?.({ stage: 'Scoring accessibility findings', percent: 92 })
-    const scoringResult = scoreDocument(qpdfResult, pdfjsResult)
+    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult)
     options?.onProgress?.({ stage: 'Finalizing report', percent: 100 })
 
     return {
@@ -75,6 +88,12 @@ export async function analyzePDF(
       pageCount: pdfjsResult.pageCount,
       fileType: 'pdf',
       pdfMetadata: pdfjsResult.metadata,
+      routingSignals: {
+        headingCount: qpdfResult.headings.length,
+        linkCount: linkSummary.linkCount,
+        rawUrlLinkCount: linkSummary.rawUrlLinkCount,
+        rawUrlLinkDensity: linkSummary.rawUrlLinkDensity,
+      },
       ...scoringResult,
     }
   } finally {

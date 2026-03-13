@@ -25,116 +25,148 @@
           </p>
         </div>
 
-        <div class="flex flex-wrap gap-2">
-          <UButton
-            v-if="hasSelection"
-            size="sm"
-            variant="soft"
-            color="primary"
-            @click="downloadSelected(selectedIds)"
-          >
-            Download Selected
-          </UButton>
-          <UButton
-            v-if="hasSelection"
-            size="sm"
-            variant="soft"
-            color="neutral"
-            @click="deleteItems(selectedIds)"
-          >
-            Delete Selected
-          </UButton>
-          <UButton
-            v-if="activeItems.length || historyItems.length"
-            size="sm"
-            variant="soft"
-            color="primary"
-            @click="downloadAllVisible"
-          >
-            Download All Visible
-          </UButton>
-          <UButton
-            v-if="activeItems.length || historyItems.length"
-            size="sm"
-            variant="ghost"
-            color="neutral"
-            @click="deleteAll"
-          >
-            Delete All
-          </UButton>
-        </div>
       </div>
-
       <DropZone @files-selected="enqueueFiles" />
-
-      <div v-if="hashingFiles.length" class="mt-4 rounded-xl border border-blue-500/20 bg-blue-500/10 p-4">
-        <p class="text-sm font-medium text-blue-200">Hashing files locally before upload</p>
-        <ul class="mt-2 space-y-1 text-sm text-blue-100">
-          <li v-for="name in hashingFiles" :key="name">{{ name }}</li>
-        </ul>
-      </div>
     </section>
 
-    <section>
-      <div class="flex items-center justify-between gap-4 mb-4">
-        <div>
-          <h2 class="text-lg font-semibold text-[var(--text-heading)]">Active Queue</h2>
-          <p class="text-sm text-[var(--text-muted)]">Uploads and processing items are pinned here.</p>
+    <div class="grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:items-start">
+      <section>
+        <div class="mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-[var(--text-heading)]">Active Queue ({{ activeDisplayCount }})</h2>
+            <p class="text-sm text-[var(--text-muted)]">Uploads, processing items, and failures stay here until completed or deleted.</p>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <UButton
+              v-if="activeDisplayCount"
+              size="sm"
+              :variant="allActiveSelected ? 'soft' : 'ghost'"
+              color="neutral"
+              @click="toggleSelectAll('active')"
+            >
+              {{ allActiveSelected ? 'Clear' : 'Select All' }}
+            </UButton>
+            <UButton
+              v-if="hasActiveSelection"
+              size="sm"
+              variant="ghost"
+              color="error"
+              square
+              title="Delete selected"
+              aria-label="Delete selected"
+              @click="confirmDeleteItems(selectedActiveIds)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6V4h8v2" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14H6L5 6" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 11v6" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 11v6" />
+              </svg>
+            </UButton>
+          </div>
         </div>
-      </div>
 
-      <div v-if="!activeItems.length" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6 text-sm text-[var(--text-muted)]">
-        No active items. Drop PDFs above to start a batch.
-      </div>
-
-      <div v-else class="space-y-4">
-        <QueueItemCard
-          v-for="item in activeItems"
-          :key="item.id"
-          :item="item"
-          :selected="selectedIds.includes(item.id)"
-          :overall-progress="itemOverallProgress(item)"
-          @toggle-selected="toggleSelected"
-          @cancel="cancelItem"
-          @delete="deleteItems([$event])"
-          @download="downloadItem"
-          @retry="retryItem"
-        />
-      </div>
-    </section>
-
-    <section>
-      <div class="flex items-center justify-between gap-4 mb-4">
-        <div>
-          <h2 class="text-lg font-semibold text-[var(--text-heading)]">Recent History</h2>
-          <p class="text-sm text-[var(--text-muted)]">Completed, failed, and cancelled items remain here for 30 days.</p>
+        <div v-if="!mergedActiveItems.length" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6 text-sm text-[var(--text-muted)]">
+          No active items. Drop PDFs above to start a batch.
         </div>
-      </div>
 
-      <div v-if="!historyItems.length" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6 text-sm text-[var(--text-muted)]">
-        No recent history yet.
-      </div>
+        <div v-else class="space-y-4">
+          <QueueItemCard
+            v-for="item in mergedActiveItems"
+            :key="item.id"
+            :item="item"
+            :selected="selectedIds.includes(item.id)"
+            :overall-progress="itemOverallProgress(item)"
+            :selectable="activeSelectableItemIds.includes(item.id)"
+            @toggle-selected="toggleSelected"
+            @delete="confirmDeleteItems([$event])"
+            @download-rebuilt="downloadItem"
+            @retry="retryItem"
+            @load-details="loadItemDetail"
+          />
+        </div>
+      </section>
 
-      <div v-else class="space-y-4">
-        <QueueItemCard
-          v-for="item in historyItems"
-          :key="item.id"
-          :item="item"
-          :selected="selectedIds.includes(item.id)"
-          :overall-progress="itemOverallProgress(item)"
-          @toggle-selected="toggleSelected"
-          @cancel="cancelItem"
-          @delete="deleteItems([$event])"
-          @download="downloadItem"
-          @retry="retryItem"
-        />
-      </div>
+      <section>
+        <div class="mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-[var(--text-heading)]">Complete ({{ completeCount }})</h2>
+            <p class="text-sm text-[var(--text-muted)]">Completed items remain here for 30 days.</p>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <UButton
+              v-if="completeCount"
+              size="sm"
+              :variant="allHistorySelected ? 'soft' : 'ghost'"
+              color="neutral"
+              @click="toggleSelectAll('history')"
+            >
+              {{ allHistorySelected ? 'Clear' : 'Select All' }}
+            </UButton>
+            <UButton
+              v-if="hasHistorySelection"
+              size="sm"
+              variant="ghost"
+              color="primary"
+              square
+              title="Download selected"
+              aria-label="Download selected"
+              @click="downloadSelected(selectedCompletedIds)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v8" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.5 12.5 3.5 3.5 3.5-3.5" />
+              </svg>
+            </UButton>
+            <UButton
+              v-if="hasHistorySelection"
+              size="sm"
+              variant="ghost"
+              color="error"
+              square
+              title="Delete selected"
+              aria-label="Delete selected"
+              @click="confirmDeleteItems(selectedCompletedIds)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6V4h8v2" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 6l-1 14H6L5 6" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 11v6" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 11v6" />
+              </svg>
+            </UButton>
+          </div>
+        </div>
 
-      <div ref="historySentinel" class="h-10" />
-      <div v-if="historyHasMore" class="mt-4 text-center text-sm text-[var(--text-muted)]">
-        Scroll for more history
-      </div>
-    </section>
+        <div v-if="!historyItems.length" class="rounded-xl border border-[var(--border)] bg-[var(--surface-card)] p-6 text-sm text-[var(--text-muted)]">
+          No recent history yet.
+        </div>
+
+        <div v-else class="space-y-4">
+          <QueueItemCard
+            v-for="item in historyItems"
+            :key="item.id"
+            :item="item"
+            :selected="selectedIds.includes(item.id)"
+            :overall-progress="itemOverallProgress(item)"
+            :selectable="item.state === 'complete'"
+            :show-progress="false"
+            @toggle-selected="toggleSelected"
+            @delete="confirmDeleteItems([$event])"
+            @download-rebuilt="downloadItem"
+            @load-details="loadItemDetail"
+          />
+        </div>
+
+        <div ref="historySentinel" class="h-10" />
+        <div v-if="historyHasMore" class="mt-4 text-center text-sm text-[var(--text-muted)]">
+          Scroll for more history
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -143,25 +175,42 @@ definePageMeta({ middleware: 'auth' })
 
 const {
   activeItems,
+  mergedActiveItems,
   historyItems,
+  activeCount,
+  activeDisplayCount,
+  completeCount,
   duplicateNotices,
   selectedIds,
-  hashingFiles,
-  hasSelection,
+  selectedActiveIds,
+  selectedCompletedIds,
+  hasActiveSelection,
+  hasHistorySelection,
+  activeSelectableItemIds,
+  historySelectableItemIds,
+  allActiveSelected,
+  allHistorySelected,
   historyHasMore,
   enqueueFiles,
-  cancelItem,
   retryItem,
   deleteItems,
-  deleteAll,
   toggleSelected,
+  toggleSelectAll,
   clearNotices,
   loadMoreHistory,
+  loadItemDetail,
   downloadItem,
   downloadSelected,
-  downloadAllVisible,
   itemOverallProgress,
 } = useClientQueue()
+
+function confirmDeleteItems(itemIds: string[]) {
+  if (!itemIds.length) return
+  if (import.meta.client && !window.confirm(`Delete ${itemIds.length} item${itemIds.length === 1 ? '' : 's'}? This cannot be undone.`)) {
+    return
+  }
+  void deleteItems(itemIds)
+}
 
 const historySentinel = ref<HTMLElement | null>(null)
 

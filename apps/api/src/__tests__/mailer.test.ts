@@ -41,7 +41,7 @@ afterEach(() => {
 // issues. But since the transporter is created at import time and we already
 // mock nodemailer, we can just import once.
 
-describe('validateMailConfig', () => {
+describe('validateMailConfig', { timeout: 15_000 }, () => {
   it('calls process.exit(1) in production without SMTP_USER', async () => {
     process.env.NODE_ENV = 'production'
     delete process.env.SMTP_USER

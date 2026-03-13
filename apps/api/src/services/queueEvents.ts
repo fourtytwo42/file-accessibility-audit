@@ -1,8 +1,8 @@
 import type { Response } from 'express'
-import { getQueueItemById, serializeQueueItem } from './queueStore.js'
+import { getQueueItemById, serializeQueueItemSummary } from './queueStore.js'
 
 type QueueEvent =
-  | { type: 'item-upserted'; item: ReturnType<typeof serializeQueueItem> }
+  | { type: 'item-upserted'; item: ReturnType<typeof serializeQueueItemSummary> }
   | { type: 'item-deleted'; itemId: string }
 
 const clients = new Map<string, Set<Response>>()
@@ -32,7 +32,7 @@ export function emitQueueItemUpsert(itemId: string): void {
   if (!row || row.hidden) return
   const listeners = clients.get(row.client_id)
   if (!listeners?.size) return
-  const event: QueueEvent = { type: 'item-upserted', item: serializeQueueItem(row) }
+  const event: QueueEvent = { type: 'item-upserted', item: serializeQueueItemSummary(row) }
   for (const res of listeners) write(res, event)
 }
 

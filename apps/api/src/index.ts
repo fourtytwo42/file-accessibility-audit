@@ -1,3 +1,5 @@
+import path from 'node:path'
+import dotenv from 'dotenv'
 import express from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
@@ -8,11 +10,17 @@ import analyzeRoutes from './routes/analyze.js'
 import reportsRoutes from './routes/reports.js'
 import logsRoutes from './routes/logs.js'
 import queueRoutes from './routes/queue.js'
+import { recoverInterruptedProcessing } from './services/queueManager.js'
+import { cleanupExpiredQueueItems, failStaleUploads } from './services/queueStore.js'
+import { probeVeraPdf } from './services/veraPdfService.js'
 
 // Import db to trigger table creation on startup
 import './db/sqlite.js'
 import { validateMailConfig } from './mailer.js'
 import { AUTH, DEPLOY } from '#config'
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env') })
+dotenv.config({ path: path.resolve(process.cwd(), 'apps/api/.env'), override: false })
 
 // Validate email config before starting — only needed when auth requires OTP emails
 if (AUTH.REQUIRE_LOGIN) {
@@ -22,6 +30,10 @@ if (AUTH.REQUIRE_LOGIN) {
 const app = express()
 const PORT = Number(process.env.PORT) || 5103
 const isProduction = process.env.NODE_ENV === 'production'
+let veraPdfStatus: { available: boolean; message: string } = {
+  available: false,
+  message: 'veraPDF probe has not run yet.',
+}
 
 // Trust proxy — behind nginx in production, behind Nuxt proxy in development
 app.set('trust proxy', 1)
@@ -40,7 +52,20 @@ app.use(express.json({ limit: '1mb' }))
 app.use(cookieParser())
 
 // Global rate limit
-app.use(globalLimiter)
+app.use((req, res, next) => {
+  const requestPath = req.path || ''
+  if (
+    requestPath === '/api/health'
+    || requestPath === '/api'
+    || requestPath === '/'
+    || requestPath === '/api/client/bootstrap'
+    || requestPath.startsWith('/api/queue/')
+  ) {
+    next()
+    return
+  }
+  globalLimiter(req, res, next)
+})
 
 // Routes
 app.use('/api/auth', authRoutes)
@@ -67,9 +92,23 @@ function healthPayload() {
   return { status: 'ok', uptime }
 }
 
-app.get('/', (_req, res) => res.json(healthPayload()))
-app.get('/api', (_req, res) => res.json(healthPayload()))
-app.get('/api/health', (_req, res) => res.json(healthPayload()))
+function extendedHealthPayload() {
+  return {
+    ...healthPayload(),
+    validators: {
+      veraPdf: veraPdfStatus.available ? 'available' : 'unavailable',
+    },
+  }
+}
+
+app.get('/', (_req, res) => res.json(extendedHealthPayload()))
+app.get('/api', (_req, res) => res.json(extendedHealthPayload()))
+app.get('/api/health', (_req, res) => res.json(extendedHealthPayload()))
+
+function runQueueMaintenance() {
+  cleanupExpiredQueueItems()
+  failStaleUploads()
+}
 
 // Global error handler — never leak internals
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -90,7 +129,16 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   })
 })
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`[API] Running on http://localhost:${PORT}`)
   console.log(`[API] Environment: ${process.env.NODE_ENV || 'development'}`)
+  veraPdfStatus = await probeVeraPdf()
+  console.log(`[API] veraPDF: ${veraPdfStatus.available ? 'available' : 'unavailable'}${veraPdfStatus.message ? ` (${veraPdfStatus.message})` : ''}`)
+  runQueueMaintenance()
+  const interval = setInterval(runQueueMaintenance, 5 * 60 * 1000)
+  interval.unref?.()
+  const recovered = recoverInterruptedProcessing()
+  if (recovered > 0) {
+    console.log(`[API] Re-queued ${recovered} interrupted processing item${recovered === 1 ? '' : 's'} after restart`)
+  }
 })

@@ -6,6 +6,7 @@ import DropZone from '../components/DropZone.vue'
 import ScoreCard from '../components/ScoreCard.vue'
 import CategoryRow from '../components/CategoryRow.vue'
 import ProcessingOverlay from '../components/ProcessingOverlay.vue'
+import QueueItemCard from '../components/QueueItemCard.vue'
 
 // ---------------------------------------------------------------------------
 // DropZone
@@ -295,5 +296,84 @@ describe('ProcessingOverlay', () => {
     await wrapper.setProps({ stage: 'Step 2' })
     expect(wrapper.text()).toContain('Step 2')
     expect(wrapper.text()).not.toContain('Step 1')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// QueueItemCard
+// ---------------------------------------------------------------------------
+describe('QueueItemCard', () => {
+  it('renders provisional local intake rows without details or retry actions', () => {
+    const wrapper = mount(QueueItemCard, {
+      props: {
+        item: {
+          kind: 'local',
+          id: 'local:test-1',
+          localId: 'test-1',
+          filename: 'pending-report.pdf',
+          sizeBytes: 1024,
+          mimeType: 'application/pdf',
+          state: 'uploading',
+          intakeStatus: 'hashing',
+          progress: 35,
+          error: null,
+          createdAt: '2026-03-11T00:00:00.000Z',
+          updatedAt: '2026-03-11T00:00:00.000Z',
+          processingStage: 'Hashing file locally',
+          dedupeKey: 'pending-report.pdf::1024::1',
+          uploadProgress: 0,
+          processingProgress: 0,
+          processingPath: 'agent_patch',
+          pathFallbacks: [],
+          reconstructionStatus: 'pending',
+          documentModelStatus: 'pending',
+          pageCount: null,
+          overallScore: null,
+          grade: null,
+          originalScore: null,
+          originalGrade: null,
+          rebuiltScore: null,
+          rebuiltGrade: null,
+          reconstructionError: null,
+          uploadStartedAt: '2026-03-11T00:00:00.000Z',
+          uploadCompletedAt: null,
+          processingStartedAt: null,
+          completedAt: null,
+          expiresAt: '2026-04-10T00:00:00.000Z',
+          canRetry: false,
+          canCancel: false,
+          canDownloadOriginal: false,
+          canDownloadRebuilt: false,
+          result: null,
+          originalResult: null,
+          rebuiltResult: null,
+          documentModel: null,
+          aiAppliedChanges: [],
+          aiSuggestedChanges: [],
+          confidenceSummary: null,
+          manualReviewFlags: [],
+          detailsLoaded: false,
+          detailsLoading: false,
+          detailsError: null,
+        },
+        selected: false,
+        overallProgress: 35,
+        selectable: false,
+      },
+      global: {
+        stubs: {
+          UButton: true,
+          ScoreCard: true,
+          CategoryRow: true,
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('pending-report.pdf')
+    expect(wrapper.text()).toContain('Hashing')
+    expect(wrapper.text()).toContain('35%')
+    expect(wrapper.text()).not.toContain('Retry')
+    expect(wrapper.text()).not.toContain('Original')
+    expect(wrapper.text()).not.toContain('Remediated')
   })
 })

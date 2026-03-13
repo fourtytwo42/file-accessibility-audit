@@ -42,3 +42,4 @@ coverage/
 # Temp files
 tmp/
 *.tmp
+.local-tools/

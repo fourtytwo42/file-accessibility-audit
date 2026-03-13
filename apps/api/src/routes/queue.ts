@@ -6,25 +6,28 @@ import multer from 'multer'
 import { BATCH_QUEUE } from '#config'
 import { bootstrapClientSession, ClientSessionRequest, requireClientSession } from '../middleware/clientSession.js'
 import { streamQueueArchive } from '../services/archiveService.js'
-import { emitQueueItemUpsert, registerQueueSse } from '../services/queueEvents.js'
+import { emitQueueItemDeleted, emitQueueItemUpsert, registerQueueSse } from '../services/queueEvents.js'
 import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams } from '../services/queueManager.js'
 import {
   cleanupExpiredQueueItems,
   createQueueItem,
+  deleteQueueItemPermanently,
   failStaleUploads,
+  getQueueCounts,
   getQueueItemById,
   getQueueItemByMd5,
   getQueueStorageRoots,
   listActiveQueueItems,
   listHistoryQueueItems,
+  listSelectableQueueItemIds,
   markQueueItemHidden,
   nowIso,
   queueItemDiskPath,
   QueueItemRecord,
   removeDiskFile,
-  restoreHiddenQueueItem,
   sanitizeBasename,
-  serializeQueueItem,
+  serializeQueueItemDetail,
+  serializeQueueItemSummary,
   updateQueueItem,
 } from '../services/queueStore.js'
 
@@ -52,6 +55,16 @@ const upload = multer({
 function queueHousekeeping(): void {
   cleanupExpiredQueueItems()
   failStaleUploads()
+}
+
+let lastHousekeepingAt = 0
+const HOT_PATH_HOUSEKEEPING_INTERVAL_MS = 60_000
+
+function queueHousekeepingThrottled(): void {
+  const now = Date.now()
+  if (now - lastHousekeepingAt < HOT_PATH_HOUSEKEEPING_INTERVAL_MS) return
+  lastHousekeepingAt = now
+  queueHousekeeping()
 }
 
 function readItemId(value: string | string[] | undefined): string {
@@ -92,16 +105,14 @@ router.post('/queue/preflight', requireClientSession, (req: ClientSessionRequest
   }
 
   const existing = getQueueItemByMd5(clientId, md5)
-  if (existing && !existing.hidden) {
-    res.json({ status: 'duplicate', item: serializeQueueItem(existing) })
+  if (existing && !existing.hidden && ['uploading', 'queued', 'processing'].includes(existing.state)) {
+    res.json({ status: 'duplicate', item: serializeQueueItemSummary(existing) })
     return
   }
 
-  if (existing && existing.hidden) {
-    const restored = restoreHiddenQueueItem(existing.id)
-    emitQueueItemUpsert(restored.id)
-    res.json({ status: 'restored', item: serializeQueueItem(restored) })
-    return
+  if (existing) {
+    deleteQueueItemPermanently(existing.id)
+    emitQueueItemDeleted(clientId, existing.id)
   }
 
   const item = createQueueItem({
@@ -112,7 +123,7 @@ router.post('/queue/preflight', requireClientSession, (req: ClientSessionRequest
     mimeType,
   })
   emitQueueItemUpsert(item.id)
-  res.json({ status: 'created', item: serializeQueueItem(item) })
+  res.json({ status: 'created', item: serializeQueueItemSummary(item) })
 })
 
 router.post('/queue/items/:id/upload', requireClientSession, upload.single('file'), async (req: ClientSessionRequest, res: Response) => {
@@ -167,7 +178,7 @@ router.post('/queue/items/:id/upload', requireClientSession, upload.single('file
     const destination = queueItemDiskPath(item.id, item.filename)
     await fs.promises.rename(uploaded.path, destination)
 
-    const queued = updateQueueItem(item.id, {
+  const queued = updateQueueItem(item.id, {
       state: 'queued',
       storage_path: destination,
       original_storage_path: destination,
@@ -182,7 +193,7 @@ router.post('/queue/items/:id/upload', requireClientSession, upload.single('file
     emitQueueItemUpsert(queued.id)
     queueItemForProcessing(queued.id)
 
-    res.json({ item: serializeQueueItem(queued) })
+    res.json({ item: serializeQueueItemSummary(queued) })
   } catch (err: any) {
     removeDiskFile(uploaded.path)
     updateQueueItem(item.id, {
@@ -197,14 +208,14 @@ router.post('/queue/items/:id/upload', requireClientSession, upload.single('file
 })
 
 router.get('/queue/active', requireClientSession, (req: ClientSessionRequest, res: Response) => {
-  queueHousekeeping()
+  queueHousekeepingThrottled()
   res.json({ items: listActiveQueueItems(req.clientId!) })
 })
 
 router.get('/queue/history', requireClientSession, (req: ClientSessionRequest, res: Response) => {
-  queueHousekeeping()
+  queueHousekeepingThrottled()
   const page = Math.max(1, Number(req.query.page) || 1)
-  const limit = Math.max(1, Math.min(100, Number(req.query.limit) || BATCH_QUEUE.INITIAL_PAGE_SIZE))
+  const limit = Math.max(1, Number(req.query.limit) || BATCH_QUEUE.INITIAL_PAGE_SIZE)
   const { items, total } = listHistoryQueueItems(req.clientId!, page, limit)
   res.json({
     items,
@@ -216,6 +227,30 @@ router.get('/queue/history', requireClientSession, (req: ClientSessionRequest, r
       hasMore: page * limit < total,
     },
   })
+})
+
+router.get('/queue/counts', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  queueHousekeepingThrottled()
+  res.json(getQueueCounts(req.clientId!))
+})
+
+router.get('/queue/selectable-ids', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  queueHousekeepingThrottled()
+  const scope = req.query.scope === 'complete' ? 'complete' : req.query.scope === 'active' ? 'active' : null
+  if (!scope) {
+    res.status(400).json({ error: 'A valid selection scope is required' })
+    return
+  }
+  res.json({ ids: listSelectableQueueItemIds(req.clientId!, scope) })
+})
+
+router.get('/queue/items/:id', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  if (!item || item.client_id !== req.clientId || item.hidden) {
+    res.status(404).json({ error: 'Queue item not found' })
+    return
+  }
+  res.json({ item: serializeQueueItemDetail(item) })
 })
 
 router.get('/queue/events', requireClientSession, (req: ClientSessionRequest, res: Response) => {
@@ -260,19 +295,33 @@ router.post('/queue/items/:id/retry', requireClientSession, (req: ClientSessionR
   const updated = updateQueueItem(item.id, {
     state: 'queued',
     remediation_status: 'pending',
+    document_model_status: 'pending',
     processing_progress: 0,
     processing_stage: 'Queued for retry',
+    processing_path: 'agent_patch',
+    path_fallbacks_json: '[]',
     remediated_storage_path: null,
+    rebuilt_storage_path: null,
+    document_model_path: null,
+    review_assets_dir: null,
     result_json: null,
     remediated_result_json: null,
+    rebuilt_result_json: null,
     remediation_error_json: null,
+    reconstruction_error_json: null,
     applied_fixes_json: null,
     skipped_fixes_json: null,
     manual_review_flags_json: null,
+    ai_applied_changes_json: null,
+    ai_suggested_changes_json: null,
+    confidence_summary_json: null,
     error_json: null,
     remediated_page_count: null,
     remediated_overall_score: null,
     remediated_grade: null,
+    rebuilt_page_count: null,
+    rebuilt_overall_score: null,
+    rebuilt_grade: null,
     page_count: null,
     overall_score: null,
     grade: null,
@@ -280,7 +329,7 @@ router.post('/queue/items/:id/retry', requireClientSession, (req: ClientSessionR
   })
   emitQueueItemUpsert(updated.id)
   queueItemForProcessing(updated.id)
-  res.json({ item: serializeQueueItem(updated) })
+  res.json({ item: serializeQueueItemSummary(updated) })
 })
 
 function hideItemForClient(itemId: string, clientId: string): void {
@@ -316,11 +365,22 @@ router.post('/queue/delete-all', requireClientSession, (req: ClientSessionReques
 
 router.get('/queue/items/:id/download', requireClientSession, (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
-  if (!item || item.client_id !== req.clientId || item.hidden || !item.remediated_storage_path || !fs.existsSync(item.remediated_storage_path)) {
-    res.status(404).json({ error: 'Remediated PDF not found' })
+  const rebuiltPath = item?.rebuilt_storage_path || item?.remediated_storage_path
+  if (!item || item.client_id !== req.clientId || item.hidden || !rebuiltPath || !fs.existsSync(rebuiltPath)) {
+    res.status(404).json({ error: 'Rebuilt PDF not found' })
     return
   }
-  res.download(item.remediated_storage_path, item.filename)
+  res.download(rebuiltPath, item.filename)
+})
+
+router.get('/queue/items/:id/download-original', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  const originalPath = item?.original_storage_path || item?.storage_path
+  if (!item || item.client_id !== req.clientId || item.hidden || !originalPath || !fs.existsSync(originalPath)) {
+    res.status(404).json({ error: 'Original PDF not found' })
+    return
+  }
+  res.download(originalPath, item.filename)
 })
 
 router.post('/queue/download-many', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
