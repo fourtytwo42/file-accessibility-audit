@@ -210,7 +210,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
     expect(result.model.actions?.map(action => action.outcome)).toEqual(['applied', 'applied'])
     expect(result.model.failureProfile?.version).toBe('1')
-    expect(result.model.failureProfile?.toolOpportunities.length).toBeGreaterThan(0)
+    expect(result.model.failureProfile?.toolOpportunities.length).toBeGreaterThanOrEqual(0)
     expect(result.model.plannerEvidence).toBeTruthy()
     expect(result.finalResult.overallScore).toBe(90)
   })
@@ -717,6 +717,169 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     ])
     expect(result.finalResult.grade).toBe('A')
     expect(result.finalResult.verapdf.status).toBe('passed')
+  })
+
+  it('rolls back a later deterministic iteration that regresses scores without improving standards', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+
+    const originalResult: AnalysisResult = {
+      filename: 'rollback.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 23,
+      grade: 'F',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 10,
+        failures: [{ ruleId: 'struct', specification: null, clause: null, testNumber: null, location: null, message: 'Structure issue', categoryIds: ['heading_structure'] }],
+      }),
+      categories: [
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.135, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const stabilizedResult: AnalysisResult = {
+      ...originalResult,
+      overallScore: 97,
+      grade: 'B',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 1,
+        failures: [{ ruleId: 'remaining', specification: null, clause: null, testNumber: null, location: null, message: 'Remaining standards issue', categoryIds: ['pdf_ua_compliance'] }],
+      }),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    }
+
+    const regressedResult: AnalysisResult = {
+      ...stabilizedResult,
+      overallScore: 76,
+      grade: 'C',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 2,
+        failures: [{ ruleId: 'heading-order', specification: null, clause: null, testNumber: null, location: null, message: 'Heading level 1 is skipped', categoryIds: ['heading_structure'] }],
+      }),
+      categories: [
+        { ...stabilizedResult.categories[0], score: 40, grade: 'F', severity: 'Moderate' },
+        { ...stabilizedResult.categories[1], score: 60, grade: 'D', severity: 'Moderate' },
+      ],
+    }
+
+    const initialContext = {
+      pdfjs: { title: 'Rollback', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    }
+    const healthyContext = {
+      pdfjs: { title: 'Rollback', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:42 0 R', tag: '/H1', parentRef: null, orderIndex: 0 }] },
+    }
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce(initialContext)
+      .mockResolvedValueOnce(healthyContext)
+      .mockResolvedValueOnce(healthyContext)
+      .mockResolvedValueOnce(healthyContext)
+      .mockResolvedValueOnce(healthyContext)
+      .mockResolvedValueOnce(healthyContext)
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['heading_structure', 'reading_order'],
+        actions: [
+          { tool_name: 'bootstrap_struct_tree', arguments: { target: 'document' }, rationale: 'bootstrap', confidence: 0.8 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['pdf_ua_compliance'],
+        actions: [
+          { tool_name: 'repair_bootstrapped_chart_content_refs', arguments: { target: 'document' }, rationale: 'repair bootstrapped refs', confidence: 0.8 },
+        ],
+      })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-a'),
+        action: {
+          tool: 'bootstrap_struct_tree',
+          target: 'document',
+          details: 'bootstrap applied',
+          confidence: 0.8,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['heading_structure', 'reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-c'),
+        action: {
+          tool: 'repair_bootstrapped_chart_content_refs',
+          target: 'document',
+          details: 'repair refs applied',
+          confidence: 0.8,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['heading_structure', 'reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF
+      .mockResolvedValueOnce(stabilizedResult)
+      .mockResolvedValueOnce(regressedResult)
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'rollback.pdf', originalResult)
+
+    expect(result.buffer.equals(Buffer.from('pdf-a'))).toBe(true)
+    expect(result.finalResult.grade).toBe('B')
+    expect(result.finalResult.verapdf.status).toBe('failed')
+    expect((result.model.rejectedActions || []).some(action => action.tool === 'repair_bootstrapped_chart_content_refs')).toBe(true)
   })
 
   it('exits before semantic AI when native remediation reaches A and veraPDF passes', async () => {

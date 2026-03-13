@@ -298,8 +298,9 @@ describe('failureProfileService', () => {
     })
 
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'create_heading_from_candidate' && opportunity.status === 'auto_runnable')).toBe(true)
-    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'set_table_header_cells' && opportunity.status === 'blocked')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'set_table_header_cells' && opportunity.status === 'auto_runnable')).toBe(false)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'retag_as_figure_and_set_alt' && opportunity.status === 'auto_runnable')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName) && opportunity.status === 'blocked')).toBe(true)
   })
 
   it('marks prior attempts, rejections, and no-effect actions on matching opportunities', () => {
@@ -319,5 +320,33 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'set_link_annotation_contents' && opportunity.candidateIds[0] === 'link:1')?.status).toBe('no_effect')
     expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'reorder_structure_children' && opportunity.candidateGroupIds[0] === 'group:1')?.status).toBe('rejected')
     expect(result.plannerEvidence.rejectedKeys.some(key => key.includes('reorder_structure_children:group:1'))).toBe(true)
+  })
+
+  it('does not emit heading or figure candidate opportunities once those categories are already complete', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 100,
+      grade: 'A',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'passed',
+        isCompliant: true,
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'heading_structure' || category.id === 'alt_text'
+          ? { ...category, score: 100, grade: 'A', severity: 'Pass', findings: [] }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis: analysis as AnalysisResult }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'create_heading_from_candidate')).toBe(false)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName))).toBe(false)
   })
 })

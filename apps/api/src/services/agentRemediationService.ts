@@ -230,6 +230,18 @@ function categoryRegression(previous: AnalysisResult, next: AnalysisResult, cate
   return before !== null && after !== null && after < before
 }
 
+function hasAnyCategoryRegression(previous: AnalysisResult, next: AnalysisResult): boolean {
+  return previous.categories.some(category => categoryRegression(previous, next, category.id))
+}
+
+function hasDeterministicIterationRegression(previous: AnalysisResult, next: AnalysisResult): boolean {
+  const previousFailed = previous.verapdf?.status === 'failed' ? previous.verapdf.failedChecks : 0
+  const nextFailed = next.verapdf?.status === 'failed' ? next.verapdf.failedChecks : 0
+  return next.overallScore < previous.overallScore
+    || nextFailed > previousFailed
+    || hasAnyCategoryRegression(previous, next)
+}
+
 function semanticThreshold(batchType: SemanticBatchResult['batchType']): number {
   return batchType === 'figures' ? 0.75 : 0.8
 }
@@ -764,6 +776,8 @@ export async function remediatePdfWithAgent(
       rejectedActions,
     })
 
+    const iterationStartBuffer = workingBuffer
+    const iterationStartResult = currentResult
     const executedActions: RemediationActionRecord[] = []
     let changedDocument = false
     let improvedTargetedCategories = false
@@ -949,6 +963,41 @@ export async function remediatePdfWithAgent(
         if (!improved && action.outcome === 'applied') {
           action.outcome = 'no_effect'
         }
+      }
+
+      if (!improvedStandardsValidation && hasDeterministicIterationRegression(previousResult, currentResult)) {
+        workingBuffer = iterationStartBuffer
+        currentResult = iterationStartResult
+        changedDocument = false
+        improvedTargetedCategories = false
+        for (let actionIndex = 0; actionIndex < executedActions.length; actionIndex++) {
+          const action = executedActions[actionIndex]
+          if (action.changedDocumentBytes || action.outcome === 'no_effect') {
+            const rejected = {
+              ...action,
+              details: `${action.details} Rejected because the iteration regressed accessibility scores or standards outcomes without offsetting improvement.`,
+              outcome: 'rejected' as const,
+              autoApplied: false,
+              changedDocumentBytes: false,
+            }
+            const index = actions.indexOf(action)
+            if (index >= 0) actions[index] = rejected
+            executedActions[actionIndex] = rejected
+            rejectedActions.push(rejected)
+          }
+        }
+        latestContext = null
+        context = await inspectPdfForRemediation(workingBuffer, currentResult, {
+          inspectMode: inspectModeForResult(currentResult),
+          cache: inspectionCache,
+        })
+        latestContext = context
+        manualReviewFlags = addFlag(manualReviewFlags, {
+          code: `iteration_${iteration}_regressed`,
+          label: 'Regressive iteration rejected',
+          severity: 'warning',
+          details: `Rejected remediation iteration ${iteration} because it regressed accessibility scores or standards outcomes without offsetting improvement.`,
+        })
       }
     }
 

@@ -477,6 +477,9 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   for (const mode of failureModes) {
+    const relevantToOpenIssue = mode.categoryIds.some(categoryId => issueIds.has(categoryId))
+      || (mode.key.startsWith('pdfua.') && input.analysis.verapdf.status === 'failed')
+    if (!relevantToOpenIssue) continue
     for (const toolName of mode.nativeToolFamilies) {
       if (toolName === 'set_document_title' || toolName === 'set_document_language' || toolName === 'normalize_document_metadata') continue
       addOpportunity(opportunities, {
@@ -495,6 +498,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   for (const candidate of input.context.headingCandidates) {
+    if (!issueIds.has('heading_structure')) continue
     addOpportunity(opportunities, {
       toolName: 'create_heading_from_candidate',
       reason: candidate.repairMode === 'safe'
@@ -512,6 +516,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   for (const candidate of input.context.figureCandidates) {
+    if (!issueIds.has('alt_text')) continue
     const toolName = candidate.informativeHint === 'decorative'
       ? 'mark_figure_decorative'
       : candidate.repairMode === 'retag_then_set_alt'
@@ -534,6 +539,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   for (const candidate of input.context.tableCandidates) {
+    if (!issueIds.has('table_markup')) continue
     addOpportunity(opportunities, {
       toolName: 'set_table_header_cells',
       reason: candidate.repairMode === 'safe'
@@ -551,6 +557,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   for (const candidate of input.context.linkCandidates) {
+    if (!issueIds.has('link_quality') && !failureModeByKey.has('pdfua.annotation_alt_contents')) continue
     addOpportunity(opportunities, {
       toolName: 'set_link_annotation_contents',
       reason: `Set annotation alternate text for link candidate ${candidate.id}.`,
@@ -580,6 +587,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   for (const candidate of input.context.readingOrderParentCandidates) {
+    if (!issueIds.has('reading_order')) continue
     if (candidate.suggestedChildCandidateIds.length <= 1) continue
     addOpportunity(opportunities, {
       toolName: 'reorder_structure_children',
