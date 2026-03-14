@@ -296,6 +296,34 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     })
   }
 
+  const acrobatAltRiskNodes = input.context.structure.acrobatAltRiskNodes || []
+  if (acrobatAltRiskNodes.length) {
+    const hasDeterministicRepair = acrobatAltRiskNodes.some(node =>
+      node.ownershipMode === 'duplicate_mcid_ownership'
+      || node.ownershipMode === 'container_with_graphics_descendants'
+      || node.ownershipMode === 'graphics_only_nonfigure'
+      || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe))
+    mergeMode(modes, {
+      key: 'acrobat.other_elements_alt_text',
+      label: 'Acrobat-style other-elements alternate text',
+      source: 'context',
+      count: acrobatAltRiskNodes.length,
+      categoryIds: ['alt_text'],
+      blocking: true,
+      unmatched: false,
+      classification: hasDeterministicRepair ? 'deterministic' : 'manual_only',
+      nativeToolFamilies: hasDeterministicRepair ? ['repair_other_elements_alt_text'] : [],
+      evidence: acrobatAltRiskNodes.slice(0, 3).map(node =>
+        node.ownershipMode === 'mixed_text_graphics_same_mcid'
+          ? `${node.tag} mixes text and graphics in MCID ${node.mcids?.join(', ') || 'unknown'}${node.splitSafe ? ` (${node.operatorPattern || 'split-safe'})` : ''}.`
+          : node.ownershipMode === 'duplicate_mcid_ownership'
+            ? `${node.tag} shares MCID ownership with ${node.duplicateOwnerRefs?.join(', ') || 'another structure element'}.`
+            : node.ownershipMode === 'container_with_graphics_descendants'
+              ? `${node.tag} still directly owns graphics content while a child bridge exists.`
+              : `${node.tag} owns graphics content but is not tagged as /Figure.`),
+    })
+  }
+
   const blockedTables = input.context.tableCandidates.filter(candidate => candidate.repairMode !== 'safe')
   if (blockedTables.length) {
     mergeMode(modes, {
@@ -443,6 +471,31 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       confidence: 0.74,
       blockedReason: undefined,
       derivedFromFailureModeKeys: derivedFailureKeys(['category.alt_text', 'pdfua.figure_alt_or_artifact']),
+    })
+  }
+
+  const acrobatRiskNodes = input.context.structure.acrobatAltRiskNodes || []
+  const deterministicAcrobatRiskNodes = acrobatRiskNodes.filter(node =>
+    node.ownershipMode === 'duplicate_mcid_ownership'
+    || node.ownershipMode === 'container_with_graphics_descendants'
+    || node.ownershipMode === 'graphics_only_nonfigure'
+    || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe))
+  if (issueIds.has('alt_text') && acrobatRiskNodes.length) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_other_elements_alt_text',
+      reason: deterministicAcrobatRiskNodes.length
+        ? 'Normalize non-figure graphics ownership so Acrobat no longer flags other-elements alternate text.'
+        : 'Remaining Acrobat-style alternate-text risk requires manual review because mixed text and graphics share the same marked-content block.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['alt_text'],
+      confidence: deterministicAcrobatRiskNodes.length ? 0.9 : 0.35,
+      blockedReason: deterministicAcrobatRiskNodes.length
+        ? undefined
+        : 'Mixed text and graphics share the same marked-content block, so a safe deterministic split is not available.',
+      derivedFromFailureModeKeys: derivedFailureKeys(['acrobat.other_elements_alt_text']),
     })
   }
 

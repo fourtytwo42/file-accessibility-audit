@@ -100,6 +100,7 @@ export type RemediationToolName =
   | 'repair_native_link_structure'
   | 'repair_bootstrapped_chart_content_refs'
   | 'repair_native_figure_semantics'
+  | 'repair_other_elements_alt_text'
   | 'repair_native_table_headers'
   | 'repair_native_reading_order'
   | 'repair_font_unicode_maps'

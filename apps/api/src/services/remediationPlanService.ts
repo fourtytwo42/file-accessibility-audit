@@ -43,6 +43,7 @@ const FONT_STAGE = new Set<RemediationToolName>([
 ])
 
 const NATIVE_STRUCTURE_STAGE = new Set<RemediationToolName>([
+  'repair_other_elements_alt_text',
   'repair_native_figure_semantics',
   'repair_native_table_headers',
   'repair_native_reading_order',
@@ -88,6 +89,7 @@ const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['repair_cidset_consistency', 4],
   ['substitute_legacy_fonts_in_place', 4],
   ['finalize_substituted_font_conformance', 4],
+  ['repair_other_elements_alt_text', 5],
   ['repair_native_figure_semantics', 5],
   ['repair_native_table_headers', 5],
   ['repair_native_reading_order', 5],
@@ -123,6 +125,7 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['repair_cidset_consistency', 4],
   ['substitute_legacy_fonts_in_place', 5],
   ['finalize_substituted_font_conformance', 6],
+  ['repair_other_elements_alt_text', 0],
   ['repair_native_figure_semantics', 0],
   ['repair_native_table_headers', 1],
   ['repair_native_reading_order', 2],
@@ -381,6 +384,7 @@ function buildDeterministicCall(input: {
     case 'repair_cidset_consistency':
     case 'substitute_legacy_fonts_in_place':
     case 'finalize_substituted_font_conformance':
+    case 'repair_other_elements_alt_text':
     case 'repair_native_figure_semantics':
     case 'repair_native_table_headers':
     case 'repair_native_reading_order':

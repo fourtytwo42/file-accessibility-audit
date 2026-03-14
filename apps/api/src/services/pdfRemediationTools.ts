@@ -145,6 +145,7 @@ export interface FigureCandidate {
   pageImageCount: number
   textDensityHint: 'low' | 'medium' | 'high'
   imageEvidence: 'strong' | 'weak'
+  containsText?: boolean
 }
 
 export interface ReadingOrderCandidate {
@@ -381,6 +382,7 @@ function buildFigureCandidates(
     surroundingText: string[],
     textDensityHint: FigureCandidate['textDensityHint'],
     imageEvidence: FigureCandidate['imageEvidence'],
+    allowContainerAlt = false,
   ) => {
     const structuralNode = targetRef ? structuralByRef.get(targetRef) : null
     const figureNode = targetRef ? figureByRef.get(targetRef) : null
@@ -411,6 +413,13 @@ function buildFigureCandidates(
         targetTag,
         parentTagPath,
         unsafeReason: `unsafe_ancestry: Target ${targetRef} is associated with ${unsafeTag ? targetTag : unsafeParent} and is not safe to retag as /Figure.`,
+      }
+    }
+    if (allowContainerAlt && targetTag) {
+      return {
+        repairMode: 'set_alt' as const,
+        targetTag,
+        parentTagPath,
       }
     }
     if (targetTag && SAFE_FIGURE_TAGS.includes(targetTag as (typeof SAFE_FIGURE_TAGS)[number])) {
@@ -470,11 +479,11 @@ function buildFigureCandidates(
       imageEvidence: 'strong' as const,
     }
   })
-  const explicitImageStructNodes = (structure.imageStructNodes || []).map((node, index) => {
+  const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
     const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
-    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong')
+    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong', false)
     return {
       id: `figure:image-node:${index + 1}`,
       pageNumber: page?.pageNumber || 1,
@@ -491,6 +500,7 @@ function buildFigureCandidates(
       pageImageCount: page?.imageCount || 0,
       textDensityHint,
       imageEvidence: 'strong' as const,
+      containsText: !!node.hasText,
     }
   })
   const explicitRefs = new Set([...explicitFigures, ...explicitImageStructNodes].map(candidate => candidate.targetRef).filter(Boolean))
@@ -1427,6 +1437,7 @@ export async function executeRemediationTool(input: {
           operation: 'create_heading_from_candidate',
           targetRef: candidate.targetRef,
           level: typeof args.level === 'string' ? args.level : 'H2',
+          text: candidate.text,
         },
       })
       const translated = structureResultToAction({ baseAction, result, categoryTargets: ['heading_structure'] })
@@ -1729,6 +1740,24 @@ export async function executeRemediationTool(input: {
         manualReviewFlags: translated.manualReviewFlags,
       }
     }
+    case 'repair_other_elements_alt_text': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'repair_other_elements_alt_text',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['alt_text'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
     case 'repair_native_table_headers': {
       const result = await runPdfStructureBackend({
         buffer,
@@ -1942,6 +1971,7 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
     repair_native_link_structure: 'structure',
     repair_bootstrapped_chart_content_refs: 'structure',
     repair_native_figure_semantics: 'alt_text',
+    repair_other_elements_alt_text: 'alt_text',
     repair_native_table_headers: 'table',
     repair_native_reading_order: 'reading_order',
     repair_font_unicode_maps: 'text_recovery',
@@ -1996,6 +2026,7 @@ export function toSuggestedChange(action: RemediationActionRecord): SuggestedCha
     repair_native_link_structure: 'structure',
     repair_bootstrapped_chart_content_refs: 'structure',
     repair_native_figure_semantics: 'alt_text',
+    repair_other_elements_alt_text: 'alt_text',
     repair_native_table_headers: 'table',
     repair_native_reading_order: 'reading_order',
     repair_font_unicode_maps: 'text_recovery',

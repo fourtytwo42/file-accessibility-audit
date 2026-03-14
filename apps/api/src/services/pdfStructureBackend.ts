@@ -33,6 +33,7 @@ export interface StructureBackendMutationRequest {
     | 'repair_native_link_structure'
     | 'repair_bootstrapped_chart_content_refs'
     | 'repair_native_figure_semantics'
+    | 'repair_other_elements_alt_text'
     | 'repair_native_table_headers'
     | 'repair_native_reading_order'
     | 'repair_font_unicode_maps'
@@ -55,6 +56,7 @@ export interface StructureBackendMutationRequest {
   targetTag?: string
   targetRef?: string
   level?: string
+  text?: string
   altText?: string
   pageImageCount?: number
   textDensityHint?: 'low' | 'medium' | 'high'
@@ -90,7 +92,21 @@ export interface StructureBackendMutationResult {
     pageNumberHints?: number[]
   }>
   figures: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[] }>
-  imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[] }>
+  imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[]; hasText?: boolean }>
+  acrobatAltRiskNodes?: Array<{
+    ref: string
+    tag: string
+    pageRef?: string | null
+    mcids?: number[]
+    hasText?: boolean
+    hasGraphics?: boolean
+    splitSafe?: boolean
+    graphicsLikelyDecorative?: boolean
+    operatorPattern?: 'text_then_graphics' | 'graphics_then_text' | 'interleaved' | null
+    parentTagPath?: string[]
+    ownershipMode?: 'mixed_text_graphics_same_mcid' | 'graphics_only_nonfigure' | 'duplicate_mcid_ownership' | 'container_with_graphics_descendants'
+    duplicateOwnerRefs?: string[]
+  }>
   readingOrderNodes: Array<{ ref: string; tag: string; parentRef?: string | null; orderIndex: number }>
   readingOrderParents: Array<{
     parentRef: string
@@ -159,6 +175,7 @@ export async function runPdfStructureBackend(input: {
       tables: [],
       figures: [],
       imageStructNodes: [],
+      acrobatAltRiskNodes: [],
       readingOrderNodes: [],
       readingOrderParents: [],
     }

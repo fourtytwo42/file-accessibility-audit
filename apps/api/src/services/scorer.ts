@@ -6,6 +6,7 @@ import {
 } from '#config'
 import type { QpdfResult } from './qpdfService.js'
 import type { PdfjsResult } from './pdfjsService.js'
+import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
 import { emptyVeraPdfResult, type VeraPdfFailure, type VeraPdfResult } from './veraPdfService.js'
 
 export interface HelpLink {
@@ -201,12 +202,19 @@ interface SummaryContext {
   gradeGateApplied: boolean
 }
 
-export function scoreDocument(qpdf: QpdfResult, pdfjs: PdfjsResult, verapdf: VeraPdfResult = emptyVeraPdfResult({
-  status: 'passed',
-  executionStatus: 'ok',
-  isCompliant: true,
-  message: 'veraPDF passed PDF/UA validation.',
-})): ScoringResult {
+type AcrobatAltRiskNode = NonNullable<StructureBackendMutationResult['acrobatAltRiskNodes']>[number]
+
+export function scoreDocument(
+  qpdf: QpdfResult,
+  pdfjs: PdfjsResult,
+  verapdf: VeraPdfResult = emptyVeraPdfResult({
+    status: 'passed',
+    executionStatus: 'ok',
+    isCompliant: true,
+    message: 'veraPDF passed PDF/UA validation.',
+  }),
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
+): ScoringResult {
   let categories: CategoryResult[] = []
   const warnings: string[] = []
 
@@ -231,7 +239,7 @@ export function scoreDocument(qpdf: QpdfResult, pdfjs: PdfjsResult, verapdf: Ver
   categories.push(scoreHeadingStructure(qpdf))
 
   // 4. Alt Text on Images (15%)
-  categories.push(scoreAltText(qpdf, pdfjs))
+  categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, structure?.acrobatAltRiskNodes || []))
 
   // 5. Bookmarks / Navigation (10%)
   categories.push(scoreBookmarks(qpdf, pdfjs))
@@ -265,10 +273,11 @@ export function scoreDocument(qpdf: QpdfResult, pdfjs: PdfjsResult, verapdf: Ver
     ? Math.round(applicable.reduce((sum, c) => sum + (c.score! * (c.weight / totalWeight)), 0))
     : 0
 
-  const scoreGateApplied = verapdf.status !== 'passed' && computedScore === 100
+  const acrobatAltRiskOpen = (structure?.acrobatAltRiskNodes?.length || 0) > 0
+  const scoreGateApplied = (verapdf.status !== 'passed' || acrobatAltRiskOpen) && computedScore === 100
   const overallScore = scoreGateApplied ? 99 : computedScore
   let grade = getGrade(overallScore)
-  const gradeGateApplied = verapdf.status !== 'passed' && grade === 'A'
+  const gradeGateApplied = (verapdf.status !== 'passed' || acrobatAltRiskOpen) && grade === 'A'
   if (gradeGateApplied) {
     grade = 'B'
   }
@@ -544,6 +553,47 @@ function scoreAltText(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
     findings,
     explanation: altExplanation,
     helpLinks: altLinks,
+  }
+}
+
+function describeAcrobatAltRisk(node: AcrobatAltRiskNode): string {
+  if (node.ownershipMode === 'mixed_text_graphics_same_mcid') {
+    return `${node.tag} mixes text and graphics in the same marked-content block on MCID${node.mcids?.length === 1 ? '' : 's'} ${node.mcids?.join(', ') || 'unknown'}.`
+  }
+  if (node.ownershipMode === 'duplicate_mcid_ownership') {
+    return `${node.tag} shares MCID ownership with ${node.duplicateOwnerRefs?.join(', ') || 'another structure element'}.`
+  }
+  if (node.ownershipMode === 'container_with_graphics_descendants') {
+    return `${node.tag} still directly owns graphics content even though a child bridge already exists.`
+  }
+  return `${node.tag} owns graphics content but is not tagged as /Figure.`
+}
+
+function scoreAltTextWithAcrobatRisk(
+  qpdf: QpdfResult,
+  pdfjs: PdfjsResult,
+  acrobatAltRiskNodes: AcrobatAltRiskNode[] = [],
+): CategoryResult {
+  const category = scoreAltText(qpdf, pdfjs)
+  if (!acrobatAltRiskNodes.length) return category
+
+  const findings = [
+    ...(category.findings || []),
+    `Detected ${acrobatAltRiskNodes.length} Acrobat-risk non-figure element${acrobatAltRiskNodes.length === 1 ? '' : 's'} with graphics content.`,
+    'Acrobat-style alternate-text risk remains because graphics content is still owned by non-/Figure structure elements.',
+    ...acrobatAltRiskNodes.slice(0, 3).map(describeAcrobatAltRisk),
+  ]
+
+  const scoreCap = acrobatAltRiskNodes.some(node => node.ownershipMode === 'mixed_text_graphics_same_mcid') ? 40 : 60
+  const baseScore = category.score === null ? 100 : category.score
+  const score = Math.min(baseScore, scoreCap)
+
+  return {
+    ...category,
+    score,
+    grade: getGrade(score),
+    severity: getSeverity(score),
+    findings,
   }
 }
 

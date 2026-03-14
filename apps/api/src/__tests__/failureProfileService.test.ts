@@ -349,4 +349,112 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'create_heading_from_candidate')).toBe(false)
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName))).toBe(false)
   })
+
+  it('emits Acrobat-risk alt-text failure modes and a deterministic repair opportunity', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 88,
+      grade: 'B',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'passed',
+        isCompliant: true,
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? {
+              ...category,
+              score: 60,
+              grade: 'D',
+              severity: 'Moderate',
+              findings: ['Acrobat-risk non-figure graphics ownership remains.'],
+            }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [
+            {
+              ref: 'obj:20 0 R',
+              tag: '/H1',
+              pageRef: 'obj:1 0 R',
+              mcids: [0],
+              hasText: true,
+              hasGraphics: true,
+              parentTagPath: ['/Document'],
+              ownershipMode: 'mixed_text_graphics_same_mcid',
+              splitSafe: true,
+              operatorPattern: 'graphics_then_text',
+              duplicateOwnerRefs: [],
+            },
+          ],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'acrobat.other_elements_alt_text' && mode.classification === 'deterministic')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
+  it('keeps unsplittable mixed Acrobat-risk nodes manual-only', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 88,
+      grade: 'B',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'passed',
+        isCompliant: true,
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? {
+              ...category,
+              score: 60,
+              grade: 'D',
+              severity: 'Moderate',
+              findings: ['Acrobat-risk mixed text and graphics ownership remains.'],
+            }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [
+            {
+              ref: 'obj:20 0 R',
+              tag: '/H1',
+              pageRef: 'obj:1 0 R',
+              mcids: [0],
+              hasText: true,
+              hasGraphics: true,
+              parentTagPath: ['/Document'],
+              ownershipMode: 'mixed_text_graphics_same_mcid',
+              splitSafe: false,
+              operatorPattern: 'interleaved',
+              duplicateOwnerRefs: [],
+            },
+          ],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'acrobat.other_elements_alt_text' && mode.classification === 'manual_only')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'deferred')).toBe(true)
+  })
 })

@@ -3,6 +3,7 @@ import { scoreDocument, summarizeLinkTextQuality, type CategoryResult, type Scor
 import type { QpdfResult } from '../services/qpdfService.js'
 import type { PdfjsResult } from '../services/pdfjsService.js'
 import type { VeraPdfResult } from '../services/veraPdfService.js'
+import type { StructureBackendMutationResult } from '../services/pdfStructureBackend.js'
 
 // ---------------------------------------------------------------------------
 // Helpers to build mock data
@@ -69,6 +70,24 @@ function makeVeraPdf(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
     failedChecks: 0,
     failures: [],
     message: 'veraPDF passed PDF/UA validation.',
+    ...overrides,
+  }
+}
+
+function makeStructure(overrides: Partial<StructureBackendMutationResult> = {}): StructureBackendMutationResult {
+  return {
+    status: 'no_effect',
+    changedDocumentBytes: false,
+    appliedMutations: [],
+    warnings: [],
+    headings: [],
+    structuralNodes: [],
+    tables: [],
+    figures: [],
+    imageStructNodes: [],
+    acrobatAltRiskNodes: [],
+    readingOrderNodes: [],
+    readingOrderParents: [],
     ...overrides,
   }
 }
@@ -679,6 +698,34 @@ describe('scoreAltText edge cases', () => {
     const result = scoreDocument(qpdf, pdfjs)
     // Only ref='10 0 R' passes the filter, and it has alt
     expect(findCategory(result, 'alt_text').score).toBe(100)
+  })
+
+  it('reduces alt_text when Acrobat-risk non-figure graphics ownership remains even if veraPDF passes', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf(),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'obj:42 0 R',
+            tag: '/H1',
+            pageRef: 'obj:5 0 R',
+            mcids: [0],
+            hasText: true,
+            hasGraphics: true,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBeLessThan(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('Acrobat-risk'))).toBe(true)
+    expect(result.grade).not.toBe('A')
   })
 })
 

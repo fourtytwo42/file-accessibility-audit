@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFString, StandardFonts } from 'pdf-lib'
 import { REMEDIATION } from '#config'
 import { analyzePDF } from '../services/pdfAnalyzer.js'
+import { remediatePdfWithAgent } from '../services/agentRemediationService.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
@@ -155,6 +156,70 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.status).toBe('applied')
     expect(result.headings.map(heading => heading.tag)).toEqual(['/H1', '/H2'])
   }, 60_000)
+
+  it('splits mixed heading/logo MCIDs on the one-page chart fixture so Acrobat-risk nodes clear', async () => {
+    const buffer = await loadDownloadFixture('1total offenses_1999-2008.pdf')
+    const analysis = await analyzePDF(buffer, '1total offenses_1999-2008.pdf')
+    const remediated = await remediatePdfWithAgent(buffer, '1total offenses_1999-2008.pdf', analysis)
+    const inspect = await inspectPdfForRemediation(remediated.buffer, remediated.finalResult, { inspectMode: 'alt_text_deep' })
+
+    expect(remediated.finalResult.grade).toBe('A')
+    expect(remediated.finalResult.verapdf.status).toBe('passed')
+    expect(inspect.structure.acrobatAltRiskNodes || []).toEqual([])
+    expect(inspect.structure.figures || []).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tag: '/Figure',
+          hasAlt: true,
+        }),
+      ]),
+    )
+  }, 600_000)
+
+  it('routes Acrobat-risk alternate-text repairs through the structure backend', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'alt-risk.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [{
+        ref: 'obj:20 0 R',
+        before: 'MCID 0',
+        after: 'removed duplicate scalar ownership',
+        details: 'Removed duplicate direct MCID ownership from /Sect element obj:20 0 R for MCID 0.',
+      }],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: buffer,
+    })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'repair_other_elements_alt_text',
+        arguments: { target: 'document' },
+        rationale: 'Normalize Acrobat-risk non-figure graphics ownership.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalledWith(expect.objectContaining({
+      mutation: expect.objectContaining({
+        operation: 'repair_other_elements_alt_text',
+      }),
+    }))
+    expect(result.action.outcome).toBe('applied')
+    expect(result.action.categoryTargets).toEqual(['alt_text'])
+  })
 
   it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -2332,6 +2397,60 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const titleAction = plan.actions.find(action => action.tool_name === 'set_document_title')
     expect(titleAction?.arguments.title).not.toBe('firearmprohibitorstaskforce2024-240703T20585852')
+  })
+
+  it('prefers Acrobat-risk alternate-text repair before generic figure-alt tools', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'alt-risk.pdf')
+    const altRiskAnalysis = {
+      ...analysis,
+      overallScore: 84,
+      grade: 'B',
+      categories: analysis.categories.map(category =>
+        category.id === 'alt_text'
+          ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Acrobat-risk non-figure graphics ownership remains.'] }
+          : category),
+    }
+    const context = await inspectPdfForRemediation(buffer, altRiskAnalysis, { inspectMode: 'alt_text_deep' })
+
+    const plan = await planRemediationActions({
+      filename: 'alt-risk.pdf',
+      analysis: altRiskAnalysis,
+      context: {
+        ...context,
+        structure: {
+          ...context.structure,
+          acrobatAltRiskNodes: [
+            {
+              ref: 'obj:20 0 R',
+              tag: '/Sect',
+              pageRef: 'obj:1 0 R',
+              mcids: [0],
+              hasText: false,
+              hasGraphics: true,
+              parentTagPath: ['/Document'],
+              ownershipMode: 'duplicate_mcid_ownership',
+              duplicateOwnerRefs: ['obj:21 0 R'],
+            },
+          ],
+        },
+      },
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const repairIndex = plan.actions.findIndex(action => action.tool_name === 'repair_other_elements_alt_text')
+    const figureIndex = plan.actions.findIndex(action => action.tool_name === 'set_figure_alt_text')
+
+    expect(repairIndex).toBeGreaterThanOrEqual(0)
+    if (figureIndex >= 0) {
+      expect(repairIndex).toBeLessThan(figureIndex)
+    }
   })
 
   it('treats whitespace-only metadata titles as missing', async () => {

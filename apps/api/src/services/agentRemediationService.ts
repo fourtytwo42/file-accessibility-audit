@@ -278,6 +278,7 @@ const BATCH_SAFE_TOOLS = new Set([
 ])
 
 const FIGURE_TOOLS = new Set([
+  'repair_other_elements_alt_text',
   'set_figure_alt_text',
   'retag_as_figure_and_set_alt',
   'mark_figure_decorative',

@@ -2,6 +2,7 @@ import { analyzeWithQpdf } from './qpdfService.js'
 import { analyzeWithPdfjs, PdfMetadata } from './pdfjsService.js'
 import { scoreDocument, ScoringResult, summarizeLinkTextQuality } from './scorer.js'
 import { analyzeWithVeraPdf, type VeraPdfResult } from './veraPdfService.js'
+import { runPdfStructureBackend } from './pdfStructureBackend.js'
 import { ANALYSIS } from '#config'
 
 // Simple semaphore for concurrency limiting
@@ -77,10 +78,19 @@ export async function analyzePDF(
     })
 
     const linkSummary = summarizeLinkTextQuality(pdfjsResult.links)
+    const structureForScoring = qpdfResult.hasStructTree && (pdfjsResult.imageCount > 0 || qpdfResult.images.length > 0 || qpdfResult.headings.length > 0)
+      ? await runPdfStructureBackend({
+          buffer,
+          mutation: {
+            operation: 'inspect',
+            inspectMode: 'alt_text_deep',
+          },
+        })
+      : null
 
     // Score the document
     options?.onProgress?.({ stage: 'Scoring accessibility findings', percent: 92 })
-    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult)
+    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult, structureForScoring)
     options?.onProgress?.({ stage: 'Finalizing report', percent: 100 })
 
     return {
