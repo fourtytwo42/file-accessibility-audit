@@ -2329,6 +2329,52 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(plan.actions.some(action => action.tool_name === 'repair_cid_symbol_font_maps')).toBe(true)
   }, 120_000)
 
+  it('plans CID symbol-font recovery on OCR-searchable reports after generic Unicode repair stalls', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await loadDownloadFixture('1988-1989 Biennial Report.pdf')
+    const analysis = await analyzePDF(buffer, '1988-1989 Biennial Report.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const plan = await planRemediationActions({
+      filename: '1988-1989 Biennial Report.pdf',
+      analysis: {
+        ...analysis,
+        isScanned: false,
+        verapdf: {
+          ...analysis.verapdf,
+          status: 'failed',
+          executionStatus: 'ok',
+          isCompliant: false,
+          failedChecks: 101,
+          failures: [
+            {
+              ruleId: 'font-unicode',
+              specification: null,
+              clause: null,
+              testNumber: null,
+              location: null,
+              message: 'The glyph can not be mapped to Unicode',
+              categoryIds: [],
+            },
+          ],
+          message: 'Persistent OCR font Unicode failures remain.',
+        },
+      },
+      context,
+      iteration: 2,
+      actions: [
+        makePlannerAction('ocr_scanned_pdf'),
+        makePlannerAction('repair_font_unicode_maps', 'document', { outcome: 'no_effect' }),
+      ],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_cid_symbol_font_maps')).toBe(true)
+  }, 120_000)
+
   it('plans legacy font substitution after embedding and Type1 Unicode recovery on annual-report PDFs', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')

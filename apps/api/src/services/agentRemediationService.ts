@@ -40,7 +40,7 @@ function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   }
 }
 
-const MAX_ITERATIONS = 3
+const MAX_ITERATIONS = 5
 const NATIVE_TAGGED_RISKY_TOOLS = new Set<string>([
   'repair_structure_conformance',
   'repair_native_reading_order',

@@ -604,14 +604,22 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   if (
-    input.analysis.pageCount <= 2
-    && failureModeByKey.has('pdfua.font_unicode')
-    && input.actions.some(action => action.tool === 'repair_font_unicode_maps')
-    && !failureModeByKey.has('pdfua.type1_unicode')
+    failureModeByKey.has('pdfua.font_unicode')
+    && input.actions.some(action => action.tool === 'repair_font_unicode_maps' && action.outcome === 'no_effect')
+    && (
+      input.analysis.pageCount <= 2
+      || input.actions.some(action => action.tool === 'repair_type1_font_unicode_maps')
+      || input.actions.some(action => action.tool === 'ocr_scanned_pdf')
+    )
   ) {
+    const reason = input.analysis.pageCount <= 2
+      ? 'Small chart PDFs with persistent unmapped glyphs after generic Unicode repair often need a CID symbol-font recovery pass.'
+      : input.actions.some(action => action.tool === 'ocr_scanned_pdf')
+        ? 'OCR-searchable PDFs with persistent unmapped CID glyphs often need a CID font ToUnicode recovery pass.'
+        : 'Large legacy PDFs with persistent unmapped glyphs after generic and Type1 Unicode repair often need a CID symbol-font recovery pass.'
     addOpportunity(opportunities, {
       toolName: 'repair_cid_symbol_font_maps',
-      reason: 'Small chart PDFs with persistent unmapped glyphs after generic Unicode repair often need a CID symbol-font recovery pass.',
+      reason,
       scope: 'document',
       candidateIds: [],
       candidateGroupIds: [],

@@ -135,7 +135,7 @@ export async function runPdfStructureBackend(input: {
 }): Promise<StructureBackendMutationResult> {
   ensureHelperExists()
   const timeoutMs = input.mutation.operation === 'repair_other_elements_alt_text'
-    ? 300_000
+    ? 900_000
     : 60_000
 
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pdf-struct-'))

@@ -3323,6 +3323,7 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
     warnings = []
     changed = False
     processed_refs = set()
+    used_codes_by_font = collect_used_codes_by_font(pdf)
 
     for page in pdf.pages:
         resources = page.obj.get("/Resources")
@@ -3338,12 +3339,34 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
             if font_ref in processed_refs:
                 continue
             processed_refs.add(font_ref)
-            if has_tounicode(font):
-                continue
             subtype = str(font.get("/Subtype"))
             encoding = str(font.get("/Encoding")) if font.get("/Encoding") is not None else ""
             descriptor = font_descriptor_for(font)
             base_font = normalized_base_font_name(font.get("/BaseFont"))
+            if subtype == "/Type0" and encoding == "/Identity-H" and base_font == "/GlyphLessFont":
+                used_codes = sorted(used_codes_by_font.get(font_ref, set()))
+                codepoint_map = {
+                    code: chr(code)
+                    for code in used_codes
+                    if 0 <= code <= 0x10FFFF and not (0xD800 <= code <= 0xDFFF)
+                }
+                if codepoint_map:
+                    existing_map = parse_tounicode_map(font.get("/ToUnicode"))
+                    merged_map = {**existing_map, **codepoint_map}
+                    if merged_map != existing_map:
+                        font["/ToUnicode"] = pdf.make_stream(build_cid_tounicode_cmap(merged_map).encode("utf-8"))
+                        applied.append({
+                            "ref": ref_string(font),
+                            "before": "/ToUnicode" if existing_map else None,
+                            "after": "/ToUnicode",
+                            "details": f"{'Extended' if existing_map else 'Added'} a CID ToUnicode CMap for {base_font} using {len(codepoint_map)} OCR glyph code mappings.",
+                        })
+                        changed = True
+                    continue
+                warnings.append(f"Could not derive a ToUnicode map for {base_font} ({subtype}, {encoding or 'no encoding'}).")
+                continue
+            if has_tounicode(font):
+                continue
             if subtype != "/TrueType" or encoding not in {"/WinAnsiEncoding", "/MacRomanEncoding"}:
                 warnings.append(f"Could not derive a ToUnicode map for {base_font} ({subtype}, {encoding or 'no encoding'}).")
                 continue

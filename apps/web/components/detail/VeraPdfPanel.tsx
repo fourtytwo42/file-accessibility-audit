@@ -2,6 +2,7 @@ import type { QueueItem } from '@/lib/api'
 
 export function VeraPdfPanel({ item }: { item: QueueItem }) {
   const current = item.standardsDetail?.veraPdf.current
+
   return (
     <section className="rounded-[1.75rem] border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
       <div className="flex items-center justify-between gap-4">
@@ -30,7 +31,7 @@ export function VeraPdfPanel({ item }: { item: QueueItem }) {
         </div>
       </div>
       <ul className="mt-4 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-        {(current?.topFailures || []).slice(0, 5).map(failure => <li key={failure}>• {failure}</li>)}
+        {(current?.topFailures || []).slice(0, 5).map((failure, index) => <li key={`${index}-${failure}`}>- {failure}</li>)}
       </ul>
     </section>
   )

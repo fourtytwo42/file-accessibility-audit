@@ -53,7 +53,9 @@ export default function PdfDetailPage() {
                 <details key={category.id} className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
                   <summary className="cursor-pointer font-medium">{category.label} {typeof category.score === 'number' ? `(${category.score})` : ''}</summary>
                   <ul className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-                    {(category.findings || []).map((finding: string) => <li key={finding}>• {finding}</li>)}
+                    {(category.findings || []).map((finding: string, index: number) => (
+                      <li key={`${category.id}-${index}-${finding}`}>- {finding}</li>
+                    ))}
                   </ul>
                 </details>
               ))}
