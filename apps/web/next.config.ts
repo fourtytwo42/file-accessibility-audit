@@ -6,6 +6,9 @@ const siteUrl = isProduction ? DEPLOY.PRODUCTION_URL : `http://localhost:${DEPLO
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  experimental: {
+    middlewareClientMaxBodySize: '100mb',
+  },
   async rewrites() {
     return [
       {

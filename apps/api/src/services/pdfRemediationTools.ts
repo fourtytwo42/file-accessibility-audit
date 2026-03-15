@@ -18,6 +18,7 @@ import { analyzeWithQpdf } from './qpdfService.js'
 import type { QpdfResult } from './qpdfService.js'
 import { runPdfStructureBackend } from './pdfStructureBackend.js'
 import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
+import { normalizeLanguageTag } from './languageTags.js'
 import { ANALYSIS } from '#config'
 import type {
   AppliedChange,
@@ -298,8 +299,13 @@ function textNear(lines: RemediationPageFact['textLines'], index: number): strin
 }
 
 export function needsAltTextDeepInspection(analysis: AnalysisResult): boolean {
-  const altTextScore = analysis.categories.find(category => category.id === 'alt_text')?.score
+  const altTextCategory = analysis.categories.find(category => category.id === 'alt_text')
+  const altTextScore = altTextCategory?.score
   if (typeof altTextScore === 'number' && altTextScore < 100) return true
+  if ((altTextCategory?.findings || []).some(finding =>
+    /acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure/i.test(finding))) {
+    return true
+  }
   if (analysis.verapdf?.status !== 'failed') return false
   return analysis.verapdf.failures.some(failure =>
     failure.categoryIds.includes('alt_text')
@@ -838,8 +844,9 @@ async function setTitle(buffer: Buffer, title: string): Promise<Buffer> {
 
 async function setLanguage(buffer: Buffer, language: string): Promise<Buffer> {
   const pdfDoc = await PDFDocument.load(buffer, { updateMetadata: false, ignoreEncryption: true })
-  pdfDoc.setLanguage(language)
-  pdfDoc.catalog.set(PDFName.of('Lang'), PDFString.of(language))
+  const normalized = normalizeLanguageTag(language) || language.trim()
+  pdfDoc.setLanguage(normalized)
+  pdfDoc.catalog.set(PDFName.of('Lang'), PDFString.of(normalized))
   return Buffer.from(await pdfDoc.save())
 }
 
@@ -859,7 +866,7 @@ async function normalizeDocumentMetadata(
     mutation: {
       operation: 'set_pdfua_identification',
       title: input.title.trim() || 'Accessible PDF',
-      language: input.language.trim() || 'en',
+      language: normalizeLanguageTag(input.language) || input.language.trim() || 'en',
       part: 1,
       conformance: 'B',
     },
@@ -1160,7 +1167,8 @@ export async function executeRemediationTool(input: {
       }
     }
     case 'set_document_language': {
-      const nextLanguage = String(args.language || '').trim()
+      const requestedLanguage = String(args.language || '').trim()
+      const nextLanguage = normalizeLanguageTag(requestedLanguage) || requestedLanguage
       if (!nextLanguage) {
         return {
           buffer,
@@ -1175,7 +1183,7 @@ export async function executeRemediationTool(input: {
         }
       }
       const previousLanguage = context.qpdf.lang || context.pdfjs.lang || null
-      if (previousLanguage?.trim().toLowerCase() === nextLanguage.toLowerCase()) {
+      if ((previousLanguage?.trim() || '') === nextLanguage) {
         return {
           buffer,
           action: {
@@ -1209,7 +1217,8 @@ export async function executeRemediationTool(input: {
     }
     case 'set_pdfua_identification': {
       const title = String(args.title || context.pdfjs.title || 'Accessible PDF').trim() || 'Accessible PDF'
-      const language = String(args.language || context.qpdf.lang || context.pdfjs.lang || 'en').trim() || 'en'
+      const rawLanguage = String(args.language || context.qpdf.lang || context.pdfjs.lang || 'en').trim() || 'en'
+      const language = normalizeLanguageTag(rawLanguage) || rawLanguage
       const result = await runPdfStructureBackend({
         buffer,
         mutation: {
@@ -1229,7 +1238,8 @@ export async function executeRemediationTool(input: {
     }
     case 'normalize_document_metadata': {
       const title = String(args.title || context.pdfjs.title || '').trim()
-      const language = String(args.language || context.qpdf.lang || context.pdfjs.lang || 'en').trim() || 'en'
+      const rawLanguage = String(args.language || context.qpdf.lang || context.pdfjs.lang || 'en').trim() || 'en'
+      const language = normalizeLanguageTag(rawLanguage) || rawLanguage
       const normalized = await normalizeDocumentMetadata(buffer, {
         title: title || 'Accessible PDF',
         language,
@@ -1745,6 +1755,7 @@ export async function executeRemediationTool(input: {
         buffer,
         mutation: {
           operation: 'repair_other_elements_alt_text',
+          maxRepairsPerRun: 12,
         },
       })
       const translated = structureResultToAction({
@@ -1873,6 +1884,7 @@ export async function executeRemediationTool(input: {
         mutation: {
           operation: 'finalize_substituted_font_conformance',
           maxWidthDrift: ANALYSIS.LEGACY_FONT_WIDTH_DRIFT_THRESHOLD,
+          reportedWidthFixes: Array.isArray(args.reportedWidthFixes) ? args.reportedWidthFixes : undefined,
         },
       })
       const translated = structureResultToAction({
@@ -1960,6 +1972,7 @@ export async function executeRemediationTool(input: {
 export function toAppliedChange(action: RemediationActionRecord): AppliedChange | null {
   if (action.outcome !== 'applied') return null
   const typeMap: Record<string, AppliedChange['type']> = {
+    ocr_scanned_pdf: 'text_recovery',
     bootstrap_struct_tree: 'structure',
     set_document_title: 'title',
     set_document_language: 'language',
@@ -2012,6 +2025,7 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
 export function toSuggestedChange(action: RemediationActionRecord): SuggestedChange | null {
   if (!['unsupported', 'failed', 'skipped', 'no_effect', 'deferred', 'rejected'].includes(action.outcome)) return null
   const typeMap: Record<string, SuggestedChange['type']> = {
+    ocr_scanned_pdf: 'text_recovery',
     bootstrap_struct_tree: 'structure',
     create_bookmark: 'bookmark',
     replace_bookmarks_from_headings: 'bookmark',

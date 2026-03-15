@@ -19,6 +19,7 @@ import {
   removeDiskFile,
   updateQueueItem,
 } from './queueStore.js'
+import { getActiveClientUploads } from './uploadActivity.js'
 
 const activeControllers = new Map<string, AbortController>()
 type QueueRequeueMode = 'remediate' | 'reanalyze'
@@ -221,37 +222,40 @@ async function processQueueItem(item: QueueItemRecord): Promise<void> {
     await runAgentPatchPipeline(item, buffer, originalResult, controller)
   } catch (err: any) {
     if (controller.signal.aborted) {
-      updateQueueItem(item.id, {
+      const current = getQueueItemById(item.id)
+      if (current) updateQueueItem(item.id, {
         state: 'cancelled',
         remediation_status: 'failed',
-        document_model_status: getQueueItemById(item.id)?.document_model_path ? 'completed' : 'failed',
+        document_model_status: current.document_model_path ? 'completed' : 'failed',
         processing_progress: 0,
         processing_stage: 'Cancelled',
         error_json: JSON.stringify({ error: 'Processing cancelled.' }),
         reconstruction_error_json: JSON.stringify({ error: 'Processing cancelled.' }),
         completed_at: nowIso(),
       })
-      emitQueueItemUpsert(item.id)
+      if (current) emitQueueItemUpsert(item.id)
       return
     }
 
     const existing = getQueueItemById(item.id)
     const hasOriginalResult = !!existing?.original_result_json
 
-    updateQueueItem(item.id, {
-      state: 'failed',
-      remediation_status: 'failed',
-      document_model_status: existing?.document_model_path ? 'completed' : 'failed',
-      processing_stage: 'Processing failed',
-      error_json: JSON.stringify(err?.data || { error: err?.message || 'Processing failed.' }),
-      reconstruction_error_json: JSON.stringify(err?.data || { error: err?.message || 'Processing failed.' }),
-      result_json: hasOriginalResult ? existing?.original_result_json ?? null : null,
-      page_count: hasOriginalResult ? existing?.original_page_count ?? null : null,
-      overall_score: hasOriginalResult ? existing?.original_overall_score ?? null : null,
-      grade: hasOriginalResult ? existing?.original_grade ?? null : null,
-      completed_at: nowIso(),
-    })
-    emitQueueItemUpsert(item.id)
+    if (existing) {
+      updateQueueItem(item.id, {
+        state: 'failed',
+        remediation_status: 'failed',
+        document_model_status: existing.document_model_path ? 'completed' : 'failed',
+        processing_stage: 'Processing failed',
+        error_json: JSON.stringify(err?.data || { error: err?.message || 'Processing failed.' }),
+        reconstruction_error_json: JSON.stringify(err?.data || { error: err?.message || 'Processing failed.' }),
+        result_json: hasOriginalResult ? existing.original_result_json ?? null : null,
+        page_count: hasOriginalResult ? existing.original_page_count ?? null : null,
+        overall_score: hasOriginalResult ? existing.original_overall_score ?? null : null,
+        grade: hasOriginalResult ? existing.original_grade ?? null : null,
+        completed_at: nowIso(),
+      })
+      emitQueueItemUpsert(item.id)
+    }
   } finally {
     activeControllers.delete(item.id)
     scheduleClient(item.client_id)
@@ -260,7 +264,11 @@ async function processQueueItem(item: QueueItemRecord): Promise<void> {
 
 export function scheduleClient(clientId: string): void {
   const active = listProcessingItems(clientId).length
-  const available = Math.max(0, BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT - active)
+  const activeUploads = getActiveClientUploads(clientId)
+  const concurrencyCap = activeUploads > 0
+    ? Math.min(1, BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT)
+    : BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT
+  const available = Math.max(0, concurrencyCap - active)
   if (!available) return
 
   const queued = nextQueuedItems(clientId, available)

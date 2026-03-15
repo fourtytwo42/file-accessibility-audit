@@ -9,7 +9,7 @@ import { remediatePdfWithAgent } from '../services/agentRemediationService.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
-import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation } from '../services/pdfRemediationTools.js'
+import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation, needsAltTextDeepInspection } from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
 import type { RemediationActionRecord, RemediationToolName } from '../services/documentModel.js'
 import { planRemediationActions } from '../services/remediationPlanService.js'
@@ -107,6 +107,26 @@ afterEach(() => {
 })
 
 describe('pdfRemediationTools', { timeout: 120_000 }, () => {
+  it('keeps deep alt-text inspection enabled when analysis already contains Acrobat-risk findings', () => {
+    const analysis = {
+      ...({
+        categories: [
+          {
+            id: 'alt_text',
+            findings: ['Detected 1 Acrobat-risk non-figure element with graphics content.'],
+            score: 100,
+          },
+        ],
+        verapdf: {
+          status: 'passed',
+          failures: [],
+        },
+      } as any),
+    }
+
+    expect(needsAltTextDeepInspection(analysis)).toBe(true)
+  })
+
   it('remaps section-backed heading candidates to the first safe descendant text node', () => {
     const target = __test_remapHeadingTarget([
       { ref: 'obj:9 0 R', tag: '/Sect', parentRef: 'obj:7 0 R', orderIndex: 0, parentTagPath: ['None'] },
@@ -174,6 +194,18 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         }),
       ]),
     )
+  }, 600_000)
+
+  it('clears multi-page Acrobat-risk section ownership on the strategy fixture', async () => {
+    const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
+    const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
+    const remediated = await remediatePdfWithAgent(buffer, '04-07MVStrategy.pdf', analysis)
+    const inspect = await inspectPdfForRemediation(remediated.buffer, remediated.finalResult, { inspectMode: 'alt_text_deep' })
+
+    expect(remediated.finalResult.grade).toBe('A')
+    expect(remediated.finalResult.verapdf.status).toBe('passed')
+    expect((remediated.model.actions || []).some(action => action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied')).toBe(true)
+    expect(inspect.structure.acrobatAltRiskNodes || []).toEqual([])
   }, 600_000)
 
   it('routes Acrobat-risk alternate-text repairs through the structure backend', async () => {
@@ -348,6 +380,31 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(metadata).toBeTruthy()
     expect(String(lang)).toContain('en')
   }, 30_000)
+
+  it('canonicalizes legacy uppercase language tags instead of treating them as already valid', async () => {
+    const buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
+    const analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_document_language',
+        arguments: {
+          language: 'EN-US',
+        },
+        rationale: 'Normalize the document language tag casing.',
+        confidence: 0.9,
+      },
+    })
+
+    const nextDoc = await PDFDocument.load(result.buffer, { ignoreEncryption: true })
+    const lang = nextDoc.catalog.get(PDFName.of('Lang'))
+
+    expect(result.action.outcome).toBe('applied')
+    expect(String(lang)).toContain('en-US')
+  }, 120_000)
 
   it('repairs structure conformance in place on mixed chart PDFs', async () => {
     let buffer = await loadDownloadFixture('3violent offenses_1999-2008.pdf')
@@ -2229,6 +2286,48 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(order).toContain('repair_type1_font_unicode_maps')
     expect(order.indexOf('repair_type1_font_unicode_maps')).toBeGreaterThanOrEqual(0)
   }, 60_000)
+
+  it('plans Type1 font Unicode recovery on real annual-report fixtures after a no-effect generic Unicode pass', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await loadDownloadFixture('99anreport.pdf')
+    const analysis = await analyzePDF(buffer, '99anreport.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const plan = await planRemediationActions({
+      filename: '99anreport.pdf',
+      analysis,
+      context,
+      iteration: 2,
+      actions: [makePlannerAction('repair_font_unicode_maps', 'document', { outcome: 'no_effect' })],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_type1_font_unicode_maps')).toBe(true)
+  }, 120_000)
+
+  it('plans CID symbol-font recovery on one-page chart fixtures after generic Unicode repair stalls', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await loadDownloadFixture('10drug arrests_1999-2008.pdf')
+    const analysis = await analyzePDF(buffer, '10drug arrests_1999-2008.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const plan = await planRemediationActions({
+      filename: '10drug arrests_1999-2008.pdf',
+      analysis,
+      context,
+      iteration: 2,
+      actions: [makePlannerAction('repair_font_unicode_maps', 'document', { outcome: 'no_effect' })],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_cid_symbol_font_maps')).toBe(true)
+  }, 120_000)
 
   it('plans legacy font substitution after embedding and Type1 Unicode recovery on annual-report PDFs', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {

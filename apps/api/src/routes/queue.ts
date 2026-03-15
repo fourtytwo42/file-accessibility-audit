@@ -7,7 +7,7 @@ import { BATCH_QUEUE } from '#config'
 import { bootstrapClientSession, ClientSessionRequest, requireClientSession } from '../middleware/clientSession.js'
 import { streamQueueArchive } from '../services/archiveService.js'
 import { emitQueueItemDeleted, emitQueueItemUpsert, registerQueueSse } from '../services/queueEvents.js'
-import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams, requeueItem } from '../services/queueManager.js'
+import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams, requeueItem, scheduleClient } from '../services/queueManager.js'
 import {
   cleanupExpiredQueueItems,
   createQueueItem,
@@ -15,7 +15,6 @@ import {
   failStaleUploads,
   getQueueCounts,
   getQueueItemById,
-  getQueueItemByMd5,
   getQueueStatusCounts,
   getQueueStorageRoots,
   listActiveQueueItems,
@@ -33,6 +32,7 @@ import {
   serializeQueueItemSummary,
   updateQueueItem,
 } from '../services/queueStore.js'
+import { beginClientUpload } from '../services/uploadActivity.js'
 
 const router: IRouter = Router()
 const { stagingRoot } = getQueueStorageRoots()
@@ -80,66 +80,33 @@ function allVisibleItemsForClient(clientId: string): QueueItemRecord[] {
   return [...active, ...history]
 }
 
-async function fileMd5(filePath: string): Promise<string> {
-  const hash = crypto.createHash('md5')
-  await new Promise<void>((resolve, reject) => {
-    const stream = fs.createReadStream(filePath)
-    stream.on('data', chunk => hash.update(chunk))
-    stream.on('error', reject)
-    stream.on('end', () => resolve())
-  })
-  return hash.digest('hex')
-}
-
 router.post('/client/bootstrap', bootstrapClientSession)
 
-router.post('/queue/preflight', requireClientSession, (req: ClientSessionRequest, res: Response) => {
-  queueHousekeeping()
-
-  const clientId = req.clientId!
-  const filename = sanitizeBasename(req.body?.filename)
-  const md5 = typeof req.body?.md5 === 'string' ? req.body.md5.toLowerCase() : ''
-  const sizeBytes = Number(req.body?.sizeBytes) || 0
-  const mimeType = typeof req.body?.mimeType === 'string' ? req.body.mimeType : 'application/pdf'
-
-  if (!/^[a-f0-9]{32}$/.test(md5)) {
-    res.status(400).json({ error: 'Valid MD5 is required' })
+function trackActiveUpload(req: ClientSessionRequest, res: Response, next: () => void): void {
+  const clientId = req.clientId
+  if (!clientId) {
+    next()
     return
   }
 
-  const existing = getQueueItemByMd5(clientId, md5)
-  if (existing && !existing.hidden && ['uploading', 'queued', 'processing'].includes(existing.state)) {
-    res.json({ status: 'duplicate', item: serializeQueueItemSummary(existing) })
-    return
+  const release = beginClientUpload(clientId)
+  let cleanedUp = false
+  const cleanup = () => {
+    if (cleanedUp) return
+    cleanedUp = true
+    release()
+    scheduleClient(clientId)
   }
 
-  if (existing) {
-    deleteQueueItemPermanently(existing.id)
-    emitQueueItemDeleted(clientId, existing.id)
-  }
+  res.once('finish', cleanup)
+  res.once('close', cleanup)
+  next()
+}
 
-  const item = createQueueItem({
-    clientId,
-    filename,
-    md5,
-    sizeBytes,
-    mimeType,
-  })
-  emitQueueItemUpsert(item.id)
-  res.json({ status: 'created', item: serializeQueueItemSummary(item) })
-})
-
-router.post('/queue/items/:id/upload', requireClientSession, upload.single('file'), async (req: ClientSessionRequest, res: Response) => {
+router.post('/queue/upload', requireClientSession, trackActiveUpload, upload.single('file'), async (req: ClientSessionRequest, res: Response) => {
   queueHousekeeping()
 
-  const item = getQueueItemById(readItemId(req.params.id))
   const uploaded = req.file
-
-  if (!item || item.client_id !== req.clientId) {
-    if (uploaded?.path) removeDiskFile(uploaded.path)
-    res.status(404).json({ error: 'Queue item not found' })
-    return
-  }
 
   if (!uploaded) {
     res.status(400).json({ error: 'No file uploaded' })
@@ -147,41 +114,25 @@ router.post('/queue/items/:id/upload', requireClientSession, upload.single('file
   }
 
   try {
+    const filename = sanitizeBasename(uploaded.originalname)
     const header = fs.readFileSync(uploaded.path).subarray(0, 5).toString('ascii')
     if (header !== '%PDF-') {
       removeDiskFile(uploaded.path)
-      updateQueueItem(item.id, {
-        state: 'failed',
-        processing_stage: 'Invalid PDF',
-        error_json: JSON.stringify({
-          error: 'This file does not appear to be a valid PDF.',
-          details: 'The file header is missing or incorrect.',
-        }),
-        completed_at: nowIso(),
-      })
-      emitQueueItemUpsert(item.id)
       res.status(400).json({ error: 'This file does not appear to be a valid PDF.' })
       return
     }
 
-    const actualMd5 = await fileMd5(uploaded.path)
-    if (actualMd5 !== item.md5) {
-      removeDiskFile(uploaded.path)
-      updateQueueItem(item.id, {
-        state: 'failed',
-        processing_stage: 'Upload integrity check failed',
-        error_json: JSON.stringify({ error: 'Uploaded file hash did not match the preflight hash.' }),
-        completed_at: nowIso(),
-      })
-      emitQueueItemUpsert(item.id)
-      res.status(409).json({ error: 'Uploaded file hash did not match the preflight hash.' })
-      return
-    }
+    const item = createQueueItem({
+      clientId: req.clientId!,
+      filename,
+      sizeBytes: uploaded.size,
+      mimeType: uploaded.mimetype,
+    })
 
     const destination = queueItemDiskPath(item.id, item.filename)
     await fs.promises.rename(uploaded.path, destination)
 
-  const queued = updateQueueItem(item.id, {
+    const queued = updateQueueItem(item.id, {
       state: 'queued',
       storage_path: destination,
       original_storage_path: destination,
@@ -194,18 +145,10 @@ router.post('/queue/items/:id/upload', requireClientSession, upload.single('file
       error_json: null,
     })
     emitQueueItemUpsert(queued.id)
-    queueItemForProcessing(queued.id)
-
     res.json({ item: serializeQueueItemSummary(queued) })
+    setImmediate(() => queueItemForProcessing(queued.id))
   } catch (err: any) {
     removeDiskFile(uploaded.path)
-    updateQueueItem(item.id, {
-      state: 'failed',
-      processing_stage: 'Upload failed',
-      error_json: JSON.stringify({ error: err?.message || 'Upload failed.' }),
-      completed_at: nowIso(),
-    })
-    emitQueueItemUpsert(item.id)
     res.status(500).json({ error: 'Upload failed.' })
   }
 })
@@ -359,6 +302,22 @@ router.post('/queue/items/:id/retry', requireClientSession, (req: ClientSessionR
 function hideItemForClient(itemId: string, clientId: string): void {
   const item = getQueueItemById(itemId)
   if (!item || item.client_id !== clientId || item.hidden) return
+
+  const hasPersistedArtifacts = !!(
+    item.storage_path
+    || item.original_storage_path
+    || item.remediated_storage_path
+    || item.rebuilt_storage_path
+    || item.document_model_path
+    || item.review_assets_dir
+  )
+
+  if (item.state === 'failed' && !hasPersistedArtifacts) {
+    deleteQueueItemPermanently(itemId)
+    emitQueueItemDeleted(clientId, itemId)
+    return
+  }
+
   cancelQueueItem(itemId)
   markQueueItemHidden(itemId)
   removeQueueItemFromStreams(itemId)

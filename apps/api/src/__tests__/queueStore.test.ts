@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { serializeQueueItemDetail, serializeQueueItemSummary, type QueueItemRecord } from '../services/queueStore.js'
+import db from '../db/sqlite.js'
+import { createClient, createQueueItem, listActiveQueueItems, serializeQueueItemDetail, serializeQueueItemSummary, updateQueueItem, type QueueItemRecord } from '../services/queueStore.js'
 
 function makeRow(): QueueItemRecord {
   return {
@@ -90,6 +91,9 @@ function makeRow(): QueueItemRecord {
 describe('queueStore serialization', () => {
   afterEach(() => {
     vi.restoreAllMocks()
+    db.prepare('DELETE FROM queue_items').run()
+    db.prepare('DELETE FROM browser_sessions').run()
+    db.prepare('DELETE FROM browser_clients').run()
   })
 
   it('does not read the document model when serializing a summary item', () => {
@@ -220,5 +224,38 @@ describe('queueStore serialization', () => {
     expect(item.standardsDetail?.gradeBasis.scoreCappedByStandards).toBe(true)
     expect(item.standardsDetail?.failureModes).toEqual([])
     expect(item.standardsDetail?.plannerEvidence).toBeNull()
+  })
+
+  it('collapses duplicate transient active rows by filename', () => {
+    const clientId = 'client-collapse'
+    createClient(clientId)
+    const older = createQueueItem({
+      clientId,
+      filename: 'duplicate.pdf',
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(older.id, {
+      state: 'failed',
+      processing_stage: 'Upload interrupted',
+      error_json: JSON.stringify({ error: 'Older failure' }),
+      updated_at: '2026-03-15T00:00:00.000Z' as any,
+    } as any)
+
+    const newer = createQueueItem({
+      clientId,
+      filename: 'duplicate.pdf',
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(newer.id, {
+      state: 'uploading',
+      processing_stage: 'Uploading file',
+    })
+
+    const items = listActiveQueueItems(clientId)
+    expect(items).toHaveLength(1)
+    expect(items[0]?.id).toBe(newer.id)
+    expect(items[0]?.state).toBe('uploading')
   })
 })

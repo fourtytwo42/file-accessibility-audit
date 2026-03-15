@@ -292,6 +292,79 @@ function readDocumentModel(modelPath: string | null | undefined): DocumentModel 
   }
 }
 
+function normalizeQueueFilename(filename: string): string {
+  return filename.trim().toLowerCase()
+}
+
+function isTransientQueuePlaceholder(row: QueueItemRecord): boolean {
+  return !row.storage_path
+    && !row.original_storage_path
+    && !row.remediated_storage_path
+    && !row.rebuilt_storage_path
+    && !row.document_model_path
+    && !row.review_assets_dir
+}
+
+function transientDuplicatePriority(row: QueueItemRecord): number {
+  switch (row.state) {
+    case 'uploading':
+      return 0
+    case 'queued':
+      return 1
+    case 'processing':
+      return 2
+    case 'failed':
+      return 3
+    case 'cancelled':
+      return 4
+    default:
+      return 5
+  }
+}
+
+function collapseTransientFilenameDuplicates(rows: QueueItemRecord[]): QueueItemRecord[] {
+  const kept = new Map<string, QueueItemRecord>()
+  const passthrough: QueueItemRecord[] = []
+
+  for (const row of rows) {
+    if (!isTransientQueuePlaceholder(row)) {
+      passthrough.push(row)
+      continue
+    }
+
+    const key = normalizeQueueFilename(row.filename)
+    const existing = kept.get(key)
+    if (!existing) {
+      kept.set(key, row)
+      continue
+    }
+
+    const priorityDiff = transientDuplicatePriority(row) - transientDuplicatePriority(existing)
+    if (priorityDiff < 0) {
+      kept.set(key, row)
+      continue
+    }
+    if (priorityDiff > 0) continue
+
+    const updatedDiff = new Date(row.updated_at).getTime() - new Date(existing.updated_at).getTime()
+    if (updatedDiff > 0) {
+      kept.set(key, row)
+      continue
+    }
+    if (updatedDiff < 0) continue
+
+    if (new Date(row.created_at).getTime() > new Date(existing.created_at).getTime()) {
+      kept.set(key, row)
+    }
+  }
+
+  return [...passthrough, ...kept.values()].sort((a, b) => {
+    const createdDiff = new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    if (createdDiff !== 0) return createdDiff
+    return a.id.localeCompare(b.id)
+  })
+}
+
 function parseResult(rowValue: string | null | undefined): any | null {
   return parseJson<any | null>(rowValue, null)
 }
@@ -621,20 +694,71 @@ export function getQueueItemById(id: string): QueueItemRecord | undefined {
   return db.prepare('SELECT * FROM queue_items WHERE id = ?').get(id) as QueueItemRecord | undefined
 }
 
+export function listQueueItemsByMd5(clientId: string, md5: string): QueueItemRecord[] {
+  return db.prepare(`
+    SELECT * FROM queue_items
+    WHERE client_id = ? AND md5 = ?
+    ORDER BY
+      hidden ASC,
+      CASE
+        WHEN state IN ('uploading', 'queued', 'processing') THEN 0
+        WHEN state = 'failed' THEN 1
+        WHEN state = 'complete' THEN 2
+        ELSE 3
+      END ASC,
+      updated_at DESC,
+      created_at DESC
+  `).all(clientId, md5) as QueueItemRecord[]
+}
+
 export function getQueueItemByMd5(clientId: string, md5: string): QueueItemRecord | undefined {
-  return db.prepare('SELECT * FROM queue_items WHERE client_id = ? AND md5 = ?').get(clientId, md5) as QueueItemRecord | undefined
+  return listQueueItemsByMd5(clientId, md5)[0]
+}
+
+export function listVisibleQueueItemsByFilename(clientId: string, filename: string): QueueItemRecord[] {
+  return db.prepare(`
+    SELECT * FROM queue_items
+    WHERE client_id = ?
+      AND filename = ?
+      AND hidden = 0
+    ORDER BY
+      CASE
+        WHEN state IN ('uploading', 'queued', 'processing') THEN 0
+        WHEN state = 'failed' THEN 1
+        WHEN state = 'complete' THEN 2
+        ELSE 3
+      END ASC,
+      updated_at DESC,
+      created_at DESC
+  `).all(clientId, filename) as QueueItemRecord[]
+}
+
+export function listTransientQueueItemsByFilename(clientId: string, filename: string): QueueItemRecord[] {
+  return db.prepare(`
+    SELECT * FROM queue_items
+    WHERE client_id = ?
+      AND filename = ?
+      AND storage_path IS NULL
+      AND original_storage_path IS NULL
+      AND remediated_storage_path IS NULL
+      AND rebuilt_storage_path IS NULL
+      AND document_model_path IS NULL
+      AND review_assets_dir IS NULL
+    ORDER BY updated_at DESC, created_at DESC
+  `).all(clientId, filename) as QueueItemRecord[]
 }
 
 export function createQueueItem(input: {
   clientId: string
   filename: string
-  md5: string
+  md5?: string
   sizeBytes: number
   mimeType?: string | null
 }): QueueItemRecord {
   const id = crypto.randomUUID()
   const timestamp = nowIso()
   const expiresAt = queueExpiryIso()
+  const dedupeToken = /^[a-f0-9]{32}$/i.test(input.md5 || '') ? String(input.md5).toLowerCase() : crypto.randomBytes(16).toString('hex')
   db.prepare(`
     INSERT INTO queue_items (
       id, client_id, filename, md5, size_bytes, mime_type, state,
@@ -643,7 +767,7 @@ export function createQueueItem(input: {
       remediation_status, document_model_status, created_at, updated_at, upload_started_at, expires_at
     )
     VALUES (?, ?, ?, ?, ?, ?, 'uploading', 0, 0, 'Waiting for upload', 0, 'agent_patch', '[]', 'pending', 'pending', ?, ?, ?, ?)
-  `).run(id, input.clientId, input.filename, input.md5, input.sizeBytes, input.mimeType ?? null, timestamp, timestamp, timestamp, expiresAt)
+  `).run(id, input.clientId, input.filename, dedupeToken, input.sizeBytes, input.mimeType ?? null, timestamp, timestamp, timestamp, expiresAt)
   return getQueueItemById(id)!
 }
 
@@ -780,7 +904,7 @@ export function listActiveQueueItems(clientId: string): QueueItemSummary[] {
     WHERE client_id = ? AND hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed')
     ORDER BY created_at DESC
   `).all(clientId) as QueueItemRecord[]
-  return rows.map(serializeQueueItemSummary)
+  return collapseTransientFilenameDuplicates(rows).map(serializeQueueItemSummary)
 }
 
 export function listHistoryQueueItems(clientId: string, page: number, limit: number): { items: QueueItemSummary[]; total: number } {
@@ -800,11 +924,12 @@ export function listHistoryQueueItems(clientId: string, page: number, limit: num
 
 export function listSelectableQueueItemIds(clientId: string, scope: 'active' | 'complete'): string[] {
   if (scope === 'active') {
-    return (db.prepare(`
+    const rows = (db.prepare(`
       SELECT id FROM queue_items
       WHERE client_id = ? AND hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed')
       ORDER BY created_at DESC
-    `).all(clientId) as Array<{ id: string }>).map(row => row.id)
+    `).all(clientId) as Array<{ id: string }>).map(row => getQueueItemById(row.id)).filter(Boolean) as QueueItemRecord[]
+    return collapseTransientFilenameDuplicates(rows).map(row => row.id)
   }
 
   return (db.prepare(`
@@ -815,10 +940,11 @@ export function listSelectableQueueItemIds(clientId: string, scope: 'active' | '
 }
 
 export function getQueueCounts(clientId: string): { active: number; complete: number } {
-  const active = (db.prepare(`
-    SELECT COUNT(*) as count FROM queue_items
+  const activeRows = db.prepare(`
+    SELECT * FROM queue_items
     WHERE client_id = ? AND hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed')
-  `).get(clientId) as any).count as number
+  `).all(clientId) as QueueItemRecord[]
+  const active = collapseTransientFilenameDuplicates(activeRows).length
 
   const complete = (db.prepare(`
     SELECT COUNT(*) as count FROM queue_items
@@ -835,33 +961,37 @@ export function getQueueStatusCounts(clientId: string): {
   failed: number
   complete: number
 } {
-  const counts = db.prepare(`
-    SELECT
-      SUM(CASE WHEN hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed') THEN 1 ELSE 0 END) as active,
-      SUM(CASE WHEN hidden = 0 AND state = 'complete' THEN 1 ELSE 0 END) as history,
-      SUM(CASE WHEN hidden = 0 AND state = 'processing' THEN 1 ELSE 0 END) as processing,
-      SUM(CASE WHEN hidden = 0 AND state = 'failed' THEN 1 ELSE 0 END) as failed,
-      SUM(CASE WHEN hidden = 0 AND state = 'complete' THEN 1 ELSE 0 END) as complete
-    FROM queue_items
-    WHERE client_id = ?
-  `).get(clientId) as Record<string, number | null>
+  const activeRows = db.prepare(`
+    SELECT * FROM queue_items
+    WHERE client_id = ? AND hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed')
+  `).all(clientId) as QueueItemRecord[]
+  const activeCollapsed = collapseTransientFilenameDuplicates(activeRows)
+  const historyCount = (db.prepare(`
+    SELECT COUNT(*) as count FROM queue_items
+    WHERE client_id = ? AND hidden = 0 AND state = 'complete'
+  `).get(clientId) as any).count as number
 
   return {
-    active: counts.active ?? 0,
-    history: counts.history ?? 0,
-    processing: counts.processing ?? 0,
-    failed: counts.failed ?? 0,
-    complete: counts.complete ?? 0,
+    active: activeCollapsed.length,
+    history: historyCount,
+    processing: activeCollapsed.filter(item => item.state === 'processing').length,
+    failed: activeCollapsed.filter(item => item.state === 'failed').length,
+    complete: historyCount,
   }
 }
 
 export function listQueueStatusItems(clientId: string): QueueItemSummary[] {
-  const rows = db.prepare(`
+  const activeRows = db.prepare(`
     SELECT * FROM queue_items
-    WHERE client_id = ? AND hidden = 0
+    WHERE client_id = ? AND hidden = 0 AND state IN ('uploading', 'queued', 'processing', 'failed')
     ORDER BY updated_at DESC
   `).all(clientId) as QueueItemRecord[]
-  return rows.map(serializeQueueItemSummary)
+  const historyRows = db.prepare(`
+    SELECT * FROM queue_items
+    WHERE client_id = ? AND hidden = 0 AND state = 'complete'
+    ORDER BY updated_at DESC
+  `).all(clientId) as QueueItemRecord[]
+  return [...collapseTransientFilenameDuplicates(activeRows), ...historyRows].map(serializeQueueItemSummary)
 }
 
 export function serializeQueueItemVersions(row: QueueItemRecord): QueueItemVersion[] {

@@ -1,7 +1,5 @@
 'use client'
 
-import SparkMD5 from 'spark-md5'
-
 export type QueueState = 'uploading' | 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled'
 export type ReconstructionStatus = 'pending' | 'processing' | 'completed' | 'manual_review_required' | 'failed'
 export type DocumentModelStatus = 'pending' | 'processing' | 'completed' | 'failed'
@@ -349,24 +347,13 @@ export async function uploadFile(
   onProgress: (value: number, stage: string) => void,
 ): Promise<void> {
   const clientId = await ensureClientSession()
-  const preflightMd5 = SparkMD5.ArrayBuffer.hash(await file.arrayBuffer())
-
-  const preflight = await apiJson<{ item: QueueItemSummary }>('/api/queue/preflight', withClientHeaders(clientId, {
-    method: 'POST',
-    body: JSON.stringify({
-      filename: file.name,
-      sizeBytes: file.size,
-      mimeType: file.type || 'application/pdf',
-      md5: preflightMd5,
-    }),
-  }))
 
   await new Promise<void>((resolve, reject) => {
     const form = new FormData()
     form.append('file', file)
     const request = new XMLHttpRequest()
     request.withCredentials = true
-    request.open('POST', `/api/queue/items/${preflight.item.id}/upload`)
+    request.open('POST', `/api/queue/upload`)
     request.setRequestHeader('x-client-id', clientId)
     request.upload.onprogress = event => {
       if (!event.lengthComputable) return

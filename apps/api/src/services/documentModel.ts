@@ -89,6 +89,7 @@ export interface PageModel {
 }
 
 export type RemediationToolName =
+  | 'ocr_scanned_pdf'
   | 'get_document_metadata'
   | 'set_document_title'
   | 'set_document_language'

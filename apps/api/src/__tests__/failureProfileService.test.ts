@@ -457,4 +457,57 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'acrobat.other_elements_alt_text' && mode.classification === 'manual_only')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'deferred')).toBe(true)
   })
+
+  it('keeps Acrobat-risk repair opportunity available even when alt-text already scores 100', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 100,
+      grade: 'A',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'passed',
+        isCompliant: true,
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? {
+              ...category,
+              score: 100,
+              grade: 'A',
+              severity: 'Low',
+              findings: ['Detected 1 Acrobat-risk non-figure element with graphics content.'],
+            }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [
+            {
+              ref: 'obj:20 0 R',
+              tag: '/H1',
+              pageRef: 'obj:1 0 R',
+              mcids: [0],
+              hasText: true,
+              hasGraphics: true,
+              parentTagPath: ['/Document'],
+              ownershipMode: 'mixed_text_graphics_same_mcid',
+              splitSafe: true,
+              operatorPattern: 'graphics_then_text',
+              duplicateOwnerRefs: [],
+            },
+          ],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
 })

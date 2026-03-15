@@ -446,4 +446,62 @@ describe('queue routes', () => {
 
     expect(notFoundResponse.status).toBe(404)
   })
+
+  it('delete permanently removes failed upload placeholders that never stored an artifact', async () => {
+    const clientId = randomClientId('transient1')
+    createClient(clientId)
+    const failed = createQueueItem({
+      clientId,
+      filename: 'broken.pdf',
+      md5: '5'.repeat(32),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(failed.id, {
+      state: 'failed',
+      processing_stage: 'Upload failed',
+      error_json: JSON.stringify({ error: 'network' }),
+      completed_at: '2026-03-14T00:00:00.000Z',
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/items/${failed.id}/delete`, {
+      method: 'POST',
+      headers: authHeaders(clientId, cookie),
+    })
+
+    expect(response.status).toBe(200)
+    const row = db.prepare('SELECT id, hidden FROM queue_items WHERE id = ?').get(failed.id)
+    expect(row).toBeUndefined()
+  })
+
+  it('upload creates a queued item in a single request', async () => {
+    const clientId = randomClientId('upload1')
+    createClient(clientId)
+    const { cookie } = await bootstrap(clientId)
+    const boundary = '----codexuploadboundary'
+    const payload = Buffer.concat([
+      Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="single.pdf"\r\nContent-Type: application/pdf\r\n\r\n`, 'utf8'),
+      Buffer.from('%PDF-1.4\n1 0 obj\n<<>>\nendobj\ntrailer\n<<>>\n%%EOF', 'utf8'),
+      Buffer.from(`\r\n--${boundary}--\r\n`, 'utf8'),
+    ])
+
+    const response = await fetch(`${baseUrl}/api/queue/upload`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(clientId, cookie),
+        'content-type': `multipart/form-data; boundary=${boundary}`,
+      },
+      body: payload as any,
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.item.filename).toBe('single.pdf')
+    expect(body.item.state).toBe('queued')
+
+    const count = db.prepare('SELECT COUNT(*) as count FROM queue_items WHERE client_id = ?')
+      .get(clientId) as { count: number }
+    expect(count.count).toBe(1)
+  })
 })

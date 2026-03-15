@@ -8,6 +8,8 @@ const inspectPdfForRemediation = vi.fn()
 const executeRemediationTool = vi.fn()
 const planRemediationActions = vi.fn()
 const generateSemanticRepairBatches = vi.fn()
+const isOcrAvailable = vi.fn()
+const ocrPdfToSearchablePdf = vi.fn()
 
 function makeVeraPdfResult(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
   return {
@@ -53,10 +55,16 @@ vi.mock('../services/semanticEnrichmentService.js', () => ({
   generateSemanticRepairBatches,
 }))
 
+vi.mock('../services/ocrService.js', () => ({
+  isOcrAvailable,
+  ocrPdfToSearchablePdf,
+}))
+
 describe('agentRemediationService', { timeout: 15_000 }, () => {
   beforeEach(() => {
     vi.resetAllMocks()
     generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
+    isOcrAvailable.mockResolvedValue(false)
   })
 
   it('refreshes inspection context after document-changing actions within the same iteration', async () => {
@@ -208,7 +216,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
-    expect(result.model.actions?.map(action => action.outcome)).toEqual(['applied', 'applied'])
+    expect(result.model.actions?.map(action => action.outcome)).toEqual(['applied', 'no_effect'])
     expect(result.model.failureProfile?.version).toBe('1')
     expect(result.model.failureProfile?.toolOpportunities.length).toBeGreaterThanOrEqual(0)
     expect(result.model.plannerEvidence).toBeTruthy()
@@ -486,6 +494,73 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.pathFallbacks).toEqual([])
     expect(result.finalResult.grade).toBe('F')
     expect(result.model.manualReviewFlags.some(flag => flag.code === 'manual_rebuild_required')).toBe(true)
+  })
+
+  it('runs OCR first for scanned documents when tesseract is available', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const scannedResult: AnalysisResult = {
+      filename: 'scan.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 0,
+      grade: 'F',
+      isScanned: true,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'failed', failedChecks: 20, failures: [] }),
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.2, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+    const ocrResult: AnalysisResult = {
+      ...scannedResult,
+      isScanned: false,
+      overallScore: 50,
+      grade: 'D',
+      verapdf: makeVeraPdfResult({ status: 'failed', failedChecks: 4, failures: [] }),
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.2, score: 50, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+    }
+    isOcrAvailable.mockResolvedValue(true)
+    ocrPdfToSearchablePdf.mockResolvedValue(Buffer.from('ocr-pdf'))
+    analyzePDF.mockResolvedValueOnce(ocrResult)
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: null, lang: 'en' },
+      qpdf: { lang: null, headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: false, unresolvedIssues: ['text_extractability'], actions: [] })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'scan.pdf', scannedResult)
+
+    expect(ocrPdfToSearchablePdf).toHaveBeenCalledTimes(1)
+    expect(result.buffer.equals(Buffer.from('ocr-pdf'))).toBe(true)
+    expect(result.model.pathFallbacks).toContain('ocr_searchable_pdf')
+    expect(result.model.visibleContentChangePolicy).toBe('no_visible_changes')
+    expect(result.model.actions?.some(action => action.tool === 'ocr_scanned_pdf' && action.outcome === 'applied')).toBe(true)
+    expect(result.finalResult.grade).toBe('D')
   })
 
   it('does not escalate native documents after no-effect structural remediation', async () => {
@@ -1419,6 +1494,173 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
     expect(result.finalResult).toBe(originalResult)
     expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+  })
+
+  it('does not stop at A/pass when deterministic Acrobat-risk repair is still auto-runnable', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'acrobat-risk.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 85,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 1,
+        failures: [{ ruleId: 'alt-text', specification: null, clause: null, testNumber: null, location: null, message: 'Figure tags shall include an alternative representation', categoryIds: ['alt_text'] }],
+      }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 40, grade: 'F', severity: 'Critical', findings: ['Acrobat-risk non-figure graphics ownership remains.'], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const afterPrimaryPass: AnalysisResult = {
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass', findings: ['Detected 1 Acrobat-risk non-figure element with graphics content.'] },
+      ],
+    }
+    const afterAcrobatRepair: AnalysisResult = {
+      ...afterPrimaryPass,
+      categories: [
+        { ...afterPrimaryPass.categories[0], findings: [] },
+      ],
+    }
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [{ ref: 'obj:38 0 R', tag: '/H1', ownershipMode: 'mixed_text_graphics_same_mcid', splitSafe: true, mcids: [0] }] },
+      })
+      .mockResolvedValueOnce({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [{ ref: 'obj:38 0 R', tag: '/H1', ownershipMode: 'mixed_text_graphics_same_mcid', splitSafe: true, mcids: [0] }] },
+      })
+      .mockResolvedValueOnce({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [] },
+      })
+      .mockResolvedValue({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [] },
+      })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['alt_text'],
+        actions: [
+          { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:1', altText: 'Chart image' }, rationale: 'Primary repair', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: [],
+        actions: [
+          { tool_name: 'repair_other_elements_alt_text', arguments: {}, rationale: 'Fix Acrobat-only logo ownership', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        done: true,
+        unresolvedIssues: [],
+        actions: [],
+      })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('primary-pass'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 1',
+          candidateId: 'figure:1',
+          details: 'primary repair',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['alt_text'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('acrobat-pass'),
+        action: {
+          tool: 'repair_other_elements_alt_text',
+          target: 'document',
+          details: 'acrobat ownership repaired',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['alt_text'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF
+      .mockResolvedValueOnce(afterPrimaryPass)
+      .mockResolvedValueOnce(afterAcrobatRepair)
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'acrobat-risk.pdf', originalResult)
+
+    expect(planRemediationActions).toHaveBeenCalledTimes(2)
+    expect(executeRemediationTool.mock.calls.map(call => call[0].call.tool_name)).toEqual(['set_figure_alt_text', 'repair_other_elements_alt_text'])
+    expect(result.buffer.equals(Buffer.from('acrobat-pass'))).toBe(true)
   })
 
 })

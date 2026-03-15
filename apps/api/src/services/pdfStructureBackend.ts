@@ -69,8 +69,11 @@ export interface StructureBackendMutationRequest {
   part?: number
   conformance?: string
   maxWidthDrift?: number
+  reportedWidthFixes?: Array<{ fontName: string; code: number; width: number }>
   headings?: Array<{ text: string; level: string; pageNumber?: number; targetRef?: string | null }>
   figures?: Array<{ altText: string }>
+  includeSnapshot?: boolean
+  maxRepairsPerRun?: number
 }
 
 export interface StructureBackendMutationResult {
@@ -131,6 +134,9 @@ export async function runPdfStructureBackend(input: {
   mutation: StructureBackendMutationRequest
 }): Promise<StructureBackendMutationResult> {
   ensureHelperExists()
+  const timeoutMs = input.mutation.operation === 'repair_other_elements_alt_text'
+    ? 300_000
+    : 60_000
 
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pdf-struct-'))
   const inputPath = path.join(tmpRoot, `${randomUUID()}.pdf`)
@@ -139,7 +145,11 @@ export async function runPdfStructureBackend(input: {
 
   try {
     await fs.promises.writeFile(inputPath, input.buffer)
-    await fs.promises.writeFile(requestPath, JSON.stringify(input.mutation, null, 2))
+    const requestPayload: StructureBackendMutationRequest = {
+      includeSnapshot: input.mutation.operation === 'inspect',
+      ...input.mutation,
+    }
+    await fs.promises.writeFile(requestPath, JSON.stringify(requestPayload, null, 2))
 
     const { stdout, stderr } = await execFileAsync(PYTHON_BIN, [
       HELPER_PATH,
@@ -150,7 +160,7 @@ export async function runPdfStructureBackend(input: {
       '--output',
       outputPath,
     ], {
-      timeout: 60_000,
+      timeout: timeoutMs,
       maxBuffer: 10 * 1024 * 1024,
       encoding: 'utf-8',
       windowsHide: true,

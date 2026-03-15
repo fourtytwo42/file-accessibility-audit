@@ -24,19 +24,32 @@ UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link
 FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
 EMBEDDABLE_FONT_FILES = {
     "/ArialMT": "arial.ttf",
+    "/ArialNarrow": "ARIALN.TTF",
+    "/ArialNarrow-Bold": "ARIALNB.TTF",
+    "/ArialNarrow-Italic": "ARIALNI.TTF",
+    "/ArialNarrow-BoldItalic": "ARIALNBI.TTF",
     "/Arial-BoldMT": "arialbd.ttf",
     "/Arial-ItalicMT": "ariali.ttf",
     "/Arial-BoldItalicMT": "arialbi.ttf",
+    "/SegoeUI-Regular": "segoeui.ttf",
+    "/SegoeUI-Bold": "segoeuib.ttf",
+    "/SegoeUI-Italic": "segoeuii.ttf",
+    "/SegoeUI-Light": "segoeuil.ttf",
+    "/Georgia-Regular": "georgia.ttf",
+    "/Georgia-Bold": "georgiab.ttf",
+    "/Georgia-Italic": "georgiai.ttf",
+    "/Georgia-BoldItalic": "georgiaz.ttf",
+    "/BaskervilleOldFace": "BASKVILL.TTF",
     "/Calibri": "calibri.ttf",
     "/Calibri-Bold": "calibrib.ttf",
     "/TimesNewRomanPSMT": "times.ttf",
     "/TimesNewRomanPS-BoldMT": "timesbd.ttf",
     "/TimesNewRomanPS-ItalicMT": "timesi.ttf",
     "/TimesNewRomanPS-BoldItalicMT": "timesbi.ttf",
-    "/Helvetica": "IBMPlexSans-Regular.otf",
-    "/Helvetica-Bold": "IBMPlexSans-Bold.otf",
-    "/Helvetica-Oblique": "IBMPlexSans-Italic.otf",
-    "/Helvetica-BoldOblique": "IBMPlexSans-Italic.otf",
+    "/Helvetica": "arial.ttf",
+    "/Helvetica-Bold": "arialbd.ttf",
+    "/Helvetica-Oblique": "ariali.ttf",
+    "/Helvetica-BoldOblique": "arialbi.ttf",
     "/Verdana": "verdana.ttf",
     "/Verdana-Bold": "verdanab.ttf",
     "/SourceSans3-Regular": "SourceSans3-Regular.otf",
@@ -60,10 +73,10 @@ EMBEDDABLE_FONT_FILES = {
     "/LibreBaskerville-Bold": "LibreBaskerville-Bold.ttf",
     # Standard PDF Type1 fonts — embed OTF substitutes so veraPDF's containsFontFile
     # check passes for /Type1 fonts without needing a /Subtype switch to /TrueType.
-    "/Times-Roman": "LibreBaskerville-Regular.ttf",
-    "/Times-Bold": "LibreBaskerville-Bold.ttf",
-    "/Times-Italic": "LibreBaskerville-Italic.ttf",
-    "/Times-BoldItalic": "LibreBaskerville-Italic.ttf",
+    "/Times-Roman": "times.ttf",
+    "/Times-Bold": "timesbd.ttf",
+    "/Times-Italic": "timesi.ttf",
+    "/Times-BoldItalic": "timesbi.ttf",
     "/Symbol": "IBMPlexSans-Regular.otf",
     "/ZapfDingbats": "IBMPlexSans-Regular.otf",
     "/Courier": "SourceSans3-Regular.otf",
@@ -74,29 +87,29 @@ EMBEDDABLE_FONT_FILES = {
 
 LEGACY_FONT_SUBSTITUTES = {
     # Optima family
-    "/Optima": "/LibertinusSans-Regular",
-    "/Optima-Bold": "/LibertinusSans-Bold",
-    "/Optima-Italic": "/LibertinusSans-Italic",
-    "/Optima-BoldItalic": "/LibertinusSans-Italic",
-    "/Optima-ExtraBlack": "/LibertinusSans-Bold",
+    "/Optima": "/SegoeUI-Regular",
+    "/Optima-Bold": "/SegoeUI-Bold",
+    "/Optima-Italic": "/SegoeUI-Italic",
+    "/Optima-BoldItalic": "/SegoeUI-Italic",
+    "/Optima-ExtraBlack": "/SegoeUI-Bold",
     # Frutiger family (exact variants first, prefix catch-all last)
-    "/Frutiger-Roman": "/IBMPlexSans-Regular",
-    "/Frutiger-Italic": "/IBMPlexSans-Italic",
-    "/Frutiger-Black": "/IBMPlexSans-Bold",
-    "/Frutiger-Light": "/IBMPlexSans-Light",
-    "/Frutiger-Bold": "/IBMPlexSans-Bold",
-    "/Frutiger-BoldItalic": "/IBMPlexSans-Italic",
-    "/Frutiger-LightItalic": "/IBMPlexSans-Italic",
-    "/Frutiger-BlackItalic": "/IBMPlexSans-Italic",
-    "/Frutiger-UltraBlack": "/IBMPlexSans-Bold",
-    "/Frutiger-55Roman": "/IBMPlexSans-Regular",
-    "/Frutiger-56Italic": "/IBMPlexSans-Italic",
-    "/Frutiger-45Light": "/IBMPlexSans-Light",
-    "/Frutiger-46LightItalic": "/IBMPlexSans-Italic",
-    "/Frutiger-65Bold": "/IBMPlexSans-Bold",
-    "/Frutiger-66BoldItalic": "/IBMPlexSans-Italic",
-    "/Frutiger-75Black": "/IBMPlexSans-Bold",
-    "/Frutiger-76BlackItalic": "/IBMPlexSans-Italic",
+    "/Frutiger-Roman": "/SegoeUI-Regular",
+    "/Frutiger-Italic": "/SegoeUI-Italic",
+    "/Frutiger-Black": "/SegoeUI-Bold",
+    "/Frutiger-Light": "/SegoeUI-Light",
+    "/Frutiger-Bold": "/SegoeUI-Bold",
+    "/Frutiger-BoldItalic": "/SegoeUI-Italic",
+    "/Frutiger-LightItalic": "/SegoeUI-Italic",
+    "/Frutiger-BlackItalic": "/SegoeUI-Italic",
+    "/Frutiger-UltraBlack": "/SegoeUI-Bold",
+    "/Frutiger-55Roman": "/SegoeUI-Regular",
+    "/Frutiger-56Italic": "/SegoeUI-Italic",
+    "/Frutiger-45Light": "/SegoeUI-Light",
+    "/Frutiger-46LightItalic": "/SegoeUI-Italic",
+    "/Frutiger-65Bold": "/SegoeUI-Bold",
+    "/Frutiger-66BoldItalic": "/SegoeUI-Italic",
+    "/Frutiger-75Black": "/SegoeUI-Bold",
+    "/Frutiger-76BlackItalic": "/SegoeUI-Italic",
     # AkzidenzGrotesk family
     "/AkzidenzGroteskBE-Light": "/IBMPlexSans-Light",
     "/AkzidenzGroteskBE-Regular": "/IBMPlexSans-Regular",
@@ -107,22 +120,35 @@ LEGACY_FONT_SUBSTITUTES = {
     "/AkzidenzGroteskBE-MdIt": "/IBMPlexSans-Italic",
     "/AkzidenzGroteskBE-Medium": "/IBMPlexSans-Bold",
     "/AkzidenzGroteskBE-Super": "/IBMPlexSans-Bold",
-    "/BaskervilleBE-Regular": "/LibreBaskerville-Regular",
-    "/BaskervilleBE-Italic": "/LibreBaskerville-Italic",
-    "/BaskervilleBE-Bold": "/LibreBaskerville-Bold",
-    "/BaskervilleBE-Medium": "/LibreBaskerville-Bold",
-    "/BaskervilleBE-MediumItalic": "/LibreBaskerville-Italic",
-    "/BaskervilleBE-Light": "/LibreBaskerville-Regular",
-    "/BaskervilleBE-LightItalic": "/LibreBaskerville-Italic",
-    "/BaskervilleBE-BoldItalic": "/LibreBaskerville-Italic",
-    "/BaskervilleBE-SmBdIt": "/LibreBaskerville-Italic",
+    "/Univers-Condensed": "/ArialNarrow",
+    "/Univers-CondensedBold": "/ArialNarrow-Bold",
+    "/Univers-CondensedItalic": "/ArialNarrow-Italic",
+    "/Univers-CondensedBoldItalic": "/ArialNarrow-BoldItalic",
+    "/Formata-Regular": "/SegoeUI-Regular",
+    "/Formata-Medium": "/SegoeUI-Bold",
+    "/Formata-Italic": "/SegoeUI-Italic",
+    "/AGaramond-Regular": "/Georgia-Regular",
+    "/AGaramond-Italic": "/Georgia-Italic",
+    "/AGaramond-Semibold": "/Georgia-Bold",
+    "/AGaramond-SemiboldItalic": "/Georgia-BoldItalic",
+    "/NewCenturySchlbk-Bold": "/Georgia-Bold",
+    "/AvantGarde-Demi": "/Arial-BoldMT",
+    "/BaskervilleBE-Regular": "/Georgia-Regular",
+    "/BaskervilleBE-Italic": "/Georgia-Italic",
+    "/BaskervilleBE-Bold": "/Georgia-Bold",
+    "/BaskervilleBE-Medium": "/Georgia-Bold",
+    "/BaskervilleBE-MediumItalic": "/Georgia-Italic",
+    "/BaskervilleBE-Light": "/BaskervilleOldFace",
+    "/BaskervilleBE-LightItalic": "/Georgia-Italic",
+    "/BaskervilleBE-BoldItalic": "/Georgia-BoldItalic",
+    "/BaskervilleBE-SmBdIt": "/Georgia-BoldItalic",
     # Prefix catch-alls for all remaining variants of the above families.
     # These must come last so more-specific exact entries above take priority
     # in the exact-match check; the prefix loop picks these up for unknowns.
-    "/Frutiger": "/IBMPlexSans-Regular",
+    "/Frutiger": "/SegoeUI-Regular",
     "/AkzidenzGroteskBE": "/IBMPlexSans-Regular",
     "/AkzidenzGrotesk": "/IBMPlexSans-Regular",
-    "/BaskervilleBE": "/LibreBaskerville-Regular",
+    "/BaskervilleBE": "/Georgia-Regular",
 }
 
 GLYPH_NAME_UNICODE = {
@@ -235,6 +261,23 @@ CID_SYMBOL_UNICODE_MAPS = {
         190: "\u2022",
     },
 }
+
+TYPE1_SUBSET_UNICODE_MAPS = {
+    "/MSTT31c5d5": {
+        178: "\u2264",
+    },
+}
+
+HEURISTIC_SUBSET_FALLBACKS = [
+    "/TimesNewRomanPSMT",
+    "/TimesNewRomanPS-BoldMT",
+    "/ArialMT",
+    "/Arial-BoldMT",
+    "/Georgia-Regular",
+    "/Georgia-Bold",
+    "/SegoeUI-Regular",
+    "/SegoeUI-Bold",
+]
 
 WIN_ANSI_UNICODE = {
     code: bytes([code]).decode("cp1252")
@@ -923,6 +966,15 @@ def acrobat_alt_risk_nodes(pdf):
     for entry in entries:
         if not entry["hasGraphics"]:
             continue
+        k_value = entry["obj"].get("/K") if isinstance(entry.get("obj"), pikepdf.Dictionary) else None
+        has_struct_children = False
+        if isinstance(k_value, pikepdf.Array):
+          has_struct_children = any(
+              isinstance(item, pikepdf.Dictionary) and str(item.get("/Type")) == "/StructElem"
+              for item in k_value
+          )
+        elif isinstance(k_value, pikepdf.Dictionary):
+          has_struct_children = str(k_value.get("/Type")) == "/StructElem"
         duplicates = [candidate["ref"] for candidate in grouped.get((entry["pageRef"], tuple(entry["mcids"])), []) if candidate["ref"] != entry["ref"]]
         ownership_mode = None
         if duplicates:
@@ -931,7 +983,7 @@ def acrobat_alt_risk_nodes(pdf):
             ownership_mode = "mixed_text_graphics_same_mcid"
         elif entry["tag"] != "/Figure":
             ownership_mode = "graphics_only_nonfigure"
-        if entry["tag"] in ACROBAT_ALT_RISK_CONTAINER_TAGS:
+        if entry["tag"] in ACROBAT_ALT_RISK_CONTAINER_TAGS and has_struct_children:
             ownership_mode = "container_with_graphics_descendants" if duplicates or entry["hasGraphics"] else ownership_mode
         if entry["tag"] == "/Figure":
             continue
@@ -1442,6 +1494,9 @@ def _has_child_with_mcid(child, mcid):
 
 def remove_duplicate_scalar_mcids_from_elem(elem):
     kids = elem.get("/K")
+    if isinstance(kids, int):
+        elem["/K"] = pikepdf.Array()
+        return True, [int(kids)]
     if not isinstance(kids, pikepdf.Array):
         return False, []
     rewritten = pikepdf.Array()
@@ -1664,14 +1719,49 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
 
 
 def mutate_repair_other_elements_alt_text(pdf, mutation):
+    changed = False
+    applied = []
+    unresolved = []
+    max_repairs = mutation.get("maxRepairsPerRun")
+    try:
+        max_repairs = max(1, int(max_repairs)) if max_repairs is not None else 12
+    except Exception:
+        max_repairs = 12
+    repairs_applied = 0
     risks = acrobat_alt_risk_nodes(pdf)
     if not risks:
         return False, [], ["No Acrobat-style alternate-text ownership risks were detected."]
 
-    changed = False
-    applied = []
-    unresolved = []
+    normalization_changed = False
     for risk in risks:
+        mode = risk.get("ownershipMode")
+        if mode not in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:
+            continue
+        obj = resolve_obj(pdf, risk.get("ref"))
+        if not isinstance(obj, pikepdf.Dictionary):
+            continue
+        removed_changed, removed_mcids = remove_duplicate_scalar_mcids_from_elem(obj)
+        if removed_changed:
+            changed = True
+            normalization_changed = True
+            repairs_applied += 1
+            applied.append({
+                "ref": risk["ref"],
+                "before": ", ".join(f"MCID {mcid}" for mcid in removed_mcids),
+                "after": "removed duplicate scalar ownership",
+                "details": f"Removed duplicate direct MCID ownership from {risk['tag']} element {risk['ref']} for {', '.join(f'MCID {mcid}' for mcid in removed_mcids)}.",
+            })
+
+    if normalization_changed:
+        risks = acrobat_alt_risk_nodes(pdf)
+
+    if not risks:
+        return True, applied, []
+
+    for risk in risks:
+        if repairs_applied >= max_repairs:
+            unresolved.append(f"Deferred {len(risks)} remaining Acrobat alternate-text ownership risks for a follow-up pass.")
+            break
         obj = resolve_obj(pdf, risk.get("ref"))
         if not isinstance(obj, pikepdf.Dictionary):
             continue
@@ -1680,22 +1770,15 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
             split_changed, split_applied, split_warnings, _ = split_safe_mixed_mcid_owner(pdf, obj, risk)
             if split_changed:
                 changed = True
+                repairs_applied += 1
                 applied.extend(split_applied)
                 unresolved.extend(split_warnings[:3])
                 continue
             unresolved.extend(split_warnings[:3])
             continue
         if mode in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:
-            removed_changed, removed_mcids = remove_duplicate_scalar_mcids_from_elem(obj)
-            if removed_changed:
-                changed = True
-                applied.append({
-                    "ref": risk["ref"],
-                    "before": ", ".join(f"MCID {mcid}" for mcid in removed_mcids),
-                    "after": "removed duplicate scalar ownership",
-                    "details": f"Removed duplicate direct MCID ownership from {risk['tag']} element {risk['ref']} for {', '.join(f'MCID {mcid}' for mcid in removed_mcids)}.",
-                })
-                continue
+            unresolved.append(f"{risk['tag']} {risk['ref']} still has duplicate graphics ownership after normalization.")
+            continue
         unresolved.append(f"{risk['tag']} {risk['ref']} remains in mode {mode}.")
 
     if changed:
@@ -2634,9 +2717,11 @@ def embed_font_program(pdf, descriptor, font_path, font=None):
     - .otf (CFF)   -> /FontFile3 with /Subtype /OpenType
     - .pfb / .pfa  -> /FontFile   (Type1 PostScript)
 
-    When a TrueType substitute is embedded into what was originally a Type1
-    font, the font dictionary's /Subtype is also updated to /TrueType so that
-    veraPDF's width and encoding checks match the program type.
+    Preserve the original PDF font subtype. These remediation flows often
+    attach a fallback TrueType program to legacy simple-font dictionaries with
+    custom /Encoding differences. Flipping the dictionary to /TrueType causes
+    veraPDF to evaluate the original encoding as a non-symbolic TrueType
+    encoding, which introduces avoidable AGL conformance failures.
     """
     data = font_path.read_bytes()
     ext = font_path.suffix.lower()
@@ -2644,8 +2729,6 @@ def embed_font_program(pdf, descriptor, font_path, font=None):
         stream = pdf.make_stream(data)
         stream["/Length1"] = len(data)
         descriptor["/FontFile2"] = stream
-        if isinstance(font, pikepdf.Dictionary) and str(font.get("/Subtype")) == "/Type1":
-            font["/Subtype"] = pikepdf.Name("/TrueType")
     elif ext == ".otf":
         stream = pdf.make_stream(data)
         stream["/Subtype"] = pikepdf.Name("/OpenType")
@@ -2660,10 +2743,27 @@ def embed_font_program(pdf, descriptor, font_path, font=None):
 
 
 def normalize_font_program_subtype(font, descriptor):
-    # Keep the original font subtype for legacy simple fonts. Switching /Type1
-    # dictionaries to /TrueType reintroduces veraPDF 7.21.6 failures for these
-    # annual reports even when the embedded TTF is otherwise valid.
-    return False
+    if not isinstance(font, pikepdf.Dictionary) or not isinstance(descriptor, pikepdf.Dictionary):
+        return False
+    if str(font.get("/Subtype")) != "/Type1":
+        return False
+    if descriptor.get("/FontFile2") is None:
+        return False
+
+    changed = False
+    font["/Subtype"] = pikepdf.Name("/TrueType")
+    changed = True
+
+    encoding = font.get("/Encoding")
+    if isinstance(encoding, pikepdf.Dictionary):
+        if encoding.get("/BaseEncoding") is None:
+            encoding["/BaseEncoding"] = pikepdf.Name("/WinAnsiEncoding")
+            changed = True
+    elif encoding is None:
+        font["/Encoding"] = pikepdf.Name("/WinAnsiEncoding")
+        changed = True
+
+    return changed
 
 
 def build_tounicode_cmap(codepoint_map):
@@ -2865,18 +2965,28 @@ def update_font_widths(font, width_map):
     existing_last = font.get("/LastChar")
     existing_widths = font.get("/Widths")
     if isinstance(existing_first, int) and isinstance(existing_last, int) and isinstance(existing_widths, pikepdf.Array):
+        min_code = min(width_map.keys())
+        max_code = max(width_map.keys())
+        next_first = min(existing_first, min_code)
+        next_last = max(existing_last, max_code)
         next_widths = pikepdf.Array(existing_widths)
+        if next_first < existing_first:
+            next_widths = pikepdf.Array([0] * (existing_first - next_first) + list(next_widths))
+        if next_last > existing_last:
+            next_widths.extend([0] * (next_last - existing_last))
         changed = False
         for code, width in width_map.items():
-            if code < existing_first or code > existing_last:
-                continue
-            index = code - existing_first
+            index = code - next_first
             if index < 0 or index >= len(next_widths):
                 continue
             if int(next_widths[index]) != int(width):
                 next_widths[index] = int(width)
                 changed = True
         if changed:
+            if next_first != existing_first:
+                font["/FirstChar"] = int(next_first)
+            if next_last != existing_last:
+                font["/LastChar"] = int(next_last)
             font["/Widths"] = next_widths
         return changed
 
@@ -3233,7 +3343,7 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
             subtype = str(font.get("/Subtype"))
             encoding = str(font.get("/Encoding")) if font.get("/Encoding") is not None else ""
             descriptor = font_descriptor_for(font)
-            base_font = str(font.get("/BaseFont"))
+            base_font = normalized_base_font_name(font.get("/BaseFont"))
             if subtype != "/TrueType" or encoding not in {"/WinAnsiEncoding", "/MacRomanEncoding"}:
                 warnings.append(f"Could not derive a ToUnicode map for {base_font} ({subtype}, {encoding or 'no encoding'}).")
                 continue
@@ -3282,9 +3392,13 @@ def mutate_repair_type1_font_unicode_maps(pdf, mutation):
 
             base_font = str(font.get("/BaseFont"))
             encoding_map = font_encoding_map(font)
+            explicit_subset_map = TYPE1_SUBSET_UNICODE_MAPS.get(base_font, {})
+            encoding_map.update(explicit_subset_map)
             used_codes = sorted(used_codes_by_font.get(font_ref, set()))
             if used_codes:
                 encoding_map = {code: text for code, text in encoding_map.items() if code in used_codes}
+            if explicit_subset_map:
+                encoding_map.update(explicit_subset_map)
 
             if not encoding_map:
                 warnings.append(f"Could not derive a ToUnicode map for {base_font} ({subtype}, {font.get('/Encoding') or 'no encoding'}).")
@@ -3299,6 +3413,67 @@ def mutate_repair_type1_font_unicode_maps(pdf, mutation):
             })
             changed = True
 
+    return changed, applied, warnings
+
+
+def mutate_repair_reported_font_widths(pdf, mutation):
+    applied = []
+    warnings = []
+    changed = False
+    repairs = mutation.get("reportedWidthFixes") or []
+    if not isinstance(repairs, list) or not repairs:
+        return False, [], ["No reported font-width fixes were provided."]
+
+    repair_map = {}
+    for entry in repairs:
+        if not isinstance(entry, dict):
+            continue
+        font_name = normalized_base_font_name(entry.get("fontName"))
+        try:
+            code = int(entry.get("code"))
+            width = int(entry.get("width"))
+        except Exception:
+            continue
+        if not font_name:
+            continue
+        repair_map.setdefault(font_name, {})[code] = width
+
+    if not repair_map:
+        return False, [], ["No valid reported font-width fixes were provided."]
+
+    processed_refs = set()
+    for page in pdf.pages:
+        resources = page.obj.get("/Resources")
+        if not isinstance(resources, pikepdf.Dictionary):
+            continue
+        fonts = resources.get("/Font")
+        if not isinstance(fonts, pikepdf.Dictionary):
+            continue
+        for _, font in fonts.items():
+            if not isinstance(font, pikepdf.Dictionary):
+                continue
+            font_ref = ref_string(font) or str(id(font))
+            if font_ref in processed_refs:
+                continue
+            processed_refs.add(font_ref)
+
+            base_font = normalized_base_font_name(font.get("/BaseFont"))
+            width_map = repair_map.get(base_font)
+            if not width_map:
+                continue
+            if update_font_widths(font, width_map):
+                changed = True
+                applied.append({
+                    "ref": ref_string(font),
+                    "before": "/Widths",
+                    "after": f"{len(width_map)} reported width fixes",
+                    "details": f"Patched {len(width_map)} reported glyph width mismatches for {base_font} from validator findings.",
+                })
+            else:
+                warnings.append(f"Validator-reported width fixes for {base_font} did not change the declared /Widths array.")
+
+    if not changed and not warnings:
+        warnings.append("No fonts matched the reported width-fix payload.")
     return changed, applied, warnings
 
 
@@ -3522,6 +3697,7 @@ def mutate_embed_missing_fonts_in_place(pdf, mutation):
     warnings = []
     changed = False
     embedded = {}
+    metrics_cache = {}
 
     for page in pdf.pages:
         resources = page.obj.get("/Resources")
@@ -3541,6 +3717,11 @@ def mutate_embed_missing_fonts_in_place(pdf, mutation):
                 continue
             base_font = str(font.get("/BaseFont"))
             font_path = font_file_path(base_font)
+            fallback_name = None
+            fallback_width_map = None
+            fallback_score = None
+            if not font_path and subtype == "/TrueType":
+                fallback_name, font_path, fallback_width_map, fallback_score = best_embeddable_fallback_for_font(font, metrics_cache)
             if not font_path:
                 warnings.append(f"No embeddable font file was found for {base_font}.")
                 continue
@@ -3552,11 +3733,18 @@ def mutate_embed_missing_fonts_in_place(pdf, mutation):
             else:
                 embed_font_program(pdf, descriptor, font_path, font=font)
                 normalize_font_program_subtype(font, descriptor)
+            if fallback_width_map:
+                update_font_widths(font, fallback_width_map)
             applied.append({
                 "ref": ref_string(font),
                 "before": base_font,
                 "after": str(font_path),
-                "details": f"Embedded font program for {base_font} from {font_path.name}.",
+                "details": (
+                    f"Embedded font program for {base_font} from {font_path.name}."
+                    if not fallback_name
+                    else f"Embedded heuristic fallback font program for {base_font} using {fallback_name} from {font_path.name}."
+                    + (f" Max width drift was {fallback_score:.3f}." if fallback_score is not None else "")
+                ),
             })
             changed = True
 
@@ -3581,6 +3769,23 @@ def derive_encoding_map_for_used_codes(font, font_ref, used_codes_by_font):
         encoding_map = {code: text for code, text in encoding_map.items() if code in used_codes}
         glyph_name_map = {code: name for code, name in glyph_name_map.items() if code in used_codes}
     return encoding_map, glyph_name_map, used_codes
+
+
+def derive_declared_encoding_map(font):
+    encoding_map = font_encoding_map(font)
+    glyph_name_map = font_encoding_glyph_names(font)
+    first_char = font.get("/FirstChar")
+    last_char = font.get("/LastChar")
+    widths = font.get("/Widths")
+    if isinstance(first_char, int) and isinstance(last_char, int) and isinstance(widths, pikepdf.Array):
+        declared_codes = {
+            code
+            for code in range(first_char, last_char + 1)
+            if (code - first_char) < len(widths)
+        }
+        encoding_map = {code: text for code, text in encoding_map.items() if code in declared_codes}
+        glyph_name_map = {code: name for code, name in glyph_name_map.items() if code in declared_codes}
+    return encoding_map, glyph_name_map
 
 
 def derive_width_map(metrics, encoding_map, glyph_name_map=None):
@@ -3617,6 +3822,45 @@ def width_drift_ratio(font, width_map):
             if existing_width > 0:
                 drifts.append(abs(width - existing_width) / existing_width)
     return drifts
+
+
+def best_embeddable_fallback_for_font(font, metrics_cache, max_width_drift=0.35):
+    encoding_map, glyph_name_map = derive_declared_encoding_map(font)
+    if not encoding_map:
+        encoding_map = font_encoding_map(font)
+        glyph_name_map = font_encoding_glyph_names(font)
+    if not encoding_map:
+        return None, None, None, None
+
+    best_name = None
+    best_path = None
+    best_width_map = None
+    best_score = None
+    for candidate_name in HEURISTIC_SUBSET_FALLBACKS:
+        candidate_path = font_file_path(candidate_name)
+        if not candidate_path:
+            continue
+        cache_key = str(candidate_path)
+        metrics = metrics_cache.get(cache_key)
+        if metrics is None:
+            metrics = parse_ttf_metrics(candidate_path)
+            metrics_cache[cache_key] = metrics
+        if not metrics:
+            continue
+        width_map = derive_width_map(metrics, encoding_map, glyph_name_map)
+        if not width_map:
+            continue
+        drifts = width_drift_ratio(font, width_map)
+        score = max(drifts) if drifts else 0
+        if score > max_width_drift:
+            continue
+        if best_score is None or score < best_score:
+            best_name = candidate_name
+            best_path = candidate_path
+            best_width_map = width_map
+            best_score = score
+
+    return best_name, best_path, best_width_map, best_score
 
 
 def merge_tounicode_map(font, pdf, encoding_map):
@@ -3753,6 +3997,12 @@ def mutate_finalize_substituted_font_conformance(pdf, mutation):
     max_width_drift = float(mutation.get("maxWidthDrift") or 0.35)
     metrics_cache = {}
 
+    width_changed, width_applied, width_warnings = mutate_repair_reported_font_widths(pdf, mutation)
+    if width_changed:
+        changed = True
+        applied.extend(width_applied)
+    warnings.extend(width_warnings if width_changed or width_applied else [])
+
     for page in pdf.pages:
         resources = page.obj.get("/Resources")
         if not isinstance(resources, pikepdf.Dictionary):
@@ -3813,16 +4063,29 @@ def mutate_finalize_substituted_font_conformance(pdf, mutation):
                     metrics = parse_ttf_metrics(metrics_path)
                     metrics_cache[cache_key] = metrics
 
-            encoding_map, glyph_name_map, used_codes = derive_encoding_map_for_used_codes(font, font_ref, used_codes_by_font)
-            if not encoding_map and has_tounicode(font):
+            explicit_subset_map = TYPE1_SUBSET_UNICODE_MAPS.get(base_font, {})
+            if explicit_subset_map and merge_tounicode_map(font, pdf, explicit_subset_map):
+                changed = True
+                applied.append({
+                    "ref": ref_string(font),
+                    "before": None,
+                    "after": "/ToUnicode",
+                    "details": f"Applied explicit Unicode mappings for {base_font} from deterministic subset-font overrides.",
+                })
+
+            used_encoding_map, _, used_codes = derive_encoding_map_for_used_codes(font, font_ref, used_codes_by_font)
+            width_encoding_map, width_glyph_name_map = derive_declared_encoding_map(font)
+            if not used_encoding_map and has_tounicode(font):
                 existing_map = parse_tounicode_map(font.get("/ToUnicode"))
                 if used_codes:
-                    encoding_map = {code: text for code, text in existing_map.items() if code in used_codes}
+                    used_encoding_map = {code: text for code, text in existing_map.items() if code in used_codes}
                 else:
-                    encoding_map = existing_map
+                    used_encoding_map = existing_map
+            if not width_encoding_map and used_encoding_map:
+                width_encoding_map = dict(used_encoding_map)
 
-            if metrics and encoding_map:
-                width_map = derive_width_map(metrics, encoding_map, glyph_name_map)
+            if metrics and width_encoding_map:
+                width_map = derive_width_map(metrics, width_encoding_map, width_glyph_name_map)
                 if width_map:
                     drift_ratios = width_drift_ratio(font, width_map)
                     if update_font_widths(font, width_map):
@@ -3839,14 +4102,14 @@ def mutate_finalize_substituted_font_conformance(pdf, mutation):
             elif used_codes:
                 record_unresolved(unresolved, display_name, "width_mismatch")
 
-            if encoding_map:
-                if merge_tounicode_map(font, pdf, encoding_map):
+            if used_encoding_map:
+                if merge_tounicode_map(font, pdf, used_encoding_map):
                     changed = True
                     applied.append({
                         "ref": ref_string(font),
                         "before": None,
                         "after": "/ToUnicode",
-                        "details": f"Finalized ToUnicode mappings for {base_font} using {len(encoding_map)} used character codes.",
+                        "details": f"Finalized ToUnicode mappings for {base_font} using {len(used_encoding_map)} used character codes.",
                     })
             elif used_codes:
                 record_unresolved(unresolved, display_name, "unicode_unmapped")
@@ -4284,6 +4547,19 @@ def snapshot(pdf, inspect_mode="light"):
     }
 
 
+def empty_snapshot():
+    return {
+        "headings": [],
+        "structuralNodes": [],
+        "tables": [],
+        "figures": [],
+        "imageStructNodes": [],
+        "acrobatAltRiskNodes": [],
+        "readingOrderNodes": [],
+        "readingOrderParents": [],
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -4295,6 +4571,10 @@ def main():
     pdf = pikepdf.Pdf.open(args.input)
 
     operation = request.get("operation")
+    include_snapshot = request.get("includeSnapshot")
+    if include_snapshot is None:
+        include_snapshot = operation == "inspect"
+    include_snapshot = bool(include_snapshot)
     warnings = []
     changed = False
     applied = []
@@ -4317,6 +4597,8 @@ def main():
         changed, applied, warnings = mutate_repair_structure_conformance(pdf, request)
     elif operation == "repair_type1_font_unicode_maps":
         changed, applied, warnings = mutate_repair_type1_font_unicode_maps(pdf, request)
+    elif operation == "repair_reported_font_widths":
+        changed, applied, warnings = mutate_repair_reported_font_widths(pdf, request)
     elif operation == "substitute_legacy_fonts_in_place":
         changed, applied, warnings = mutate_substitute_legacy_fonts_in_place(pdf, request)
     elif operation == "finalize_substituted_font_conformance":
@@ -4375,7 +4657,7 @@ def main():
     if changed:
         pdf.save(args.output)
 
-    snap = snapshot(pdf, inspect_mode)
+    snap = snapshot(pdf, inspect_mode) if include_snapshot else empty_snapshot()
     print(json.dumps({
         "status": "applied" if changed else "no_effect",
         "changedDocumentBytes": changed,

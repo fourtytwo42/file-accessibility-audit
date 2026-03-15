@@ -9,6 +9,7 @@ import type {
   ToolOpportunityScope,
 } from './documentModel.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
+import { normalizeLanguageTag } from './languageTags.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 
 const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
@@ -259,6 +260,21 @@ function readingOrderGroupPriority(opportunity: ToolOpportunity, context: PdfRem
   }
 }
 
+function reportedWidthFixes(analysis: AnalysisResult): Array<{ fontName: string; code: number; width: number }> {
+  const fixes = new Map<string, { fontName: string; code: number; width: number }>()
+  for (const failure of analysis.verapdf.failures) {
+    const messageMatch = failure.message.match(/Glyph width\s+(\d+)\s+in the embedded font program is not consistent with the Widths entry of the font dictionary \(value\s+(\d+)\)/i)
+    const locationMatch = failure.location?.match(/\(([^()\s]+)\s+\1\s+(\d+)\s+/)
+    if (!messageMatch || !locationMatch) continue
+    const fontName = `/${locationMatch[1].replace(/^\/+/, '')}`
+    const code = Number(locationMatch[2])
+    const width = Number(messageMatch[1])
+    if (!fontName || !Number.isFinite(code) || !Number.isFinite(width)) continue
+    fixes.set(`${fontName}:${code}`, { fontName, code, width })
+  }
+  return [...fixes.values()]
+}
+
 function hasBlockingFailure(opportunity: ToolOpportunity, failureModeByKey: Map<string, FailureMode>): boolean {
   return opportunity.derivedFromFailureModeKeys.some(key => failureModeByKey.get(key)?.blocking)
 }
@@ -334,7 +350,7 @@ function buildDeterministicCall(input: {
   const title = hasMeaningfulMetadataTitle(context.pdfjs.title)
     ? context.pdfjs.title!.trim()
     : suggestDocumentTitle({ filename: input.filename, context })
-  const language = context.qpdf.lang || context.pdfjs.lang || 'en'
+  const language = normalizeLanguageTag(context.qpdf.lang || context.pdfjs.lang || 'en') || 'en'
 
   switch (opportunity.toolName) {
     case 'set_pdfua_identification':
@@ -383,7 +399,19 @@ function buildDeterministicCall(input: {
     case 'repair_cid_symbol_font_maps':
     case 'repair_cidset_consistency':
     case 'substitute_legacy_fonts_in_place':
+      return {
+        tool_name: opportunity.toolName,
+        arguments: { target: 'document' },
+        rationale: opportunity.reason,
+        confidence: opportunity.confidence,
+      }
     case 'finalize_substituted_font_conformance':
+      return {
+        tool_name: opportunity.toolName,
+        arguments: { target: 'document', reportedWidthFixes: reportedWidthFixes(input.analysis) },
+        rationale: opportunity.reason,
+        confidence: opportunity.confidence,
+      }
     case 'repair_other_elements_alt_text':
     case 'repair_native_figure_semantics':
     case 'repair_native_table_headers':

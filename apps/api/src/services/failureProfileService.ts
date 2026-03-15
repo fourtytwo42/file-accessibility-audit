@@ -12,6 +12,7 @@ import type {
   ToolOpportunityStatus,
 } from './documentModel.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
+import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
 
 interface BuildFailureProfileInput {
   analysis: AnalysisResult
@@ -39,6 +40,22 @@ const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
     label: 'PDF/UA metadata and identification',
     pattern: /pdf\/ua identification|identification extension schema|conformance level|metadata stream doesn't contain pdf\/ua/i,
     nativeToolFamilies: ['set_pdfua_identification', 'normalize_document_metadata'],
+    categoryIds: ['title_language', 'pdf_ua_compliance'],
+    classification: 'deterministic',
+  },
+  {
+    key: 'pdfua.document_language',
+    label: 'Document language tag',
+    pattern: /lang entry.*language identifier|value .* of the lang entry is not a language-tag|language-tag as defined in rfc 3066/i,
+    nativeToolFamilies: ['set_document_language', 'normalize_document_metadata', 'set_pdfua_identification'],
+    categoryIds: ['title_language', 'pdf_ua_compliance'],
+    classification: 'deterministic',
+  },
+  {
+    key: 'pdfua.display_doc_title',
+    label: 'Display document title metadata',
+    pattern: /viewerpreferences|displaydoctitle|document catalog dictionary shall include a viewerpreferences dictionary/i,
+    nativeToolFamilies: ['set_document_title', 'normalize_document_metadata', 'set_pdfua_identification'],
     categoryIds: ['title_language', 'pdf_ua_compliance'],
     classification: 'deterministic',
   },
@@ -395,6 +412,20 @@ function deriveOpportunityStatus(
       : candidateGroupId ? action.candidateGroupId === candidateGroupId
       : action.target === target),
   )
+  if (
+    prior?.outcome === 'no_effect'
+    && opportunity.toolName === 'repair_other_elements_alt_text'
+    && opportunity.derivedFromFailureModeKeys.includes('acrobat.other_elements_alt_text')
+  ) {
+    return 'auto_runnable'
+  }
+  if (
+    prior?.outcome === 'no_effect'
+    && opportunity.toolName === 'finalize_substituted_font_conformance'
+    && opportunity.derivedFromFailureModeKeys.some(key => key === 'pdfua.font_widths' || key === 'pdfua.font_embedding')
+  ) {
+    return 'auto_runnable'
+  }
   if (prior?.outcome === 'no_effect') return 'no_effect'
   if (prior) return 'already_attempted'
   if (opportunity.blockedReason) return opportunity.scope === 'candidate' || opportunity.scope === 'candidate_group' ? 'blocked' : 'deferred'
@@ -439,10 +470,13 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
         derivedFromFailureModeKeys: derivedFailureKeys(['category.title_language']),
       })
     }
-    if (!(input.context.qpdf.lang || input.context.pdfjs.lang)) {
+    const currentLanguage = input.context.qpdf.lang || input.context.pdfjs.lang || ''
+    if (!currentLanguage || needsLanguageTagNormalization(currentLanguage)) {
       addOpportunity(opportunities, {
         toolName: 'set_document_language',
-        reason: 'The document language is missing from metadata.',
+        reason: currentLanguage
+          ? `The document language "${currentLanguage}" should be normalized to "${normalizeLanguageTag(currentLanguage)}".`
+          : 'The document language is missing from metadata.',
         scope: 'document',
         candidateIds: [],
         candidateGroupIds: [],
@@ -480,7 +514,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     || node.ownershipMode === 'container_with_graphics_descendants'
     || node.ownershipMode === 'graphics_only_nonfigure'
     || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe))
-  if (issueIds.has('alt_text') && acrobatRiskNodes.length) {
+  if (acrobatRiskNodes.length) {
     addOpportunity(opportunities, {
       toolName: 'repair_other_elements_alt_text',
       reason: deterministicAcrobatRiskNodes.length
@@ -548,6 +582,45 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
         derivedFromFailureModeKeys: [mode.key],
       })
     }
+  }
+
+  if (
+    input.analysis.pageCount >= 10
+    && failureModeByKey.has('pdfua.font_unicode')
+    && !failureModeByKey.has('pdfua.type1_unicode')
+  ) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_type1_font_unicode_maps',
+      reason: 'Large legacy PDFs with persistent font Unicode failures often need a Type1/Type3-specific Unicode recovery pass.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+      confidence: 0.72,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['pdfua.font_unicode']),
+    })
+  }
+
+  if (
+    input.analysis.pageCount <= 2
+    && failureModeByKey.has('pdfua.font_unicode')
+    && input.actions.some(action => action.tool === 'repair_font_unicode_maps')
+    && !failureModeByKey.has('pdfua.type1_unicode')
+  ) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_cid_symbol_font_maps',
+      reason: 'Small chart PDFs with persistent unmapped glyphs after generic Unicode repair often need a CID symbol-font recovery pass.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+      confidence: 0.74,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['pdfua.font_unicode']),
+    })
   }
 
   for (const candidate of input.context.headingCandidates) {

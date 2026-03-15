@@ -1,9 +1,7 @@
-import SparkMD5 from 'spark-md5'
-
 type QueueState = 'uploading' | 'queued' | 'processing' | 'complete' | 'failed' | 'cancelled'
 type ReconstructionStatus = 'pending' | 'processing' | 'completed' | 'manual_review_required' | 'failed'
 type DocumentModelStatus = 'pending' | 'processing' | 'completed' | 'failed'
-type LocalIntakeStatus = 'pending' | 'hashing' | 'preflight' | 'uploading' | 'failed_intake'
+type LocalIntakeStatus = 'pending' | 'uploading' | 'failed_intake'
 
 interface BoundingBox {
   x: number
@@ -114,7 +112,6 @@ export interface LocalIntakeItem extends QueueItemDetail {
   createdAt: string
   updatedAt: string
   processingStage: string | null
-  serverItemId?: string
   md5?: string
   dedupeKey: string
   uploadProgress: number
@@ -210,21 +207,6 @@ function createClientId(): string {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
-async function hashFileMd5(file: File): Promise<string> {
-  const chunkSize = 2 * 1024 * 1024
-  const spark = new SparkMD5.ArrayBuffer()
-  let offset = 0
-
-  while (offset < file.size) {
-    const chunk = file.slice(offset, offset + chunkSize)
-    const buffer = await chunk.arrayBuffer()
-    spark.append(buffer)
-    offset += chunkSize
-  }
-
-  return spark.end()
-}
-
 function withClientHeaders(clientId: string) {
   return {
     'x-client-id': clientId,
@@ -302,7 +284,6 @@ export function useClientQueue() {
   const activeCount = useState<number>('queue-active-count', () => 0)
   const completeCount = useState<number>('queue-complete-count', () => 0)
   const intakeWorkersRunning = useState<number>('queue-intake-workers-running', () => 0)
-  const duplicateNotices = useState<Array<{ id: string; filename: string; createdAt: number }>>('queue-duplicate-notices', () => [])
   const selectedActiveIdsState = useState<string[]>('queue-selected-active-ids', () => [])
   const selectedCompletedIdsState = useState<string[]>('queue-selected-completed-ids', () => [])
   const historyPage = useState<number>('queue-history-page', () => 1)
@@ -435,6 +416,10 @@ export function useClientQueue() {
   function removePendingIntake(localId: string) {
     pendingIntakeItems.value = pendingIntakeItems.value.filter(item => item.localId !== localId)
     delete intakeFiles.value[localId]
+    if (uploadControllers.value[`local:${localId}`]) {
+      uploadControllers.value[`local:${localId}`].abort()
+      delete uploadControllers.value[`local:${localId}`]
+    }
   }
 
   function findPendingIntake(localId: string): LocalIntakeItem | undefined {
@@ -445,9 +430,9 @@ export function useClientQueue() {
     const next = pendingIntakeItems.value.find(item => item.intakeStatus === 'pending')
     if (!next) return null
     replacePendingIntake(next.localId, {
-      intakeStatus: 'hashing',
-      processingStage: 'Hashing file locally',
-      progress: 5,
+      intakeStatus: 'uploading',
+      processingStage: 'Uploading file',
+      progress: 10,
       error: null,
     })
     return findPendingIntake(next.localId) || null
@@ -647,49 +632,9 @@ export function useClientQueue() {
       if (!file) {
         throw new Error('Local intake file reference is missing.')
       }
-
-      const md5 = await hashFileMd5(file)
-      replacePendingIntake(item.localId, {
-        md5,
-        intakeStatus: 'preflight',
-        processingStage: 'Preparing queue item',
-        progress: 35,
-      })
-
-      const preflight = await $fetch<{ status: 'duplicate' | 'restored' | 'created'; item: QueueItemSummary }>('/api/queue/preflight', {
-        method: 'POST',
-        credentials: 'include',
-        headers: withClientHeaders(getOrCreateClientId()),
-        body: {
-          clientId: getOrCreateClientId(),
-          filename: file.name,
-          md5,
-          sizeBytes: file.size,
-          mimeType: file.type || 'application/pdf',
-        },
-      })
-
-      if (preflight.status === 'duplicate') {
-        duplicateNotices.value = [
-          { id: `${preflight.item.id}-${Date.now()}`, filename: file.name, createdAt: Date.now() },
-          ...duplicateNotices.value,
-        ].slice(0, 8)
-        mergeItem(preflight.item)
-        removePendingIntake(item.localId)
-        return
-      }
-
-      replacePendingIntake(item.localId, {
-        intakeStatus: 'uploading',
-        processingStage: 'Uploading file',
-        progress: 55,
-        serverItemId: preflight.item.id,
-      })
-      mergeItem(preflight.item)
+      await uploadFile(item.localId, file)
       removePendingIntake(item.localId)
-      uploadProgressOverrides.value[preflight.item.id] = 1
       scheduleRefresh({ counts: true, active: true })
-      void uploadFile(preflight.item.id, file)
     } catch (error: any) {
       replacePendingIntake(item.localId, {
         intakeStatus: 'failed_intake',
@@ -742,33 +687,56 @@ export function useClientQueue() {
     ensureIntakeWorkers()
   }
 
-  function uploadFile(itemId: string, file: File): Promise<void> {
-    return new Promise((resolve) => {
+  function uploadFile(localId: string, file: File): Promise<QueueItemSummary | null> {
+    return new Promise((resolve, reject) => {
       const controller = new AbortController()
-      uploadControllers.value[itemId] = controller
+      uploadControllers.value[`local:${localId}`] = controller
       const xhr = new XMLHttpRequest()
-      xhr.open('POST', `/api/queue/items/${encodeURIComponent(itemId)}/upload?clientId=${encodeURIComponent(getOrCreateClientId())}`, true)
+      xhr.timeout = 15 * 60 * 1000
+      xhr.open('POST', `/api/queue/upload?clientId=${encodeURIComponent(getOrCreateClientId())}`, true)
       xhr.withCredentials = true
       xhr.upload.onprogress = (event) => {
         if (!event.lengthComputable) return
-        uploadProgressOverrides.value[itemId] = Math.round((event.loaded / event.total) * 100)
+        const pending = findPendingIntake(localId)
+        if (pending) {
+          replacePendingIntake(pending.localId, {
+            progress: Math.round((event.loaded / event.total) * 100),
+          })
+        }
       }
       xhr.onload = () => {
-        delete uploadControllers.value[itemId]
-        delete uploadProgressOverrides.value[itemId]
+        delete uploadControllers.value[`local:${localId}`]
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const payload = JSON.parse(xhr.responseText || '{}')
+            if (payload?.item) {
+              mergeItem(payload.item as QueueItemSummary)
+              scheduleRefresh({ counts: true, active: true })
+              resolve(payload.item as QueueItemSummary)
+              return
+            }
+          } catch {}
+          scheduleRefresh({ counts: true, active: true })
+          resolve(null)
+          return
+        }
+        const message = xhr.responseText || `Upload failed with status ${xhr.status}.`
         scheduleRefresh({ counts: true, active: true })
-        resolve()
+        reject(new Error(message))
       }
       xhr.onerror = () => {
-        delete uploadControllers.value[itemId]
-        delete uploadProgressOverrides.value[itemId]
+        delete uploadControllers.value[`local:${localId}`]
         scheduleRefresh({ counts: true, active: true })
-        resolve()
+        reject(new Error('Upload failed before the file reached the server.'))
       }
       xhr.onabort = () => {
-        delete uploadControllers.value[itemId]
-        delete uploadProgressOverrides.value[itemId]
-        resolve()
+        delete uploadControllers.value[`local:${localId}`]
+        reject(new Error('Upload was cancelled.'))
+      }
+      xhr.ontimeout = () => {
+        delete uploadControllers.value[`local:${localId}`]
+        scheduleRefresh({ counts: true, active: true })
+        reject(new Error('Upload timed out before the server finished receiving the file.'))
       }
 
       controller.signal.addEventListener('abort', () => xhr.abort(), { once: true })
@@ -954,7 +922,6 @@ export function useClientQueue() {
   }
 
   function clearNotices() {
-    duplicateNotices.value = []
   }
 
   async function loadMoreHistory() {
@@ -988,7 +955,6 @@ export function useClientQueue() {
     activeDisplayCount,
     completeCount,
     intakeWorkersRunning,
-    duplicateNotices,
     selectedIds,
     selectedActiveIds,
     selectedCompletedIds,

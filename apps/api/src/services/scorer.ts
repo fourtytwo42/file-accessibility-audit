@@ -239,7 +239,7 @@ export function scoreDocument(
   categories.push(scoreHeadingStructure(qpdf))
 
   // 4. Alt Text on Images (15%)
-  categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, structure?.acrobatAltRiskNodes || []))
+  categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, verapdf, structure?.acrobatAltRiskNodes || []))
 
   // 5. Bookmarks / Navigation (10%)
   categories.push(scoreBookmarks(qpdf, pdfjs))
@@ -273,11 +273,10 @@ export function scoreDocument(
     ? Math.round(applicable.reduce((sum, c) => sum + (c.score! * (c.weight / totalWeight)), 0))
     : 0
 
-  const acrobatAltRiskOpen = (structure?.acrobatAltRiskNodes?.length || 0) > 0
-  const scoreGateApplied = (verapdf.status !== 'passed' || acrobatAltRiskOpen) && computedScore === 100
+  const scoreGateApplied = verapdf.status !== 'passed' && computedScore === 100
   const overallScore = scoreGateApplied ? 99 : computedScore
   let grade = getGrade(overallScore)
-  const gradeGateApplied = (verapdf.status !== 'passed' || acrobatAltRiskOpen) && grade === 'A'
+  const gradeGateApplied = verapdf.status !== 'passed' && grade === 'A'
   if (gradeGateApplied) {
     grade = 'B'
   }
@@ -572,6 +571,7 @@ function describeAcrobatAltRisk(node: AcrobatAltRiskNode): string {
 function scoreAltTextWithAcrobatRisk(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
+  verapdf: VeraPdfResult,
   acrobatAltRiskNodes: AcrobatAltRiskNode[] = [],
 ): CategoryResult {
   const category = scoreAltText(qpdf, pdfjs)
@@ -583,6 +583,13 @@ function scoreAltTextWithAcrobatRisk(
     'Acrobat-style alternate-text risk remains because graphics content is still owned by non-/Figure structure elements.',
     ...acrobatAltRiskNodes.slice(0, 3).map(describeAcrobatAltRisk),
   ]
+
+  if (verapdf.status === 'passed' && category.score === 100) {
+    return {
+      ...category,
+      findings,
+    }
+  }
 
   const scoreCap = acrobatAltRiskNodes.some(node => node.ownershipMode === 'mixed_text_graphics_same_mcid') ? 40 : 60
   const baseScore = category.score === null ? 100 : category.score

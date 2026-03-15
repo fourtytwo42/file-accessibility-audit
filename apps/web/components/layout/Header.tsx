@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
@@ -9,7 +10,12 @@ export function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const isPublic = pathname?.startsWith('/report/')
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   async function handleLogout() {
     try {
@@ -38,7 +44,7 @@ export function Header() {
             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle color mode"
           >
-            {resolvedTheme === 'dark' ? 'Light' : 'Dark'}
+            {mounted ? (resolvedTheme === 'dark' ? 'Light' : 'Dark') : 'Theme'}
           </button>
           {!isPublic && pathname !== '/login' ? (
             <button

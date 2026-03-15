@@ -31,9 +31,9 @@ export function PdfCard({
   const local = isLocal(item)
   const topIssue = local
     ? item.stage
-    : item.standardsSummary?.failureOverview.topFailureModes[0]?.label
+    : item.error?.error
+      || item.standardsSummary?.failureOverview.topFailureModes[0]?.label
       || item.processingStage
-      || item.error?.error
       || 'No major issue summary yet'
   const progress = local
     ? item.progress
