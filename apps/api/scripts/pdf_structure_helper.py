@@ -23,70 +23,123 @@ SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
 UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link", "/L", "/LI"}
 FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
 EMBEDDABLE_FONT_FILES = {
+    # Arial family
     "/ArialMT": "arial.ttf",
-    "/ArialNarrow": "ARIALN.TTF",
-    "/ArialNarrow-Bold": "ARIALNB.TTF",
-    "/ArialNarrow-Italic": "ARIALNI.TTF",
-    "/ArialNarrow-BoldItalic": "ARIALNBI.TTF",
     "/Arial-BoldMT": "arialbd.ttf",
     "/Arial-ItalicMT": "ariali.ttf",
     "/Arial-BoldItalicMT": "arialbi.ttf",
-    "/SegoeUI-Regular": "segoeui.ttf",
-    "/SegoeUI-Bold": "segoeuib.ttf",
-    "/SegoeUI-Italic": "segoeuii.ttf",
-    "/SegoeUI-Light": "segoeuil.ttf",
-    "/Georgia-Regular": "georgia.ttf",
-    "/Georgia-Bold": "georgiab.ttf",
-    "/Georgia-Italic": "georgiai.ttf",
-    "/Georgia-BoldItalic": "georgiaz.ttf",
-    "/BaskervilleOldFace": "BASKVILL.TTF",
+    # Arial Narrow — Liberation Sans Narrow is metric-compatible
+    "/ArialNarrow": "LiberationSansNarrow-Regular.ttf",
+    "/ArialNarrow-Bold": "LiberationSansNarrow-Bold.ttf",
+    "/ArialNarrow-Italic": "LiberationSansNarrow-Italic.ttf",
+    "/ArialNarrow-BoldItalic": "LiberationSansNarrow-BoldItalic.ttf",
+    # Segoe UI — Noto Sans is the closest open-source substitute
+    "/SegoeUI-Regular": "NotoSans-Regular.ttf",
+    "/SegoeUI-Bold": "NotoSans-Bold.ttf",
+    "/SegoeUI-Italic": "NotoSans-Italic.ttf",
+    "/SegoeUI-Light": "NotoSans-Regular.ttf",
+    # Georgia — Noto Serif (humanist serif, similar proportions)
+    "/Georgia-Regular": "NotoSerif-Regular.ttf",
+    "/Georgia-Bold": "NotoSerif-Bold.ttf",
+    "/Georgia-Italic": "NotoSerif-Italic.ttf",
+    "/Georgia-BoldItalic": "NotoSerif-BoldItalic.ttf",
+    # Baskerville variants → Noto Serif
+    "/BaskervilleOldFace": "NotoSerif-Regular.ttf",
+    "/LibreBaskerville-Regular": "NotoSerif-Regular.ttf",
+    "/LibreBaskerville-Italic": "NotoSerif-Italic.ttf",
+    "/LibreBaskerville-Bold": "NotoSerif-Bold.ttf",
+    # Calibri (Carlito is metric-compatible)
     "/Calibri": "calibri.ttf",
     "/Calibri-Bold": "calibrib.ttf",
+    "/Calibri-Italic": "calibri.ttf",
+    "/Calibri-BoldItalic": "calibrib.ttf",
+    # Times New Roman
     "/TimesNewRomanPSMT": "times.ttf",
     "/TimesNewRomanPS-BoldMT": "timesbd.ttf",
     "/TimesNewRomanPS-ItalicMT": "timesi.ttf",
     "/TimesNewRomanPS-BoldItalicMT": "timesbi.ttf",
+    # Helvetica → Arial (traditional substitute)
     "/Helvetica": "arial.ttf",
     "/Helvetica-Bold": "arialbd.ttf",
     "/Helvetica-Oblique": "ariali.ttf",
     "/Helvetica-BoldOblique": "arialbi.ttf",
+    "/HelveticaNeue": "arial.ttf",
+    "/HelveticaNeue-Bold": "arialbd.ttf",
+    "/HelveticaNeue-Italic": "ariali.ttf",
+    "/HelveticaNeue-BoldItalic": "arialbi.ttf",
+    # Verdana
     "/Verdana": "verdana.ttf",
     "/Verdana-Bold": "verdanab.ttf",
-    "/SourceSans3-Regular": "SourceSans3-Regular.otf",
-    "/SourceSans3-It": "SourceSans3-It.otf",
-    "/SourceSans3-Bold": "SourceSans3-Bold.otf",
-    "/SourceSans3-Black": "SourceSans3-Black.otf",
-    "/SourceSans3-Light": "SourceSans3-Light.otf",
-    "/IBMPlexSans-Regular": "IBMPlexSans-Regular.otf",
-    "/IBMPlexSans-Italic": "IBMPlexSans-Italic.otf",
-    "/IBMPlexSans-Bold": "IBMPlexSans-Bold.otf",
-    "/IBMPlexSans-Light": "IBMPlexSans-Light.otf",
-    "/LibertinusSans-Regular": "LibertinusSans-Regular.otf",
-    "/LibertinusSans-Bold": "LibertinusSans-Bold.otf",
-    "/LibertinusSans-Italic": "LibertinusSans-Italic.otf",
-    "/LibertinusSerif-Regular": "LibertinusSerif-Regular.otf",
-    "/LibertinusSerif-Italic": "LibertinusSerif-Italic.otf",
-    "/LibertinusSerif-Bold": "LibertinusSerif-Bold.otf",
-    "/LibertinusSerif-BoldItalic": "LibertinusSerif-BoldItalic.otf",
-    "/LibreBaskerville-Regular": "LibreBaskerville-Regular.ttf",
-    "/LibreBaskerville-Italic": "LibreBaskerville-Italic.ttf",
-    "/LibreBaskerville-Bold": "LibreBaskerville-Bold.ttf",
-    # Standard PDF Type1 fonts — embed OTF substitutes so veraPDF's containsFontFile
-    # check passes for /Type1 fonts without needing a /Subtype switch to /TrueType.
+    "/Verdana-Italic": "verdana.ttf",
+    "/Verdana-BoldItalic": "verdanab.ttf",
+    # Source Sans 3 → IBM Plex Sans (both geometric sans-serifs)
+    "/SourceSans3-Regular": "IBMPlexSans-Regular.ttf",
+    "/SourceSans3-It": "IBMPlexSans-Italic.ttf",
+    "/SourceSans3-Italic": "IBMPlexSans-Italic.ttf",
+    "/SourceSans3-Bold": "IBMPlexSans-Bold.ttf",
+    "/SourceSans3-Black": "IBMPlexSans-Bold.ttf",
+    "/SourceSans3-Light": "IBMPlexSans-Light.ttf",
+    # IBM Plex Sans (TTF versions)
+    "/IBMPlexSans-Regular": "IBMPlexSans-Regular.ttf",
+    "/IBMPlexSans-Italic": "IBMPlexSans-Italic.ttf",
+    "/IBMPlexSans-Bold": "IBMPlexSans-Bold.ttf",
+    "/IBMPlexSans-Light": "IBMPlexSans-Light.ttf",
+    # Libertinus → Noto equivalents
+    "/LibertinusSans-Regular": "NotoSans-Regular.ttf",
+    "/LibertinusSans-Bold": "NotoSans-Bold.ttf",
+    "/LibertinusSans-Italic": "NotoSans-Italic.ttf",
+    "/LibertinusSerif-Regular": "NotoSerif-Regular.ttf",
+    "/LibertinusSerif-Italic": "NotoSerif-Italic.ttf",
+    "/LibertinusSerif-Bold": "NotoSerif-Bold.ttf",
+    "/LibertinusSerif-BoldItalic": "NotoSerif-BoldItalic.ttf",
+    # Open Sans
+    "/OpenSans-Regular": "OpenSans-Regular.ttf",
+    "/OpenSans-Bold": "OpenSans-Bold.ttf",
+    "/OpenSans-Italic": "OpenSans-Italic.ttf",
+    # Palatino / Book Antiqua → Noto Serif (transitional serif)
+    "/Palatino-Roman": "NotoSerif-Regular.ttf",
+    "/Palatino-Bold": "NotoSerif-Bold.ttf",
+    "/Palatino-Italic": "NotoSerif-Italic.ttf",
+    "/Palatino-BoldItalic": "NotoSerif-BoldItalic.ttf",
+    "/BookAntiqua": "NotoSerif-Regular.ttf",
+    "/BookAntiqua-Bold": "NotoSerif-Bold.ttf",
+    "/BookAntiqua-Italic": "NotoSerif-Italic.ttf",
+    "/BookAntiqua-BoldItalic": "NotoSerif-BoldItalic.ttf",
+    # Garamond → Noto Serif
+    "/Garamond": "NotoSerif-Regular.ttf",
+    "/Garamond-Bold": "NotoSerif-Bold.ttf",
+    "/Garamond-Italic": "NotoSerif-Italic.ttf",
+    # Century Schoolbook, Century Gothic → Arial / Times
+    "/CenturySchoolbook": "times.ttf",
+    "/CenturyGothic": "arial.ttf",
+    "/CenturyGothic-Bold": "arialbd.ttf",
+    # Tahoma → Noto Sans
+    "/Tahoma": "NotoSans-Regular.ttf",
+    "/Tahoma-Bold": "NotoSans-Bold.ttf",
+    # Standard PDF Type1 fonts — embed substitutes so veraPDF's containsFontFile check passes
     "/Times-Roman": "times.ttf",
     "/Times-Bold": "timesbd.ttf",
     "/Times-Italic": "timesi.ttf",
     "/Times-BoldItalic": "timesbi.ttf",
-    "/Symbol": "IBMPlexSans-Regular.otf",
-    "/ZapfDingbats": "IBMPlexSans-Regular.otf",
-    "/Courier": "SourceSans3-Regular.otf",
-    "/Courier-Bold": "SourceSans3-Bold.otf",
-    "/Courier-Oblique": "SourceSans3-It.otf",
-    "/Courier-BoldOblique": "SourceSans3-Bold.otf",
+    "/Symbol": "IBMPlexSans-Regular.ttf",
+    "/ZapfDingbats": "IBMPlexSans-Regular.ttf",
+    "/Courier": "LiberationMono-Regular.ttf",
+    "/Courier-Bold": "LiberationMono-Bold.ttf",
+    "/Courier-Oblique": "LiberationMono-Italic.ttf",
+    "/Courier-BoldOblique": "LiberationMono-BoldItalic.ttf",
+    # Courier New
+    "/CourierNewPSMT": "LiberationMono-Regular.ttf",
+    "/CourierNewPS-BoldMT": "LiberationMono-Bold.ttf",
+    "/CourierNewPS-ItalicMT": "LiberationMono-Italic.ttf",
+    "/CourierNewPS-BoldItalicMT": "LiberationMono-BoldItalic.ttf",
+    "/CourierNew": "LiberationMono-Regular.ttf",
+    "/CourierNew-Bold": "LiberationMono-Bold.ttf",
+    "/CourierNew-Italic": "LiberationMono-Italic.ttf",
+    "/CourierNew-BoldItalic": "LiberationMono-BoldItalic.ttf",
 }
 
 LEGACY_FONT_SUBSTITUTES = {
-    # Optima family
+    # Optima family (humanist sans → Noto Sans)
     "/Optima": "/SegoeUI-Regular",
     "/Optima-Bold": "/SegoeUI-Bold",
     "/Optima-Italic": "/SegoeUI-Italic",
@@ -110,7 +163,7 @@ LEGACY_FONT_SUBSTITUTES = {
     "/Frutiger-66BoldItalic": "/SegoeUI-Italic",
     "/Frutiger-75Black": "/SegoeUI-Bold",
     "/Frutiger-76BlackItalic": "/SegoeUI-Italic",
-    # AkzidenzGrotesk family
+    # AkzidenzGrotesk family (geometric grotesque → IBM Plex Sans)
     "/AkzidenzGroteskBE-Light": "/IBMPlexSans-Light",
     "/AkzidenzGroteskBE-Regular": "/IBMPlexSans-Regular",
     "/AkzidenzGroteskBE-Bold": "/IBMPlexSans-Bold",
@@ -120,19 +173,54 @@ LEGACY_FONT_SUBSTITUTES = {
     "/AkzidenzGroteskBE-MdIt": "/IBMPlexSans-Italic",
     "/AkzidenzGroteskBE-Medium": "/IBMPlexSans-Bold",
     "/AkzidenzGroteskBE-Super": "/IBMPlexSans-Bold",
+    # Univers family (neo-grotesque condensed → Arial Narrow)
     "/Univers-Condensed": "/ArialNarrow",
     "/Univers-CondensedBold": "/ArialNarrow-Bold",
     "/Univers-CondensedItalic": "/ArialNarrow-Italic",
     "/Univers-CondensedBoldItalic": "/ArialNarrow-BoldItalic",
+    "/Univers-Light": "/SegoeUI-Light",
+    "/Univers-Roman": "/SegoeUI-Regular",
+    "/Univers-Bold": "/SegoeUI-Bold",
+    "/Univers-Italic": "/SegoeUI-Italic",
+    # Formata
     "/Formata-Regular": "/SegoeUI-Regular",
     "/Formata-Medium": "/SegoeUI-Bold",
     "/Formata-Italic": "/SegoeUI-Italic",
+    # Garamond / AGaramond (old-style serif → Georgia/NotoSerif)
     "/AGaramond-Regular": "/Georgia-Regular",
     "/AGaramond-Italic": "/Georgia-Italic",
     "/AGaramond-Semibold": "/Georgia-Bold",
     "/AGaramond-SemiboldItalic": "/Georgia-BoldItalic",
+    "/GaramondMT": "/Georgia-Regular",
+    "/GaramondMT-Bold": "/Georgia-Bold",
+    "/GaramondMT-Italic": "/Georgia-Italic",
+    # New Century Schoolbook / Palatino (transitional serif → Georgia/NotoSerif)
+    "/NewCenturySchlbk-Roman": "/Georgia-Regular",
     "/NewCenturySchlbk-Bold": "/Georgia-Bold",
+    "/NewCenturySchlbk-Italic": "/Georgia-Italic",
+    "/NewCenturySchlbk-BoldItalic": "/Georgia-BoldItalic",
+    "/Palatino-Roman": "/Georgia-Regular",
+    "/Palatino-Bold": "/Georgia-Bold",
+    "/Palatino-Italic": "/Georgia-Italic",
+    "/Palatino-BoldItalic": "/Georgia-BoldItalic",
+    # Avant Garde / Franklin Gothic / Myriad (geometric/humanist sans → Arial)
+    "/AvantGarde-Book": "/ArialMT",
     "/AvantGarde-Demi": "/Arial-BoldMT",
+    "/AvantGarde-BookOblique": "/Arial-ItalicMT",
+    "/FranklinGothic-Book": "/ArialMT",
+    "/FranklinGothic-Demi": "/Arial-BoldMT",
+    "/FranklinGothic-Heavy": "/Arial-BoldMT",
+    "/FranklinGothicMedium": "/Arial-BoldMT",
+    "/MyriadPro-Regular": "/ArialMT",
+    "/MyriadPro-Bold": "/Arial-BoldMT",
+    "/MyriadPro-It": "/Arial-ItalicMT",
+    "/MyriadPro-BoldIt": "/Arial-BoldItalicMT",
+    # Minion Pro (old-style serif → Times)
+    "/MinionPro-Regular": "/TimesNewRomanPSMT",
+    "/MinionPro-Bold": "/TimesNewRomanPS-BoldMT",
+    "/MinionPro-It": "/TimesNewRomanPS-ItalicMT",
+    "/MinionPro-BoldIt": "/TimesNewRomanPS-BoldItalicMT",
+    # Baskerville family (transitional serif → NotoSerif)
     "/BaskervilleBE-Regular": "/Georgia-Regular",
     "/BaskervilleBE-Italic": "/Georgia-Italic",
     "/BaskervilleBE-Bold": "/Georgia-Bold",
@@ -142,13 +230,16 @@ LEGACY_FONT_SUBSTITUTES = {
     "/BaskervilleBE-LightItalic": "/Georgia-Italic",
     "/BaskervilleBE-BoldItalic": "/Georgia-BoldItalic",
     "/BaskervilleBE-SmBdIt": "/Georgia-BoldItalic",
-    # Prefix catch-alls for all remaining variants of the above families.
-    # These must come last so more-specific exact entries above take priority
-    # in the exact-match check; the prefix loop picks these up for unknowns.
+    # Prefix catch-alls — these must come LAST so exact entries above take priority
     "/Frutiger": "/SegoeUI-Regular",
     "/AkzidenzGroteskBE": "/IBMPlexSans-Regular",
     "/AkzidenzGrotesk": "/IBMPlexSans-Regular",
     "/BaskervilleBE": "/Georgia-Regular",
+    "/Univers": "/SegoeUI-Regular",
+    "/Franklin": "/ArialMT",
+    "/Myriad": "/ArialMT",
+    "/Minion": "/TimesNewRomanPSMT",
+    "/Garamond": "/Georgia-Regular",
 }
 
 GLYPH_NAME_UNICODE = {
@@ -269,14 +360,30 @@ TYPE1_SUBSET_UNICODE_MAPS = {
 }
 
 HEURISTIC_SUBSET_FALLBACKS = [
+    # Serif candidates (best match for body text in older government PDFs)
     "/TimesNewRomanPSMT",
     "/TimesNewRomanPS-BoldMT",
-    "/ArialMT",
-    "/Arial-BoldMT",
+    "/TimesNewRomanPS-ItalicMT",
     "/Georgia-Regular",
     "/Georgia-Bold",
+    "/Georgia-Italic",
+    # Sans-serif candidates
+    "/ArialMT",
+    "/Arial-BoldMT",
+    "/Arial-ItalicMT",
     "/SegoeUI-Regular",
     "/SegoeUI-Bold",
+    "/IBMPlexSans-Regular",
+    "/IBMPlexSans-Bold",
+    # Narrow sans (for condensed/narrow fonts)
+    "/ArialNarrow",
+    "/ArialNarrow-Bold",
+    # Monospace (for Courier-like fonts)
+    "/Courier",
+    "/Courier-Bold",
+    # Broad coverage fallback
+    "/Calibri",
+    "/Verdana",
 ]
 
 WIN_ANSI_UNICODE = {
@@ -639,18 +746,69 @@ def table_candidates(pdf):
 
 def figure_candidates(pdf):
     figures = []
+    page_usage = {}
     for obj in iter_struct_elems(pdf):
         tag = str(obj.get("/S"))
         if tag != "/Figure":
             continue
+        mcids = normalized_struct_elem_mcids(obj)
+        page_obj = page_ref_for_struct_elem(obj)
+        page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
+        usage = page_usage.setdefault(page_ref, page_mcid_analysis(page_obj)) if page_ref and isinstance(page_obj, pikepdf.Dictionary) else {}
+        has_text = any(usage.get(mcid, {}).get("hasText") for mcid in mcids)
+        has_graphics = any(usage.get(mcid, {}).get("hasGraphics") for mcid in mcids)
         raw_alt = obj.get("/Alt")
         alt_text = str(raw_alt).replace("u:", "") if raw_alt is not None else None
+        split_generated = False
+        split_source_ref = None
+        split_source_tag = None
+        parent = obj.get("/P")
+        if isinstance(parent, pikepdf.Dictionary):
+            kids = parent.get("/K")
+            kid_list = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if kids is not None else [])
+            current_ref = ref_string(obj)
+            for index, kid in enumerate(kid_list):
+                if not isinstance(kid, pikepdf.Dictionary) or ref_string(kid) != current_ref:
+                    continue
+                previous = kid_list[index - 1] if index > 0 else None
+                if not isinstance(previous, pikepdf.Dictionary):
+                    break
+                previous_ref = ref_string(previous)
+                previous_tag = str(previous.get("/S", ""))
+                previous_mcids = normalized_struct_elem_mcids(previous)
+                previous_page = page_ref_for_struct_elem(previous)
+                previous_page_ref = ref_string(previous_page) if isinstance(previous_page, pikepdf.Dictionary) else None
+                previous_usage = page_usage.setdefault(previous_page_ref, page_mcid_analysis(previous_page)) if previous_page_ref and isinstance(previous_page, pikepdf.Dictionary) else {}
+                previous_has_text = any(previous_usage.get(mcid, {}).get("hasText") for mcid in previous_mcids)
+                previous_has_graphics = any(previous_usage.get(mcid, {}).get("hasGraphics") for mcid in previous_mcids)
+                if (
+                    previous_ref
+                    and previous_tag
+                    and previous_tag != "/Figure"
+                    and previous_page_ref == page_ref
+                    and mcids
+                    and has_graphics
+                    and not has_text
+                    and previous_mcids
+                    and previous_has_text
+                    and not previous_has_graphics
+                ):
+                    split_generated = True
+                    split_source_ref = previous_ref
+                    split_source_tag = previous_tag
+                break
         figures.append({
             "ref": ref_string(obj),
             "tag": tag,
             "hasAlt": bool(alt_text),
             "altText": alt_text,
             "parentTagPath": parent_tag_path(obj),
+            "pageRef": page_ref,
+            "mcids": mcids,
+            "hasText": has_text,
+            "splitGenerated": split_generated,
+            "splitSourceRef": split_source_ref,
+            "splitSourceTag": split_source_tag,
         })
     return [figure for figure in figures if figure["ref"]]
 
@@ -809,9 +967,20 @@ def split_group_into_text_and_graphics_segments(group):
         }
 
     split_safe = not saw_text_outside_bt and not saw_graphics_inside_text
+
+    # Even when not strictly split-safe, if the segments cleanly alternate between
+    # text blocks (BT/ET) and graphics blocks with no interleaved text-outside-BT,
+    # we can still determine the operator pattern for downstream repair decisions.
     operator_pattern = "interleaved"
-    if split_safe and visible_kinds:
-        operator_pattern = "graphics_then_text" if visible_kinds[0] == "graphics" else "text_then_graphics"
+    if visible_kinds:
+        first_visible = visible_kinds[0]
+        last_visible = visible_kinds[-1]
+        if first_visible != last_visible:
+            operator_pattern = "graphics_then_text" if first_visible == "graphics" else "text_then_graphics"
+        elif first_visible == "text":
+            operator_pattern = "text_then_graphics" if saw_graphics_segment else "interleaved"
+        else:
+            operator_pattern = "graphics_then_text" if saw_text_segment else "interleaved"
 
     graphics_ops = [
         str(instruction.operator)
@@ -820,7 +989,8 @@ def split_group_into_text_and_graphics_segments(group):
         for instruction in segment["instructions"]
         if str(instruction.operator) in GRAPHICS_OPERATORS
     ]
-    graphics_likely_decorative = split_safe and bool(graphics_ops) and all(op in {"m", "l", "S", "s", "re", "n"} for op in graphics_ops)
+    # Graphics are likely decorative (lines/borders) if they only use path/stroke ops
+    graphics_likely_decorative = bool(graphics_ops) and all(op in {"m", "l", "S", "s", "re", "n", "c", "v", "y", "h", "f", "F", "f*", "B", "B*", "b", "b*", "W", "W*"} for op in graphics_ops)
 
     return {
         "splitSafe": split_safe,
@@ -963,6 +1133,7 @@ def struct_elem_mcid_info(pdf):
 def acrobat_alt_risk_nodes(pdf):
     entries, grouped = struct_elem_mcid_info(pdf)
     risks = []
+    seen_refs = set()
     for entry in entries:
         if not entry["hasGraphics"]:
             continue
@@ -989,6 +1160,9 @@ def acrobat_alt_risk_nodes(pdf):
             continue
         if ownership_mode is None:
             continue
+        obj = entry.get("obj")
+        has_alt = isinstance(obj, pikepdf.Dictionary) and obj.get("/Alt") is not None
+        seen_refs.add(entry["ref"])
         risks.append({
             "ref": entry["ref"],
             "tag": entry["tag"],
@@ -996,6 +1170,7 @@ def acrobat_alt_risk_nodes(pdf):
             "mcids": entry["mcids"],
             "hasText": entry["hasText"],
             "hasGraphics": entry["hasGraphics"],
+            "hasAlt": has_alt,
             "splitSafe": entry.get("splitSafe", False),
             "graphicsLikelyDecorative": entry.get("graphicsLikelyDecorative", False),
             "operatorPattern": entry.get("operatorPattern"),
@@ -1003,6 +1178,292 @@ def acrobat_alt_risk_nodes(pdf):
             "ownershipMode": ownership_mode,
             "duplicateOwnerRefs": duplicates,
         })
+
+    # Also find struct elements that have /Alt but no MCID content (empty /K or /K array).
+    # These trigger Adobe's "Associated with content" failure: the element has /Alt but no
+    # actual content backing it. This happens when duplicate-MCID cleanup removes the only
+    # scalar MCID from a bootstrapped heading element, leaving it empty but retaining /Alt.
+    root = get_struct_tree_root(pdf)
+    if isinstance(root, pikepdf.Dictionary):
+        visited_orphan = set()
+        def scan_orphaned_alt(node):
+            try:
+                obj = node if isinstance(node, pikepdf.Dictionary) else None
+                if obj is None:
+                    return
+                node_ref = ref_string(obj)
+                if not node_ref or node_ref in visited_orphan:
+                    return
+                visited_orphan.add(node_ref)
+                tag = str(obj.get("/S", ""))
+                kids = obj.get("/K")
+                has_alt = obj.get("/Alt") is not None
+                has_mcid_kid = False
+                has_struct_kid = False
+                kid_list = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if kids is not None else [])
+                for kid in kid_list:
+                    if isinstance(kid, (int, pikepdf.Integer)):
+                        has_mcid_kid = True
+                    elif isinstance(kid, pikepdf.Dictionary):
+                        ktype = str(kid.get("/Type", ""))
+                        if ktype != "/OBJR":
+                            has_struct_kid = True
+                            scan_orphaned_alt(kid)
+                # Flag this element if it has /Alt but no content kids of any kind
+                if has_alt and not has_mcid_kid and not has_struct_kid and node_ref not in seen_refs:
+                    pg = obj.get("/Pg")
+                    page_ref = ref_string(pg) if isinstance(pg, pikepdf.Dictionary) else None
+                    risks.append({
+                        "ref": node_ref,
+                        "tag": tag,
+                        "pageRef": page_ref,
+                        "mcids": [],
+                        "hasText": False,
+                        "hasGraphics": False,
+                        "hasAlt": True,
+                        "splitSafe": False,
+                        "graphicsLikelyDecorative": False,
+                        "operatorPattern": None,
+                        "parentTagPath": [],
+                        "ownershipMode": "orphaned_alt_empty_element",
+                        "duplicateOwnerRefs": [],
+                    })
+            except Exception:
+                pass
+
+        doc_kids = root.get("/K")
+        if doc_kids is not None:
+            top_list = list(doc_kids) if isinstance(doc_kids, pikepdf.Array) else [doc_kids]
+            for top in top_list:
+                if isinstance(top, pikepdf.Dictionary):
+                    scan_orphaned_alt(top)
+
+        # Scan for non-Figure, non-Formula struct elements that have /Alt set AND
+        # have actual content kids (MCIDs or struct children). Adobe's
+        # "Other elements alternate text" check fails for any such element — /Alt
+        # is only valid on /Figure and /Formula elements per PDF/UA.
+        visited_nonfigure_alt = set()
+        def scan_nonfigure_with_alt(node):
+            try:
+                obj = node if isinstance(node, pikepdf.Dictionary) else None
+                if obj is None:
+                    return
+                node_ref = ref_string(obj)
+                if not node_ref or node_ref in visited_nonfigure_alt:
+                    return
+                visited_nonfigure_alt.add(node_ref)
+                tag = str(obj.get("/S", ""))
+                if tag in ("/Figure", "/Formula"):
+                    # These are allowed to carry /Alt — skip
+                    kids = obj.get("/K")
+                    if kids is not None:
+                        kid_list = list(kids) if isinstance(kids, pikepdf.Array) else [kids]
+                        for kid in kid_list:
+                            if isinstance(kid, pikepdf.Dictionary) and str(kid.get("/Type", "")) not in ("/MCR", "/OBJR"):
+                                scan_nonfigure_with_alt(kid)
+                    return
+                has_alt = obj.get("/Alt") is not None
+                kids = obj.get("/K")
+                has_any_kid = False
+                kid_list = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if kids is not None else [])
+                child_structs = []
+                for kid in kid_list:
+                    if isinstance(kid, (int, pikepdf.Integer)):
+                        has_any_kid = True
+                    elif isinstance(kid, pikepdf.Dictionary):
+                        ktype = str(kid.get("/Type", ""))
+                        if ktype == "/MCR":
+                            has_any_kid = True
+                        elif ktype != "/OBJR":
+                            has_any_kid = True
+                            child_structs.append(kid)
+                # Flag non-Figure elements with /Alt AND actual content
+                if has_alt and has_any_kid and node_ref not in seen_refs:
+                    pg = obj.get("/Pg")
+                    page_ref = ref_string(pg) if isinstance(pg, pikepdf.Dictionary) else None
+                    seen_refs.add(node_ref)
+                    risks.append({
+                        "ref": node_ref,
+                        "tag": tag,
+                        "pageRef": page_ref,
+                        "mcids": [],
+                        "hasText": False,
+                        "hasGraphics": False,
+                        "hasAlt": True,
+                        "splitSafe": False,
+                        "graphicsLikelyDecorative": False,
+                        "operatorPattern": None,
+                        "parentTagPath": [],
+                        "ownershipMode": "nonfigure_with_alt",
+                        "duplicateOwnerRefs": [],
+                    })
+                for child in child_structs:
+                    scan_nonfigure_with_alt(child)
+            except Exception:
+                pass
+
+        for top in top_list:
+            if isinstance(top, pikepdf.Dictionary):
+                scan_nonfigure_with_alt(top)
+
+        # Fallback sweep: some indirect StructElem nodes can evade the tree-walk path
+        # above depending on how pikepdf materializes descendants. Acrobat still flags
+        # any non-/Figure, non-/Formula element carrying /Alt, so do a final whole-doc
+        # pass over all structure elements and report any remaining offenders.
+        for obj in iter_struct_elems(pdf):
+            try:
+                node_ref = ref_string(obj)
+                if not node_ref or node_ref in seen_refs:
+                    continue
+                tag = str(obj.get("/S", ""))
+                if tag in ("/Figure", "/Formula"):
+                    continue
+                if obj.get("/Alt") is None:
+                    continue
+                pg = obj.get("/Pg")
+                page_ref = ref_string(pg) if isinstance(pg, pikepdf.Dictionary) else None
+                seen_refs.add(node_ref)
+                risks.append({
+                    "ref": node_ref,
+                    "tag": tag,
+                    "pageRef": page_ref,
+                    "mcids": normalized_struct_elem_mcids(obj),
+                    "hasText": False,
+                    "hasGraphics": False,
+                    "hasAlt": True,
+                    "splitSafe": False,
+                    "graphicsLikelyDecorative": False,
+                    "operatorPattern": None,
+                    "parentTagPath": [],
+                    "ownershipMode": "nonfigure_with_alt",
+                    "duplicateOwnerRefs": [],
+                })
+            except Exception:
+                pass
+
+    # Phase 4: Find image XObjects invoked in content streams where the MCID is not
+    # claimed by any struct element. Adobe's "Other elements alternate text" check
+    # fails for any rendered image that has no struct-tree owner, even if it is inside
+    # a marked-content section with a valid MCID.
+    # Use the ParentTree as the canonical ownership authority — it maps each page's
+    # MCID indices to struct elements and is more reliable than walking /K chains.
+    try:
+        from pikepdf import parse_content_stream as _parse_cs
+        # Build set of (page_ref_str, mcid_int) pairs already owned via ParentTree
+        owned_image_keys = set()
+        pt_root = get_struct_tree_root(pdf)
+        pt = pt_root.get("/ParentTree") if isinstance(pt_root, pikepdf.Dictionary) else None
+        pt_nums = pt.get("/Nums") if isinstance(pt, pikepdf.Dictionary) else None
+        if isinstance(pt_nums, pikepdf.Array):
+            idx = 0
+            while idx + 1 < len(pt_nums):
+                page_key = pt_nums[idx]
+                entry_arr = pt_nums[idx + 1]
+                if isinstance(entry_arr, pikepdf.Array):
+                    # Find which page has StructParents == page_key
+                    for page in pdf.pages:
+                        try:
+                            sp = page.get("/StructParents")
+                            if sp is not None and int(sp) == int(page_key):
+                                page_ref_str = ref_string(page)
+                                for mcid_idx, owner in enumerate(entry_arr):
+                                    try:
+                                        if owner is None or str(owner) in ("null", ""):
+                                            continue
+                                        # Only count as properly owned if the owner is a /Figure
+                                        # or /Formula — these are the only elements allowed to
+                                        # carry /Alt for images. Non-Figure owners (e.g. /Sect
+                                        # with empty /K) still leave the image untagged for Adobe.
+                                        owner_tag = str(owner.get("/S", "")) if isinstance(owner, pikepdf.Dictionary) else ""
+                                        if owner_tag in ("/Figure", "/Formula"):
+                                            owned_image_keys.add((page_ref_str, mcid_idx))
+                                    except Exception:
+                                        # Conservative: treat as owned to avoid false positives
+                                        owned_image_keys.add((page_ref_str, mcid_idx))
+                                break
+                        except Exception:
+                            pass
+                idx += 2
+
+        seen_untagged_keys = set()
+        for page_num, page in enumerate(pdf.pages, 1):
+            page_ref_str = ref_string(page)
+            resources = page.get("/Resources", {})
+            xobjects = resources.get("/XObject", {}) if resources else {}
+            image_names = set()
+            for name, xobj in xobjects.items():
+                try:
+                    if str(xobj.get("/Subtype", "")) == "/Image":
+                        image_names.add(str(name))
+                except Exception:
+                    pass
+            if not image_names:
+                continue
+
+            current_mcid = None
+            try:
+                for operands, operator in _parse_cs(page):
+                    op = str(operator)
+                    if op in ("BMC", "BDC"):
+                        for operand in operands:
+                            if isinstance(operand, pikepdf.Dictionary):
+                                mcid_val = operand.get("/MCID")
+                                if mcid_val is not None:
+                                    current_mcid = int(mcid_val)
+                    elif op == "EMC":
+                        current_mcid = None
+                    elif op == "Do":
+                        xobj_name = str(operands[0]) if operands else ""
+                        if xobj_name in image_names:
+                            if current_mcid is not None:
+                                key = (page_ref_str, current_mcid)
+                                if key not in owned_image_keys and key not in seen_untagged_keys:
+                                    seen_untagged_keys.add(key)
+                                    risks.append({
+                                        "ref": f"page:{page_num}:mcid:{current_mcid}",
+                                        "tag": "(untagged)",
+                                        "pageRef": page_ref_str,
+                                        "pageNum": page_num,
+                                        "mcids": [current_mcid],
+                                        "hasText": False,
+                                        "hasGraphics": True,
+                                        "hasAlt": False,
+                                        "splitSafe": False,
+                                        "graphicsLikelyDecorative": True,
+                                        "operatorPattern": None,
+                                        "parentTagPath": [],
+                                        "ownershipMode": "untagged_image_mcid",
+                                        "duplicateOwnerRefs": [],
+                                        "xobjName": xobj_name,
+                                    })
+                            else:
+                                # Image invoked at depth 0 — no BDC wrapper at all.
+                                # These are completely invisible to Phase 1-3 detection.
+                                key = (page_ref_str, f"raw:{xobj_name}")
+                                if key not in seen_untagged_keys:
+                                    seen_untagged_keys.add(key)
+                                    risks.append({
+                                        "ref": f"page:{page_num}:raw:{xobj_name}",
+                                        "tag": "(untagged)",
+                                        "pageRef": page_ref_str,
+                                        "pageNum": page_num,
+                                        "mcids": [],
+                                        "hasText": False,
+                                        "hasGraphics": True,
+                                        "hasAlt": False,
+                                        "splitSafe": False,
+                                        "graphicsLikelyDecorative": True,
+                                        "operatorPattern": None,
+                                        "parentTagPath": [],
+                                        "ownershipMode": "untagged_image_direct",
+                                        "duplicateOwnerRefs": [],
+                                        "xobjName": xobj_name,
+                                    })
+            except Exception:
+                pass
+    except Exception:
+        pass
+
     return risks
 
 
@@ -1137,12 +1598,13 @@ def mutate_bootstrap_struct_tree(pdf, mutation):
             "/S": pikepdf.Name(level),
             "/P": document,
             "/K": next_mcid,
-            "/Alt": pikepdf.String(heading_text),
+            # Note: do NOT set /Alt on heading elements. Adobe's "Other elements
+            # alternate text" check fails for any non-Figure/non-Formula element
+            # that carries /Alt. Heading text is already accessible via its MCIDs.
         }))
         if page_obj is not None:
             element["/Pg"] = page_obj
         document["/K"].append(element)
-        applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, element, heading_text))
         applied.append({
             "ref": ref_string(element),
             "before": None,
@@ -1392,7 +1854,7 @@ def alt_text_for_matching_page_mcid_struct_elem(pdf, page_obj, mcids):
     return None
 
 
-ALT_TEXT_LEAF_TAGS = {"/Figure", "/Span", "/P", "/TextBox", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
+ALT_TEXT_LEAF_TAGS = {"/Figure", "/Formula"}
 ALT_TEXT_CONTAINER_TAGS = {"/Sect", "/Div", "/Part", "/Document"}
 
 
@@ -1496,6 +1958,13 @@ def remove_duplicate_scalar_mcids_from_elem(elem):
     kids = elem.get("/K")
     if isinstance(kids, int):
         elem["/K"] = pikepdf.Array()
+        # Element is now empty — remove /Alt to prevent "Associated with content" failures.
+        # An element with /Alt but no MCID content causes Adobe Acrobat to flag both
+        # "Associated with content" and "Other elements alternate text".
+        try:
+            del elem["/Alt"]
+        except Exception:
+            pass
         return True, [int(kids)]
     if not isinstance(kids, pikepdf.Array):
         return False, []
@@ -1510,6 +1979,12 @@ def remove_duplicate_scalar_mcids_from_elem(elem):
     if not removed:
         return False, []
     elem["/K"] = rewritten
+    # If rewritten is empty (all MCIDs were duplicates), also remove /Alt
+    if len(rewritten) == 0:
+        try:
+            del elem["/Alt"]
+        except Exception:
+            pass
     return True, removed
 
 
@@ -1639,6 +2114,12 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
     parent_tree, nums, page_key, current_entry = parent_tree_entry_for_page(root, pdf, page_obj)
     reserved_mcids.update(index for index, owner in enumerate(current_entry) if owner is not None)
     next_mcid = (max(reserved_mcids) + 1) if reserved_mcids else 0
+    # When graphics segments are decorative (borders, backgrounds, rule lines),
+    # mark them as /Artifact in the content stream instead of /Figure.
+    # This removes them from reading order and satisfies Adobe's alt-text check
+    # without creating struct-tree Figure siblings that interleave MCIDs.
+    graphics_likely_decorative = bool(risk.get("graphicsLikelyDecorative", False))
+
     text_mcids = []
     graphics_mcids = []
     rewritten_groups = []
@@ -1651,6 +2132,15 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
                 rewritten_groups[-1].extend(instructions)
             else:
                 rewritten_groups.append(list(instructions))
+            continue
+        if segment["kind"] == "graphics" and graphics_likely_decorative:
+            # Wrap as /Artifact — no MCID needed, no struct element entry
+            wrapped = [
+                pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                *instructions,
+                pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
+            ]
+            rewritten_groups.append(wrapped)
             continue
         mcid = next_mcid
         next_mcid += 1
@@ -1667,8 +2157,10 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
         else:
             graphics_mcids.append(mcid)
 
-    if not text_mcids or not graphics_mcids:
-        return False, [], [f"{risk['tag']} {risk['ref']} did not produce both text and graphics segments during splitting."], []
+    if not text_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} did not produce text segments during splitting."], []
+    if not graphics_likely_decorative and not graphics_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} did not produce graphics segments during splitting."], []
 
     rewritten = []
     for index, (is_marked, existing_group) in enumerate(groups):
@@ -1681,40 +2173,67 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
 
     replace_struct_elem_mcids(source_obj, text_mcids)
     existing_alt = source_obj.get("/Alt")
-    alt_text = str(existing_alt).replace("u:", "").strip() if existing_alt is not None else ""
     if existing_alt is not None:
         try:
             del source_obj["/Alt"]
         except Exception:
             pass
-    figure_alt = alt_text or str(source_obj.get("/ActualText") or "").strip() or str(source_obj.get("/S") or "/Figure").lstrip("/")
-    figure_elem = create_split_figure_elem(pdf, source_obj, page_obj, figure_alt)
-    if not isinstance(figure_elem, pikepdf.Dictionary):
-        return False, [], [f"Could not create a sibling /Figure element for {risk['ref']}."], []
-    replace_struct_elem_mcids(figure_elem, graphics_mcids)
 
-    highest = max(text_mcids + graphics_mcids)
+    # Update parent tree: text MCIDs → source element; graphics MCIDs → figure element (if any)
+    highest = max(text_mcids + graphics_mcids) if graphics_mcids else max(text_mcids)
     while len(current_entry) <= highest:
         current_entry.append(None)
     current_entry[target_mcid] = None
     for mcid in text_mcids:
         current_entry[mcid] = source_obj
-    for mcid in graphics_mcids:
-        current_entry[mcid] = figure_elem
-    upsert_parent_tree_entry(nums, page_key, current_entry)
-    root["/ParentTree"] = parent_tree
 
     applied = [{
         "ref": risk["ref"],
         "before": f"MCID {target_mcid}",
         "after": ", ".join(f"MCID {mcid}" for mcid in text_mcids),
         "details": f"Split mixed text and graphics ownership for {risk['tag']} element {risk['ref']} into {len(text_mcids)} text MCID segment(s).",
-    }, {
+    }]
+
+    if graphics_likely_decorative:
+        # Graphics wrapped as /Artifact — no struct element needed, no parent tree entry
+        applied.append({
+            "ref": risk["ref"],
+            "before": None,
+            "after": "artifact",
+            "details": f"Wrapped {len(rewritten_groups) - len([g for g in rewritten_groups if g])} decorative graphics segment(s) as /Artifact (no struct element) for {risk['ref']}.",
+        })
+        upsert_parent_tree_entry(nums, page_key, current_entry)
+        root["/ParentTree"] = parent_tree
+        return True, applied, [], [{"textMcids": text_mcids, "graphicsMcids": [], "figureRef": None}]
+
+    actual_text = str(source_obj.get("/ActualText") or "").strip()
+    # Never synthesize placeholder alt text from the source tag name (e.g. "Sect").
+    # Acrobat will still treat that as alternate text on a Figure, but it is low-signal
+    # and can cause false confidence while still failing practical review. If we cannot
+    # derive meaningful text here, create the sibling Figure without /Alt and let later
+    # figure-specific remediation decide whether to set informative alt text or mark the
+    # graphic decorative.
+    alt_text = actual_text if actual_text else None
+    figure_elem = create_split_figure_elem(pdf, source_obj, page_obj, alt_text)
+    if not isinstance(figure_elem, pikepdf.Dictionary):
+        return False, [], [f"Could not create a sibling /Figure element for {risk['ref']}."], []
+    replace_struct_elem_mcids(figure_elem, graphics_mcids)
+
+    for mcid in graphics_mcids:
+        current_entry[mcid] = figure_elem
+    upsert_parent_tree_entry(nums, page_key, current_entry)
+    root["/ParentTree"] = parent_tree
+
+    applied.append({
         "ref": ref_string(figure_elem),
         "before": None,
         "after": ", ".join(f"MCID {mcid}" for mcid in graphics_mcids),
-        "details": f"Created sibling /Figure element {ref_string(figure_elem)} with alt text \"{figure_alt}\" for {len(graphics_mcids)} graphics MCID segment(s).",
-    }]
+        "details": (
+            f"Created sibling /Figure element {ref_string(figure_elem)}"
+            f"{f' with alt text \"{alt_text}\"' if alt_text else ' without synthesized alt text'} "
+            f"for {len(graphics_mcids)} graphics MCID segment(s)."
+        ),
+    })
     return True, applied, [], [{"textMcids": text_mcids, "graphicsMcids": graphics_mcids, "figureRef": ref_string(figure_elem)}]
 
 
@@ -1762,10 +2281,301 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
         if repairs_applied >= max_repairs:
             unresolved.append(f"Deferred {len(risks)} remaining Acrobat alternate-text ownership risks for a follow-up pass.")
             break
+        mode = risk.get("ownershipMode")
+
+        if mode == "untagged_image_mcid":
+            # Handled before resolve_obj — these have no real PDF object ref
+            page_ref_str = risk.get("pageRef")
+            mcid = risk.get("mcids", [None])[0] if risk.get("mcids") else None
+            if page_ref_str is None or mcid is None:
+                unresolved.append(f"Cannot create Figure for untagged image: missing page ref or MCID.")
+                continue
+            page_obj = None
+            for p in pdf.pages:
+                if ref_string(p) == page_ref_str:
+                    page_obj = p.obj if hasattr(p, 'obj') else p
+                    break
+            if page_obj is None:
+                unresolved.append(f"Cannot locate page {page_ref_str} to tag untagged image MCID {mcid}.")
+                continue
+            try:
+                struct_root = get_struct_tree_root(pdf)
+                if not isinstance(struct_root, pikepdf.Dictionary):
+                    unresolved.append(f"No struct tree root for untagged image MCID {mcid}.")
+                    continue
+
+                # Check whether this MCID is already owned by an existing struct element
+                # (e.g. bootstrap created a /P or /H1 for it). If so:
+                # - If it's already a /Figure, just ensure /Alt is set.
+                # - If it's a non-heading element AND the BDC block contains only image
+                #   operators (no text), retag the existing element as /Figure in-place.
+                # - Otherwise, skip to avoid corrupting the struct tree.
+                page_dict = page_obj if isinstance(page_obj, pikepdf.Dictionary) else page_obj
+                parent_tree, nums, page_key, current_entry = parent_tree_entry_for_page(struct_root, pdf, page_dict)
+                mcid_int = int(mcid)
+                if mcid_int < len(current_entry) and current_entry[mcid_int] is not None:
+                    existing = current_entry[mcid_int]
+                    if isinstance(existing, pikepdf.Dictionary):
+                        existing_tag = str(existing.get("/S", ""))
+                        if existing_tag == "/Figure":
+                            # Already a /Figure — ensure /Alt is present for semantic enrichment.
+                            if existing.get("/Alt") is None:
+                                existing["/Alt"] = pikepdf.String("")
+                                changed = True
+                                repairs_applied += 1
+                                applied.append({
+                                    "ref": risk["ref"],
+                                    "before": f"existing /Figure MCID {mcid} missing /Alt on page {risk.get('pageNum', '?')}",
+                                    "after": "/Figure with empty alt (pending semantic enrichment)",
+                                    "details": (
+                                        f"Added empty /Alt to existing /Figure struct element for image "
+                                        f"'{risk.get('xobjName', '?')}' MCID {mcid} on page {risk.get('pageNum', '?')}."
+                                    ),
+                                })
+                            else:
+                                unresolved.append(
+                                    f"MCID {mcid} on page {risk.get('pageNum', '?')} already has /Figure with /Alt."
+                                )
+                        elif existing_tag not in ("/H1", "/H2", "/H3", "/H4", "/H5", "/H6"):
+                            # Non-heading element: check if the BDC block is image-only.
+                            # If so, retag in-place as /Figure (safe because no text content).
+                            block_has_text = False
+                            try:
+                                depth_local = 0
+                                in_target_block = False
+                                for inst in pikepdf.parse_content_stream(page_obj):
+                                    ops_l, op_l = inst
+                                    op_str = str(op_l)
+                                    if op_str in ("BMC", "BDC"):
+                                        for operand in ops_l:
+                                            if isinstance(operand, pikepdf.Dictionary):
+                                                if int(operand.get("/MCID", -1)) == mcid_int:
+                                                    in_target_block = True
+                                        depth_local += 1
+                                    elif op_str == "EMC":
+                                        depth_local -= 1
+                                        if in_target_block and depth_local == 0:
+                                            break
+                                    elif in_target_block and op_str in TEXT_SHOWING_OPERATORS:
+                                        block_has_text = True
+                                        break
+                            except Exception:
+                                block_has_text = True  # conservative: assume text present
+
+                            if not block_has_text:
+                                existing["/S"] = pikepdf.Name("/Figure")
+                                if existing.get("/Alt") is None:
+                                    existing["/Alt"] = pikepdf.String("")
+                                changed = True
+                                repairs_applied += 1
+                                applied.append({
+                                    "ref": risk["ref"],
+                                    "before": f"{existing_tag} MCID {mcid} wraps image-only block on page {risk.get('pageNum', '?')}",
+                                    "after": "/Figure with empty alt (pending semantic enrichment)",
+                                    "details": (
+                                        f"Retagged {existing_tag} → /Figure for image-only MCID {mcid} "
+                                        f"on page {risk.get('pageNum', '?')}. "
+                                        f"Fixes Adobe 'Other elements alternate text' check."
+                                    ),
+                                })
+                            else:
+                                unresolved.append(
+                                    f"MCID {mcid} on page {risk.get('pageNum', '?')} is {existing_tag} with mixed "
+                                    f"text+image content; cannot safely retag as /Figure."
+                                )
+                        else:
+                            # Heading element — do NOT touch it.
+                            unresolved.append(
+                                f"MCID {mcid} on page {risk.get('pageNum', '?')} is owned by a "
+                                f"{existing_tag} heading; skipping."
+                            )
+                    continue
+
+                document = ensure_document_struct_elem(pdf, struct_root)
+                mcr = pikepdf.Dictionary({
+                    "/Type": pikepdf.Name("/MCR"),
+                    "/Pg": page_obj,
+                    "/MCID": pikepdf.Integer(int(mcid)),
+                })
+                figure = pdf.make_indirect(pikepdf.Dictionary({
+                    "/Type": pikepdf.Name("/StructElem"),
+                    "/S": pikepdf.Name("/Figure"),
+                    "/P": document,
+                    "/Pg": page_obj,
+                    "/Alt": pikepdf.String(""),
+                    "/K": pikepdf.Array([mcr]),
+                }))
+                doc_kids = ensure_struct_elem_kids_array(document, preserve_scalar=True)
+                doc_kids.append(figure)
+                document["/K"] = doc_kids
+                while len(current_entry) <= mcid_int:
+                    current_entry.append(None)  # pikepdf null
+                current_entry[mcid_int] = figure
+                upsert_parent_tree_entry(nums, page_key, current_entry)
+                changed = True
+                repairs_applied += 1
+                applied.append({
+                    "ref": risk["ref"],
+                    "before": f"untagged image MCID {mcid} on page {risk.get('pageNum', '?')}",
+                    "after": "/Figure with empty alt (pending semantic enrichment)",
+                    "details": (
+                        f"Created /Figure struct element for untagged image '{risk.get('xobjName', '?')}' "
+                        f"MCID {mcid} on page {risk.get('pageNum', '?')}. "
+                        f"Fixes Adobe 'Other elements alternate text' check."
+                    ),
+                })
+            except Exception as exc:
+                unresolved.append(f"Could not create Figure for untagged image MCID {mcid}: {exc}")
+            continue
+
+        if mode == "untagged_image_direct":
+            # Image invoked via `Do` at depth 0 — no BDC/MCID wrapper at all.
+            # Strategy: rewrite the page content stream to wrap the `Do` with a
+            # new `BDC << /MCID N >> ... EMC` block, then create a /Figure struct
+            # element for it and add it to the ParentTree.
+            page_ref_str = risk.get("pageRef")
+            xobj_name = risk.get("xobjName", "")
+            page_num = risk.get("pageNum", "?")
+            if not page_ref_str or not xobj_name:
+                unresolved.append(f"Cannot tag direct image: missing page ref or xobj name.")
+                continue
+            page_obj = None
+            for p in pdf.pages:
+                if ref_string(p) == page_ref_str:
+                    page_obj = p.obj if hasattr(p, "obj") else p
+                    break
+            if page_obj is None:
+                unresolved.append(f"Cannot locate page {page_ref_str} for direct image {xobj_name}.")
+                continue
+            try:
+                struct_root = get_struct_tree_root(pdf)
+                if not isinstance(struct_root, pikepdf.Dictionary):
+                    unresolved.append(f"No struct tree root for direct image {xobj_name}.")
+                    continue
+
+                # Determine the next available MCID for this page.
+                # Must account for MCIDs already claimed by struct elements in the struct
+                # tree (e.g. bootstrap creates heading struct elements with /K: N without
+                # adding BDC blocks to the content stream — extract_page_mcids would miss
+                # those, causing MCID collisions that corrupt the struct tree).
+                existing_mcids = extract_page_mcids(page_obj)
+                page_ref_match = ref_string(page_obj)
+                struct_claimed_mcids = []
+                try:
+                    for elem in iter_struct_elems(pdf):
+                        elem_pg = elem.get("/Pg")
+                        if elem_pg is not None and ref_string(elem_pg) != page_ref_match:
+                            continue
+                        k = elem.get("/K")
+                        if k is None:
+                            continue
+                        if isinstance(k, pikepdf.Array):
+                            for item in k:
+                                try:
+                                    struct_claimed_mcids.append(int(item))
+                                except Exception:
+                                    pass
+                        else:
+                            try:
+                                struct_claimed_mcids.append(int(k))
+                            except Exception:
+                                pass
+                except Exception:
+                    pass
+                all_known_mcids = existing_mcids + struct_claimed_mcids
+                new_mcid = (max(all_known_mcids) + 1) if all_known_mcids else 0
+
+                # Rewrite the content stream: wrap depth-0 `Do /xobj_name` with BDC/EMC.
+                # We only wrap the FIRST occurrence of this xobj at depth 0 to avoid
+                # double-tagging if the same image appears multiple times.
+                instructions = list(pikepdf.parse_content_stream(page_obj))
+                rewritten = []
+                depth = 0
+                wrapped_once = False
+                for inst in instructions:
+                    operands, operator = inst
+                    op = str(operator)
+                    if op in ("BMC", "BDC"):
+                        depth += 1
+                    elif op == "EMC":
+                        depth -= 1
+                    if (
+                        not wrapped_once
+                        and depth == 0
+                        and op == "Do"
+                        and operands
+                        and str(operands[0]) == xobj_name
+                    ):
+                        props = pikepdf.Dictionary({"/MCID": pikepdf.Integer(new_mcid)})
+                        rewritten.append(
+                            pikepdf.ContentStreamInstruction([props], pikepdf.Operator("BDC"))
+                        )
+                        rewritten.append(inst)
+                        rewritten.append(
+                            pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC"))
+                        )
+                        wrapped_once = True
+                        continue
+                    # Pass inst through unchanged — preserves ContentStreamInlineImage
+                    rewritten.append(inst)
+
+                if not wrapped_once:
+                    unresolved.append(
+                        f"Could not find depth-0 Do /{xobj_name} on page {page_num} to wrap."
+                    )
+                    continue
+
+                page_obj["/Contents"] = pdf.make_stream(
+                    pikepdf.unparse_content_stream(rewritten)
+                )
+
+                # Create MCR and /Figure struct element.
+                document = ensure_document_struct_elem(pdf, struct_root)
+                mcr = pikepdf.Dictionary({
+                    "/Type": pikepdf.Name("/MCR"),
+                    "/Pg": page_obj,
+                    "/MCID": pikepdf.Integer(new_mcid),
+                })
+                figure = pdf.make_indirect(pikepdf.Dictionary({
+                    "/Type": pikepdf.Name("/StructElem"),
+                    "/S": pikepdf.Name("/Figure"),
+                    "/P": document,
+                    "/Pg": page_obj,
+                    "/Alt": pikepdf.String(""),
+                    "/K": pikepdf.Array([mcr]),
+                }))
+                doc_kids = ensure_struct_elem_kids_array(document, preserve_scalar=True)
+                doc_kids.append(figure)
+                document["/K"] = doc_kids
+
+                # Update ParentTree.
+                parent_tree, nums, page_key, current_entry = parent_tree_entry_for_page(
+                    struct_root, pdf, page_obj
+                )
+                while len(current_entry) <= new_mcid:
+                    current_entry.append(None)  # pikepdf null
+                current_entry[new_mcid] = figure
+                upsert_parent_tree_entry(nums, page_key, current_entry)
+
+                changed = True
+                repairs_applied += 1
+                applied.append({
+                    "ref": risk["ref"],
+                    "before": f"untagged depth-0 image '{xobj_name}' on page {page_num}",
+                    "after": f"/Figure MCID {new_mcid} with empty alt (decorative)",
+                    "details": (
+                        f"Wrapped depth-0 Do /{xobj_name} in BDC /MCID {new_mcid} EMC "
+                        f"and created /Figure struct element on page {page_num}. "
+                        f"Fixes Adobe 'Other elements alternate text' check."
+                    ),
+                })
+            except Exception as exc:
+                unresolved.append(f"Could not tag direct image {xobj_name} on page {page_num}: {exc}")
+            continue
+
         obj = resolve_obj(pdf, risk.get("ref"))
         if not isinstance(obj, pikepdf.Dictionary):
             continue
-        mode = risk.get("ownershipMode")
         if mode == "mixed_text_graphics_same_mcid" and risk.get("splitSafe"):
             split_changed, split_applied, split_warnings, _ = split_safe_mixed_mcid_owner(pdf, obj, risk)
             if split_changed:
@@ -1774,8 +2584,103 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                 applied.extend(split_applied)
                 unresolved.extend(split_warnings[:3])
                 continue
+            # Split failed despite splitSafe=True — fall through to /Alt fallback below.
             unresolved.extend(split_warnings[:3])
+
+        if mode == "mixed_text_graphics_same_mcid":
+            # Element mixes text and graphics in the same MCID and could not be split.
+            # Do NOT add /Alt — adding /Alt to a non-Figure element causes Adobe's
+            # "Other elements alternate text" failure. The element's text content is
+            # directly readable by assistive technology via the MCID. If the graphics
+            # are content-bearing (not decorative), a manual structural split is needed.
+            unresolved.append(
+                f"{risk['tag']} {risk['ref']} mixes text and graphics in the same MCID and "
+                f"could not be split automatically. Manual remediation needed to separate "
+                f"the graphic into a child /Figure element with its own /Alt."
+            )
             continue
+
+        if mode == "graphics_only_nonfigure":
+            # Struct element contains only graphics but is tagged as a non-Figure element.
+            # The correct structural fix is to retag as /Figure with /Alt="" (decorative).
+            # Only do this for tags that are safe to retag and have no unsafe ancestry
+            # (table cells, TOC items, links, etc. must stay as-is).
+            tag = str(obj.get("/S", ""))
+            parent_tags = risk.get("parentTagPath") or []
+            has_unsafe_ancestry = any(t in UNSAFE_FIGURE_ANCESTRY for t in parent_tags)
+            if tag in SAFE_FIGURE_RETAG_TAGS and not has_unsafe_ancestry:
+                try:
+                    obj["/S"] = pikepdf.Name("/Figure")
+                    obj["/Alt"] = pikepdf.String("")
+                    changed = True
+                    repairs_applied += 1
+                    applied.append({
+                        "ref": risk["ref"],
+                        "before": tag,
+                        "after": "/Figure",
+                        "details": (
+                            f"Retagged graphics-only {tag} {risk['ref']} as /Figure with empty alt "
+                            f"(decorative). Fixes Adobe 'Other elements alternate text' check."
+                        ),
+                    })
+                except Exception as exc:
+                    unresolved.append(f"Could not retag {risk['tag']} {risk['ref']} as /Figure: {exc}")
+                continue
+            unresolved.append(
+                f"{risk['tag']} {risk['ref']} contains only graphics but is not tagged as /Figure. "
+                f"Manual remediation needed: retag as /Figure with /Alt, or mark content as /Artifact."
+            )
+            continue
+
+        if mode == "nonfigure_with_alt":
+            # Non-Figure/non-Formula element has /Alt set with actual content kids.
+            # Adobe's "Other elements alternate text" check fails for these because
+            # /Alt is only valid on /Figure and /Formula elements per PDF/UA.
+            # The element's text content is directly accessible via its MCIDs, so
+            # /Alt is redundant and incorrect here.
+            existing_alt = obj.get("/Alt")
+            if existing_alt is not None:
+                try:
+                    del obj["/Alt"]
+                    changed = True
+                    repairs_applied += 1
+                    applied.append({
+                        "ref": risk["ref"],
+                        "before": str(existing_alt)[:60],
+                        "after": None,
+                        "details": (
+                            f"Removed /Alt from {risk['tag']} element {risk['ref']}: non-Figure elements "
+                            f"must not carry /Alt (Adobe 'Other elements alternate text' check). "
+                            f"The element's text content is accessible via its MCIDs."
+                        ),
+                    })
+                except Exception as exc:
+                    unresolved.append(f"Could not remove /Alt from {risk['tag']} {risk['ref']}: {exc}")
+            continue
+
+        if mode == "orphaned_alt_empty_element":
+            # Element has /Alt but no MCID content (empty or missing /K). This triggers
+            # Adobe's "Associated with content" failure. The fix is to remove /Alt since
+            # there is no content to describe.
+            existing_alt = obj.get("/Alt")
+            if existing_alt is not None:
+                try:
+                    del obj["/Alt"]
+                    changed = True
+                    repairs_applied += 1
+                    applied.append({
+                        "ref": risk["ref"],
+                        "before": str(existing_alt)[:60],
+                        "after": None,
+                        "details": (
+                            f"Removed /Alt from {risk['tag']} element {risk['ref']} which had no MCID "
+                            f"content (empty /K). The /Alt caused Adobe 'Associated with content' failure."
+                        ),
+                    })
+                except Exception as exc:
+                    unresolved.append(f"Could not remove /Alt from {risk['tag']} {risk['ref']}: {exc}")
+            continue
+
         if mode in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:
             unresolved.append(f"{risk['tag']} {risk['ref']} still has duplicate graphics ownership after normalization.")
             continue
@@ -2091,7 +2996,7 @@ def collect_used_cids_by_font(pdf):
     return used
 
 
-def artifact_orphan_top_level_content_groups(pdf, page_obj):
+def artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=False):
     groups = parse_top_level_content_groups(page_obj)
     if not groups:
         return False, []
@@ -2113,18 +3018,22 @@ def artifact_orphan_top_level_content_groups(pdf, page_obj):
             })
             continue
 
-        if is_marked is False and not group_has_text_showing(group) and group_has_visible_graphics(group):
-            rewritten.append(pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")))
-            rewritten.extend(group)
-            rewritten.append(pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")))
-            changed = True
-            applied.append({
-                "ref": page_ref,
-                "before": "untagged top-level graphics",
-                "after": "/Artifact",
-                "details": f"Marked untagged top-level graphics group {index} on page {page_ref} as /Artifact.",
-            })
-            continue
+        if is_marked is False:
+            has_text = group_has_text_showing(group)
+            has_graphics = group_has_visible_graphics(group)
+            if has_graphics or (include_text_groups and has_text):
+                rewritten.append(pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")))
+                rewritten.extend(group)
+                rewritten.append(pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")))
+                changed = True
+                kind = "text+graphics" if has_text else "graphics"
+                applied.append({
+                    "ref": page_ref,
+                    "before": f"untagged top-level {kind}",
+                    "after": "/Artifact",
+                    "details": f"Marked untagged top-level {kind} group {index} on page {page_ref} as /Artifact.",
+                })
+                continue
 
         rewritten.extend(group)
 
@@ -2169,10 +3078,6 @@ def ensure_link_annotation_tags(pdf, parent_elem, page_obj, parent_tree_nums, ne
             "/Pg": page_obj,
             "/K": objr,
         }))
-        contents = annot.get("/Contents")
-        if contents is not None:
-            link["/Alt"] = contents
-
         kids = parent_elem.get("/K")
         if not isinstance(kids, pikepdf.Array):
             kids = pikepdf.Array([kids]) if kids is not None else pikepdf.Array()
@@ -2480,9 +3385,11 @@ def mutate_repair_native_link_structure(pdf, mutation):
                 "/Pg": page_obj,
                 "/K": objr,
             }))
-            contents = annot.get("/Contents")
-            if contents is not None:
-                link_elem["/Alt"] = contents
+            # Do NOT copy /Contents to /Alt on the struct element. Struct elements
+            # that only have an OBJR (no MCID content) must not carry /Alt or Adobe
+            # fires "Associated with content - Failed" because /Alt requires MCID-based
+            # content association. The annotation's /Contents is the accessible
+            # description and is read directly by assistive technology.
 
             kids = document.get("/K")
             if not isinstance(kids, pikepdf.Array):
@@ -2742,6 +3649,85 @@ def embed_font_program(pdf, descriptor, font_path, font=None):
         descriptor["/FontFile"] = stream
 
 
+def _agl_compliant_differences(differences_array):
+    """Return a cleaned /Differences array keeping only AGL-compliant glyph names.
+
+    veraPDF rule (PDF/UA-1 via ISO 32000-1 §9.6.6.4): non-symbolic TrueType fonts
+    may only define a /Differences array if every glyph name is listed in the
+    Adobe Glyph List.  Names not in the AGL must be removed; if none remain the
+    entire /Differences key should be deleted.
+
+    Returns (new_array_or_None, changed: bool).
+    """
+    if not isinstance(differences_array, pikepdf.Array):
+        return None, False
+
+    new_items = []
+    current_code = None
+    pending_code = None
+    pending_names = []
+    any_removed = False
+
+    def flush_pending():
+        nonlocal pending_code
+        if pending_code is None:
+            return
+        for name in pending_names:
+            glyph = name.lstrip("/")
+            in_agl = glyph_name_to_unicode(glyph) is not None
+            if in_agl:
+                if not new_items or not isinstance(new_items[-1], int):
+                    new_items.append(pending_code)
+                new_items.append(pikepdf.Name("/" + glyph))
+            else:
+                new_items  # skip — do not add
+        pending_code = None
+        pending_names.clear()
+
+    temp_pending_code = None
+    temp_pending_names = []
+
+    for item in differences_array:
+        if isinstance(item, int):
+            # flush previous run
+            if temp_pending_code is not None:
+                code = temp_pending_code
+                for idx, name in enumerate(temp_pending_names):
+                    glyph = str(name).lstrip("/")
+                    in_agl = glyph_name_to_unicode(glyph) is not None
+                    if in_agl:
+                        if not new_items or not isinstance(new_items[-1], int):
+                            new_items.append(code + idx)
+                        new_items.append(pikepdf.Name("/" + glyph))
+                    else:
+                        any_removed = True
+            temp_pending_code = int(item)
+            temp_pending_names = []
+        else:
+            temp_pending_names.append(str(item))
+
+    # flush last run
+    if temp_pending_code is not None:
+        code = temp_pending_code
+        for idx, name in enumerate(temp_pending_names):
+            glyph = str(name).lstrip("/")
+            in_agl = glyph_name_to_unicode(glyph) is not None
+            if in_agl:
+                if not new_items or not isinstance(new_items[-1], int):
+                    new_items.append(code + idx)
+                new_items.append(pikepdf.Name("/" + glyph))
+            else:
+                any_removed = True
+
+    if not any_removed:
+        return differences_array, False
+
+    if not new_items:
+        return None, True  # all entries were non-AGL — delete the key
+
+    return pikepdf.Array(new_items), True
+
+
 def normalize_font_program_subtype(font, descriptor):
     if not isinstance(font, pikepdf.Dictionary) or not isinstance(descriptor, pikepdf.Dictionary):
         return False
@@ -2758,6 +3744,15 @@ def normalize_font_program_subtype(font, descriptor):
     if isinstance(encoding, pikepdf.Dictionary):
         if encoding.get("/BaseEncoding") is None:
             encoding["/BaseEncoding"] = pikepdf.Name("/WinAnsiEncoding")
+            changed = True
+        # Strip or clean /Differences so every remaining glyph name is AGL-compliant.
+        # veraPDF requires this for non-symbolic TrueType fonts (ISO 32000-1 §9.6.6.4).
+        cleaned, diff_changed = _agl_compliant_differences(encoding.get("/Differences"))
+        if diff_changed:
+            if cleaned is None:
+                del encoding["/Differences"]
+            else:
+                encoding["/Differences"] = cleaned
             changed = True
     elif encoding is None:
         font["/Encoding"] = pikepdf.Name("/WinAnsiEncoding")
@@ -3318,6 +4313,65 @@ def normalize_annotation_sort_key(annot):
     return (0, 0)
 
 
+def mutate_repair_truetype_encoding_differences(pdf, mutation):
+    """Remove non-AGL glyph names from /Differences arrays of TrueType fonts.
+
+    veraPDF PDF/UA-1 rule: non-symbolic TrueType fonts may only include a
+    /Differences array when every glyph name is in the Adobe Glyph List.
+    This pass strips non-AGL names (or removes the array entirely) for all
+    embedded TrueType fonts, resolving the 'Differences are Unicode compliant =
+    false' failure without changing any visible rendering.
+    """
+    applied = []
+    warnings = []
+    changed = False
+    processed_refs = set()
+
+    for page in pdf.pages:
+        resources = page.obj.get("/Resources")
+        if not isinstance(resources, pikepdf.Dictionary):
+            continue
+        fonts = resources.get("/Font")
+        if not isinstance(fonts, pikepdf.Dictionary):
+            continue
+        for _, font in fonts.items():
+            if not isinstance(font, pikepdf.Dictionary):
+                continue
+            subtype = str(font.get("/Subtype"))
+            if subtype != "/TrueType":
+                continue
+            font_ref = ref_string(font) or str(id(font))
+            if font_ref in processed_refs:
+                continue
+            processed_refs.add(font_ref)
+            encoding = font.get("/Encoding")
+            if not isinstance(encoding, pikepdf.Dictionary):
+                continue
+            base_font = normalized_base_font_name(font.get("/BaseFont"))
+            cleaned, diff_changed = _agl_compliant_differences(encoding.get("/Differences"))
+            if not diff_changed:
+                continue
+            changed = True
+            if cleaned is None:
+                del encoding["/Differences"]
+                applied.append({
+                    "ref": font_ref,
+                    "before": "/Differences",
+                    "after": None,
+                    "details": f"Removed non-AGL /Differences array from TrueType font {base_font}; encoding is now purely WinAnsiEncoding/MacRomanEncoding-based.",
+                })
+            else:
+                encoding["/Differences"] = cleaned
+                applied.append({
+                    "ref": font_ref,
+                    "before": "/Differences",
+                    "after": "/Differences",
+                    "details": f"Stripped non-AGL glyph names from /Differences array of TrueType font {base_font}; remaining entries are AGL-compliant.",
+                })
+
+    return changed, applied, warnings
+
+
 def mutate_repair_font_unicode_maps(pdf, mutation):
     applied = []
     warnings = []
@@ -3501,34 +4555,336 @@ def mutate_repair_reported_font_widths(pdf, mutation):
 
 
 def mutate_normalize_annotation_tab_order(pdf, mutation):
+    """Set /Tabs /S on every page in a tagged PDF and reorder annotated pages top-to-bottom.
+
+    Adobe Acrobat's Accessibility Checker reports 'Tab order - Failed' when any page
+    in a tagged document lacks /Tabs /S (PDF/UA-1 clause 7.20 applies to all pages,
+    not just annotated ones).
+    """
+    catalog = get_catalog(pdf)
+    is_tagged = False
+    if isinstance(catalog, pikepdf.Dictionary):
+        mark_info = catalog.get("/MarkInfo")
+        if isinstance(mark_info, pikepdf.Dictionary):
+            marked = mark_info.get("/Marked")
+            is_tagged = bool(marked) and str(marked) != "false"
+
     applied = []
     changed = False
     for page in pdf.pages:
         page_obj = page.obj
-        annots = page_obj.get("/Annots")
-        if not isinstance(annots, pikepdf.Array) or len(annots) < 1:
+        annots_raw = page_obj.get("/Annots")
+        # Resolve indirect reference to the annotation array if needed
+        if isinstance(annots_raw, pikepdf.Object) and not isinstance(annots_raw, pikepdf.Array):
+            try:
+                annots_raw = annots_raw.obj if hasattr(annots_raw, 'obj') else annots_raw
+            except Exception:
+                pass
+        has_annots = isinstance(annots_raw, pikepdf.Array) and len(annots_raw) > 0
+
+        if not has_annots and not is_tagged:
             continue
-        if str(page_obj.get("/Tabs")) != "/S":
+
+        tabs_val = page_obj.get("/Tabs")
+        if tabs_val is None or str(tabs_val) != "/S":
             page_obj["/Tabs"] = pikepdf.Name("/S")
             changed = True
             applied.append({
                 "ref": ref_string(page_obj),
-                "before": None,
+                "before": str(tabs_val) if tabs_val is not None else None,
                 "after": "/Tabs /S",
-                "details": f"Normalized page tab order mode to /S for {ref_string(page_obj)}.",
+                "details": f"Normalized page tab order to /S for {ref_string(page_obj)} ({'annotated' if has_annots else 'tagged document'}).",
             })
 
-        ordered = sorted(list(annots), key=normalize_annotation_sort_key)
-        if ordered != list(annots):
-            page_obj["/Annots"] = pikepdf.Array(ordered)
+        if has_annots:
+            annots = annots_raw
+            ordered = sorted(list(annots), key=normalize_annotation_sort_key)
+            if ordered != list(annots):
+                page_obj["/Annots"] = pikepdf.Array(ordered)
+                changed = True
+                applied.append({
+                    "ref": ref_string(page_obj),
+                    "before": "annotation order",
+                    "after": "reading order",
+                    "details": f"Reordered annotations on {ref_string(page_obj)} to follow visual reading order.",
+                })
+    return changed, applied, []
+
+
+def mutate_set_tabs_all_annotated_pages(pdf, mutation):
+    """Set /Tabs /S on every page in a tagged PDF, unconditionally.
+
+    Adobe Acrobat's Accessibility Checker fires 'Tab order - Failed' when any page
+    in a tagged document lacks /Tabs /S -- this applies to ALL pages, not only those
+    with annotations.  PDF/UA-1 (ISO 14289-1) clause 7.20 requires that the /Tabs
+    entry in every page dictionary has the value /S when the document is tagged.
+
+    Unlike normalize_annotation_tab_order this does not reorder annotations,
+    making it safe to run as a final cleanup pass.
+    """
+    catalog = get_catalog(pdf)
+    is_tagged = False
+    if isinstance(catalog, pikepdf.Dictionary):
+        mark_info = catalog.get("/MarkInfo")
+        if isinstance(mark_info, pikepdf.Dictionary):
+            marked = mark_info.get("/Marked")
+            is_tagged = bool(marked) and str(marked) != "false"
+
+    applied = []
+    changed = False
+    for page in pdf.pages:
+        page_obj = page.obj
+        tabs_val = page_obj.get("/Tabs")
+        # Set /Tabs /S if:
+        #  - The page has annotations, OR
+        #  - The document is tagged (PDF/UA requires /Tabs /S on all pages in tagged docs)
+        has_annots = False
+        annots_raw = page_obj.get("/Annots")
+        if isinstance(annots_raw, pikepdf.Object) and not isinstance(annots_raw, pikepdf.Array):
+            try:
+                annots_raw = annots_raw.obj if hasattr(annots_raw, 'obj') else annots_raw
+            except Exception:
+                pass
+        if isinstance(annots_raw, pikepdf.Array) and len(annots_raw) > 0:
+            has_annots = True
+
+        if not has_annots and not is_tagged:
+            continue
+
+        if tabs_val is None or str(tabs_val) != "/S":
+            page_obj["/Tabs"] = pikepdf.Name("/S")
             changed = True
             applied.append({
                 "ref": ref_string(page_obj),
-                "before": "annotation order",
-                "after": "reading order",
-                "details": f"Reordered annotations on {ref_string(page_obj)} to follow visual reading order.",
+                "before": str(tabs_val) if tabs_val is not None else None,
+                "after": "/Tabs /S",
+                "details": f"Set /Tabs /S on page {ref_string(page_obj)} ({'annotated' if has_annots else 'tagged document'}).",
             })
     return changed, applied, []
+
+
+# Annotation subtypes that Adobe's checker expects to have accessible content
+_VISIBLE_ANNOT_SUBTYPES = {
+    "/Link", "/Widget", "/Screen", "/Movie", "/Sound",
+    "/FileAttachment", "/Stamp", "/FreeText", "/Highlight",
+    "/Underline", "/Squiggly", "/StrikeOut", "/Ink", "/Popup",
+}
+
+
+def _annotation_is_invisible(annot):
+    """Return True if the annotation is invisible/hidden and can be skipped."""
+    flags = annot.get("/F")
+    if isinstance(flags, int):
+        invisible = (flags & 1)   # bit 1 = Invisible
+        hidden = (flags & 2)      # bit 2 = Hidden
+        no_view = (flags & 32)    # bit 6 = NoView
+        if invisible or hidden or no_view:
+            return True
+    return False
+
+
+def mutate_repair_annotation_alt_text(pdf, mutation):
+    """Ensure all visible annotations have accessible descriptions.
+
+    Adobe Accessibility Checker reports two failures for annotations without
+    accessible text:
+      - 'Associated with content - Failed': the annotation is not linked into
+        the document's structure tree via a /StructParent back-reference.
+      - 'Other elements alternate text - Failed': a non-link annotation lacks
+        a /Contents entry (the tooltip/alt text that assistive technology reads).
+
+    This operation:
+    1. Ensures every visible, non-link annotation has a /Contents entry.
+       - Links already have their text from the visible link text or URL.
+       - For other annotation types we synthesise a description from the
+         annotation's existing /T (title), /Contents, subtype, or a generic
+         fallback so screen readers have something to announce.
+    2. For every annotation that already has a /Contents entry, ensures
+       the string is non-empty (replaces blank entries with a generic label).
+    3. Sets /Tabs /S on every page that has annotations (covers the
+       'Tab order - Failed' Adobe check for non-link annotations that the
+       set_page_tabs tool misses because it only targets pages with links).
+    """
+    applied = []
+    warnings = []
+    changed = False
+
+    subtype_labels = {
+        "/Stamp": "Stamp",
+        "/FreeText": "Text annotation",
+        "/Highlight": "Highlighted text",
+        "/Underline": "Underlined text",
+        "/Squiggly": "Squiggly underline",
+        "/StrikeOut": "Strikethrough",
+        "/Ink": "Ink annotation",
+        "/Sound": "Sound annotation",
+        "/Movie": "Movie annotation",
+        "/FileAttachment": "File attachment",
+        "/Screen": "Screen annotation",
+        "/Widget": "Form field",
+        "/Popup": "Popup note",
+    }
+
+    # Determine if document is tagged (PDF/UA requires /Tabs /S on all pages)
+    catalog = get_catalog(pdf)
+    is_tagged = False
+    if isinstance(catalog, pikepdf.Dictionary):
+        mark_info = catalog.get("/MarkInfo")
+        if isinstance(mark_info, pikepdf.Dictionary):
+            marked = mark_info.get("/Marked")
+            is_tagged = bool(marked) and str(marked) != "false"
+
+    # Set up parent tree access for /StructParent repairs on non-Link annotations.
+    # Adobe fires 'Associated with content - Failed' when a visible annotation in a
+    # tagged document lacks a /StructParent back-reference into the parent tree.
+    struct_root = None
+    struct_document = None
+    struct_nums = None
+    struct_next_key = 0
+    if is_tagged:
+        struct_root = get_struct_tree_root(pdf)
+        if isinstance(struct_root, pikepdf.Dictionary):
+            struct_document = ensure_document_struct_elem(pdf, struct_root)
+            _, struct_nums = ensure_parent_tree(struct_root, pdf)
+            struct_next_key = int(struct_root.get("/ParentTreeNextKey", 0) or 0)
+
+    for page in pdf.pages:
+        page_obj = page.obj
+        annots_raw = page_obj.get("/Annots")
+        # Resolve indirect reference to annotation array if needed
+        if isinstance(annots_raw, pikepdf.Object) and not isinstance(annots_raw, pikepdf.Array):
+            try:
+                annots_raw = annots_raw.obj if hasattr(annots_raw, 'obj') else annots_raw
+            except Exception:
+                pass
+        has_annots = isinstance(annots_raw, pikepdf.Array) and len(annots_raw) > 0
+        annots = annots_raw if has_annots else pikepdf.Array()
+
+        # Fix tab order: PDF/UA requires /Tabs /S on all pages in a tagged doc.
+        # Adobe fires 'Tab order - Failed' on any page missing this, with or without annotations.
+        if has_annots or is_tagged:
+            tabs_val = page_obj.get("/Tabs")
+            if tabs_val is None or str(tabs_val) != "/S":
+                page_obj["/Tabs"] = pikepdf.Name("/S")
+                changed = True
+                applied.append({
+                    "ref": ref_string(page_obj),
+                    "before": str(tabs_val) if tabs_val is not None else None,
+                    "after": "/Tabs /S",
+                    "details": f"Set /Tabs /S on page {ref_string(page_obj)} ({'annotated' if has_annots else 'tagged document, PDF/UA clause 7.20'}).",
+                })
+
+        if not has_annots:
+            continue
+
+        for annot_ref in annots:
+            try:
+                # Resolve indirect object references to get the annotation dict
+                annot = pdf.get_object(annot_ref.objgen) if hasattr(annot_ref, 'objgen') else annot_ref
+                if not isinstance(annot, pikepdf.Dictionary):
+                    continue
+            except Exception:
+                try:
+                    annot = annot_ref
+                    if not isinstance(annot, pikepdf.Dictionary):
+                        continue
+                except Exception:
+                    continue
+
+            subtype = str(annot.get("/Subtype") or "")
+            if subtype not in _VISIBLE_ANNOT_SUBTYPES:
+                continue
+            if _annotation_is_invisible(annot):
+                continue
+            # Links are handled by set_link_annotation_contents; skip them here
+            if subtype == "/Link":
+                continue
+
+            existing_contents = annot.get("/Contents")
+            existing_text = ""
+            if existing_contents is not None:
+                try:
+                    existing_text = str(existing_contents).strip()
+                except Exception:
+                    existing_text = ""
+
+            if not existing_text:
+                # Build a description from available fields
+                title = ""
+                try:
+                    t = annot.get("/T")
+                    if t is not None:
+                        title = str(t).strip()
+                except Exception:
+                    pass
+
+                label = subtype_labels.get(subtype, subtype.lstrip("/") + " annotation")
+                description = title if title else label
+
+                try:
+                    annot["/Contents"] = pikepdf.String(description)
+                    changed = True
+                    applied.append({
+                        "ref": ref_string(annot),
+                        "before": None,
+                        "after": f"/Contents '{description}'",
+                        "details": f"Added /Contents alt text '{description}' to {subtype} annotation (required for Adobe 'Other elements alternate text' accessibility check).",
+                    })
+                except Exception as exc:
+                    warnings.append(f"Could not set /Contents on {subtype} annotation: {exc}")
+
+            # In tagged documents, non-Link annotations must have a /StructParent
+            # back-reference into the parent tree or Adobe fires 'Associated with
+            # content - Failed'. We create a minimal /Annot struct element and OBJR
+            # reference so the annotation is properly linked into the structure tree.
+            if is_tagged and struct_nums is not None and struct_document is not None:
+                existing_struct_parent = annot.get("/StructParent")
+                if existing_struct_parent is None:
+                    try:
+                        contents_val = annot.get("/Contents")
+                        contents_str = str(contents_val).strip() if contents_val is not None else ""
+
+                        objr = pdf.make_indirect(pikepdf.Dictionary({
+                            "/Type": pikepdf.Name("/OBJR"),
+                            "/Obj": annot,
+                            "/Pg": page_obj,
+                        }))
+                        # Do NOT set /Alt on this struct element. Elements with only
+                        # an OBJR (no MCID content) must not carry /Alt or Adobe fires
+                        # "Associated with content - Failed". The annotation's /Contents
+                        # is the accessible description; the struct element just provides
+                        # the parent-tree back-reference for tagged-PDF association.
+                        annot_elem = pdf.make_indirect(pikepdf.Dictionary({
+                            "/Type": pikepdf.Name("/StructElem"),
+                            "/S": pikepdf.Name("/Annot"),
+                            "/P": struct_document,
+                            "/Pg": page_obj,
+                            "/K": objr,
+                        }))
+
+                        kids = struct_document.get("/K")
+                        if not isinstance(kids, pikepdf.Array):
+                            kids = pikepdf.Array([kids]) if kids is not None else pikepdf.Array()
+                        kids.append(annot_elem)
+                        struct_document["/K"] = kids
+
+                        annot["/StructParent"] = pikepdf.Integer(struct_next_key)
+                        upsert_parent_tree_entry(struct_nums, struct_next_key, annot_elem)
+                        struct_next_key += 1
+                        changed = True
+                        applied.append({
+                            "ref": ref_string(annot),
+                            "before": None,
+                            "after": f"/StructParent {struct_next_key - 1}",
+                            "details": f"Added /StructParent and /Annot struct element for {subtype} annotation to fix Adobe 'Associated with content' accessibility check.",
+                        })
+                    except Exception as exc:
+                        warnings.append(f"Could not add /StructParent to {subtype} annotation: {exc}")
+
+    if struct_root is not None and isinstance(struct_root, pikepdf.Dictionary):
+        struct_root["/ParentTreeNextKey"] = pikepdf.Integer(struct_next_key)
+
+    return changed, applied, warnings
 
 
 def mutate_repair_cid_symbol_font_maps(pdf, mutation):
@@ -3689,29 +5045,33 @@ def mutate_repair_cidset_consistency(pdf, mutation):
 
 
 def mutate_artifact_nonsemantic_page_elements(pdf, mutation):
+    # Only proceed when the document has a struct tree – that means bootstrap has
+    # already run and the accessible structure is in place.  Without a struct tree,
+    # marking every content item as Artifact would strip accessibility entirely.
+    root = get_struct_tree_root(pdf)
+    has_struct = isinstance(root, pikepdf.Dictionary)
+
     applied = []
     changed = False
-    for obj in iter_struct_elems(pdf):
-        tag = str(obj.get("/S"))
-        if tag not in {"/NonStruct", "/Span", "/Div"}:
+    for page in pdf.pages:
+        page_obj = page.obj if hasattr(page, "obj") else page
+        try:
+            raw = page_content_bytes(page_obj)
+            if not raw:
+                continue
+        except Exception:
             continue
-        if obj.get("/Alt") is not None:
+        # When there is a struct tree, process every page (including pages without
+        # existing BDC blocks) so all top-level untagged content gets an Artifact
+        # wrapper.  Without a struct tree, only fix pages that already have some
+        # marked content to avoid hiding otherwise-accessible text.
+        text = raw.decode("latin-1", "ignore")
+        if not has_struct and "BMC" not in text and "BDC" not in text:
             continue
-        parent = obj.get("/P")
-        if not isinstance(parent, pikepdf.Dictionary):
-            continue
-        kids = obj.get("/K")
-        has_child_struct = isinstance(kids, pikepdf.Array) and any(isinstance(child, pikepdf.Dictionary) for child in kids)
-        if has_child_struct:
-            continue
-        obj["/Alt"] = pikepdf.String("Decorative element")
-        changed = True
-        applied.append({
-            "ref": ref_string(obj),
-            "before": tag,
-            "after": "Decorative element",
-            "details": f"Marked nonsemantic element {ref_string(obj)} as decorative for alternate-text checks.",
-        })
+        page_changed, page_applied = artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=True)
+        if page_changed:
+            applied.extend(page_applied)
+            changed = True
     return changed, applied, []
 
 
@@ -4270,16 +5630,17 @@ def mutate_create_heading_from_candidate(pdf, mutation):
     if before == after and (not candidate_text or before_alt_text == candidate_text):
         return False, [], [f"Target {target_ref} is already tagged as {after}."]
     obj["/S"] = pikepdf.Name(after)
-    if candidate_text:
-        obj["/Alt"] = pikepdf.String(candidate_text)
+    if before_alt is not None:
+        try:
+            del obj["/Alt"]
+        except Exception:
+            pass
     applied = [{
         "ref": ref_string(obj),
         "before": before_alt_text or before,
-        "after": candidate_text or after,
-        "details": f"Retagged structural candidate {ref_string(obj)} from {before} to {after}{f' and set /Alt to \"{candidate_text}\"' if candidate_text else ''}.",
+        "after": after,
+        "details": f"Retagged structural candidate {ref_string(obj)} from {before} to {after}.",
     }]
-    if candidate_text:
-        applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, obj, candidate_text))
     return True, applied, []
 
 
@@ -4385,6 +5746,8 @@ def mutate_set_figure_alt_text(pdf, mutation):
     if not isinstance(obj, pikepdf.Dictionary):
         return False, [], [f"Could not resolve figure target {target_ref}."]
     before_tag = str(obj.get("/S"))
+    if before_tag != "/Figure":
+        return False, [], [f"Target {target_ref} has tag {before_tag} and is not a /Figure element."]
     before_alt = obj.get("/Alt")
     before_alt_text = str(before_alt).replace("u:", "") if isinstance(before_alt, str) else None
     obj["/Alt"] = pikepdf.String(alt_text)
@@ -4583,6 +5946,96 @@ def empty_snapshot():
     }
 
 
+def analyze_reading_order_pdfminer(pdf_path, request):
+    try:
+        from pdfminer.high_level import extract_pages
+        from pdfminer.layout import LTTextBox, LTTextLine, LAParams
+    except ImportError:
+        return {"status": "unavailable", "disorder_ratio": None, "pages_analyzed": 0,
+                "total_blocks": 0, "disordered_block_count": 0, "disordered_blocks": [], "warnings": []}
+
+    max_pages = request.get("maxPages", 20)
+
+    try:
+        laparams = LAParams(all_texts=True)
+        stream_blocks = []  # (stream_order_index, page_num, x0, y0, x1, y1, text_preview)
+
+        for page_num, page_layout in enumerate(extract_pages(pdf_path, laparams=laparams), start=1):
+            if page_num > max_pages:
+                break
+            for element in page_layout:
+                if isinstance(element, LTTextBox):
+                    text = element.get_text().strip()[:60]
+                    stream_blocks.append({
+                        "page": page_num,
+                        "stream_idx": len(stream_blocks),
+                        "x0": element.x0,
+                        "y0": element.y0,
+                        "x1": element.x1,
+                        "y1": element.y1,
+                        "text": text,
+                    })
+
+        if len(stream_blocks) < 2:
+            return {"status": "ok", "disorder_ratio": 0.0, "pages_analyzed": page_num if stream_blocks else 0,
+                    "total_blocks": len(stream_blocks), "disordered_block_count": 0, "disordered_blocks": [], "warnings": []}
+
+        # Compute visual order per page (top-to-bottom, left-to-right = sort by -y1 then x0)
+        # Assign visual rank across all blocks (per-page then concatenate)
+        pages_seen = sorted(set(b["page"] for b in stream_blocks))
+        visual_rank = {}  # stream_idx -> visual rank
+        rank = 0
+        for pn in pages_seen:
+            page_blocks = [b for b in stream_blocks if b["page"] == pn]
+            page_blocks_sorted = sorted(page_blocks, key=lambda b: (-b["y1"], b["x0"]))
+            for b in page_blocks_sorted:
+                visual_rank[b["stream_idx"]] = rank
+                rank += 1
+
+        # Count inversions: pairs (i,j) where stream order i<j but visual_rank[i] > visual_rank[j]
+        n = len(stream_blocks)
+        inversions = 0
+        disordered = []
+        for i in range(n):
+            for j in range(i + 1, n):
+                bi = stream_blocks[i]
+                bj = stream_blocks[j]
+                if bi["page"] != bj["page"]:
+                    continue  # only check within same page
+                if visual_rank[bi["stream_idx"]] > visual_rank[bj["stream_idx"]]:
+                    inversions += 1
+                    if len(disordered) < 10:
+                        disordered.append({
+                            "page": bi["page"],
+                            "stream_rank": bi["stream_idx"],
+                            "visual_rank": visual_rank[bi["stream_idx"]],
+                            "text_preview": bi["text"][:40],
+                        })
+
+        # Total pairs within same page
+        total_pairs = sum(
+            len(page_blocks) * (len(page_blocks) - 1) // 2
+            for page in pages_seen
+            for page_blocks in [[b for b in stream_blocks if b["page"] == page]]
+        )
+
+        disorder_ratio = inversions / total_pairs if total_pairs > 0 else 0.0
+
+        return {
+            "status": "ok",
+            "disorder_ratio": round(disorder_ratio, 4),
+            "pages_analyzed": len(pages_seen),
+            "total_blocks": len(stream_blocks),
+            "disordered_block_count": len(disordered),
+            "disordered_blocks": disordered,
+            "warnings": [],
+        }
+    except Exception as exc:
+        return {"status": "error", "disorder_ratio": None, "pages_analyzed": 0,
+                "total_blocks": 0, "disordered_block_count": 0, "disordered_blocks": [],
+                "warnings": [str(exc)]}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -4591,9 +6044,17 @@ def main():
     args = parser.parse_args()
 
     request = json.loads(Path(args.request).read_text(encoding="utf-8"))
-    pdf = pikepdf.Pdf.open(args.input)
 
     operation = request.get("operation")
+
+    # Read-only analysis operations — handle before opening with pikepdf
+    if operation == "analyze_reading_order_pdfminer":
+        result = analyze_reading_order_pdfminer(args.input, request)
+        print(json.dumps(result))
+        return
+
+    pdf = pikepdf.Pdf.open(args.input)
+
     include_snapshot = request.get("includeSnapshot")
     if include_snapshot is None:
         include_snapshot = operation == "inspect"
@@ -4612,6 +6073,8 @@ def main():
         changed, applied, warnings = mutate_set_pdfua_identification(pdf, request)
     elif operation == "normalize_annotation_tab_order":
         changed, applied, warnings = mutate_normalize_annotation_tab_order(pdf, request)
+    elif operation == "set_tabs_all_annotated_pages":
+        changed, applied, warnings = mutate_set_tabs_all_annotated_pages(pdf, request)
     elif operation == "repair_cid_symbol_font_maps":
         changed, applied, warnings = mutate_repair_cid_symbol_font_maps(pdf, request)
     elif operation == "repair_cidset_consistency":
@@ -4644,6 +6107,10 @@ def main():
         changed, applied, warnings = mutate_repair_native_reading_order(pdf, request)
     elif operation == "repair_font_unicode_maps":
         changed, applied, warnings = mutate_repair_font_unicode_maps(pdf, request)
+    elif operation == "repair_annotation_alt_text":
+        changed, applied, warnings = mutate_repair_annotation_alt_text(pdf, request)
+    elif operation == "repair_truetype_encoding_differences":
+        changed, applied, warnings = mutate_repair_truetype_encoding_differences(pdf, request)
     elif operation == "embed_missing_fonts_in_place":
         changed, applied, warnings = mutate_embed_missing_fonts_in_place(pdf, request)
     elif operation == "artifact_nonsemantic_page_elements":

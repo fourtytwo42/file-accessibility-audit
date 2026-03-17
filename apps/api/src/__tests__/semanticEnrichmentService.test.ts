@@ -74,6 +74,7 @@ function makeContext(): PdfRemediationContext {
     analysis: makeAnalysisResult(),
     qpdf: {
       hasStructTree: true,
+      isTagged: true,
       hasLang: true,
       lang: 'en',
       hasOutlines: false,
@@ -86,6 +87,7 @@ function makeContext(): PdfRemediationContext {
       tables: [],
       structTreeDepth: 2,
       contentOrder: [],
+      annotationCount: 0,
       error: null,
     },
     pdfjs: { title: 'Sample', lang: 'en' } as any,

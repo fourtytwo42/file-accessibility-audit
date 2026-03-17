@@ -1,8 +1,8 @@
 import { spawn, type ChildProcess } from 'node:child_process'
 import { createConnection } from 'node:net'
 
-const API_PORT = 5103
-const WEB_PORT = 5102
+const API_PORT = 6103
+const WEB_PORT = 6102
 
 function killPort(port: number): Promise<void> {
   return new Promise((resolve) => {

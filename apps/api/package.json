@@ -6,14 +6,16 @@
     "#config": "../../audit.config.ts"
   },
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "NODE_OPTIONS=--max-old-space-size=2048 tsx watch src/index.ts",
     "build": "tsc --noEmit",
-    "start": "node --import tsx src/index.ts",
+    "start": "node --max-old-space-size=2048 --import tsx src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:scoring": "vitest run --testPathPattern=scoring"
+    "test:scoring": "vitest run --testPathPattern=scoring",
+    "validate:adobe": "tsx src/scripts/validateAdobe99anreport.ts"
   },
   "dependencies": {
+    "@adobe/pdfservices-node-sdk": "^4.1.0",
     "@napi-rs/canvas": "^0.1.96",
     "@pdf-lib/fontkit": "^1.1.1",
     "archiver": "^7.0.1",

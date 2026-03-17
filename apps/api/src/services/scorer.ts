@@ -8,6 +8,11 @@ import type { QpdfResult } from './qpdfService.js'
 import type { PdfjsResult } from './pdfjsService.js'
 import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
 import { emptyVeraPdfResult, type VeraPdfFailure, type VeraPdfResult } from './veraPdfService.js'
+import { ALT_REMOVAL_MODES } from './altTextScoring.js'
+import type { AdobeSummary } from './documentModel.js'
+import type { ReadingOrderResult } from './readingOrderService.js'
+import type { ColorContrastResult } from './colorContrastService.js'
+import type { TableStructureResult } from './tableStructureService.js'
 
 export interface HelpLink {
   label: string
@@ -32,6 +37,7 @@ export interface ScoringResult {
   isScanned: boolean
   executiveSummary: string
   verapdf: VeraPdfResult
+  adobe?: AdobeSummary | null
   categories: CategoryResult[]
   warnings: string[]
 }
@@ -40,14 +46,22 @@ export function isRawUrlLinkText(text: string): boolean {
   return /^(https?:\/\/|www\.)/i.test(text.trim())
 }
 
+export function isGenericLinkText(text: string): boolean {
+  const normalized = text.trim().toLowerCase().replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '')
+  return (ANALYSIS.GENERIC_LINK_TEXT_PATTERNS as string[]).includes(normalized)
+}
+
 export function summarizeLinkTextQuality(links: Array<{ url: string; text: string }>) {
   const rawLinks = links.filter(link => isRawUrlLinkText(link.text))
+  const genericLinks = links.filter(link => !isRawUrlLinkText(link.text) && isGenericLinkText(link.text))
   return {
     linkCount: links.length,
     rawUrlLinkCount: rawLinks.length,
     rawUrlLinkDensity: links.length > 0 ? rawLinks.length / links.length : 0,
-    descriptiveLinks: links.filter(link => !isRawUrlLinkText(link.text)),
+    descriptiveLinks: links.filter(link => !isRawUrlLinkText(link.text) && !isGenericLinkText(link.text)),
     rawLinks,
+    genericLinks,
+    genericLinkCount: genericLinks.length,
   }
 }
 
@@ -84,6 +98,30 @@ function appendVeraPdfFinding(category: CategoryResult, failureCount: number): C
     ...category,
     findings: [...category.findings, finding],
   }
+}
+
+function applyAdobeEvidence(categories: CategoryResult[], adobe?: AdobeSummary | null): CategoryResult[] {
+  if (!adobe || adobe.status !== 'failed' || !adobe.findings.length) return categories
+
+  const counts = new Map<string, number>()
+  for (const finding of adobe.findings) {
+    if (!finding.categoryId || finding.severity !== 'error') continue
+    counts.set(finding.categoryId, (counts.get(finding.categoryId) || 0) + 1)
+  }
+
+  return categories.map(category => {
+    const count = counts.get(category.id) || 0
+    if (!count || category.score === null) return category
+    const score = Math.min(category.score, category.id === 'alt_text' ? 60 : 75)
+    const note = `Adobe Accessibility Checker reported ${count} related issue${count === 1 ? '' : 's'}.`
+    return {
+      ...category,
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
+      findings: category.findings.includes(note) ? category.findings : [...category.findings, note],
+    }
+  })
 }
 
 function applyVeraPdfEvidence(categories: CategoryResult[], verapdf: VeraPdfResult): {
@@ -214,6 +252,12 @@ export function scoreDocument(
     message: 'veraPDF passed PDF/UA validation.',
   }),
   structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
+  adobe?: AdobeSummary | null,
+  extras?: {
+    readingOrder?: ReadingOrderResult | null
+    colorContrast?: ColorContrastResult | null
+    tableStructure?: TableStructureResult | null
+  },
 ): ScoringResult {
   let categories: CategoryResult[] = []
   const warnings: string[] = []
@@ -224,6 +268,11 @@ export function scoreDocument(
   const veraPdfMessage = veraPdfWarning(verapdf)
   if (veraPdfMessage && verapdf.status !== 'failed') {
     warnings.push(veraPdfMessage)
+  }
+  if (adobe?.status === 'failed') {
+    warnings.push(adobe.summary)
+  } else if (adobe?.status && adobe.status !== 'passed') {
+    warnings.push(adobe.summary)
   }
 
   // 1. Text Extractability (20%)
@@ -245,7 +294,7 @@ export function scoreDocument(
   categories.push(scoreBookmarks(qpdf, pdfjs))
 
   // 6. Table Markup (10%)
-  categories.push(scoreTableMarkup(qpdf))
+  categories.push(scoreTableMarkup(qpdf, extras?.tableStructure))
 
   // 7. Link & URL Quality (5%)
   categories.push(scoreLinkQuality(pdfjs))
@@ -254,10 +303,14 @@ export function scoreDocument(
   categories.push(scoreFormAccessibility(qpdf))
 
   // 9. Reading Order (5%)
-  categories.push(scoreReadingOrder(qpdf))
+  categories.push(scoreReadingOrder(qpdf, extras?.readingOrder))
+
+  // 10. Color Contrast (4.5%)
+  categories.push(scoreColorContrast(extras?.colorContrast))
 
   const veraPdfAdjusted = applyVeraPdfEvidence(categories, verapdf)
   categories = veraPdfAdjusted.categories
+  categories = applyAdobeEvidence(categories, adobe)
   categories.push(scorePdfUaCompliance(verapdf))
   if (verapdf.status === 'failed') {
     warnings.push(veraPdfMessage || 'veraPDF detected PDF/UA compliance issues.')
@@ -295,6 +348,7 @@ export function scoreDocument(
     isScanned,
     executiveSummary,
     verapdf,
+    adobe,
     categories,
     warnings,
   }
@@ -585,8 +639,26 @@ function scoreAltTextWithAcrobatRisk(
   ]
 
   if (verapdf.status === 'passed' && category.score === 100) {
+    // Determine which nodes are still unresolved:
+    // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved if /Alt IS present (needs removal)
+    // - all other modes: unresolved if /Alt is NOT present (needs addition)
+    const unresolvedRiskNodes = acrobatAltRiskNodes.filter(n =>
+      ALT_REMOVAL_MODES.has(n.ownershipMode ?? '') ? n.hasAlt : !n.hasAlt
+    )
+    if (!unresolvedRiskNodes.length) {
+      return {
+        ...category,
+        findings,
+      }
+    }
+    // Some nodes still need repair — veraPDF passes but Adobe will flag them.
+    // Cap the score to reflect that these are real accessibility failures.
+    const scoreCap = unresolvedRiskNodes.some(n => n.ownershipMode === 'mixed_text_graphics_same_mcid') ? 75 : 85
     return {
       ...category,
+      score: scoreCap,
+      grade: getGrade(scoreCap),
+      severity: getSeverity(scoreCap),
       findings,
     }
   }
@@ -686,7 +758,98 @@ function scoreBookmarks(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
   }
 }
 
-function scoreTableMarkup(qpdf: QpdfResult): CategoryResult {
+function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResult {
+  const contrastLinks: CategoryResult['helpLinks'] = [
+    { label: 'WCAG 1.4.3: Contrast (Minimum)', url: 'https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum.html' },
+    { label: 'WebAIM: Contrast Checker', url: 'https://webaim.org/resources/contrastchecker/' },
+    { label: 'Adobe: Check Color Accessibility', url: 'https://helpx.adobe.com/acrobat/using/accessibility-features-pdfs.html' },
+  ]
+  const contrastExplanation = 'Color contrast measures how readable text is against its background. WCAG requires a contrast ratio of at least 4.5:1 for normal-sized text and 3:1 for large text (18pt or 14pt bold). Low contrast text is difficult or impossible to read for people with low vision or color blindness.'
+
+  if (!contrast || contrast.status === 'unavailable') {
+    return {
+      id: 'color_contrast',
+      label: 'Color Contrast',
+      weight: SCORING_WEIGHTS.color_contrast,
+      score: null,
+      grade: null,
+      severity: null,
+      findings: [
+        'Color contrast analysis is unavailable — required tools (pdftoppm / Pillow / pdfminer) are not installed.',
+        'Install poppler-utils, Pillow, and pdfminer.six to enable this check.',
+        contrast?.warnings?.[0] ?? '',
+      ].filter(Boolean),
+      explanation: contrastExplanation,
+      helpLinks: contrastLinks,
+    }
+  }
+
+  if (contrast.status === 'error' || contrast.status === 'timeout') {
+    return {
+      id: 'color_contrast',
+      label: 'Color Contrast',
+      weight: SCORING_WEIGHTS.color_contrast,
+      score: 50,
+      grade: getGrade(50),
+      severity: getSeverity(50),
+      findings: [
+        contrast.status === 'timeout'
+          ? 'Color contrast analysis timed out before completing.'
+          : `Color contrast analysis encountered an error: ${contrast.warnings?.[0] ?? 'unknown error'}.`,
+      ],
+      explanation: contrastExplanation,
+      helpLinks: contrastLinks,
+    }
+  }
+
+  // status === 'ok'
+  const findings: string[] = []
+  findings.push(`Analyzed ${contrast.totalSamples} text samples across ${contrast.pagesAnalyzed} page(s).`)
+
+  let score: number
+  if (contrast.failRatio === 0 || contrast.failingContrastCount === 0) {
+    score = 100
+    findings.push('All sampled text meets WCAG contrast requirements.')
+  } else if ((contrast.failRatio ?? 0) < 0.05) {
+    score = 80
+    findings.push(`${contrast.failingContrastCount} text sample(s) fail contrast requirements (${Math.round((contrast.failRatio ?? 0) * 100)}% of samples).`)
+  } else if ((contrast.failRatio ?? 0) < 0.20) {
+    score = 60
+    findings.push(`${contrast.failingContrastCount} text sample(s) fail contrast requirements (${Math.round((contrast.failRatio ?? 0) * 100)}% of samples).`)
+  } else {
+    score = 30
+    findings.push(`${contrast.failingContrastCount} text sample(s) fail contrast requirements (${Math.round((contrast.failRatio ?? 0) * 100)}% of samples — significant contrast problem).`)
+  }
+
+  // Show up to 5 failure examples
+  for (const failure of contrast.failures.slice(0, 5)) {
+    findings.push(`Page ${failure.page}: "${failure.textPreview}" — contrast ratio ${failure.contrastRatio}:1 (minimum ${failure.threshold}:1, colors ${failure.fgColor} on ${failure.bgColor})`)
+  }
+
+  if (contrast.failingContrastCount > 0) {
+    findings.push('How to fix: Increase the contrast between text and background colors. Use a contrast checker (e.g. WebAIM Contrast Checker) to verify your color choices meet WCAG 1.4.3. In the source document, adjust text or background colors before re-exporting to PDF.')
+  }
+
+  if (contrast.warnings?.length) {
+    for (const w of contrast.warnings) {
+      findings.push(`Note: ${w}`)
+    }
+  }
+
+  return {
+    id: 'color_contrast',
+    label: 'Color Contrast',
+    weight: SCORING_WEIGHTS.color_contrast,
+    score,
+    grade: getGrade(score),
+    severity: getSeverity(score),
+    findings,
+    explanation: contrastExplanation,
+    helpLinks: contrastLinks,
+  }
+}
+
+function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResult | null): CategoryResult {
   const tableLinks: CategoryResult['helpLinks'] = [
     { label: 'Adobe: Make Tables Accessible', url: 'https://helpx.adobe.com/acrobat/using/editing-document-structure-content-tags.html' },
     { label: 'WCAG 1.3.1: Info and Relationships', url: 'https://www.w3.org/WAI/WCAG21/Understanding/info-and-relationships.html' },
@@ -715,13 +878,22 @@ function scoreTableMarkup(qpdf: QpdfResult): CategoryResult {
 
   if (withHeaders === qpdf.tables.length) {
     findings.push(`All ${qpdf.tables.length} table(s) have proper header tags (TH)`)
+
+    let score = 100
+    // Apply secondary signal from visual table detection
+    if (tableStructure?.status === 'ok' && (tableStructure.untaggedTables ?? 0) > 0) {
+      const n = tableStructure.untaggedTables!
+      findings.push(`${n} table(s) detected visually that have no PDF tags. Screen readers cannot access these tables.`)
+      score = 70
+    }
+
     return {
       id: 'table_markup',
       label: 'Table Markup',
       weight: SCORING_WEIGHTS.table_markup,
-      score: 100,
-      grade: 'A',
-      severity: 'Pass',
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
       findings,
       explanation: tableExplanation,
       helpLinks: tableLinks,
@@ -735,6 +907,12 @@ function scoreTableMarkup(qpdf: QpdfResult): CategoryResult {
     findings.push(`${qpdf.tables.length} table(s) found but none have header tags (TH)`)
   }
   findings.push('How to fix: In Adobe Acrobat, open the Tags panel → expand each <Table> tag → find the header row → change the cell tags from <TD> to <TH>. This tells screen readers "this cell is a column/row header" so they can announce it with each data cell.')
+
+  // Apply secondary signal from visual table detection
+  if (tableStructure?.status === 'ok' && (tableStructure.untaggedTables ?? 0) > 0) {
+    const n = tableStructure.untaggedTables!
+    findings.push(`${n} table(s) detected visually that have no PDF tags. Screen readers cannot access these tables.`)
+  }
 
   return {
     id: 'table_markup',
@@ -762,30 +940,40 @@ function scoreLinkQuality(pdfjs: PdfjsResult): CategoryResult {
       id: 'link_quality',
       label: 'Link & URL Quality',
       weight: SCORING_WEIGHTS.link_quality,
-      score: null,
-      grade: null,
-      severity: null,
-      findings: ['No links found in this document — this category does not affect the score'],
+      score: 100,
+      grade: 'A',
+      severity: 'Pass',
+      findings: ['No links found in this document'],
       explanation: linkExplanation,
       helpLinks: linkLinks,
     }
   }
 
-  const { descriptiveLinks: descriptive, rawLinks, rawUrlLinkCount } = summarizeLinkTextQuality(pdfjs.links)
-  const score = Math.round((descriptive.length / pdfjs.links.length) * 100)
+  const { descriptiveLinks: descriptive, rawLinks, rawUrlLinkCount, genericLinks, genericLinkCount } = summarizeLinkTextQuality(pdfjs.links)
+  const goodLinks = descriptive // descriptive already excludes both raw URLs and generic
+  const score = Math.round((goodLinks.length / pdfjs.links.length) * 100)
   const findings: string[] = []
 
-  if (descriptive.length === pdfjs.links.length) {
+  if (goodLinks.length === pdfjs.links.length) {
     findings.push(`All ${pdfjs.links.length} link(s) use descriptive text`)
     for (const link of pdfjs.links) {
       findings.push(`Link: "${link.text.trim()}"`)
     }
   } else {
-    findings.push(`${rawUrlLinkCount} of ${pdfjs.links.length} link(s) display raw URLs instead of descriptive text`)
-    for (const link of rawLinks) {
-      findings.push(`Raw URL link: "${link.text.trim()}"`)
+    if (rawUrlLinkCount > 0) {
+      findings.push(`${rawUrlLinkCount} of ${pdfjs.links.length} link(s) display raw URLs instead of descriptive text`)
+      for (const link of rawLinks) {
+        findings.push(`Raw URL link: "${link.text.trim()}"`)
+      }
+      findings.push('How to fix: In the original document (Word, InDesign, etc.), change the visible link text to something descriptive before re-exporting to PDF. In Adobe Acrobat, you can edit link properties via the Edit PDF tool.')
     }
-    findings.push('How to fix: In the original document (Word, InDesign, etc.), change the visible link text to something descriptive before re-exporting to PDF. In Adobe Acrobat, you can edit link properties via the Edit PDF tool.')
+    if (genericLinkCount > 0) {
+      findings.push(`${genericLinkCount} link(s) use generic/meaningless text (e.g. 'click here', 'read more'). Screen readers present these out of context.`)
+      for (const link of genericLinks) {
+        findings.push(`Generic link: "${link.text.trim()}"`)
+      }
+      findings.push("How to fix: Replace generic link text with descriptive text that makes sense when read in isolation, e.g. 'Download the 2024 Annual Report (PDF)' instead of 'click here'.")
+    }
   }
 
   return {
@@ -853,7 +1041,7 @@ function scoreFormAccessibility(qpdf: QpdfResult): CategoryResult {
   }
 }
 
-function scoreReadingOrder(qpdf: QpdfResult): CategoryResult {
+function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | null): CategoryResult {
   const readingLinks: CategoryResult['helpLinks'] = [
     { label: 'Adobe: Fix Reading Order', url: 'https://helpx.adobe.com/acrobat/using/create-verify-pdf-accessibility.html' },
     { label: 'WCAG 1.3.2: Meaningful Sequence', url: 'https://www.w3.org/WAI/WCAG21/Understanding/meaningful-sequence.html' },
@@ -900,42 +1088,84 @@ function scoreReadingOrder(qpdf: QpdfResult): CategoryResult {
     }
   }
 
-  // Check MCID ordering
+  // Check MCID ordering per page.
+  // contentOrder entries are encoded as pageIndex * 100_000 + mcid so that
+  // cross-page MCID resets don't cause false positives. We split by page and
+  // measure disorder within each page independently.
   if (qpdf.contentOrder.length > 1) {
+    const PAGE_STRIDE = 100_000
+    // Group consecutive entries by page index
     let outOfOrder = 0
+    let comparisons = 0
+    let prevPage = Math.floor(qpdf.contentOrder[0] / PAGE_STRIDE)
+    let prevMcid = qpdf.contentOrder[0] % PAGE_STRIDE
     for (let i = 1; i < qpdf.contentOrder.length; i++) {
-      if (qpdf.contentOrder[i] < qpdf.contentOrder[i - 1]) {
-        outOfOrder++
+      const encoded = qpdf.contentOrder[i]
+      const page = Math.floor(encoded / PAGE_STRIDE)
+      const mcid = encoded % PAGE_STRIDE
+      if (page === prevPage) {
+        // Same page — compare MCIDs
+        comparisons++
+        if (mcid < prevMcid) outOfOrder++
       }
+      // Cross-page transitions are not compared (page MCID counters reset to 0)
+      prevPage = page
+      prevMcid = mcid
     }
-    const disorderRatio = outOfOrder / (qpdf.contentOrder.length - 1)
 
-    if (disorderRatio > ANALYSIS.READING_ORDER_DISORDER_THRESHOLD) {
-      findings.push(`Content order has significant deviations (${Math.round(disorderRatio * 100)}% of items out of sequence)`)
-      findings.push('This means the tag order doesn\'t match the page content order — a screen reader may announce content in a confusing sequence.')
-      findings.push('How to fix: Use the Reading Order tool in Adobe Acrobat (Accessibility → Reading Order) to reorder elements.')
-      return {
-        id: 'reading_order',
-        label: 'Reading Order',
-        weight: SCORING_WEIGHTS.reading_order,
-        score: 50,
-        grade: getGrade(50),
-        severity: getSeverity(50),
-        findings,
-        explanation: readingExplanation,
-        helpLinks: readingLinks,
+    if (comparisons > 0) {
+      const disorderRatio = outOfOrder / comparisons
+      if (disorderRatio > ANALYSIS.READING_ORDER_DISORDER_THRESHOLD) {
+        findings.push(`Content order has significant deviations (${Math.round(disorderRatio * 100)}% of items out of sequence)`)
+        findings.push('This means the tag order doesn\'t match the page content order — a screen reader may announce content in a confusing sequence.')
+        findings.push('How to fix: Use the Reading Order tool in Adobe Acrobat (Accessibility → Reading Order) to reorder elements.')
+        if (
+          pdfminer?.status === 'ok' &&
+          pdfminer.disorderRatio !== null &&
+          pdfminer.disorderRatio > ANALYSIS.PDFMINER_READING_ORDER_THRESHOLD
+        ) {
+          const pct = Math.round(pdfminer.disorderRatio * 100)
+          findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages).`)
+        }
+        return {
+          id: 'reading_order',
+          label: 'Reading Order',
+          weight: SCORING_WEIGHTS.reading_order,
+          score: 50,
+          grade: getGrade(50),
+          severity: getSeverity(50),
+          findings,
+          explanation: readingExplanation,
+          helpLinks: readingLinks,
+        }
       }
     }
   }
 
   findings.push('Structure tree defines a logical reading order')
+
+  let finalScore = 100
+  if (
+    pdfminer?.status === 'ok' &&
+    pdfminer.disorderRatio !== null &&
+    pdfminer.disorderRatio > ANALYSIS.PDFMINER_READING_ORDER_THRESHOLD
+  ) {
+    const pct = Math.round(pdfminer.disorderRatio * 100)
+    if (finalScore < 100) {
+      findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages).`)
+    } else {
+      finalScore = 70
+      findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages). Although the tag structure appears correct, the underlying content stream order differs significantly from the visual layout.`)
+    }
+  }
+
   return {
     id: 'reading_order',
     label: 'Reading Order',
     weight: SCORING_WEIGHTS.reading_order,
-    score: 100,
-    grade: 'A',
-    severity: 'Pass',
+    score: finalScore,
+    grade: getGrade(finalScore),
+    severity: getSeverity(finalScore),
     findings,
     explanation: readingExplanation,
     helpLinks: readingLinks,

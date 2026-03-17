@@ -38,6 +38,9 @@ export interface StructureBackendMutationRequest {
     | 'repair_native_reading_order'
     | 'repair_font_unicode_maps'
     | 'repair_type1_font_unicode_maps'
+    | 'repair_truetype_encoding_differences'
+    | 'repair_annotation_alt_text'
+    | 'set_tabs_all_annotated_pages'
     | 'substitute_legacy_fonts_in_place'
     | 'finalize_substituted_font_conformance'
     | 'artifact_nonsemantic_page_elements'
@@ -94,7 +97,19 @@ export interface StructureBackendMutationResult {
     headerCellRefs: string[]
     pageNumberHints?: number[]
   }>
-  figures: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[] }>
+  figures: Array<{
+    ref: string
+    tag: string
+    hasAlt: boolean
+    altText?: string | null
+    parentTagPath?: string[]
+    pageRef?: string | null
+    mcids?: number[]
+    hasText?: boolean
+    splitGenerated?: boolean
+    splitSourceRef?: string | null
+    splitSourceTag?: string | null
+  }>
   imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[]; hasText?: boolean }>
   acrobatAltRiskNodes?: Array<{
     ref: string
@@ -103,11 +118,12 @@ export interface StructureBackendMutationResult {
     mcids?: number[]
     hasText?: boolean
     hasGraphics?: boolean
+    hasAlt?: boolean
     splitSafe?: boolean
     graphicsLikelyDecorative?: boolean
     operatorPattern?: 'text_then_graphics' | 'graphics_then_text' | 'interleaved' | null
     parentTagPath?: string[]
-    ownershipMode?: 'mixed_text_graphics_same_mcid' | 'graphics_only_nonfigure' | 'duplicate_mcid_ownership' | 'container_with_graphics_descendants'
+    ownershipMode?: 'mixed_text_graphics_same_mcid' | 'graphics_only_nonfigure' | 'duplicate_mcid_ownership' | 'container_with_graphics_descendants' | 'orphaned_alt_empty_element' | 'nonfigure_with_alt'
     duplicateOwnerRefs?: string[]
   }>
   readingOrderNodes: Array<{ ref: string; tag: string; parentRef?: string | null; orderIndex: number }>

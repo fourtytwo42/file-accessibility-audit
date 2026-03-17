@@ -82,13 +82,13 @@ export const DEPLOY = {
    *
    * SAFE TO CHANGE: Yes — if you change the Nuxt dev port, update this.
    */
-  DEV_FRONTEND_URL: 'http://localhost:5102',
+  DEV_FRONTEND_URL: 'http://localhost:6102',
 
   /** API server port (development and production) */
-  API_PORT: 5103,
+  API_PORT: 6103,
 
   /** Frontend server port (Nuxt dev / production) */
-  WEB_PORT: 5102,
+  WEB_PORT: 6102,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -156,27 +156,27 @@ export const EMAIL = {
 export const SCORING_WEIGHTS = {
   /** Is the PDF text-based (not scanned) and tagged? Highest weight because
    *  a scanned PDF is fundamentally inaccessible — nothing else matters. */
-  text_extractability: 0.18,
+  text_extractability: 0.175,
 
   /** Does the PDF have a meaningful title and a declared language?
    *  Screen readers announce both on document open. */
-  title_language: 0.135,
+  title_language: 0.130,
 
   /** Are H1–H6 heading tags present with a logical hierarchy?
    *  Headings are the primary navigation mechanism for screen reader users. */
-  heading_structure: 0.135,
+  heading_structure: 0.130,
 
   /** Do images have alternative text descriptions?
    *  Required by WCAG 1.1.1 for all non-decorative images. */
-  alt_text: 0.135,
+  alt_text: 0.130,
 
   /** Does the document have bookmarks/outlines for navigation?
    *  Only assessed for documents with 10+ pages (see ANALYSIS.BOOKMARKS_PAGE_THRESHOLD). */
-  bookmarks: 0.09,
+  bookmarks: 0.085,
 
   /** Are data tables marked up with /Table, /TH, and /TD tags?
    *  Without these, screen readers can't convey table structure. */
-  table_markup: 0.09,
+  table_markup: 0.085,
 
   /** Are hyperlinks descriptive (not raw URLs)?
    *  "Click here" and raw URLs are unhelpful to screen reader users. */
@@ -184,16 +184,20 @@ export const SCORING_WEIGHTS = {
 
   /** Do form fields have accessible labels (/TU tooltip)?
    *  Unlabeled form fields are unusable with assistive technology. */
-  form_accessibility: 0.045,
+  form_accessibility: 0.040,
 
   /** Does the structure tree define a correct reading order?
    *  Distinct from text_extractability: this checks ORDER quality, not just
    *  whether the StructTree exists. */
-  reading_order: 0.045,
+  reading_order: 0.040,
 
   /** Did veraPDF confirm PDF/UA compliance?
    *  This is a direct standards signal that complements heuristic checks. */
-  pdf_ua_compliance: 0.10,
+  pdf_ua_compliance: 0.095,
+
+  /** Does text have sufficient color contrast against its background?
+   *  WCAG 1.4.3 requires 4.5:1 for normal text, 3:1 for large text. */
+  color_contrast: 0.045,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -354,6 +358,66 @@ export const ANALYSIS = {
    * exact source fonts are unavailable; decrease to keep layout stricter.
    */
   LEGACY_FONT_WIDTH_DRIFT_THRESHOLD: 0.35,
+
+  /**
+   * Generic/meaningless link text patterns. Links whose visible text matches
+   * one of these phrases (case-insensitive) are flagged by scoreLinkQuality.
+   */
+  GENERIC_LINK_TEXT_PATTERNS: [
+    'click here', 'here', 'read more', 'more', 'link', 'this link',
+    'learn more', 'find out more', 'continue', 'go here', 'download',
+  ] as string[],
+
+  /**
+   * PDFMiner reading order: disorder ratio above which the secondary signal
+   * triggers a score reduction in scoreReadingOrder.
+   */
+  PDFMINER_READING_ORDER_THRESHOLD: 0.25,
+
+  /**
+   * Maximum number of pages analyzed by the PDFMiner reading order checker.
+   */
+  PDFMINER_MAX_PAGES: 20,
+
+  /**
+   * Timeout for PDFMiner reading order analysis, in milliseconds.
+   */
+  PDFMINER_TIMEOUT_MS: 45_000,
+
+  /**
+   * Maximum number of pages analyzed for color contrast.
+   */
+  COLOR_CONTRAST_MAX_PAGES: 10,
+
+  /**
+   * Timeout for color contrast analysis, in milliseconds.
+   */
+  COLOR_CONTRAST_TIMEOUT_MS: 120_000,
+
+  /**
+   * WCAG minimum contrast ratio for normal-sized text (4.5:1).
+   */
+  COLOR_CONTRAST_NORMAL_TEXT_THRESHOLD: 4.5,
+
+  /**
+   * WCAG minimum contrast ratio for large text (3:1).
+   */
+  COLOR_CONTRAST_LARGE_TEXT_THRESHOLD: 3.0,
+
+  /**
+   * Font size threshold (in points) for "large text" (non-bold).
+   */
+  COLOR_CONTRAST_LARGE_TEXT_MIN_PT: 18,
+
+  /**
+   * Font size threshold (in points) for "large text" when bold.
+   */
+  COLOR_CONTRAST_BOLD_LARGE_TEXT_MIN_PT: 14,
+
+  /**
+   * Timeout for table structure detection, in milliseconds.
+   */
+  TABLE_STRUCTURE_TIMEOUT_MS: 60_000,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -368,6 +432,19 @@ export const ANALYSIS = {
 
 export const REMEDIATION = {
   ENABLE_PLANNER_AI_FALLBACK: false,
+
+  /**
+   * Enable Adobe PDF Services API integration (Accessibility Checker + Auto-Tag).
+   *
+   * Set to false when Adobe API quota is exhausted or credentials are unavailable.
+   * When disabled:
+   * - The accessibility checker is skipped during analysis (adobe panel shows 'unavailable')
+   * - The adobe_auto_tag remediation tool is skipped entirely
+   * - All scoring proceeds without Adobe evidence (no score caps from Adobe findings)
+   *
+   * SAFE TO CHANGE: Yes — flip back to true when quota resets or new credentials are loaded.
+   */
+  ENABLE_ADOBE_API: false,
 } as const
 
 // ---------------------------------------------------------------------------

@@ -9,17 +9,22 @@ import { ANALYSIS } from '#config'
 const execFileAsync = promisify(execFile)
 const TMP_DIR = process.env.TMP_DIR || os.tmpdir()
 
-const VERA_PDF_BIN = process.env.VERAPDF_PATH || (() => {
-  const candidates = [
-    'C:/Users/Hendo420/veraPDF/verapdf.bat',
-    'C:/Program Files/veraPDF/veraPDF CLI/verapdf.bat',
-    'C:/Program Files/veraPDF/veraPDF Software/verapdf.bat',
-    'C:/Program Files/veraPDF/verapdf.bat',
-    '/opt/homebrew/bin/verapdf',
-    '/usr/local/bin/verapdf',
-  ]
-  return candidates.find(candidate => fs.existsSync(candidate)) || 'verapdf'
-})()
+const VERA_PDF_CANDIDATES = [
+  'C:/Users/Hendo420/veraPDF/verapdf.bat',
+  'C:/Program Files/veraPDF/veraPDF CLI/verapdf.bat',
+  'C:/Program Files/veraPDF/veraPDF Software/verapdf.bat',
+  'C:/Program Files/veraPDF/verapdf.bat',
+  '/opt/homebrew/bin/verapdf',
+  '/usr/local/bin/verapdf',
+] as const
+
+/** Resolved at runtime so process.env.VERAPDF_PATH is set after dotenv loads. */
+function getVeraPdfBin(): string {
+  const configured = process.env.VERAPDF_PATH?.trim()
+  if (configured && fs.existsSync(configured)) return configured
+  const found = VERA_PDF_CANDIDATES.find(c => fs.existsSync(c))
+  return found ?? 'verapdf'
+}
 
 function veraPdfChildEnv(): NodeJS.ProcessEnv {
   const env = { ...process.env }
@@ -271,8 +276,8 @@ export async function analyzeWithVeraPdf(buffer: Buffer, options?: { signal?: Ab
   try {
     fs.writeFileSync(tmpPath, buffer)
 
-    const shell = /\.bat$/i.test(VERA_PDF_BIN) || /\.cmd$/i.test(VERA_PDF_BIN)
-    const { stdout } = await execFileAsync(VERA_PDF_BIN, [
+    const shell = /\.bat$/i.test(getVeraPdfBin()) || /\.cmd$/i.test(getVeraPdfBin())
+    const { stdout } = await execFileAsync(getVeraPdfBin(), [
       '--format',
       'json',
       '--defaultflavour',
@@ -331,8 +336,8 @@ export async function analyzeWithVeraPdf(buffer: Buffer, options?: { signal?: Ab
 
 export async function probeVeraPdf(): Promise<{ available: boolean; message: string }> {
   try {
-    const shell = /\.bat$/i.test(VERA_PDF_BIN) || /\.cmd$/i.test(VERA_PDF_BIN)
-    const { stdout, stderr } = await execFileAsync(VERA_PDF_BIN, ['--version'], {
+    const shell = /\.bat$/i.test(getVeraPdfBin()) || /\.cmd$/i.test(getVeraPdfBin())
+    const { stdout, stderr } = await execFileAsync(getVeraPdfBin(), ['--version'], {
       timeout: 10_000,
       maxBuffer: 1024 * 1024,
       encoding: 'utf-8',

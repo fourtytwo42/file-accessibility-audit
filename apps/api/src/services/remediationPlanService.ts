@@ -30,6 +30,8 @@ const STRUCTURE_LINK_STAGE = new Set<RemediationToolName>([
   'repair_native_link_structure',
   'set_page_tabs',
   'normalize_annotation_tab_order',
+  'set_tabs_all_annotated_pages',
+  'repair_annotation_alt_text',
   'set_link_annotation_contents',
 ])
 
@@ -37,6 +39,7 @@ const FONT_STAGE = new Set<RemediationToolName>([
   'embed_missing_fonts_in_place',
   'repair_font_unicode_maps',
   'repair_type1_font_unicode_maps',
+  'repair_truetype_encoding_differences',
   'repair_cid_symbol_font_maps',
   'repair_cidset_consistency',
   'substitute_legacy_fonts_in_place',
@@ -44,6 +47,7 @@ const FONT_STAGE = new Set<RemediationToolName>([
 ])
 
 const NATIVE_STRUCTURE_STAGE = new Set<RemediationToolName>([
+  'adobe_auto_tag',
   'repair_other_elements_alt_text',
   'repair_native_figure_semantics',
   'repair_native_table_headers',
@@ -69,7 +73,7 @@ const METADATA_STAGE = new Set<RemediationToolName>([
   'set_document_language',
 ])
 
-const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
+export const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['set_pdfua_identification', 1],
   ['normalize_document_metadata', 1],
   ['set_document_title', 1],
@@ -82,15 +86,19 @@ const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['repair_native_link_structure', 3],
   ['set_page_tabs', 3],
   ['normalize_annotation_tab_order', 3],
+  ['set_tabs_all_annotated_pages', 3],
+  ['repair_annotation_alt_text', 3],
   ['set_link_annotation_contents', 3],
   ['embed_missing_fonts_in_place', 4],
   ['repair_font_unicode_maps', 4],
   ['repair_type1_font_unicode_maps', 4],
+  ['repair_truetype_encoding_differences', 4],
   ['repair_cid_symbol_font_maps', 4],
   ['repair_cidset_consistency', 4],
   ['substitute_legacy_fonts_in_place', 4],
   ['finalize_substituted_font_conformance', 4],
   ['repair_other_elements_alt_text', 5],
+  ['adobe_auto_tag', 5],
   ['repair_native_figure_semantics', 5],
   ['repair_native_table_headers', 5],
   ['repair_native_reading_order', 5],
@@ -118,15 +126,19 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['repair_native_link_structure', 0],
   ['set_page_tabs', 1],
   ['normalize_annotation_tab_order', 2],
-  ['set_link_annotation_contents', 3],
+  ['set_tabs_all_annotated_pages', 2],
+  ['repair_annotation_alt_text', 3],
+  ['set_link_annotation_contents', 4],
   ['embed_missing_fonts_in_place', 0],
   ['repair_font_unicode_maps', 1],
   ['repair_type1_font_unicode_maps', 2],
-  ['repair_cid_symbol_font_maps', 3],
-  ['repair_cidset_consistency', 4],
-  ['substitute_legacy_fonts_in_place', 5],
-  ['finalize_substituted_font_conformance', 6],
+  ['repair_truetype_encoding_differences', 3],
+  ['repair_cid_symbol_font_maps', 4],
+  ['repair_cidset_consistency', 5],
+  ['substitute_legacy_fonts_in_place', 6],
+  ['finalize_substituted_font_conformance', 7],
   ['repair_other_elements_alt_text', 0],
+  ['adobe_auto_tag', 0],
   ['repair_native_figure_semantics', 0],
   ['repair_native_table_headers', 1],
   ['repair_native_reading_order', 2],
@@ -155,6 +167,8 @@ export interface RemediationPlanResult {
   done: boolean
   actions: RemediationToolCall[]
   unresolvedIssues: string[]
+  failureProfile: import('./documentModel.js').FailureProfile
+  plannerEvidence: import('./documentModel.js').PlannerEvidenceSummary
 }
 
 function clampConfidence(value: unknown): number {
@@ -310,10 +324,12 @@ function shouldUseBootstrappedChartConformance(input: {
   analysis: AnalysisResult
   context: PdfRemediationContext
   actions: RemediationActionRecord[]
+  selectedActions?: RemediationToolCall[]
 }): boolean {
   return input.analysis.pageCount === 1
     && input.context.qpdf.hasStructTree
-    && hasActionTool(input.actions, 'bootstrap_struct_tree')
+    && (hasActionTool(input.actions, 'bootstrap_struct_tree')
+      || hasPlannedTool(input.selectedActions ?? [], 'bootstrap_struct_tree'))
 }
 
 function hasSemanticOrManualOnlyIssues(failureModes: FailureMode[]): boolean {
@@ -333,6 +349,9 @@ function headingLevelForCandidate(candidateId: string, context: PdfRemediationCo
 function figureAltText(candidateId: string, context: PdfRemediationContext): string {
   const candidate = context.figureCandidates.find(entry => entry.id === candidateId)
   if (!candidate) return 'Image'
+  if (candidate.splitGenerated || candidate.informativeHint !== 'informative') {
+    return `Decorative image on page ${candidate.pageNumber}`
+  }
   if (candidate.surroundingText[0]) {
     return `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
   }
@@ -418,6 +437,9 @@ function buildDeterministicCall(input: {
     case 'repair_native_reading_order':
     case 'artifact_nonsemantic_page_elements':
     case 'normalize_annotation_tab_order':
+    case 'set_tabs_all_annotated_pages':
+    case 'repair_annotation_alt_text':
+    case 'adobe_auto_tag':
       return {
         tool_name: opportunity.toolName,
         arguments: { target: 'document' },
@@ -527,7 +549,7 @@ function isOpportunitySelectable(input: {
   if (CANDIDATE_ONLY_TOOLS.has(opportunity.toolName) && opportunity.scope === 'document') return false
 
   const alreadyTaggedNative = !analysis.isScanned && isNativeTaggedSafeContext(context) && !hasActionTool(actions, 'bootstrap_struct_tree')
-  const useBootstrappedChartConformance = shouldUseBootstrappedChartConformance({ analysis, context, actions })
+  const useBootstrappedChartConformance = shouldUseBootstrappedChartConformance({ analysis, context, actions, selectedActions })
   const hasAutoNativeMarkedContent = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_marked_content_refs')
   const hasAutoNativeLinkRepair = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_link_structure')
 
@@ -576,6 +598,8 @@ function isOpportunitySelectable(input: {
         )
     case 'finalize_substituted_font_conformance':
       return attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
+    case 'adobe_auto_tag':
+      return !attemptedOrPlanned('adobe_auto_tag', actions, selectedActions)
     case 'set_document_title':
       return !hasMeaningfulMetadataTitle(context.pdfjs.title)
     case 'set_document_language':
@@ -594,13 +618,14 @@ function deterministicActions(input: {
   context: PdfRemediationContext
   actions: RemediationActionRecord[]
   rejectedActions: RemediationActionRecord[]
-}): RemediationToolCall[] {
-  const { failureProfile } = buildFailureProfileArtifacts({
+}): { actions: RemediationToolCall[]; artifacts: ReturnType<typeof buildFailureProfileArtifacts> } {
+  const artifacts = buildFailureProfileArtifacts({
     analysis: input.analysis,
     context: input.context,
     actions: input.actions,
     rejectedActions: input.rejectedActions,
   })
+  const { failureProfile } = artifacts
   const failureModeByKey = new Map(failureProfile.failureModes.map(mode => [mode.key, mode]))
   const autoRunnableOpportunities = failureProfile.toolOpportunities.filter(opportunity => opportunity.status === 'auto_runnable')
 
@@ -656,7 +681,7 @@ function deterministicActions(input: {
     }
   }
 
-  return dedupeActions(selected)
+  return { actions: dedupeActions(selected), artifacts }
 }
 
 function buildPrompt(input: {
@@ -666,8 +691,9 @@ function buildPrompt(input: {
   iteration: number
   actions: RemediationActionRecord[]
   rejectedActions: RemediationActionRecord[]
+  precomputedArtifacts?: ReturnType<typeof buildFailureProfileArtifacts>
 }): string {
-  const { failureProfile, plannerEvidence } = buildFailureProfileArtifacts({
+  const { failureProfile, plannerEvidence } = input.precomputedArtifacts ?? buildFailureProfileArtifacts({
     analysis: input.analysis,
     context: input.context,
     actions: input.actions,
@@ -690,7 +716,7 @@ function buildPrompt(input: {
   ].join('\n')
 }
 
-async function openAiPlan(messages: any[]): Promise<RemediationPlanResult> {
+async function openAiPlan(messages: any[]): Promise<Pick<RemediationPlanResult, 'done' | 'actions' | 'unresolvedIssues'>> {
   const response = await fetch(`${OPENAI_COMPAT_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers: {
@@ -769,12 +795,14 @@ export async function planRemediationActions(input: {
   rejectedActions: RemediationActionRecord[]
 }): Promise<RemediationPlanResult> {
   const unresolvedIssues = issueCategoryIds(input.analysis)
-  const deterministic = deterministicActions(input)
+  const { actions: deterministic, artifacts } = deterministicActions(input)
   if (deterministic.length > 0 || unresolvedIssues.length === 0) {
     return {
       done: unresolvedIssues.length === 0,
       actions: deterministic,
       unresolvedIssues,
+      failureProfile: artifacts.failureProfile,
+      plannerEvidence: artifacts.plannerEvidence,
     }
   }
 
@@ -783,24 +811,30 @@ export async function planRemediationActions(input: {
       done: false,
       actions: [],
       unresolvedIssues,
+      failureProfile: artifacts.failureProfile,
+      plannerEvidence: artifacts.plannerEvidence,
     }
   }
 
   try {
     const planned = await openAiPlan([{
       role: 'user',
-      content: [{ type: 'text', text: buildPrompt(input) }],
+      content: [{ type: 'text', text: buildPrompt({ ...input, precomputedArtifacts: artifacts }) }],
     }])
     return {
       done: planned.done,
       actions: dedupeActions(planned.actions),
       unresolvedIssues: planned.unresolvedIssues.length ? planned.unresolvedIssues : unresolvedIssues,
+      failureProfile: artifacts.failureProfile,
+      plannerEvidence: artifacts.plannerEvidence,
     }
   } catch {
     return {
       done: false,
       actions: [],
       unresolvedIssues,
+      failureProfile: artifacts.failureProfile,
+      plannerEvidence: artifacts.plannerEvidence,
     }
   }
 }

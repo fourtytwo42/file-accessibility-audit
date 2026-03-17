@@ -810,7 +810,7 @@ See 04-deployment-guide.md for nginx hardening, firewall rules, and HTTP securit
     "@vue/test-utils": "^2.x"
   },
   "scripts": {
-    "dev": "nuxt dev --port 5102",
+    "dev": "nuxt dev --port 6102",
     "build": "nuxt build",
     "start": "node .output/server/index.mjs",
     "test": "vitest run",
@@ -848,12 +848,12 @@ pnpm install
 # Terminal 1: API server (with hot reload)
 cd apps/api
 cp .env.example .env    # edit with dev values (see below)
-pnpm dev                # starts on http://localhost:5103
+pnpm dev                # starts on http://localhost:6103
 
 # Terminal 2: Nuxt frontend (with hot reload)
 cd apps/web
 cp .env.example .env    # edit with dev values (see below)
-pnpm dev                # starts on http://localhost:5102
+pnpm dev                # starts on http://localhost:6102
 ```
 
 ### Development Environment Variables
@@ -862,7 +862,7 @@ pnpm dev                # starts on http://localhost:5102
 
 ```env
 NODE_ENV=development
-PORT=5103
+PORT=6103
 JWT_SECRET=dev-secret-do-not-use-in-production
 JWT_EXPIRY_HOURS=72
 OTP_EXPIRY_MINUTES=15
@@ -883,7 +883,7 @@ ALLOWED_DOMAINS=illinois.gov,localhost
 
 ```env
 NUXT_PUBLIC_APP_NAME=File Accessibility Audit (DEV)
-NUXT_API_BASE=http://localhost:5103
+NUXT_API_BASE=http://localhost:6103
 ```
 
 ### Development vs. Production Differences
@@ -892,7 +892,7 @@ NUXT_API_BASE=http://localhost:5103
 |---------|------------|------------|
 | **Cookie `Secure` flag** | `false` (HTTP on localhost) | `true` (HTTPS required) |
 | **`SameSite`** | `Lax` (cross-port localhost) | `Strict` |
-| **CORS origin** | `http://localhost:5102` | Same origin (via nginx proxy) |
+| **CORS origin** | `http://localhost:6102` | Same origin (via nginx proxy) |
 | **Email delivery** | Local mail catcher (Mailpit) | SMTP2GO |
 | **Domain validation** | Allow `@localhost` for testing | `@illinois.gov` only |
 | **`trust proxy`** | Not set (direct access) | `1` (behind nginx) |
@@ -912,7 +912,7 @@ const cookieOptions = {
 
 // CORS
 app.use(cors({
-  origin: isProduction ? false : 'http://localhost:5102',
+  origin: isProduction ? false : 'http://localhost:6102',
   credentials: true,
 }))
 

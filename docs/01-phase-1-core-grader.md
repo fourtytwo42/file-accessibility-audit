@@ -111,7 +111,7 @@ Deploy per **04-deployment-guide.md**. Includes DigitalOcean droplet, Forge, PM2
 - [ ] Helmet headers present: X-Content-Type-Options, X-Frame-Options, HSTS
 - [ ] Error responses in production do not leak stack traces, file paths, or library versions
 - [ ] QPDF subprocess times out after 30 seconds on adversarial input
-- [ ] Ports 5102/5103 are not accessible from external network (firewall test)
+- [ ] Ports 6102/6103 are not accessible from external network (firewall test)
 - [ ] JWT verification uses `algorithms: ['HS256']` — rejects tokens with `alg: none`
 - [ ] Expired OTP rows are cleaned up (do not accumulate in SQLite)
 - [ ] OTP generated with `crypto.randomInt`, not `Math.random` (verify in code review)
@@ -122,7 +122,7 @@ Deploy per **04-deployment-guide.md**. Includes DigitalOcean droplet, Forge, PM2
 - [ ] SQLite WAL mode enabled — verify with `PRAGMA journal_mode` returning `wal`
 - [ ] `audit_log` table includes `score` and `grade` columns for analyze events
 - [ ] Cookie `Secure` flag is `false` in development (NODE_ENV=development), `true` in production
-- [ ] CORS allows `http://localhost:5102` in development, blocks cross-origin in production
+- [ ] CORS allows `http://localhost:6102` in development, blocks cross-origin in production
 
 ---
 

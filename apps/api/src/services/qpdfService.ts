@@ -18,6 +18,7 @@ const QPDF_BIN = process.env.QPDF_PATH || (() => {
 
 export interface QpdfResult {
   hasStructTree: boolean
+  isTagged: boolean // /MarkInfo /Marked = true in the catalog
   hasLang: boolean
   lang: string | null
   hasOutlines: boolean
@@ -29,7 +30,11 @@ export interface QpdfResult {
   headings: Array<{ level: string; tag: string }>
   tables: Array<{ hasHeaders: boolean }>
   structTreeDepth: number
-  contentOrder: number[] // MCIDs in structure tree order
+  // MCIDs in struct-tree depth-first order, as (pageIndex, mcid) pairs.
+  // Each pair is encoded as pageIndex * 100000 + mcid so that the scorer can
+  // detect per-page disorder without cross-page MCID resets causing false positives.
+  contentOrder: number[]
+  annotationCount: number // non-Widget annotations visible on pages
   error: string | null
 }
 
@@ -59,6 +64,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
     if (err.killed || err.signal === 'SIGTERM') {
       return {
         hasStructTree: false,
+        isTagged: false,
         hasLang: false,
         lang: null,
         hasOutlines: false,
@@ -71,6 +77,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         tables: [],
         structTreeDepth: 0,
         contentOrder: [],
+        annotationCount: 0,
         error: 'QPDF timeout',
       }
     }
@@ -82,6 +89,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
     // Return partial result with error
     return {
       hasStructTree: false,
+      isTagged: false,
       hasLang: false,
       lang: null,
       hasOutlines: false,
@@ -94,6 +102,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       tables: [],
       structTreeDepth: 0,
       contentOrder: [],
+      annotationCount: 0,
       error: 'QPDF parsing failed',
     }
   } finally {
@@ -104,6 +113,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
 function parseQpdfJson(json: any): QpdfResult {
   const result: QpdfResult = {
     hasStructTree: false,
+    isTagged: false,
     hasLang: false,
     lang: null,
     hasOutlines: false,
@@ -116,6 +126,7 @@ function parseQpdfJson(json: any): QpdfResult {
     tables: [],
     structTreeDepth: 0,
     contentOrder: [],
+    annotationCount: 0,
     error: null,
   }
 
@@ -140,7 +151,7 @@ function parseQpdfJson(json: any): QpdfResult {
         result.hasStructTree = true
       }
 
-      // Check catalog for StructTreeRoot, Lang, Outlines
+      // Check catalog for StructTreeRoot, Lang, Outlines, MarkInfo
       if (o['/Type'] === '/Catalog') {
         if (o['/StructTreeRoot']) result.hasStructTree = true
         if (o['/Lang']) {
@@ -151,6 +162,12 @@ function parseQpdfJson(json: any): QpdfResult {
         }
         if (o['/Outlines']) result.hasOutlines = true
         if (o['/AcroForm']) result.hasAcroForm = true
+        // /MarkInfo /Marked = true means the document is a Tagged PDF
+        const markInfo = o['/MarkInfo']
+        if (markInfo) {
+          const marked = typeof markInfo === 'object' ? markInfo['/Marked'] : null
+          if (marked === true || marked === 'true') result.isTagged = true
+        }
       }
 
       // Count outline entries and collect titles
@@ -199,14 +216,18 @@ function parseQpdfJson(json: any): QpdfResult {
           }
         }
 
-        // Collect MCIDs for reading order
-        collectMCIDs(o, result.contentOrder)
       }
 
-      // Form fields
-      if (o['/Type'] === '/Annot' && o['/Subtype'] === '/Widget') {
-        const name = typeof o['/T'] === 'string' ? o['/T'].replace(/^u:/, '') : undefined
-        result.formFields.push({ hasTU: !!o['/TU'], name })
+      // Annotations (non-Widget subtypes that appear on pages)
+      if (o['/Type'] === '/Annot') {
+        const subtype = o['/Subtype']
+        if (subtype === '/Widget') {
+          const name = typeof o['/T'] === 'string' ? o['/T'].replace(/^u:/, '') : undefined
+          result.formFields.push({ hasTU: !!o['/TU'], name })
+        } else if (subtype && subtype !== '/Popup') {
+          // Count all non-Widget, non-Popup annotations (Link, Text, Stamp, etc.)
+          result.annotationCount++
+        }
       }
     }
 
@@ -232,9 +253,37 @@ function parseQpdfJson(json: any): QpdfResult {
       }
     }
 
-    // Calculate structure tree depth
+    // Walk structure tree from root for proper depth measurement and reading-order MCIDs
     if (result.hasStructTree) {
-      result.structTreeDepth = calculateTreeDepth(objects)
+      // Find the StructTreeRoot ref from the catalog
+      let structTreeRootRef: string | null = null
+      for (const [_ref, obj] of Object.entries(objects)) {
+        const o = obj as any
+        if (o?.['/Type'] === '/Catalog' && o['/StructTreeRoot']) {
+          const rawRef = o['/StructTreeRoot']
+          structTreeRootRef = typeof rawRef === 'string' ? rawRef : null
+          break
+        }
+      }
+
+      if (structTreeRootRef) {
+        const structRoot = resolveRef(structTreeRootRef, objects)
+        result.structTreeDepth = structRoot ? calculateTreeDepthFromRoot(structRoot, objects) : 0
+
+        // Build a page-ref → page-index map for per-page MCID ordering
+        const pageRefToIndex = new Map<string, number>()
+        for (const [ref, obj] of Object.entries(objects)) {
+          const o = obj as any
+          if (o?.['/Type'] === '/Page') {
+            pageRefToIndex.set(ref, pageRefToIndex.size)
+          }
+        }
+
+        // Walk struct tree depth-first, collect (pageIndex * 100000 + mcid) pairs
+        walkStructTreeForMCIDs(structRoot, objects, pageRefToIndex, result.contentOrder, null)
+      } else {
+        result.structTreeDepth = calculateTreeDepth(objects)
+      }
     }
 
   } catch (err) {
@@ -353,4 +402,77 @@ function calculateTreeDepth(objects: any): number {
   }
 
   return maxDepth
+}
+
+function calculateTreeDepthFromRoot(root: any, objects: any): number {
+  let maxDepth = 0
+  const visited = new Set<string>()
+
+  const measure = (node: any, depth: number): void => {
+    if (depth > 50) return
+    maxDepth = Math.max(maxDepth, depth)
+    const kids = node?.['/K']
+    if (!kids) return
+    const kidList = Array.isArray(kids) ? kids : [kids]
+    for (const kid of kidList) {
+      if (typeof kid === 'number') continue // leaf MCID
+      if (kid && typeof kid === 'object' && kid['/MCID'] !== undefined) continue // marked content ref
+      if (typeof kid === 'string') {
+        if (visited.has(kid)) continue
+        visited.add(kid)
+        const child = resolveRef(kid, objects)
+        if (child) measure(child, depth + 1)
+      } else if (kid && typeof kid === 'object') {
+        measure(kid, depth + 1)
+      }
+    }
+  }
+
+  measure(root, 0)
+  return maxDepth
+}
+
+/**
+ * Walk the struct tree depth-first from `node` and collect per-page MCID pairs.
+ * Each entry pushed to `out` is encoded as: pageIndex * 100_000 + mcid
+ * so that disorder can be detected per-page (cross-page MCID resets don't cause
+ * false positives). `inheritedPageRef` carries the /Pg from parent elements.
+ */
+function walkStructTreeForMCIDs(
+  node: any,
+  objects: any,
+  pageRefToIndex: Map<string, number>,
+  out: number[],
+  inheritedPageRef: string | null,
+): void {
+  if (!node || typeof node !== 'object') return
+
+  const nodePageRef: string | null = typeof node['/Pg'] === 'string' ? node['/Pg'] : inheritedPageRef
+  const kids = node['/K']
+  if (kids === undefined) return
+
+  const kidList = Array.isArray(kids) ? kids : [kids]
+  for (const kid of kidList) {
+    if (typeof kid === 'number') {
+      // Bare MCID integer
+      const pageIdx = nodePageRef ? (pageRefToIndex.get(nodePageRef) ?? pageRefToIndex.get(`obj:${nodePageRef}`) ?? -1) : -1
+      if (pageIdx >= 0) out.push(pageIdx * 100_000 + kid)
+    } else if (kid && typeof kid === 'object') {
+      if (kid['/MCID'] !== undefined) {
+        // Marked content reference dict: { /Type /MCR, /Pg ..., /MCID N }
+        const kidPage: string | null = typeof kid['/Pg'] === 'string' ? kid['/Pg'] : nodePageRef
+        const pageIdx = kidPage ? (pageRefToIndex.get(kidPage) ?? pageRefToIndex.get(`obj:${kidPage}`) ?? -1) : -1
+        if (pageIdx >= 0) out.push(pageIdx * 100_000 + kid['/MCID'])
+      } else if (typeof kid === 'object' && kid['/S']) {
+        // Inline struct element
+        walkStructTreeForMCIDs(kid, objects, pageRefToIndex, out, nodePageRef)
+      } else {
+        walkStructTreeForMCIDs(kid, objects, pageRefToIndex, out, nodePageRef)
+      }
+    } else if (typeof kid === 'string') {
+      // Ref to another struct element
+      const child = resolveRef(kid, objects)
+      if (child) walkStructTreeForMCIDs(child, objects, pageRefToIndex, out, nodePageRef)
+    }
+  }
 }

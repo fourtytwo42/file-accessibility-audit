@@ -94,6 +94,11 @@ export interface QueueItem extends QueueItemSummary {
       original: { status: VeraPdfStatus | null; failedChecks: number | null; profile: string | null; flavour: string | null; topFailures: string[] }
       rebuilt: { status: VeraPdfStatus | null; failedChecks: number | null; profile: string | null; flavour: string | null; topFailures: string[] }
     }
+    adobe?: {
+      current: { status: string | null; summary: string; issueCount: number; findings: Array<{ id: string; rule: string; message: string; severity: string }> } | null
+      original: { status: string | null; summary: string; issueCount: number; findings: Array<{ id: string; rule: string; message: string; severity: string }> } | null
+      rebuilt: { status: string | null; summary: string; issueCount: number; findings: Array<{ id: string; rule: string; message: string; severity: string }> } | null
+    }
     failureModes: Array<{ key: string; label: string; classification: string; blocking: boolean; count: number; evidence: string[] }>
     plannerEvidence: {
       topFailureModeKeys: string[]
@@ -246,9 +251,35 @@ function withClientHeaders(clientId: string, init?: RequestInit): RequestInit {
   }
 }
 
+function isClientSessionExpiredError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err)
+  return msg.includes('Client session expired') || msg.includes('Client session required') || msg.includes('Client session mismatch')
+}
+
+/** Clear stored client id so the next bootstrap gets a fresh session from the server (cookie). */
+export function clearStoredClientSession(): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(CLIENT_ID_KEY)
+}
+
 export async function fetchQueueStatus(): Promise<QueueStatusResponse> {
   const clientId = await ensureClientSession()
-  return apiJson<QueueStatusResponse>('/api/queue/status', withClientHeaders(clientId))
+  try {
+    return await apiJson<QueueStatusResponse>('/api/queue/status', withClientHeaders(clientId))
+  } catch (err) {
+    if (isClientSessionExpiredError(err)) {
+      clearStoredClientSession()
+      const fresh = await apiJson<{ clientId: string }>('/api/client/bootstrap', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
+      if (fresh.clientId) {
+        setStoredClientId(fresh.clientId)
+        return apiJson<QueueStatusResponse>('/api/queue/status', withClientHeaders(fresh.clientId))
+      }
+    }
+    throw err
+  }
 }
 
 export async function fetchQueueItem(itemId: string): Promise<QueueItemResponse> {

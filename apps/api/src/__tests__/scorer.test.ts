@@ -12,6 +12,7 @@ import type { StructureBackendMutationResult } from '../services/pdfStructureBac
 function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
   return {
     hasStructTree: false,
+    isTagged: false,
     hasLang: false,
     lang: null,
     hasOutlines: false,
@@ -24,6 +25,7 @@ function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
     tables: [],
     structTreeDepth: 0,
     contentOrder: [],
+    annotationCount: 0,
     error: null,
     ...overrides,
   }
@@ -725,7 +727,7 @@ describe('scoreAltText edge cases', () => {
 
     expect(findCategory(result, 'alt_text').score).toBeLessThan(100)
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('Acrobat-risk'))).toBe(true)
-    expect(result.grade).not.toBe('A')
+    expect(findCategory(result, 'alt_text').grade).not.toBe('A')
   })
 })
 

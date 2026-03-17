@@ -148,5 +148,8 @@ ensureColumn('queue_items', 'ai_suggested_changes_json', 'TEXT')
 ensureColumn('queue_items', 'confidence_summary_json', 'TEXT')
 ensureColumn('queue_items', 'processing_path', "TEXT NOT NULL DEFAULT 'rebuild'")
 ensureColumn('queue_items', 'path_fallbacks_json', 'TEXT')
+ensureColumn('queue_items', 'adobe_summary_json', 'TEXT')
+ensureColumn('queue_items', 'original_adobe_summary_json', 'TEXT')
+ensureColumn('queue_items', 'rebuilt_adobe_summary_json', 'TEXT')
 
 export default db

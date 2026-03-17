@@ -57,7 +57,7 @@ Set these values in `apps/api/.env`:
 
 ```env
 NODE_ENV=production
-PORT=5103
+PORT=6103
 JWT_SECRET=<run: openssl rand -hex 32>
 DB_PATH=./data/audit.db
 SMTP_USER=postmaster@icjia.cloud
@@ -105,8 +105,8 @@ Verify:
 
 ```bash
 pm2 status                                # Both "online"
-curl -s http://localhost:5103/api/health   # { "status": "ok" }
-curl -s http://localhost:5102 | head -5    # HTML from Nuxt
+curl -s http://localhost:6103/api/health   # { "status": "ok" }
+curl -s http://localhost:6102 | head -5    # HTML from Nuxt
 ```
 
 ---
@@ -156,10 +156,10 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
 
-    # ── Proxy 1: API (Express on port 5103) ──
+    # ── Proxy 1: API (Express on port 6103) ──
     # MUST come before the catch-all / block
     location /api/ {
-        proxy_pass http://127.0.0.1:5103;
+        proxy_pass http://127.0.0.1:6103;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -169,9 +169,9 @@ server {
         proxy_read_timeout 60s;
     }
 
-    # ── Proxy 2: Frontend (Nuxt SSR on port 5102) ──
+    # ── Proxy 2: Frontend (Nuxt SSR on port 6102) ──
     location / {
-        proxy_pass http://127.0.0.1:5102;
+        proxy_pass http://127.0.0.1:6102;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -184,7 +184,7 @@ server {
 
     # ── Static asset caching ──
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot|webmanifest)$ {
-        proxy_pass http://127.0.0.1:5102;
+        proxy_pass http://127.0.0.1:6102;
         proxy_set_header Host $host;
         expires 30d;
         add_header Cache-Control "public, immutable";
@@ -204,8 +204,8 @@ server {
 
 | Location | Port | Service |
 |----------|------|---------|
-| `/api/` | 5103 | Express API — PDF analysis, auth, shared reports |
-| `/` | 5102 | Nuxt SSR — all pages, components, static assets |
+| `/api/` | 6103 | Express API — PDF analysis, auth, shared reports |
+| `/` | 6102 | Nuxt SSR — all pages, components, static assets |
 
 ---
 
@@ -227,7 +227,7 @@ DigitalOcean → Networking → Firewalls:
 | 80 | Anywhere |
 | 443 | Anywhere |
 
-Block everything else. Ports 5102/5103 are localhost-only behind nginx.
+Block everything else. Ports 6102/6103 are localhost-only behind nginx.
 
 ---
 
@@ -277,5 +277,5 @@ pm2 restart ecosystem.config.cjs   # Restart all services
 | 502 Bad Gateway | `pm2 status` — processes crashed. `pm2 logs` to see why, then `pm2 restart all` |
 | 413 Entity Too Large | nginx needs `client_max_body_size 110M;` in the `/api/` block |
 | QPDF errors | `qpdf --version` — install with `sudo apt install qpdf` |
-| Port already in use | `lsof -i :5102` / `lsof -i :5103` and kill the stale process |
+| Port already in use | `lsof -i :6102` / `lsof -i :6103` and kill the stale process |
 | Nuxt build fails | `pnpm clean && pnpm install --frozen-lockfile && pnpm build` |

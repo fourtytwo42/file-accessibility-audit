@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { AdobePanel } from '@/components/detail/AdobePanel'
 import { DetailControls } from '@/components/detail/DetailControls'
 import { FailureModeList } from '@/components/detail/FailureModeList'
 import { GradePanel } from '@/components/detail/GradePanel'
@@ -41,10 +42,24 @@ export default function PdfDetailPage() {
         </div>
       </div>
 
+      {item.state === 'failed' && (item.error || item.reconstructionError) ? (
+        <div className="rounded-[1.75rem] border border-red-500/30 bg-red-500/10 p-5">
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--danger)' }}>Why this run failed</h2>
+          {item.error ? (
+            <p className="mt-2 text-sm">{typeof item.error === 'object' && item.error?.error != null ? String(item.error.error) : 'Processing failed.'}</p>
+          ) : null}
+          {item.reconstructionError ? (
+            <p className="mt-2 text-sm">{typeof item.reconstructionError === 'object' && item.reconstructionError?.error != null ? String(item.reconstructionError.error) : 'Reconstruction failed.'}</p>
+          ) : null}
+          <p className="mt-3 text-sm" style={{ color: 'var(--text-muted)' }}>Use <strong>Run remediation</strong> below to retry with the same original file.</p>
+        </div>
+      ) : null}
+
       <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
         <div className="space-y-6">
           <GradePanel item={item} />
           <VeraPdfPanel item={item} />
+          <AdobePanel item={item} />
           <FailureModeList item={item} />
           <section className="rounded-[1.75rem] border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
             <h2 className="text-lg font-semibold">Category breakdown</h2>

@@ -5,7 +5,7 @@ import { BulkActionBar } from '@/components/grid/BulkActionBar'
 import { FilterBar, type QueueFilters } from '@/components/grid/FilterBar'
 import { PdfCard } from '@/components/grid/PdfCard'
 import { DropZone } from '@/components/upload/DropZone'
-import { deleteQueueItems, downloadMany, downloadQueueFile, reanalyzeQueueItems, remediateQueueItems, retryQueueItem } from '@/lib/api'
+import { clearStoredClientSession, deleteQueueItems, downloadMany, downloadQueueFile, reanalyzeQueueItems, remediateQueueItems, retryQueueItem } from '@/lib/api'
 import { useQueueEvents } from '@/hooks/useQueueEvents'
 import { useQueueStatus } from '@/hooks/useQueueStatus'
 import { useSelection } from '@/hooks/useSelection'
@@ -102,7 +102,20 @@ export default function QueuePage() {
           className="rounded-[1rem] border px-4 py-3 text-sm"
           style={{ borderColor: 'var(--danger)', background: 'color-mix(in srgb, var(--danger) 10%, var(--surface))', color: 'var(--text)' }}
         >
-          Failed to load your PDF queue. {loadError}
+          <p className="mb-2">Failed to load your PDF queue. {loadError}</p>
+          {(loadError.includes('Client session expired') || loadError.includes('Client session required') || loadError.includes('Client session mismatch')) ? (
+            <button
+              type="button"
+              className="rounded-full border px-3 py-1.5 text-sm font-medium hover:opacity-90"
+              style={{ borderColor: 'var(--border)' }}
+              onClick={() => {
+                clearStoredClientSession()
+                void mutate()
+              }}
+            >
+              Reconnect
+            </button>
+          ) : null}
         </section>
       ) : null}
 

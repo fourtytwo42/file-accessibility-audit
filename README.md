@@ -56,8 +56,8 @@ cp apps/web/.env.example.local apps/web/.env
 pnpm dev
 ```
 
-- **Frontend:** http://localhost:5102
-- **API:** http://localhost:5103
+- **Frontend:** http://localhost:6102
+- **API:** http://localhost:6103
 
 ### Verify an Existing Environment
 
@@ -77,7 +77,7 @@ pnpm test       # Run all tests with summary
 pnpm dev        # Start API + Web dev servers
 pnpm build      # Type-check API + build Nuxt frontend
 pnpm verify:env # Verify the remediation runtime and managed font bundle
-pnpm start:all  # Start both production servers (kills stale ports, API :5103, Web :5102)
+pnpm start:all  # Start both production servers (kills stale ports, API :6103, Web :6102)
 pnpm rebrand    # Regenerate static files after changing BRANDING in audit.config.ts
 ```
 
@@ -498,7 +498,7 @@ pm2 restart ecosystem.config.cjs --update-env  # PM2 sets PORT and NODE_ENV
 For local production testing (without PM2):
 
 ```bash
-pnpm build && pnpm start:all    # Clears ports, starts API :5103 + Web :5102
+pnpm build && pnpm start:all    # Clears ports, starts API :6103 + Web :6102
 ```
 
 ## Security

@@ -51,11 +51,15 @@ function signClientSession(clientId: string, sessionId: string, expiresAt: strin
 }
 
 function setClientSessionCookie(res: Response, clientId: string, sessionId: string, expiresAt: string): void {
-  const isProduction = process.env.NODE_ENV === 'production'
+  // Use SECURE_COOKIES env var when explicitly set; otherwise only secure when not on localhost.
+  // This prevents Secure-cookie failures when NODE_ENV=production but the site runs over HTTP
+  // (e.g., local VM accessed by IP address without an HTTPS proxy).
+  const secureEnv = process.env.SECURE_COOKIES
+  const useSecure = secureEnv !== undefined ? secureEnv === 'true' : process.env.NODE_ENV === 'production'
   res.cookie(CLIENT_SESSION_COOKIE, signClientSession(clientId, sessionId, expiresAt), {
     httpOnly: true,
     sameSite: 'lax',
-    secure: isProduction,
+    secure: useSecure,
     expires: new Date(expiresAt),
   })
 }

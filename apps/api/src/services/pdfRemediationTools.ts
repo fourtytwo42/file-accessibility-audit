@@ -17,9 +17,10 @@ import type { PdfjsResult } from './pdfjsService.js'
 import { analyzeWithQpdf } from './qpdfService.js'
 import type { QpdfResult } from './qpdfService.js'
 import { runPdfStructureBackend } from './pdfStructureBackend.js'
+import { runAdobeAutoTag } from './adobePdfServices.js'
 import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
 import { normalizeLanguageTag } from './languageTags.js'
-import { ANALYSIS } from '#config'
+import { ANALYSIS, REMEDIATION } from '#config'
 import type {
   AppliedChange,
   BoundingBox,
@@ -147,6 +148,9 @@ export interface FigureCandidate {
   textDensityHint: 'low' | 'medium' | 'high'
   imageEvidence: 'strong' | 'weak'
   containsText?: boolean
+  splitGenerated?: boolean
+  splitSourceRef?: string | null
+  splitSourceTag?: string | null
 }
 
 export interface ReadingOrderCandidate {
@@ -303,7 +307,7 @@ export function needsAltTextDeepInspection(analysis: AnalysisResult): boolean {
   const altTextScore = altTextCategory?.score
   if (typeof altTextScore === 'number' && altTextScore < 100) return true
   if ((altTextCategory?.findings || []).some(finding =>
-    /acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure/i.test(finding))) {
+    /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding))) {
     return true
   }
   if (analysis.verapdf?.status !== 'failed') return false
@@ -388,6 +392,9 @@ function buildFigureCandidates(
     surroundingText: string[],
     textDensityHint: FigureCandidate['textDensityHint'],
     imageEvidence: FigureCandidate['imageEvidence'],
+    informativeHint: FigureCandidate['informativeHint'],
+    splitGenerated = false,
+    splitSourceTag: string | null | undefined = null,
     allowContainerAlt = false,
   ) => {
     const structuralNode = targetRef ? structuralByRef.get(targetRef) : null
@@ -407,6 +414,16 @@ function buildFigureCandidates(
       }
     }
     if (targetTag === '/Figure') {
+      if (splitGenerated) {
+        return {
+          repairMode: informativeHint === 'decorative' ? 'set_alt' as const : 'defer' as const,
+          targetTag,
+          parentTagPath,
+          unsafeReason: informativeHint === 'decorative'
+            ? undefined
+            : `split_generated_figure: Target ${targetRef} was created from mixed ${splitSourceTag || 'non-figure'} content and should not receive heading-derived informative alt text automatically.`,
+        }
+      }
       return {
         repairMode: 'set_alt' as const,
         targetTag,
@@ -464,9 +481,18 @@ function buildFigureCandidates(
   const explicitFigures = structure.figures.map((figure, index) => {
     const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
-    const informativeHint = surroundingText.length > 0 ? 'informative' as const : 'unknown' as const
+    const informativeHint = figure.splitGenerated ? 'decorative' as const : (surroundingText.length > 0 ? 'informative' as const : 'unknown' as const)
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
-    const classification = classifyFigureTarget(figure.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong')
+    const classification = classifyFigureTarget(
+      figure.ref,
+      page?.imageCount || 0,
+      surroundingText,
+      textDensityHint,
+      'strong',
+      informativeHint,
+      !!figure.splitGenerated,
+      figure.splitSourceTag,
+    )
     return {
       id: `figure:${index + 1}`,
       pageNumber: page?.pageNumber || 1,
@@ -483,13 +509,16 @@ function buildFigureCandidates(
       pageImageCount: page?.imageCount || 0,
       textDensityHint,
       imageEvidence: 'strong' as const,
+      splitGenerated: !!figure.splitGenerated,
+      splitSourceRef: figure.splitSourceRef || null,
+      splitSourceTag: figure.splitSourceTag || null,
     }
   })
   const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
     const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
-    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong', false)
+    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong', surroundingText.length > 0 ? 'informative' as const : 'unknown' as const, false, null, false)
     return {
       id: `figure:image-node:${index + 1}`,
       pageNumber: page?.pageNumber || 1,
@@ -526,7 +555,7 @@ function buildFigureCandidates(
           [index] || null
       const targetRef = structuralFallback?.ref || imageFallback || null
       const imageEvidence = structuralFallback || image.ref ? 'strong' as const : 'weak' as const
-      const classification = classifyFigureTarget(targetRef, page?.imageCount || 0, surroundingText, textDensityHint, imageEvidence)
+      const classification = classifyFigureTarget(targetRef, page?.imageCount || 0, surroundingText, textDensityHint, imageEvidence, surroundingText.length ? 'informative' as const : 'unknown' as const)
       return {
         id: `figure:${explicitFigures.length + index + 1}`,
         pageNumber: page?.pageNumber || 1,
@@ -561,7 +590,7 @@ function buildFigureCandidates(
     const surroundingText = page.textLines.slice(0, 4).map(line => line.text)
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
     const imageEvidence = structuralFallback ? 'strong' as const : 'weak' as const
-    const classification = classifyFigureTarget(targetRef, page.imageCount, surroundingText, textDensityHint, imageEvidence)
+    const classification = classifyFigureTarget(targetRef, page.imageCount, surroundingText, textDensityHint, imageEvidence, page.textLines.length ? 'informative' as const : 'unknown' as const)
     return {
       id: `figure:${index + 1}`,
       pageNumber: page.pageNumber,
@@ -1098,6 +1127,7 @@ export async function executeRemediationTool(input: {
 
   switch (call.tool_name) {
     case 'get_document_metadata':
+    case 'adobe_accessibility_check':
     case 'list_bookmarks':
     case 'list_links':
     case 'list_figures':
@@ -1118,6 +1148,44 @@ export async function executeRemediationTool(input: {
         },
         manualReviewFlags: [],
       }
+    case 'adobe_auto_tag': {
+      if (!REMEDIATION.ENABLE_ADOBE_API) {
+        return {
+          buffer,
+          action: { ...baseAction, details: 'Adobe API disabled.', changedVisibleContent: false, changedDocumentBytes: false, outcome: 'deferred' },
+          manualReviewFlags: [],
+        }
+      }
+      const reviewAssetsDir = typeof args.reviewAssetsDir === 'string' ? args.reviewAssetsDir : undefined
+      const autoTag = await runAdobeAutoTag({
+        buffer,
+        filename: typeof args.filename === 'string' ? args.filename : 'document.pdf',
+        artifactsDir: reviewAssetsDir,
+        generateReport: true,
+      })
+      return {
+        buffer: autoTag.outputPdf || buffer,
+        action: {
+          ...baseAction,
+          before: 'native remediation path',
+          after: autoTag.outputPdf ? 'adobe auto-tag path' : 'native remediation path',
+          details: autoTag.summary,
+          changedVisibleContent: false,
+          changedDocumentBytes: !!autoTag.outputPdf,
+          categoryTargets: ['heading_structure', 'alt_text', 'reading_order'],
+          validationWarnings: autoTag.warnings,
+          outcome: autoTag.outputPdf ? 'applied' : (autoTag.status === 'unavailable' ? 'deferred' : 'no_effect'),
+        },
+        manualReviewFlags: autoTag.status === 'unavailable'
+          ? [{
+              code: 'adobe_autotag_unavailable',
+              label: 'Adobe Auto-Tag unavailable',
+              severity: 'warning',
+              details: autoTag.summary,
+            }]
+          : [],
+      }
+    }
     case 'set_document_title': {
       const nextTitle = String(args.title || '').trim()
       if (!nextTitle) {
@@ -1311,6 +1379,42 @@ export async function executeRemediationTool(input: {
         manualReviewFlags: translated.manualReviewFlags,
       }
     }
+    case 'repair_annotation_alt_text': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'repair_annotation_alt_text',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['alt_text', 'link_quality', 'reading_order'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
+    case 'set_tabs_all_annotated_pages': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'set_tabs_all_annotated_pages',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['link_quality', 'reading_order'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
     case 'bootstrap_struct_tree': {
       const headingCandidates = context.headingCandidates.length
         ? context.headingCandidates
@@ -1340,18 +1444,12 @@ export async function executeRemediationTool(input: {
         level: normalizedHeadingLevels[index] || 'H2',
         pageNumber: candidate.pageNumber,
       }))
-      const figures = context.figureCandidates.slice(0, Math.max(1, context.pages.filter(page => page.imageCount > 0).length)).map(candidate => ({
-        altText: candidate.surroundingText[0]
-          ? `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
-          : `Image on page ${candidate.pageNumber}`,
-        pageNumber: candidate.pageNumber,
-      }))
       const result = await runPdfStructureBackend({
         buffer,
         mutation: {
           operation: 'bootstrap_struct_tree',
           headings,
-          figures,
+          figures: [],
         },
       })
       const translated = structureResultToAction({
@@ -1859,6 +1957,24 @@ export async function executeRemediationTool(input: {
         manualReviewFlags: translated.manualReviewFlags,
       }
     }
+    case 'repair_truetype_encoding_differences': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'repair_truetype_encoding_differences',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
     case 'substitute_legacy_fonts_in_place': {
       const result = await runPdfStructureBackend({
         buffer,
@@ -1994,6 +2110,8 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
     repair_cidset_consistency: 'text_recovery',
     set_page_tabs: 'structure',
     normalize_annotation_tab_order: 'reading_order',
+    set_tabs_all_annotated_pages: 'reading_order',
+    repair_annotation_alt_text: 'alt_text',
     replace_bookmarks_from_headings: 'bookmark',
     create_bookmark: 'bookmark',
     set_figure_alt_text: 'alt_text',
@@ -2045,11 +2163,14 @@ export function toSuggestedChange(action: RemediationActionRecord): SuggestedCha
     repair_native_reading_order: 'reading_order',
     repair_font_unicode_maps: 'text_recovery',
     repair_type1_font_unicode_maps: 'text_recovery',
+    repair_truetype_encoding_differences: 'text_recovery',
     substitute_legacy_fonts_in_place: 'text_recovery',
     finalize_substituted_font_conformance: 'text_recovery',
     repair_cidset_consistency: 'text_recovery',
     set_page_tabs: 'structure',
     normalize_annotation_tab_order: 'reading_order',
+    set_tabs_all_annotated_pages: 'reading_order',
+    repair_annotation_alt_text: 'alt_text',
     set_link_annotation_contents: 'structure',
     repair_cid_symbol_font_maps: 'text_recovery',
     artifact_nonsemantic_page_elements: 'artifact',

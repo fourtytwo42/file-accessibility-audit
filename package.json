@@ -5,15 +5,15 @@
   "scripts": {
     "bootstrap:ubuntu": "bash ./scripts/bootstrap-ubuntu.sh",
     "dev": "tsx scripts/dev.ts",
-    "dev:api": "kill-port 5103 && pnpm --filter api dev",
-    "dev:web": "kill-port 5102 && pnpm --filter web dev",
+    "dev:api": "kill-port 6103 && pnpm --filter api dev",
+    "dev:web": "kill-port 6102 && pnpm --filter web dev",
     "build": "pnpm --filter api build && pnpm --filter web build",
     "test": "tsx scripts/test.ts",
     "test:api": "pnpm --filter api test",
     "test:web": "pnpm --filter web test",
     "test:scoring": "pnpm --filter api test:scoring",
     "verify:env": "bash ./scripts/verify-env.sh",
-    "start:all": "kill-port 5103 5102 && sleep 1 && echo '\\n[start:all] API → http://localhost:5103  |  WEB → http://localhost:5102\\n' && PORT=5103 pnpm --filter api start & PORT=5102 pnpm --filter web start & wait",
+    "start:all": "kill-port 6103 6102 && sleep 1 && echo '\\n[start:all] API → http://localhost:6103  |  WEB → http://localhost:6102\\n' && PORT=6103 pnpm --filter api start & PORT=6102 pnpm --filter web start & wait",
     "clean": "rm -rf apps/web/.nuxt apps/web/.output apps/web/node_modules/.vite apps/api/dist node_modules/.cache && echo 'Cleaned all caches'",
     "rebrand": "tsx scripts/rebrand.ts"
   },

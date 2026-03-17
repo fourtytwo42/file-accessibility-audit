@@ -182,11 +182,21 @@ router.get('/queue/counts', requireClientSession, (req: ClientSessionRequest, re
 
 router.get('/queue/status', requireClientSession, (req: ClientSessionRequest, res: Response) => {
   queueHousekeepingThrottled()
-  res.json({
-    items: listQueueStatusItems(req.clientId!),
-    counts: getQueueStatusCounts(req.clientId!),
-    generatedAt: nowIso(),
-  })
+  try {
+    const items = listQueueStatusItems(req.clientId!)
+    const counts = getQueueStatusCounts(req.clientId!)
+    res.json({
+      items,
+      counts,
+      generatedAt: nowIso(),
+    })
+  } catch (err) {
+    console.error('[queue/status] Failed to load queue:', err)
+    res.status(500).json({
+      error: 'Failed to load your PDF queue.',
+      ...(process.env.NODE_ENV !== 'production' && { details: err instanceof Error ? err.message : String(err) }),
+    })
+  }
 })
 
 router.get('/queue/selectable-ids', requireClientSession, (req: ClientSessionRequest, res: Response) => {

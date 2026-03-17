@@ -131,6 +131,52 @@ Run verification with API smoke test at the end:
 bash ./scripts/bootstrap-ubuntu.sh --smoke-api
 ```
 
+## Low-memory / small VM (unresponsive during processing)
+
+If the VM becomes slow or unresponsive while PDFs are processing, the main consumers are:
+
+- **veraPDF (Java)** — can use a lot of heap on large PDFs.
+- **Node (API)** — holds buffers and document state.
+- **Python (remediation)** — one subprocess per run, moderate memory.
+
+The following limits are already set or recommended:
+
+| Control | Where | Effect |
+|--------|--------|--------|
+| `JAVA_TOOL_OPTIONS=-Xmx768m` | `apps/api/.env` | Caps the Java heap used by veraPDF (e.g. 768 MB). Lower to `512m` if the VM has very little RAM. |
+| `--max-old-space-size=512` | API `start` / `dev` scripts | Caps Node’s heap (512 MB). |
+| `QUEUE_MAX_PARALLEL=1` | `apps/api/.env` | Only one PDF processed at a time; reduces peak memory and keeps the VM responsive (see [SSH tunnel](#ssh-tunnel-and-remote-access)). |
+
+After changing `.env`, restart the API. If the VM still struggles, try `JAVA_TOOL_OPTIONS=-Xmx512m` and ensure `QUEUE_MAX_PARALLEL=1`.
+
+## SSH tunnel and remote access
+
+When you run the app on a VM and access it via an SSH tunnel, heavy processing (veraPDF, Python remediation) can load the VM enough that the tunnel goes idle or the connection drops. You may see the tunnel repeatedly close and re-establish.
+
+**Keep the tunnel alive (on your local machine):**
+
+Use keepalives so the SSH client sends traffic regularly and the tunnel is not treated as idle:
+
+```bash
+ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=6 -L 6102:127.0.0.1:6102 -L 6103:127.0.0.1:6103 user@your-vm
+```
+
+- `ServerAliveInterval=30` — send a keepalive every 30 seconds
+- `ServerAliveCountMax=6` — allow several missed replies before disconnecting
+
+**Reduce load so the VM stays responsive:**
+
+Limit how many PDFs are processed at once so CPU/memory don’t starve SSH:
+
+In `apps/api/.env`:
+
+```bash
+# Process one PDF at a time (default is 5). Use when running over SSH on a small VM.
+QUEUE_MAX_PARALLEL=1
+```
+
+Restart the API after changing this. Processing will be slower but the tunnel should stay up.
+
 ## Troubleshooting
 
 ### Playwright Chromium did not launch
@@ -161,6 +207,11 @@ bash ./scripts/bootstrap-ubuntu.sh --smoke-api
 - Confirm `apt` succeeded
 - Check `qpdf --version`
 - Re-run the bootstrap if package installation was interrupted
+
+### SSH tunnel keeps closing during processing
+
+- Use keepalives when opening the tunnel: `-o ServerAliveInterval=30 -o ServerAliveCountMax=6` (see [SSH tunnel and remote access](#ssh-tunnel-and-remote-access)).
+- Set `QUEUE_MAX_PARALLEL=1` in `apps/api/.env` and restart the API so only one PDF is processed at a time; this reduces CPU/memory spikes that can make the VM unresponsive and drop the connection.
 
 ### Bootstrap rerun behavior
 

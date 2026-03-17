@@ -12,6 +12,7 @@ import type {
   ToolOpportunityStatus,
 } from './documentModel.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
+import { ALT_REMOVAL_MODES } from './altTextScoring.js'
 import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
 
 interface BuildFailureProfileInput {
@@ -79,7 +80,7 @@ const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
     key: 'pdfua.logical_structure',
     label: 'Logical structure and marked content',
     pattern: /content shall be marked as artifact|content is neither marked as artifact nor tagged as real content|logical structure|parenttree|marked content|structtree/i,
-    nativeToolFamilies: ['repair_native_marked_content_refs', 'repair_structure_conformance', 'repair_bootstrapped_chart_content_refs'],
+    nativeToolFamilies: ['repair_native_marked_content_refs', 'repair_structure_conformance', 'repair_bootstrapped_chart_content_refs', 'artifact_nonsemantic_page_elements'],
     categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
     classification: 'deterministic',
   },
@@ -120,6 +121,14 @@ const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
     label: 'Legacy Type1 or Type3 Unicode mapping',
     pattern: /could not derive a tounicode map for .*type1|type1|type3|encoding differences|custom encoding/i,
     nativeToolFamilies: ['repair_type1_font_unicode_maps'],
+    categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+    classification: 'deterministic',
+  },
+  {
+    key: 'pdfua.truetype_encoding_differences',
+    label: 'TrueType encoding Differences array compliance',
+    pattern: /non-symbolic truetype.*differences|differences array.*adobe glyph list|glyph names.*differences array|encoding.*winansicoding.*differences|differences.*unicode compliant.*false/i,
+    nativeToolFamilies: ['repair_truetype_encoding_differences'],
     categoryIds: ['text_extractability', 'pdf_ua_compliance'],
     classification: 'deterministic',
   },
@@ -281,6 +290,40 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     }
   }
 
+  if (input.analysis.adobe?.status === 'failed' && input.analysis.adobe.findings.length) {
+    const grouped = new Map<string, { label: string; count: number; evidence: string[]; categoryIds: string[] }>()
+    for (const finding of input.analysis.adobe.findings) {
+      if (finding.severity === 'info') continue
+      const key = `adobe.${finding.categoryId || 'general'}`
+      const current = grouped.get(key) || {
+        label: finding.categoryId ? `Adobe ${finding.categoryId.replace(/_/g, ' ')}` : 'Adobe accessibility findings',
+        count: 0,
+        evidence: [],
+        categoryIds: finding.categoryId ? [finding.categoryId] : ['pdf_ua_compliance'],
+      }
+      current.count += 1
+      current.evidence.push(finding.message)
+      grouped.set(key, current)
+    }
+    for (const [key, value] of grouped.entries()) {
+      const includesAlt = value.categoryIds.includes('alt_text')
+      mergeMode(modes, {
+        key,
+        label: value.label,
+        source: 'composite',
+        count: value.count,
+        categoryIds: value.categoryIds,
+        blocking: true,
+        unmatched: false,
+        classification: includesAlt ? 'semantic' : 'deterministic',
+        nativeToolFamilies: includesAlt
+          ? ['repair_other_elements_alt_text', 'repair_native_figure_semantics', 'adobe_auto_tag']
+          : ['adobe_auto_tag'],
+        evidence: value.evidence.slice(0, 3),
+      })
+    }
+  }
+
   const blockedHeadings = input.context.headingCandidates.filter(candidate => candidate.repairMode !== 'safe')
   if (blockedHeadings.length) {
     mergeMode(modes, {
@@ -314,30 +357,47 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   }
 
   const acrobatAltRiskNodes = input.context.structure.acrobatAltRiskNodes || []
-  if (acrobatAltRiskNodes.length) {
-    const hasDeterministicRepair = acrobatAltRiskNodes.some(node =>
+  // Determine unresolved alt risk nodes. The resolution semantics differ by mode:
+  // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved when /Alt IS present (needs removal)
+  // - all other modes: unresolved when /Alt is NOT present (needs addition)
+  const unresolvedAltRiskNodes = acrobatAltRiskNodes.filter(node =>
+    ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt
+  )
+  if (unresolvedAltRiskNodes.length) {
+    const hasDeterministicRepair = unresolvedAltRiskNodes.some(node =>
       node.ownershipMode === 'duplicate_mcid_ownership'
       || node.ownershipMode === 'container_with_graphics_descendants'
-      || node.ownershipMode === 'graphics_only_nonfigure'
-      || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe))
+      // split-safe: can rewrite content stream to separate text and graphics MCIDs
+      || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe)
+      // orphaned_alt_empty_element: remove /Alt from empty element with no content
+      || node.ownershipMode === 'orphaned_alt_empty_element'
+      // nonfigure_with_alt: remove /Alt from non-Figure element that has actual content
+      || node.ownershipMode === 'nonfigure_with_alt'
+      // untagged images: wraps Do operator in BDC/EMC and creates /Figure struct element
+      || node.ownershipMode === 'untagged_image_mcid'
+      || node.ownershipMode === 'untagged_image_direct');
     mergeMode(modes, {
       key: 'acrobat.other_elements_alt_text',
       label: 'Acrobat-style other-elements alternate text',
       source: 'context',
-      count: acrobatAltRiskNodes.length,
+      count: unresolvedAltRiskNodes.length,
       categoryIds: ['alt_text'],
       blocking: true,
       unmatched: false,
       classification: hasDeterministicRepair ? 'deterministic' : 'manual_only',
       nativeToolFamilies: hasDeterministicRepair ? ['repair_other_elements_alt_text'] : [],
-      evidence: acrobatAltRiskNodes.slice(0, 3).map(node =>
-        node.ownershipMode === 'mixed_text_graphics_same_mcid'
-          ? `${node.tag} mixes text and graphics in MCID ${node.mcids?.join(', ') || 'unknown'}${node.splitSafe ? ` (${node.operatorPattern || 'split-safe'})` : ''}.`
-          : node.ownershipMode === 'duplicate_mcid_ownership'
-            ? `${node.tag} shares MCID ownership with ${node.duplicateOwnerRefs?.join(', ') || 'another structure element'}.`
-            : node.ownershipMode === 'container_with_graphics_descendants'
-              ? `${node.tag} still directly owns graphics content while a child bridge exists.`
-              : `${node.tag} owns graphics content but is not tagged as /Figure.`),
+      evidence: unresolvedAltRiskNodes.slice(0, 3).map(node =>
+        node.ownershipMode === 'nonfigure_with_alt'
+          ? `${node.tag} has /Alt but is not a /Figure or /Formula — triggers "Other elements alternate text" in Adobe Acrobat.`
+          : node.ownershipMode === 'orphaned_alt_empty_element'
+            ? `${node.tag} has /Alt but no MCID content (empty element) — triggers "Associated with content" in Adobe Acrobat.`
+            : node.ownershipMode === 'mixed_text_graphics_same_mcid'
+              ? `${node.tag} mixes text and graphics in MCID ${node.mcids?.join(', ') || 'unknown'} (${node.operatorPattern || 'mixed'}, splitSafe=${node.splitSafe}).`
+              : node.ownershipMode === 'duplicate_mcid_ownership'
+                ? `${node.tag} shares MCID ownership with ${node.duplicateOwnerRefs?.join(', ') || 'another structure element'}.`
+                : node.ownershipMode === 'container_with_graphics_descendants'
+                  ? `${node.tag} still directly owns graphics content while a child bridge exists.`
+                  : `${node.tag} owns graphics content but is not tagged as /Figure.`),
     })
   }
 
@@ -508,18 +568,30 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     })
   }
 
-  const acrobatRiskNodes = input.context.structure.acrobatAltRiskNodes || []
+  // Only schedule repair for nodes that are still unresolved:
+  // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved when /Alt IS present (needs removal)
+  // - all other modes: unresolved when /Alt is NOT present (needs addition)
+  const acrobatRiskNodes = (input.context.structure.acrobatAltRiskNodes || []).filter(node =>
+    ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt
+  )
+  // Nodes that can be deterministically repaired
   const deterministicAcrobatRiskNodes = acrobatRiskNodes.filter(node =>
     node.ownershipMode === 'duplicate_mcid_ownership'
     || node.ownershipMode === 'container_with_graphics_descendants'
-    || node.ownershipMode === 'graphics_only_nonfigure'
-    || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe))
+    || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe)
+    // orphaned_alt_empty_element: remove /Alt from empty element (no content kids)
+    || node.ownershipMode === 'orphaned_alt_empty_element'
+    // nonfigure_with_alt: remove /Alt from non-Figure element with real content kids
+    || node.ownershipMode === 'nonfigure_with_alt'
+    // untagged images: wraps Do operator in BDC/EMC and creates /Figure struct element
+    || node.ownershipMode === 'untagged_image_mcid'
+    || node.ownershipMode === 'untagged_image_direct')
   if (acrobatRiskNodes.length) {
     addOpportunity(opportunities, {
       toolName: 'repair_other_elements_alt_text',
       reason: deterministicAcrobatRiskNodes.length
         ? 'Normalize non-figure graphics ownership so Acrobat no longer flags other-elements alternate text.'
-        : 'Remaining Acrobat-style alternate-text risk requires manual review because mixed text and graphics share the same marked-content block.',
+        : 'Remaining Acrobat-style alternate-text risk requires manual review.',
       scope: 'document',
       candidateIds: [],
       candidateGroupIds: [],
@@ -528,7 +600,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       confidence: deterministicAcrobatRiskNodes.length ? 0.9 : 0.35,
       blockedReason: deterministicAcrobatRiskNodes.length
         ? undefined
-        : 'Mixed text and graphics share the same marked-content block, so a safe deterministic split is not available.',
+        : 'Mixed text and graphics share the same marked-content block with no safe deterministic repair.',
       derivedFromFailureModeKeys: derivedFailureKeys(['acrobat.other_elements_alt_text']),
     })
   }
@@ -560,6 +632,46 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       confidence: 0.74,
       blockedReason: undefined,
       derivedFromFailureModeKeys: derivedFailureKeys(['category.reading_order']),
+    })
+  }
+
+  // Proactively add /Contents alt text to non-link annotations and set /Tabs /S on all
+  // annotated / tagged pages.  Adobe Acrobat's checker fires 'Tab order - Failed',
+  // 'Associated with content - Failed', and 'Other elements alternate text - Failed'
+  // for annotations that lack these properties even when veraPDF passes.
+  // Only schedule these when the document actually has annotations or is a tagged PDF —
+  // skipping them on plain image/text PDFs avoids an unnecessary structure-backend call.
+  const hasAnnotationsOrTagged = (input.context.qpdf.annotationCount ?? 0) > 0
+    || input.context.qpdf.isTagged
+    || input.context.qpdf.hasStructTree
+  if (hasAnnotationsOrTagged) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_annotation_alt_text',
+      reason: 'Ensure all non-link annotations have /Contents alt text and all annotated/tagged pages have /Tabs /S to satisfy Adobe Accessibility Checker requirements.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['alt_text', 'reading_order'],
+      confidence: 0.88,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: [],
+    })
+
+    // Final-pass tab-order fix: set /Tabs /S on every annotated page.
+    // Runs after all other tools so it catches any pages whose annotation arrays were
+    // created or modified during remediation and might still be missing /Tabs /S.
+    addOpportunity(opportunities, {
+      toolName: 'set_tabs_all_annotated_pages',
+      reason: 'Set /Tabs /S on all annotated/tagged pages as a final pass to satisfy Adobe Accessibility Checker tab-order requirement.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['reading_order'],
+      confidence: 0.95,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: [],
     })
   }
 

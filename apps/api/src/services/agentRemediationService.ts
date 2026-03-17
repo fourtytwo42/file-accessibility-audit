@@ -23,7 +23,7 @@ import {
   type RemediationInspectionCache,
 } from './pdfRemediationTools.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
-import { planRemediationActions } from './remediationPlanService.js'
+import { planRemediationActions, TOOL_STAGE_ORDER } from './remediationPlanService.js'
 import { generateSemanticRepairBatches, type SemanticBatchResult } from './semanticEnrichmentService.js'
 import { isOcrAvailable, ocrPdfToSearchablePdf } from './ocrService.js'
 
@@ -40,13 +40,15 @@ function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   }
 }
 
-const MAX_ITERATIONS = 5
 const NATIVE_TAGGED_RISKY_TOOLS = new Set<string>([
   'repair_structure_conformance',
   'repair_native_reading_order',
   'repair_native_figure_semantics',
   'repair_native_table_headers',
 ])
+
+/** Max number of grade-then-fix rounds. After each round we re-analyze and re-plan to catch regressions and new fixable issues. */
+const MAX_REMEDIATION_ROUNDS = 5
 
 function inferSourceType(originalResult: AnalysisResult): DocumentModel['sourceType'] {
   if (originalResult.isScanned) return 'flattened'
@@ -174,10 +176,6 @@ function unresolvedIssues(result: AnalysisResult): string[] {
     .map(category => category.label)
 }
 
-function hasRemainingDeterministicOpportunities(model: DocumentModel): boolean {
-  return (model.failureProfile?.toolOpportunities || []).some(opportunity => opportunity.status === 'auto_runnable')
-}
-
 function scoreForCategory(result: AnalysisResult, categoryId: string): number | null {
   const category = result.categories.find(entry => entry.id === categoryId)
   return typeof category?.score === 'number' ? category.score : null
@@ -231,16 +229,12 @@ function categoryRegression(previous: AnalysisResult, next: AnalysisResult, cate
   return before !== null && after !== null && after < before
 }
 
-function hasAnyCategoryRegression(previous: AnalysisResult, next: AnalysisResult): boolean {
-  return previous.categories.some(category => categoryRegression(previous, next, category.id))
-}
-
-function hasDeterministicIterationRegression(previous: AnalysisResult, next: AnalysisResult): boolean {
+function hasDeterministicRegression(previous: AnalysisResult, next: AnalysisResult): boolean {
   const previousFailed = previous.verapdf?.status === 'failed' ? previous.verapdf.failedChecks : 0
   const nextFailed = next.verapdf?.status === 'failed' ? next.verapdf.failedChecks : 0
   return next.overallScore < previous.overallScore
     || nextFailed > previousFailed
-    || hasAnyCategoryRegression(previous, next)
+    || previous.categories.some(category => categoryRegression(previous, next, category.id))
 }
 
 function standardsValidationImproved(previous: AnalysisResult, next: AnalysisResult): boolean {
@@ -293,49 +287,6 @@ function hasRemainingSemanticWork(result: AnalysisResult): boolean {
   })
 }
 
-type ContextRefreshPolicy = {
-  inspectMode: RemediationInspectMode
-  reuseQpdf: boolean
-  reusePdfjs: boolean
-  reusePages: boolean
-  batchSafe: boolean
-}
-
-const BATCH_SAFE_TOOLS = new Set([
-  'set_document_title',
-  'set_document_language',
-  'normalize_document_metadata',
-  'set_pdfua_identification',
-  'set_page_tabs',
-  'normalize_annotation_tab_order',
-  'set_link_annotation_contents',
-])
-
-const FIGURE_TOOLS = new Set([
-  'repair_other_elements_alt_text',
-  'set_figure_alt_text',
-  'retag_as_figure_and_set_alt',
-  'mark_figure_decorative',
-  'repair_native_figure_semantics',
-  'artifact_nonsemantic_page_elements',
-])
-
-const HEADING_TOOLS = new Set([
-  'create_heading_tag',
-  'create_heading_from_candidate',
-  'retag_node',
-])
-
-const FONT_TOOLS = new Set([
-  'embed_missing_fonts_in_place',
-  'repair_font_unicode_maps',
-  'repair_type1_font_unicode_maps',
-  'repair_cid_symbol_font_maps',
-  'repair_cidset_consistency',
-  'substitute_legacy_fonts_in_place',
-  'finalize_substituted_font_conformance',
-])
-
 function veraPdfNeedsAltTextAttention(result: AnalysisResult): boolean {
   return result.verapdf?.status === 'failed'
     && result.verapdf.failures.some(failure =>
@@ -344,83 +295,17 @@ function veraPdfNeedsAltTextAttention(result: AnalysisResult): boolean {
     )
 }
 
+function hasAcrobatAltRiskFindings(result: AnalysisResult): boolean {
+  const altTextCategory = result.categories.find(category => category.id === 'alt_text')
+  return (altTextCategory?.findings || []).some(finding =>
+    /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding),
+  )
+}
+
 function inspectModeForResult(result: AnalysisResult): RemediationInspectMode {
-  return needsAltTextDeepInspection(result) || veraPdfNeedsAltTextAttention(result)
+  return needsAltTextDeepInspection(result) || veraPdfNeedsAltTextAttention(result) || hasAcrobatAltRiskFindings(result)
     ? 'alt_text_deep'
     : 'light'
-}
-
-function refreshPolicyForTool(tool: string, currentResult: AnalysisResult): ContextRefreshPolicy {
-  if (FIGURE_TOOLS.has(tool)) {
-    return {
-      inspectMode: 'alt_text_deep',
-      reuseQpdf: true,
-      reusePdfjs: true,
-      reusePages: true,
-      batchSafe: false,
-    }
-  }
-
-  if (HEADING_TOOLS.has(tool)) {
-    return {
-      inspectMode: 'light',
-      reuseQpdf: true,
-      reusePdfjs: true,
-      reusePages: true,
-      batchSafe: false,
-    }
-  }
-
-  if (FONT_TOOLS.has(tool)) {
-    return {
-      inspectMode: 'light',
-      reuseQpdf: true,
-      reusePdfjs: true,
-      reusePages: true,
-      batchSafe: false,
-    }
-  }
-
-  if (BATCH_SAFE_TOOLS.has(tool)) {
-    return {
-      inspectMode: 'light',
-      reuseQpdf: ['set_document_title', 'set_document_language', 'normalize_document_metadata', 'set_pdfua_identification'].includes(tool) ? false : true,
-      reusePdfjs: ['set_document_title', 'set_document_language', 'normalize_document_metadata', 'set_pdfua_identification'].includes(tool) ? false : true,
-      reusePages: true,
-      batchSafe: true,
-    }
-  }
-
-  return {
-    inspectMode: inspectModeForResult(currentResult),
-    reuseQpdf: false,
-    reusePdfjs: false,
-    reusePages: false,
-    batchSafe: false,
-  }
-}
-
-async function refreshInspectionContext(input: {
-  buffer: Buffer
-  analysis: AnalysisResult
-  previousContext: PdfRemediationContext | null
-  policy: ContextRefreshPolicy
-  cache: RemediationInspectionCache
-}): Promise<PdfRemediationContext> {
-  const nextCache: RemediationInspectionCache = {
-    qpdf: input.policy.reuseQpdf ? (input.previousContext?.qpdf || input.cache.qpdf) : undefined,
-    pdfjs: input.policy.reusePdfjs ? (input.previousContext?.pdfjs || input.cache.pdfjs) : undefined,
-    pages: input.policy.reusePages ? (input.previousContext?.pages || input.cache.pages) : undefined,
-  }
-
-  const context = await inspectPdfForRemediation(input.buffer, input.analysis, {
-    inspectMode: input.policy.inspectMode,
-    cache: nextCache,
-  })
-  input.cache.qpdf = context.qpdf
-  input.cache.pdfjs = context.pdfjs
-  input.cache.pages = context.pages
-  return context
 }
 
 function shouldRunSemanticStage(result: AnalysisResult, originalResult: AnalysisResult): boolean {
@@ -691,7 +576,7 @@ async function runSemanticEnrichmentStage(input: {
       continue
     }
 
-    const analyzedBatch = await analyzePDF(batchBuffer, input.filename, { signal: input.signal })
+    const analyzedBatch = await analyzePDF(batchBuffer, input.filename, { signal: input.signal, skipAdobe: true })
     const targetedCategories = [...new Set(batchActions.flatMap(action => action.categoryTargets || []))]
     const hasCategoryRegression = targetedCategories.some(categoryId => categoryRegression(batchStartResult, analyzedBatch, categoryId))
     const hasVisibleRegression = batchActions.some(action =>
@@ -776,7 +661,6 @@ export async function remediatePdfWithAgent(
   const actions: RemediationActionRecord[] = []
   const rejectedActions: RemediationActionRecord[] = []
   let manualReviewFlags: ModelReviewFlag[] = []
-  let shouldStop = false
   let nativeTaggedSafeMode = false
   let latestContext: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null = null
   const inspectionCache: RemediationInspectionCache = {}
@@ -787,7 +671,7 @@ export async function remediatePdfWithAgent(
       signal: options?.signal,
       onProgress: options?.onProgress,
     })
-    const ocrResult = await analyzePDF(ocrBuffer, filename, { signal: options?.signal })
+    const ocrResult = await analyzePDF(ocrBuffer, filename, { signal: options?.signal, skipAdobe: true })
     const ocrAction: RemediationActionRecord = {
       tool: 'ocr_scanned_pdf',
       target: 'document',
@@ -814,160 +698,110 @@ export async function remediatePdfWithAgent(
     visibleContentChangePolicy = 'no_visible_changes'
   }
 
-  for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
-    if (options?.signal?.aborted) {
-      const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
-      error.aborted = true
-      throw error
+  if (options?.signal?.aborted) {
+    const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
+    error.aborted = true
+    throw error
+  }
+
+  // Single inspection pass
+  options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 20 })
+  let stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
+    inspectMode: inspectModeForResult(currentResult),
+    cache: inspectionCache,
+  })
+  inspectionCache.qpdf = stageContext.qpdf
+  inspectionCache.pdfjs = stageContext.pdfjs
+  inspectionCache.pages = stageContext.pages
+  latestContext = stageContext
+
+  nativeTaggedSafeMode = isNativeTaggedSafeContext(stageContext, currentResult)
+  currentTitle = stageContext.pdfjs.title || currentTitle
+  currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
+
+  // Grade-then-fix rounds: after each round we re-analyze and re-plan to catch regressions and new fixable issues.
+  type PlanResult = Awaited<ReturnType<typeof planRemediationActions>>
+  options?.onProgress?.({ stage: 'Planning remediation', percent: 32 })
+  let plan: PlanResult = await planRemediationActions({
+    filename,
+    analysis: currentResult,
+    context: stageContext,
+    iteration: 1,
+    actions,
+    rejectedActions,
+  })
+  const allExecutedActions: RemediationActionRecord[] = []
+  let round = 1
+
+  while (round <= MAX_REMEDIATION_ROUNDS) {
+    let orderedStages: [number, PlanResult['actions']][]
+    if (round === 1) {
+      const stageMap = new Map<number, PlanResult['actions']>()
+      for (const call of plan.actions) {
+        const stageNum = TOOL_STAGE_ORDER.get(call.tool_name as any) ?? 99
+        if (!stageMap.has(stageNum)) stageMap.set(stageNum, [])
+        stageMap.get(stageNum)!.push(call)
+      }
+      orderedStages = [...stageMap.entries()].sort(([a], [b]) => a - b)
+    } else {
+      options?.onProgress?.({ stage: `Re-analyzing and planning (round ${round})`, percent: 35 + (round - 1) * 10 })
+      stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
+        inspectMode: inspectModeForResult(currentResult),
+        cache: inspectionCache,
+      })
+      latestContext = stageContext
+      plan = await planRemediationActions({
+        filename,
+        analysis: currentResult,
+        context: stageContext,
+        iteration: round,
+        actions,
+        rejectedActions,
+      })
+      if (plan.actions.length === 0 || plan.done) break
+      const stageMap = new Map<number, PlanResult['actions']>()
+      for (const call of plan.actions) {
+        const stageNum = TOOL_STAGE_ORDER.get(call.tool_name as any) ?? 99
+        if (!stageMap.has(stageNum)) stageMap.set(stageNum, [])
+        stageMap.get(stageNum)!.push(call)
+      }
+      orderedStages = [...stageMap.entries()].sort(([a], [b]) => a - b)
     }
 
-    options?.onProgress?.({ stage: `Planning remediation iteration ${iteration}`, percent: 20 + ((iteration - 1) * 20) })
-    let context = await inspectPdfForRemediation(workingBuffer, currentResult, {
-      inspectMode: inspectModeForResult(currentResult),
-      cache: inspectionCache,
-    })
-    inspectionCache.qpdf = context.qpdf
-    inspectionCache.pdfjs = context.pdfjs
-    inspectionCache.pages = context.pages
-    latestContext = context
-    const bootstrapPreviouslyAttempted = previousActionNames.some(name => name.startsWith('bootstrap_struct_tree:'))
-    const iterationNativeTaggedSafeMode = isNativeTaggedSafeContext(context, currentResult) && !bootstrapPreviouslyAttempted
-    nativeTaggedSafeMode = nativeTaggedSafeMode || iterationNativeTaggedSafeMode
-    currentTitle = context.pdfjs.title || currentTitle
-    currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
-    const plan = await planRemediationActions({
-      filename,
-      analysis: currentResult,
-      context,
-      iteration,
-      actions,
-      rejectedActions,
-    })
-
-    const iterationStartBuffer = workingBuffer
-    const iterationStartResult = currentResult
-    const executedActions: RemediationActionRecord[] = []
-    let changedDocument = false
-    let improvedTargetedCategories = false
-    let improvedStandardsValidation = false
-    let analyzedDuringIteration = false
-
-    for (let actionIndex = 0; actionIndex < plan.actions.length; actionIndex++) {
-      const call = plan.actions[actionIndex]
+    let roundChangedDocument = false
+    for (const [stageNum, stageCalls] of orderedStages) {
       if (options?.signal?.aborted) {
         const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
         error.aborted = true
         throw error
       }
 
-      options?.onProgress?.({ stage: `Applying PDF fixes (iteration ${iteration})`, percent: 25 + ((iteration - 1) * 20) })
-      const policy = refreshPolicyForTool(call.tool_name, currentResult)
+      options?.onProgress?.({ stage: `Applying PDF fixes (stage ${stageNum})`, percent: 35 + stageNum * 5 })
+    const stageStartBuffer = workingBuffer
+    const stageStartResult = currentResult
+    const stageActions: RemediationActionRecord[] = []
+    let stageChangedDocument = false
+    let stageImprovedStandards = false
 
-      if (!iterationNativeTaggedSafeMode && policy.batchSafe) {
-        const batchStartBuffer = workingBuffer
-        const batchStartResult = currentResult
-        const batchStartGlobalActionIndex = actions.length
-        const batchCalls = [call]
-        while (actionIndex + 1 < plan.actions.length && refreshPolicyForTool(plan.actions[actionIndex + 1].tool_name, currentResult).batchSafe) {
-          batchCalls.push(plan.actions[actionIndex + 1])
-          actionIndex++
-        }
-
-        let batchChangedDocument = false
-        const batchStartActionIndex = executedActions.length
-        for (const batchedCall of batchCalls) {
-          const outcome = await executeRemediationTool({
-            buffer: workingBuffer,
-            context,
-            call: batchedCall,
-          })
-          workingBuffer = outcome.buffer
-          batchChangedDocument = batchChangedDocument || (!!outcome.action.changedDocumentBytes && outcome.action.outcome !== 'rejected')
-          executedActions.push(outcome.action)
-          actions.push(outcome.action)
-          manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
-        }
-
-        if (batchChangedDocument) {
-          const analyzedBatch = await analyzePDF(workingBuffer, filename, { signal: options?.signal })
-          analyzedDuringIteration = true
-          const batchImprovedStandards = standardsValidationImproved(batchStartResult, analyzedBatch)
-          let batchImprovedTargets = false
-          for (const action of executedActions.slice(batchStartActionIndex)) {
-            batchImprovedTargets = applyScoreDelta(action, batchStartResult, analyzedBatch) || batchImprovedTargets
-            if (!batchImprovedTargets && action.outcome === 'applied') {
-              action.outcome = 'no_effect'
-            }
-          }
-          if (!batchImprovedStandards && !batchImprovedTargets && hasDeterministicIterationRegression(batchStartResult, analyzedBatch)) {
-            for (let index = batchStartActionIndex; index < executedActions.length; index++) {
-              const rejected = rejectAction({
-                action: executedActions[index],
-                reason: 'regressed accessibility scores or standards outcomes without offsetting improvement',
-              })
-              executedActions[index] = rejected
-              actions[batchStartGlobalActionIndex + (index - batchStartActionIndex)] = rejected
-              rejectedActions.push(rejected)
-            }
-            manualReviewFlags = addFlag(manualReviewFlags, {
-              code: `batch_${iteration}_${batchStartActionIndex}_regressed`,
-              label: 'Regressive deterministic batch rejected',
-              severity: 'warning',
-              details: `Rejected a deterministic batch in iteration ${iteration} because it regressed accessibility scores or standards outcomes without offsetting improvement.`,
-            })
-            workingBuffer = batchStartBuffer
-            currentResult = batchStartResult
-            context = await inspectPdfForRemediation(workingBuffer, currentResult, {
-              inspectMode: inspectModeForResult(currentResult),
-              cache: inspectionCache,
-            })
-            latestContext = context
-            continue
-          }
-          changedDocument = true
-          currentResult = analyzedBatch
-          improvedStandardsValidation = improvedStandardsValidation || batchImprovedStandards
-          improvedTargetedCategories = improvedTargetedCategories || batchImprovedTargets
-          const batchPolicy = batchCalls.reduce<ContextRefreshPolicy>((current, candidate) => {
-            const nextPolicy = refreshPolicyForTool(candidate.tool_name, currentResult)
-            return {
-              inspectMode: current.inspectMode === 'alt_text_deep' || nextPolicy.inspectMode === 'alt_text_deep' ? 'alt_text_deep' : 'light',
-              reuseQpdf: current.reuseQpdf && nextPolicy.reuseQpdf,
-              reusePdfjs: current.reusePdfjs && nextPolicy.reusePdfjs,
-              reusePages: current.reusePages && nextPolicy.reusePages,
-              batchSafe: true,
-            }
-          }, policy)
-          context = await refreshInspectionContext({
-            buffer: workingBuffer,
-            analysis: currentResult,
-            previousContext: context,
-            policy: batchPolicy,
-            cache: inspectionCache,
-          })
-          latestContext = context
-          currentTitle = context.pdfjs.title || currentTitle
-          currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
-        }
-        continue
+    for (const call of stageCalls) {
+      if (options?.signal?.aborted) {
+        const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
+        error.aborted = true
+        throw error
       }
 
-      const previousResultForAction = currentResult
-      const previousBufferForAction = workingBuffer
-      const outcome = await executeRemediationTool({
-        buffer: workingBuffer,
-        context,
-        call,
-      })
+      const prevResult = currentResult
+      const prevBuffer = workingBuffer
+      const outcome = await executeRemediationTool({ buffer: workingBuffer, context: stageContext, call })
       let adoptedAction = outcome.action
       let adoptedBuffer = outcome.buffer
-      let adoptedResult = currentResult
 
-      if (iterationNativeTaggedSafeMode && outcome.action.changedDocumentBytes) {
-        const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal })
+      if (nativeTaggedSafeMode && outcome.action.changedDocumentBytes) {
+        // Per-action regression check in native-tagged-safe context
+        const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal, skipAdobe: true })
         const regressionReason =
-          hasNativeStandardsRegression(previousResultForAction, candidateResult, outcome.action.tool)
-          || shouldRejectNativeVisibleRewrite(previousResultForAction, candidateResult, outcome.action)
+          hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
+          || shouldRejectNativeVisibleRewrite(prevResult, candidateResult, outcome.action)
         if (regressionReason) {
           adoptedAction = {
             ...outcome.action,
@@ -983,211 +817,263 @@ export async function remediatePdfWithAgent(
             severity: 'warning',
             details: `Rejected ${outcome.action.tool} because it ${regressionReason}.`,
           })
-          adoptedBuffer = previousBufferForAction
-          adoptedResult = previousResultForAction
+          adoptedBuffer = prevBuffer
         } else {
-          adoptedResult = candidateResult
           if (outcome.action.categoryTargets?.length) {
             adoptedAction.scoreDelta = outcome.action.categoryTargets.map(categoryId => ({
               categoryId,
-              before: scoreForCategory(previousResultForAction, categoryId),
+              before: scoreForCategory(prevResult, categoryId),
               after: scoreForCategory(candidateResult, categoryId),
             }))
-            const improved = adoptedAction.scoreDelta.some(delta => (delta.after ?? -1) > (delta.before ?? -1))
-            improvedTargetedCategories = improvedTargetedCategories || improved
-            if (!improved && adoptedAction.outcome === 'applied') {
-              adoptedAction.outcome = 'no_effect'
-            }
+            const improved = adoptedAction.scoreDelta.some(d => (d.after ?? -1) > (d.before ?? -1))
+            if (!improved && adoptedAction.outcome === 'applied') adoptedAction.outcome = 'no_effect'
           }
-          improvedStandardsValidation = improvedStandardsValidation
-            || (candidateResult.verapdf?.status === 'failed'
-              && previousResultForAction.verapdf?.status === 'failed'
-              && candidateResult.verapdf.failedChecks < previousResultForAction.verapdf.failedChecks)
-            || (candidateResult.verapdf?.status === 'passed' && previousResultForAction.verapdf?.status !== 'passed')
-          workingBuffer = adoptedBuffer
-          currentResult = adoptedResult
-          changedDocument = changedDocument || (!!adoptedAction.changedDocumentBytes && adoptedAction.outcome !== 'rejected')
-          context = await refreshInspectionContext({
-            buffer: workingBuffer,
-            analysis: currentResult,
-            previousContext: context,
-            policy,
+          stageImprovedStandards = stageImprovedStandards || standardsValidationImproved(prevResult, candidateResult)
+          currentResult = candidateResult
+          stageChangedDocument = true
+          stageContext = await inspectPdfForRemediation(adoptedBuffer, currentResult, {
+            inspectMode: inspectModeForResult(currentResult),
             cache: inspectionCache,
           })
-          latestContext = context
-          currentTitle = context.pdfjs.title || currentTitle
-          currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
+          latestContext = stageContext
+          currentTitle = stageContext.pdfjs.title || currentTitle
+          currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
         }
-      } else {
-        workingBuffer = adoptedBuffer
-        if (adoptedAction.changedDocumentBytes) {
-          const candidateResult = await analyzePDF(adoptedBuffer, filename, { signal: options?.signal })
-          analyzedDuringIteration = true
-          const improvedTargets = applyScoreDelta(adoptedAction, previousResultForAction, candidateResult)
-          const improvedStandards = standardsValidationImproved(previousResultForAction, candidateResult)
-          if (
-            !improvedStandards
-            && !improvedTargets
-            && hasDeterministicIterationRegression(previousResultForAction, candidateResult)
-          ) {
-            adoptedAction = rejectAction({
-              action: adoptedAction,
-              reason: 'regressed accessibility scores or standards outcomes without offsetting improvement',
-            })
-            rejectedActions.push(adoptedAction)
-            workingBuffer = previousBufferForAction
-            currentResult = previousResultForAction
-          } else {
-            if (!improvedTargets && adoptedAction.outcome === 'applied') {
-              adoptedAction.outcome = 'no_effect'
-            }
-            changedDocument = true
-            currentResult = candidateResult
-            improvedTargetedCategories = improvedTargetedCategories || improvedTargets
-            improvedStandardsValidation = improvedStandardsValidation || improvedStandards
-            context = await refreshInspectionContext({
-              buffer: workingBuffer,
-              analysis: currentResult,
-              previousContext: context,
-              policy,
-              cache: inspectionCache,
-            })
-            latestContext = context
-            currentTitle = context.pdfjs.title || currentTitle
-            currentLanguage = context.qpdf.lang || context.pdfjs.lang || currentLanguage
-          }
-        }
+      } else if (outcome.action.changedDocumentBytes && outcome.action.outcome !== 'rejected') {
+        stageChangedDocument = true
       }
 
-      executedActions.push(adoptedAction)
+      workingBuffer = adoptedBuffer
+      stageActions.push(adoptedAction)
       actions.push(adoptedAction)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
     }
 
-    iterations.push({
-      iteration,
-      plannedActions: plan.actions,
-      executedActions,
-      changedDocument,
-    })
-
-    previousActionNames = Array.from(new Set([
-      ...previousActionNames,
-      ...executedActions.map(action => `${action.tool}:${action.candidateGroupId || action.candidateId || action.target}`),
-    ]))
-    if (changedDocument && !iterationNativeTaggedSafeMode && !analyzedDuringIteration) {
-      const previousResult = currentResult
-      options?.onProgress?.({ stage: `Re-analyzing remediated PDF (iteration ${iteration})`, percent: 35 + ((iteration - 1) * 20) })
-      currentResult = await analyzePDF(workingBuffer, filename, { signal: options?.signal })
-      improvedStandardsValidation = improvedStandardsValidation
-        || (currentResult.verapdf?.status === 'failed'
-          && previousResult.verapdf?.status === 'failed'
-          && currentResult.verapdf.failedChecks < previousResult.verapdf.failedChecks)
-        || (currentResult.verapdf?.status === 'passed' && previousResult.verapdf?.status !== 'passed')
-
-      for (const action of executedActions) {
-        const targets = action.categoryTargets || []
-        if (!targets.length) continue
-        action.scoreDelta = targets.map(categoryId => ({
-          categoryId,
-          before: scoreForCategory(previousResult, categoryId),
-          after: scoreForCategory(currentResult, categoryId),
-        }))
-        const improved = action.scoreDelta.some(delta => (delta.after ?? -1) > (delta.before ?? -1))
-        improvedTargetedCategories = improvedTargetedCategories || improved
-        if (!improved && action.outcome === 'applied') {
-          action.outcome = 'no_effect'
-        }
+    // Non-native mode: single analysis per stage (instead of per action)
+    if (!nativeTaggedSafeMode && stageChangedDocument) {
+      const analyzedStage = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+      // repair_other_elements_alt_text fixes Adobe Acrobat issues not reflected in our score model
+      const isAcrobatAltRepair = stageActions.some(
+        a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied',
+      )
+      stageImprovedStandards = standardsValidationImproved(stageStartResult, analyzedStage)
+      let stageImprovedTargets = false
+      for (const action of stageActions) {
+        stageImprovedTargets = applyScoreDelta(action, stageStartResult, analyzedStage) || stageImprovedTargets
+        if (!stageImprovedTargets && action.outcome === 'applied') action.outcome = 'no_effect'
       }
 
-      if (!improvedStandardsValidation && hasDeterministicIterationRegression(previousResult, currentResult)) {
-        workingBuffer = iterationStartBuffer
-        currentResult = iterationStartResult
-        changedDocument = false
-        improvedTargetedCategories = false
-        for (let actionIndex = 0; actionIndex < executedActions.length; actionIndex++) {
-          const action = executedActions[actionIndex]
+      if (!isAcrobatAltRepair && !stageImprovedStandards && !stageImprovedTargets
+        && hasDeterministicRegression(stageStartResult, analyzedStage)) {
+        // Rollback entire stage
+        for (const action of stageActions) {
           if (action.changedDocumentBytes || action.outcome === 'no_effect') {
             const rejected = {
               ...action,
-              details: `${action.details} Rejected because the iteration regressed accessibility scores or standards outcomes without offsetting improvement.`,
+              details: `${action.details} Rejected because the stage regressed accessibility scores or standards outcomes without offsetting improvement.`,
               outcome: 'rejected' as const,
               autoApplied: false,
               changedDocumentBytes: false,
             }
-            const index = actions.indexOf(action)
-            if (index >= 0) actions[index] = rejected
-            executedActions[actionIndex] = rejected
+            const idx = actions.indexOf(action)
+            if (idx >= 0) actions[idx] = rejected
             rejectedActions.push(rejected)
           }
         }
-        latestContext = null
-        context = await inspectPdfForRemediation(workingBuffer, currentResult, {
-          inspectMode: inspectModeForResult(currentResult),
-          cache: inspectionCache,
-        })
-        latestContext = context
         manualReviewFlags = addFlag(manualReviewFlags, {
-          code: `iteration_${iteration}_regressed`,
-          label: 'Regressive iteration rejected',
+          code: `stage_${stageNum}_regressed`,
+          label: 'Regressive stage rejected',
           severity: 'warning',
-          details: `Rejected remediation iteration ${iteration} because it regressed accessibility scores or standards outcomes without offsetting improvement.`,
+          details: `Rejected remediation stage ${stageNum} because it regressed accessibility scores or standards outcomes without offsetting improvement.`,
         })
+        workingBuffer = stageStartBuffer
+        currentResult = stageStartResult
+      } else {
+        currentResult = analyzedStage
       }
+      stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
+        inspectMode: inspectModeForResult(currentResult),
+        cache: inspectionCache,
+      })
+      latestContext = stageContext
+      currentTitle = stageContext.pdfjs.title || currentTitle
+      currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
     }
 
-    const profileArtifacts = buildFailureProfileArtifacts({
-      analysis: currentResult,
-      context,
-      actions,
-      rejectedActions,
-      iterations,
-    })
+    allExecutedActions.push(...stageActions)
+    previousActionNames = Array.from(new Set([
+      ...previousActionNames,
+      ...stageActions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+    ]))
+    if (stageChangedDocument) roundChangedDocument = true
 
-    const model: DocumentModel = {
-      version: '6',
-      processingPath: 'agent_patch',
-      pathFallbacks,
-      title: currentTitle,
-      language: context.qpdf.lang || context.pdfjs.lang || currentLanguage,
-      sourceType: inferSourceType(originalResult),
-      confidenceSummary: confidenceSummary(actions),
-      iterations: [...iterations],
-      actions: [...actions],
-      rejectedActions: [...rejectedActions],
-      nativeTaggedSafeMode,
-      visibleContentChangePolicy,
-      originalVeraPdf: summarizeVeraPdf(originalResult),
-      remediatedVeraPdf: summarizeVeraPdf(currentResult),
-      failureProfile: profileArtifacts.failureProfile,
-      plannerEvidence: profileArtifacts.plannerEvidence,
-      finalAudit: {
-        overallScore: currentResult.overallScore,
-        grade: currentResult.grade,
-        unresolvedIssues: unresolvedIssues(currentResult),
-        veraPdf: summarizeVeraPdf(currentResult),
-      },
-      manualReviewFlags: collectCategoryFlags(currentResult, manualReviewFlags),
-      aiAppliedChanges: actions.map(toAppliedChange).filter(Boolean) as AppliedChange[],
-      aiSuggestedChanges: actions.map(toSuggestedChange).filter(Boolean) as SuggestedChange[],
-    }
-
-    await options?.onCheckpoint?.(model)
-
-    if (isFullyDone(currentResult) && !hasRemainingDeterministicOpportunities(model)) {
-      manualReviewFlags = model.manualReviewFlags
-      break
-    }
-
-    if (changedDocument && !improvedTargetedCategories && !improvedStandardsValidation) {
-      shouldStop = !hasRemainingDeterministicOpportunities(model)
-    }
-
-    if (plan.done || !plan.actions.length || !changedDocument || shouldStop) {
-      manualReviewFlags = model.manualReviewFlags
-      break
+    if (stageChangedDocument) {
+      const checkpointModel: DocumentModel = {
+        version: '6',
+        processingPath: 'agent_patch',
+        pathFallbacks,
+        title: currentTitle,
+        language: currentLanguage,
+        sourceType: inferSourceType(originalResult),
+        confidenceSummary: confidenceSummary(actions),
+        iterations: [],
+        actions: [...actions],
+        rejectedActions: [...rejectedActions],
+        nativeTaggedSafeMode,
+        visibleContentChangePolicy,
+        originalVeraPdf: summarizeVeraPdf(originalResult),
+        remediatedVeraPdf: summarizeVeraPdf(currentResult),
+        failureProfile: plan.failureProfile,
+        plannerEvidence: plan.plannerEvidence,
+        finalAudit: {
+          overallScore: currentResult.overallScore,
+          grade: currentResult.grade,
+          unresolvedIssues: unresolvedIssues(currentResult),
+        },
+        manualReviewFlags: collectCategoryFlags(currentResult, manualReviewFlags),
+        aiAppliedChanges: actions.map(toAppliedChange).filter(Boolean) as AppliedChange[],
+        aiSuggestedChanges: actions.map(toSuggestedChange).filter(Boolean) as SuggestedChange[],
+      }
+      await options?.onCheckpoint?.(checkpointModel)
     }
   }
+
+    const bootstrapWasApplied = actions.some(a => a.tool === 'bootstrap_struct_tree' && a.outcome === 'applied')
+    const altTextStillBroken = (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
+    const altRepairAlreadyApplied = actions.some(a => a.tool === 'repair_other_elements_alt_text' && (a.outcome === 'applied' || a.outcome === 'no_effect'))
+    if (round > 1 && !roundChangedDocument) break
+    // Post-bootstrap second pass (round 1 only): when bootstrap created a struct tree, re-inspect for alt risks and run stages 5+.
+    if (round === 1 && bootstrapWasApplied && altTextStillBroken && !altRepairAlreadyApplied) {
+    if (options?.signal?.aborted) {
+      const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
+      error.aborted = true
+      throw error
+    }
+    options?.onProgress?.({ stage: 'Post-bootstrap alt-text inspection', percent: 73 })
+    stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
+      inspectMode: 'alt_text_deep',
+      cache: inspectionCache,
+    })
+    latestContext = stageContext
+    inspectionCache.qpdf = stageContext.qpdf
+    inspectionCache.pdfjs = stageContext.pdfjs
+    inspectionCache.pages = stageContext.pages
+
+    const postBootstrapPlan = await planRemediationActions({
+      filename,
+      analysis: currentResult,
+      context: stageContext,
+      iteration: 2,
+      actions,
+      rejectedActions,
+    })
+
+    // Only execute stages 5+ (alt text, figures, semantic fixes)
+    const postBootstrapStageMap = new Map<number, typeof postBootstrapPlan.actions>()
+    for (const call of postBootstrapPlan.actions) {
+      const stageNum = TOOL_STAGE_ORDER.get(call.tool_name as any) ?? 99
+      if (stageNum < 5) continue // skip already-run stages
+      if (!postBootstrapStageMap.has(stageNum)) postBootstrapStageMap.set(stageNum, [])
+      postBootstrapStageMap.get(stageNum)!.push(call)
+    }
+    const postBootstrapStages = [...postBootstrapStageMap.entries()].sort(([a], [b]) => a - b)
+
+    for (const [stageNum, stageCalls] of postBootstrapStages) {
+      if (options?.signal?.aborted) {
+        const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
+        error.aborted = true
+        throw error
+      }
+      options?.onProgress?.({ stage: `Post-bootstrap fixes (stage ${stageNum})`, percent: 75 + stageNum })
+      const stageStartBuffer = workingBuffer
+      const stageStartResult = currentResult
+      const stageActions: RemediationActionRecord[] = []
+      let stageChangedDocument = false
+
+      for (const call of stageCalls) {
+        const prevResult = currentResult
+        const prevBuffer = workingBuffer
+        const outcome = await executeRemediationTool({ buffer: workingBuffer, context: stageContext, call })
+        let adoptedAction = outcome.action
+        let adoptedBuffer = outcome.buffer
+
+        if (nativeTaggedSafeMode && outcome.action.changedDocumentBytes) {
+          const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal, skipAdobe: true })
+          const regressionReason =
+            hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
+            || shouldRejectNativeVisibleRewrite(prevResult, candidateResult, outcome.action)
+          if (regressionReason) {
+            adoptedAction = { ...outcome.action, details: `${outcome.action.details} Rejected because it ${regressionReason}.`, outcome: 'rejected', autoApplied: false, changedDocumentBytes: false }
+            rejectedActions.push(adoptedAction)
+            adoptedBuffer = prevBuffer
+          } else {
+            if (outcome.action.categoryTargets?.length) {
+              adoptedAction.scoreDelta = outcome.action.categoryTargets.map(categoryId => ({
+                categoryId,
+                before: scoreForCategory(prevResult, categoryId),
+                after: scoreForCategory(candidateResult, categoryId),
+              }))
+              if (!adoptedAction.scoreDelta.some(d => (d.after ?? -1) > (d.before ?? -1)) && adoptedAction.outcome === 'applied') adoptedAction.outcome = 'no_effect'
+            }
+            currentResult = candidateResult
+            stageChangedDocument = true
+            stageContext = await inspectPdfForRemediation(adoptedBuffer, currentResult, { inspectMode: inspectModeForResult(currentResult), cache: inspectionCache })
+            latestContext = stageContext
+          }
+        } else if (outcome.action.changedDocumentBytes && outcome.action.outcome !== 'rejected') {
+          stageChangedDocument = true
+        }
+
+        workingBuffer = adoptedBuffer
+        stageActions.push(adoptedAction)
+        actions.push(adoptedAction)
+        allExecutedActions.push(adoptedAction)
+        manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+      }
+
+      if (!nativeTaggedSafeMode && stageChangedDocument) {
+        const analyzedStage = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+        const isAcrobatAltRepair = stageActions.some(a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied')
+        const stageImprovedStandards = standardsValidationImproved(stageStartResult, analyzedStage)
+        let stageImprovedTargets = false
+        for (const action of stageActions) {
+          stageImprovedTargets = applyScoreDelta(action, stageStartResult, analyzedStage) || stageImprovedTargets
+          if (!stageImprovedTargets && action.outcome === 'applied') action.outcome = 'no_effect'
+        }
+        if (!isAcrobatAltRepair && !stageImprovedStandards && !stageImprovedTargets && hasDeterministicRegression(stageStartResult, analyzedStage)) {
+          for (const action of stageActions) {
+            if (action.changedDocumentBytes || action.outcome === 'no_effect') {
+              const rejected = { ...action, details: `${action.details} Rejected (post-bootstrap stage ${stageNum} regressed).`, outcome: 'rejected' as const, autoApplied: false, changedDocumentBytes: false }
+              const idx = actions.indexOf(action)
+              if (idx >= 0) actions[idx] = rejected
+              rejectedActions.push(rejected)
+            }
+          }
+          workingBuffer = stageStartBuffer
+          currentResult = stageStartResult
+        } else {
+          currentResult = analyzedStage
+        }
+        stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, { inspectMode: inspectModeForResult(currentResult), cache: inspectionCache })
+        latestContext = stageContext
+      }
+
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...stageActions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ]))
+    }
+    }
+    round++
+  }
+
+  // Record as a single iteration for model compatibility
+  iterations.push({
+    iteration: 1,
+    plannedActions: plan.actions,
+    executedActions: allExecutedActions,
+    changedDocument: !workingBuffer.equals(originalBuffer),
+  })
 
   let semanticStageChangedDocument = false
   if (shouldRunSemanticStage(currentResult, originalResult)) {

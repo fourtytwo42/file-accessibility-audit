@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import db from '../db/sqlite.js'
 import { BATCH_QUEUE } from '#config'
 import type {
+  AdobeSummary,
   AppliedChange,
   ConfidenceSummary,
   DocumentModel,
@@ -78,6 +79,9 @@ export interface QueueItemRecord {
   ai_applied_changes_json: string | null
   ai_suggested_changes_json: string | null
   confidence_summary_json: string | null
+  adobe_summary_json: string | null
+  original_adobe_summary_json: string | null
+  rebuilt_adobe_summary_json: string | null
   created_at: string
   updated_at: string
   upload_started_at: string | null
@@ -191,6 +195,12 @@ export interface QueueVeraPdfCompactSummary {
   failedChecks: number | null
 }
 
+export interface QueueAdobeCompactSummary {
+  status: AdobeSummary['status'] | null
+  issueCount: number | null
+  summary: string | null
+}
+
 export interface QueuePlannerOverview {
   autoRunnableOpportunityCount: number
   blockedOpportunityCount: number
@@ -202,6 +212,7 @@ export interface QueuePlannerOverview {
 export interface QueueItemStandardsSummary {
   gradeBasis: QueueGradeBasisSummary
   veraPdf: QueueVeraPdfCompactSummary
+  adobe?: QueueAdobeCompactSummary
   failureOverview: {
     topFailureModes: QueueFailureModeSummary[]
   }
@@ -232,6 +243,11 @@ export interface QueueItemStandardsDetail {
     current: QueueVeraPdfDetailSummary
     original: QueueVeraPdfDetailSummary
     rebuilt: QueueVeraPdfDetailSummary
+  }
+  adobe?: {
+    current: AdobeSummary | null
+    original: AdobeSummary | null
+    rebuilt: AdobeSummary | null
   }
   failureModes: FailureMode[]
   plannerEvidence: PlannerEvidenceSummary | null
@@ -423,6 +439,20 @@ function detailSummaryFromModel(candidate: VeraPdfSummary | null | undefined): Q
   }
 }
 
+function extractAdobeSummary(candidate: any): AdobeSummary | null {
+  const adobe = candidate?.adobe
+  if (!adobe || typeof adobe !== 'object') return null
+  return {
+    status: typeof adobe.status === 'string' ? adobe.status as AdobeSummary['status'] : 'error',
+    summary: typeof adobe.summary === 'string' ? adobe.summary : 'Adobe summary unavailable.',
+    passed: typeof adobe.passed === 'boolean' ? adobe.passed : null,
+    issueCount: typeof adobe.issueCount === 'number' ? adobe.issueCount : 0,
+    findings: Array.isArray(adobe.findings) ? adobe.findings : [],
+    warnings: Array.isArray(adobe.warnings) ? adobe.warnings : [],
+    artifacts: adobe.artifacts && typeof adobe.artifacts === 'object' ? adobe.artifacts : null,
+  }
+}
+
 function compactFailureModes(failureModes: FailureMode[] | null | undefined, limit: number): QueueFailureModeSummary[] {
   if (!failureModes?.length) return []
   return [...failureModes]
@@ -492,6 +522,7 @@ function synthesizeSummaryText(input: {
 function buildStandardsSummary(row: QueueItemRecord): QueueItemStandardsSummary {
   const result = parseResult(row.result_json)
   const veraPdf = extractVeraPdfSummary(result)
+  const adobe = parseJson<AdobeSummary | null>(row.adobe_summary_json, extractAdobeSummary(result))
   return {
     gradeBasis: {
       currentGrade: row.grade,
@@ -503,6 +534,11 @@ function buildStandardsSummary(row: QueueItemRecord): QueueItemStandardsSummary 
       status: veraPdf.status,
       failedChecks: veraPdf.failedChecks,
     },
+    adobe: adobe ? {
+      status: adobe.status,
+      issueCount: adobe.issueCount,
+      summary: adobe.summary,
+    } : undefined,
     failureOverview: {
       topFailureModes: [],
     },
@@ -531,6 +567,9 @@ function buildStandardsDetail(row: QueueItemRecord, documentModel: DocumentModel
     : extractVeraPdfSummary(rebuiltResult)
   const topFailureModes = compactFailureModes(documentModel?.failureProfile?.failureModes, 1)
   const overview = plannerOverviewFromModel(documentModel)
+  const currentAdobe = parseJson<AdobeSummary | null>(row.adobe_summary_json, documentModel?.finalAudit?.adobe || extractAdobeSummary(currentResult))
+  const originalAdobe = parseJson<AdobeSummary | null>(row.original_adobe_summary_json, documentModel?.originalAdobe || extractAdobeSummary(originalResult))
+  const rebuiltAdobe = parseJson<AdobeSummary | null>(row.rebuilt_adobe_summary_json, documentModel?.remediatedAdobe || extractAdobeSummary(rebuiltResult))
 
   return {
     gradeBasis: {
@@ -555,6 +594,11 @@ function buildStandardsDetail(row: QueueItemRecord, documentModel: DocumentModel
       current: currentVeraPdf,
       original: originalVeraPdf,
       rebuilt: rebuiltVeraPdf,
+    },
+    adobe: {
+      current: currentAdobe,
+      original: originalAdobe,
+      rebuilt: rebuiltAdobe,
     },
     failureModes: documentModel?.failureProfile?.failureModes || [],
     plannerEvidence: documentModel?.plannerEvidence || null,
@@ -600,16 +644,16 @@ export function serializeQueueItemSummary(row: QueueItemRecord): QueueItemSummar
     clientId: row.client_id,
     filename: row.filename,
     md5: row.md5,
-    sizeBytes: row.size_bytes,
+    sizeBytes: row.size_bytes ?? 0,
     mimeType: row.mime_type,
     state: row.state,
-    uploadProgress: row.upload_progress,
-    processingProgress: row.processing_progress,
+    uploadProgress: row.upload_progress ?? 0,
+    processingProgress: row.processing_progress ?? 0,
     processingStage: row.processing_stage,
-    processingPath: (row.processing_path as 'ai_html' | 'agent_patch') || 'agent_patch',
+    processingPath: (row.processing_path === 'ai_html' || row.processing_path === 'agent_patch' ? row.processing_path : 'agent_patch'),
     pathFallbacks: parsePublicPathFallbacks(row.path_fallbacks_json),
-    reconstructionStatus: row.remediation_status,
-    documentModelStatus: row.document_model_status,
+    reconstructionStatus: row.remediation_status ?? 'pending',
+    documentModelStatus: row.document_model_status ?? 'pending',
     pageCount: row.page_count,
     overallScore: row.overall_score,
     grade: row.grade,
@@ -835,6 +879,9 @@ export function updateQueueItem(id: string, patch: Partial<QueueItemRecord>): Qu
       ai_applied_changes_json = ?,
       ai_suggested_changes_json = ?,
       confidence_summary_json = ?,
+      adobe_summary_json = ?,
+      original_adobe_summary_json = ?,
+      rebuilt_adobe_summary_json = ?,
       updated_at = ?,
       upload_started_at = ?,
       upload_completed_at = ?,
@@ -887,6 +934,9 @@ export function updateQueueItem(id: string, patch: Partial<QueueItemRecord>): Qu
     next.ai_applied_changes_json,
     next.ai_suggested_changes_json,
     next.confidence_summary_json,
+    next.adobe_summary_json,
+    next.original_adobe_summary_json,
+    next.rebuilt_adobe_summary_json,
     next.updated_at,
     next.upload_started_at,
     next.upload_completed_at,

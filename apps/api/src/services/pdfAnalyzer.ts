@@ -3,7 +3,12 @@ import { analyzeWithPdfjs, PdfMetadata } from './pdfjsService.js'
 import { scoreDocument, ScoringResult, summarizeLinkTextQuality } from './scorer.js'
 import { analyzeWithVeraPdf, type VeraPdfResult } from './veraPdfService.js'
 import { runPdfStructureBackend } from './pdfStructureBackend.js'
-import { ANALYSIS } from '#config'
+import { runAdobeAccessibilityCheck } from './adobePdfServices.js'
+import type { AdobeSummary } from './documentModel.js'
+import { analyzeReadingOrder, type ReadingOrderResult } from './readingOrderService.js'
+import { analyzeColorContrast, type ColorContrastResult } from './colorContrastService.js'
+import { analyzeTableStructure, type TableStructureResult } from './tableStructureService.js'
+import { ANALYSIS, REMEDIATION } from '#config'
 
 // Simple semaphore for concurrency limiting
 let activeAnalyses = 0
@@ -34,6 +39,7 @@ export interface AnalysisResult extends ScoringResult {
   fileType: 'pdf'
   pdfMetadata: PdfMetadata
   verapdf: VeraPdfResult
+  adobe?: AdobeSummary | null
   routingSignals: {
     headingCount: number
     linkCount: number
@@ -48,15 +54,24 @@ export async function analyzePDF(
   options?: {
     signal?: AbortSignal
     onProgress?: (progress: { stage: string; percent: number }) => void
+    artifactsDir?: string
+    skipAdobe?: boolean
   },
 ): Promise<AnalysisResult> {
   await acquireSemaphore()
 
   try {
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
-    const [qpdfResult, veraPdfResult] = await Promise.all([
+    const [qpdfResult, veraPdfResult, adobeResult] = await Promise.all([
       analyzeWithQpdf(buffer, { signal: options?.signal }),
       analyzeWithVeraPdf(buffer, { signal: options?.signal }),
+      (options?.skipAdobe || !REMEDIATION.ENABLE_ADOBE_API)
+        ? Promise.resolve(null)
+        : runAdobeAccessibilityCheck({
+            buffer,
+            filename,
+            artifactsDir: options?.artifactsDir,
+          }),
     ])
 
     if (options?.signal?.aborted) {
@@ -88,9 +103,31 @@ export async function analyzePDF(
         })
       : null
 
+    // Run new accessibility detection modules in parallel
+    const [readingOrderResult, colorContrastResult, tableStructureResult] = await Promise.all([
+      analyzeReadingOrder(buffer, { signal: options?.signal }),
+      analyzeColorContrast(buffer, { signal: options?.signal }),
+      analyzeTableStructure(buffer, qpdfResult.tables?.length ?? 0, { signal: options?.signal }),
+    ])
+
     // Score the document
     options?.onProgress?.({ stage: 'Scoring accessibility findings', percent: 92 })
-    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult, structureForScoring)
+    const adobeSummary: AdobeSummary | null = adobeResult
+      ? {
+          status: adobeResult.status,
+          summary: adobeResult.summary,
+          passed: adobeResult.passed,
+          issueCount: adobeResult.issueCount,
+          findings: adobeResult.findings,
+          warnings: adobeResult.warnings,
+          artifacts: adobeResult.artifacts ?? null,
+        }
+      : null
+    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult, structureForScoring, adobeSummary, {
+      readingOrder: readingOrderResult,
+      colorContrast: colorContrastResult,
+      tableStructure: tableStructureResult,
+    })
     options?.onProgress?.({ stage: 'Finalizing report', percent: 100 })
 
     return {
@@ -98,6 +135,7 @@ export async function analyzePDF(
       pageCount: pdfjsResult.pageCount,
       fileType: 'pdf',
       pdfMetadata: pdfjsResult.metadata,
+      adobe: adobeSummary,
       routingSignals: {
         headingCount: qpdfResult.headings.length,
         linkCount: linkSummary.linkCount,

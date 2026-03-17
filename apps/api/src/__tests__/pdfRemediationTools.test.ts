@@ -174,7 +174,36 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     })
 
     expect(result.status).toBe('applied')
-    expect(result.headings.map(heading => heading.tag)).toEqual(['/H1', '/H2'])
+    expect(result.outputBuffer).toBeDefined()
+    const reInspect = await runPdfStructureBackend({
+      buffer: result.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    expect(reInspect.headings.map(heading => heading.tag)).toEqual(['/H1', '/H2'])
+  }, 60_000)
+
+  it('bootstrap_struct_tree does not leave non-figure alt-text risks on headings', async () => {
+    const buffer = await makePdf()
+
+    const result = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section one', level: 'H2', pageNumber: 1 },
+          { text: 'Section two', level: 'H4', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(result.outputBuffer).toBeDefined()
+    const inspect = await runPdfStructureBackend({
+      buffer: result.outputBuffer!,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+
+    expect((inspect.acrobatAltRiskNodes || []).filter(node => node.ownershipMode === 'nonfigure_with_alt')).toEqual([])
   }, 60_000)
 
   it('splits mixed heading/logo MCIDs on the one-page chart fixture so Acrobat-risk nodes clear', async () => {
@@ -194,6 +223,18 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         }),
       ]),
     )
+    expect((inspect.structure.figures || []).filter(figure => figure.splitGenerated)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          tag: '/Figure',
+          splitGenerated: true,
+          splitSourceTag: expect.any(String),
+        }),
+      ]),
+    )
+    expect((inspect.structure.figures || []).every(figure =>
+      !figure.splitGenerated || !/image related to/i.test(figure.altText || '')
+    )).toBe(true)
   }, 600_000)
 
   it('clears multi-page Acrobat-risk section ownership on the strategy fixture', async () => {
@@ -206,6 +247,27 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(remediated.finalResult.verapdf.status).toBe('passed')
     expect((remediated.model.actions || []).some(action => action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied')).toBe(true)
     expect(inspect.structure.acrobatAltRiskNodes || []).toEqual([])
+    expect((inspect.structure.figures || []).every(figure =>
+      !figure.splitGenerated || !/image related to/i.test(figure.altText || '')
+    )).toBe(true)
+  }, 600_000)
+
+  it('does not assign heading-derived alt text to split-generated figures on 99anreport', async () => {
+    const buffer = await loadDownloadFixture('99anreport.pdf')
+    const analysis = await analyzePDF(buffer, '99anreport.pdf')
+    const remediated = await remediatePdfWithAgent(buffer, '99anreport.pdf', analysis)
+    const inspect = await inspectPdfForRemediation(remediated.buffer, remediated.finalResult, { inspectMode: 'alt_text_deep' })
+
+    expect(remediated.finalResult.grade).toBe('A')
+    expect(remediated.finalResult.verapdf.status).toBe('passed')
+    expect(inspect.structure.acrobatAltRiskNodes || []).toEqual([])
+
+    const splitFigures = (inspect.structure.figures || []).filter(figure => figure.splitGenerated)
+    expect(splitFigures.length).toBeGreaterThan(0)
+    expect(splitFigures.every(figure =>
+      !/image related to/i.test(figure.altText || '')
+      && !/^sect$/i.test((figure.altText || '').trim())
+    )).toBe(true)
   }, 600_000)
 
   it('routes Acrobat-risk alternate-text repairs through the structure backend', async () => {
@@ -294,6 +356,50 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.outcome).toBe('applied')
     expect(next.verapdf.failures.some(failure => /Heading level 1 is skipped/i.test(failure.message))).toBe(false)
     expect(next.categories.find(category => category.id === 'heading_structure')?.findings).toContain('Heading outline: H1')
+  }, 90_000)
+
+  it('create_heading_from_candidate does not introduce non-figure alt-text risks', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect' },
+    })
+    const headingRefs = inspect.headings.map(heading => heading.ref)
+    const degraded = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: headingRefs,
+        targetTag: 'P',
+      },
+    })
+    const degradedBuffer = degraded.outputBuffer!
+    const analysis = await analyzePDF(degradedBuffer, 'accessible.pdf')
+    const context = await inspectPdfForRemediation(degradedBuffer, analysis)
+    const candidate = context.headingCandidates.find(entry => entry.repairMode === 'safe')
+
+    expect(candidate).toBeTruthy()
+
+    const result = await executeRemediationTool({
+      buffer: degradedBuffer,
+      context,
+      call: {
+        tool_name: 'create_heading_from_candidate',
+        arguments: {
+          candidateId: candidate!.id,
+          level: 'H2',
+        },
+        rationale: 'Create the first heading tag.',
+        confidence: 0.9,
+      },
+    })
+
+    const deepInspect = await runPdfStructureBackend({
+      buffer: result.buffer,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+
+    expect((deepInspect.acrobatAltRiskNodes || []).filter(node => node.ownershipMode === 'nonfigure_with_alt')).toEqual([])
   }, 90_000)
 
   it('sets /Tabs /S on annotated pages', async () => {
@@ -471,6 +577,100 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.outcome).toBe('applied')
     expect(after.verapdf.failedChecks).toBeLessThan(before.verapdf.failedChecks)
   }, 120_000)
+
+  it('repair_structure_conformance does not add /Alt to /Link structure elements', async () => {
+    let buffer = await makePdfWithLink()
+    let analysis = await analyzePDF(buffer, 'linked.pdf')
+    let context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const tabs = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_page_tabs',
+        arguments: { pageNumbers: [1] },
+        rationale: 'Normalize page tabs.',
+        confidence: 0.9,
+      },
+    })
+    buffer = tabs.buffer
+
+    analysis = await analyzePDF(buffer, 'linked.pdf')
+    context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const linkCandidate = context.linkCandidates[0]
+    expect(linkCandidate).toBeTruthy()
+
+    const contents = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_link_annotation_contents',
+        arguments: {
+          candidateId: linkCandidate!.id,
+          contents: 'Example report link',
+        },
+        rationale: 'Set annotation contents before structure repair.',
+        confidence: 0.9,
+      },
+    })
+    buffer = contents.buffer
+
+    const bootstrapContext = await inspectPdfForRemediation(buffer, await analyzePDF(buffer, 'linked.pdf'))
+    const bootstrap = await executeRemediationTool({
+      buffer,
+      context: bootstrapContext,
+      call: {
+        tool_name: 'bootstrap_struct_tree',
+        arguments: { target: 'document' },
+        rationale: 'Bootstrap structure tree.',
+        confidence: 0.9,
+      },
+    })
+
+    const repaired = await executeRemediationTool({
+      buffer: bootstrap.buffer,
+      context: await inspectPdfForRemediation(bootstrap.buffer, await analyzePDF(bootstrap.buffer, 'linked.pdf')),
+      call: {
+        tool_name: 'repair_structure_conformance',
+        arguments: { target: 'document' },
+        rationale: 'Repair logical structure conformance.',
+        confidence: 0.9,
+      },
+    })
+
+    const repairedDoc = await PDFDocument.load(repaired.buffer, { ignoreEncryption: true })
+    const structTreeRoot = repairedDoc.catalog.lookupMaybe(PDFName.of('StructTreeRoot'), PDFDict)
+    const linkElems: PDFDict[] = []
+    const visit = (value: any) => {
+      if (!(value instanceof PDFDict)) return
+      const tag = value.get(PDFName.of('S'))
+      if (String(tag) === '/Link') linkElems.push(value)
+      const kids = value.get(PDFName.of('K'))
+      if (kids instanceof PDFArray) {
+        for (let i = 0; i < kids.size(); i += 1) visit(repairedDoc.context.lookup(kids.get(i)))
+      } else if (kids) {
+        visit(repairedDoc.context.lookup(kids))
+      }
+    }
+    visit(structTreeRoot)
+
+    expect(linkElems.every(link => !link.has(PDFName.of('Alt')))).toBe(true)
+  }, 60_000)
+
+  it('artifact_nonsemantic_page_elements does not resolve by writing non-figure /Alt', async () => {
+    const buffer = await loadFixture('accessible.pdf')
+    const result = await runPdfStructureBackend({
+      buffer,
+      mutation: { operation: 'artifact_nonsemantic_page_elements' },
+    })
+
+    const inspect = await runPdfStructureBackend({
+      buffer: result.outputBuffer || buffer,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+
+    expect((inspect.acrobatAltRiskNodes || []).filter(node => node.ownershipMode === 'nonfigure_with_alt')).toEqual([])
+  }, 60_000)
 
   it('repairs missing ToUnicode maps in place on large mixed/native PDFs', async () => {
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')

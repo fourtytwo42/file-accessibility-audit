@@ -29,6 +29,29 @@ export interface VeraPdfSummary {
   topFailures: string[]
 }
 
+export interface AdobeFindingSummary {
+  id: string
+  rule: string
+  categoryId: string | null
+  severity: 'info' | 'warning' | 'error'
+  message: string
+}
+
+export interface AdobeSummary {
+  status: 'passed' | 'failed' | 'unavailable' | 'error'
+  summary: string
+  passed: boolean | null
+  issueCount: number
+  findings: AdobeFindingSummary[]
+  warnings: string[]
+  artifacts?: {
+    checkerJsonPath?: string | null
+    checkerReportPath?: string | null
+    autoTagPdfPath?: string | null
+    autoTagReportPath?: string | null
+  } | null
+}
+
 export interface ModelReviewFlag {
   code: string
   label: string
@@ -90,6 +113,8 @@ export interface PageModel {
 
 export type RemediationToolName =
   | 'ocr_scanned_pdf'
+  | 'adobe_accessibility_check'
+  | 'adobe_auto_tag'
   | 'get_document_metadata'
   | 'set_document_title'
   | 'set_document_language'
@@ -106,6 +131,9 @@ export type RemediationToolName =
   | 'repair_native_reading_order'
   | 'repair_font_unicode_maps'
   | 'repair_type1_font_unicode_maps'
+  | 'repair_truetype_encoding_differences'
+  | 'repair_annotation_alt_text'
+  | 'set_tabs_all_annotated_pages'
   | 'substitute_legacy_fonts_in_place'
   | 'finalize_substituted_font_conformance'
   | 'repair_cidset_consistency'
@@ -227,6 +255,8 @@ export interface FailureProfile {
   analysisScore: number
   veraPdfStatus: VeraPdfSummary['status']
   veraPdfFailedChecks: number
+  adobeStatus?: AdobeSummary['status']
+  adobeIssueCount?: number
   failureModes: FailureMode[]
   toolOpportunities: ToolOpportunity[]
   summary: {
@@ -257,9 +287,12 @@ export interface DocumentModel {
     grade: string
     unresolvedIssues: string[]
     veraPdf?: VeraPdfSummary | null
+    adobe?: AdobeSummary | null
   } | null
   originalVeraPdf?: VeraPdfSummary | null
   remediatedVeraPdf?: VeraPdfSummary | null
+  originalAdobe?: AdobeSummary | null
+  remediatedAdobe?: AdobeSummary | null
   failureProfile?: FailureProfile | null
   plannerEvidence?: PlannerEvidenceSummary | null
   manualReviewFlags: ModelReviewFlag[]

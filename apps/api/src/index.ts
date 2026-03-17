@@ -28,7 +28,7 @@ if (AUTH.REQUIRE_LOGIN) {
 }
 
 const app = express()
-const PORT = Number(process.env.PORT) || 5103
+const PORT = Number(process.env.PORT) || 6103
 const isProduction = process.env.NODE_ENV === 'production'
 let veraPdfStatus: { available: boolean; message: string } = {
   available: false,

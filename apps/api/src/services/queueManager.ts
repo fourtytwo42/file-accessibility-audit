@@ -1,8 +1,9 @@
 import fs from 'node:fs'
-import { BATCH_QUEUE } from '#config'
+import { BATCH_QUEUE, REMEDIATION } from '#config'
 import type { DocumentModel } from './documentModel.js'
 import { remediatePdfWithAgent } from './agentRemediationService.js'
 import { analyzePDF } from './pdfAnalyzer.js'
+import { runAdobeAccessibilityCheck } from './adobePdfServices.js'
 import { emitQueueItemDeleted, emitQueueItemUpsert } from './queueEvents.js'
 import {
   getQueueItemById,
@@ -92,18 +93,43 @@ async function runAgentPatchPipeline(
   })
   emitQueueItemUpsert(item.id)
 
-  const rebuiltResult = remediation.finalResult.overallScore === originalResult.overallScore && remediation.finalResult.grade === originalResult.grade
+  const baseRebuiltResult = remediation.finalResult.overallScore === originalResult.overallScore && remediation.finalResult.grade === originalResult.grade
     ? await analyzePDF(remediation.buffer, item.filename, {
       signal: controller.signal,
+      artifactsDir: reviewAssetsDir,
+      skipAdobe: true,
       onProgress(progress) {
         updateQueueItem(item.id, {
-          processing_progress: remapProgress(82, 98, progress.percent),
+          processing_progress: remapProgress(82, 96, progress.percent),
           processing_stage: `Remediated analysis: ${progress.stage}`,
         })
         emitQueueItemUpsert(item.id)
       },
     })
     : remediation.finalResult
+
+  // Run the Adobe check exactly once on the final built PDF (when enabled).
+  // All intermediate remediation passes use skipAdobe: true to conserve API quota.
+  let rebuiltResult = baseRebuiltResult
+  if (REMEDIATION.ENABLE_ADOBE_API) {
+    updateQueueItem(item.id, { processing_progress: 97, processing_stage: 'Running Adobe Accessibility Check' })
+    emitQueueItemUpsert(item.id)
+    const finalAdobeResult = await runAdobeAccessibilityCheck({
+      buffer: remediation.buffer,
+      filename: item.filename,
+      artifactsDir: reviewAssetsDir,
+    })
+    const finalAdobeSummary = {
+      status: finalAdobeResult.status,
+      summary: finalAdobeResult.summary,
+      passed: finalAdobeResult.passed,
+      issueCount: finalAdobeResult.issueCount,
+      findings: finalAdobeResult.findings,
+      warnings: finalAdobeResult.warnings,
+      artifacts: finalAdobeResult.artifacts ?? null,
+    }
+    rebuiltResult = { ...baseRebuiltResult, adobe: finalAdobeSummary }
+  }
 
   const reconstructionStatus = remediation.model.manualReviewFlags.length > 0 ? 'manual_review_required' : 'completed'
   updateQueueItem(item.id, {
@@ -115,6 +141,8 @@ async function runAgentPatchPipeline(
     processing_stage: 'Complete',
     result_json: JSON.stringify(rebuiltResult),
     rebuilt_result_json: JSON.stringify(rebuiltResult),
+    adobe_summary_json: JSON.stringify(rebuiltResult.adobe || null),
+    rebuilt_adobe_summary_json: JSON.stringify(rebuiltResult.adobe || null),
     rebuilt_page_count: rebuiltResult.pageCount,
     rebuilt_overall_score: rebuiltResult.overallScore,
     rebuilt_grade: rebuiltResult.grade,
@@ -173,6 +201,7 @@ async function processQueueItem(item: QueueItemRecord): Promise<void> {
     const buffer = await fs.promises.readFile(originalPath)
     const originalResult = await analyzePDF(buffer, item.filename, {
       signal: controller.signal,
+      artifactsDir: queueItemReviewAssetsDir(item.id),
       onProgress(progress) {
         updateQueueItem(item.id, {
           processing_progress: remapProgress(5, 30, progress.percent),
@@ -184,6 +213,7 @@ async function processQueueItem(item: QueueItemRecord): Promise<void> {
 
     updateQueueItem(item.id, {
       original_result_json: JSON.stringify(originalResult),
+      original_adobe_summary_json: JSON.stringify(originalResult.adobe || null),
       original_page_count: originalResult.pageCount,
       original_overall_score: originalResult.overallScore,
       original_grade: originalResult.grade,
@@ -200,7 +230,9 @@ async function processQueueItem(item: QueueItemRecord): Promise<void> {
         processing_stage: 'Complete',
         path_fallbacks_json: '[]',
         result_json: JSON.stringify(originalResult),
+        adobe_summary_json: JSON.stringify(originalResult.adobe || null),
         rebuilt_result_json: null,
+        rebuilt_adobe_summary_json: null,
         rebuilt_page_count: null,
         rebuilt_overall_score: null,
         rebuilt_grade: null,
@@ -262,12 +294,23 @@ async function processQueueItem(item: QueueItemRecord): Promise<void> {
   }
 }
 
+/** Max parallel processing jobs per client. Lower this (e.g. 1) when using SSH tunnels to avoid overloading the VM and dropping the connection. */
+function maxParallelPerClient(): number {
+  const env = process.env.QUEUE_MAX_PARALLEL
+  if (env !== undefined && env !== '') {
+    const n = parseInt(env, 10)
+    if (Number.isFinite(n) && n >= 1) return Math.min(n, BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT)
+  }
+  return BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT
+}
+
 export function scheduleClient(clientId: string): void {
   const active = listProcessingItems(clientId).length
   const activeUploads = getActiveClientUploads(clientId)
+  const cap = maxParallelPerClient()
   const concurrencyCap = activeUploads > 0
-    ? Math.min(1, BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT)
-    : BATCH_QUEUE.MAX_PARALLEL_PER_CLIENT
+    ? Math.min(1, cap)
+    : cap
   const available = Math.max(0, concurrencyCap - active)
   if (!available) return
 

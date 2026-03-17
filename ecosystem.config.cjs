@@ -8,7 +8,7 @@ module.exports = {
       interpreter: 'none',
       env: {
         NODE_ENV: 'production',
-        PORT: 5103,
+        PORT: 6103,
       },
       watch: false,
       max_memory_restart: '512M',
@@ -23,7 +23,7 @@ module.exports = {
       interpreter: 'none',
       env: {
         NODE_ENV: 'production',
-        PORT: 5102,
+        PORT: 6102,
       },
       watch: false,
       max_memory_restart: '512M',
