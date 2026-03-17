@@ -64,7 +64,7 @@ const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
     key: 'pdfua.page_tabs',
     label: 'Page tab order metadata',
     pattern: /\/tabs\b|value shall be s\b|page dictionary.*key tabs|key tabs with value s|\btab order\b|annotation.*tab order|tabs shall/i,
-    nativeToolFamilies: ['set_page_tabs', 'normalize_annotation_tab_order'],
+    nativeToolFamilies: ['set_page_tabs', 'normalize_annotation_tab_order', 'set_tabs_all_annotated_pages'],
     categoryIds: ['reading_order', 'pdf_ua_compliance'],
     classification: 'deterministic',
   },

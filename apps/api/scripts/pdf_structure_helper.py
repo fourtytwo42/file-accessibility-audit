@@ -4568,6 +4568,8 @@ def mutate_normalize_annotation_tab_order(pdf, mutation):
         if isinstance(mark_info, pikepdf.Dictionary):
             marked = mark_info.get("/Marked")
             is_tagged = bool(marked) and str(marked) != "false"
+    if not is_tagged:
+        is_tagged = isinstance(get_struct_tree_root(pdf), pikepdf.Dictionary)
 
     applied = []
     changed = False
@@ -4629,6 +4631,11 @@ def mutate_set_tabs_all_annotated_pages(pdf, mutation):
         if isinstance(mark_info, pikepdf.Dictionary):
             marked = mark_info.get("/Marked")
             is_tagged = bool(marked) and str(marked) != "false"
+    # Also treat as tagged when a StructTreeRoot is present — some PDFs have a struct
+    # tree without /MarkInfo/Marked being set, and Adobe Acrobat's 'Tab order - Failed'
+    # check applies to any page in a document that contains structure.
+    if not is_tagged:
+        is_tagged = isinstance(get_struct_tree_root(pdf), pikepdf.Dictionary)
 
     applied = []
     changed = False
