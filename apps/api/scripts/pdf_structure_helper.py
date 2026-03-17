@@ -5044,6 +5044,93 @@ def mutate_repair_cidset_consistency(pdf, mutation):
     return changed, applied, warnings
 
 
+def _get_valid_mcids_from_stream(page_obj):
+    """Return the set of integer MCIDs that have a BDC /MCID N block in the content stream."""
+    try:
+        raw = page_content_bytes(page_obj)
+        if not raw:
+            return set()
+        instructions = pikepdf.parse_content_stream(page_obj)
+    except Exception:
+        return set()
+    valid = set()
+    for operands, operator in instructions:
+        if str(operator) == "BDC" and len(operands) >= 2:
+            props = operands[1]
+            if isinstance(props, pikepdf.Dictionary):
+                mcid = props.get("/MCID")
+                if mcid is not None:
+                    try:
+                        valid.add(int(mcid))
+                    except Exception:
+                        pass
+    return valid
+
+
+def _cleanup_floating_mcid_refs(pdf, page_obj, valid_mcids):
+    """
+    After Artifact-wrapping, struct elements that carried integer /K MCIDs for
+    content now moved under /Artifact no longer have corresponding BDC blocks.
+    Acrobat validates those references and raises "error on the page" when they
+    are missing.  This function finds every struct element whose /Pg matches
+    page_obj and whose /K is a plain integer not in valid_mcids, then removes
+    that dangling reference.
+    """
+    page_objgen = getattr(page_obj, "objgen", None)
+    if page_objgen is None:
+        return False
+
+    changed = False
+    for elem in iter_struct_elems(pdf):
+        try:
+            pg = elem.get("/Pg")
+            elem_objgen = getattr(pg, "objgen", None) if pg is not None else None
+            if elem_objgen != page_objgen:
+                continue
+            k = elem.get("/K")
+            if k is None:
+                continue
+            # Plain integer /K — check if it's orphaned
+            if isinstance(k, int):
+                if k not in valid_mcids:
+                    del elem["/K"]
+                    changed = True
+                continue
+            # pikepdf wraps integers as pikepdf.Integer
+            try:
+                k_int = int(k)
+                is_int = True
+            except Exception:
+                is_int = False
+            if is_int:
+                if k_int not in valid_mcids:
+                    del elem["/K"]
+                    changed = True
+                continue
+            # Array /K — remove individual integer entries that are orphaned
+            if isinstance(k, pikepdf.Array):
+                keep = []
+                array_changed = False
+                for item in k:
+                    try:
+                        item_int = int(item)
+                        if item_int in valid_mcids:
+                            keep.append(item)
+                        else:
+                            array_changed = True
+                    except Exception:
+                        keep.append(item)
+                if array_changed:
+                    if keep:
+                        elem["/K"] = pikepdf.Array(keep)
+                    else:
+                        del elem["/K"]
+                    changed = True
+        except Exception:
+            continue
+    return changed
+
+
 def mutate_artifact_nonsemantic_page_elements(pdf, mutation):
     # Only proceed when the document has a struct tree – that means bootstrap has
     # already run and the accessible structure is in place.  Without a struct tree,
@@ -5072,6 +5159,14 @@ def mutate_artifact_nonsemantic_page_elements(pdf, mutation):
         if page_changed:
             applied.extend(page_applied)
             changed = True
+            # After rewriting the content stream, clean up any struct-element /K
+            # references that point to MCIDs no longer present as BDC blocks.
+            # Bootstrap creates heading elements with integer /K values (floating
+            # MCIDs) that become orphaned once their content is wrapped as Artifact.
+            # Adobe Acrobat validates these references and shows "error on the page"
+            # when any /K MCID is missing from the content stream.
+            valid_mcids = _get_valid_mcids_from_stream(page_obj)
+            _cleanup_floating_mcid_refs(pdf, page_obj, valid_mcids)
     return changed, applied, []
 
 
