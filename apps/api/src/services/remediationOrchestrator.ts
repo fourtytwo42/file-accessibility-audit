@@ -1141,12 +1141,16 @@ async function runCommand(command: string, args: string[], options: {
   cwd: string
   stdinText?: string
   outputPath?: string
+  heartbeatMs?: number
+  onHeartbeat?: (payload: { elapsedMs: number; stdout: string; stderr: string }) => Promise<void> | void
 }): Promise<{ code: number; stdout: string; stderr: string }> {
   return await new Promise((resolve, reject) => {
     let settled = false
+    const startedAt = Date.now()
     const finish = async (payload: { code: number; stdout: string; stderr: string }) => {
       if (settled) return
       settled = true
+      if (heartbeatTimer) clearInterval(heartbeatTimer)
       if (options.outputPath) {
         await fs.promises.mkdir(path.dirname(options.outputPath), { recursive: true })
         await fs.promises.writeFile(options.outputPath, `${payload.stdout}${payload.stderr}`, 'utf8')
@@ -1160,6 +1164,15 @@ async function runCommand(command: string, args: string[], options: {
     })
     const stdoutChunks: Buffer[] = []
     const stderrChunks: Buffer[] = []
+    const heartbeatTimer = options.onHeartbeat
+      ? setInterval(() => {
+          void options.onHeartbeat?.({
+            elapsedMs: Date.now() - startedAt,
+            stdout: Buffer.concat(stdoutChunks).toString('utf8'),
+            stderr: Buffer.concat(stderrChunks).toString('utf8'),
+          })
+        }, Math.max(1000, options.heartbeatMs ?? 5000))
+      : null
     child.stdout.on('data', chunk => stdoutChunks.push(Buffer.from(chunk)))
     child.stderr.on('data', chunk => stderrChunks.push(Buffer.from(chunk)))
     child.on('error', async error => {
@@ -1208,7 +1221,12 @@ function latestAutofixLogPath(config: OrchestratorConfig): string {
   return path.join(config.attemptsRootDir, 'autofix-last.log')
 }
 
-async function runAutofixPass(state: CampaignState, config: OrchestratorConfig, entries: TrackedPdfState[]): Promise<{ success: boolean; output: string }> {
+async function runAutofixPass(
+  state: CampaignState,
+  config: OrchestratorConfig,
+  entries: TrackedPdfState[],
+  onHeartbeat?: (payload: { elapsedMs: number; stdout: string; stderr: string }) => Promise<void> | void,
+): Promise<{ success: boolean; output: string }> {
   const prompt = buildAutofixPrompt(state, config, entries)
   const outputPath = latestAutofixLogPath(config)
   const result = await runCommand(config.codexBinary, [
@@ -1223,6 +1241,8 @@ async function runAutofixPass(state: CampaignState, config: OrchestratorConfig, 
     cwd: config.repoRoot,
     stdinText: prompt,
     outputPath,
+    heartbeatMs: 5000,
+    onHeartbeat,
   })
   return {
     success: result.code === 0,
@@ -1356,7 +1376,33 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
             await writeProgressTracker(state, config, preAutofixHealth)
             stdout.write('\x1b[2J\x1b[H')
             stdout.write(`${renderDashboard(state, preAutofixHealth)}\n`)
-            const autofix = await runAutofixPass(state, config, needsFix)
+            const autofix = await runAutofixPass(state, config, needsFix, async ({ elapsedMs, stdout: childStdout, stderr: childStderr }) => {
+              const elapsedSeconds = Math.floor(elapsedMs / 1000)
+              const mm = String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')
+              const ss = String(elapsedSeconds % 60).padStart(2, '0')
+              const lastOutputLine = `${childStdout}\n${childStderr}`
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean)
+                .at(-1)
+              for (const entry of needsFix) {
+                state.files[entry.filename] = {
+                  ...state.files[entry.filename],
+                  latestProcessingStage: `Running Codex autofix (${mm}:${ss})${lastOutputLine ? ` - ${trimForDisplay(lastOutputLine, 48)}` : ''}`,
+                  latestProcessingProgress: 100,
+                  lastUpdatedAt: nowIso(),
+                }
+              }
+              state = appendEvent(
+                state,
+                `Autofix heartbeat (${mm}:${ss}) for: ${needsFix.map(entry => entry.filename).join(', ')}${lastOutputLine ? ` | ${trimForDisplay(lastOutputLine, 80)}` : ''}`,
+              )
+              saveCampaignState(config.stateFilePath, state)
+              const heartbeatHealth = collectSystemHealth(apiStatus, needsFix.length, concurrencyCap)
+              await writeProgressTracker(state, config, heartbeatHealth)
+              stdout.write('\x1b[2J\x1b[H')
+              stdout.write(`${renderDashboard(state, heartbeatHealth)}\n`)
+            })
             if (autofix.success) {
               state = appendEvent(state, `Autofix batch completed: ${needsFix.map(entry => entry.filename).join(', ')}`)
               await restartApi(config)
