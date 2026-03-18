@@ -1065,6 +1065,93 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(qpdf.outlineCount).toBeGreaterThan(0)
   })
 
+  it('normalizes existing top-level heading hierarchy so sibling headings stay H1', async () => {
+    const buffer = await makePdf()
+    const bootstrapped = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section one', level: 'H2', pageNumber: 1 },
+          { text: 'Section two', level: 'H2', pageNumber: 1 },
+          { text: 'Section three', level: 'H2', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(bootstrapped.outputBuffer).toBeDefined()
+    const inspectBootstrapped = await runPdfStructureBackend({
+      buffer: bootstrapped.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    const degraded = await runPdfStructureBackend({
+      buffer: bootstrapped.outputBuffer!,
+      mutation: {
+        operation: 'retag_node',
+        targets: [inspectBootstrapped.headings[0]!.ref],
+        targetTag: 'H2',
+      },
+    })
+
+    expect(degraded.outputBuffer).toBeDefined()
+    const normalized = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: { operation: 'normalize_heading_hierarchy' },
+    })
+
+    expect(normalized.status).toBe('applied')
+    const reInspect = await runPdfStructureBackend({
+      buffer: normalized.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    expect(reInspect.headings.map(heading => heading.tag).slice(0, 3)).toEqual(['/H1', '/H1', '/H1'])
+  }, 60_000)
+
+  it('normalizes descending root-heading resets so sibling headings settle on H1', async () => {
+    const buffer = await makePdf()
+    const bootstrapped = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Document title', level: 'H1', pageNumber: 1 },
+          { text: 'Section one', level: 'H2', pageNumber: 1 },
+          { text: 'Section two', level: 'H1', pageNumber: 1 },
+          { text: 'Section three', level: 'H2', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(bootstrapped.outputBuffer).toBeDefined()
+    const inspectBootstrapped = await runPdfStructureBackend({
+      buffer: bootstrapped.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    const degraded = await runPdfStructureBackend({
+      buffer: bootstrapped.outputBuffer!,
+      mutation: {
+        operation: 'retag_node',
+        targets: [inspectBootstrapped.headings[2]!.ref],
+        targetTag: 'H1',
+      },
+    })
+
+    expect(degraded.outputBuffer).toBeDefined()
+    const normalized = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: { operation: 'normalize_heading_hierarchy' },
+    })
+
+    expect(normalized.status).toBe('applied')
+    const reInspect = await runPdfStructureBackend({
+      buffer: normalized.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    expect(reInspect.headings.map(heading => heading.tag).slice(0, 4)).toEqual(['/H1', '/H1', '/H1', '/H1'])
+  }, 60_000)
+
   it('retags a safe figure candidate and restores alt text', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const inspect = await runPdfStructureBackend({
@@ -1787,6 +1874,63 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     })
 
     expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:sect')).toBe(true)
+  }, 15_000)
+
+  it('promotes chapter-style headings to H1 in heuristic mode', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'example.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const heuristicContext: PdfRemediationContext = {
+      ...context,
+      headingCandidates: [
+        {
+          id: 'heading:chapter',
+          pageNumber: 6,
+          text: 'Chapter 1: Introduction',
+          bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+          fontSize: 18,
+          fontWeight: 'bold',
+          nearbyContext: ['Body'],
+          targetRef: 'obj:19 0 R',
+          existingTag: '/Sect',
+          repairMode: 'safe',
+        },
+        {
+          id: 'heading:sub',
+          pageNumber: 7,
+          text: 'Background Information',
+          bbox: { x: 0, y: 0.2, width: 1, height: 0.1 },
+          fontSize: 16,
+          fontWeight: 'bold',
+          nearbyContext: ['Body'],
+          targetRef: 'obj:20 0 R',
+          existingTag: '/Sect',
+          repairMode: 'safe',
+        },
+      ],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'example.pdf',
+      analysis: {
+        ...analysis,
+        categories: analysis.categories.map(category =>
+          category.id === 'heading_structure' ? { ...category, score: 0 } : category),
+      },
+      context: heuristicContext,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const chapterAction = plan.actions.find(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:chapter')
+    const subheadingAction = plan.actions.find(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:sub')
+    expect(chapterAction?.arguments.level).toBe('H1')
+    expect(subheadingAction?.arguments.level).toBe('H2')
   }, 15_000)
 
   it('plans reading-order fixes from parent groups instead of giant mixed candidate sets', async () => {

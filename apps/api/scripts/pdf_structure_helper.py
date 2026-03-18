@@ -24,6 +24,10 @@ UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link
 FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
 EMBEDDABLE_FONT_FILES = {
     # Arial family
+    "/Arial": "arial.ttf",
+    "/Arial,Bold": "arialbd.ttf",
+    "/Arial,Italic": "ariali.ttf",
+    "/Arial,BoldItalic": "arialbi.ttf",
     "/ArialMT": "arial.ttf",
     "/Arial-BoldMT": "arialbd.ttf",
     "/Arial-ItalicMT": "ariali.ttf",
@@ -54,6 +58,10 @@ EMBEDDABLE_FONT_FILES = {
     "/Calibri-Italic": "calibri.ttf",
     "/Calibri-BoldItalic": "calibrib.ttf",
     # Times New Roman
+    "/TimesNewRoman": "times.ttf",
+    "/TimesNewRoman,Bold": "timesbd.ttf",
+    "/TimesNewRoman,Italic": "timesi.ttf",
+    "/TimesNewRoman,BoldItalic": "timesbi.ttf",
     "/TimesNewRomanPSMT": "times.ttf",
     "/TimesNewRomanPS-BoldMT": "timesbd.ttf",
     "/TimesNewRomanPS-ItalicMT": "timesi.ttf",
@@ -116,6 +124,9 @@ EMBEDDABLE_FONT_FILES = {
     # Tahoma → Noto Sans
     "/Tahoma": "NotoSans-Regular.ttf",
     "/Tahoma-Bold": "NotoSans-Bold.ttf",
+    # Symbol-oriented Unicode fonts
+    "/NotoSansSymbols-Regular": "NotoSansSymbols-Regular.ttf",
+    "/NotoSansSymbols2-Regular": "NotoSansSymbols2-Regular.ttf",
     # Standard PDF Type1 fonts — embed substitutes so veraPDF's containsFontFile check passes
     "/Times-Roman": "times.ttf",
     "/Times-Bold": "timesbd.ttf",
@@ -357,6 +368,37 @@ TYPE1_SUBSET_UNICODE_MAPS = {
     "/MSTT31c5d5": {
         178: "\u2264",
     },
+}
+
+SIMPLE_TRUETYPE_UNICODE_MAPS = {
+    "/Symbol": {
+        0x96: "\u2013",
+        0x97: "\u2014",
+        0xA3: "\u2264",
+        0xB7: "\u2022",
+    },
+    "/MapInfoArrows": {
+        0x3D: "\u2019",
+        0x40: "\u2022",
+        0x41: "\u2022",
+        0x42: "\u2013",
+    },
+}
+
+SIMPLE_TRUETYPE_ENCODING_DIFFERENCES = {
+    "/Symbol": [
+        163, pikepdf.Name("/lessequal"),
+    ],
+    "/MapInfoArrows": [
+        61, pikepdf.Name("/quoteright"),
+        64, pikepdf.Name("/bullet"),
+        pikepdf.Name("/bullet"),
+        pikepdf.Name("/endash"),
+    ],
+}
+
+SIMPLE_TRUETYPE_SUBSTITUTE_FONTS = {
+    "/MapInfoArrows": "/ArialMT",
 }
 
 HEURISTIC_SUBSET_FALLBACKS = [
@@ -674,8 +716,11 @@ def normalize_heading_sequence(levels):
             numeric = 2
         if index == 0:
             numeric = 1
-        elif previous is not None and numeric > previous + 1:
-            numeric = previous + 1
+        elif previous is not None:
+            if numeric > previous + 1:
+                numeric = previous + 1
+            elif numeric < previous:
+                numeric = previous
         numeric = min(6, max(1, numeric))
         normalized.append(f"H{numeric}")
         previous = numeric
@@ -747,6 +792,31 @@ def table_candidates(pdf):
 def figure_candidates(pdf):
     figures = []
     page_usage = {}
+    def count_descendant_figures(node):
+        count = 0
+        visited = set()
+
+        def visit(value, is_root=False):
+            nonlocal count
+            if not isinstance(value, pikepdf.Dictionary):
+                return
+            node_ref = ref_string(value)
+            if node_ref and node_ref in visited:
+                return
+            if node_ref:
+                visited.add(node_ref)
+            if not is_root and str(value.get("/S")) == "/Figure":
+                count += 1
+            kids = value.get("/K")
+            if isinstance(kids, pikepdf.Array):
+                for child in kids:
+                    visit(child)
+            elif isinstance(kids, pikepdf.Dictionary):
+                visit(kids)
+
+        visit(node, is_root=True)
+        return count
+
     for obj in iter_struct_elems(pdf):
         tag = str(obj.get("/S"))
         if tag != "/Figure":
@@ -802,6 +872,7 @@ def figure_candidates(pdf):
             "tag": tag,
             "hasAlt": bool(alt_text),
             "altText": alt_text,
+            "childFigureCount": count_descendant_figures(obj),
             "parentTagPath": parent_tag_path(obj),
             "pageRef": page_ref,
             "mcids": mcids,
@@ -1400,21 +1471,37 @@ def acrobat_alt_risk_nodes(pdf):
             if not image_names:
                 continue
 
-            current_mcid = None
+            marked_content_stack = []
             try:
                 for operands, operator in _parse_cs(page):
                     op = str(operator)
                     if op in ("BMC", "BDC"):
+                        entry = {
+                            "artifact": False,
+                            "mcid": None,
+                        }
                         for operand in operands:
+                            if str(operand) == "/Artifact":
+                                entry["artifact"] = True
                             if isinstance(operand, pikepdf.Dictionary):
                                 mcid_val = operand.get("/MCID")
                                 if mcid_val is not None:
-                                    current_mcid = int(mcid_val)
+                                    entry["mcid"] = int(mcid_val)
+                        marked_content_stack.append(entry)
                     elif op == "EMC":
-                        current_mcid = None
+                        if marked_content_stack:
+                            marked_content_stack.pop()
                     elif op == "Do":
                         xobj_name = str(operands[0]) if operands else ""
                         if xobj_name in image_names:
+                            in_artifact = any(entry.get("artifact") for entry in marked_content_stack)
+                            current_mcid = None
+                            for entry in reversed(marked_content_stack):
+                                if entry.get("mcid") is not None:
+                                    current_mcid = entry.get("mcid")
+                                    break
+                            if in_artifact:
+                                continue
                             if current_mcid is not None:
                                 key = (page_ref_str, current_mcid)
                                 if key not in owned_image_keys and key not in seen_untagged_keys:
@@ -1910,6 +1997,50 @@ def mirror_alt_text_to_matching_struct_elems(pdf, source_obj, alt_text):
     return applied
 
 
+def remove_alt_from_descendants(node, skip_ref=None):
+    applied = []
+    visited = set()
+
+    def visit(value):
+        if not isinstance(value, pikepdf.Dictionary):
+            return
+        node_ref = ref_string(value)
+        if node_ref and node_ref in visited:
+            return
+        if node_ref:
+            visited.add(node_ref)
+        if skip_ref and node_ref == skip_ref:
+            kids = value.get("/K")
+        else:
+            raw_alt = value.get("/Alt")
+            existing_alt = str(raw_alt).replace("u:", "") if raw_alt is not None else None
+            if existing_alt is not None:
+                try:
+                    del value["/Alt"]
+                except Exception:
+                    pass
+                applied.append({
+                    "ref": node_ref,
+                    "before": existing_alt,
+                    "after": None,
+                    "details": f"Removed nested alternate text from descendant element {node_ref}.",
+                })
+            kids = value.get("/K")
+        if isinstance(kids, pikepdf.Array):
+            for child in kids:
+                visit(child)
+        elif isinstance(kids, pikepdf.Dictionary):
+            visit(kids)
+
+    kids = node.get("/K") if isinstance(node, pikepdf.Dictionary) else None
+    if isinstance(kids, pikepdf.Array):
+        for child in kids:
+            visit(child)
+    elif isinstance(kids, pikepdf.Dictionary):
+        visit(kids)
+    return applied
+
+
 def ensure_page_content_struct_elem(pdf, document, page_obj):
     page_ref = ref_string(page_obj)
     existing = get_child_dicts(document)
@@ -2303,6 +2434,37 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                 if not isinstance(struct_root, pikepdf.Dictionary):
                     unresolved.append(f"No struct tree root for untagged image MCID {mcid}.")
                     continue
+                if bool(risk.get("graphicsLikelyDecorative", False)):
+                    groups, group_index = top_level_mcid_group_index(page_obj, int(mcid))
+                    if group_index is None:
+                        unresolved.append(f"Could not locate the top-level marked-content group for decorative image MCID {mcid}.")
+                        continue
+                    group = groups[group_index][1]
+                    if len(group) < 2:
+                        unresolved.append(f"Decorative image MCID {mcid} on page {risk.get('pageNum', '?')} did not expose a full marked-content group.")
+                        continue
+                    artifact_group = [
+                        pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                        *group[1:-1],
+                        pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
+                    ]
+                    rewritten = []
+                    for index, (_, existing_group) in enumerate(groups):
+                        rewritten.extend(artifact_group if index == group_index else existing_group)
+                    page_obj["/Contents"] = pdf.make_stream(pikepdf.unparse_content_stream(rewritten))
+                    changed = True
+                    repairs_applied += 1
+                    applied.append({
+                        "ref": risk["ref"],
+                        "before": f"untagged image MCID {mcid} on page {risk.get('pageNum', '?')}",
+                        "after": "/Artifact",
+                        "details": (
+                            f"Rewrote decorative untagged image '{risk.get('xobjName', '?')}' MCID {mcid} on "
+                            f"page {risk.get('pageNum', '?')} as /Artifact to satisfy Acrobat's "
+                            f"'Other elements alternate text' check."
+                        ),
+                    })
+                    continue
 
                 # Check whether this MCID is already owned by an existing struct element
                 # (e.g. bootstrap created a /P or /H1 for it). If so:
@@ -2506,10 +2668,21 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                         and operands
                         and str(operands[0]) == xobj_name
                     ):
-                        props = pikepdf.Dictionary({"/MCID": pikepdf.Integer(new_mcid)})
-                        rewritten.append(
-                            pikepdf.ContentStreamInstruction([props], pikepdf.Operator("BDC"))
-                        )
+                        if bool(risk.get("graphicsLikelyDecorative", False)):
+                            rewritten.append(
+                                pikepdf.ContentStreamInstruction(
+                                    [pikepdf.Name("/Artifact")],
+                                    pikepdf.Operator("BMC"),
+                                )
+                            )
+                        else:
+                            props = pikepdf.Dictionary({"/MCID": pikepdf.Integer(new_mcid)})
+                            rewritten.append(
+                                pikepdf.ContentStreamInstruction(
+                                    [pikepdf.Name("/Figure"), props],
+                                    pikepdf.Operator("BDC"),
+                                )
+                            )
                         rewritten.append(inst)
                         rewritten.append(
                             pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC"))
@@ -2528,6 +2701,20 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                 page_obj["/Contents"] = pdf.make_stream(
                     pikepdf.unparse_content_stream(rewritten)
                 )
+
+                if bool(risk.get("graphicsLikelyDecorative", False)):
+                    changed = True
+                    repairs_applied += 1
+                    applied.append({
+                        "ref": risk["ref"],
+                        "before": f"untagged depth-0 image '{xobj_name}' on page {page_num}",
+                        "after": "/Artifact",
+                        "details": (
+                            f"Wrapped decorative depth-0 Do /{xobj_name} in /Artifact on page {page_num}. "
+                            f"Fixes Acrobat 'Other elements alternate text' without creating a new figure."
+                        ),
+                    })
+                    continue
 
                 # Create MCR and /Figure struct element.
                 document = ensure_document_struct_elem(pdf, struct_root)
@@ -3094,6 +3281,122 @@ def ensure_link_annotation_tags(pdf, parent_elem, page_obj, parent_tree_nums, ne
     return applied, next_key
 
 
+def _build_mcid_to_struct_tag(pdf, page_obj):
+    """Build a mapping from MCID integer → struct element /S tag name for a given page."""
+    page_objgen = getattr(page_obj, "objgen", None)
+    mcid_to_tag = {}
+    if page_objgen is None:
+        return mcid_to_tag
+    for elem in iter_struct_elems(pdf):
+        try:
+            pg = elem.get("/Pg")
+            elem_pg = getattr(pg, "objgen", None) if pg is not None else None
+            if elem_pg != page_objgen:
+                continue
+            tag = str(elem.get("/S", "/Span"))
+            k = elem.get("/K")
+            if k is None:
+                continue
+            try:
+                mcid_to_tag[int(k)] = tag
+                continue
+            except Exception:
+                pass
+            if isinstance(k, pikepdf.Array):
+                for item in k:
+                    try:
+                        mcid_to_tag[int(item)] = tag
+                    except Exception:
+                        if isinstance(item, pikepdf.Dictionary):
+                            mcid_val = item.get("/MCID")
+                            if mcid_val is not None:
+                                try:
+                                    mcid_to_tag[int(mcid_val)] = tag
+                                except Exception:
+                                    pass
+            elif isinstance(k, pikepdf.Dictionary):
+                mcid_val = k.get("/MCID")
+                if mcid_val is not None:
+                    try:
+                        mcid_to_tag[int(mcid_val)] = tag
+                    except Exception:
+                        pass
+        except Exception:
+            continue
+    return mcid_to_tag
+
+
+def repair_malformed_bdc_tags_on_page(pdf, page_obj):
+    """Fix BDC operators that are missing their tag-name operand.
+
+    Some PDF generators emit `<properties_dict> BDC` instead of the required
+    `/TagName <properties_dict> BDC`.  pdftoppm and other renderers reject these
+    as a syntax error, causing pages to render as white and producing false-positive
+    color-contrast failures.  This function patches each such instruction by
+    prepending the correct tag name looked up from the struct tree, or /Span if
+    the MCID cannot be found.
+    """
+    try:
+        instructions = list(pikepdf.parse_content_stream(page_obj))
+    except Exception:
+        return False, []
+
+    malformed_indices = []
+    for i, inst in enumerate(instructions):
+        if str(inst.operator) != "BDC":
+            continue
+        ops = list(inst.operands)
+        # Well-formed BDC has [/TagName, properties_dict] or [/TagName, /PropsName]
+        if len(ops) >= 2:
+            continue
+        # Single operand — should be a properties dict (malformed, missing tag name)
+        if len(ops) == 1 and isinstance(ops[0], pikepdf.Dictionary):
+            malformed_indices.append(i)
+
+    if not malformed_indices:
+        return False, []
+
+    mcid_map = _build_mcid_to_struct_tag(pdf, page_obj)
+
+    rewritten = list(instructions)
+    applied_details = []
+    for i in reversed(malformed_indices):
+        props_dict = list(rewritten[i].operands)[0]
+        mcid_val = props_dict.get("/MCID")
+        try:
+            mcid_int = int(mcid_val) if mcid_val is not None else None
+        except Exception:
+            mcid_int = None
+        tag_name = mcid_map.get(mcid_int, "/Span") if mcid_int is not None else "/Span"
+        rewritten[i] = pikepdf.ContentStreamInstruction(
+            [pikepdf.Name(tag_name), props_dict],
+            pikepdf.Operator("BDC"),
+        )
+        applied_details.append(f"Fixed malformed BDC at instruction {i}: prepended {tag_name} (MCID {mcid_int})")
+
+    page_obj["/Contents"] = pdf.make_stream(pikepdf.unparse_content_stream(rewritten))
+    return True, applied_details
+
+
+def mutate_repair_malformed_bdc_operators(pdf, mutation):
+    """Repair BDC operators missing their tag-name operand across all pages."""
+    applied = []
+    changed = False
+    for page in pdf.pages:
+        page_obj = page.obj if hasattr(page, "obj") else page
+        page_changed, details = repair_malformed_bdc_tags_on_page(pdf, page_obj)
+        if page_changed:
+            changed = True
+            for detail in details:
+                applied.append({
+                    "ref": ref_string(page_obj),
+                    "before": "malformed BDC (1 operand)",
+                    "after": "well-formed BDC (2 operands)",
+                    "details": detail,
+                })
+    return changed, applied, []
+
+
 def mutate_repair_structure_conformance(pdf, mutation):
     catalog = get_catalog(pdf)
     if catalog is None:
@@ -3153,6 +3456,14 @@ def mutate_repair_structure_conformance(pdf, mutation):
 
     root["/ParentTree"] = parent_tree
     root["/ParentTreeNextKey"] = next_key
+
+    # Also fix malformed BDC operators (missing tag-name operand) which cause
+    # pdftoppm and other renderers to emit syntax errors and render pages as white.
+    bdc_changed, bdc_applied, _ = mutate_repair_malformed_bdc_operators(pdf, mutation)
+    if bdc_changed:
+        applied.extend(bdc_applied)
+        changed = True
+
     return changed, applied, []
 
 
@@ -3304,6 +3615,72 @@ def _annotation_has_link_struct_parent(annot, nums):
     return False
 
 
+def _struct_kids_list(obj):
+    kids = obj.get("/K") if isinstance(obj, pikepdf.Dictionary) else None
+    if isinstance(kids, pikepdf.Array):
+        return list(kids)
+    if kids is None:
+        return []
+    return [kids]
+
+
+def _objr_targets_annotation(kid, annot):
+    if not isinstance(kid, pikepdf.Dictionary):
+        return False
+    if str(kid.get("/Type", "")) != "/OBJR":
+        return False
+    try:
+        target = kid.get("/Obj")
+    except Exception:
+        return False
+    if not isinstance(target, pikepdf.Dictionary):
+        return False
+    return ref_string(target) == ref_string(annot)
+
+
+def _remove_annotation_objr_from_nonlink_elems(pdf, annot):
+    removed = []
+    annot_ref = ref_string(annot)
+    if not annot_ref:
+        return removed
+
+    for elem in iter_struct_elems(pdf):
+        tag = str(elem.get("/S", ""))
+        if tag == "/Link":
+            continue
+        kids = _struct_kids_list(elem)
+        if not kids:
+            continue
+        kept = []
+        changed = False
+        for kid in kids:
+            if _objr_targets_annotation(kid, annot):
+                changed = True
+                removed.append({
+                    "ref": ref_string(elem),
+                    "before": tag or "null-tag",
+                    "after": "OBJR removed",
+                    "details": f"Removed stale OBJR for link annotation {annot_ref} from non-/Link structure element {ref_string(elem)}.",
+                })
+                continue
+            kept.append(kid)
+
+        if not changed:
+            continue
+
+        if len(kept) == 0:
+            try:
+                del elem["/K"]
+            except Exception:
+                elem["/K"] = pikepdf.Array()
+        elif len(kept) == 1:
+            elem["/K"] = kept[0]
+        else:
+            elem["/K"] = pikepdf.Array(kept)
+
+    return removed
+
+
 def mutate_repair_native_link_structure(pdf, mutation):
     """Create /Link structure elements for link annotations not properly enclosed in a /Link struct elem.
 
@@ -3360,6 +3737,11 @@ def mutate_repair_native_link_structure(pdf, mutation):
             # Skip if already properly enclosed in a /Link struct element.
             if _annotation_has_link_struct_parent(annot, nums):
                 continue
+
+            removed_objr = _remove_annotation_objr_from_nonlink_elems(pdf, annot)
+            if removed_objr:
+                applied.extend(removed_objr)
+                changed = True
 
             # Assign a new StructParent key if the annotation doesn't already have one.
             struct_parent = annot.get("/StructParent")
@@ -4378,6 +4760,7 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
     changed = False
     processed_refs = set()
     used_codes_by_font = collect_used_codes_by_font(pdf)
+    metrics_cache = {}
 
     for page in pdf.pages:
         resources = page.obj.get("/Resources")
@@ -4422,6 +4805,63 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
             if has_tounicode(font):
                 continue
             if subtype != "/TrueType" or encoding not in {"/WinAnsiEncoding", "/MacRomanEncoding"}:
+                explicit_map = SIMPLE_TRUETYPE_UNICODE_MAPS.get(base_font, {})
+                used_codes = sorted(used_codes_by_font.get(font_ref, set()))
+                if explicit_map:
+                    if used_codes:
+                        explicit_map = {code: text for code, text in explicit_map.items() if code in used_codes}
+                    if explicit_map:
+                        substitute_name = SIMPLE_TRUETYPE_SUBSTITUTE_FONTS.get(base_font)
+                        substitute_path = font_file_path(substitute_name) if substitute_name else None
+                        if substitute_path and isinstance(descriptor, pikepdf.Dictionary):
+                            embed_font_program(pdf, descriptor, substitute_path, font=font)
+                            changed = True
+                            applied.append({
+                                "ref": ref_string(font),
+                                "before": base_font,
+                                "after": substitute_name,
+                                "details": f"Embedded a full substitute font program for legacy symbol font {base_font} using {substitute_path.name}.",
+                            })
+                            cache_key = str(substitute_path)
+                            metrics = metrics_cache.get(cache_key)
+                            if metrics is None:
+                                metrics = parse_ttf_metrics(substitute_path)
+                                metrics_cache[cache_key] = metrics
+                            if metrics:
+                                width_map = derive_width_map(metrics, explicit_map)
+                                if width_map and update_font_widths(font, width_map):
+                                    changed = True
+                                    applied.append({
+                                        "ref": ref_string(font),
+                                        "before": "/Widths",
+                                        "after": f"{len(width_map)} width entries",
+                                        "details": f"Updated width entries for {base_font} from the substitute font metrics in {substitute_path.name}.",
+                                    })
+                        if merge_tounicode_map(font, pdf, explicit_map):
+                            applied.append({
+                                "ref": ref_string(font),
+                                "before": None,
+                                "after": "/ToUnicode",
+                                "details": f"Added an explicit ToUnicode CMap for legacy symbol font {base_font} using {len(explicit_map)} deterministic character mappings.",
+                            })
+                            changed = True
+                        if ensure_explicit_truetype_encoding(font, base_font):
+                            changed = True
+                            applied.append({
+                                "ref": ref_string(font),
+                                "before": None,
+                                "after": "/Encoding",
+                                "details": f"Added an explicit WinAnsi-based encoding profile for {base_font} to keep the substitute TrueType font validator-compliant.",
+                            })
+                        if normalize_symbolic_flags_for_unicode_substitute(descriptor):
+                            changed = True
+                            applied.append({
+                                "ref": ref_string(descriptor) or ref_string(font),
+                                "before": None,
+                                "after": "/Flags 32",
+                                "details": f"Normalized font descriptor flags for {base_font} to a non-symbolic substitute profile after explicit Unicode recovery.",
+                            })
+                        continue
                 warnings.append(f"Could not derive a ToUnicode map for {base_font} ({subtype}, {encoding or 'no encoding'}).")
                 continue
             cmap = build_tounicode_cmap(WIN_ANSI_UNICODE)
@@ -4464,6 +4904,19 @@ def mutate_repair_type1_font_unicode_maps(pdf, mutation):
             if font_ref in processed_refs:
                 continue
             processed_refs.add(font_ref)
+            descriptor = font_descriptor_for(font)
+            if isinstance(descriptor, pikepdf.Dictionary) and descriptor.get("/CharSet") is not None:
+                try:
+                    del descriptor["/CharSet"]
+                    applied.append({
+                        "ref": ref_string(font),
+                        "before": "/CharSet",
+                        "after": "removed",
+                        "details": f"Removed invalid /CharSet entry from Type1/Type3 font descriptor for {str(font.get('/BaseFont'))}.",
+                    })
+                    changed = True
+                except Exception:
+                    warnings.append(f"Could not remove /CharSet from {str(font.get('/BaseFont'))}.")
             if has_tounicode(font):
                 continue
 
@@ -5359,6 +5812,45 @@ def merge_tounicode_map(font, pdf, encoding_map):
     return True
 
 
+def normalize_symbolic_flags_for_unicode_substitute(descriptor):
+    if not isinstance(descriptor, pikepdf.Dictionary):
+        return False
+    try:
+        flags = int(descriptor.get("/Flags") or 0)
+    except Exception:
+        flags = 0
+    desired = (flags | 32) & ~4
+    if desired == flags:
+        return False
+    descriptor["/Flags"] = pikepdf.Integer(desired)
+    return True
+
+
+def ensure_explicit_truetype_encoding(font, base_font):
+    if not isinstance(font, pikepdf.Dictionary):
+        return False
+    differences = SIMPLE_TRUETYPE_ENCODING_DIFFERENCES.get(base_font)
+    if not differences:
+        return False
+    desired = pikepdf.Dictionary({
+        "/BaseEncoding": pikepdf.Name("/WinAnsiEncoding"),
+        "/Differences": pikepdf.Array(differences),
+    })
+    encoding = font.get("/Encoding")
+    if isinstance(encoding, pikepdf.Dictionary):
+        same_base = str(encoding.get("/BaseEncoding")) == "/WinAnsiEncoding"
+        same_differences = list(encoding.get("/Differences") or []) == list(desired["/Differences"])
+        if same_base and same_differences:
+            return False
+        encoding["/BaseEncoding"] = pikepdf.Name("/WinAnsiEncoding")
+        encoding["/Differences"] = desired["/Differences"]
+        return True
+    if str(encoding) == "/WinAnsiEncoding" and base_font != "/Symbol":
+        return False
+    font["/Encoding"] = desired
+    return True
+
+
 def record_unresolved(unresolved, font_name, reason):
     unresolved.setdefault(reason, set()).add(font_name)
 
@@ -5746,6 +6238,120 @@ def mutate_create_heading_from_candidate(pdf, mutation):
     return True, applied, []
 
 
+def mutate_normalize_heading_hierarchy(pdf, mutation):
+    heading_nodes = []
+    for obj in iter_struct_elems(pdf):
+        tag = str(obj.get("/S"))
+        if heading_level_number(tag) is None:
+            continue
+        heading_nodes.append(obj)
+
+    if not heading_nodes:
+        return False, [], ["No heading tags were found in the structure tree."]
+
+    applied = []
+    normalized_levels_by_ref = {}
+    sibling_levels_by_parent_ref = {}
+
+    for obj in heading_nodes:
+        obj_ref = ref_string(obj)
+        parent = obj.get("/P") if isinstance(obj.get("/P"), pikepdf.Dictionary) else None
+        parent_ref = ref_string(parent) if isinstance(parent, pikepdf.Dictionary) else None
+        normalized_level = None
+
+        if parent_ref and parent_ref in sibling_levels_by_parent_ref:
+            normalized_level = sibling_levels_by_parent_ref[parent_ref]
+        else:
+            ancestor = parent
+            ancestor_level = None
+            while isinstance(ancestor, pikepdf.Dictionary):
+                ancestor_ref = ref_string(ancestor)
+                if ancestor_ref and ancestor_ref in normalized_levels_by_ref:
+                    ancestor_level = normalized_levels_by_ref[ancestor_ref]
+                    break
+                direct_level = heading_level_number(ancestor.get("/S"))
+                if direct_level is not None:
+                    ancestor_level = direct_level
+                    break
+                ancestor = ancestor.get("/P") if isinstance(ancestor.get("/P"), pikepdf.Dictionary) else None
+
+            if ancestor_level is None:
+                normalized_level = 1
+            else:
+                normalized_level = min(6, max(1, ancestor_level + 1))
+
+        if obj_ref:
+            normalized_levels_by_ref[obj_ref] = normalized_level
+        if parent_ref:
+            sibling_levels_by_parent_ref[parent_ref] = normalized_level
+
+        before = str(obj.get("/S"))
+        after = f"/H{normalized_level}"
+        if before == after:
+            continue
+        obj["/S"] = pikepdf.Name(after)
+        applied.append({
+            "ref": obj_ref,
+            "before": before,
+            "after": after,
+            "details": f"Normalized heading level for {obj_ref} from {before} to {after}.",
+        })
+
+    if not applied:
+        return False, [], ["Heading hierarchy is already normalized."]
+    return True, applied, []
+
+
+def mutate_normalize_nested_figure_containers(pdf, mutation):
+    applied = []
+    for obj in iter_struct_elems(pdf):
+        if str(obj.get("/S")) != "/Figure":
+            continue
+
+        kids = obj.get("/K")
+        if isinstance(kids, pikepdf.Array):
+            child_values = list(kids)
+        elif kids is None:
+            child_values = []
+        else:
+            child_values = [kids]
+
+        child_figures = 0
+        has_non_struct_kid = False
+        for child in child_values:
+            if not isinstance(child, pikepdf.Dictionary):
+                has_non_struct_kid = True
+                continue
+            child_tag = str(child.get("/S"))
+            if child_tag == "/Figure":
+                child_figures += 1
+            elif not child_tag:
+                has_non_struct_kid = True
+
+        mcids = normalized_struct_elem_mcids(obj)
+        if child_figures <= 0 or has_non_struct_kid or mcids:
+            continue
+
+        before_alt = obj.get("/Alt")
+        before_alt_text = str(before_alt).replace("u:", "") if isinstance(before_alt, str) else None
+        if before_alt is not None:
+            try:
+                del obj["/Alt"]
+            except Exception:
+                pass
+        obj["/S"] = pikepdf.Name("/Sect")
+        applied.append({
+            "ref": ref_string(obj),
+            "before": before_alt_text or "/Figure",
+            "after": "/Sect",
+            "details": f"Retagged empty wrapper figure container {ref_string(obj)} as /Sect because it contains {child_figures} child /Figure element(s) and no direct marked content.",
+        })
+
+    if not applied:
+        return False, [], ["No nested wrapper figure containers required normalization."]
+    return True, applied, []
+
+
 def mutate_retag_node(pdf, mutation):
     targets = mutation.get("targets") or []
     target_tag = mutation.get("targetTag")
@@ -5781,6 +6387,34 @@ def mutate_set_table_header_cells(pdf, mutation):
     applied = []
     for table in selected:
         header_refs = []
+        table_obj = resolve_obj(pdf, table["ref"])
+        row_nodes = []
+        if isinstance(table_obj, pikepdf.Dictionary):
+            row_nodes = [row for row in get_child_dicts(table_obj) if str(row.get("/S")) == "/TR"]
+            if row_nodes:
+                def cell_span(cell):
+                    try:
+                        return max(1, int(cell.get("/ColSpan", 1) or 1))
+                    except Exception:
+                        return 1
+                row_column_counts = []
+                row_cells = []
+                for row in row_nodes:
+                    cells = [cell for cell in get_child_dicts(row) if str(cell.get("/S")) in {"/TD", "/TH"}]
+                    row_cells.append(cells)
+                    row_column_counts.append(sum(cell_span(cell) for cell in cells))
+                max_columns = max(row_column_counts) if row_column_counts else 0
+                if max_columns > 1 and row_cells and len(row_cells[0]) == 1:
+                    title_cell = row_cells[0][0]
+                    current_span = cell_span(title_cell)
+                    if current_span != max_columns:
+                        title_cell["/ColSpan"] = pikepdf.Integer(max_columns)
+                        applied.append({
+                            "ref": ref_string(title_cell),
+                            "before": str(current_span),
+                            "after": str(max_columns),
+                            "details": f"Expanded first-row table title cell {ref_string(title_cell)} to /ColSpan {max_columns} so header rows align with later rows.",
+                        })
         for cell_ref in table["firstRowCellRefs"]:
             obj = resolve_obj(pdf, cell_ref)
             if not isinstance(obj, pikepdf.Dictionary):
@@ -5819,7 +6453,6 @@ def mutate_set_table_header_cells(pdf, mutation):
                     "details": f"Set table header scope to /Column on {ref}.",
                 })
         if unique_headers:
-            table_obj = resolve_obj(pdf, table["ref"])
             if isinstance(table_obj, pikepdf.Dictionary):
                 for row in get_child_dicts(table_obj):
                     if str(row.get("/S")) != "/TR":
@@ -5853,12 +6486,15 @@ def mutate_set_figure_alt_text(pdf, mutation):
     before_alt = obj.get("/Alt")
     before_alt_text = str(before_alt).replace("u:", "") if isinstance(before_alt, str) else None
     obj["/Alt"] = pikepdf.String(alt_text)
-    return True, [{
+    applied = [{
         "ref": ref_string(obj),
         "before": before_alt_text or before_tag,
         "after": alt_text,
         "details": f"Set alternate text on {before_tag} element {ref_string(obj)} to \"{alt_text}\".",
-    }], []
+    }]
+    applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj)))
+    applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, obj, alt_text))
+    return True, applied, []
 
 
 def mutate_retag_as_figure_and_set_alt(pdf, mutation):
@@ -5898,18 +6534,26 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
             "/Alt": pikepdf.String(alt_text),
         }))
         obj["/K"] = figure
+        try:
+            if obj.get("/Alt") is not None:
+                del obj["/Alt"]
+        except Exception:
+            pass
         if isinstance(original_k, pikepdf.Dictionary):
             original_k["/P"] = figure
         elif isinstance(original_k, pikepdf.Array):
             for child in original_k:
                 if isinstance(child, pikepdf.Dictionary):
                     child["/P"] = figure
-        return True, [{
+        applied = [{
             "ref": ref_string(figure),
             "before": before_tag,
             "after": alt_text,
             "details": f"Wrapped content of {ref_string(obj)} in a child /Figure and set alt text to \"{alt_text}\".",
-        }], []
+        }]
+        applied.extend(remove_alt_from_descendants(figure, skip_ref=ref_string(figure)))
+        applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, figure, alt_text))
+        return True, applied, []
     if ancestry & UNSAFE_FIGURE_ANCESTRY:
         original_k = obj.get("/K")
         if original_k is None:
@@ -5922,26 +6566,37 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
             "/Alt": pikepdf.String(alt_text),
         }))
         obj["/K"] = figure
+        try:
+            if obj.get("/Alt") is not None:
+                del obj["/Alt"]
+        except Exception:
+            pass
         if isinstance(original_k, pikepdf.Dictionary):
             original_k["/P"] = figure
         elif isinstance(original_k, pikepdf.Array):
             for child in original_k:
                 if isinstance(child, pikepdf.Dictionary):
                     child["/P"] = figure
-        return True, [{
+        applied = [{
             "ref": ref_string(figure),
             "before": before_tag,
             "after": alt_text,
             "details": f"Wrapped content under {ref_string(obj)} in a child /Figure despite unsafe ancestry and set alt text to \"{alt_text}\".",
-        }], []
+        }]
+        applied.extend(remove_alt_from_descendants(figure, skip_ref=ref_string(figure)))
+        applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, figure, alt_text))
+        return True, applied, []
     obj["/S"] = pikepdf.Name("/Figure")
     obj["/Alt"] = pikepdf.String(alt_text)
-    return True, [{
+    applied = [{
         "ref": ref_string(obj),
         "before": before_tag,
         "after": alt_text,
         "details": f"Retagged {ref_string(obj)} as /Figure and set alt text to \"{alt_text}\".",
-    }], []
+    }]
+    applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj)))
+    applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, obj, alt_text))
+    return True, applied, []
 
 
 def mutate_mark_figure_decorative(pdf, mutation):
@@ -6215,6 +6870,8 @@ def main():
         changed, applied, warnings = mutate_repair_truetype_encoding_differences(pdf, request)
     elif operation == "embed_missing_fonts_in_place":
         changed, applied, warnings = mutate_embed_missing_fonts_in_place(pdf, request)
+    elif operation == "repair_malformed_bdc_operators":
+        changed, applied, warnings = mutate_repair_malformed_bdc_operators(pdf, request)
     elif operation == "artifact_nonsemantic_page_elements":
         changed, applied, warnings = mutate_artifact_nonsemantic_page_elements(pdf, request)
     elif operation == "replace_bookmarks_from_headings":
@@ -6223,6 +6880,10 @@ def main():
         changed, applied, warnings = mutate_create_heading_tag(pdf, request)
     elif operation == "create_heading_from_candidate":
         changed, applied, warnings = mutate_create_heading_from_candidate(pdf, request)
+    elif operation == "normalize_heading_hierarchy":
+        changed, applied, warnings = mutate_normalize_heading_hierarchy(pdf, request)
+    elif operation == "normalize_nested_figure_containers":
+        changed, applied, warnings = mutate_normalize_nested_figure_containers(pdf, request)
     elif operation == "retag_node":
         changed, applied, warnings = mutate_retag_node(pdf, request)
     elif operation == "set_table_header_cells":

@@ -13,6 +13,7 @@ import type { AdobeSummary } from './documentModel.js'
 import type { ReadingOrderResult } from './readingOrderService.js'
 import type { ColorContrastResult } from './colorContrastService.js'
 import type { TableStructureResult } from './tableStructureService.js'
+import type { TabOrderResult } from './tabOrderService.js'
 
 export interface HelpLink {
   label: string
@@ -257,6 +258,7 @@ export function scoreDocument(
     readingOrder?: ReadingOrderResult | null
     colorContrast?: ColorContrastResult | null
     tableStructure?: TableStructureResult | null
+    tabOrder?: TabOrderResult | null
   },
 ): ScoringResult {
   let categories: CategoryResult[] = []
@@ -303,7 +305,7 @@ export function scoreDocument(
   categories.push(scoreFormAccessibility(qpdf))
 
   // 9. Reading Order (5%)
-  categories.push(scoreReadingOrder(qpdf, extras?.readingOrder))
+  categories.push(scoreReadingOrder(qpdf, extras?.readingOrder, extras?.tabOrder, verapdf))
 
   // 10. Color Contrast (4.5%)
   categories.push(scoreColorContrast(extras?.colorContrast))
@@ -322,9 +324,15 @@ export function scoreDocument(
   // Calculate weighted average (N/A categories excluded, weights renormalized)
   const applicable = categories.filter(c => c.score !== null)
   const totalWeight = applicable.reduce((sum, c) => sum + c.weight, 0)
-  const computedScore = totalWeight > 0
+  let computedScore = totalWeight > 0
     ? Math.round(applicable.reduce((sum, c) => sum + (c.score! * (c.weight / totalWeight)), 0))
     : 0
+
+  // If veraPDF is fully clean, allow near-perfect heuristic scores to reach 100/100.
+  const veraPdfClean = verapdf.status === 'passed' && (verapdf.failedChecks || verapdf.failures.length) === 0
+  if (veraPdfClean && computedScore >= 98) {
+    computedScore = 100
+  }
 
   const scoreGateApplied = verapdf.status !== 'passed' && computedScore === 100
   const overallScore = scoreGateApplied ? 99 : computedScore
@@ -500,12 +508,15 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
     if (levels[i] > levels[i - 1] + 1) {
       hierarchyBroken = true
       findings.push(`Heading hierarchy skip: H${levels[i - 1]} → H${levels[i]} (skipped H${levels[i - 1] + 1})`)
+    } else if (levels[i] < levels[i - 1]) {
+      hierarchyBroken = true
+      findings.push(`Heading hierarchy reset: H${levels[i - 1]} → H${levels[i]} (descending levels should not restart)`)
     }
   }
 
   if (hierarchyBroken) {
     findings.unshift(`Found ${levels.length} heading tags, but hierarchy has gaps`)
-    findings.push('Heading levels should not skip — e.g., don\'t jump from H1 to H3 without an H2 in between.')
+    findings.push('Heading levels should not skip or restart — e.g., don\'t jump from H1 to H3 or fall back from H2 to H1 in the same outline.')
     return {
       id: 'heading_structure',
       label: 'Heading Structure',
@@ -645,6 +656,16 @@ function scoreAltTextWithAcrobatRisk(
     const unresolvedRiskNodes = acrobatAltRiskNodes.filter(n =>
       ALT_REMOVAL_MODES.has(n.ownershipMode ?? '') ? n.hasAlt : !n.hasAlt
     )
+    const substantiveUnresolvedRiskNodes = unresolvedRiskNodes.filter(node => !node.graphicsLikelyDecorative)
+    if (!substantiveUnresolvedRiskNodes.length) {
+      return {
+        ...category,
+        findings: [
+          ...category.findings,
+          'Decorative-looking non-figure graphics were detected, but all informative figures already have compliant alternate text.',
+        ],
+      }
+    }
     if (!unresolvedRiskNodes.length) {
       return {
         ...category,
@@ -653,7 +674,7 @@ function scoreAltTextWithAcrobatRisk(
     }
     // Some nodes still need repair — veraPDF passes but Adobe will flag them.
     // Cap the score to reflect that these are real accessibility failures.
-    const scoreCap = unresolvedRiskNodes.some(n => n.ownershipMode === 'mixed_text_graphics_same_mcid') ? 75 : 85
+    const scoreCap = substantiveUnresolvedRiskNodes.some(n => n.ownershipMode === 'mixed_text_graphics_same_mcid') ? 75 : 85
     return {
       ...category,
       score: scoreCap,
@@ -804,29 +825,41 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
 
   // status === 'ok'
   const findings: string[] = []
+  const ignorableInvisibleFailures = contrast.failures.filter(failure =>
+    failure.contrastRatio <= 1.05 && failure.fgColor.toLowerCase() === failure.bgColor.toLowerCase()
+  )
+  const effectiveFailures = contrast.failures.filter(failure =>
+    !(failure.contrastRatio <= 1.05 && failure.fgColor.toLowerCase() === failure.bgColor.toLowerCase())
+  )
+  const effectiveFailingCount = effectiveFailures.length
+  const effectiveFailRatio = contrast.totalSamples > 0 ? effectiveFailingCount / contrast.totalSamples : 0
   findings.push(`Analyzed ${contrast.totalSamples} text samples across ${contrast.pagesAnalyzed} page(s).`)
 
   let score: number
-  if (contrast.failRatio === 0 || contrast.failingContrastCount === 0) {
+  if (effectiveFailRatio === 0 || effectiveFailingCount === 0) {
     score = 100
     findings.push('All sampled text meets WCAG contrast requirements.')
-  } else if ((contrast.failRatio ?? 0) < 0.05) {
+  } else if (effectiveFailRatio < 0.05) {
     score = 80
-    findings.push(`${contrast.failingContrastCount} text sample(s) fail contrast requirements (${Math.round((contrast.failRatio ?? 0) * 100)}% of samples).`)
-  } else if ((contrast.failRatio ?? 0) < 0.20) {
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
+  } else if (effectiveFailRatio < 0.20) {
     score = 60
-    findings.push(`${contrast.failingContrastCount} text sample(s) fail contrast requirements (${Math.round((contrast.failRatio ?? 0) * 100)}% of samples).`)
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
   } else {
     score = 30
-    findings.push(`${contrast.failingContrastCount} text sample(s) fail contrast requirements (${Math.round((contrast.failRatio ?? 0) * 100)}% of samples — significant contrast problem).`)
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples — significant contrast problem).`)
   }
 
   // Show up to 5 failure examples
-  for (const failure of contrast.failures.slice(0, 5)) {
+  for (const failure of effectiveFailures.slice(0, 5)) {
     findings.push(`Page ${failure.page}: "${failure.textPreview}" — contrast ratio ${failure.contrastRatio}:1 (minimum ${failure.threshold}:1, colors ${failure.fgColor} on ${failure.bgColor})`)
   }
 
-  if (contrast.failingContrastCount > 0) {
+  if (ignorableInvisibleFailures.length > 0) {
+    findings.push(`Ignored ${ignorableInvisibleFailures.length} white-on-white sample(s) that appear to be invisible or hidden text rather than visible page content.`)
+  }
+
+  if (effectiveFailingCount > 0) {
     findings.push('How to fix: Increase the contrast between text and background colors. Use a contrast checker (e.g. WebAIM Contrast Checker) to verify your color choices meet WCAG 1.4.3. In the source document, adjust text or background colors before re-exporting to PDF.')
   }
 
@@ -1041,7 +1074,7 @@ function scoreFormAccessibility(qpdf: QpdfResult): CategoryResult {
   }
 }
 
-function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | null): CategoryResult {
+function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | null, tabOrder?: TabOrderResult | null, verapdf?: VeraPdfResult | null): CategoryResult {
   const readingLinks: CategoryResult['helpLinks'] = [
     { label: 'Adobe: Fix Reading Order', url: 'https://helpx.adobe.com/acrobat/using/create-verify-pdf-accessibility.html' },
     { label: 'WCAG 1.3.2: Meaningful Sequence', url: 'https://www.w3.org/WAI/WCAG21/Understanding/meaningful-sequence.html' },
@@ -1151,12 +1184,35 @@ function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | nul
     pdfminer.disorderRatio > ANALYSIS.PDFMINER_READING_ORDER_THRESHOLD
   ) {
     const pct = Math.round(pdfminer.disorderRatio * 100)
-    if (finalScore < 100) {
+    const shouldIgnorePdfMinerMismatch = qpdf.contentOrder.length === 0 && verapdf?.status === 'passed'
+    if (shouldIgnorePdfMinerMismatch) {
+      findings.push(`PDFMiner detected a ${pct}% content-stream mismatch, but this was ignored because the document passes PDF/UA and no MCID content-order trace was available for a stronger comparison.`)
+    } else if (finalScore < 100) {
       findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages).`)
     } else {
       finalScore = 70
       findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages). Although the tag structure appears correct, the underlying content stream order differs significantly from the visual layout.`)
     }
+  }
+
+  if (tabOrder?.status === 'ok') {
+    if (tabOrder.missingTabsCount > 0) {
+      finalScore = Math.min(finalScore, 60)
+      findings.push(`${tabOrder.missingTabsCount} page(s) are missing /Tabs /S.`)
+    }
+    if (tabOrder.outOfOrderPageCount > 0) {
+      finalScore = Math.min(finalScore, 75)
+      findings.push(`${tabOrder.outOfOrderPageCount} page(s) have annotations that are not ordered top-to-bottom, left-to-right.`)
+    }
+    if (tabOrder.annotatedPageCount > 0 && tabOrder.missingTabsCount === 0 && tabOrder.outOfOrderPageCount === 0) {
+      findings.push('Annotated pages use /Tabs /S and annotation arrays already follow reading order.')
+    }
+  } else if (tabOrder?.status === 'error' && tabOrder.warnings.length > 0) {
+    findings.push(`Tab order analysis warning: ${tabOrder.warnings[0]}`)
+  }
+
+  if (finalScore < 100) {
+    findings.push('How to fix: Set /Tabs /S on every tagged or annotated page and reorder each page’s annotations from top-to-bottom, then left-to-right.')
   }
 
   return {

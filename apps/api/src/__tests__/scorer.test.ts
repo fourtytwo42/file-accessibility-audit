@@ -4,6 +4,7 @@ import type { QpdfResult } from '../services/qpdfService.js'
 import type { PdfjsResult } from '../services/pdfjsService.js'
 import type { VeraPdfResult } from '../services/veraPdfService.js'
 import type { StructureBackendMutationResult } from '../services/pdfStructureBackend.js'
+import type { TabOrderResult } from '../services/tabOrderService.js'
 
 // ---------------------------------------------------------------------------
 // Helpers to build mock data
@@ -90,6 +91,19 @@ function makeStructure(overrides: Partial<StructureBackendMutationResult> = {}):
     acrobatAltRiskNodes: [],
     readingOrderNodes: [],
     readingOrderParents: [],
+    ...overrides,
+  }
+}
+
+function makeTabOrder(overrides: Partial<TabOrderResult> = {}): TabOrderResult {
+  return {
+    status: 'ok',
+    pagesAnalyzed: 1,
+    annotatedPageCount: 0,
+    missingTabsCount: 0,
+    outOfOrderPageCount: 0,
+    issues: [],
+    warnings: [],
     ...overrides,
   }
 }
@@ -209,6 +223,41 @@ describe('scoreDocument — fully accessible PDF', () => {
 
   it('pdf_ua_compliance scores 100', () => {
     expect(findCategory(result, 'pdf_ua_compliance').score).toBe(100)
+  })
+})
+
+describe('scoreDocument — local tab order detection', () => {
+  it('reduces reading-order score when tagged pages are missing /Tabs /S', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, {
+      tabOrder: makeTabOrder({
+        annotatedPageCount: 1,
+        missingTabsCount: 2,
+        issues: [
+          { page: 1, reason: 'missing_tabs_s', details: 'Page 1 is missing /Tabs /S.' },
+          { page: 2, reason: 'missing_tabs_s', details: 'Page 2 is missing /Tabs /S.' },
+        ],
+      }),
+    })
+
+    expect(findCategory(result, 'reading_order').score).toBe(60)
+    expect(findCategory(result, 'reading_order').findings.some(finding => finding.includes('/Tabs /S'))).toBe(true)
+  })
+
+  it('reduces reading-order score when annotations are out of order', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, {
+      tabOrder: makeTabOrder({
+        annotatedPageCount: 1,
+        outOfOrderPageCount: 1,
+        issues: [
+          { page: 1, reason: 'annotation_order', details: 'Page 1 annotations are not ordered top-to-bottom, left-to-right.' },
+        ],
+      }),
+    })
+
+    expect(findCategory(result, 'reading_order').score).toBe(75)
+    expect(findCategory(result, 'reading_order').findings.some(finding => finding.includes('annotations'))).toBe(true)
   })
 })
 
@@ -626,7 +675,7 @@ describe('scoreHeadingStructure edge cases', () => {
     expect(findCategory(result, 'heading_structure').score).toBe(100)
   })
 
-  it('H1→H2→H2→H1 (no skips) → score 100', () => {
+  it('H1→H2→H2→H1 reset → score 60', () => {
     const qpdf = makeQpdf({
       headings: [
         { level: 'H1', tag: '/H1' },
@@ -637,8 +686,9 @@ describe('scoreHeadingStructure edge cases', () => {
     })
     const pdfjs = makePdfjs()
     const result = scoreDocument(qpdf, pdfjs)
-    // Going from H2 back to H1 is not a skip (only checks if next > prev + 1)
-    expect(findCategory(result, 'heading_structure').score).toBe(100)
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(60)
+    expect(cat.findings.some(f => f.includes('reset'))).toBe(true)
   })
 })
 
