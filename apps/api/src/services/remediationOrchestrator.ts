@@ -1359,6 +1359,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
     let apiStatus: 'ok' | 'unavailable' = 'ok'
     let concurrencyCap = state.currentConcurrencyCap
     try {
+      let scheduledRerunsThisLoop = false
       try {
         await client.health()
       } catch {
@@ -1392,6 +1393,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
         if (awaitingAnyRestart.length > 0) {
           state = appendEvent(state, `Scheduling reruns after restart: ${awaitingAnyRestart.map(entry => entry.filename).join(', ')}`)
           state = await queueAwaitingRestartEntries(client, state)
+          scheduledRerunsThisLoop = true
         } else if (config.autoFixEnabled) {
           const needsFix = Object.values(state.files)
             .filter(entry => (entry.lifecycleState === 'needs_fix' || entry.lifecycleState === 'blocked') && entry.latestFailurePacketPath)
@@ -1469,7 +1471,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
         }
       }
 
-      if (!config.validateOnly && apiStatus === 'ok' && activeCount < concurrencyCap && !hasRerunBarrier) {
+      if (!config.validateOnly && apiStatus === 'ok' && activeCount < concurrencyCap && !hasRerunBarrier && !scheduledRerunsThisLoop) {
         const available = concurrencyCap - activeCount
         const candidates = Object.values(state.files)
           .filter(entry => entry.lifecycleState === 'queued' && !entry.queueItemId)
