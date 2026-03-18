@@ -193,10 +193,15 @@ function weakNativeBootstrapNeeded(input: BuildFailureProfileInput): boolean {
   if (input.analysis.isScanned || !input.context.qpdf.hasStructTree) return false
   const headingScore = categoryScore(input, 'heading_structure') ?? 100
   const altScore = categoryScore(input, 'alt_text') ?? 100
+  const tableScore = categoryScore(input, 'table_markup')
   const hasNativeHeadings = (input.context.qpdf.headings?.length || 0) > 0
   const hasSafeHeadingTargets = input.context.headingCandidates.some(candidate => candidate.repairMode === 'safe')
   const hasRetaggableFigures = input.context.figureCandidates.some(candidate => candidate.repairMode !== 'defer')
   const hasAccessibleImages = input.context.qpdf.images.some(image => image.hasAlt)
+  const hasPdfImages = (input.context.qpdf.images?.length || 0) > 0
+  const hasNativeFigureNodes = (input.context.structure.figures?.length || 0) > 0 || (input.context.structure.imageStructNodes?.length || 0) > 0
+  const hasNativeTables = (input.context.structure.tables?.length || 0) > 0
+  const hasPdfTables = (input.context.qpdf.tables?.length || 0) > 0
   return (
     headingScore < 100
     && !hasNativeHeadings
@@ -204,8 +209,16 @@ function weakNativeBootstrapNeeded(input: BuildFailureProfileInput): boolean {
     && !hasSafeHeadingTargets
   ) || (
     altScore < 100
-    && hasRetaggableFigures
+    && (
+      hasRetaggableFigures
+      || (hasPdfImages && !hasNativeFigureNodes)
+    )
     && !hasAccessibleImages
+  ) || (
+    typeof tableScore === 'number'
+    && tableScore < 100
+    && hasPdfTables
+    && !hasNativeTables
   )
 }
 
@@ -613,6 +626,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     node.ownershipMode === 'duplicate_mcid_ownership'
     || node.ownershipMode === 'container_with_graphics_descendants'
     || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe)
+    || node.ownershipMode === 'graphics_only_nonfigure'
     // orphaned_alt_empty_element: remove /Alt from empty element (no content kids)
     || node.ownershipMode === 'orphaned_alt_empty_element'
     // nonfigure_with_alt: remove /Alt from non-Figure element with real content kids
@@ -918,10 +932,10 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       candidateIds: [],
       candidateGroupIds: [],
       pageNumbers: [],
-      categoryTargets: ['text_extractability', 'heading_structure', 'alt_text', 'reading_order'],
+      categoryTargets: ['text_extractability', 'heading_structure', 'alt_text', 'reading_order', 'table_markup'],
       confidence: 0.72,
       blockedReason: undefined,
-      derivedFromFailureModeKeys: derivedFailureKeys(['category.text_extractability', 'category.heading_structure', 'category.alt_text', 'category.reading_order']),
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.text_extractability', 'category.heading_structure', 'category.alt_text', 'category.reading_order', 'category.table_markup']),
     })
   }
 

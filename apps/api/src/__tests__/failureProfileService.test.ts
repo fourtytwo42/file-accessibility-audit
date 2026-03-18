@@ -303,6 +303,37 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName) && opportunity.status === 'blocked')).toBe(true)
   })
 
+  it('treats graphics-only non-figure Acrobat risks as deterministically repairable', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext({
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [{
+            ref: '90 0 R',
+            tag: '/Shape',
+            pageRef: '5 0 R',
+            mcids: [12],
+            hasText: false,
+            hasGraphics: true,
+            hasAlt: false,
+            splitSafe: false,
+            graphicsLikelyDecorative: false,
+            operatorPattern: 'graphics_then_text',
+            parentTagPath: [],
+            ownershipMode: 'graphics_only_nonfigure',
+          }],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const opportunity = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_other_elements_alt_text')
+    expect(opportunity?.status).toBe('auto_runnable')
+    expect(opportunity?.blockedReason).toBeUndefined()
+  })
+
   it('marks prior attempts, rejections, and no-effect actions on matching opportunities', () => {
     const result = buildFailureProfileArtifacts({
       analysis: makeAnalysisResult(),
@@ -509,5 +540,34 @@ describe('failureProfileService', () => {
     })
 
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
+  it('does not emit blocked semantic failure modes once those categories are already complete', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 100,
+      grade: 'A',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'passed',
+        isCompliant: true,
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        ['heading_structure', 'alt_text', 'table_markup'].includes(category.id)
+          ? { ...category, score: 100, grade: 'A', severity: 'Pass', findings: [] }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis: analysis as AnalysisResult }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.heading_candidates_blocked')).toBe(false)
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.figure_candidates_blocked')).toBe(false)
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.table_candidates_blocked')).toBe(false)
   })
 })

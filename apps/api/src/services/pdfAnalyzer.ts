@@ -8,6 +8,7 @@ import type { AdobeSummary } from './documentModel.js'
 import { analyzeReadingOrder, type ReadingOrderResult } from './readingOrderService.js'
 import { analyzeColorContrast, type ColorContrastResult } from './colorContrastService.js'
 import { analyzeTableStructure, type TableStructureResult } from './tableStructureService.js'
+import { analyzeTabOrder } from './tabOrderService.js'
 import { ANALYSIS, REMEDIATION } from '#config'
 
 // Simple semaphore for concurrency limiting
@@ -104,10 +105,11 @@ export async function analyzePDF(
       : null
 
     // Run new accessibility detection modules in parallel
-    const [readingOrderResult, colorContrastResult, tableStructureResult] = await Promise.all([
+    const [readingOrderResult, colorContrastResult, tableStructureResult, tabOrderResult] = await Promise.all([
       analyzeReadingOrder(buffer, { signal: options?.signal }),
       analyzeColorContrast(buffer, { signal: options?.signal }),
       analyzeTableStructure(buffer, qpdfResult.tables?.length ?? 0, { signal: options?.signal }),
+      analyzeTabOrder(buffer, { isTagged: qpdfResult.isTagged || qpdfResult.hasStructTree }),
     ])
 
     // Score the document
@@ -127,6 +129,7 @@ export async function analyzePDF(
       readingOrder: readingOrderResult,
       colorContrast: colorContrastResult,
       tableStructure: tableStructureResult,
+      tabOrder: tabOrderResult,
     })
     options?.onProgress?.({ stage: 'Finalizing report', percent: 100 })
 

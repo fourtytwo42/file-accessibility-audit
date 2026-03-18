@@ -66,8 +66,9 @@ export interface HeadingCandidate {
 
 const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
 const UNSAFE_HEADING_TAGS = ['/Link', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
-const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox'] as const
+const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Shape', '/InlineShape'] as const
 const UNSAFE_FIGURE_TAGS = ['/TD', '/TH', '/TR', '/Table', '/TOCI', '/TOC', '/Link', '/L', '/LI'] as const
+const LEGACY_HEADING_TAG_RE = /^\/heading\s+(\d+)$/i
 const WINDOWS_FONT_CANDIDATES = [
   'arial.ttf',
   'segoeui.ttf',
@@ -92,11 +93,26 @@ async function loadRewriteFontBytes(): Promise<Buffer | null> {
 }
 
 function isSafeHeadingTag(tag?: string | null): boolean {
-  return !!tag && SAFE_HEADING_TAGS.includes(tag as (typeof SAFE_HEADING_TAGS)[number])
+  return !!tag
+    && (
+      SAFE_HEADING_TAGS.includes(tag as (typeof SAFE_HEADING_TAGS)[number])
+      || LEGACY_HEADING_TAG_RE.test(tag)
+    )
 }
 
 function isUnsafeHeadingTag(tag?: string | null): boolean {
   return !!tag && UNSAFE_HEADING_TAGS.includes(tag as (typeof UNSAFE_HEADING_TAGS)[number])
+}
+
+export function normalizedExistingHeadingLevel(tag?: string | null): string | null {
+  if (!tag) return null
+  if (/^\/?H[1-6]$/i.test(tag)) {
+    return String(tag).replace(/^\//, '').toUpperCase()
+  }
+  const legacy = String(tag).match(LEGACY_HEADING_TAG_RE)
+  if (!legacy) return null
+  const numeric = Math.max(1, Math.min(6, Number(legacy[1]) || 1))
+  return `H${numeric}`
 }
 
 function remapHeadingTarget(
@@ -196,6 +212,16 @@ export interface TableCandidate {
   unsafeReason?: string
 }
 
+function bootstrapFigureAltText(candidate: FigureCandidate): string {
+  if (candidate.splitGenerated || candidate.informativeHint !== 'informative') {
+    return `Decorative image on page ${candidate.pageNumber}`
+  }
+  if (candidate.surroundingText[0]) {
+    return `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
+  }
+  return `Image on page ${candidate.pageNumber}`
+}
+
 export interface PdfRemediationContext {
   analysis: AnalysisResult
   qpdf: QpdfResult
@@ -229,6 +255,75 @@ function clamp(value: number, min = 0, max = 1): number {
 
 function isRawUrl(text: string): boolean {
   return /^(https?:\/\/|www\.)/i.test(text.trim())
+}
+
+function normalizeHeadingText(text: string): string {
+  return text.replace(/\s+/g, ' ').trim()
+}
+
+function looksLikeProseHeadingText(text: string): boolean {
+  const normalized = normalizeHeadingText(text)
+  if (!normalized) return true
+  if (normalized.length < 3 || normalized.length > 120) return true
+  if (normalized.endsWith('.')) return true
+  const words = normalized.match(/\b[\p{L}\p{N}&/-]+\b/gu) || []
+  if (words.length > 12) return true
+  const sentencePunctuationCount = (normalized.match(/[.;!?]/g) || []).length
+  if (sentencePunctuationCount > 0 && words.length > 6) return true
+  if (/,/.test(normalized) && words.length > 7) return true
+  if (/[()]/.test(normalized) && words.length > 9) return true
+  if (/\b(and|or|but|because|while|although|since|were|was|are|have|has)\b/i.test(normalized) && words.length > 8) return true
+
+  const significantWords = words.filter(word => /[A-Za-z]/.test(word))
+  const lowercaseWords = significantWords.filter(word => /^[a-z]/.test(word))
+  const uppercaseWords = significantWords.filter(word => /^[A-Z0-9]/.test(word) || word === word.toUpperCase())
+  if (significantWords.length >= 6 && lowercaseWords.length > uppercaseWords.length) return true
+
+  return false
+}
+
+function normalizeBookmarkText(text: string): string {
+  return text
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([,.;:!?])/g, '$1')
+    .trim()
+}
+
+function looksLikeBookmarkNoise(text: string): boolean {
+  const normalized = normalizeBookmarkText(text)
+  if (!normalized) return true
+  if (normalized.length < 4) return true
+  if (!/[A-Za-z]/.test(normalized)) return true
+  if (normalized.length > 90) return true
+  if ((normalized.match(/\b\w+\b/g) || []).length > 12) return true
+  if (/^[A-Z]\s+[a-z].{12,}/.test(normalized)) return true
+  if (/^[a-z]/.test(normalized)) return true
+  if (/(we are pleased|under the leadership|for the agency|state fiscal year|provides statistical|the weeks that followed)/i.test(normalized)) return true
+  return false
+}
+
+function cleanedBookmarkHeadings(candidates: HeadingCandidate[]): Array<{
+  text: string
+  level: string
+  targetRef?: string | null
+  pageNumber: number
+}> {
+  const seen = new Set<string>()
+  const headings: Array<{ text: string; level: string; targetRef?: string | null; pageNumber: number }> = []
+  for (const candidate of candidates) {
+    const text = normalizeBookmarkText(candidate.text)
+    if (!text || looksLikeBookmarkNoise(text)) continue
+    const key = text.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    headings.push({
+      text,
+      level: normalizedExistingHeadingLevel(candidate.existingTag) || (candidate.pageNumber === 1 ? 'H1' : 'H2'),
+      targetRef: candidate.targetRef,
+      pageNumber: candidate.pageNumber,
+    })
+  }
+  return headings
 }
 
 function toNormalizedBbox(x: number, y: number, width: number, height: number, pageWidth: number, pageHeight: number): BoundingBox {
@@ -344,11 +439,13 @@ function buildHeadingCandidates(
     const medianFont = fontSizes.length ? fontSizes[Math.floor(fontSizes.length / 2)] : 12
 
     page.textLines.forEach((line, index) => {
+      const normalizedText = normalizeHeadingText(line.text)
       const headingLike =
-        line.text.length >= 3 &&
-        line.text.length <= 120 &&
-        !isRawUrl(line.text) &&
-        !line.text.startsWith('•') &&
+        normalizedText.length >= 3 &&
+        normalizedText.length <= 120 &&
+        !isRawUrl(normalizedText) &&
+        !normalizedText.startsWith('•') &&
+        !looksLikeProseHeadingText(normalizedText) &&
         (line.fontWeight === 'bold' || line.fontSize >= medianFont + 2)
 
       if (!headingLike) return
@@ -357,7 +454,7 @@ function buildHeadingCandidates(
       candidates.push({
         id: `heading:${page.pageNumber}:${candidates.length + 1}`,
         pageNumber: page.pageNumber,
-        text: line.text,
+        text: normalizedText,
         bbox: line.bbox,
         fontSize: line.fontSize,
         fontWeight: line.fontWeight,
@@ -385,6 +482,12 @@ function buildFigureCandidates(
 ): FigureCandidate[] {
   const structuralByRef = new Map(structure.structuralNodes.map(node => [node.ref, node]))
   const figureByRef = new Map(structure.figures.map(figure => [figure.ref, figure]))
+  const nestedFigureContainerRefs = new Set(
+    structure.figures
+      .filter(figure => (figure.childFigureCount || 0) > 0)
+      .map(figure => figure.ref)
+      .filter(Boolean),
+  )
   const imagePages = pages.filter(page => page.imageCount > 0)
   const classifyFigureTarget = (
     targetRef: string | null | undefined,
@@ -401,6 +504,7 @@ function buildFigureCandidates(
     const figureNode = targetRef ? figureByRef.get(targetRef) : null
     const targetTag = figureNode?.tag || structuralNode?.tag || null
     const parentTagPath = figureNode?.parentTagPath || structuralNode?.parentTagPath || []
+    const childFigureCount = figureNode?.childFigureCount || 0
     const unsafeTag = targetTag && UNSAFE_FIGURE_TAGS.includes(targetTag as (typeof UNSAFE_FIGURE_TAGS)[number])
     const unsafeParent = parentTagPath.find(tag => UNSAFE_FIGURE_TAGS.includes(tag as (typeof UNSAFE_FIGURE_TAGS)[number]))
     if (!targetRef) {
@@ -414,6 +518,14 @@ function buildFigureCandidates(
       }
     }
     if (targetTag === '/Figure') {
+      if (childFigureCount > 0) {
+        return {
+          repairMode: 'defer' as const,
+          targetTag,
+          parentTagPath,
+          unsafeReason: `nested_figure_container: Target ${targetRef} is a container /Figure with ${childFigureCount} descendant figure(s) and should not receive direct alt text.`,
+        }
+      }
       if (splitGenerated) {
         return {
           repairMode: informativeHint === 'decorative' ? 'set_alt' as const : 'defer' as const,
@@ -478,7 +590,9 @@ function buildFigureCandidates(
     }
   }
 
-  const explicitFigures = structure.figures.map((figure, index) => {
+  const explicitFigures = structure.figures
+    .filter(figure => !((figure.childFigureCount || 0) > 0))
+    .map((figure, index) => {
     const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const informativeHint = figure.splitGenerated ? 'decorative' as const : (surroundingText.length > 0 ? 'informative' as const : 'unknown' as const)
@@ -509,11 +623,12 @@ function buildFigureCandidates(
       pageImageCount: page?.imageCount || 0,
       textDensityHint,
       imageEvidence: 'strong' as const,
+      containsText: figure.childFigureCount ? true : undefined,
       splitGenerated: !!figure.splitGenerated,
       splitSourceRef: figure.splitSourceRef || null,
       splitSourceTag: figure.splitSourceTag || null,
     }
-  })
+    })
   const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
     const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
@@ -539,10 +654,11 @@ function buildFigureCandidates(
     }
   })
   const explicitRefs = new Set([...explicitFigures, ...explicitImageStructNodes].map(candidate => candidate.targetRef).filter(Boolean))
+  for (const ref of nestedFigureContainerRefs) explicitRefs.add(ref)
 
   const fallbackFigures = qpdf.images
     .map((image, index) => ({ image, index }))
-    .filter(({ image }) => !explicitRefs.has(image.ref))
+    .filter(({ image }) => !!image.ref && !explicitRefs.has(image.ref) && !nestedFigureContainerRefs.has(image.ref))
     .map(({ image, index }) => {
       const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || pages[0] || null
       const imageFallback = image.ref || null
@@ -1121,6 +1237,9 @@ export async function executeRemediationTool(input: {
     confidence: Math.max(0, Math.min(1, Number(call.confidence) || 0.5)),
     autoApplied: true,
     changedVisibleContent: ['update_link_visible_text', 'rewrite_link_visible_text'].includes(call.tool_name),
+    generationSource: args.generationSource === 'semantic_ai' || args.generationSource === 'heuristic_fallback' || args.generationSource === 'manual_deferred'
+      ? args.generationSource
+      : undefined,
     categoryTargets: [],
     changedDocumentBytes: false,
   } satisfies Omit<RemediationActionRecord, 'outcome'>
@@ -1423,16 +1542,17 @@ export async function executeRemediationTool(input: {
             const medianFont = fontSizes.length ? fontSizes[Math.floor(fontSizes.length / 2)] : 12
             return page.textLines
               .filter(line =>
-                line.text.length >= 3 &&
-                line.text.length <= 140 &&
-                !isRawUrl(line.text) &&
-                !line.text.startsWith('â€¢') &&
+                normalizeHeadingText(line.text).length >= 3 &&
+                normalizeHeadingText(line.text).length <= 140 &&
+                !isRawUrl(normalizeHeadingText(line.text)) &&
+                !normalizeHeadingText(line.text).startsWith('â€¢') &&
+                !looksLikeProseHeadingText(normalizeHeadingText(line.text)) &&
                 (line.fontWeight === 'bold' || line.fontSize >= medianFont + 1),
               )
               .slice(0, page.pageNumber === 1 ? 3 : 2)
               .map(line => ({
                 pageNumber: page.pageNumber,
-                text: line.text,
+                text: normalizeHeadingText(line.text),
               }))
           })
       const selectedHeadingCandidates = headingCandidates.slice(0, 6)
@@ -1444,12 +1564,23 @@ export async function executeRemediationTool(input: {
         level: normalizedHeadingLevels[index] || 'H2',
         pageNumber: candidate.pageNumber,
       }))
+      const figures = context.figureCandidates
+        .filter(candidate =>
+          candidate.pageImageCount > 0
+          && candidate.informativeHint !== 'decorative'
+          && Number.isFinite(candidate.pageNumber)
+        )
+        .slice(0, 24)
+        .map(candidate => ({
+          pageNumber: candidate.pageNumber,
+          altText: bootstrapFigureAltText(candidate),
+        }))
       const result = await runPdfStructureBackend({
         buffer,
         mutation: {
           operation: 'bootstrap_struct_tree',
           headings,
-          figures: [],
+          figures,
         },
       })
       const translated = structureResultToAction({
@@ -1464,16 +1595,19 @@ export async function executeRemediationTool(input: {
       }
     }
     case 'replace_bookmarks_from_headings': {
-      const headings = context.headingCandidates
-        .filter(candidate => candidate.text.trim() && (candidate.targetRef || Number.isFinite(candidate.pageNumber)))
-        .map(candidate => ({
-          text: candidate.text.trim(),
-          level: /^\/?H[1-6]$/i.test(candidate.existingTag || '')
-            ? String(candidate.existingTag).replace(/^\//, '').toUpperCase()
-            : (candidate.pageNumber === 1 ? 'H1' : 'H2'),
-          targetRef: candidate.targetRef,
-          pageNumber: candidate.pageNumber,
-        }))
+      const explicitHeadings = Array.isArray(args.headings)
+        ? args.headings
+          .map(entry => ({
+            text: normalizeBookmarkText(String(entry?.text || '')),
+            level: /^H[1-6]$/i.test(String(entry?.level || '')) ? String(entry.level).toUpperCase() : 'H2',
+            targetRef: typeof entry?.targetRef === 'string' ? entry.targetRef : undefined,
+            pageNumber: Number.isFinite(Number(entry?.pageNumber)) ? Number(entry.pageNumber) : undefined,
+          }))
+          .filter(entry => entry.text && !looksLikeBookmarkNoise(entry.text) && (entry.targetRef || Number.isFinite(entry.pageNumber)))
+        : null
+      const headings = explicitHeadings?.length
+        ? explicitHeadings
+        : cleanedBookmarkHeadings(context.headingCandidates)
       if (!headings.length) {
         const deferred = deferredAction(
           baseAction,
@@ -1492,6 +1626,42 @@ export async function executeRemediationTool(input: {
         },
       })
       const translated = structureResultToAction({ baseAction, result, categoryTargets: ['bookmarks'] })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
+    case 'normalize_heading_hierarchy': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'normalize_heading_hierarchy',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['heading_structure', 'pdf_ua_compliance'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
+    case 'normalize_nested_figure_containers': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'normalize_nested_figure_containers',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['alt_text', 'pdf_ua_compliance', 'reading_order'],
+      })
       return {
         buffer: translated.buffer || buffer,
         action: translated.action,
@@ -1738,6 +1908,24 @@ export async function executeRemediationTool(input: {
           outcome: nextBuffer === buffer ? 'no_effect' : 'applied',
         },
         manualReviewFlags: [],
+      }
+    }
+    case 'repair_malformed_bdc_operators': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'repair_malformed_bdc_operators',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
       }
     }
     case 'repair_structure_conformance': {
@@ -2095,6 +2283,7 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
     set_pdfua_identification: 'language',
     normalize_document_metadata: 'language',
     repair_structure_conformance: 'structure',
+    repair_malformed_bdc_operators: 'structure',
     repair_note_tag_ids: 'structure',
     repair_native_marked_content_refs: 'structure',
     repair_native_link_structure: 'structure',
@@ -2113,6 +2302,8 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
     set_tabs_all_annotated_pages: 'reading_order',
     repair_annotation_alt_text: 'alt_text',
     replace_bookmarks_from_headings: 'bookmark',
+    normalize_heading_hierarchy: 'structure',
+    normalize_nested_figure_containers: 'structure',
     create_bookmark: 'bookmark',
     set_figure_alt_text: 'alt_text',
     retag_as_figure_and_set_alt: 'alt_text',
@@ -2137,6 +2328,7 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
     details: action.details,
     confidence: action.confidence,
     autoApplied: action.autoApplied,
+    generationSource: action.generationSource,
   }
 }
 
@@ -2147,12 +2339,15 @@ export function toSuggestedChange(action: RemediationActionRecord): SuggestedCha
     bootstrap_struct_tree: 'structure',
     create_bookmark: 'bookmark',
     replace_bookmarks_from_headings: 'bookmark',
+    normalize_heading_hierarchy: 'structure',
+    normalize_nested_figure_containers: 'structure',
     set_figure_alt_text: 'alt_text',
     retag_as_figure_and_set_alt: 'alt_text',
     mark_figure_decorative: 'artifact',
     set_pdfua_identification: 'language',
     normalize_document_metadata: 'language',
     repair_structure_conformance: 'structure',
+    repair_malformed_bdc_operators: 'structure',
     repair_note_tag_ids: 'structure',
     repair_native_marked_content_refs: 'structure',
     repair_native_link_structure: 'structure',
@@ -2193,6 +2388,7 @@ export function toSuggestedChange(action: RemediationActionRecord): SuggestedCha
     details: action.details,
     confidence: action.confidence,
     autoApplied: false,
+    generationSource: action.generationSource,
     reason: action.outcome === 'unsupported'
       ? 'Current mutation backend does not support this repair safely.'
       : action.outcome === 'rejected'

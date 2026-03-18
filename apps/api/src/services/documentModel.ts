@@ -69,6 +69,7 @@ export interface AppliedChange {
   pageNumber?: number
   confidence: number
   autoApplied: boolean
+  generationSource?: 'semantic_ai' | 'heuristic_fallback' | 'manual_deferred'
 }
 
 export interface SuggestedChange extends AppliedChange {
@@ -121,6 +122,7 @@ export type RemediationToolName =
   | 'set_pdfua_identification'
   | 'normalize_document_metadata'
   | 'repair_structure_conformance'
+  | 'repair_malformed_bdc_operators'
   | 'repair_note_tag_ids'
   | 'repair_native_marked_content_refs'
   | 'repair_native_link_structure'
@@ -162,6 +164,7 @@ export type RemediationToolName =
   | 'inspect_reading_order'
   | 'bootstrap_struct_tree'
   | 'create_heading_from_candidate'
+  | 'normalize_heading_hierarchy'
   | 'retag_node'
   | 'create_heading_tag'
   | 'set_table_header_cells'
@@ -197,6 +200,7 @@ export interface RemediationActionRecord {
   changedDocumentBytes?: boolean
   scoreDelta?: Array<{ categoryId: string; before: number | null; after: number | null }>
   validationWarnings?: string[]
+  generationSource?: 'semantic_ai' | 'heuristic_fallback' | 'manual_deferred'
 }
 
 export interface RemediationIteration {

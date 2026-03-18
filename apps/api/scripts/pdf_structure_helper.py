@@ -1782,13 +1782,35 @@ def build_pdfua_xmp(title, language, part, conformance):
 <?xpacket end="w"?>"""
 
 
+def normalize_language_tag(language):
+    raw = str(language or "").strip().replace("_", "-")
+    if not raw:
+        return "en"
+
+    parts = [part for part in raw.split("-") if part]
+    if not parts:
+        return "en"
+
+    normalized = []
+    for index, part in enumerate(parts):
+        if index == 0:
+            normalized.append(part.lower())
+        elif re.fullmatch(r"[A-Za-z]{4}", part):
+            normalized.append(part[:1].upper() + part[1:].lower())
+        elif re.fullmatch(r"[A-Za-z]{2}", part) or re.fullmatch(r"\d{3}", part):
+            normalized.append(part.upper())
+        else:
+            normalized.append(part.lower())
+    return "-".join(normalized)
+
+
 def mutate_set_pdfua_identification(pdf, mutation):
     catalog = get_catalog(pdf)
     if catalog is None:
         return False, [], ["Could not locate the PDF catalog to attach metadata."]
 
     title = str(mutation.get("title") or "").strip() or "Accessible PDF"
-    language = str(mutation.get("language") or "").strip() or "en"
+    language = normalize_language_tag(mutation.get("language") or "en")
     part = mutation.get("part") or 1
     conformance = str(mutation.get("conformance") or "B").strip() or "B"
 
@@ -6419,7 +6441,14 @@ def mutate_set_table_header_cells(pdf, mutation):
         return False, [], ["No /Table elements were found in the structure tree."]
 
     requested = set(mutation.get("targets") or [])
-    selected = tables if not requested else [table for table in tables if table["ref"] in requested]
+    selected = tables if not requested else [
+        table for table in tables
+        if (
+            table["ref"] in requested
+            or any(cell_ref in requested for cell_ref in table["firstRowCellRefs"])
+            or any(cell_ref in requested for cell_ref in table["headerCellRefs"])
+        )
+    ]
     applied = []
     for table in selected:
         header_refs = []
@@ -6440,18 +6469,38 @@ def mutate_set_table_header_cells(pdf, mutation):
                     row_cells.append(cells)
                     row_column_counts.append(sum(cell_span(cell) for cell in cells))
                 max_columns = max(row_column_counts) if row_column_counts else 0
-                if max_columns > 1 and row_cells and len(row_cells[0]) == 1:
-                    title_cell = row_cells[0][0]
-                    current_span = cell_span(title_cell)
-                    if current_span != max_columns:
+                if max_columns > 1:
+                    for row_index, cells in enumerate(row_cells):
+                        if len(cells) != 1:
+                            continue
+                        title_cell = cells[0]
+                        current_span = cell_span(title_cell)
+                        if current_span == max_columns:
+                            continue
                         title_cell["/ColSpan"] = pikepdf.Integer(max_columns)
                         applied.append({
                             "ref": ref_string(title_cell),
                             "before": str(current_span),
                             "after": str(max_columns),
-                            "details": f"Expanded first-row table title cell {ref_string(title_cell)} to /ColSpan {max_columns} so header rows align with later rows.",
+                            "details": (
+                                f"Expanded single-cell row {row_index + 1} table title cell {ref_string(title_cell)} "
+                                f"to /ColSpan {max_columns} so header/data rows align."
+                            ),
                         })
-        for cell_ref in table["firstRowCellRefs"]:
+        first_row_refs = list(table["firstRowCellRefs"])
+        if not first_row_refs and row_nodes:
+            for row in row_nodes:
+                cells = [cell for cell in get_child_dicts(row) if str(cell.get("/S")) in {"/TD", "/TH"}]
+                if len(cells) > 1:
+                    first_row_refs = [ref_string(cell) for cell in cells if ref_string(cell)]
+                    break
+            if not first_row_refs:
+                for row in row_nodes:
+                    cells = [cell for cell in get_child_dicts(row) if str(cell.get("/S")) in {"/TD", "/TH"}]
+                    if cells:
+                        first_row_refs = [ref_string(cell) for cell in cells if ref_string(cell)]
+                        break
+        for cell_ref in first_row_refs:
             obj = resolve_obj(pdf, cell_ref)
             if not isinstance(obj, pikepdf.Dictionary):
                 continue

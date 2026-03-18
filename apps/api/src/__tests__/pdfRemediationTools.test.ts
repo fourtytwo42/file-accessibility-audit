@@ -127,6 +127,123 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(needsAltTextDeepInspection(analysis)).toBe(true)
   })
 
+  it('plans table header repair against table refs instead of individual cell refs', async () => {
+    const analysis = {
+      ...({
+        filename: 'table.pdf',
+        pageCount: 1,
+        fileType: 'pdf',
+        pdfMetadata: {
+          creator: null,
+          producer: null,
+          creationDate: null,
+          modDate: null,
+          pdfVersion: '1.7',
+          isEncrypted: false,
+          keywords: null,
+          author: null,
+          subject: null,
+          pageCount: 1,
+        },
+        routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+        overallScore: 72,
+        grade: 'C',
+        isScanned: false,
+        executiveSummary: '',
+        verapdf: {
+          status: 'passed',
+          executionStatus: 'ok',
+          profile: 'PDF/UA-1',
+          flavour: 'ua1',
+          isCompliant: true,
+          passedChecks: 10,
+          failedChecks: 0,
+          failures: [],
+          message: '',
+        },
+        categories: [
+          { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 40, grade: 'F', severity: 'Critical', findings: ['Missing TH'], explanation: '', helpLinks: [] },
+        ],
+        warnings: [],
+      }) as any,
+    }
+    const context: PdfRemediationContext = {
+      analysis,
+      qpdf: {
+        hasStructTree: true,
+        hasLang: true,
+        lang: 'en',
+        hasOutlines: false,
+        outlineCount: 0,
+        outlineTitles: [],
+        hasAcroForm: false,
+        formFields: [],
+        images: [],
+        headings: [],
+        tables: [],
+        structTreeDepth: 2,
+        contentOrder: [],
+        error: null,
+      },
+      pdfjs: {
+        pageCount: 1,
+        hasText: true,
+        textLength: 100,
+        title: null,
+        author: null,
+        subject: null,
+        lang: 'en',
+        hasOutlines: false,
+        outlineCount: 0,
+        links: [],
+        imageCount: 0,
+        metadata: {
+          creator: null,
+          producer: null,
+          creationDate: null,
+          modDate: null,
+          pdfVersion: '1.7',
+          isEncrypted: false,
+          keywords: null,
+          author: null,
+          subject: null,
+          pageCount: 1,
+        },
+        error: null,
+      },
+      structure: { structuralNodes: [], tables: [], figures: [], headings: [], readingOrderNodes: [], readingOrderParents: [] } as any,
+      pages: [{ pageNumber: 1, width: 612, height: 792, imageCount: 0, textLines: [], links: [] }],
+      headingCandidates: [],
+      figureCandidates: [],
+      tableCandidates: [{
+        id: 'table:1',
+        ref: '21 0 R',
+        pageNumberHints: [1],
+        firstRowCellRefs: ['31 0 R', '32 0 R'],
+        headerCellRefs: [],
+        hasHeaders: false,
+        repairMode: 'safe',
+        nearbyContext: ['Example table'],
+      }],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      linkCandidates: [],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'table.pdf',
+      analysis: analysis as any,
+      context,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const action = plan.actions.find(entry => entry.tool_name === 'set_table_header_cells')
+    expect(action).toBeTruthy()
+    expect(action?.arguments).toEqual({ targets: ['21 0 R'] })
+  })
+
   it('remaps section-backed heading candidates to the first safe descendant text node', () => {
     const target = __test_remapHeadingTarget([
       { ref: 'obj:9 0 R', tag: '/Sect', parentRef: 'obj:7 0 R', orderIndex: 0, parentTagPath: ['None'] },
@@ -354,6 +471,69 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }))
     expect(result.action.outcome).toBe('applied')
     expect(result.action.categoryTargets).toEqual(['alt_text'])
+  })
+
+  it('passes figure bootstrap candidates into bootstrap_struct_tree for weak native image documents', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'bootstrap-figures.pdf')
+    const inspected = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const context: PdfRemediationContext = {
+      ...inspected,
+      headingCandidates: [],
+      figureCandidates: [{
+        id: 'figure:1',
+        pageNumber: 1,
+        targetRef: 'obj:10 0 R',
+        bbox: { x: 0, y: 0, width: 0.5, height: 0.5 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Cover chart.'],
+        repairMode: 'defer',
+        targetTag: null,
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      }],
+    }
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [{
+        ref: 'obj:20 0 R',
+        before: null,
+        after: '/Figure',
+        details: 'Created figure tag with alt text.',
+      }],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: buffer,
+    })
+
+    await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'bootstrap_struct_tree',
+        arguments: { target: 'document' },
+        rationale: 'Bootstrap structure tree.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalledWith(expect.objectContaining({
+      mutation: expect.objectContaining({
+        operation: 'bootstrap_struct_tree',
+        figures: [{ pageNumber: 1, altText: 'Image related to Cover chart' }],
+      }),
+    }))
   })
 
   it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {
@@ -2426,6 +2606,83 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     const plan = await planRemediationActions({
       filename: 'weak-native.pdf',
+      analysis: weakAnalysis as any,
+      context: weakContext as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'bootstrap_struct_tree')).toBe(true)
+  })
+
+  it('plans bootstrap augmentation for weak native-tagged documents with images and tables but no native figure/table nodes', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'weak-native-figures.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const weakAnalysis = {
+      ...analysis,
+      isScanned: false,
+      categories: analysis.categories.map(category => {
+        if (category.id === 'alt_text') return { ...category, score: 0, grade: 'F', findings: ['Images are not tagged as Figure elements'] }
+        if (category.id === 'table_markup') return { ...category, score: 40, grade: 'F', findings: ['Tables found but no TH tags'] }
+        if (category.id === 'reading_order') return { ...category, score: 40, grade: 'F' }
+        return category
+      }),
+    }
+    const weakContext = {
+      ...context,
+      qpdf: {
+        ...context.qpdf,
+        hasStructTree: true,
+        isTagged: true,
+        structTreeDepth: 2,
+        images: [{ ref: 'obj:20 0 R', hasAlt: false }],
+        tables: [{ page: 1 }],
+      },
+      structure: {
+        ...context.structure,
+        figures: [],
+        imageStructNodes: [],
+        tables: [],
+      },
+      figureCandidates: [{
+        id: 'figure:1',
+        pageNumber: 1,
+        targetRef: null,
+        bbox: { x: 0, y: 0, width: 1, height: 1 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative' as const,
+        surroundingText: ['State seal'],
+        repairMode: 'defer' as const,
+        targetTag: null,
+        unsafeReason: 'Figure candidate did not map to an editable structure element.',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'low' as const,
+        imageEvidence: 'strong' as const,
+      }],
+      tableCandidates: [{
+        id: 'table:1',
+        ref: 'obj:30 0 R',
+        pageNumberHints: [1],
+        firstRowCellRefs: [],
+        headerCellRefs: [],
+        hasHeaders: false,
+        repairMode: 'defer' as const,
+        nearbyContext: ['Example table'],
+        unsafeReason: 'Table candidate does not expose first-row cells that can be safely promoted to headers.',
+      }],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'weak-native-figures.pdf',
       analysis: weakAnalysis as any,
       context: weakContext as any,
       iteration: 1,

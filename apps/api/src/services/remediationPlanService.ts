@@ -508,10 +508,10 @@ function buildDeterministicCall(input: {
     case 'set_table_header_cells': {
       const candidateId = opportunity.candidateIds[0]
       const candidate = context.tableCandidates.find(entry => entry.id === candidateId)
-      if (!candidate?.firstRowCellRefs?.length) return null
+      if (!candidate?.ref) return null
       return {
         tool_name: 'set_table_header_cells',
-        arguments: { targets: candidate.firstRowCellRefs },
+        arguments: { targets: [candidate.ref] },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
       }

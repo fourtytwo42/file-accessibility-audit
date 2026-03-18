@@ -50,6 +50,9 @@ tmp/
 .local-tools/
 .claude/
 downloads/
+Downloads/
+Mitigated/
+MitigationAttempts/
 apps/api/data/
 apps/api/scripts/__pycache__/
 apps/api/tmp-*.pdf

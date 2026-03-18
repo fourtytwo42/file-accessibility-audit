@@ -43,10 +43,13 @@ export interface StructureBackendMutationRequest {
     | 'set_tabs_all_annotated_pages'
     | 'substitute_legacy_fonts_in_place'
     | 'finalize_substituted_font_conformance'
+    | 'repair_malformed_bdc_operators'
     | 'artifact_nonsemantic_page_elements'
     | 'replace_bookmarks_from_headings'
     | 'create_heading_tag'
     | 'create_heading_from_candidate'
+    | 'normalize_heading_hierarchy'
+    | 'normalize_nested_figure_containers'
     | 'retag_node'
     | 'set_table_header_cells'
     | 'set_figure_alt_text'
@@ -102,6 +105,7 @@ export interface StructureBackendMutationResult {
     tag: string
     hasAlt: boolean
     altText?: string | null
+    childFigureCount?: number
     parentTagPath?: string[]
     pageRef?: string | null
     mcids?: number[]
@@ -152,7 +156,11 @@ export async function runPdfStructureBackend(input: {
   ensureHelperExists()
   const timeoutMs = input.mutation.operation === 'repair_other_elements_alt_text'
     ? 900_000
-    : 60_000
+    : input.mutation.operation === 'inspect' && input.mutation.inspectMode === 'alt_text_deep'
+      ? 300_000
+      : input.mutation.operation === 'inspect'
+        ? 120_000
+        : 60_000
 
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pdf-struct-'))
   const inputPath = path.join(tmpRoot, `${randomUUID()}.pdf`)
