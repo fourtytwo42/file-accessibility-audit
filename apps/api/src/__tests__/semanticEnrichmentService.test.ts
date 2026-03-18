@@ -187,7 +187,9 @@ describe('semanticEnrichmentService', () => {
     expect(batches.map(batch => `${batch.batchType}:${batch.headings.length || batch.figures.length || batch.tables.length || batch.links.length}`)).toEqual([
       'headings:8',
       'headings:1',
-      'figures:3',
+      'figures:1',
+      'figures:1',
+      'figures:1',
       'figures:1',
       'tables:1',
       'links:8',
@@ -243,6 +245,70 @@ describe('semanticEnrichmentService', () => {
     }])
   })
 
+  it('routes each eligible figure as its own vision request with cropped image data', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn(async (_url, init: any) => {
+      const body = JSON.parse(String(init?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      expect(prompt).toContain('Batch type: figures')
+      expect(prompt).toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
+      expect((prompt.match(/"candidateId":"figure:/g) || []).length).toBe(1)
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    figures: [{ candidateId: 'figure:1', decorative: false, altText: 'Chart of outcomes', confidence: 0.9, rationale: 'Visible chart.' }],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      }
+    })
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        headingCandidates: [],
+        tableCandidates: [],
+        linkCandidates: [],
+      },
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(4)
+    expect(cropDataUrlRegion).toHaveBeenCalledWith(
+      expect.any(Buffer),
+      expect.objectContaining({ x: 0, y: 0, width: 1, height: 1 }),
+      expect.objectContaining({ maxDimension: 768, maxBytes: 90000 }),
+    )
+  })
+
+  it('includes informative figures even when they already have alt text', async () => {
+    const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const context = makeContext()
+    context.figureCandidates = [{
+      ...context.figureCandidates[0],
+      hasAlt: true,
+      altText: 'Older alt text',
+      informativeHint: 'informative',
+    }]
+    const batches = buildSemanticRepairBatches({ context, analysis: makeAnalysisResult() })
+    expect(batches.filter(batch => batch.batchType === 'figures')).toHaveLength(1)
+    expect(batches.find(batch => batch.batchType === 'figures')?.figures[0]?.id).toBe('figure:1')
+  })
+
   it('skips clean categories even when candidates exist', async () => {
     const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const analysis = makeAnalysisResult()
@@ -253,10 +319,26 @@ describe('semanticEnrichmentService', () => {
       { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
     ] as any
     const batches = buildSemanticRepairBatches({ context: makeContext(), analysis })
-    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures'])
+    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures'])
   })
 
-  it('returns no batches for fully compliant results', async () => {
+  it('still returns bookmark cleanup batches when bookmarks are the only remaining semantic work', async () => {
+    const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const analysis = makeAnalysisResult()
+    analysis.grade = 'B'
+    analysis.verapdf = makeVeraPdfResult({ status: 'passed', isCompliant: true, failedChecks: 0, failures: [] })
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+    const batches = buildSemanticRepairBatches({ context: makeContext(), analysis })
+    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures', 'bookmarks'])
+  })
+
+  it('still returns figure batches for fully compliant results when AI-first figures are eligible', async () => {
     const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const analysis = makeAnalysisResult()
     analysis.grade = 'A'
@@ -268,7 +350,7 @@ describe('semanticEnrichmentService', () => {
       { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
     ] as any
     const batches = buildSemanticRepairBatches({ context: makeContext(), analysis })
-    expect(batches).toEqual([])
+    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures'])
   })
 
   it('retries oversized heading batches with smaller requests', async () => {

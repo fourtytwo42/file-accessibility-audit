@@ -17,8 +17,9 @@ const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENR
 const PROPOSE_SEMANTIC_REPAIRS_TOOL = 'propose_semantic_repairs'
 const HEADING_BATCH_SIZE = 8
 const LINK_BATCH_SIZE = 8
-const FIGURE_BATCH_SIZE = 3
+const FIGURE_BATCH_SIZE = 1
 const TABLE_BATCH_SIZE = 3
+const BOOKMARK_BATCH_SIZE = 10
 const MAX_TEXT = 240
 const MAX_ALT_TEXT = 180
 const TOP_FAILURE_LIMIT = 2
@@ -27,6 +28,9 @@ const FIGURE_CONTEXT_LIMIT = 2
 const TABLE_CONTEXT_LIMIT = 3
 const TEXT_ONLY_SOFT_BUDGET = 7_500
 const IMAGE_BATCH_SOFT_BUDGET = 180_000
+const SEMANTIC_PAGE_RENDER_SCALE = 1.0
+const SEMANTIC_FIGURE_MAX_DIMENSION = 768
+const SEMANTIC_FIGURE_MAX_BYTES = 90_000
 
 type SemanticRepairBatch = ReturnType<typeof buildSemanticRepairBatches>[number]
 
@@ -60,12 +64,21 @@ export interface SemanticLinkProposal {
   rationale: string
 }
 
+export interface SemanticBookmarkProposal {
+  candidateId: string
+  title: string
+  level: 'H1' | 'H2' | 'H3' | 'H4' | 'H5' | 'H6'
+  confidence: number
+  rationale: string
+}
+
 export interface SemanticBatchResult {
-  batchType: 'headings' | 'figures' | 'tables' | 'links'
+  batchType: 'headings' | 'figures' | 'tables' | 'links' | 'bookmarks'
   headings: SemanticHeadingProposal[]
   figures: SemanticFigureProposal[]
   tables: SemanticTableProposal[]
   links: SemanticLinkProposal[]
+  bookmarks: SemanticBookmarkProposal[]
 }
 
 interface SemanticHeadingTarget {
@@ -103,6 +116,14 @@ interface SemanticLinkTarget {
   text: string
   suggestedText: string | null
   annotationContents: string | null
+}
+
+interface SemanticBookmarkTarget {
+  candidateId: string
+  pageNumber: number
+  text: string
+  nearbyContext: string[]
+  existingTag: string | null
 }
 
 interface SemanticDocumentSummary {
@@ -173,7 +194,7 @@ function categoryNeedsWork(result: AnalysisResult, categoryId: string): boolean 
 
 function semanticWorkComplete(result: AnalysisResult): boolean {
   if (result.verapdf?.status === 'passed' && result.grade === 'A') return true
-  return !['heading_structure', 'alt_text', 'table_markup', 'link_quality'].some(categoryId => categoryNeedsWork(result, categoryId))
+  return !['heading_structure', 'alt_text', 'table_markup', 'link_quality', 'bookmarks'].some(categoryId => categoryNeedsWork(result, categoryId))
 }
 
 function summarizeDocument(filename: string, title: string | null, language: string | null, result: AnalysisResult): SemanticDocumentSummary {
@@ -187,7 +208,7 @@ function summarizeDocument(filename: string, title: string | null, language: str
   }
 }
 
-function hasSemanticRepairConfig(): boolean {
+export function hasSemanticRepairConfig(): boolean {
   return !!OPENAI_COMPAT_API_KEY
 }
 
@@ -198,14 +219,18 @@ function buildPrompt(input: {
   figures: SemanticFigureTarget[]
   tables: SemanticTableTarget[]
   links: SemanticLinkTarget[]
+  bookmarks: SemanticBookmarkTarget[]
 }): string {
   return [
     'You are proposing semantic accessibility repairs for an existing native PDF.',
     'Do not rewrite the whole document. Only return semantic decisions for the provided targets.',
     'Prefer conservative outputs. If a target is ambiguous, lower confidence and keep text short.',
     'For figures: if decorative is true, altText should be empty.',
+    'For figures: use the cropped image as the primary evidence and use nearby text only as supporting context.',
+    'For figures: avoid generic labels like "Image related to..." or "Image on page...". Describe the figure content or purpose specifically and concisely.',
     'For links: replacementText should be short visible text, annotationContents can be a slightly longer accessible label.',
     'For tables: only set useFirstRowAsHeader when the first row clearly behaves like column headers.',
+    'For bookmarks: return concise, section-like sidebar labels. Clean up noisy OCR or fragmented heading text. Do not invent sections.',
     `Document summary: ${JSON.stringify(input.document)}`,
     `Batch type: ${input.batchType}`,
     JSON.stringify({
@@ -213,6 +238,7 @@ function buildPrompt(input: {
       figures: input.figures,
       tables: input.tables,
       links: input.links,
+      bookmarks: input.bookmarks,
     }),
   ].join('\n')
 }
@@ -289,6 +315,21 @@ async function openAiCompatJsonResponse(messages: any[]): Promise<any> {
                     candidateId: { type: 'string' },
                     replacementText: { type: 'string' },
                     annotationContents: { type: 'string' },
+                    confidence: { type: 'number' },
+                    rationale: { type: 'string' },
+                  },
+                },
+              },
+              bookmarks: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  required: ['candidateId', 'title', 'level', 'confidence', 'rationale'],
+                  properties: {
+                    candidateId: { type: 'string' },
+                    title: { type: 'string' },
+                    level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
                     confidence: { type: 'number' },
                     rationale: { type: 'string' },
                   },
@@ -379,8 +420,20 @@ function normalizeBatchResult(
         rationale: sanitizeText(entry.rationale, MAX_TEXT),
       }))
     : []
+  const bookmarks = Array.isArray(payload?.bookmarks)
+    ? payload.bookmarks
+      .filter((entry: any) => allowedIds.has(String(entry?.candidateId || '')))
+      .map((entry: any) => ({
+        candidateId: String(entry.candidateId),
+        title: sanitizeText(entry.title, 120),
+        level: allowedLevel(entry.level),
+        confidence: clampConfidence(entry.confidence),
+        rationale: sanitizeText(entry.rationale, MAX_TEXT),
+      }))
+      .filter((entry: SemanticBookmarkProposal) => entry.title)
+    : []
 
-  return { batchType, headings, figures, tables, links }
+  return { batchType, headings, figures, tables, links, bookmarks }
 }
 
 async function renderPageImages(buffer: Buffer, pageNumbers: number[]): Promise<Map<number, string>> {
@@ -397,7 +450,7 @@ async function renderPageImages(buffer: Buffer, pageNumbers: number[]): Promise<
     for (const pageNumber of unique) {
       if (pageNumber > doc.numPages) continue
       const page = await doc.getPage(pageNumber)
-      const rendered = await renderPdfPageToDataUrl(page, { scale: 1.35, format: 'png' })
+      const rendered = await renderPdfPageToDataUrl(page, { scale: SEMANTIC_PAGE_RENDER_SCALE, format: 'png' })
       images.set(pageNumber, rendered.dataUrl)
     }
   } finally {
@@ -408,12 +461,24 @@ async function renderPageImages(buffer: Buffer, pageNumbers: number[]): Promise<
 
 function figureTargets(context: PdfRemediationContext): FigureCandidate[] {
   return context.figureCandidates.filter(candidate =>
-    !candidate.hasAlt || candidate.informativeHint === 'unknown'
+    candidate.repairMode !== 'defer'
+    && candidate.informativeHint !== 'decorative'
   )
+}
+
+function hasFigureSemanticWork(context: PdfRemediationContext): boolean {
+  return figureTargets(context).length > 0
 }
 
 function headingTargets(context: PdfRemediationContext): HeadingCandidate[] {
   return context.headingCandidates.filter(candidate => candidate.repairMode === 'safe')
+}
+
+function bookmarkTargets(context: PdfRemediationContext): HeadingCandidate[] {
+  return context.headingCandidates.filter(candidate =>
+    candidate.text.trim()
+    && (candidate.targetRef || Number.isFinite(candidate.pageNumber))
+  )
 }
 
 function tableTargets(context: PdfRemediationContext): TableCandidate[] {
@@ -435,7 +500,8 @@ export function buildSemanticRepairBatches(input: {
   links: LinkCandidate[]
 }> {
   const analysis = input.analysis || input.context.analysis
-  if (semanticWorkComplete(analysis)) return []
+  const figureSemanticWork = hasSemanticRepairConfig() && hasFigureSemanticWork(input.context)
+  if (semanticWorkComplete(analysis) && !figureSemanticWork) return []
 
   return [
     ...(!categoryNeedsWork(analysis, 'heading_structure') ? [] : chunk(headingTargets(input.context), HEADING_BATCH_SIZE).map(headings => ({
@@ -445,7 +511,7 @@ export function buildSemanticRepairBatches(input: {
       tables: [],
       links: [],
     }))),
-    ...(!categoryNeedsWork(analysis, 'alt_text') ? [] : chunk(figureTargets(input.context), FIGURE_BATCH_SIZE).map(figures => ({
+    ...(!figureSemanticWork ? [] : chunk(figureTargets(input.context), FIGURE_BATCH_SIZE).map(figures => ({
       batchType: 'figures' as const,
       headings: [],
       figures,
@@ -466,6 +532,13 @@ export function buildSemanticRepairBatches(input: {
       tables: [],
       links,
     }))),
+    ...(categoryNeedsWork(analysis, 'bookmarks') ? chunk(bookmarkTargets(input.context), BOOKMARK_BATCH_SIZE).map(headings => ({
+      batchType: 'bookmarks' as const,
+      headings,
+      figures: [],
+      tables: [],
+      links: [],
+    })) : []),
   ]
 }
 
@@ -490,6 +563,13 @@ function splitBatch(batch: SemanticRepairBatch): SemanticRepairBatch[] {
       { ...batch, links: batch.links.slice(midpoint) },
     ].filter(entry => entry.links.length)
   }
+  if (batch.batchType === 'bookmarks' && batch.headings.length > 1) {
+    const midpoint = Math.ceil(batch.headings.length / 2)
+    return [
+      { ...batch, headings: batch.headings.slice(0, midpoint) },
+      { ...batch, headings: batch.headings.slice(midpoint) },
+    ].filter(entry => entry.headings.length)
+  }
   if (batch.batchType === 'figures' && batch.figures.length > 1) {
     return batch.figures.map(figure => ({ ...batch, figures: [figure] }))
   }
@@ -504,6 +584,7 @@ async function buildBatchInputs(batch: SemanticRepairBatch, pageImages: Map<numb
   figures: SemanticFigureTarget[]
   tables: SemanticTableTarget[]
   links: SemanticLinkTarget[]
+  bookmarks: SemanticBookmarkTarget[]
   allowedIds: Set<string>
 }> {
   const headings: SemanticHeadingTarget[] = batch.headings.map(candidate => ({
@@ -522,7 +603,11 @@ async function buildBatchInputs(batch: SemanticRepairBatch, pageImages: Map<numb
     repairMode: candidate.repairMode,
     targetTag: candidate.targetTag || null,
     imageDataUrl: candidate.bbox && pageImages.has(candidate.pageNumber)
-      ? await cropDataUrlRegion(Buffer.from(pageImages.get(candidate.pageNumber)!.split(',', 2)[1], 'base64'), candidate.bbox).catch(() => null)
+      ? await cropDataUrlRegion(
+        Buffer.from(pageImages.get(candidate.pageNumber)!.split(',', 2)[1], 'base64'),
+        candidate.bbox,
+        { maxDimension: SEMANTIC_FIGURE_MAX_DIMENSION, maxBytes: SEMANTIC_FIGURE_MAX_BYTES },
+      ).catch(() => null)
       : null,
   })))
   const tables: SemanticTableTarget[] = batch.tables.map(candidate => ({
@@ -541,17 +626,28 @@ async function buildBatchInputs(batch: SemanticRepairBatch, pageImages: Map<numb
     suggestedText: candidate.suggestedText ? sanitizeText(candidate.suggestedText, 120) : null,
     annotationContents: candidate.annotationContents ? sanitizeText(candidate.annotationContents, MAX_TEXT) : null,
   }))
+  const bookmarks: SemanticBookmarkTarget[] = batch.batchType === 'bookmarks'
+    ? batch.headings.map(candidate => ({
+      candidateId: candidate.id,
+      pageNumber: candidate.pageNumber,
+      text: sanitizeText(candidate.text, MAX_TEXT),
+      nearbyContext: candidate.nearbyContext.map(value => sanitizeText(value, MAX_TEXT)).filter(Boolean).slice(0, HEADING_CONTEXT_LIMIT),
+      existingTag: candidate.existingTag || null,
+    }))
+    : []
 
   return {
     headings,
     figures,
     tables,
     links,
+    bookmarks,
     allowedIds: new Set([
       ...headings.map(item => item.candidateId),
       ...figures.map(item => item.candidateId),
       ...tables.map(item => item.candidateId),
       ...links.map(item => item.candidateId),
+      ...bookmarks.map(item => item.candidateId),
     ]),
   }
 }
@@ -563,6 +659,7 @@ function estimateBatchSize(input: {
   figures: SemanticFigureTarget[]
   tables: SemanticTableTarget[]
   links: SemanticLinkTarget[]
+  bookmarks: SemanticBookmarkTarget[]
 }): number {
   const promptBytes = JSON.stringify(input).length
   const imageBytes = input.figures.reduce((total, figure) => total + (figure.imageDataUrl?.length || 0), 0)
@@ -591,8 +688,9 @@ async function resolveBatchWithFallbacks(input: {
     headings: prepared.headings,
     figures: prepared.figures,
     tables: prepared.tables,
-    links: prepared.links,
-  })
+      links: prepared.links,
+      bookmarks: prepared.bookmarks,
+    })
 
   if (estimatedSize > softBudgetForBatch(input.batch.batchType)) {
     const smallerBatches = splitBatch(input.batch)
@@ -627,6 +725,7 @@ async function resolveBatchWithFallbacks(input: {
         figures: prepared.figures,
         tables: prepared.tables,
         links: prepared.links,
+        bookmarks: prepared.bookmarks,
       }),
     }])
     return {
