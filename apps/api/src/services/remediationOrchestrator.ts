@@ -706,7 +706,9 @@ export function renderDashboard(state: CampaignState, health: SystemHealth): str
     || row.lifecycleState === 'analyzing'
     || row.lifecycleState === 'rerunning'
     || row.lifecycleState === 'visual_compare'
-    || row.lifecycleState === 'needs_fix'
+  ).slice(0, 8)
+  const pausedRows = rows.filter(row =>
+    row.lifecycleState === 'needs_fix'
     || row.lifecycleState === 'awaiting_restart'
     || row.lifecycleState === 'blocked',
   ).slice(0, 8)
@@ -726,6 +728,19 @@ export function renderDashboard(state: CampaignState, health: SystemHealth): str
     lines.push('No active PDFs.')
   } else {
     for (const row of activeRows) {
+      const score = row.score === null ? '--' : String(row.score)
+      const grade = row.grade || '--'
+      lines.push(trimForDisplay(row.filename, 80))
+      lines.push(`  [${progressBar(row.progressPercent, 28)}] ${String(row.progressPercent).padStart(3, ' ')}% | ${row.lifecycleState} | ${trimForDisplay(row.stageLabel, 38)} | score ${score} | grade ${grade} | loop ${row.loopCount}`)
+    }
+  }
+  lines.push('')
+  lines.push('Paused / Blocked PDFs')
+  lines.push('-'.repeat(80))
+  if (pausedRows.length === 0) {
+    lines.push('No paused or blocked PDFs.')
+  } else {
+    for (const row of pausedRows) {
       const score = row.score === null ? '--' : String(row.score)
       const grade = row.grade || '--'
       lines.push(trimForDisplay(row.filename, 80))
