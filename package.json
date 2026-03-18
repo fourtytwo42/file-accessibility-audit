@@ -7,6 +7,8 @@
     "dev": "tsx scripts/dev.ts",
     "dev:api": "kill-port 6103 && pnpm --filter api dev",
     "dev:web": "kill-port 6102 && pnpm --filter web dev",
+    "orchestrator": "tsx scripts/remediation-orchestrator.ts",
+    "orchestrator:validate": "tsx scripts/remediation-orchestrator.ts --validate-only",
     "build": "pnpm --filter api build && pnpm --filter web build",
     "test": "tsx scripts/test.ts",
     "test:api": "pnpm --filter api test",
