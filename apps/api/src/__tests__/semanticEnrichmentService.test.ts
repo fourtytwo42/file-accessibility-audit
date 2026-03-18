@@ -395,6 +395,187 @@ describe('semanticEnrichmentService', () => {
     expect(generated.batches[0]?.bookmarks[0]?.title).toBe('Council members')
   })
 
+  it('keeps cleaner heading text when existing outline titles are raw toc noise', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn(async (_url, init: any) => {
+      const body = JSON.parse(String(init?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      expect(prompt).toContain('Batch type: bookmarks')
+      expect(prompt).toContain('"text":"Council members"')
+      expect(prompt).not.toContain('Council members .............. 6')
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    bookmarks: [{ candidateId: 'heading:1:1', title: 'Council members', level: 'H2', confidence: 0.92, rationale: 'Clean section label.' }],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      }
+    })
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    const context = makeContext()
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = []
+    context.qpdf.outlineTitles = ['Council members .............. 6']
+    context.headingCandidates = [{
+      ...context.headingCandidates[0],
+      text: 'Council members',
+    }]
+    const analysis = makeAnalysisResult()
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+
+    await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis,
+      context,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('strips decoded dot leaders and page numbers from outline bookmark seeds', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn(async (_url, init: any) => {
+      const body = JSON.parse(String(init?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      expect(prompt).toContain('"text":"2007 trust fund contributors"')
+      expect(prompt).not.toContain('8383')
+      expect(prompt).not.toContain(' 18"')
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    bookmarks: [{ candidateId: 'heading:1:1', title: '2007 trust fund contributors', level: 'H2', confidence: 0.92, rationale: 'Clean section label.' }],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      }
+    })
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    const context = makeContext()
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = []
+    context.qpdf.outlineTitles = ['b:323030372074727573742066756e6420636f6e7472696275746f727320838383838383838383838383832e2e203138']
+    context.headingCandidates = [{
+      ...context.headingCandidates[0],
+      text: 'Heading 1',
+    }]
+    const analysis = makeAnalysisResult()
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+
+    await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis,
+      context,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+  })
+
+  it('builds bookmark cleanup targets from outline titles when heading candidates are sparse', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn(async (_url, init: any) => {
+      const body = JSON.parse(String(init?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      expect(prompt).toContain('"candidateId":"bookmark:outline:1"')
+      expect(prompt).toContain('"pageNumber":6')
+      expect(prompt).toContain('"text":"2008 Council members"')
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    bookmarks: [
+                      { candidateId: 'bookmark:outline:1', title: 'Council members', level: 'H2', confidence: 0.94, rationale: 'Clean section title.' },
+                    ],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      }
+    })
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    const context = makeContext()
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = []
+    context.headingCandidates = []
+    context.qpdf.outlineTitles = [
+      'b:3230303820436f756e63696c206d656d62657273208383838383838383838383838383832e2036',
+      'u:2008 programs and participating agencies………………….. 15',
+    ]
+    const analysis = makeAnalysisResult()
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+
+    const generated = await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'annual-report.pdf',
+      title: 'Annual report',
+      language: 'en',
+      analysis,
+      context,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(generated.batches[0]?.bookmarks[0]).toMatchObject({
+      candidateId: 'bookmark:outline:1',
+      pageNumber: 6,
+      title: 'Council members',
+    })
+  })
+
   it('still returns figure batches for fully compliant results when AI-first figures are eligible', async () => {
     const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const analysis = makeAnalysisResult()

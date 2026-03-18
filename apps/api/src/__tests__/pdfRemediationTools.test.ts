@@ -9,7 +9,7 @@ import { remediatePdfWithAgent } from '../services/agentRemediationService.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
-import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation, needsAltTextDeepInspection } from '../services/pdfRemediationTools.js'
+import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation, needsAltTextDeepInspection, normalizedExistingHeadingLevel } from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
 import type { RemediationActionRecord, RemediationToolName } from '../services/documentModel.js'
 import { planRemediationActions } from '../services/remediationPlanService.js'
@@ -135,6 +135,13 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     ], 0)
 
     expect(target?.ref).toBe('obj:14 0 R')
+  })
+
+  it('normalizes legacy PDFMaker heading styles into usable heading levels', () => {
+    expect(normalizedExistingHeadingLevel('/heading 1')).toBe('H1')
+    expect(normalizedExistingHeadingLevel('/heading 4')).toBe('H4')
+    expect(normalizedExistingHeadingLevel('/heading 9')).toBe('H6')
+    expect(normalizedExistingHeadingLevel('/Normal')).toBeNull()
   })
 
   it('sets title metadata in-place', async () => {
@@ -1307,6 +1314,49 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         operation: 'retag_as_figure_and_set_alt',
         targetRef: figureRef!,
         altText: 'Accessible TextBox figure',
+      },
+    })
+
+    expect(['applied', 'no_effect']).toContain(result.status)
+    if (result.status === 'applied') {
+      expect(result.changedDocumentBytes).toBe(true)
+      expect(result.outputBuffer).toBeDefined()
+    }
+  })
+
+  it('retags a safe Shape figure candidate and restores alt text', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect' },
+    })
+    const figureRef = inspect.figures[0]?.ref
+    expect(figureRef).toBeTruthy()
+
+    const degraded = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: [figureRef!],
+        targetTag: 'Shape',
+      },
+    })
+    expect(degraded.status).toBe('applied')
+
+    const degradedAnalysis = await analyzePDF(degraded.outputBuffer!, 'accessible.pdf')
+    const context = await inspectPdfForRemediation(degraded.outputBuffer!, degradedAnalysis)
+    const figureCandidate = context.figureCandidates.find(candidate =>
+      candidate.targetRef === figureRef || candidate.targetTag === '/Shape' || candidate.repairMode === 'retag_then_set_alt')
+      || context.figureCandidates[0]
+
+    expect(figureCandidate?.repairMode).toBe('retag_then_set_alt')
+
+    const result = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: {
+        operation: 'retag_as_figure_and_set_alt',
+        targetRef: figureCandidate!.targetRef!,
+        altText: 'Accessible shape-backed figure',
       },
     })
 

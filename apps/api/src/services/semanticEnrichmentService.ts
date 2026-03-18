@@ -70,6 +70,8 @@ export interface SemanticBookmarkProposal {
   level: 'H1' | 'H2' | 'H3' | 'H4' | 'H5' | 'H6'
   confidence: number
   rationale: string
+  pageNumber?: number
+  targetRef?: string | null
 }
 
 export interface SemanticBatchResult {
@@ -124,6 +126,7 @@ interface SemanticBookmarkTarget {
   text: string
   nearbyContext: string[]
   existingTag: string | null
+  targetRef?: string | null
 }
 
 interface SemanticDocumentSummary {
@@ -377,6 +380,7 @@ function normalizeBatchResult(
   batchType: SemanticBatchResult['batchType'],
   payload: any,
   allowedIds: Set<string>,
+  bookmarkTargetsById: Map<string, { pageNumber: number; targetRef?: string | null }> = new Map(),
 ): SemanticBatchResult {
   const headings = Array.isArray(payload?.headings)
     ? payload.headings
@@ -423,13 +427,19 @@ function normalizeBatchResult(
   const bookmarks = Array.isArray(payload?.bookmarks)
     ? payload.bookmarks
       .filter((entry: any) => allowedIds.has(String(entry?.candidateId || '')))
-      .map((entry: any) => ({
-        candidateId: String(entry.candidateId),
-        title: sanitizeText(entry.title, 120),
-        level: allowedLevel(entry.level),
-        confidence: clampConfidence(entry.confidence),
-        rationale: sanitizeText(entry.rationale, MAX_TEXT),
-      }))
+      .map((entry: any) => {
+        const candidateId = String(entry.candidateId)
+        const target = bookmarkTargetsById.get(candidateId)
+        return {
+          candidateId,
+          title: sanitizeText(entry.title, 120),
+          level: allowedLevel(entry.level),
+          confidence: clampConfidence(entry.confidence),
+          rationale: sanitizeText(entry.rationale, MAX_TEXT),
+          pageNumber: target?.pageNumber,
+          targetRef: target?.targetRef ?? null,
+        }
+      })
       .filter((entry: SemanticBookmarkProposal) => entry.title)
     : []
 
@@ -491,23 +501,111 @@ function decodeOutlineTitleForPrompt(title: string): string {
   }
 }
 
+function normalizeBookmarkSeedText(text: string): string {
+  return text
+    .replace(/[•\u2022]+/g, ' ')
+    .replace(/\s*[.·•…]{2,}.*$/g, '')
+    .replace(/[.·•]{3,}\s*\d+\s*$/g, '')
+    .replace(/(?:…\s*)+\d+\s*$/g, '')
+    .replace(/(?:[.·•…]\s*){3,}\s*$/g, '')
+    .replace(/\s+\d+\s*$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function looksLikeNoisyBookmarkSeed(text: string): boolean {
+  if (!text) return true
+  if (!/[A-Za-z]/.test(text)) return true
+  if (text.length < 4 || text.length > 90) return true
+  if ((text.match(/\b\w+\b/g) || []).length > 12) return true
+  if (/^[a-z]/.test(text)) return true
+  if (/^[A-Z]\s+[a-z].{12,}/.test(text)) return true
+  if (/(we are pleased|under the leadership|for the agency|state fiscal year|provides statistical|the weeks that followed)/i.test(text)) return true
+  return false
+}
+
+function isGenericHeadingPlaceholder(text: string): boolean {
+  return /^(heading|section|chapter|part)\s*\d*$/i.test(text.trim())
+}
+
+function bookmarkSeedQuality(text: string): number {
+  const normalized = normalizeBookmarkSeedText(text)
+  if (!normalized) return -10
+  let score = 0
+  if (!looksLikeNoisyBookmarkSeed(normalized)) score += 3
+  if (!isGenericHeadingPlaceholder(normalized)) score += 2
+  if (!/[.·•…]{3,}\s*\d*$/.test(text)) score += 2
+  if (!/\s\d+\s*$/.test(text)) score += 1
+  if (normalized.length >= 6 && normalized.length <= 80) score += 1
+  if (/[A-Za-z]/.test(normalized)) score += 1
+  return score
+}
+
+function chooseBookmarkSeedText(candidateText: string, outlineTitle?: string): string {
+  const candidateNormalized = normalizeBookmarkSeedText(candidateText)
+  const outlineNormalized = normalizeBookmarkSeedText(outlineTitle || '')
+  if (!outlineNormalized) return candidateNormalized
+  if (!candidateNormalized) return outlineNormalized
+  if (isGenericHeadingPlaceholder(candidateNormalized) && !isGenericHeadingPlaceholder(outlineNormalized)) {
+    return outlineNormalized
+  }
+  return bookmarkSeedQuality(outlineTitle || '') > bookmarkSeedQuality(candidateText)
+    ? outlineNormalized
+    : candidateNormalized
+}
+
 function bookmarkTargets(context: PdfRemediationContext): HeadingCandidate[] {
   const outlineTitles = (context.qpdf.outlineTitles || [])
     .map(title => decodeOutlineTitleForPrompt(String(title || '')))
     .filter(Boolean)
-
-  return context.headingCandidates
+  const headingBackedTargets = context.headingCandidates
     .filter(candidate =>
       candidate.text.trim()
       && (candidate.targetRef || Number.isFinite(candidate.pageNumber))
     )
     .map((candidate, index) => {
       const outlineTitle = outlineTitles[index]
-      if (!outlineTitle) return candidate
+      if (!outlineTitle) {
+        return {
+          ...candidate,
+          text: normalizeBookmarkSeedText(candidate.text),
+        }
+      }
       return {
         ...candidate,
-        text: outlineTitle,
+        text: chooseBookmarkSeedText(candidate.text, outlineTitle),
       }
+    })
+    .filter(candidate => candidate.text)
+  const outlineBackedTargets = outlineTitles
+    .map((title, index) => {
+      const pageMatch = title.match(/(?:[.·•…]\s*|\s+)(\d{1,4})\s*$/)
+      const pageNumber = pageMatch ? Number(pageMatch[1]) : NaN
+      const text = normalizeBookmarkSeedText(title)
+      if (!Number.isFinite(pageNumber) || pageNumber < 1) return null
+      if (!text || looksLikeNoisyBookmarkSeed(text)) return null
+      return {
+        id: `bookmark:outline:${index + 1}`,
+        pageNumber,
+        text,
+        bbox: { x: 0, y: 0, width: 1, height: 0.05 },
+        fontSize: 12,
+        fontWeight: 'normal' as const,
+        nearbyContext: [],
+        targetRef: null,
+        existingTag: null,
+        repairMode: 'defer' as const,
+      }
+    })
+    .filter(Boolean) as HeadingCandidate[]
+
+  const seen = new Set<string>()
+  return [...headingBackedTargets, ...outlineBackedTargets]
+    .filter(candidate => {
+      const key = `${candidate.pageNumber}:${normalizeBookmarkSeedText(candidate.text).toLowerCase()}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
     })
 }
 
@@ -663,6 +761,7 @@ async function buildBatchInputs(batch: SemanticRepairBatch, pageImages: Map<numb
       text: sanitizeText(candidate.text, MAX_TEXT),
       nearbyContext: candidate.nearbyContext.map(value => sanitizeText(value, MAX_TEXT)).filter(Boolean).slice(0, HEADING_CONTEXT_LIMIT),
       existingTag: candidate.existingTag || null,
+      targetRef: candidate.targetRef || null,
     }))
     : []
 
@@ -746,6 +845,9 @@ async function resolveBatchWithFallbacks(input: {
   }
 
   try {
+    const bookmarkTargetsById = new Map(
+      prepared.bookmarks.map(item => [item.candidateId, { pageNumber: item.pageNumber, targetRef: item.targetRef || null }]),
+    )
     const payload = await openAiCompatJsonResponse([{
       role: 'user',
       content: buildPrompt({
@@ -759,7 +861,7 @@ async function resolveBatchWithFallbacks(input: {
       }),
     }])
     return {
-      results: [normalizeBatchResult(input.batch.batchType, payload, prepared.allowedIds)],
+      results: [normalizeBatchResult(input.batch.batchType, payload, prepared.allowedIds, bookmarkTargetsById)],
       reviewFlags: [],
     }
   } catch (error) {

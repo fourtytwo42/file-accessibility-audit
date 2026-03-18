@@ -11,6 +11,7 @@ import type {
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
 import { normalizeLanguageTag } from './languageTags.js'
 import { hasSemanticRepairConfig } from './semanticEnrichmentService.js'
+import { normalizedExistingHeadingLevel } from './pdfRemediationTools.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 
 const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
@@ -343,8 +344,9 @@ function hasSemanticOrManualOnlyIssues(failureModes: FailureMode[]): boolean {
 function headingLevelForCandidate(candidateId: string, context: PdfRemediationContext, selectedActions: RemediationToolCall[]): string {
   const candidate = context.headingCandidates.find(entry => entry.id === candidateId)
   if (!candidate) return 'H2'
-  if (/^\/?H[1-6]$/i.test(candidate.existingTag || '')) {
-    return String(candidate.existingTag).replace(/^\//, '').toUpperCase()
+  const existingLevel = normalizedExistingHeadingLevel(candidate.existingTag)
+  if (existingLevel) {
+    return existingLevel
   }
   const normalizedText = candidate.text.replace(/\s+/g, ' ').trim().toLowerCase()
   const looksLikeTopLevelHeading = candidate.pageNumber === 1

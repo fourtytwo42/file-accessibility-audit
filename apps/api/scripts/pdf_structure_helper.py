@@ -18,10 +18,16 @@ except Exception:
 
 
 HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Sect", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
-FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct"}
-SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
+FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct", "/Shape", "/InlineShape"}
+SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Shape", "/InlineShape"}
 UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link", "/L", "/LI"}
 FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
+LEGACY_HEADING_TAG_RE = re.compile(r"^/heading\s+(\d+)$", re.IGNORECASE)
+
+
+def is_heading_compat_tag(tag):
+    normalized = str(tag or "")
+    return normalized in HEADING_COMPAT_TAGS or LEGACY_HEADING_TAG_RE.fullmatch(normalized) is not None
 EMBEDDABLE_FONT_FILES = {
     # Arial family
     "/Arial": "arial.ttf",
@@ -691,7 +697,7 @@ def top_level_heading_candidates(pdf):
         tag = str(obj.get("/S"))
         parent = obj.get("/P")
         parent_ref = ref_string(parent) if isinstance(parent, pikepdf.Dictionary) else None
-        if tag in HEADING_COMPAT_TAGS and parent_ref:
+        if is_heading_compat_tag(tag) and parent_ref:
             candidates.append({
                 "ref": ref_string(obj),
                 "tag": tag,

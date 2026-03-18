@@ -49,10 +49,24 @@ vi.mock('../services/pdfRemediationTools.js', () => ({
 
 vi.mock('../services/remediationPlanService.js', () => ({
   planRemediationActions,
+  heuristicFigureAltText: (_candidateId: string, _context: unknown) => 'Image related to County outcomes chart',
+  TOOL_STAGE_ORDER: new Map([
+    ['set_document_title', 1],
+    ['normalize_document_metadata', 1],
+    ['set_document_language', 1],
+    ['set_page_tabs', 3],
+    ['normalize_annotation_tab_order', 3],
+    ['set_tabs_all_annotated_pages', 3],
+    ['set_figure_alt_text', 5],
+    ['repair_other_elements_alt_text', 5],
+    ['repair_cidset_consistency', 2],
+    ['substitute_legacy_fonts_in_place', 2],
+  ]),
 }))
 
 vi.mock('../services/semanticEnrichmentService.js', () => ({
   generateSemanticRepairBatches,
+  hasSemanticRepairConfig: () => true,
 }))
 
 vi.mock('../services/ocrService.js', () => ({
@@ -65,6 +79,21 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     vi.resetAllMocks()
     generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
     isOcrAvailable.mockResolvedValue(false)
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('pdf'),
+      action: {
+        tool: 'normalize_annotation_tab_order',
+        target: 'document',
+        details: 'no-op',
+        confidence: 0.9,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: false,
+        categoryTargets: ['reading_order'],
+        outcome: 'no_effect',
+      },
+      manualReviewFlags: [],
+    })
   })
 
   it('refreshes inspection context after document-changing actions within the same iteration', async () => {
@@ -341,6 +370,125 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(analyzePDF).toHaveBeenCalledTimes(1)
     expect(result.finalResult.grade).toBe('A')
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
+  })
+
+  it('always runs final tab-order cleanup before returning the remediated PDF', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'cleanup.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 96,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const context = {
+      pdfjs: { title: 'Cleanup', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(context)
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cleanup-0'),
+        action: {
+          tool: 'repair_native_link_structure',
+          target: 'document',
+          details: 'link structure normalized',
+          confidence: 0.97,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['link_quality', 'reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cleanup-1'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'annotation order normalized',
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cleanup-2'),
+        action: {
+          tool: 'set_tabs_all_annotated_pages',
+          target: 'document',
+          details: 'tabs normalized',
+          confidence: 0.98,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF.mockResolvedValue({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass', findings: ['Annotated pages use /Tabs /S and annotation arrays already follow reading order.'] },
+      ],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'cleanup.pdf', originalResult)
+
+    expect(executeRemediationTool.mock.calls.map(call => call[0]?.call?.tool_name)).toEqual([
+      'repair_native_link_structure',
+      'normalize_annotation_tab_order',
+      'set_tabs_all_annotated_pages',
+    ])
+    expect(executeRemediationTool).toHaveBeenCalledTimes(3)
+    expect(result.model.actions?.slice(-3).map(action => action.tool)).toEqual([
+      'repair_native_link_structure',
+      'normalize_annotation_tab_order',
+      'set_tabs_all_annotated_pages',
+    ])
+    expect(result.buffer.equals(Buffer.from('pdf-cleanup-2'))).toBe(true)
   })
 
   it('requests deep inspection only when figure or alt-text work remains', async () => {
@@ -1046,7 +1194,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.finalResult.verapdf.status).toBe('passed')
   })
 
-  it('skips semantic AI when semantic categories are already all complete', async () => {
+  it('skips semantic AI when semantic categories are already all complete and no AI-first figures exist', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
       creator: null,
@@ -1088,7 +1236,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     inspectPdfForRemediation.mockResolvedValue({
       pdfjs: { title: 'Done Semantics', lang: 'en' },
       qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
-      figureCandidates: [{ id: 'figure:1', targetRef: 'obj:1 0 R' }],
+      figureCandidates: [],
       tableCandidates: [],
       headingCandidates: [{ id: 'heading:1:1', pageNumber: 1, text: 'Done', bbox: { x: 0, y: 0, width: 0.2, height: 0.05 }, fontSize: 18, fontWeight: 'bold', nearbyContext: [], targetRef: 'obj:2 0 R', existingTag: '/H1', repairMode: 'safe' }],
       pages: [],
@@ -1102,6 +1250,101 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     await remediatePdfWithAgent(Buffer.from('pdf'), 'done-semantics.pdf', originalResult)
 
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
+  })
+
+  it('still runs semantic AI for eligible figures even when semantic categories are complete', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 4,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'figure-semantic.pdf',
+      pageCount: 4,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 95,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Figure Semantic', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [{
+        id: 'figure:1',
+        pageNumber: 1,
+        targetRef: 'obj:1 0 R',
+        bbox: { x: 0, y: 0, width: 1, height: 1 },
+        hasAlt: true,
+        altText: 'Old text',
+        informativeHint: 'informative',
+        surroundingText: ['County services chart'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      }],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    generateSemanticRepairBatches.mockResolvedValue({ batches: [{
+      batchType: 'figures',
+      headings: [],
+      figures: [{ candidateId: 'figure:1', decorative: false, altText: 'Bar chart showing county services by year', confidence: 0.92, rationale: 'Vision identifies a bar chart.' }],
+      tables: [],
+      links: [],
+      bookmarks: [],
+    }], reviewFlags: [] })
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('figure-fixed'),
+      action: {
+        tool: 'set_figure_alt_text',
+        target: 'page 1',
+        candidateId: 'figure:1',
+        details: 'AI figure proposal',
+        confidence: 0.92,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['alt_text'],
+        generationSource: 'semantic_ai',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+    analyzePDF.mockResolvedValue(originalResult)
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'figure-semantic.pdf', originalResult)
+
+    expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
+    expect(executeRemediationTool).toHaveBeenCalled()
+    expect(executeRemediationTool.mock.calls[0][0].call.arguments.generationSource).toBe('semantic_ai')
   })
 
   it('applies post-native semantic AI fixes through native tools', async () => {
@@ -1496,6 +1739,95 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
   })
 
+  it('uses heuristic alt-text fallback only after AI figure generation fails', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'figure-fallback.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 75,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 2,
+        failures: [{ ruleId: 'alt', specification: null, clause: null, testNumber: null, location: null, message: 'Missing alt text', categoryIds: ['alt_text'] }],
+      }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 40, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Fallback', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [{
+        id: 'figure:1',
+        pageNumber: 2,
+        targetRef: 'obj:21 0 R',
+        bbox: { x: 0, y: 0, width: 1, height: 1 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['County outcomes chart'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      }],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    generateSemanticRepairBatches.mockRejectedValue(new Error('OpenAI-compatible semantic repair request failed: 413 {"error":{"message":"context_length_exceeded"}}'))
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('fallback-fixed'),
+      action: {
+        tool: 'set_figure_alt_text',
+        target: 'page 2',
+        candidateId: 'figure:1',
+        details: 'heuristic fallback',
+        confidence: 0.55,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: false,
+        categoryTargets: ['alt_text'],
+        generationSource: 'heuristic_fallback',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'figure-fallback.pdf', originalResult)
+
+    expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
+    expect(executeRemediationTool.mock.calls.some(call => call[0].call.arguments.generationSource === 'heuristic_fallback')).toBe(true)
+    expect(result.model.actions?.some(action => action.generationSource === 'heuristic_fallback')).toBe(true)
+  })
+
   it('does not stop at A/pass when deterministic Acrobat-risk repair is still auto-runnable', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
@@ -1661,6 +1993,116 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(planRemediationActions).toHaveBeenCalledTimes(2)
     expect(executeRemediationTool.mock.calls.map(call => call[0].call.tool_name)).toEqual(['set_figure_alt_text', 'repair_other_elements_alt_text'])
     expect(result.buffer.equals(Buffer.from('acrobat-pass'))).toBe(true)
+  })
+
+  it('applies semantic bookmark cleanup from outline-backed targets without matching heading candidates', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 24,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'outline-backed-bookmarks.pdf',
+      pageCount: 24,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 94,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Annual report', lang: 'en', pageCount: 24 },
+      qpdf: {
+        lang: 'en',
+        headings: [],
+        tables: [],
+        images: [],
+        formFields: [],
+        hasStructTree: true,
+        outlineCount: 6,
+        outlineTitles: ['Raw outline 6', 'Raw outline 7', 'Raw outline 8', 'Raw outline 9'],
+        structTreeDepth: 2,
+      },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    generateSemanticRepairBatches.mockResolvedValue({
+      batches: [{
+        batchType: 'bookmarks',
+        headings: [],
+        figures: [],
+        tables: [],
+        links: [],
+        bookmarks: [{
+          candidateId: 'bookmark:outline:1',
+          title: 'Council members',
+          level: 'H2',
+          confidence: 0.96,
+          rationale: 'Clean outline label.',
+          pageNumber: 6,
+          targetRef: null,
+        }],
+      }],
+      reviewFlags: [],
+    })
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('bookmark-fixed'),
+      action: {
+        tool: 'replace_bookmarks_from_headings',
+        target: 'document',
+        details: 'AI bookmark cleanup',
+        confidence: 0.96,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['bookmarks'],
+        generationSource: 'semantic_ai',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+    analyzePDF.mockResolvedValue(originalResult)
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'outline-backed-bookmarks.pdf', originalResult)
+
+    expect(executeRemediationTool).toHaveBeenCalled()
+    const bookmarkCall = executeRemediationTool.mock.calls
+      .map(call => call[0].call)
+      .find(call => call.tool_name === 'replace_bookmarks_from_headings')
+    expect(bookmarkCall).toMatchObject({
+      tool_name: 'replace_bookmarks_from_headings',
+      arguments: {
+        headings: [{
+          text: 'Council members',
+          level: 'H2',
+          pageNumber: 6,
+          targetRef: null,
+        }],
+      },
+    })
   })
 
 })

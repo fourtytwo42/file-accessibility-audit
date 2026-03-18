@@ -23,8 +23,8 @@ import {
   type RemediationInspectionCache,
 } from './pdfRemediationTools.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
-import { planRemediationActions, TOOL_STAGE_ORDER } from './remediationPlanService.js'
-import { generateSemanticRepairBatches, type SemanticBatchResult } from './semanticEnrichmentService.js'
+import { heuristicFigureAltText, planRemediationActions, TOOL_STAGE_ORDER } from './remediationPlanService.js'
+import { generateSemanticRepairBatches, hasSemanticRepairConfig, type SemanticBatchResult } from './semanticEnrichmentService.js'
 import { isOcrAvailable, ocrPdfToSearchablePdf } from './ocrService.js'
 
 function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
@@ -274,7 +274,7 @@ function semanticThreshold(batchType: SemanticBatchResult['batchType']): number 
   return batchType === 'figures' ? 0.75 : 0.8
 }
 
-const SEMANTIC_CATEGORY_IDS = ['heading_structure', 'alt_text', 'table_markup', 'link_quality'] as const
+const SEMANTIC_CATEGORY_IDS = ['heading_structure', 'alt_text', 'table_markup', 'link_quality', 'bookmarks'] as const
 
 function isFullyDone(result: AnalysisResult): boolean {
   return result.grade === 'A' && result.verapdf?.status === 'passed'
@@ -285,6 +285,36 @@ function hasRemainingSemanticWork(result: AnalysisResult): boolean {
     const score = scoreForCategory(result, categoryId)
     return score !== null && score < 100
   })
+}
+
+function shouldRunBookmarkCleanup(
+  result: AnalysisResult,
+  originalResult: AnalysisResult,
+  context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null,
+): boolean {
+  if (!context) return false
+  const bookmarkCategory = result.categories.find(category => category.id === 'bookmarks')
+  if (bookmarkCategory?.score === null) return false
+  if ((context.pdfjs.pageCount || 0) < 8) return false
+  const headingCount = context.headingCandidates.filter(candidate => candidate.text.trim()).length
+  const outlineCount = context.qpdf.outlineTitles?.filter(title => title.trim()).length || 0
+  return Math.max(headingCount, outlineCount) >= 4
+}
+
+function bookmarkCleanupTriggerAnalysis(result: AnalysisResult): AnalysisResult {
+  return {
+    ...result,
+    grade: result.grade === 'A' ? 'B' : result.grade,
+    categories: result.categories.map(category => {
+      if (category.id === 'bookmarks') return { ...category, score: 0, grade: 'F' }
+      if (category.id === 'heading_structure') return { ...category, score: 100, grade: 'A' }
+      if (category.id === 'alt_text' || category.id === 'table_markup' || category.id === 'link_quality') {
+        if (category.score === null) return category
+        return { ...category, score: 100, grade: 'A' }
+      }
+      return category
+    }),
+  }
 }
 
 function veraPdfNeedsAltTextAttention(result: AnalysisResult): boolean {
@@ -308,8 +338,20 @@ function inspectModeForResult(result: AnalysisResult): RemediationInspectMode {
     : 'light'
 }
 
-function shouldRunSemanticStage(result: AnalysisResult, originalResult: AnalysisResult): boolean {
+function aiFirstFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
+  if (!context || !hasSemanticRepairConfig()) return []
+  return context.figureCandidates.filter(candidate =>
+    candidate.repairMode !== 'defer' && candidate.informativeHint !== 'decorative'
+  )
+}
+
+function shouldRunSemanticStage(
+  result: AnalysisResult,
+  originalResult: AnalysisResult,
+  context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null,
+): boolean {
   if (originalResult.isScanned) return false
+  if (aiFirstFigureCandidates(context).length > 0) return true
   if (isFullyDone(result)) return false
   return hasRemainingSemanticWork(result)
 }
@@ -326,6 +368,7 @@ function semanticDeferredAction(input: {
   confidence: number
   details: string
   categoryTargets: string[]
+  generationSource?: RemediationActionRecord['generationSource']
 }): RemediationActionRecord {
   return {
     tool: input.tool,
@@ -337,8 +380,55 @@ function semanticDeferredAction(input: {
     changedVisibleContent: input.tool === 'rewrite_link_visible_text' || input.tool === 'update_link_visible_text',
     categoryTargets: input.categoryTargets,
     changedDocumentBytes: false,
+    generationSource: input.generationSource,
     outcome: 'deferred',
   }
+}
+
+async function runHeuristicFigureFallbackStage(input: {
+  buffer: Buffer
+  result: AnalysisResult
+  context: Awaited<ReturnType<typeof inspectPdfForRemediation>>
+  previousActionNames: string[]
+}): Promise<{
+  buffer: Buffer
+  result: AnalysisResult
+  actions: RemediationActionRecord[]
+  manualReviewFlags: ModelReviewFlag[]
+}> {
+  const candidates = aiFirstFigureCandidates(input.context)
+  if (!candidates.length) {
+    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [] }
+  }
+
+  let workingBuffer = input.buffer
+  let currentResult = input.result
+  const actions: RemediationActionRecord[] = []
+  let context = input.context
+
+  for (const candidate of candidates) {
+    const key = `set_figure_alt_text:${candidate.id}`
+    if (input.previousActionNames.includes(key)) continue
+    const call = {
+      tool_name: 'set_figure_alt_text' as const,
+      arguments: {
+        candidateId: candidate.id,
+        altText: heuristicFigureAltText(candidate.id, context),
+        generationSource: 'heuristic_fallback' as const,
+      },
+      rationale: `Heuristic fallback after AI figure generation was unavailable for page ${candidate.pageNumber}.`,
+      confidence: 0.55,
+    }
+    const outcome = await executeRemediationTool({ buffer: workingBuffer, context, call })
+    workingBuffer = outcome.buffer
+    actions.push(outcome.action)
+    if (outcome.action.changedDocumentBytes) {
+      currentResult = await analyzePDF(workingBuffer, currentResult.filename || 'document.pdf', { skipAdobe: true })
+      context = await inspectPdfForRemediation(workingBuffer, currentResult)
+    }
+  }
+
+  return { buffer: workingBuffer, result: currentResult, actions, manualReviewFlags: [] }
 }
 
 async function runSemanticEnrichmentStage(input: {
@@ -359,11 +449,12 @@ async function runSemanticEnrichmentStage(input: {
   actions: RemediationActionRecord[]
   manualReviewFlags: ModelReviewFlag[]
 }> {
-  if (!shouldRunSemanticStage(input.result, input.originalResult)) {
+  if (!shouldRunSemanticStage(input.result, input.originalResult, input.context)) {
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [] }
   }
 
   let context = input.context
+  const originalAiFirstFigureCandidates = aiFirstFigureCandidates(context)
   input.onProgress?.({ stage: 'Generating semantic fixes', percent: 86 })
   let generated
   try {
@@ -379,6 +470,23 @@ async function runSemanticEnrichmentStage(input: {
     if (!isSemanticStageTooLargeError(error)) {
       throw error
     }
+    if (aiFirstFigureCandidates(context).length > 0) {
+      const fallback = await runHeuristicFigureFallbackStage({
+        buffer: input.buffer,
+        result: input.result,
+        context,
+        previousActionNames: input.previousActionNames,
+      })
+      return {
+        ...fallback,
+        manualReviewFlags: [{
+          code: 'semantic_enrichment_skipped',
+          label: 'Semantic enrichment skipped',
+          severity: 'warning',
+          details: `Semantic figure generation overflowed, so heuristic alt-text fallback was used instead: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
+        }],
+      }
+    }
     return {
       buffer: input.buffer,
       result: input.result,
@@ -393,6 +501,18 @@ async function runSemanticEnrichmentStage(input: {
   }
   const batches = generated.batches
   if (!batches.length) {
+    if (aiFirstFigureCandidates(context).length > 0) {
+      const fallback = await runHeuristicFigureFallbackStage({
+        buffer: input.buffer,
+        result: input.result,
+        context,
+        previousActionNames: input.previousActionNames,
+      })
+      return {
+        ...fallback,
+        manualReviewFlags: generated.reviewFlags,
+      }
+    }
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: generated.reviewFlags }
   }
 
@@ -453,6 +573,7 @@ async function runSemanticEnrichmentStage(input: {
             confidence: proposal.confidence,
             details,
             categoryTargets: ['alt_text'],
+            generationSource: 'manual_deferred',
           }))
           continue
         }
@@ -461,7 +582,7 @@ async function runSemanticEnrichmentStage(input: {
           categoryTargets: ['alt_text'],
           call: {
             tool_name: tool,
-            arguments: { candidateId: proposal.candidateId, altText: proposal.altText },
+            arguments: { candidateId: proposal.candidateId, altText: proposal.altText, generationSource: 'semantic_ai' },
             rationale: details,
             confidence: proposal.confidence,
           },
@@ -540,6 +661,44 @@ async function runSemanticEnrichmentStage(input: {
             },
           })
         }
+      }
+    } else if (batch.batchType === 'bookmarks') {
+      const headings = batch.bookmarks
+        .filter(proposal => proposal.confidence >= batchThreshold && proposal.title)
+        .map(proposal => {
+          const candidate = context.headingCandidates.find(entry => entry.id === proposal.candidateId)
+          const pageNumber = proposal.pageNumber ?? candidate?.pageNumber
+          const targetRef = proposal.targetRef ?? candidate?.targetRef ?? null
+          if (!Number.isFinite(pageNumber)) return null
+          return {
+            text: proposal.title,
+            level: proposal.level,
+            targetRef,
+            pageNumber,
+          }
+        })
+        .filter(Boolean)
+      const key = `replace_bookmarks_from_headings:${headings.length}`
+      if (!headings.length || input.previousActionNames.includes(key)) {
+        deferredActions.push(semanticDeferredAction({
+          tool: 'replace_bookmarks_from_headings',
+          target: 'document',
+          candidateId: 'document',
+          confidence: headings.length ? batch.bookmarks[0]?.confidence || 0 : 0,
+          details: 'AI bookmark proposal did not produce enough confident bookmark titles.',
+          categoryTargets: ['bookmarks'],
+        }))
+      } else {
+        plannedCalls.push({
+          key,
+          categoryTargets: ['bookmarks'],
+          call: {
+            tool_name: 'replace_bookmarks_from_headings',
+            arguments: { headings },
+            rationale: `AI bookmark cleanup (${headings.length} entries): replace noisy bookmark titles with concise semantic labels.`,
+            confidence: Math.min(0.98, Math.max(...batch.bookmarks.map(entry => entry.confidence))),
+          },
+        })
       }
     }
 
@@ -627,6 +786,36 @@ async function runSemanticEnrichmentStage(input: {
     workingBuffer = batchBuffer
     currentResult = analyzedBatch
     context = await inspectPdfForRemediation(workingBuffer, currentResult)
+  }
+
+  const skippedFigureSemanticWork = generated.reviewFlags.some(flag =>
+    flag.code === 'semantic_enrichment_skipped' && /figures semantic enrichment/i.test(flag.details),
+  )
+  const hasAltTextActions = acceptedActions.some(action =>
+    action.categoryTargets?.includes('alt_text') && (action.generationSource === 'semantic_ai' || action.generationSource === 'heuristic_fallback'),
+  )
+  if (skippedFigureSemanticWork && originalAiFirstFigureCandidates.length > 0) {
+    const fallback = await runHeuristicFigureFallbackStage({
+      buffer: workingBuffer,
+      result: currentResult,
+      context,
+      previousActionNames: [
+        ...input.previousActionNames,
+        ...acceptedActions.map(action => `${action.tool}:${action.candidateGroupId || action.candidateId || action.target}`),
+      ],
+    })
+    workingBuffer = fallback.buffer
+    currentResult = fallback.result
+    acceptedActions.push(...fallback.actions)
+    manualReviewFlags.push(...fallback.manualReviewFlags)
+    if (!hasAltTextActions && fallback.actions.length) {
+      manualReviewFlags.push({
+        code: 'semantic_figure_fallback_applied',
+        label: 'Heuristic figure fallback applied',
+        severity: 'warning',
+        details: 'Semantic figure generation was skipped for one or more targets, so heuristic figure alt text was applied as a last resort.',
+      })
+    }
   }
 
   return {
@@ -1076,7 +1265,7 @@ export async function remediatePdfWithAgent(
   })
 
   let semanticStageChangedDocument = false
-  if (shouldRunSemanticStage(currentResult, originalResult)) {
+  if (shouldRunSemanticStage(currentResult, originalResult, latestContext)) {
     const semanticContext = inspectModeForResult(currentResult) === 'alt_text_deep'
       ? await inspectPdfForRemediation(workingBuffer, currentResult, {
         inspectMode: 'alt_text_deep',
@@ -1113,7 +1302,160 @@ export async function remediatePdfWithAgent(
     manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, semanticStage.manualReviewFlags)
   }
 
-  const finalContext = semanticStageChangedDocument || !latestContext
+  if (shouldRunBookmarkCleanup(currentResult, originalResult, latestContext)) {
+    const bookmarkContext = latestContext || await inspectPdfForRemediation(workingBuffer, currentResult, {
+      inspectMode: 'light',
+      cache: inspectionCache,
+    })
+    latestContext = bookmarkContext
+    inspectionCache.qpdf = bookmarkContext.qpdf
+    inspectionCache.pdfjs = bookmarkContext.pdfjs
+    inspectionCache.pages = bookmarkContext.pages
+
+    const bookmarkStage = await runSemanticEnrichmentStage({
+      buffer: workingBuffer,
+      filename,
+      result: bookmarkCleanupTriggerAnalysis(currentResult),
+      context: bookmarkContext,
+      originalResult: {
+        ...originalResult,
+        isScanned: false,
+      },
+      currentTitle,
+      currentLanguage,
+      previousActionNames,
+      signal: options?.signal,
+      onProgress: options?.onProgress,
+      rejectedActions,
+    })
+
+    if (!bookmarkStage.buffer.equals(workingBuffer)) {
+      workingBuffer = bookmarkStage.buffer
+      currentResult = bookmarkStage.result
+      actions.push(...bookmarkStage.actions)
+      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, bookmarkStage.manualReviewFlags)
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...bookmarkStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ]))
+      latestContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
+        inspectMode: inspectModeForResult(currentResult),
+        cache: inspectionCache,
+      })
+    }
+  }
+
+  const finalCleanupContext = semanticStageChangedDocument || !latestContext
+    ? await inspectPdfForRemediation(workingBuffer, currentResult, {
+      inspectMode: inspectModeForResult(currentResult),
+      cache: inspectionCache,
+    })
+    : latestContext
+  latestContext = finalCleanupContext
+
+  const finalCleanupCalls = [
+    {
+      tool_name: 'normalize_heading_hierarchy' as const,
+      arguments: { target: 'document' },
+      rationale: 'Final cleanup: normalize heading levels so the first heading is H1 and later headings do not skip levels.',
+      confidence: 0.97,
+    },
+    {
+      tool_name: 'normalize_nested_figure_containers' as const,
+      arguments: { target: 'document' },
+      rationale: 'Final cleanup: retag empty wrapper /Figure containers so only leaf figures require alternate text.',
+      confidence: 0.97,
+    },
+    {
+      tool_name: 'repair_native_link_structure' as const,
+      arguments: { target: 'document' },
+      rationale: 'Final cleanup: repair link annotation structure after any bootstrap or semantic tagging changes.',
+      confidence: 0.97,
+    },
+    {
+      tool_name: 'normalize_annotation_tab_order' as const,
+      arguments: { target: 'document' },
+      rationale: 'Final cleanup: normalize annotation order on annotated pages before saving the remediated PDF.',
+      confidence: 0.95,
+    },
+    {
+      tool_name: 'set_tabs_all_annotated_pages' as const,
+      arguments: { target: 'document' },
+      rationale: 'Final cleanup: set /Tabs /S on all annotated or tagged pages before saving the remediated PDF.',
+      confidence: 0.98,
+    },
+  ]
+
+  let finalCleanupChangedDocument = false
+  const finalCleanupActions: RemediationActionRecord[] = []
+  let cleanupContext = finalCleanupContext
+  for (const call of finalCleanupCalls) {
+    const prevResult = currentResult
+    const prevBuffer = workingBuffer
+    const outcome = await executeRemediationTool({ buffer: workingBuffer, context: cleanupContext, call })
+    let adoptedAction = outcome.action
+    let adoptedBuffer = outcome.buffer
+
+    if (nativeTaggedSafeMode && outcome.action.changedDocumentBytes) {
+      const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal, skipAdobe: true })
+      const regressionReason =
+        hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
+        || shouldRejectNativeVisibleRewrite(prevResult, candidateResult, outcome.action)
+      if (regressionReason) {
+        adoptedAction = {
+          ...outcome.action,
+          details: `${outcome.action.details} Rejected because it ${regressionReason}.`,
+          outcome: 'rejected',
+          autoApplied: false,
+          changedDocumentBytes: false,
+        }
+        rejectedActions.push(adoptedAction)
+        adoptedBuffer = prevBuffer
+      } else {
+        if (outcome.action.categoryTargets?.length) {
+          adoptedAction.scoreDelta = outcome.action.categoryTargets.map(categoryId => ({
+            categoryId,
+            before: scoreForCategory(prevResult, categoryId),
+            after: scoreForCategory(candidateResult, categoryId),
+          }))
+          if (!adoptedAction.scoreDelta.some(d => (d.after ?? -1) > (d.before ?? -1)) && adoptedAction.outcome === 'applied') {
+            adoptedAction.outcome = 'no_effect'
+          }
+        }
+        currentResult = candidateResult
+        finalCleanupChangedDocument = true
+        cleanupContext = await inspectPdfForRemediation(adoptedBuffer, currentResult, {
+          inspectMode: inspectModeForResult(currentResult),
+          cache: inspectionCache,
+        })
+        latestContext = cleanupContext
+      }
+    } else if (outcome.action.changedDocumentBytes && outcome.action.outcome !== 'rejected') {
+      finalCleanupChangedDocument = true
+    }
+
+    workingBuffer = adoptedBuffer
+    finalCleanupActions.push(adoptedAction)
+    actions.push(adoptedAction)
+    allExecutedActions.push(adoptedAction)
+    manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+  }
+
+  if (!nativeTaggedSafeMode && finalCleanupChangedDocument) {
+    currentResult = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+    cleanupContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
+      inspectMode: inspectModeForResult(currentResult),
+      cache: inspectionCache,
+    })
+    latestContext = cleanupContext
+  }
+
+  previousActionNames = Array.from(new Set([
+    ...previousActionNames,
+    ...finalCleanupActions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+  ]))
+
+  const finalContext = finalCleanupChangedDocument || !latestContext
     ? await inspectPdfForRemediation(workingBuffer, currentResult, {
       inspectMode: inspectModeForResult(currentResult),
       cache: inspectionCache,
