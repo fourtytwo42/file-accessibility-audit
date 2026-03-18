@@ -465,6 +465,11 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
   return await response.json() as T
 }
 
+export function isExpiredSessionError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  return /API request failed \(401\)/.test(error.message) && /Client session expired/i.test(error.message)
+}
+
 export class QueueApiClient {
   private readonly baseUrl: string
   private readonly fetchImpl: typeof fetch
@@ -1522,6 +1527,28 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
       const allDone = Object.values(state.files).length > 0 && Object.values(state.files).every(entry => entry.lifecycleState === 'done')
       if (allDone) return
     } catch (error) {
+      if (isExpiredSessionError(error)) {
+        try {
+          const session = await client.bootstrap(state.session?.clientId || undefined)
+          state.session = session
+          state = appendEvent(state, `API session renewed for client ${session.clientId}`)
+          saveCampaignState(config.stateFilePath, state)
+          await writeProgressTracker(state, config, collectSystemHealth('ok', 0, concurrencyCap))
+          stdout.write('\x1b[2J\x1b[H')
+          stdout.write(`${renderDashboard(state, collectSystemHealth('ok', 0, concurrencyCap))}\n`)
+          await sleep(1000)
+          continue
+        } catch (renewError) {
+          state = appendEvent(
+            state,
+            `Session renewal failed: ${trimForDisplay(renewError instanceof Error ? renewError.stack || renewError.message : String(renewError), 180)}`,
+          )
+          saveCampaignState(config.stateFilePath, state)
+          await writeProgressTracker(state, config, collectSystemHealth('unavailable', 0, concurrencyCap))
+          await sleep(config.pollIntervalMs)
+          continue
+        }
+      }
       state = appendEvent(state, `Loop error recovered: ${trimForDisplay(error instanceof Error ? error.stack || error.message : String(error), 180)}`)
       saveCampaignState(config.stateFilePath, state)
       await writeProgressTracker(state, config, collectSystemHealth(apiStatus, 0, concurrencyCap))

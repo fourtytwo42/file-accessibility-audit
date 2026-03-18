@@ -10,6 +10,9 @@ import {
   createEmptyCampaignState,
   defaultOrchestratorConfig,
   deriveDashboardRow,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // imported for targeted classifier coverage
+  isExpiredSessionError,
   loadCampaignState,
   progressBar,
   recoverInterruptedCampaignState,
@@ -105,6 +108,12 @@ describe('remediationOrchestrator', () => {
     expect(recovered.files['stuck.pdf']?.lifecycleState).toBe('needs_fix')
     expect(recovered.files['stuck.pdf']?.latestProcessingStage).toContain('Recovered')
     expect(recovered.recentEvents.at(-1)).toContain('Recovered interrupted autofix state')
+  })
+
+  it('detects expired client-session API errors', () => {
+    expect(isExpiredSessionError(new Error('API request failed (401): {"error":"Client session expired"}'))).toBe(true)
+    expect(isExpiredSessionError(new Error('API request failed (500): boom'))).toBe(false)
+    expect(isExpiredSessionError(new Error('different message'))).toBe(false)
   })
 
   it('fails visual comparison when rendered pages differ too much', async () => {
