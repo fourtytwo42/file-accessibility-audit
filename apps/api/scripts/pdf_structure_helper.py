@@ -1635,42 +1635,52 @@ def mutate_create_heading_tag(pdf, mutation):
 
 def mutate_bootstrap_struct_tree(pdf, mutation):
     root = get_struct_tree_root(pdf)
-    if root is not None:
-        return False, [], ["Document already has a structure tree."]
-
     headings = mutation.get("headings") or []
     figures = mutation.get("figures") or []
     if not headings and not figures:
         return False, [], ["bootstrap_struct_tree requires heading or figure candidates."]
+    applied = []
+    if root is None:
+        catalog = None
+        for obj in pdf.objects:
+            if isinstance(obj, pikepdf.Dictionary) and str(obj.get("/Type")) == "/Catalog":
+                catalog = obj
+                break
+        if catalog is None:
+            return False, [], ["Could not locate the PDF catalog to attach a structure tree."]
 
-    catalog = None
-    for obj in pdf.objects:
-        if isinstance(obj, pikepdf.Dictionary) and str(obj.get("/Type")) == "/Catalog":
-            catalog = obj
-            break
-    if catalog is None:
-        return False, [], ["Could not locate the PDF catalog to attach a structure tree."]
+        struct_root = pdf.make_indirect(pikepdf.Dictionary({
+            "/Type": pikepdf.Name("/StructTreeRoot"),
+            "/K": pikepdf.Array(),
+        }))
+        document = pdf.make_indirect(pikepdf.Dictionary({
+            "/Type": pikepdf.Name("/StructElem"),
+            "/S": pikepdf.Name("/Document"),
+            "/P": struct_root,
+            "/K": pikepdf.Array(),
+        }))
+        struct_root["/K"] = pikepdf.Array([document])
+        catalog["/StructTreeRoot"] = struct_root
+        applied.append({
+            "ref": ref_string(struct_root),
+            "before": None,
+            "after": "/StructTreeRoot",
+            "details": f"Created a new structure tree rooted at {ref_string(struct_root)}.",
+        })
+    else:
+        struct_root = root
+        document = ensure_document_struct_elem(pdf, struct_root)
+        if not isinstance(document.get("/K"), pikepdf.Array):
+            existing_kids = document.get("/K")
+            document["/K"] = pikepdf.Array([existing_kids]) if existing_kids is not None else pikepdf.Array()
+        applied.append({
+            "ref": ref_string(document),
+            "before": "/Document",
+            "after": "/Document",
+            "details": f"Augmented existing structure tree under {ref_string(document)}.",
+        })
 
-    struct_root = pdf.make_indirect(pikepdf.Dictionary({
-        "/Type": pikepdf.Name("/StructTreeRoot"),
-        "/K": pikepdf.Array(),
-    }))
-    document = pdf.make_indirect(pikepdf.Dictionary({
-        "/Type": pikepdf.Name("/StructElem"),
-        "/S": pikepdf.Name("/Document"),
-        "/P": struct_root,
-        "/K": pikepdf.Array(),
-    }))
-    struct_root["/K"] = pikepdf.Array([document])
-    catalog["/StructTreeRoot"] = struct_root
-
-    next_mcid = 0
-    applied = [{
-        "ref": ref_string(struct_root),
-        "before": None,
-        "after": "/StructTreeRoot",
-        "details": f"Created a new structure tree rooted at {ref_string(struct_root)}.",
-    }]
+    next_mcid = next_available_struct_mcid(pdf)
 
     normalized_heading_levels = normalize_heading_sequence([
         entry.get("level") or "H2"
@@ -1891,8 +1901,28 @@ def ensure_document_struct_elem(pdf, struct_root):
         "/P": struct_root,
         "/K": pikepdf.Array(),
     }))
-    struct_root["/K"] = pikepdf.Array([document])
+    if isinstance(kids, pikepdf.Array):
+        kids.append(document)
+    elif kids is None:
+        struct_root["/K"] = pikepdf.Array([document])
+    else:
+        struct_root["/K"] = pikepdf.Array([kids, document])
     return document
+
+
+def next_available_struct_mcid(pdf):
+    reserved = set()
+    try:
+        for obj in iter_struct_elems(pdf):
+            reserved.update(mcid for mcid in normalized_struct_elem_mcids(obj) if isinstance(mcid, int))
+    except Exception:
+        pass
+    try:
+        for page in pdf.pages:
+            reserved.update(extract_page_mcids(page.obj))
+    except Exception:
+        pass
+    return (max(reserved) + 1) if reserved else 0
 
 
 def page_content_bytes(page_obj):

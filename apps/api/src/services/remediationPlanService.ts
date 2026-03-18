@@ -10,6 +10,7 @@ import type {
 } from './documentModel.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
 import { normalizeLanguageTag } from './languageTags.js'
+import { hasSemanticRepairConfig } from './semanticEnrichmentService.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 
 const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
@@ -20,6 +21,7 @@ const MAX_ACTIONS = 32
 
 const STRUCTURE_BOOTSTRAP_STAGE = new Set<RemediationToolName>([
   'bootstrap_struct_tree',
+  'repair_malformed_bdc_operators',
   'repair_note_tag_ids',
   'repair_native_marked_content_refs',
   'repair_bootstrapped_chart_content_refs',
@@ -79,6 +81,7 @@ export const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['set_document_title', 1],
   ['set_document_language', 1],
   ['bootstrap_struct_tree', 2],
+  ['repair_malformed_bdc_operators', 2],
   ['repair_note_tag_ids', 2],
   ['repair_native_marked_content_refs', 2],
   ['repair_bootstrapped_chart_content_refs', 2],
@@ -119,6 +122,7 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['set_document_title', 2],
   ['set_document_language', 3],
   ['bootstrap_struct_tree', 0],
+  ['repair_malformed_bdc_operators', 1],
   ['repair_note_tag_ids', 1],
   ['repair_native_marked_content_refs', 2],
   ['repair_bootstrapped_chart_content_refs', 3],
@@ -342,11 +346,15 @@ function headingLevelForCandidate(candidateId: string, context: PdfRemediationCo
   if (/^\/?H[1-6]$/i.test(candidate.existingTag || '')) {
     return String(candidate.existingTag).replace(/^\//, '').toUpperCase()
   }
+  const normalizedText = candidate.text.replace(/\s+/g, ' ').trim().toLowerCase()
+  const looksLikeTopLevelHeading = candidate.pageNumber === 1
+    || /^(executive summary|table of contents(?:\s*\(continued\))?|contents|introduction|overview|conclusion|appendix\b|appendices\b|chapter\s+\d+\b|part\s+\d+\b|section\s+\d+\b|foreword|preface|acknowledg(?:e)?ments?)\b/.test(normalizedText)
+  if (looksLikeTopLevelHeading) return 'H1'
   const h1AlreadyPlanned = selectedActions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.level === 'H1')
-  return candidate.pageNumber === 1 && !h1AlreadyPlanned ? 'H1' : 'H2'
+  return h1AlreadyPlanned ? 'H2' : 'H1'
 }
 
-function figureAltText(candidateId: string, context: PdfRemediationContext): string {
+export function heuristicFigureAltText(candidateId: string, context: PdfRemediationContext): string {
   const candidate = context.figureCandidates.find(entry => entry.id === candidateId)
   if (!candidate) return 'Image'
   if (candidate.splitGenerated || candidate.informativeHint !== 'informative') {
@@ -356,6 +364,13 @@ function figureAltText(candidateId: string, context: PdfRemediationContext): str
     return `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
   }
   return `Image on page ${candidate.pageNumber}`
+}
+
+function shouldPreferSemanticFigureAltText(candidateId: string, context: PdfRemediationContext): boolean {
+  if (!hasSemanticRepairConfig()) return false
+  const candidate = context.figureCandidates.find(entry => entry.id === candidateId)
+  if (!candidate) return false
+  return candidate.repairMode !== 'defer' && candidate.informativeHint !== 'decorative'
 }
 
 function buildDeterministicCall(input: {
@@ -431,6 +446,7 @@ function buildDeterministicCall(input: {
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
       }
+    case 'repair_malformed_bdc_operators':
     case 'repair_other_elements_alt_text':
     case 'repair_native_figure_semantics':
     case 'repair_native_table_headers':
@@ -502,9 +518,14 @@ function buildDeterministicCall(input: {
     case 'retag_as_figure_and_set_alt': {
       const candidateId = opportunity.candidateIds[0]
       if (!candidateId) return null
+      if (shouldPreferSemanticFigureAltText(candidateId, context)) return null
       return {
         tool_name: opportunity.toolName,
-        arguments: { candidateId, altText: figureAltText(candidateId, context) },
+        arguments: {
+          candidateId,
+          altText: heuristicFigureAltText(candidateId, context),
+          generationSource: 'heuristic_fallback',
+        },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
       }
@@ -548,7 +569,10 @@ function isOpportunitySelectable(input: {
   if (!TOOL_STAGE_ORDER.has(opportunity.toolName)) return false
   if (CANDIDATE_ONLY_TOOLS.has(opportunity.toolName) && opportunity.scope === 'document') return false
 
-  const alreadyTaggedNative = !analysis.isScanned && isNativeTaggedSafeContext(context) && !hasActionTool(actions, 'bootstrap_struct_tree')
+  const alreadyTaggedNative = !analysis.isScanned
+    && isNativeTaggedSafeContext(context)
+    && !hasActionTool(actions, 'bootstrap_struct_tree')
+    && !hasPlannedTool(selectedActions, 'bootstrap_struct_tree')
   const useBootstrappedChartConformance = shouldUseBootstrappedChartConformance({ analysis, context, actions, selectedActions })
   const hasAutoNativeMarkedContent = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_marked_content_refs')
   const hasAutoNativeLinkRepair = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_link_structure')

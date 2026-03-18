@@ -206,6 +206,40 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect((inspect.acrobatAltRiskNodes || []).filter(node => node.ownershipMode === 'nonfigure_with_alt')).toEqual([])
   }, 60_000)
 
+  it('bootstrap_struct_tree can augment an existing structure tree with headings', async () => {
+    const buffer = await makePdf()
+    const initial = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section one', level: 'H1', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(initial.outputBuffer).toBeDefined()
+    const augmented = await runPdfStructureBackend({
+      buffer: initial.outputBuffer!,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section two', level: 'H2', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(augmented.status).toBe('applied')
+    expect(augmented.outputBuffer).toBeDefined()
+    const reInspect = await runPdfStructureBackend({
+      buffer: augmented.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    expect(reInspect.headings.map(heading => heading.tag)).toEqual(['/H1', '/H1'])
+  }, 60_000)
+
   it('splits mixed heading/logo MCIDs on the one-page chart fixture so Acrobat-risk nodes clear', async () => {
     const buffer = await loadDownloadFixture('1total offenses_1999-2008.pdf')
     const analysis = await analyzePDF(buffer, '1total offenses_1999-2008.pdf')
@@ -2275,6 +2309,82 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(plan.actions.some(action => action.tool_name === 'embed_missing_fonts_in_place')).toBe(true)
     expect(plan.actions.some(action => action.tool_name === 'repair_font_unicode_maps')).toBe(true)
   }, 60_000)
+
+  it('plans bootstrap augmentation for weak native-tagged documents with no usable heading structure', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'weak-native.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const weakAnalysis = {
+      ...analysis,
+      isScanned: false,
+      categories: analysis.categories.map(category => {
+        if (category.id === 'heading_structure') return { ...category, score: 0, grade: 'F', findings: ['No heading tags found in the document structure'] }
+        if (category.id === 'alt_text') return { ...category, score: 0, grade: 'F', findings: ['Images are not tagged as Figure elements'] }
+        if (category.id === 'reading_order') return { ...category, score: 40, grade: 'F' }
+        return category
+      }),
+    }
+    const weakContext = {
+      ...context,
+      qpdf: {
+        ...context.qpdf,
+        hasStructTree: true,
+        isTagged: true,
+        structTreeDepth: 2,
+        headings: [],
+        images: [{ ref: 'obj:20 0 R', hasAlt: false }],
+      },
+      structure: {
+        ...context.structure,
+        structuralNodes: [{ ref: 'obj:10 0 R', tag: '/Normal', parentRef: 'obj:9 0 R', orderIndex: 0 }],
+      },
+      headingCandidates: [{
+        id: 'heading:1:1',
+        pageNumber: 1,
+        text: 'Executive Summary',
+        bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+        fontSize: 18,
+        fontWeight: 'bold' as const,
+        nearbyContext: ['Context line'],
+        targetRef: null,
+        existingTag: '/Normal',
+        repairMode: 'defer' as const,
+        unsafeReason: 'Heading candidate did not map cleanly to a safe text-bearing structure element.',
+      }],
+      figureCandidates: [{
+        id: 'figure:1',
+        pageNumber: 1,
+        targetRef: 'obj:20 0 R',
+        bbox: { x: 0, y: 0, width: 1, height: 1 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative' as const,
+        surroundingText: ['State seal'],
+        repairMode: 'retag_then_set_alt' as const,
+        targetTag: '/TextBox',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'low' as const,
+        imageEvidence: 'strong' as const,
+      }],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'weak-native.pdf',
+      analysis: weakAnalysis as any,
+      context: weakContext as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'bootstrap_struct_tree')).toBe(true)
+  })
 
   it('maps existing tagged-PDF issue categories to native-safe repair tools', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {

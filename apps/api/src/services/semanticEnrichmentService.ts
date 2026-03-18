@@ -474,11 +474,41 @@ function headingTargets(context: PdfRemediationContext): HeadingCandidate[] {
   return context.headingCandidates.filter(candidate => candidate.repairMode === 'safe')
 }
 
+function decodeOutlineTitleForPrompt(title: string): string {
+  const trimmed = title.trim()
+  const hexMatch = /^b:([0-9a-f]+)$/i.exec(trimmed)
+  if (!hexMatch) return trimmed
+  try {
+    const decoded = Buffer.from(hexMatch[1], 'hex')
+      .toString('latin1')
+      .replace(/[\x00-\x1f\x7f]/g, ' ')
+      .replace(/[\x80-\x9f]/g, '…')
+      .replace(/\s+/g, ' ')
+      .trim()
+    return decoded || trimmed
+  } catch {
+    return trimmed
+  }
+}
+
 function bookmarkTargets(context: PdfRemediationContext): HeadingCandidate[] {
-  return context.headingCandidates.filter(candidate =>
-    candidate.text.trim()
-    && (candidate.targetRef || Number.isFinite(candidate.pageNumber))
-  )
+  const outlineTitles = (context.qpdf.outlineTitles || [])
+    .map(title => decodeOutlineTitleForPrompt(String(title || '')))
+    .filter(Boolean)
+
+  return context.headingCandidates
+    .filter(candidate =>
+      candidate.text.trim()
+      && (candidate.targetRef || Number.isFinite(candidate.pageNumber))
+    )
+    .map((candidate, index) => {
+      const outlineTitle = outlineTitles[index]
+      if (!outlineTitle) return candidate
+      return {
+        ...candidate,
+        text: outlineTitle,
+      }
+    })
 }
 
 function tableTargets(context: PdfRemediationContext): TableCandidate[] {

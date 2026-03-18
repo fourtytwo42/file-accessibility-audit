@@ -184,6 +184,31 @@ function sortedNumeric(values: number[]): number[] {
   return [...new Set(values)].sort((a, b) => a - b)
 }
 
+function categoryScore(input: BuildFailureProfileInput, categoryId: string): number | null {
+  const category = input.analysis.categories.find(entry => entry.id === categoryId)
+  return typeof category?.score === 'number' ? category.score : null
+}
+
+function weakNativeBootstrapNeeded(input: BuildFailureProfileInput): boolean {
+  if (input.analysis.isScanned || !input.context.qpdf.hasStructTree) return false
+  const headingScore = categoryScore(input, 'heading_structure') ?? 100
+  const altScore = categoryScore(input, 'alt_text') ?? 100
+  const hasNativeHeadings = (input.context.qpdf.headings?.length || 0) > 0
+  const hasSafeHeadingTargets = input.context.headingCandidates.some(candidate => candidate.repairMode === 'safe')
+  const hasRetaggableFigures = input.context.figureCandidates.some(candidate => candidate.repairMode !== 'defer')
+  const hasAccessibleImages = input.context.qpdf.images.some(image => image.hasAlt)
+  return (
+    headingScore < 100
+    && !hasNativeHeadings
+    && input.context.headingCandidates.length > 0
+    && !hasSafeHeadingTargets
+  ) || (
+    altScore < 100
+    && hasRetaggableFigures
+    && !hasAccessibleImages
+  )
+}
+
 function actionTargetForOpportunity(input: {
   scope: ToolOpportunityScope
   candidateIds?: string[]
@@ -324,7 +349,10 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     }
   }
 
-  const blockedHeadings = input.context.headingCandidates.filter(candidate => candidate.repairMode !== 'safe')
+  const headingNeedsReview = (categoryScore(input, 'heading_structure') ?? 100) < 100
+  const blockedHeadings = headingNeedsReview
+    ? input.context.headingCandidates.filter(candidate => candidate.repairMode !== 'safe')
+    : []
   if (blockedHeadings.length) {
     mergeMode(modes, {
       key: 'context.heading_candidates_blocked',
@@ -340,7 +368,10 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     })
   }
 
-  const blockedFigures = input.context.figureCandidates.filter(candidate => candidate.repairMode === 'defer')
+  const altTextNeedsReview = (categoryScore(input, 'alt_text') ?? 100) < 100
+  const blockedFigures = altTextNeedsReview
+    ? input.context.figureCandidates.filter(candidate => candidate.repairMode === 'defer')
+    : []
   if (blockedFigures.length) {
     mergeMode(modes, {
       key: 'context.figure_candidates_blocked',
@@ -401,7 +432,10 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     })
   }
 
-  const blockedTables = input.context.tableCandidates.filter(candidate => candidate.repairMode !== 'safe')
+  const tableNeedsReview = (categoryScore(input, 'table_markup') ?? 100) < 100
+  const blockedTables = tableNeedsReview
+    ? input.context.tableCandidates.filter(candidate => candidate.repairMode !== 'safe')
+    : []
   if (blockedTables.length) {
     mergeMode(modes, {
       key: 'context.table_candidates_blocked',
@@ -635,6 +669,25 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     })
   }
 
+  // Proactively fix malformed BDC operators (missing tag-name operand) on tagged PDFs.
+  // Some generators emit `<dict> BDC` instead of `/Tag <dict> BDC`; this causes pdftoppm
+  // to fail rendering pages (white-page output), which in turn causes false-positive
+  // color-contrast failures. Schedule this repair whenever the document has a struct tree.
+  if (input.context.qpdf.hasStructTree || input.context.qpdf.isTagged) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_malformed_bdc_operators',
+      reason: 'Repair BDC operators missing their tag-name operand to fix page rendering and eliminate false-positive color-contrast failures.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+      confidence: 0.9,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: [],
+    })
+  }
+
   // Proactively add /Contents alt text to non-link annotations and set /Tabs /S on all
   // annotated / tagged pages.  Adobe Acrobat's checker fires 'Tab order - Failed',
   // 'Associated with content - Failed', and 'Other elements alternate text - Failed'
@@ -852,13 +905,15 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   if (
-    !input.context.qpdf.hasStructTree
-    && !input.analysis.isScanned
+    !input.analysis.isScanned
     && (issueIds.has('text_extractability') || issueIds.has('heading_structure') || issueIds.has('alt_text') || issueIds.has('reading_order'))
+    && (!input.context.qpdf.hasStructTree || weakNativeBootstrapNeeded(input))
   ) {
     addOpportunity(opportunities, {
       toolName: 'bootstrap_struct_tree',
-      reason: 'The document lacks a usable structure tree, so a bootstrap pass is the first deterministic repair opportunity.',
+      reason: !input.context.qpdf.hasStructTree
+        ? 'The document lacks a usable structure tree, so a bootstrap pass is the first deterministic repair opportunity.'
+        : 'The native structure tree is present but too weak to support headings or figures reliably, so a bootstrap augmentation pass is warranted.',
       scope: 'document',
       candidateIds: [],
       candidateGroupIds: [],

@@ -338,6 +338,63 @@ describe('semanticEnrichmentService', () => {
     expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures', 'bookmarks'])
   })
 
+  it('uses existing outline titles as bookmark AI input when available', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn(async (_url, init: any) => {
+      const body = JSON.parse(String(init?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      expect(prompt).toContain('Batch type: bookmarks')
+      expect(prompt).toContain('Council members')
+      expect(prompt).not.toContain('Heading 1')
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    bookmarks: [{ candidateId: 'heading:1:1', title: 'Council members', level: 'H2', confidence: 0.92, rationale: 'Clean section label.' }],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      }
+    })
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    const context = makeContext()
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = []
+    context.qpdf.outlineTitles = ['b:436f756e63696c206d656d62657273']
+    context.headingCandidates = [context.headingCandidates[0]]
+    const analysis = makeAnalysisResult()
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+
+    const generated = await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis,
+      context,
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(generated.batches).toHaveLength(1)
+    expect(generated.batches[0]?.bookmarks[0]?.title).toBe('Council members')
+  })
+
   it('still returns figure batches for fully compliant results when AI-first figures are eligible', async () => {
     const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const analysis = makeAnalysisResult()
