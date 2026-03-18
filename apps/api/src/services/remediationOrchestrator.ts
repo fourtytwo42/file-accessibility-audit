@@ -375,12 +375,19 @@ export function recoverInterruptedCampaignState(state: CampaignState): CampaignS
 
   for (const [filename, entry] of Object.entries(state.files)) {
     if (entry.lifecycleState !== 'autofixing') continue
+    const completedAutofix = state.recentEvents.some(event =>
+      event.includes('Autofix batch completed:')
+      && event.includes(filename),
+    )
     next.files[filename] = {
       ...entry,
-      lifecycleState: entry.latestFailurePacketPath ? 'needs_fix' : 'blocked',
-      latestProcessingStage: 'Recovered after interrupted orchestrator run',
+      lifecycleState: completedAutofix ? 'awaiting_restart' : (entry.latestFailurePacketPath ? 'needs_fix' : 'blocked'),
+      latestProcessingStage: completedAutofix
+        ? 'Recovered after completed autofix; awaiting rerun'
+        : 'Recovered after interrupted orchestrator run',
       latestProcessingProgress: 0,
       validationStage: 'idle',
+      resultProvenance: completedAutofix ? 'stale_after_restart' : entry.resultProvenance,
       lastUpdatedAt: nowIso(),
     }
     recovered.push(filename)
@@ -1289,19 +1296,41 @@ function markEntriesAwaitingRestart(state: CampaignState, filenames: string[]): 
 }
 
 async function queueAwaitingRestartEntries(client: QueueApiClient, state: CampaignState): Promise<CampaignState> {
-  const itemIds = Object.values(state.files)
-    .filter(entry => entry.lifecycleState === 'awaiting_restart' && entry.queueItemId)
-    .map(entry => entry.queueItemId!) 
-  if (!itemIds.length) return state
-  await client.remediateMany(itemIds)
   const next = { ...state, files: { ...state.files } }
-  for (const entry of Object.values(next.files)) {
-    if (entry.lifecycleState !== 'awaiting_restart') continue
+  const awaiting = Object.values(state.files).filter(entry => entry.lifecycleState === 'awaiting_restart')
+  if (!awaiting.length) return state
+
+  const rerunIds = awaiting.filter(entry => entry.queueItemId).map(entry => entry.queueItemId!)
+  if (rerunIds.length) {
+    await client.remediateMany(rerunIds)
+  }
+
+  for (const entry of awaiting) {
+    if (entry.queueItemId) {
+      next.files[entry.filename] = {
+        ...entry,
+        lifecycleState: 'rerunning',
+        validationStage: 'idle',
+        resultProvenance: 'current_session',
+        latestProcessingStage: 'Queued post-fix rerun',
+        latestProcessingProgress: 1,
+        lastUpdatedAt: nowIso(),
+      }
+      continue
+    }
+
+    const uploaded = await client.uploadPdf(entry.sourcePath)
     next.files[entry.filename] = {
       ...entry,
-      lifecycleState: 'rerunning',
+      queueItemId: uploaded.id,
+      attemptNumber: entry.attemptNumber + 1,
+      loopCount: entry.loopCount + 1,
+      lifecycleState: 'uploading',
       validationStage: 'idle',
       resultProvenance: 'current_session',
+      latestProcessingStage: 'Uploading post-fix rerun',
+      latestProcessingProgress: 1,
+      queuedAt: nowIso(),
       lastUpdatedAt: nowIso(),
     }
   }
@@ -1355,11 +1384,13 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
         || entry.lifecycleState === 'analyzing'
         || entry.lifecycleState === 'rerunning',
       ).length
+      const hasRerunBarrier = Object.values(state.files).some(entry => entry.lifecycleState === 'awaiting_restart')
 
       if (!config.validateOnly && apiStatus === 'ok' && activeCount === 0) {
         const awaitingRestart = Object.values(state.files).filter(entry => entry.lifecycleState === 'awaiting_restart' && entry.queueItemId)
-        if (awaitingRestart.length > 0) {
-          state = appendEvent(state, `Scheduling reruns after restart: ${awaitingRestart.map(entry => entry.filename).join(', ')}`)
+        const awaitingAnyRestart = Object.values(state.files).filter(entry => entry.lifecycleState === 'awaiting_restart')
+        if (awaitingAnyRestart.length > 0) {
+          state = appendEvent(state, `Scheduling reruns after restart: ${awaitingAnyRestart.map(entry => entry.filename).join(', ')}`)
           state = await queueAwaitingRestartEntries(client, state)
         } else if (config.autoFixEnabled) {
           const needsFix = Object.values(state.files)
@@ -1410,13 +1441,19 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
             })
             if (autofix.success) {
               state = appendEvent(state, `Autofix batch completed: ${needsFix.map(entry => entry.filename).join(', ')}`)
-              await restartApi(config)
-              state.lastApiRestartAt = nowIso()
-              const session = await client.bootstrap(state.session?.clientId || undefined)
-              state.session = session
-              await waitForApiHealthy(client, config.apiRestartWaitMs, sleep)
               state = markEntriesAwaitingRestart(state, needsFix.map(entry => entry.filename))
-              state = appendEvent(state, `API restarted and reruns queued for: ${needsFix.map(entry => entry.filename).join(', ')}`)
+              state = appendEvent(state, `Autofix completed; restart and rerun required for: ${needsFix.map(entry => entry.filename).join(', ')}`)
+              saveCampaignState(config.stateFilePath, state)
+              try {
+                await restartApi(config)
+                state.lastApiRestartAt = nowIso()
+                const session = await client.bootstrap(state.session?.clientId || undefined)
+                state.session = session
+                await waitForApiHealthy(client, config.apiRestartWaitMs, sleep)
+                state = appendEvent(state, `API restarted successfully; reruns pending for: ${needsFix.map(entry => entry.filename).join(', ')}`)
+              } catch (restartError) {
+                state = appendEvent(state, `Restart/rerun staging failed: ${trimForDisplay(restartError instanceof Error ? restartError.stack || restartError.message : String(restartError), 160)}`)
+              }
             } else {
               state = appendEvent(state, `Autofix batch failed: ${trimForDisplay(autofix.output || 'codex exec failed', 140)}`)
               for (const entry of needsFix) {
@@ -1432,7 +1469,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
         }
       }
 
-      if (!config.validateOnly && apiStatus === 'ok' && activeCount < concurrencyCap) {
+      if (!config.validateOnly && apiStatus === 'ok' && activeCount < concurrencyCap && !hasRerunBarrier) {
         const available = concurrencyCap - activeCount
         const candidates = Object.values(state.files)
           .filter(entry => entry.lifecycleState === 'queued' && !entry.queueItemId)

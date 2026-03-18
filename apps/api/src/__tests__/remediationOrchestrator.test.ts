@@ -110,6 +110,38 @@ describe('remediationOrchestrator', () => {
     expect(recovered.recentEvents.at(-1)).toContain('Recovered interrupted autofix state')
   })
 
+  it('recovers completed autofix entries into awaiting-restart state', () => {
+    const state = createEmptyCampaignState('http://127.0.0.1:6103')
+    state.recentEvents.push('2026-03-18T00:00:05.000Z Autofix batch completed: stuck.pdf')
+    state.files['stuck.pdf'] = {
+      filename: 'stuck.pdf',
+      sourcePath: '/tmp/stuck.pdf',
+      queueItemId: null,
+      attemptNumber: 3,
+      loopCount: 3,
+      lifecycleState: 'autofixing',
+      validationStage: 'idle',
+      latestOutputPath: '/tmp/stuck.pdf',
+      latestFailurePacketPath: '/tmp/stuck-failure.json',
+      latestScore: 44,
+      latestGrade: 'F',
+      latestVeraPdfStatus: 'failed',
+      latestProcessingStage: 'Running Codex autofix',
+      latestProcessingProgress: 100,
+      latestVisualComparison: null,
+      latestBookmarkValidation: null,
+      latestValidationPassed: false,
+      resultProvenance: 'current_session',
+      queuedAt: null,
+      lastUpdatedAt: '2026-03-18T00:00:00.000Z',
+    }
+
+    const recovered = recoverInterruptedCampaignState(state)
+    expect(recovered.files['stuck.pdf']?.lifecycleState).toBe('awaiting_restart')
+    expect(recovered.files['stuck.pdf']?.latestProcessingStage).toContain('awaiting rerun')
+    expect(recovered.files['stuck.pdf']?.resultProvenance).toBe('stale_after_restart')
+  })
+
   it('detects expired client-session API errors', () => {
     expect(isExpiredSessionError(new Error('API request failed (401): {"error":"Client session expired"}'))).toBe(true)
     expect(isExpiredSessionError(new Error('API request failed (500): boom'))).toBe(false)
