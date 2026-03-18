@@ -1352,7 +1352,10 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
             }
             state = appendEvent(state, `Autofix batch started: ${needsFix.map(entry => entry.filename).join(', ')}`)
             saveCampaignState(config.stateFilePath, state)
-            await writeProgressTracker(state, config, collectSystemHealth(apiStatus, activeCount, concurrencyCap))
+            const preAutofixHealth = collectSystemHealth(apiStatus, activeCount, concurrencyCap)
+            await writeProgressTracker(state, config, preAutofixHealth)
+            stdout.write('\x1b[2J\x1b[H')
+            stdout.write(`${renderDashboard(state, preAutofixHealth)}\n`)
             const autofix = await runAutofixPass(state, config, needsFix)
             if (autofix.success) {
               state = appendEvent(state, `Autofix batch completed: ${needsFix.map(entry => entry.filename).join(', ')}`)
