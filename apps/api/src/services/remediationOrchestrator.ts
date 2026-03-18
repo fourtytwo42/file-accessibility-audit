@@ -1467,7 +1467,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
       saveCampaignState(config.stateFilePath, state)
       const health = collectSystemHealth(apiStatus, activeCount, concurrencyCap)
       await writeProgressTracker(state, config, health)
-      stdout.write('\x1bc')
+      stdout.write('\x1b[2J\x1b[H')
       stdout.write(`${renderDashboard(state, health)}\n`)
 
       const allDone = Object.values(state.files).length > 0 && Object.values(state.files).every(entry => entry.lifecycleState === 'done')
