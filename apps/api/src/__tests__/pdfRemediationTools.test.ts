@@ -2745,7 +2745,17 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
           structuralNodes: context.structure.structuralNodes?.length
             ? context.structure.structuralNodes
             : [{ ref: 'obj:1 0 R', tag: '/Sect', orderIndex: 0 }],
+          // Ensure native figure nodes exist so weakNativeBootstrapNeeded's
+          // (hasPdfImages && !hasNativeFigureNodes) branch doesn't fire.
+          figures: context.structure.figures?.length
+            ? context.structure.figures
+            : [{ ref: 'obj:2 0 R', tag: '/Figure', hasAlt: false }],
         },
+        // Defer all figure candidates so weakNativeBootstrapNeeded's hasRetaggableFigures
+        // branch doesn't fire — we're testing native repair tools, not bootstrap.
+        figureCandidates: context.figureCandidates.map(c => ({ ...c, repairMode: 'defer' as const })),
+        // No heading candidates to avoid bootstrap condition 1 (headingScore < 100 && candidates).
+        headingCandidates: [],
       },
       iteration: 2,
       actions: [],
