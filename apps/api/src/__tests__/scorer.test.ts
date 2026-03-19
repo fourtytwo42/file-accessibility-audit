@@ -181,8 +181,8 @@ describe('scoreDocument — fully accessible PDF', () => {
     expect(result.executiveSummary).toContain('ready for publication')
   })
 
-  it('all 10 categories are present', () => {
-    expect(result.categories).toHaveLength(10)
+  it('all 11 categories are present', () => {
+    expect(result.categories).toHaveLength(11)
   })
 
   it('text_extractability scores 100', () => {
@@ -877,7 +877,7 @@ describe('scoreLinkQuality edge cases', () => {
     const qpdf = makeQpdf()
     const pdfjs = makePdfjs({
       links: [
-        { url: 'https://a.com', text: 'Click here' }, // descriptive
+        { url: 'https://a.com', text: 'Annual Report 2024' }, // descriptive
         { url: 'https://b.com', text: 'https://b.com' }, // raw
       ],
     })
@@ -976,6 +976,8 @@ describe('summarizeLinkTextQuality', () => {
       rawUrlLinkDensity: 0,
       descriptiveLinks: [],
       rawLinks: [],
+      genericLinks: [],
+      genericLinkCount: 0,
     })
   })
 

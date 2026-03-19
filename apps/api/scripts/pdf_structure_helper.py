@@ -6878,6 +6878,89 @@ def analyze_reading_order_pdfminer(pdf_path, request):
                 "warnings": [str(exc)]}
 
 
+def dispatch_single_operation(pdf, operation, request):
+    """Route a single operation name to its mutate_* function.
+
+    Returns (changed: bool, applied: list, warnings: list).
+    Returns (False, [], ["unsupported: <op>"]) for unknown operations.
+    Not intended for 'inspect', 'batch_mutate', or 'analyze_reading_order_pdfminer'.
+    """
+    if operation == "bootstrap_struct_tree":
+        return mutate_bootstrap_struct_tree(pdf, request)
+    elif operation == "set_pdfua_identification":
+        return mutate_set_pdfua_identification(pdf, request)
+    elif operation == "normalize_annotation_tab_order":
+        return mutate_normalize_annotation_tab_order(pdf, request)
+    elif operation == "set_tabs_all_annotated_pages":
+        return mutate_set_tabs_all_annotated_pages(pdf, request)
+    elif operation == "repair_cid_symbol_font_maps":
+        return mutate_repair_cid_symbol_font_maps(pdf, request)
+    elif operation == "repair_cidset_consistency":
+        return mutate_repair_cidset_consistency(pdf, request)
+    elif operation == "repair_structure_conformance":
+        return mutate_repair_structure_conformance(pdf, request)
+    elif operation == "repair_type1_font_unicode_maps":
+        return mutate_repair_type1_font_unicode_maps(pdf, request)
+    elif operation == "repair_reported_font_widths":
+        return mutate_repair_reported_font_widths(pdf, request)
+    elif operation == "substitute_legacy_fonts_in_place":
+        return mutate_substitute_legacy_fonts_in_place(pdf, request)
+    elif operation == "finalize_substituted_font_conformance":
+        return mutate_finalize_substituted_font_conformance(pdf, request)
+    elif operation == "repair_note_tag_ids":
+        return mutate_repair_note_tag_ids(pdf, request)
+    elif operation == "repair_native_marked_content_refs":
+        return mutate_repair_native_marked_content_refs(pdf, request)
+    elif operation == "repair_native_link_structure":
+        return mutate_repair_native_link_structure(pdf, request)
+    elif operation == "repair_bootstrapped_chart_content_refs":
+        return mutate_repair_bootstrapped_chart_content_refs(pdf, request)
+    elif operation == "repair_native_figure_semantics":
+        return mutate_repair_native_figure_semantics(pdf, request)
+    elif operation == "repair_other_elements_alt_text":
+        return mutate_repair_other_elements_alt_text(pdf, request)
+    elif operation == "repair_native_table_headers":
+        return mutate_repair_native_table_headers(pdf, request)
+    elif operation == "repair_native_reading_order":
+        return mutate_repair_native_reading_order(pdf, request)
+    elif operation == "repair_font_unicode_maps":
+        return mutate_repair_font_unicode_maps(pdf, request)
+    elif operation == "repair_annotation_alt_text":
+        return mutate_repair_annotation_alt_text(pdf, request)
+    elif operation == "repair_truetype_encoding_differences":
+        return mutate_repair_truetype_encoding_differences(pdf, request)
+    elif operation == "embed_missing_fonts_in_place":
+        return mutate_embed_missing_fonts_in_place(pdf, request)
+    elif operation == "repair_malformed_bdc_operators":
+        return mutate_repair_malformed_bdc_operators(pdf, request)
+    elif operation == "artifact_nonsemantic_page_elements":
+        return mutate_artifact_nonsemantic_page_elements(pdf, request)
+    elif operation == "replace_bookmarks_from_headings":
+        return mutate_replace_bookmarks_from_headings(pdf, request)
+    elif operation == "create_heading_tag":
+        return mutate_create_heading_tag(pdf, request)
+    elif operation == "create_heading_from_candidate":
+        return mutate_create_heading_from_candidate(pdf, request)
+    elif operation == "normalize_heading_hierarchy":
+        return mutate_normalize_heading_hierarchy(pdf, request)
+    elif operation == "normalize_nested_figure_containers":
+        return mutate_normalize_nested_figure_containers(pdf, request)
+    elif operation == "retag_node":
+        return mutate_retag_node(pdf, request)
+    elif operation == "set_table_header_cells":
+        return mutate_set_table_header_cells(pdf, request)
+    elif operation == "set_figure_alt_text":
+        return mutate_set_figure_alt_text(pdf, request)
+    elif operation == "retag_as_figure_and_set_alt":
+        return mutate_retag_as_figure_and_set_alt(pdf, request)
+    elif operation == "mark_figure_decorative":
+        return mutate_mark_figure_decorative(pdf, request)
+    elif operation == "reorder_structure_children":
+        return mutate_reorder_structure_children(pdf, request)
+    else:
+        return False, [], [f"unsupported: {operation}"]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
@@ -6909,88 +6992,52 @@ def main():
 
     if operation == "inspect":
         pass
-    elif operation == "bootstrap_struct_tree":
-        changed, applied, warnings = mutate_bootstrap_struct_tree(pdf, request)
-    elif operation == "set_pdfua_identification":
-        changed, applied, warnings = mutate_set_pdfua_identification(pdf, request)
-    elif operation == "normalize_annotation_tab_order":
-        changed, applied, warnings = mutate_normalize_annotation_tab_order(pdf, request)
-    elif operation == "set_tabs_all_annotated_pages":
-        changed, applied, warnings = mutate_set_tabs_all_annotated_pages(pdf, request)
-    elif operation == "repair_cid_symbol_font_maps":
-        changed, applied, warnings = mutate_repair_cid_symbol_font_maps(pdf, request)
-    elif operation == "repair_cidset_consistency":
-        changed, applied, warnings = mutate_repair_cidset_consistency(pdf, request)
-    elif operation == "repair_structure_conformance":
-        changed, applied, warnings = mutate_repair_structure_conformance(pdf, request)
-    elif operation == "repair_type1_font_unicode_maps":
-        changed, applied, warnings = mutate_repair_type1_font_unicode_maps(pdf, request)
-    elif operation == "repair_reported_font_widths":
-        changed, applied, warnings = mutate_repair_reported_font_widths(pdf, request)
-    elif operation == "substitute_legacy_fonts_in_place":
-        changed, applied, warnings = mutate_substitute_legacy_fonts_in_place(pdf, request)
-    elif operation == "finalize_substituted_font_conformance":
-        changed, applied, warnings = mutate_finalize_substituted_font_conformance(pdf, request)
-    elif operation == "repair_note_tag_ids":
-        changed, applied, warnings = mutate_repair_note_tag_ids(pdf, request)
-    elif operation == "repair_native_marked_content_refs":
-        changed, applied, warnings = mutate_repair_native_marked_content_refs(pdf, request)
-    elif operation == "repair_native_link_structure":
-        changed, applied, warnings = mutate_repair_native_link_structure(pdf, request)
-    elif operation == "repair_bootstrapped_chart_content_refs":
-        changed, applied, warnings = mutate_repair_bootstrapped_chart_content_refs(pdf, request)
-    elif operation == "repair_native_figure_semantics":
-        changed, applied, warnings = mutate_repair_native_figure_semantics(pdf, request)
-    elif operation == "repair_other_elements_alt_text":
-        changed, applied, warnings = mutate_repair_other_elements_alt_text(pdf, request)
-    elif operation == "repair_native_table_headers":
-        changed, applied, warnings = mutate_repair_native_table_headers(pdf, request)
-    elif operation == "repair_native_reading_order":
-        changed, applied, warnings = mutate_repair_native_reading_order(pdf, request)
-    elif operation == "repair_font_unicode_maps":
-        changed, applied, warnings = mutate_repair_font_unicode_maps(pdf, request)
-    elif operation == "repair_annotation_alt_text":
-        changed, applied, warnings = mutate_repair_annotation_alt_text(pdf, request)
-    elif operation == "repair_truetype_encoding_differences":
-        changed, applied, warnings = mutate_repair_truetype_encoding_differences(pdf, request)
-    elif operation == "embed_missing_fonts_in_place":
-        changed, applied, warnings = mutate_embed_missing_fonts_in_place(pdf, request)
-    elif operation == "repair_malformed_bdc_operators":
-        changed, applied, warnings = mutate_repair_malformed_bdc_operators(pdf, request)
-    elif operation == "artifact_nonsemantic_page_elements":
-        changed, applied, warnings = mutate_artifact_nonsemantic_page_elements(pdf, request)
-    elif operation == "replace_bookmarks_from_headings":
-        changed, applied, warnings = mutate_replace_bookmarks_from_headings(pdf, request)
-    elif operation == "create_heading_tag":
-        changed, applied, warnings = mutate_create_heading_tag(pdf, request)
-    elif operation == "create_heading_from_candidate":
-        changed, applied, warnings = mutate_create_heading_from_candidate(pdf, request)
-    elif operation == "normalize_heading_hierarchy":
-        changed, applied, warnings = mutate_normalize_heading_hierarchy(pdf, request)
-    elif operation == "normalize_nested_figure_containers":
-        changed, applied, warnings = mutate_normalize_nested_figure_containers(pdf, request)
-    elif operation == "retag_node":
-        changed, applied, warnings = mutate_retag_node(pdf, request)
-    elif operation == "set_table_header_cells":
-        changed, applied, warnings = mutate_set_table_header_cells(pdf, request)
-    elif operation == "set_figure_alt_text":
-        changed, applied, warnings = mutate_set_figure_alt_text(pdf, request)
-    elif operation == "retag_as_figure_and_set_alt":
-        changed, applied, warnings = mutate_retag_as_figure_and_set_alt(pdf, request)
-    elif operation == "mark_figure_decorative":
-        changed, applied, warnings = mutate_mark_figure_decorative(pdf, request)
-    elif operation == "reorder_structure_children":
-        changed, applied, warnings = mutate_reorder_structure_children(pdf, request)
-    else:
-        snap = snapshot(pdf, inspect_mode)
+    elif operation == "batch_mutate":
+        # Run a list of operations sequentially on the same PDF object — one spawn, one save, one snapshot.
+        # Each sub-operation result is recorded individually so the TS side can map back to per-tool outcomes.
+        sub_ops = request.get("operations", [])
+        per_op_results = []
+        for sub_req in sub_ops:
+            sub_op = sub_req.get("operation", "")
+            try:
+                op_changed, op_applied, op_warnings = dispatch_single_operation(pdf, sub_op, sub_req)
+            except Exception as exc:
+                op_changed, op_applied, op_warnings = False, [], [f"error in {sub_op}: {exc}"]
+            if op_changed:
+                changed = True
+            applied.extend(op_applied)
+            warnings.extend(op_warnings)
+            per_op_results.append({
+                "operation": sub_op,
+                "status": "applied" if op_changed else ("unsupported" if op_warnings and op_warnings[0].startswith("unsupported:") else "no_effect"),
+                "changedDocumentBytes": op_changed,
+                "appliedMutations": op_applied,
+                "warnings": op_warnings,
+            })
+        snap = snapshot(pdf, inspect_mode) if include_snapshot else empty_snapshot()
         print(json.dumps({
-            "status": "unsupported",
-            "changedDocumentBytes": False,
-            "appliedMutations": [],
-            "warnings": [f"Unsupported operation: {operation}"],
+            "status": "applied" if changed else "no_effect",
+            "changedDocumentBytes": changed,
+            "appliedMutations": applied,
+            "warnings": warnings,
+            "operationResults": per_op_results,
             **snap,
         }))
+        if changed:
+            pdf.save(args.output)
         return
+    else:
+        changed, applied, warnings = dispatch_single_operation(pdf, operation, request)
+        if not changed and not applied and warnings and warnings[0].startswith("unsupported:"):
+            snap = snapshot(pdf, inspect_mode)
+            print(json.dumps({
+                "status": "unsupported",
+                "changedDocumentBytes": False,
+                "appliedMutations": [],
+                "warnings": [f"Unsupported operation: {operation}"],
+                **snap,
+            }))
+            return
 
     if changed:
         pdf.save(args.output)

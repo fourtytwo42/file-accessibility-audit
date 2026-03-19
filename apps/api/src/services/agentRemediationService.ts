@@ -933,6 +933,8 @@ export async function remediatePdfWithAgent(
       }
       orderedStages = [...stageMap.entries()].sort(([a], [b]) => a - b)
     } else {
+      // Quality shortcircuit: if the PDF is already fully compliant, stop before re-inspecting.
+      if (isFullyDone(currentResult)) break
       options?.onProgress?.({ stage: `Re-analyzing and planning (round ${round})`, percent: 35 + (round - 1) * 10 })
       stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
         inspectMode: inspectModeForResult(currentResult),

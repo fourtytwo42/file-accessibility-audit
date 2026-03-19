@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { analyzeWithQpdf } from './qpdfService.js'
 import { analyzeWithPdfjs, PdfMetadata } from './pdfjsService.js'
 import { scoreDocument, ScoringResult, summarizeLinkTextQuality } from './scorer.js'
@@ -10,6 +11,24 @@ import { analyzeColorContrast, type ColorContrastResult } from './colorContrastS
 import { analyzeTableStructure, type TableStructureResult } from './tableStructureService.js'
 import { analyzeTabOrder } from './tabOrderService.js'
 import { ANALYSIS, REMEDIATION } from '#config'
+
+// Cache veraPDF results by buffer hash — same bytes always yield the same result,
+// so we skip redundant 30–120s runs during multi-round remediation re-analysis.
+const veraPdfResultCache = new Map<string, VeraPdfResult>()
+const MAX_VERA_CACHE_ENTRIES = 20
+
+function getVeraPdfCached(buffer: Buffer, signal?: AbortSignal): Promise<VeraPdfResult> {
+  const key = createHash('sha256').update(buffer).digest('hex').slice(0, 32)
+  const cached = veraPdfResultCache.get(key)
+  if (cached) return Promise.resolve(cached)
+  return analyzeWithVeraPdf(buffer, { signal }).then(result => {
+    if (veraPdfResultCache.size >= MAX_VERA_CACHE_ENTRIES) {
+      veraPdfResultCache.delete(veraPdfResultCache.keys().next().value!)
+    }
+    veraPdfResultCache.set(key, result)
+    return result
+  })
+}
 
 // Simple semaphore for concurrency limiting
 let activeAnalyses = 0
@@ -63,9 +82,9 @@ export async function analyzePDF(
 
   try {
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
-    const [qpdfResult, veraPdfResult, adobeResult] = await Promise.all([
+    const [qpdfResult, veraPdfResult, adobeResult, pdfjsResult] = await Promise.all([
       analyzeWithQpdf(buffer, { signal: options?.signal }),
-      analyzeWithVeraPdf(buffer, { signal: options?.signal }),
+      getVeraPdfCached(buffer, options?.signal),
       (options?.skipAdobe || !REMEDIATION.ENABLE_ADOBE_API)
         ? Promise.resolve(null)
         : runAdobeAccessibilityCheck({
@@ -73,6 +92,16 @@ export async function analyzePDF(
             filename,
             artifactsDir: options?.artifactsDir,
           }),
+      analyzeWithPdfjs(buffer, {
+        signal: options?.signal,
+        onProgress(progress) {
+          const scaled = 20 + Math.round(progress.percent * 0.65)
+          options?.onProgress?.({
+            stage: progress.stage,
+            percent: Math.min(85, scaled),
+          })
+        },
+      }),
     ])
 
     if (options?.signal?.aborted) {
@@ -80,18 +109,6 @@ export async function analyzePDF(
       error.aborted = true
       throw error
     }
-
-    options?.onProgress?.({ stage: 'Extracting text and metadata', percent: 20 })
-    const pdfjsResult = await analyzeWithPdfjs(buffer, {
-      signal: options?.signal,
-      onProgress(progress) {
-        const scaled = 20 + Math.round(progress.percent * 0.65)
-        options?.onProgress?.({
-          stage: progress.stage,
-          percent: Math.min(85, scaled),
-        })
-      },
-    })
 
     const linkSummary = summarizeLinkTextQuality(pdfjsResult.links)
     const structureForScoring = qpdfResult.hasStructTree && (pdfjsResult.imageCount > 0 || qpdfResult.images.length > 0 || qpdfResult.headings.length > 0)

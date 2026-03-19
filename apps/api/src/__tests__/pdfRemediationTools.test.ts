@@ -15,7 +15,7 @@ import type { RemediationActionRecord, RemediationToolName } from '../services/d
 import { planRemediationActions } from '../services/remediationPlanService.js'
 
 const FIXTURES_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
-const DOWNLOADS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../downloads/icjia-publications')
+const DOWNLOADS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Processed/Before')
 
 async function makePdf(): Promise<Buffer> {
   const doc = await PDFDocument.create()

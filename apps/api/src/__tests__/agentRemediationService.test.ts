@@ -245,7 +245,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
-    expect(result.model.actions?.map(action => action.outcome)).toEqual(['applied', 'no_effect'])
+    expect(result.model.actions?.slice(0, 2).map(action => action.outcome)).toEqual(['applied', 'no_effect'])
     expect(result.model.failureProfile?.version).toBe('1')
     expect(result.model.failureProfile?.toolOpportunities.length).toBeGreaterThanOrEqual(0)
     expect(result.model.plannerEvidence).toBeTruthy()
@@ -308,6 +308,10 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         ...lightContext,
         pdfjs: { title: 'Batched Fixed', lang: 'en' },
       })
+      .mockResolvedValueOnce({
+        ...lightContext,
+        pdfjs: { title: 'Batched Fixed', lang: 'en' },
+      })
 
     planRemediationActions
       .mockResolvedValueOnce({
@@ -365,9 +369,9 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'batched.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(2)
-    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light'])
-    expect(analyzePDF).toHaveBeenCalledTimes(1)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(3)
+    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light'])
+    expect(analyzePDF).toHaveBeenCalledTimes(2)
     expect(result.finalResult.grade).toBe('A')
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
   })
@@ -420,6 +424,36 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
 
     executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cleanup-heading'),
+        action: {
+          tool: 'normalize_heading_hierarchy',
+          target: 'document',
+          details: 'heading hierarchy normalized',
+          confidence: 0.97,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['heading_structure'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cleanup-figure'),
+        action: {
+          tool: 'normalize_nested_figure_containers',
+          target: 'document',
+          details: 'nested figure containers normalized',
+          confidence: 0.97,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
       .mockResolvedValueOnce({
         buffer: Buffer.from('pdf-cleanup-0'),
         action: {
@@ -478,11 +512,13 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'cleanup.pdf', originalResult)
 
     expect(executeRemediationTool.mock.calls.map(call => call[0]?.call?.tool_name)).toEqual([
+      'normalize_heading_hierarchy',
+      'normalize_nested_figure_containers',
       'repair_native_link_structure',
       'normalize_annotation_tab_order',
       'set_tabs_all_annotated_pages',
     ])
-    expect(executeRemediationTool).toHaveBeenCalledTimes(3)
+    expect(executeRemediationTool).toHaveBeenCalledTimes(5)
     expect(result.model.actions?.slice(-3).map(action => action.tool)).toEqual([
       'repair_native_link_structure',
       'normalize_annotation_tab_order',
@@ -555,7 +591,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       })
       .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
 
-    executeRemediationTool.mockResolvedValue({
+    executeRemediationTool.mockResolvedValueOnce({
       buffer: Buffer.from('figure-fixed'),
       action: {
         tool: 'set_figure_alt_text',
@@ -584,7 +620,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'alt-text.pdf', originalResult)
 
-    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['alt_text_deep', 'alt_text_deep'])
+    expect(inspectPdfForRemediation.mock.calls[0]?.[2]?.inspectMode).toBe('alt_text_deep')
     expect(result.finalResult.grade).toBe('A')
   })
 
@@ -700,6 +736,25 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       structure: {},
     })
     planRemediationActions.mockResolvedValue({ done: false, unresolvedIssues: ['text_extractability'], actions: [] })
+    // 5 cleanup tools always run; ensure they pass through the OCR buffer unchanged
+    const ocrBuffer = Buffer.from('ocr-pdf')
+    for (let i = 0; i < 5; i++) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: ocrBuffer,
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'no-op',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'scan.pdf', scannedResult)
 
@@ -934,7 +989,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'cidset.pdf', originalResult)
 
     expect(planRemediationActions).toHaveBeenCalledTimes(2)
-    expect((result.model.actions || []).map(action => action.tool)).toEqual([
+    expect((result.model.actions || []).slice(0, 2).map(action => action.tool)).toEqual([
       'repair_cidset_consistency',
       'substitute_legacy_fonts_in_place',
     ])
@@ -1060,10 +1115,16 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           { tool_name: 'repair_bootstrapped_chart_content_refs', arguments: { target: 'document' }, rationale: 'repair bootstrapped refs', confidence: 0.8 },
         ],
       })
+      .mockResolvedValueOnce({
+        done: true,
+        unresolvedIssues: [],
+        actions: [],
+      })
 
+    const pdfABuffer = Buffer.from('pdf-a')
     executeRemediationTool
       .mockResolvedValueOnce({
-        buffer: Buffer.from('pdf-a'),
+        buffer: pdfABuffer,
         action: {
           tool: 'bootstrap_struct_tree',
           target: 'document',
@@ -1092,6 +1153,24 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
         manualReviewFlags: [],
       })
+    // 5 final cleanup tools; pass through the rolled-back buffer unchanged
+    for (let i = 0; i < 5; i++) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: pdfABuffer,
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'no-op',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
 
     analyzePDF
       .mockResolvedValueOnce(stabilizedResult)
@@ -1416,22 +1495,42 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       tables: [],
       links: [],
     }], reviewFlags: [] })
-    executeRemediationTool.mockResolvedValue({
-      buffer: Buffer.from('semantic-fixed'),
-      action: {
-        tool: 'create_heading_from_candidate',
-        target: 'page 1',
-        candidateId: 'heading:1:1',
-        details: 'AI heading proposal',
-        confidence: 0.91,
-        autoApplied: true,
-        changedVisibleContent: false,
-        changedDocumentBytes: true,
-        categoryTargets: ['heading_structure'],
-        outcome: 'applied',
-      },
-      manualReviewFlags: [],
-    })
+    const semanticFixedBuffer = Buffer.from('semantic-fixed')
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: semanticFixedBuffer,
+        action: {
+          tool: 'create_heading_from_candidate',
+          target: 'page 1',
+          candidateId: 'heading:1:1',
+          details: 'AI heading proposal',
+          confidence: 0.91,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['heading_structure'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+    // 5 final cleanup tools; pass through the semantic-fixed buffer unchanged
+    for (let i = 0; i < 5; i++) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: semanticFixedBuffer,
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'no-op',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
     analyzePDF.mockResolvedValue({
       ...originalResult,
       overallScore: 81,
@@ -1450,7 +1549,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'semantic.pdf', originalResult)
 
     expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
-    expect(executeRemediationTool).toHaveBeenCalledTimes(1)
+    expect(executeRemediationTool).toHaveBeenCalledTimes(6)
     expect(result.buffer.equals(Buffer.from('semantic-fixed'))).toBe(true)
     expect(result.model.actions?.some(action => action.tool === 'create_heading_from_candidate' && action.outcome === 'applied')).toBe(true)
     expect(result.finalResult.overallScore).toBe(81)
@@ -1522,7 +1621,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       tables: [],
       links: [{ candidateId: 'link:1:1', replacementText: 'Example', annotationContents: 'Example link', confidence: 0.92, rationale: 'Short descriptive label.' }],
     }], reviewFlags: [] })
-    executeRemediationTool.mockResolvedValue({
+    executeRemediationTool.mockResolvedValueOnce({
       buffer: Buffer.from('worse-links'),
       action: {
         tool: 'rewrite_link_visible_text',
@@ -1595,31 +1694,22 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       warnings: [],
     } as AnalysisResult
 
+    const taggedContext = {
+      pdfjs: { title: 'Tagged PDF', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 5 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Sect', orderIndex: 0 }] },
+    }
     inspectPdfForRemediation
-      .mockResolvedValueOnce({
-        pdfjs: { title: 'Tagged PDF', lang: 'en' },
-        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 5 },
-        figureCandidates: [],
-        tableCandidates: [],
-        headingCandidates: [],
-        pages: [],
-        linkCandidates: [],
-        readingOrderCandidates: [],
-        readingOrderParentCandidates: [],
-        structure: { structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Sect', orderIndex: 0 }] },
-      })
-      .mockResolvedValueOnce({
-        pdfjs: { title: 'Tagged PDF', lang: 'en' },
-        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 5 },
-        figureCandidates: [],
-        tableCandidates: [],
-        headingCandidates: [],
-        pages: [],
-        linkCandidates: [],
-        readingOrderCandidates: [],
-        readingOrderParentCandidates: [],
-        structure: { structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Sect', orderIndex: 0 }] },
-      })
+      .mockResolvedValueOnce(taggedContext)
+      .mockResolvedValueOnce(taggedContext)
+      .mockResolvedValueOnce(taggedContext)
 
     planRemediationActions
       .mockResolvedValueOnce({
@@ -1631,7 +1721,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       })
       .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
 
-    executeRemediationTool.mockResolvedValue({
+    executeRemediationTool.mockResolvedValueOnce({
       buffer: Buffer.from('pdf-regressive'),
       action: {
         tool: 'repair_structure_conformance',
@@ -1936,12 +2026,6 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         unresolvedIssues: ['alt_text'],
         actions: [
           { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:1', altText: 'Chart image' }, rationale: 'Primary repair', confidence: 0.9 },
-        ],
-      })
-      .mockResolvedValueOnce({
-        done: false,
-        unresolvedIssues: [],
-        actions: [
           { tool_name: 'repair_other_elements_alt_text', arguments: {}, rationale: 'Fix Acrobat-only logo ownership', confidence: 0.9 },
         ],
       })
@@ -1951,6 +2035,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         actions: [],
       })
 
+    const acrobatPassBuffer = Buffer.from('acrobat-pass')
     executeRemediationTool
       .mockResolvedValueOnce({
         buffer: Buffer.from('primary-pass'),
@@ -1969,7 +2054,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         manualReviewFlags: [],
       })
       .mockResolvedValueOnce({
-        buffer: Buffer.from('acrobat-pass'),
+        buffer: acrobatPassBuffer,
         action: {
           tool: 'repair_other_elements_alt_text',
           target: 'document',
@@ -1983,15 +2068,31 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
         manualReviewFlags: [],
       })
+    // 5 final cleanup tools; pass through the acrobat-fixed buffer unchanged
+    for (let i = 0; i < 5; i++) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: acrobatPassBuffer,
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'no-op',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
 
-    analyzePDF
-      .mockResolvedValueOnce(afterPrimaryPass)
-      .mockResolvedValueOnce(afterAcrobatRepair)
+    analyzePDF.mockResolvedValueOnce(afterAcrobatRepair)
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'acrobat-risk.pdf', originalResult)
 
-    expect(planRemediationActions).toHaveBeenCalledTimes(2)
-    expect(executeRemediationTool.mock.calls.map(call => call[0].call.tool_name)).toEqual(['set_figure_alt_text', 'repair_other_elements_alt_text'])
+    expect(planRemediationActions).toHaveBeenCalledTimes(1)
+    expect(executeRemediationTool.mock.calls.slice(0, 2).map(call => call[0].call.tool_name)).toEqual(['set_figure_alt_text', 'repair_other_elements_alt_text'])
     expect(result.buffer.equals(Buffer.from('acrobat-pass'))).toBe(true)
   })
 

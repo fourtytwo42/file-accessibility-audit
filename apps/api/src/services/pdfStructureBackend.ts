@@ -21,6 +21,7 @@ const HELPER_PATH = path.resolve(
 export interface StructureBackendMutationRequest {
   operation:
     | 'inspect'
+    | 'batch_mutate'
     | 'bootstrap_struct_tree'
     | 'set_pdfua_identification'
     | 'normalize_annotation_tab_order'
@@ -143,6 +144,18 @@ export interface StructureBackendMutationResult {
   outputBuffer?: Buffer
 }
 
+export interface StructureBackendOperationResult {
+  operation: string
+  status: 'applied' | 'no_effect' | 'unsupported'
+  changedDocumentBytes: boolean
+  appliedMutations: StructureBackendMutationResult['appliedMutations']
+  warnings: string[]
+}
+
+export interface StructureBackendBatchResult extends StructureBackendMutationResult {
+  operationResults: StructureBackendOperationResult[]
+}
+
 function ensureHelperExists(): void {
   if (!fs.existsSync(HELPER_PATH)) {
     throw new Error(`PDF structure helper not found at ${HELPER_PATH}`)
@@ -212,6 +225,83 @@ export async function runPdfStructureBackend(input: {
       acrobatAltRiskNodes: [],
       readingOrderNodes: [],
       readingOrderParents: [],
+    }
+  } finally {
+    try { fs.rmSync(tmpRoot, { recursive: true, force: true }) } catch {}
+  }
+}
+
+/**
+ * Run multiple mutations in a single Python subprocess invocation.
+ * Each mutation is applied sequentially on the same pikepdf.Pdf object — one
+ * file open, one file save, one snapshot — dramatically reducing spawn overhead
+ * when a stage has many deterministic tools to apply.
+ *
+ * Per-operation outcomes are returned in `result.operationResults` so callers
+ * can map back to individual tool records in the DocumentModel.
+ */
+export async function runPdfStructureBackendBatch(input: {
+  buffer: Buffer
+  mutations: StructureBackendMutationRequest[]
+  /** Snapshot mode for the final snapshot after all mutations. Default: 'light' */
+  inspectMode?: 'light' | 'alt_text_deep'
+}): Promise<StructureBackendBatchResult> {
+  ensureHelperExists()
+  if (input.mutations.length === 0) {
+    throw new Error('runPdfStructureBackendBatch: mutations array must be non-empty')
+  }
+
+  const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pdf-struct-batch-'))
+  const inputPath = path.join(tmpRoot, `${randomUUID()}.pdf`)
+  const requestPath = path.join(tmpRoot, `${randomUUID()}.json`)
+  const outputPath = path.join(tmpRoot, `${randomUUID()}.pdf`)
+
+  try {
+    await fs.promises.writeFile(inputPath, input.buffer)
+    const requestPayload = {
+      operation: 'batch_mutate' as const,
+      inspectMode: input.inspectMode ?? 'light',
+      includeSnapshot: true,
+      operations: input.mutations.map(m => ({ includeSnapshot: false, ...m })),
+    }
+    await fs.promises.writeFile(requestPath, JSON.stringify(requestPayload, null, 2))
+
+    const { stdout, stderr } = await execFileAsync(PYTHON_BIN, [
+      HELPER_PATH,
+      '--input', inputPath,
+      '--request', requestPath,
+      '--output', outputPath,
+    ], {
+      timeout: 120_000,
+      maxBuffer: 10 * 1024 * 1024,
+      encoding: 'utf-8',
+      windowsHide: true,
+    })
+
+    const parsed = JSON.parse(stdout) as StructureBackendBatchResult
+    if ((parsed.status === 'applied' || parsed.changedDocumentBytes) && fs.existsSync(outputPath)) {
+      parsed.outputBuffer = await fs.promises.readFile(outputPath)
+    }
+    if (stderr?.trim()) {
+      parsed.warnings = [...(parsed.warnings ?? []), stderr.trim()]
+    }
+    parsed.operationResults = parsed.operationResults ?? []
+    return parsed
+  } catch (error: any) {
+    return {
+      status: 'failed',
+      changedDocumentBytes: false,
+      appliedMutations: [],
+      warnings: [error?.message || 'Structure backend batch failed.'],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      operationResults: [],
     }
   } finally {
     try { fs.rmSync(tmpRoot, { recursive: true, force: true }) } catch {}
