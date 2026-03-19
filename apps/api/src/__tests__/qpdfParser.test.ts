@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
-import { analyzeWithQpdf } from '../services/qpdfService.js'
+import { analyzeWithQpdf, parseQpdfJson } from '../services/qpdfService.js'
 
 const fixturesDir = path.join(import.meta.dirname, 'fixtures')
 
@@ -29,4 +29,17 @@ describe('analyzeWithQpdf', () => {
     expect(result.hasStructTree).toBe(false)
     expect(result.headings).toHaveLength(0)
   }, 30_000)
+
+  it('does not treat orphaned /Figure alt text as valid image coverage', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog', '/StructTreeRoot': 'obj:2 0 R', '/MarkInfo': { '/Marked': true } } },
+        'obj:2 0 R': { value: { '/Type': '/StructTreeRoot', '/K': ['obj:10 0 R'] } },
+        'obj:3 0 R': { value: { '/Subtype': '/Image' } },
+        'obj:10 0 R': { value: { '/S': '/Figure', '/Alt': 'u:County seal', '/K': [] } },
+      },
+    })
+
+    expect(result.images).toEqual([{ ref: 'obj:3 0 R', hasAlt: false }])
+  })
 })

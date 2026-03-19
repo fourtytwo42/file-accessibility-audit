@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-19T07:51:26Z System fix: orphaned empty /Figure alt text now scores as unresolved Acrobat risk and is auto-repaired by stripping orphaned /Alt; verified with `pnpm --filter api build`, `vitest` on qpdf parser/scorer, and targeted Acrobat-risk service tests
 - 2026-03-19T07:40:51Z System fix verification complete: API build passed, remediation service tests passed, snapshot optimization updates committed for restart-ready validation
 - 2026-03-18T11:07:32.180Z Needs fix: 2022 SFS Process Evaluation Report-230622T16355531.pdf: Unmatched PDF/UA failures | score 57 | grade F
 - 2026-03-18T11:27:04.571Z Upload started: 2022 Victim Service Planning Research Report -230817T20035755.pdf

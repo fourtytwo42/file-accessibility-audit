@@ -779,6 +779,37 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('Acrobat-risk'))).toBe(true)
     expect(findCategory(result, 'alt_text').grade).not.toBe('A')
   })
+
+  it('reduces alt_text when Acrobat reports orphaned alternate text with no associated content', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf(),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'obj:77 0 R',
+            tag: '/Figure',
+            pageRef: 'obj:5 0 R',
+            mcids: [],
+            hasText: false,
+            hasGraphics: false,
+            hasAlt: true,
+            splitSafe: false,
+            graphicsLikelyDecorative: false,
+            operatorPattern: null,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'orphaned_alt_empty_element',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBeLessThan(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('Acrobat-style alternate-text risk'))).toBe(true)
+  })
 })
 
 describe('scoreBookmarks edge cases', () => {

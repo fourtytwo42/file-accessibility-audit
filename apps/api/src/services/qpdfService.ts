@@ -110,7 +110,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
   }
 }
 
-function parseQpdfJson(json: any): QpdfResult {
+export function parseQpdfJson(json: any): QpdfResult {
   const result: QpdfResult = {
     hasStructTree: false,
     isTagged: false,
@@ -202,16 +202,18 @@ function parseQpdfJson(json: any): QpdfResult {
           const rawAlt = o['/Alt']
           const altText = typeof rawAlt === 'string' ? rawAlt.replace(/^u:/, '') : undefined
           const hasAlt = altText !== undefined && altText !== ''
+          const hasAssociatedContent = structElemHasAssociatedContent(o, objects)
           // Try to match to an image
-          if (result.images.length > 0) {
+          if (result.images.length > 0 && hasAlt && hasAssociatedContent) {
             const unmatched = result.images.find(img => !img.hasAlt)
-            if (unmatched && hasAlt) {
+            if (unmatched) {
               unmatched.hasAlt = true
               unmatched.altText = altText
             }
           }
-          // Also add as a standalone figure check
-          if (!result.images.some(img => img.ref === ref)) {
+          // Only count figures with real associated content. Empty /Figure elements with /Alt
+          // are Adobe "Associated with content" failures and must not satisfy alt-text scoring.
+          if (hasAssociatedContent && !result.images.some(img => img.ref === ref)) {
             result.images.push({ ref, hasAlt, altText })
           }
         }
@@ -298,6 +300,32 @@ function parseQpdfJson(json: any): QpdfResult {
 function resolveRef(ref: string, objects: any): any {
   if (!ref || typeof ref !== 'string') return null
   return objects[ref] ?? objects[`obj:${ref}`] ?? null
+}
+
+function structElemHasAssociatedContent(node: any, objects: any, visited = new Set<any>()): boolean {
+  if (!node || typeof node !== 'object') return false
+  if (visited.has(node)) return false
+  visited.add(node)
+
+  const kids = node['/K']
+  if (kids === undefined || kids === null) return false
+  if (typeof kids === 'number') return true
+
+  const kidList = Array.isArray(kids) ? kids : [kids]
+  for (const kid of kidList) {
+    if (typeof kid === 'number') return true
+    if (typeof kid === 'string') {
+      const child = resolveRef(kid, objects)
+      if (child && structElemHasAssociatedContent(child, objects, visited)) return true
+      continue
+    }
+    if (kid && typeof kid === 'object') {
+      if (kid['/Type'] === '/OBJR' || kid['/MCID'] !== undefined) return true
+      if (structElemHasAssociatedContent(kid, objects, visited)) return true
+    }
+  }
+
+  return false
 }
 
 function countOutlineEntries(outline: any, objects: any, titles: string[]): number {

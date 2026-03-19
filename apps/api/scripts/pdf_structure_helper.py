@@ -2909,18 +2909,27 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
             continue
 
         if mode == "orphaned_alt_empty_element":
-            # Element has /Alt but no MCID content. Adobe Acrobat flags this as
-            # "Associated with content" failure. However:
-            # - Removing /Alt or retagging as /NonStruct breaks QPDF's heuristic
-            #   figure-image matching, which uses /Figure /Alt values to mark real
-            #   image XObjects as covered. This causes the alt_text score to drop.
-            # - veraPDF does not check /Alt on empty /Figure elements with no content.
-            # These nodes are cosmetic Adobe-checker issues only. Leave them as-is;
-            # callers are expected to filter orphaned_alt_empty_element from their checks.
-            unresolved.append(
-                f"{risk['tag']} {risk['ref']} has /Alt but no MCID content "
-                f"(Adobe 'Associated with content' issue; no safe fix without hurting alt_text score)."
-            )
+            # Element has /Alt but no MCID/OBJR-backed content. Adobe flags this as
+            # "Associated with content - Failed". Now that QPDF scoring ignores empty
+            # /Figure alt text, we can safely strip the orphaned /Alt deterministically.
+            existing_alt = obj.get("/Alt")
+            if existing_alt is not None:
+                try:
+                    del obj["/Alt"]
+                    changed = True
+                    repairs_applied += 1
+                    applied.append({
+                        "ref": risk["ref"],
+                        "before": str(existing_alt)[:60],
+                        "after": None,
+                        "details": (
+                            f"Removed orphaned /Alt from {risk['tag']} element {risk['ref']}: "
+                            f"empty structure elements must not carry alternate text "
+                            f"(Adobe 'Associated with content' check)."
+                        ),
+                    })
+                except Exception as exc:
+                    unresolved.append(f"Could not remove orphaned /Alt from {risk['tag']} {risk['ref']}: {exc}")
             continue
 
         if mode in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:
