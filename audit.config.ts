@@ -324,7 +324,7 @@ export const ANALYSIS = {
    * Each analysis can consume 100MB+ in memory (multer buffer + QPDF process).
    * Increase only if you upgrade the droplet's RAM.
    */
-  MAX_CONCURRENT_ANALYSES: 2,
+  MAX_CONCURRENT_ANALYSES: 5,
 
   /**
    * Minimum page count to require bookmarks/outlines.
