@@ -316,6 +316,16 @@ export const ANALYSIS = {
   VERAPDF_DEFAULT_FLAVOUR: 'ua1',
 
   /**
+   * Skip veraPDF by default for normal analysis requests.
+   * Set `DEFAULT_SKIP_VERAPDF=false` in the environment to restore veraPDF
+   * as the default path without changing call sites.
+   *
+   * SAFE TO CHANGE: Yes — `true` speeds up frontend/API analysis, while
+   * `false` restores standards validation as the default behavior.
+   */
+  DEFAULT_SKIP_VERAPDF: process.env.DEFAULT_SKIP_VERAPDF !== 'false',
+
+  /**
    * Maximum number of PDFs being analyzed simultaneously.
    * Implemented as a semaphore in pdfAnalyzer.ts. Requests beyond this limit
    * wait in a queue (or return 503 if the queue is also full).
