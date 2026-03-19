@@ -1136,6 +1136,14 @@ export function listInterruptedProcessingItems(): QueueItemRecord[] {
   `).all() as QueueItemRecord[]
 }
 
+export function listClientsWithQueuedItems(): string[] {
+  const rows = db.prepare(`
+    SELECT DISTINCT client_id FROM queue_items
+    WHERE hidden = 0 AND state = 'queued' AND storage_path IS NOT NULL
+  `).all() as { client_id: string }[]
+  return rows.map(r => r.client_id)
+}
+
 export function markQueueItemHidden(id: string): QueueItemRecord {
   return updateQueueItem(id, { hidden: 1 })
 }

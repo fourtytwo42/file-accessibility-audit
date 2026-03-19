@@ -8,6 +8,7 @@ import { emitQueueItemDeleted, emitQueueItemUpsert } from './queueEvents.js'
 import {
   getQueueItemById,
   INTERNAL_QUEUE_MARKERS,
+  listClientsWithQueuedItems,
   listInterruptedProcessingItems,
   listProcessingItems,
   nextQueuedItems,
@@ -414,7 +415,6 @@ export function removeQueueItemFromStreams(itemId: string): void {
 
 export function recoverInterruptedProcessing(): number {
   const interrupted = listInterruptedProcessingItems()
-  if (!interrupted.length) return 0
 
   const clientIds = new Set<string>()
   for (const item of interrupted) {
@@ -431,6 +431,11 @@ export function recoverInterruptedProcessing(): number {
     })
     emitQueueItemUpsert(item.id)
     clientIds.add(item.client_id)
+  }
+
+  // Also schedule clients that already have items in queued state (not just interrupted ones)
+  for (const clientId of listClientsWithQueuedItems()) {
+    clientIds.add(clientId)
   }
 
   for (const clientId of clientIds) {
