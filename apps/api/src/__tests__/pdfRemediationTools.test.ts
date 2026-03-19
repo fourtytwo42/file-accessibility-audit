@@ -1062,10 +1062,14 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         },
       })
       buffer = result.buffer
-      analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+      // Font tools only need QPDF/PDF.js data from context; skip veraPDF between prep steps
+      analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf', { skipVeraPdf: true })
       context = await inspectPdfForRemediation(buffer, analysis)
     }
 
+    // Run veraPDF once after all font prep to get the accurate failedChecks baseline
+    analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+    context = await inspectPdfForRemediation(buffer, analysis)
     const beforeFailedChecks = analysis.verapdf.failedChecks
     const cidsetResult = await executeRemediationTool({
       buffer,
@@ -1085,7 +1089,9 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
   it('reports CIDSet inspection coverage and returns no_effect when a second pass finds nothing new to rewrite', async () => {
     let buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
-    let analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+    // Initial analysis needed for context; subsequent steps skip veraPDF since
+    // font prep tools only use QPDF/PDF.js data and this test has no veraPDF assertions.
+    let analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf', { skipVeraPdf: true })
     let context = await inspectPdfForRemediation(buffer, analysis)
 
     for (const tool_name of ['embed_missing_fonts_in_place', 'repair_font_unicode_maps', 'repair_cid_symbol_font_maps'] as const) {
@@ -1100,7 +1106,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         },
       })
       buffer = result.buffer
-      analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
+      analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf', { skipVeraPdf: true })
       context = await inspectPdfForRemediation(buffer, analysis)
     }
 
@@ -1117,7 +1123,8 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
     expect(firstPass.action.details).toContain('Inspected')
 
-    const secondAnalysis = await analyzePDF(firstPass.buffer, '11drug seizures_1997-2007.pdf')
+    // Skip veraPDF for second-pass context: only testing CIDSet idempotency, not compliance
+    const secondAnalysis = await analyzePDF(firstPass.buffer, '11drug seizures_1997-2007.pdf', { skipVeraPdf: true })
     const secondContext = await inspectPdfForRemediation(firstPass.buffer, secondAnalysis)
     const secondPass = await executeRemediationTool({
       buffer: firstPass.buffer,

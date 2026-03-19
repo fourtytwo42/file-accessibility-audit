@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { analyzeWithQpdf } from './qpdfService.js'
 import { analyzeWithPdfjs, PdfMetadata } from './pdfjsService.js'
 import { scoreDocument, ScoringResult, summarizeLinkTextQuality } from './scorer.js'
-import { analyzeWithVeraPdf, type VeraPdfResult } from './veraPdfService.js'
+import { analyzeWithVeraPdf, emptyVeraPdfResult, type VeraPdfResult } from './veraPdfService.js'
 import { runPdfStructureBackend } from './pdfStructureBackend.js'
 import { runAdobeAccessibilityCheck } from './adobePdfServices.js'
 import type { AdobeSummary } from './documentModel.js'
@@ -76,6 +76,7 @@ export async function analyzePDF(
     onProgress?: (progress: { stage: string; percent: number }) => void
     artifactsDir?: string
     skipAdobe?: boolean
+    skipVeraPdf?: boolean
   },
 ): Promise<AnalysisResult> {
   await acquireSemaphore()
@@ -84,7 +85,7 @@ export async function analyzePDF(
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
     const [qpdfResult, veraPdfResult, adobeResult, pdfjsResult] = await Promise.all([
       analyzeWithQpdf(buffer, { signal: options?.signal }),
-      getVeraPdfCached(buffer, options?.signal),
+      options?.skipVeraPdf ? Promise.resolve(emptyVeraPdfResult()) : getVeraPdfCached(buffer, options?.signal),
       (options?.skipAdobe || !REMEDIATION.ENABLE_ADOBE_API)
         ? Promise.resolve(null)
         : runAdobeAccessibilityCheck({
