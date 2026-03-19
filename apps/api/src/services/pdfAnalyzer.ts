@@ -77,6 +77,7 @@ export async function analyzePDF(
     artifactsDir?: string
     skipAdobe?: boolean
     skipVeraPdf?: boolean
+    inheritedVeraPdf?: VeraPdfResult
   },
 ): Promise<AnalysisResult> {
   await acquireSemaphore()
@@ -85,7 +86,11 @@ export async function analyzePDF(
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
     const [qpdfResult, veraPdfResult, adobeResult, pdfjsResult] = await Promise.all([
       analyzeWithQpdf(buffer, { signal: options?.signal }),
-      options?.skipVeraPdf ? Promise.resolve(emptyVeraPdfResult()) : getVeraPdfCached(buffer, options?.signal),
+      options?.inheritedVeraPdf
+        ? Promise.resolve(options.inheritedVeraPdf)
+        : options?.skipVeraPdf
+          ? Promise.resolve(emptyVeraPdfResult())
+          : getVeraPdfCached(buffer, options?.signal),
       (options?.skipAdobe || !REMEDIATION.ENABLE_ADOBE_API)
         ? Promise.resolve(null)
         : runAdobeAccessibilityCheck({

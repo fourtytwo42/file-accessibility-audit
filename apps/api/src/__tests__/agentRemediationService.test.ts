@@ -287,7 +287,15 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(planRemediationActions).toHaveBeenCalled()
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
-    expect(analyzePDF).toHaveBeenCalledTimes(2)
+    expect(analyzePDF).toHaveBeenCalledTimes(3)
+    expect(analyzePDF.mock.calls[0]?.[2]).toMatchObject({
+      skipAdobe: true,
+      inheritedVeraPdf: originalResult.verapdf,
+    })
+    expect(analyzePDF.mock.calls.at(-1)?.[2]).toMatchObject({
+      skipAdobe: true,
+    })
+    expect(analyzePDF.mock.calls.at(-1)?.[2]?.inheritedVeraPdf).toBeUndefined()
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
     expect(result.model.actions?.slice(0, 2).map(action => action.outcome)).toEqual(['applied', 'no_effect'])
     expect(result.model.failureProfile?.version).toBe('1')
@@ -415,7 +423,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(inspectPdfForRemediation).toHaveBeenCalledTimes(3)
     expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light'])
-    expect(analyzePDF).toHaveBeenCalledTimes(2)
+    expect(analyzePDF).toHaveBeenCalledTimes(3)
     expect(result.finalResult.grade).toBe('A')
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
   })
@@ -891,10 +899,25 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           { ...originalResult.categories[1] },
         ],
       })
+      .mockResolvedValue({
+        ...originalResult,
+        overallScore: 93,
+        grade: 'A',
+        verapdf: makeVeraPdfResult({
+          status: 'failed',
+          isCompliant: false,
+          failedChecks: 3,
+          failures: [{ ruleId: 'ro', specification: null, clause: null, testNumber: null, location: null, message: 'Reading order issue', categoryIds: ['reading_order'] }],
+        }),
+        categories: [
+          { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[1] },
+        ],
+      })
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'tagged-stage.pdf', originalResult)
 
-    expect(analyzePDF).toHaveBeenCalledTimes(2)
+    expect(analyzePDF).toHaveBeenCalledTimes(3)
     expect(runPdfStructureBackendBatch).toHaveBeenCalled()
     expect(runPdfStructureBackendBatch.mock.calls.some(call =>
       JSON.stringify(call[0]?.mutations) === JSON.stringify([
@@ -1039,7 +1062,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       'set_tabs_all_annotated_pages',
     ])
     expect(result.buffer.equals(Buffer.from('pdf-cleanup-batch'))).toBe(true)
-    expect(analyzePDF).toHaveBeenCalledTimes(1)
+    expect(analyzePDF).toHaveBeenCalledTimes(2)
     expect(inspectPdfForRemediation).toHaveBeenCalledTimes(1)
   })
 
@@ -1114,7 +1137,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'native-cleanup.pdf', originalResult)
 
-    expect(analyzePDF).toHaveBeenCalledTimes(1)
+    expect(analyzePDF).toHaveBeenCalledTimes(2)
     expect(executeRemediationTool).toHaveBeenCalledTimes(5)
     expect(result.model.actions?.slice(-5).map(action => action.tool)).toEqual([
       'normalize_heading_hierarchy',
@@ -1373,7 +1396,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     }
     isOcrAvailable.mockResolvedValue(true)
     ocrPdfToSearchablePdf.mockResolvedValue(Buffer.from('ocr-pdf'))
-    analyzePDF.mockResolvedValueOnce(ocrResult)
+    analyzePDF.mockResolvedValue(ocrResult)
     inspectPdfForRemediation.mockResolvedValue({
       pdfjs: { title: null, lang: 'en' },
       qpdf: { lang: null, headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
@@ -1410,6 +1433,10 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'scan.pdf', scannedResult)
 
     expect(ocrPdfToSearchablePdf).toHaveBeenCalledTimes(1)
+    expect(analyzePDF.mock.calls[0]?.[2]).toMatchObject({
+      skipAdobe: true,
+      inheritedVeraPdf: scannedResult.verapdf,
+    })
     expect(result.buffer.equals(Buffer.from('ocr-pdf'))).toBe(true)
     expect(result.model.pathFallbacks).toContain('ocr_searchable_pdf')
     expect(result.model.visibleContentChangePolicy).toBe('no_visible_changes')
@@ -1636,6 +1663,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     analyzePDF
       .mockResolvedValueOnce(sameCidsetResult)
       .mockResolvedValueOnce(passedResult)
+      .mockResolvedValue(passedResult)
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'cidset.pdf', originalResult)
 
@@ -1826,6 +1854,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     analyzePDF
       .mockResolvedValueOnce(stabilizedResult)
       .mockResolvedValueOnce(regressedResult)
+      .mockResolvedValue(stabilizedResult)
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'rollback.pdf', originalResult)
 
@@ -2294,9 +2323,9 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       },
       manualReviewFlags: [],
     })
-    analyzePDF.mockResolvedValue({
+    analyzePDF.mockImplementation(async (_buffer: Buffer, _filename: string, options?: { inheritedVeraPdf?: VeraPdfResult }) => ({
       ...originalResult,
-      verapdf: makeVeraPdfResult({
+      verapdf: options?.inheritedVeraPdf ?? makeVeraPdfResult({
         status: 'failed',
         isCompliant: false,
         failedChecks: 16,
@@ -2305,7 +2334,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           { ruleId: 'new', specification: null, clause: null, testNumber: null, location: null, message: 'New issue', categoryIds: [] },
         ],
       }),
-    })
+    }))
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'links.pdf', originalResult)
 
@@ -2557,7 +2586,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
     generateSemanticRepairBatches.mockRejectedValue(new Error('OpenAI-compatible semantic repair request failed: 413 {"error":{"message":"context_length_exceeded"}}'))
     executeRemediationTool.mockResolvedValue({
-      buffer: Buffer.from('fallback-fixed'),
+      buffer: Buffer.from('pdf'),
       action: {
         tool: 'set_figure_alt_text',
         target: 'page 2',
@@ -2751,7 +2780,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       })
     }
 
-    analyzePDF.mockResolvedValueOnce(afterAcrobatRepair)
+    analyzePDF.mockResolvedValue(afterAcrobatRepair)
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'acrobat-risk.pdf', originalResult)
 

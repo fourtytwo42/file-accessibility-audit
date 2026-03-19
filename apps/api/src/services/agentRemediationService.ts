@@ -47,6 +47,19 @@ function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   }
 }
 
+async function analyzeIntermediatePdf(
+  buffer: Buffer,
+  filename: string,
+  baselineResult: AnalysisResult,
+  signal?: AbortSignal,
+): Promise<AnalysisResult> {
+  return analyzePDF(buffer, filename, {
+    signal,
+    skipAdobe: true,
+    inheritedVeraPdf: baselineResult.verapdf,
+  })
+}
+
 const NATIVE_TAGGED_RISKY_TOOLS = new Set<string>([
   'repair_structure_conformance',
   'repair_native_reading_order',
@@ -724,16 +737,18 @@ async function runHeuristicFigureFallbackStage(input: {
   result: AnalysisResult
   actions: RemediationActionRecord[]
   manualReviewFlags: ModelReviewFlag[]
+  usedInheritedVeraPdf: boolean
 }> {
   const candidates = aiFirstFigureCandidates(input.context)
   if (!candidates.length) {
-    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [] }
+    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
   }
 
   let workingBuffer = input.buffer
   let currentResult = input.result
   const actions: RemediationActionRecord[] = []
   let context = input.context
+  let usedInheritedVeraPdf = false
 
   for (const candidate of candidates) {
     const key = `set_figure_alt_text:${candidate.id}`
@@ -752,10 +767,8 @@ async function runHeuristicFigureFallbackStage(input: {
     workingBuffer = outcome.buffer
     actions.push(outcome.action)
     if (outcome.action.changedDocumentBytes) {
-      currentResult = await analyzePDF(workingBuffer, currentResult.filename || 'document.pdf', {
-        skipAdobe: true,
-        skipVeraPdf: true,
-      })
+      currentResult = await analyzeIntermediatePdf(workingBuffer, currentResult.filename || 'document.pdf', currentResult)
+      usedInheritedVeraPdf = true
       context = await inspectPdfForRemediation(workingBuffer, currentResult, {
         inspectMode: 'light',
         cache: input.inspectionCache,
@@ -763,7 +776,7 @@ async function runHeuristicFigureFallbackStage(input: {
     }
   }
 
-  return { buffer: workingBuffer, result: currentResult, actions, manualReviewFlags: [] }
+  return { buffer: workingBuffer, result: currentResult, actions, manualReviewFlags: [], usedInheritedVeraPdf }
 }
 
 async function runSemanticEnrichmentStage(input: {
@@ -784,9 +797,10 @@ async function runSemanticEnrichmentStage(input: {
   result: AnalysisResult
   actions: RemediationActionRecord[]
   manualReviewFlags: ModelReviewFlag[]
+  usedInheritedVeraPdf: boolean
 }> {
   if (!shouldRunSemanticStage(input.result, input.originalResult, input.context)) {
-    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [] }
+    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
   }
 
   let context = input.context
@@ -834,6 +848,7 @@ async function runSemanticEnrichmentStage(input: {
         severity: 'warning',
         details: `Skipped semantic enrichment because the provider rejected the request as too large: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
       }],
+      usedInheritedVeraPdf: false,
     }
   }
   const batches = generated.batches
@@ -851,13 +866,14 @@ async function runSemanticEnrichmentStage(input: {
         manualReviewFlags: generated.reviewFlags,
       }
     }
-    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: generated.reviewFlags }
+    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: generated.reviewFlags, usedInheritedVeraPdf: false }
   }
 
   const manualReviewFlags: ModelReviewFlag[] = [...generated.reviewFlags]
   const acceptedActions: RemediationActionRecord[] = []
   let workingBuffer = input.buffer
   let currentResult = input.result
+  let usedInheritedVeraPdf = false
 
   for (const batch of batches) {
     const batchThreshold = semanticThreshold(batch.batchType)
@@ -1075,7 +1091,8 @@ async function runSemanticEnrichmentStage(input: {
       continue
     }
 
-    const analyzedBatch = await analyzePDF(batchBuffer, input.filename, { signal: input.signal, skipAdobe: true })
+    const analyzedBatch = await analyzeIntermediatePdf(batchBuffer, input.filename, batchStartResult, input.signal)
+    usedInheritedVeraPdf = true
     const targetedCategories = [...new Set(batchActions.flatMap(action => action.categoryTargets || []))]
     const hasCategoryRegression = targetedCategories.some(categoryId => categoryRegression(batchStartResult, analyzedBatch, categoryId))
     const hasVisibleRegression = batchActions.some(action =>
@@ -1153,6 +1170,7 @@ async function runSemanticEnrichmentStage(input: {
     currentResult = fallback.result
     acceptedActions.push(...fallback.actions)
     manualReviewFlags.push(...fallback.manualReviewFlags)
+    usedInheritedVeraPdf = usedInheritedVeraPdf || fallback.usedInheritedVeraPdf
     if (!hasAltTextActions && fallback.actions.length) {
       manualReviewFlags.push({
         code: 'semantic_figure_fallback_applied',
@@ -1168,6 +1186,7 @@ async function runSemanticEnrichmentStage(input: {
     result: currentResult,
     actions: acceptedActions,
     manualReviewFlags: mergeManualReviewFlags([], manualReviewFlags),
+    usedInheritedVeraPdf,
   }
 }
 
@@ -1186,6 +1205,7 @@ export async function remediatePdfWithAgent(
 }> {
   let workingBuffer = originalBuffer
   let currentResult = originalResult
+  let currentResultHasFreshVeraPdf = true
   let previousActionNames: string[] = []
   let currentTitle = filename.replace(/\.pdf$/i, '')
   let currentLanguage = 'en'
@@ -1205,7 +1225,7 @@ export async function remediatePdfWithAgent(
       signal: options?.signal,
       onProgress: options?.onProgress,
     })
-    const ocrResult = await analyzePDF(ocrBuffer, filename, { signal: options?.signal, skipAdobe: true })
+    const ocrResult = await analyzeIntermediatePdf(ocrBuffer, filename, currentResult, options?.signal)
     const ocrAction: RemediationActionRecord = {
       tool: 'ocr_scanned_pdf',
       target: 'document',
@@ -1226,6 +1246,7 @@ export async function remediatePdfWithAgent(
     }
     workingBuffer = ocrBuffer
     currentResult = ocrResult
+    currentResultHasFreshVeraPdf = false
     actions.push(ocrAction)
     previousActionNames.push('ocr_scanned_pdf:document')
     pathFallbacks = [...pathFallbacks, 'ocr_searchable_pdf']
@@ -1557,7 +1578,7 @@ export async function remediatePdfWithAgent(
         break
       }
 
-      const analyzedAttempt = await analyzePDF(attemptBuffer, filename, { signal: options?.signal, skipAdobe: true })
+      const analyzedAttempt = await analyzeIntermediatePdf(attemptBuffer, filename, checkpointResult, options?.signal)
       const attemptRegressionReason = nativeStageRegressionReason(
         checkpointResult,
         analyzedAttempt,
@@ -1603,7 +1624,7 @@ export async function remediatePdfWithAgent(
       for (const [position, { entry, index }] of changedEntries.entries()) {
         const analyzedEntry = position === changedEntries.length - 1
           ? analyzedAttempt
-          : await analyzePDF(entry.afterBuffer, filename, { signal: options?.signal, skipAdobe: true })
+          : await analyzeIntermediatePdf(entry.afterBuffer, filename, checkpointResult, options?.signal)
         const entryRegressionReason = nativeStageRegressionReason(
           checkpointResult,
           analyzedEntry,
@@ -1757,7 +1778,7 @@ export async function remediatePdfWithAgent(
 
     // Non-native mode: single analysis per stage (instead of per action)
     if (!nativeTaggedSafeMode && stageChangedDocument) {
-      const analyzedStage = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+      const analyzedStage = await analyzeIntermediatePdf(workingBuffer, filename, stageStartResult, options?.signal)
       // repair_other_elements_alt_text fixes Adobe Acrobat issues not reflected in our score model
       const isAcrobatAltRepair = stageActions.some(
         a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied',
@@ -1796,6 +1817,7 @@ export async function remediatePdfWithAgent(
         currentResult = stageStartResult
       } else {
         currentResult = analyzedStage
+        currentResultHasFreshVeraPdf = false
       }
       stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
         inspectMode: inspectModeForResult(currentResult),
@@ -1919,7 +1941,7 @@ export async function remediatePdfWithAgent(
       }
 
       if (!nativeTaggedSafeMode && stageChangedDocument) {
-        const analyzedStage = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+        const analyzedStage = await analyzeIntermediatePdf(workingBuffer, filename, stageStartResult, options?.signal)
         const isAcrobatAltRepair = stageActions.some(a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied')
         const stageImprovedStandards = standardsValidationImproved(stageStartResult, analyzedStage)
         let stageImprovedTargets = false
@@ -1940,6 +1962,7 @@ export async function remediatePdfWithAgent(
           currentResult = stageStartResult
         } else {
           currentResult = analyzedStage
+          currentResultHasFreshVeraPdf = false
         }
         stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, { inspectMode: inspectModeForResult(currentResult), cache: inspectionCache })
         latestContext = stageContext
@@ -1997,6 +2020,7 @@ export async function remediatePdfWithAgent(
       workingBuffer = semanticStage.buffer
     }
     currentResult = semanticStage.result
+    currentResultHasFreshVeraPdf = !semanticStage.usedInheritedVeraPdf
     actions.push(...semanticStage.actions)
     manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, semanticStage.manualReviewFlags)
   }
@@ -2032,6 +2056,7 @@ export async function remediatePdfWithAgent(
     if (!bookmarkStage.buffer.equals(workingBuffer)) {
       workingBuffer = bookmarkStage.buffer
       currentResult = bookmarkStage.result
+      currentResultHasFreshVeraPdf = !bookmarkStage.usedInheritedVeraPdf
       actions.push(...bookmarkStage.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, bookmarkStage.manualReviewFlags)
       previousActionNames = Array.from(new Set([
@@ -2153,7 +2178,8 @@ export async function remediatePdfWithAgent(
   }
 
   if (!nativeTaggedSafeMode && finalCleanupChangedDocument) {
-    currentResult = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+    currentResult = await analyzeIntermediatePdf(workingBuffer, filename, currentResult, options?.signal)
+    currentResultHasFreshVeraPdf = false
     cleanupContext = buildRemediationContextFromSnapshot({
       analysis: currentResult,
       qpdf: cleanupContext.qpdf,
@@ -2164,6 +2190,12 @@ export async function remediatePdfWithAgent(
       cache: inspectionCache,
     })
     latestContext = cleanupContext
+  }
+
+  if (!workingBuffer.equals(originalBuffer)) {
+    currentResult = await analyzePDF(workingBuffer, filename, { signal: options?.signal, skipAdobe: true })
+    currentResultHasFreshVeraPdf = true
+    latestContext = null
   }
 
   previousActionNames = Array.from(new Set([
