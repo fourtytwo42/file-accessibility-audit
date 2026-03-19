@@ -9,8 +9,9 @@ import { GradePanel } from '@/components/detail/GradePanel'
 import { VeraPdfPanel } from '@/components/detail/VeraPdfPanel'
 import { VersionHistory } from '@/components/detail/VersionHistory'
 import { StatusChip } from '@/components/shared/StatusChip'
-import { formatDate } from '@/lib/formatters'
+import { formatDate, formatElapsedDuration } from '@/lib/formatters'
 import { useQueueItem } from '@/hooks/useQueueItem'
+import { useProcessingElapsed } from '@/hooks/useProcessingElapsed'
 import { useQueueVersions } from '@/hooks/useQueueVersions'
 
 export default function PdfDetailPage() {
@@ -27,6 +28,8 @@ export default function PdfDetailPage() {
     return <main className="page-shell py-10">Unable to load PDF detail.</main>
   }
 
+  const elapsed = useProcessingElapsed(item.processingStartedAt, item.completedAt, item.state === 'processing')
+
   return (
     <main className="page-shell space-y-6 pb-20">
       <div className="space-y-3">
@@ -37,6 +40,11 @@ export default function PdfDetailPage() {
             <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
               Last updated {formatDate(item.updatedAt)}
             </p>
+            {elapsed != null ? (
+              <p className="mt-1 text-sm font-medium" style={{ color: 'var(--accent-strong)' }}>
+                {item.state === 'processing' ? 'Elapsed time' : 'Processing time'} {formatElapsedDuration(elapsed)}
+              </p>
+            ) : null}
           </div>
           <StatusChip state={item.state} />
         </div>

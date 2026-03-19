@@ -1,10 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { BulkActionBar } from '@/components/grid/BulkActionBar'
 import { FilterBar } from '@/components/grid/FilterBar'
 import { PdfCard } from '@/components/grid/PdfCard'
 import { DropZone } from '@/components/upload/DropZone'
 import { GradePanel } from '@/components/detail/GradePanel'
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 describe('DropZone', () => {
   it('forwards selected files', () => {
@@ -75,6 +79,9 @@ describe('PdfCard', () => {
   })
 
   it('uses processing progress instead of completed upload progress while processing', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-03-13T00:01:45.000Z'))
+
     render(
       <PdfCard
         item={{
@@ -106,7 +113,7 @@ describe('PdfCard', () => {
           updatedAt: '2026-03-13T00:00:30.000Z',
           uploadStartedAt: null,
           uploadCompletedAt: null,
-          processingStartedAt: null,
+          processingStartedAt: '2026-03-13T00:00:00.000Z',
           completedAt: null,
           expiresAt: '2026-04-13T00:00:00.000Z',
           canRetry: false,
@@ -121,6 +128,7 @@ describe('PdfCard', () => {
 
     const progressFill = document.querySelector('[style*="width: 38%"]')
     expect(progressFill).toBeTruthy()
+    expect(screen.getByText('Elapsed 01:45')).toBeInTheDocument()
   })
 })
 

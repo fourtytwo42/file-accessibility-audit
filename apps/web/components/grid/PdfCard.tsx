@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import type { LocalUploadItem, QueueItemSummary } from '@/lib/api'
-import { formatDate, formatScore } from '@/lib/formatters'
+import { formatDate, formatElapsedDuration, formatScore } from '@/lib/formatters'
 import { GradeBadge } from '@/components/shared/GradeBadge'
 import { ProgressBar } from '@/components/shared/ProgressBar'
 import { StatusChip } from '@/components/shared/StatusChip'
+import { useProcessingElapsed } from '@/hooks/useProcessingElapsed'
 
 type CardItem = QueueItemSummary | (LocalUploadItem & { local: true })
 
@@ -42,6 +43,11 @@ export function PdfCard({
       : item.state === 'queued' || item.state === 'processing'
         ? item.processingProgress
         : 100
+  const elapsed = useProcessingElapsed(
+    local ? null : item.processingStartedAt,
+    local ? null : item.completedAt,
+    !local && item.state === 'processing',
+  )
 
   const content = (
     <div
@@ -64,6 +70,11 @@ export function PdfCard({
           <div>
             <h3 className="line-clamp-2 text-sm font-semibold md:text-base">{item.filename}</h3>
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{formatDate(local ? new Date().toISOString() : item.updatedAt)}</p>
+            {!local && elapsed != null ? (
+              <p className="mt-1 text-xs font-medium" style={{ color: 'var(--accent-strong)' }}>
+                {item.state === 'processing' ? 'Elapsed' : 'Processing time'} {formatElapsedDuration(elapsed)}
+              </p>
+            ) : null}
           </div>
         </label>
         <GradeBadge grade={local ? null : item.grade} />
