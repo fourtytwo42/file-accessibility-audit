@@ -165,6 +165,7 @@ export type RemediationToolName =
   | 'bootstrap_struct_tree'
   | 'create_heading_from_candidate'
   | 'normalize_heading_hierarchy'
+  | 'normalize_nested_figure_containers'
   | 'retag_node'
   | 'create_heading_tag'
   | 'set_table_header_cells'

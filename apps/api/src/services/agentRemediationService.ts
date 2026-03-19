@@ -1447,7 +1447,10 @@ export async function remediatePdfWithAgent(
     for (let index = 0; index < finalCleanupCalls.length; index += 1) {
       const call = finalCleanupCalls[index]
       const operationResult = operationResults[index]
-      const status = operationResult?.status || 'failed'
+      const status: 'applied' | 'no_effect' | 'unsupported' | 'failed' =
+        operationResult?.status === 'applied' || operationResult?.status === 'no_effect' || operationResult?.status === 'unsupported'
+          ? operationResult.status
+          : 'failed'
       const changedDocumentBytes = !!operationResult?.changedDocumentBytes
       const action: RemediationActionRecord = {
         tool: call.tool_name,

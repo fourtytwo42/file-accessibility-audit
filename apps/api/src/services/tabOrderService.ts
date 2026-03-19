@@ -23,7 +23,7 @@ function decodePdfNumber(value: unknown): number | null {
 }
 
 function annotationIsInvisible(annotation: PDFDict): boolean {
-  const flags = annotation.lookupMaybe(PDFName.of('F'))
+  const flags = annotation.lookupMaybe(PDFName.of('F'), PDFNumber)
   const numeric = decodePdfNumber(flags)
   if (!Number.isFinite(numeric)) return false
   return Boolean((numeric! & 1) || (numeric! & 2) || (numeric! & 32))

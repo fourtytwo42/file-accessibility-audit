@@ -11,6 +11,7 @@ import {
 import fontkit from '@pdf-lib/fontkit'
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { createHash } from 'node:crypto'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import { analyzeWithPdfjs, getLinkDisplayText } from './pdfjsService.js'
 import type { PdfjsResult } from './pdfjsService.js'
@@ -238,7 +239,14 @@ export interface PdfRemediationContext {
 
 export type RemediationInspectMode = 'light' | 'alt_text_deep'
 
+type CachedPdfRemediationPayload = Omit<PdfRemediationContext, 'analysis'>
+
+const INSPECTION_RESULT_CACHE_MAX_ENTRIES = 20
+const inspectionResultCache = new Map<string, CachedPdfRemediationPayload>()
+
 export interface RemediationInspectionCache {
+  bufferSha256?: string
+  contextsByMode?: Partial<Record<RemediationInspectMode, CachedPdfRemediationPayload>>
   qpdf?: QpdfResult
   pdfjs?: PdfjsResult
   pages?: RemediationPageFact[]
@@ -247,6 +255,43 @@ export interface RemediationInspectionCache {
 export interface RemediationInspectOptions {
   inspectMode?: RemediationInspectMode
   cache?: RemediationInspectionCache
+}
+
+function inspectionCacheKey(bufferSha256: string, inspectMode: RemediationInspectMode): string {
+  return `${bufferSha256}:${inspectMode}`
+}
+
+function getBufferSha256(buffer: Buffer): string {
+  return createHash('sha256').update(buffer).digest('hex')
+}
+
+function toInspectionContext(
+  analysis: AnalysisResult,
+  payload: CachedPdfRemediationPayload,
+): PdfRemediationContext {
+  return {
+    analysis,
+    ...payload,
+  }
+}
+
+function setCachedInspectionPayload(
+  cacheKey: string,
+  payload: CachedPdfRemediationPayload,
+): void {
+  if (inspectionResultCache.has(cacheKey)) inspectionResultCache.delete(cacheKey)
+  else if (inspectionResultCache.size >= INSPECTION_RESULT_CACHE_MAX_ENTRIES) {
+    inspectionResultCache.delete(inspectionResultCache.keys().next().value!)
+  }
+  inspectionResultCache.set(cacheKey, payload)
+}
+
+export function __test_resetInspectionResultCache(): void {
+  inspectionResultCache.clear()
+}
+
+export function __test_getInspectionResultCacheSize(): number {
+  return inspectionResultCache.size
 }
 
 function clamp(value: number, min = 0, max = 1): number {
@@ -399,10 +444,11 @@ function textNear(lines: RemediationPageFact['textLines'], index: number): strin
 
 export function needsAltTextDeepInspection(analysis: AnalysisResult): boolean {
   const altTextCategory = analysis.categories.find(category => category.id === 'alt_text')
-  const altTextScore = altTextCategory?.score
-  if (typeof altTextScore === 'number' && altTextScore < 100) return true
-  if ((altTextCategory?.findings || []).some(finding =>
-    /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding))) {
+  const hasAcrobatAltRiskFindings = (altTextCategory?.findings || []).some(finding =>
+    /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding))
+  if (hasAcrobatAltRiskFindings) {
+    // Once scoring has already surfaced Acrobat-risk ownership findings, keep deep inspection
+    // enabled for follow-up remediation rounds regardless of the current category score.
     return true
   }
   if (analysis.verapdf?.status !== 'failed') return false
@@ -895,6 +941,34 @@ export async function inspectPdfForRemediation(
   options: RemediationInspectOptions = {},
 ): Promise<PdfRemediationContext> {
   const inspectMode = options.inspectMode || (needsAltTextDeepInspection(analysis) ? 'alt_text_deep' : 'light')
+  const bufferSha256 = getBufferSha256(buffer)
+  const cacheKey = inspectionCacheKey(bufferSha256, inspectMode)
+  const perRunCache = options.cache
+  if (perRunCache) {
+    if (perRunCache.bufferSha256 !== bufferSha256) {
+      perRunCache.bufferSha256 = bufferSha256
+      perRunCache.contextsByMode = {}
+    }
+    const cachedContext = perRunCache.contextsByMode?.[inspectMode]
+    if (cachedContext) {
+      return toInspectionContext(analysis, cachedContext)
+    }
+  }
+
+  const cachedPayload = inspectionResultCache.get(cacheKey)
+  if (cachedPayload) {
+    perRunCache && (perRunCache.contextsByMode = {
+      ...(perRunCache.contextsByMode || {}),
+      [inspectMode]: cachedPayload,
+    })
+    if (perRunCache) {
+      perRunCache.qpdf = cachedPayload.qpdf
+      perRunCache.pdfjs = cachedPayload.pdfjs
+      perRunCache.pages = cachedPayload.pages
+    }
+    return toInspectionContext(analysis, cachedPayload)
+  }
+
   const qpdfPromise = options.cache?.qpdf ? Promise.resolve(options.cache.qpdf) : analyzeWithQpdf(buffer)
   const pdfjsPromise = options.cache?.pdfjs ? Promise.resolve(options.cache.pdfjs) : analyzeWithPdfjs(buffer)
   const pagesPromise = options.cache?.pages ? Promise.resolve(options.cache.pages) : buildRemediationPageFacts(buffer)
@@ -907,8 +981,7 @@ export async function inspectPdfForRemediation(
 
   const readingOrderCandidates = buildReadingOrderCandidates(structure)
 
-  return {
-    analysis,
+  const payload: CachedPdfRemediationPayload = {
     qpdf,
     pdfjs,
     structure,
@@ -920,6 +993,20 @@ export async function inspectPdfForRemediation(
     readingOrderParentCandidates: buildReadingOrderParentCandidates(structure, readingOrderCandidates),
     linkCandidates: buildLinkCandidates(pages),
   }
+
+  if (perRunCache) {
+    perRunCache.bufferSha256 = bufferSha256
+    perRunCache.contextsByMode = {
+      ...(perRunCache.contextsByMode || {}),
+      [inspectMode]: payload,
+    }
+    perRunCache.qpdf = qpdf
+    perRunCache.pdfjs = pdfjs
+    perRunCache.pages = pages
+  }
+  setCachedInspectionPayload(cacheKey, payload)
+
+  return toInspectionContext(analysis, payload)
 }
 
 function uniqueFlag(next: ModelReviewFlag, flags: ModelReviewFlag[]): ModelReviewFlag[] {

@@ -9,7 +9,15 @@ import { remediatePdfWithAgent } from '../services/agentRemediationService.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
-import { __test_remapHeadingTarget, executeRemediationTool, inspectPdfForRemediation, needsAltTextDeepInspection, normalizedExistingHeadingLevel } from '../services/pdfRemediationTools.js'
+import {
+  __test_getInspectionResultCacheSize,
+  __test_remapHeadingTarget,
+  __test_resetInspectionResultCache,
+  executeRemediationTool,
+  inspectPdfForRemediation,
+  needsAltTextDeepInspection,
+  normalizedExistingHeadingLevel,
+} from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
 import type { RemediationActionRecord, RemediationToolName } from '../services/documentModel.js'
 import { planRemediationActions } from '../services/remediationPlanService.js'
@@ -22,6 +30,14 @@ async function makePdf(): Promise<Buffer> {
   const page = doc.addPage([612, 792])
   const font = await doc.embedFont(StandardFonts.Helvetica)
   page.drawText('Example document', { x: 72, y: 720, size: 16, font })
+  return Buffer.from(await doc.save())
+}
+
+async function makePdfWithText(text: string): Promise<Buffer> {
+  const doc = await PDFDocument.create()
+  const page = doc.addPage([612, 792])
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  page.drawText(text, { x: 72, y: 720, size: 16, font })
   return Buffer.from(await doc.save())
 }
 
@@ -104,6 +120,7 @@ function makePlannerAction(
 
 afterEach(() => {
   vi.restoreAllMocks()
+  __test_resetInspectionResultCache()
 })
 
 describe('pdfRemediationTools', { timeout: 120_000 }, () => {
@@ -125,6 +142,140 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }
 
     expect(needsAltTextDeepInspection(analysis)).toBe(true)
+  })
+
+  it('does not enable deep alt-text inspection for minor non-Acrobat alt-text defects', () => {
+    const analysis = {
+      categories: [
+        {
+          id: 'alt_text',
+          findings: ['One figure is missing alt text.'],
+          score: 95,
+        },
+      ],
+      verapdf: {
+        status: 'passed',
+        failures: [],
+      },
+    } as any
+
+    expect(needsAltTextDeepInspection(analysis)).toBe(false)
+  })
+
+  it('does not enable deep alt-text inspection for low scores without Acrobat-risk evidence', () => {
+    const analysis = {
+      categories: [
+        {
+          id: 'alt_text',
+          findings: ['Several figures are missing alt text.'],
+          score: 75,
+        },
+      ],
+      verapdf: {
+        status: 'passed',
+        failures: [],
+      },
+    } as any
+
+    expect(needsAltTextDeepInspection(analysis)).toBe(false)
+  })
+
+  it('keeps deep alt-text inspection enabled for low scores with Acrobat-risk evidence', () => {
+    const analysis = {
+      categories: [
+        {
+          id: 'alt_text',
+          findings: ['Acrobat-style alternate-text risk remains because graphics content is still owned by non-/Figure structure elements.'],
+          score: 75,
+        },
+      ],
+      verapdf: {
+        status: 'passed',
+        failures: [],
+      },
+    } as any
+
+    expect(needsAltTextDeepInspection(analysis)).toBe(true)
+  })
+
+  it('reuses cached inspection results for the same buffer and inspect mode', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'cache.pdf', { skipAdobe: true })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+
+    const first = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const second = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    expect(backendSpy).toHaveBeenCalledTimes(1)
+    expect(second.structure).toEqual(first.structure)
+    expect(__test_getInspectionResultCacheSize()).toBeGreaterThanOrEqual(1)
+  })
+
+  it('does not cross-reuse inspection cache entries across inspect modes', async () => {
+    const buffer = await loadFixture('accessible.pdf')
+    const analysis = await analyzePDF(buffer, 'accessible.pdf', { skipAdobe: true })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+
+    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
+
+    expect(backendSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('invalidates inspection cache when the buffer changes', async () => {
+    const firstBuffer = await makePdf()
+    const secondBuffer = await makePdfWithLink()
+    const firstAnalysis = await analyzePDF(firstBuffer, 'first.pdf', { skipAdobe: true })
+    const secondAnalysis = await analyzePDF(secondBuffer, 'second.pdf', { skipAdobe: true })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+
+    await inspectPdfForRemediation(firstBuffer, firstAnalysis, { inspectMode: 'light' })
+    await inspectPdfForRemediation(secondBuffer, secondAnalysis, { inspectMode: 'light' })
+
+    expect(backendSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('evicts the oldest inspection cache entry when the process cache is full', async () => {
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+    const buffers: Buffer[] = []
+
+    for (let index = 0; index <= 20; index++) {
+      const buffer = await makePdfWithText(`pdf-${index}`)
+      buffers.push(buffer)
+      const analysis = {
+        categories: [{ id: 'alt_text', score: 100, findings: [] }],
+        verapdf: { status: 'passed', failures: [] },
+      } as any
+      await inspectPdfForRemediation(buffer, analysis, {
+        inspectMode: 'light',
+        cache: {
+          qpdf: { hasStructTree: true, headings: [], tables: [], images: [], formFields: [], outlineCount: 0, structTreeDepth: 1, lang: 'en' } as any,
+          pdfjs: { title: null, lang: 'en', links: [], pageCount: 1 } as any,
+          pages: [],
+        },
+      })
+    }
+
+    expect(backendSpy).toHaveBeenCalledTimes(21)
+    expect(__test_getInspectionResultCacheSize()).toBe(20)
+
+    const evictedBuffer = buffers[0]
+    const evictedAnalysis = {
+      categories: [{ id: 'alt_text', score: 100, findings: [] }],
+      verapdf: { status: 'passed', failures: [] },
+    } as any
+
+    await inspectPdfForRemediation(evictedBuffer, evictedAnalysis, {
+      inspectMode: 'light',
+      cache: {
+        qpdf: { hasStructTree: true, headings: [], tables: [], images: [], formFields: [], outlineCount: 0, structTreeDepth: 1, lang: 'en' } as any,
+        pdfjs: { title: null, lang: 'en', links: [], pageCount: 1 } as any,
+        pages: [],
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalledTimes(22)
+    expect(__test_getInspectionResultCacheSize()).toBe(20)
   })
 
   it('plans table header repair against table refs instead of individual cell refs', async () => {
@@ -171,12 +322,14 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       analysis,
       qpdf: {
         hasStructTree: true,
+        isTagged: true,
         hasLang: true,
         lang: 'en',
         hasOutlines: false,
         outlineCount: 0,
         outlineTitles: [],
         hasAcroForm: false,
+        annotationCount: 0,
         formFields: [],
         images: [],
         headings: [],
@@ -1036,7 +1189,9 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
   })
 
   it('repairs CID symbol font maps in place on large mixed/native PDFs', async () => {
-    const { analysis, context } = chartPdfPlanFixture
+    const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
+    const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
 
     const result = await executeRemediationTool({
       buffer,

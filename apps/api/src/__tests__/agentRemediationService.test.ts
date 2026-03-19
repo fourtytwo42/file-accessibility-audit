@@ -35,8 +35,10 @@ vi.mock('../services/pdfRemediationTools.js', () => ({
   inspectPdfForRemediation,
   executeRemediationTool,
   needsAltTextDeepInspection: (analysis: any) => {
-    const altTextScore = analysis?.categories?.find((category: any) => category.id === 'alt_text')?.score
-    if (typeof altTextScore === 'number' && altTextScore < 100) return true
+    const findings = analysis?.categories?.find((category: any) => category.id === 'alt_text')?.findings || []
+    const hasAcrobatAltRiskFindings = findings.some((finding: any) =>
+      /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(String(finding || '')))
+    if (hasAcrobatAltRiskFindings) return true
     if (analysis?.verapdf?.status !== 'failed') return false
     return (analysis?.verapdf?.failures || []).some((failure: any) =>
       (failure?.categoryIds || []).includes('alt_text')
@@ -618,6 +620,59 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(inspectPdfForRemediation.mock.calls[0]?.[2]?.inspectMode).toBe('alt_text_deep')
     expect(result.finalResult.grade).toBe('A')
+  })
+
+  it('keeps minor alt-text defects on light inspection without Acrobat-risk evidence', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'minor-alt-text.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 96,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 95, grade: 'B', severity: 'Moderate', findings: ['One figure is missing alt text.'], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const lightContext = {
+      pdfjs: { title: 'Minor Alt Text', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(lightContext)
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: ['alt_text'], actions: [] })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'minor-alt-text.pdf', originalResult)
+
+    expect(inspectPdfForRemediation.mock.calls[0]?.[2]?.inspectMode).toBe('light')
+    expect(result.finalResult.grade).toBe('B')
   })
 
   it('keeps scanned documents on the patch path when no actions are available', async () => {
