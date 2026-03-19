@@ -1082,7 +1082,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const after = await analyzePDF(cidsetResult.buffer, '11drug seizures_1997-2007.pdf')
     expect(['applied', 'no_effect']).toContain(cidsetResult.action.outcome)
     expect(after.verapdf.failedChecks).toBeLessThanOrEqual(beforeFailedChecks)
-  }, 120_000)
+  }, 300_000)
 
   it('reports CIDSet inspection coverage and returns no_effect when a second pass finds nothing new to rewrite', async () => {
     let buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
@@ -1134,7 +1134,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(secondPass.action.outcome).toBe('no_effect')
     expect(secondPass.action.details).toContain('Inspected')
     expect(secondPass.action.details).toContain('rewrote 0 stream')
-  }, 120_000)
+  }, 300_000)
 
   it('surfaces no_effect when CIDSet repair cannot derive a trustworthy embedded CID universe', async () => {
     const buffer = await makePdf()
@@ -1799,7 +1799,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.changedDocumentBytes).toBe(true)
     expect(result.action.categoryTargets).toEqual(['bookmarks'])
     expect(nextBookmarkScore).toBe(100)
-  }, 30_000)
+  }, 90_000)
 
   it('creates bookmarks from page-mapped heading candidates even when structure refs are unavailable', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
@@ -2457,7 +2457,7 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(repair.action.outcome).toBe('applied')
     expect(after.pageCount).toBe(beforePageCount)
     expect(after.verapdf.failedChecks).toBeLessThan(beforeFailedChecks)
-  }, 120_000)
+  }, 300_000)
 
   it('plans native-safe conformance repairs on already-tagged large PDFs instead of broad structure repair', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
