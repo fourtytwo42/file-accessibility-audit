@@ -1369,6 +1369,12 @@ export async function remediatePdfWithAgent(
       confidence: 0.97,
     },
     {
+      tool_name: 'repair_other_elements_alt_text' as const,
+      arguments: { target: 'document' },
+      rationale: 'Final cleanup: remove orphaned /Alt attributes left on empty Figure elements after container normalization.',
+      confidence: 0.95,
+    },
+    {
       tool_name: 'repair_native_link_structure' as const,
       arguments: { target: 'document' },
       rationale: 'Final cleanup: repair link annotation structure after any bootstrap or semantic tagging changes.',

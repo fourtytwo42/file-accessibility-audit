@@ -455,6 +455,21 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         manualReviewFlags: [],
       })
       .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-cleanup-figure'),
+        action: {
+          tool: 'repair_other_elements_alt_text',
+          target: 'document',
+          details: 'orphaned alt attributes removed',
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
         buffer: Buffer.from('pdf-cleanup-0'),
         action: {
           tool: 'repair_native_link_structure',
@@ -514,11 +529,12 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(executeRemediationTool.mock.calls.map(call => call[0]?.call?.tool_name)).toEqual([
       'normalize_heading_hierarchy',
       'normalize_nested_figure_containers',
+      'repair_other_elements_alt_text',
       'repair_native_link_structure',
       'normalize_annotation_tab_order',
       'set_tabs_all_annotated_pages',
     ])
-    expect(executeRemediationTool).toHaveBeenCalledTimes(5)
+    expect(executeRemediationTool).toHaveBeenCalledTimes(6)
     expect(result.model.actions?.slice(-3).map(action => action.tool)).toEqual([
       'repair_native_link_structure',
       'normalize_annotation_tab_order',
@@ -736,9 +752,9 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       structure: {},
     })
     planRemediationActions.mockResolvedValue({ done: false, unresolvedIssues: ['text_extractability'], actions: [] })
-    // 5 cleanup tools always run; ensure they pass through the OCR buffer unchanged
+    // 6 cleanup tools always run; ensure they pass through the OCR buffer unchanged
     const ocrBuffer = Buffer.from('ocr-pdf')
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       executeRemediationTool.mockResolvedValueOnce({
         buffer: ocrBuffer,
         action: {
@@ -1153,8 +1169,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
         manualReviewFlags: [],
       })
-    // 5 final cleanup tools; pass through the rolled-back buffer unchanged
-    for (let i = 0; i < 5; i++) {
+    // 6 final cleanup tools; pass through the rolled-back buffer unchanged
+    for (let i = 0; i < 6; i++) {
       executeRemediationTool.mockResolvedValueOnce({
         buffer: pdfABuffer,
         action: {
@@ -1513,8 +1529,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
         manualReviewFlags: [],
       })
-    // 5 final cleanup tools; pass through the semantic-fixed buffer unchanged
-    for (let i = 0; i < 5; i++) {
+    // 6 final cleanup tools; pass through the semantic-fixed buffer unchanged
+    for (let i = 0; i < 6; i++) {
       executeRemediationTool.mockResolvedValueOnce({
         buffer: semanticFixedBuffer,
         action: {
@@ -1549,7 +1565,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'semantic.pdf', originalResult)
 
     expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
-    expect(executeRemediationTool).toHaveBeenCalledTimes(6)
+    expect(executeRemediationTool).toHaveBeenCalledTimes(7)
     expect(result.buffer.equals(Buffer.from('semantic-fixed'))).toBe(true)
     expect(result.model.actions?.some(action => action.tool === 'create_heading_from_candidate' && action.outcome === 'applied')).toBe(true)
     expect(result.finalResult.overallScore).toBe(81)
@@ -2068,8 +2084,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
         manualReviewFlags: [],
       })
-    // 5 final cleanup tools; pass through the acrobat-fixed buffer unchanged
-    for (let i = 0; i < 5; i++) {
+    // 6 final cleanup tools; pass through the acrobat-fixed buffer unchanged
+    for (let i = 0; i < 6; i++) {
       executeRemediationTool.mockResolvedValueOnce({
         buffer: acrobatPassBuffer,
         action: {
