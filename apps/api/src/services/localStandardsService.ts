@@ -2,6 +2,7 @@ import type { QpdfResult } from './qpdfService.js'
 import type { PdfjsResult } from './pdfjsService.js'
 import type { TabOrderResult } from './tabOrderService.js'
 import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
+import { hasCanonicalLanguageTag } from './languageTags.js'
 
 export type LocalStandardsSource = 'qpdf' | 'pdfjs' | 'structure_backend' | 'composite'
 export type LocalStandardsSeverity = 'warning' | 'error'
@@ -38,9 +39,14 @@ function looksLikeBrokenBookmarkTitle(title: string): boolean {
     || /[\u0080-\u009f]/.test(normalized)
 }
 
-function missingLogicalStructureFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
+function missingLogicalStructureFinding(
+  qpdf: QpdfResult,
+  pdfjs: PdfjsResult,
+  structure?: Pick<StructureBackendMutationResult, 'structuralNodes'> | null,
+): LocalStandardsFinding | null {
   const evidence: string[] = []
   let count = 0
+  let inferred = false
 
   if (!qpdf.hasStructTree) {
     count += 1
@@ -54,6 +60,37 @@ function missingLogicalStructureFinding(qpdf: QpdfResult): LocalStandardsFinding
     evidence.push('MarkInfo dictionary is present but /Marked is not true.')
   }
 
+  const structureNodeCount = structure?.structuralNodes?.length ?? 0
+  const weakContentEvidence = pdfjs.textLength > 0 && qpdf.contentOrder.length === 0
+  const shallowStructureTree = qpdf.hasStructTree && qpdf.structTreeDepth > 0 && qpdf.structTreeDepth <= 1
+  const sparseStructureSnapshot = qpdf.hasStructTree && structureNodeCount > 0 && structureNodeCount <= 1 && pdfjs.textLength > 0
+  const semanticNodeCoverageAbsent = qpdf.hasStructTree
+    && pdfjs.textLength > 1000
+    && qpdf.outlineCount === 0
+    && qpdf.headings.length === 0
+    && qpdf.tables.length === 0
+    && qpdf.images.length === 0
+
+  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent)) {
+    inferred = true
+    if (weakContentEvidence) {
+      count += 1
+      evidence.push('The document exposes text content, but no structure-tree MCID traversal could confirm that page content is represented in tagged reading order.')
+    }
+    if (shallowStructureTree) {
+      count += 1
+      evidence.push(`Structure tree depth is only ${qpdf.structTreeDepth}, which is too shallow to justify a reliable logical structure pass for this document.`)
+    }
+    if (sparseStructureSnapshot) {
+      count += 1
+      evidence.push(`Only ${structureNodeCount} structural node was recovered from the backend structure snapshot despite extractable page text.`)
+    }
+    if (semanticNodeCoverageAbsent) {
+      count += 1
+      evidence.push('The document is tagged at the catalog level, but no headings, tables, figures, or outline structure were recoverable from local analysis despite substantial text content.')
+    }
+  }
+
   if (!count) return null
   return {
     key: 'pdfua.logical_structure',
@@ -61,28 +98,54 @@ function missingLogicalStructureFinding(qpdf: QpdfResult): LocalStandardsFinding
     severity: 'error',
     blocking: true,
     categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
-    confidence: 0.98,
+    confidence: inferred ? 0.76 : 0.98,
     evidence,
-    source: 'qpdf',
-    inferred: false,
+    source: inferred ? 'composite' : 'qpdf',
+    inferred,
     count,
   }
 }
 
-function documentLanguageFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
-  if (qpdf.hasLang && qpdf.lang && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(qpdf.lang)) return null
+function documentLanguageFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalStandardsFinding | null {
+  const qpdfLangValid = !!(qpdf.hasLang && qpdf.lang && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(qpdf.lang))
+  const pdfjsLangValid = !!(pdfjs.lang && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$/.test(pdfjs.lang))
+  const qpdfCanonical = qpdfLangValid && hasCanonicalLanguageTag(qpdf.lang)
+  const pdfjsCanonical = pdfjsLangValid && hasCanonicalLanguageTag(pdfjs.lang)
+  if (qpdfCanonical && (!pdfjs.lang || pdfjsCanonical)) return null
+
+  const evidence: string[] = []
+  let inferred = false
+
+  if (!qpdf.hasLang) {
+    evidence.push('No document language declaration was found in the catalog metadata.')
+  } else if (!qpdfLangValid) {
+    evidence.push(`Language tag "${qpdf.lang || 'unknown'}" does not appear normalized.`)
+  } else if (!qpdfCanonical) {
+    inferred = true
+    evidence.push(`Language tag "${qpdf.lang}" is present but not canonicalized to BCP 47 casing.`)
+  }
+
+  if (qpdfLangValid && pdfjs.lang && !pdfjsLangValid) {
+    inferred = true
+    evidence.push(`PDF.js exposed an inconsistent language tag "${pdfjs.lang}", so local analyzers could not confirm a stable document language value.`)
+  } else if (qpdfLangValid && !pdfjs.lang) {
+    inferred = true
+    evidence.push('Language metadata is present in qpdf output, but it was not recoverable through PDF.js metadata, so local confirmation remains incomplete.')
+  } else if (pdfjsLangValid && !pdfjsCanonical) {
+    inferred = true
+    evidence.push(`PDF.js exposed language tag "${pdfjs.lang}" in non-canonical form.`)
+  }
+
   return {
     key: 'pdfua.document_language',
     label: 'Document language tag',
     severity: 'error',
     blocking: true,
     categoryIds: ['title_language', 'pdf_ua_compliance'],
-    confidence: qpdf.hasLang ? 0.8 : 0.95,
-    evidence: qpdf.hasLang
-      ? [`Language tag "${qpdf.lang || 'unknown'}" does not appear normalized.`]
-      : ['No document language declaration was found in the catalog metadata.'],
-    source: 'qpdf',
-    inferred: false,
+    confidence: inferred ? 0.72 : qpdf.hasLang ? 0.8 : 0.95,
+    evidence,
+    source: inferred ? 'composite' : 'qpdf',
+    inferred,
     count: 1,
   }
 }
@@ -230,6 +293,34 @@ function cidSymbolFontFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
   }
 }
 
+function cidSetConsistencyFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
+  const riskCount = qpdf.cidSetRiskFontCount ?? 0
+  if (riskCount <= 0) return null
+  const explicitCount = qpdf.cidSetExplicitFontCount ?? 0
+  const inferredCount = Math.max(0, riskCount - explicitCount)
+  const evidence: string[] = []
+
+  if (explicitCount > 0) {
+    evidence.push(`Detected ${explicitCount} embedded CID font descriptor(s) with a /CIDSet entry, which matches a known PDF/UA CIDSet consistency failure pattern.`)
+  }
+  if (inferredCount > 0) {
+    evidence.push(`Detected ${inferredCount} embedded subsetted CID font object(s) with legacy Symbol/Dingbat characteristics or missing Unicode coverage, which is a conservative proxy for CIDSet conformance drift.`)
+  }
+
+  return {
+    key: 'pdfua.cidset_consistency',
+    label: 'CIDSet consistency',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+    confidence: explicitCount > 0 && inferredCount === 0 ? 0.92 : explicitCount > 0 ? 0.82 : 0.68,
+    evidence,
+    source: 'qpdf',
+    inferred: inferredCount > 0,
+    count: riskCount,
+  }
+}
+
 function pageTabsFinding(tabOrder: TabOrderResult | null | undefined): LocalStandardsFinding | null {
   if (!tabOrder || tabOrder.status !== 'ok') return null
   const issueCount = tabOrder.missingTabsCount + tabOrder.outOfOrderPageCount
@@ -349,14 +440,15 @@ export function buildLocalStandardsReport(
   },
 ): LocalStandardsReport {
   const findings: LocalStandardsFinding[] = []
-  pushFinding(findings, missingLogicalStructureFinding(qpdf))
-  pushFinding(findings, documentLanguageFinding(qpdf))
+  pushFinding(findings, missingLogicalStructureFinding(qpdf, pdfjs, options?.structure))
+  pushFinding(findings, documentLanguageFinding(qpdf, pdfjs))
   pushFinding(findings, displayDocTitleFinding(qpdf, pdfjs))
   pushFinding(findings, metadataIdentificationFinding(qpdf))
   pushFinding(findings, bookmarkLanguageFinding(qpdf, pdfjs))
   pushFinding(findings, fontEmbeddingFinding(qpdf))
   pushFinding(findings, fontUnicodeFinding(qpdf))
   pushFinding(findings, cidSymbolFontFinding(qpdf))
+  pushFinding(findings, cidSetConsistencyFinding(qpdf))
   pushFinding(findings, pageTabsFinding(options?.tabOrder))
   pushFinding(findings, annotationAltContentsFinding(qpdf, pdfjs))
   pushFinding(findings, linkTaggingFinding(qpdf, pdfjs, options?.structure))

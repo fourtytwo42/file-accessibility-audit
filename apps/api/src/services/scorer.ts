@@ -277,6 +277,8 @@ function scorePdfUaComplianceFromLocal(report: LocalStandardsReport): CategoryRe
   const blockingCount = blockingFindings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
   const canJustifyCleanPass = report.status === 'clear' && report.knownGapKeys.length === 0
   const logicalStructureBlocking = blockingFindings.find(finding => finding.key === 'pdfua.logical_structure')
+  const cidsetBlocking = blockingFindings.find(finding => finding.key === 'pdfua.cidset_consistency')
+  const languageBlocking = blockingFindings.find(finding => finding.key === 'pdfua.document_language')
   const affectedCategoryCount = new Set(blockingFindings.flatMap(finding => finding.categoryIds)).size
   const explanation = 'PDF/UA Compliance reflects standards-level evidence gathered from local PDF analyzers when veraPDF is skipped or unavailable.'
   const helpLinks: HelpLink[] = [
@@ -309,6 +311,23 @@ function scorePdfUaComplianceFromLocal(report: LocalStandardsReport): CategoryRe
       findings: [
         `Local standards checks reported ${blockingCount} PDF/UA-related issue${blockingCount === 1 ? '' : 's'}.`,
         'The document is missing fundamental logical-structure evidence, so provisional no-vera scoring remains heavily capped.',
+      ],
+      explanation,
+      helpLinks,
+    }
+  }
+
+  if (logicalStructureBlocking && cidsetBlocking && (languageBlocking || report.knownGapKeys.length > 0 || affectedCategoryCount >= 3)) {
+    return {
+      id: 'pdf_ua_compliance',
+      label: 'PDF/UA Compliance',
+      weight: SCORING_WEIGHTS.pdf_ua_compliance,
+      score: 20,
+      grade: getGrade(20),
+      severity: getSeverity(20),
+      findings: [
+        `Local standards checks reported ${blockingCount} PDF/UA-related issue${blockingCount === 1 ? '' : 's'}.`,
+        'The document still shows combined logical-structure and CID-font conformance blockers, so provisional no-vera scoring remains heavily capped.',
       ],
       explanation,
       helpLinks,

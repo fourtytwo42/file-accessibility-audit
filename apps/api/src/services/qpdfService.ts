@@ -36,6 +36,8 @@ export interface QpdfResult {
   unembeddedFontCount?: number
   fontsMissingToUnicode?: number
   cidFontsMissingCidToGidMap?: number
+  cidSetRiskFontCount?: number
+  cidSetExplicitFontCount?: number
   legacyWidthRiskFontCount?: number
   linkAnnotationCount?: number
   linkAnnotationsMissingContents?: number
@@ -95,6 +97,8 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         unembeddedFontCount: 0,
         fontsMissingToUnicode: 0,
         cidFontsMissingCidToGidMap: 0,
+        cidSetRiskFontCount: 0,
+        cidSetExplicitFontCount: 0,
         legacyWidthRiskFontCount: 0,
         linkAnnotationCount: 0,
         linkAnnotationsMissingContents: 0,
@@ -133,6 +137,8 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       unembeddedFontCount: 0,
       fontsMissingToUnicode: 0,
       cidFontsMissingCidToGidMap: 0,
+      cidSetRiskFontCount: 0,
+      cidSetExplicitFontCount: 0,
       legacyWidthRiskFontCount: 0,
       linkAnnotationCount: 0,
       linkAnnotationsMissingContents: 0,
@@ -170,6 +176,8 @@ export function parseQpdfJson(json: any): QpdfResult {
     unembeddedFontCount: 0,
     fontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
+    cidSetRiskFontCount: 0,
+    cidSetExplicitFontCount: 0,
     legacyWidthRiskFontCount: 0,
     linkAnnotationCount: 0,
     linkAnnotationsMissingContents: 0,
@@ -317,6 +325,9 @@ export function parseQpdfJson(json: any): QpdfResult {
         if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
         if (!fontHasToUnicode(o, objects)) result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
         if (fontMissingCidToGidMap(o, objects)) result.cidFontsMissingCidToGidMap = (result.cidFontsMissingCidToGidMap ?? 0) + 1
+        const cidSetRisk = fontCidSetRisk(o, objects)
+        if (cidSetRisk.risk) result.cidSetRiskFontCount = (result.cidSetRiskFontCount ?? 0) + 1
+        if (cidSetRisk.explicit) result.cidSetExplicitFontCount = (result.cidSetExplicitFontCount ?? 0) + 1
         if (fontHasLegacyWidthRisk(o, objects)) result.legacyWidthRiskFontCount = (result.legacyWidthRiskFontCount ?? 0) + 1
       }
     }
@@ -468,6 +479,38 @@ function fontMissingCidToGidMap(fontObj: any, objects: any): boolean {
   const targetSubtype = target['/Subtype'] || subtype
   if (targetSubtype !== '/CIDFontType2') return false
   return !target['/CIDToGIDMap']
+}
+
+function fontCidSetRisk(fontObj: any, objects: any): { risk: boolean; explicit: boolean } {
+  if (fontObj['/Subtype'] === '/CIDFontType0' || fontObj['/Subtype'] === '/CIDFontType2') {
+    return { risk: false, explicit: false }
+  }
+  const descendants = fontObj['/DescendantFonts']
+  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  const descendant = descendantList.length > 0
+    ? (typeof descendantList[0] === 'string' ? resolveRef(descendantList[0], objects) : descendantList[0])
+    : null
+
+  const target = descendant && typeof descendant === 'object' ? descendant : fontObj
+  if (!target || typeof target !== 'object') return { risk: false, explicit: false }
+  const targetSubtype = target['/Subtype'] || fontObj['/Subtype']
+  if (!['/CIDFontType0', '/CIDFontType2'].includes(targetSubtype)) return { risk: false, explicit: false }
+
+  const descriptor = resolveFontDescriptor(fontObj, objects)
+  const explicit = !!descriptor?.['/CIDSet']
+  if (explicit) return { risk: true, explicit: true }
+
+  if (!fontHasEmbeddedProgram(fontObj, objects)) return { risk: false, explicit: false }
+
+  const baseFont = String(fontObj['/BaseFont'] || target['/BaseFont'] || '')
+  const looksSubsetted = /^\//.test(baseFont) && baseFont.includes('+')
+  const looksLegacyCidFont = /symbol|wingdings|zapfdingbats/i.test(baseFont)
+  const missingUnicode = !fontHasToUnicode(fontObj, objects)
+
+  return {
+    risk: looksSubsetted && (looksLegacyCidFont || missingUnicode),
+    explicit: false,
+  }
 }
 
 function hasCustomEncoding(fontObj: any, objects: any): boolean {

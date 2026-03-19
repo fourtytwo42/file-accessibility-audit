@@ -114,4 +114,58 @@ describe('analyzeWithQpdf', () => {
     expect(result.linkAnnotationsMissingContents).toBe(1)
     expect(result.legacyWidthRiskFontCount).toBe(1)
   })
+
+  it('tracks explicit and inferred CIDSet risk signals for CID fonts', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type0',
+            '/BaseFont': '/ABCDEE+SymbolMT',
+            '/DescendantFonts': ['obj:11 0 R'],
+          },
+        },
+        'obj:11 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/CIDFontType2',
+            '/FontDescriptor': 'obj:12 0 R',
+          },
+        },
+        'obj:12 0 R': {
+          value: {
+            '/Type': '/FontDescriptor',
+            '/FontFile2': 'obj:13 0 R',
+            '/CIDSet': 'obj:14 0 R',
+          },
+        },
+        'obj:20 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type0',
+            '/BaseFont': '/XYZABC+SymbolMT',
+            '/DescendantFonts': ['obj:21 0 R'],
+          },
+        },
+        'obj:21 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/CIDFontType2',
+            '/FontDescriptor': 'obj:22 0 R',
+          },
+        },
+        'obj:22 0 R': {
+          value: {
+            '/Type': '/FontDescriptor',
+            '/FontFile2': 'obj:23 0 R',
+          },
+        },
+      },
+    })
+
+    expect(result.cidSetRiskFontCount).toBe(2)
+    expect(result.cidSetExplicitFontCount).toBe(1)
+  })
 })

@@ -1121,6 +1121,65 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.overallScore).toBeLessThan(100)
   })
 
+  it('heavily caps local PDF/UA scoring when structure and CIDSet blockers coexist', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure and marked content',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
+            confidence: 0.76,
+            evidence: ['No structure-tree MCID traversal could be confirmed.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+          {
+            key: 'pdfua.cidset_consistency',
+            label: 'CIDSet consistency',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.68,
+            evidence: ['CID font descriptors expose CIDSet-risk signals.'],
+            source: 'qpdf',
+            inferred: true,
+            count: 2,
+          },
+          {
+            key: 'pdfua.document_language',
+            label: 'Document language tag',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.72,
+            evidence: ['Language metadata could not be confirmed across analyzers.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+        ],
+        knownGapKeys: ['pdfua.artifact_vs_real_content_partial'],
+      }),
+    )
+
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(20)
+  })
+
   it('reduces the PDF/UA category more heavily for substantial veraPDF failures', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({

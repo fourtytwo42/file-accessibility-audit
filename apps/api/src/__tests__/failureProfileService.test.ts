@@ -352,9 +352,13 @@ describe('failureProfileService', () => {
       ] as any,
     })
 
+    const context = makeContext({ analysis })
+    context.qpdf.hasLang = false
+    context.qpdf.lang = null
+
     const result = buildFailureProfileArtifacts({
       analysis,
-      context: makeContext({ analysis }),
+      context,
       actions: [],
       rejectedActions: [],
     })
@@ -430,6 +434,75 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'normalize_annotation_tab_order')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'set_link_annotation_contents')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_link_structure')).toBe(true)
+  })
+
+  it('maps local CIDSet, language, and logical-structure findings into planner opportunities', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.cidset_consistency',
+            label: 'CIDSet consistency',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.7,
+            evidence: ['CID font descriptors expose CIDSet-risk signals.'],
+            source: 'qpdf',
+            inferred: true,
+            count: 2,
+          },
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure and marked content',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
+            confidence: 0.76,
+            evidence: ['No structure-tree MCID traversal could be confirmed.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+          {
+            key: 'pdfua.document_language',
+            label: 'Document language tag',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.72,
+            evidence: ['Language metadata could not be confirmed across analyzers.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+        ],
+        knownGapKeys: ['pdfua.artifact_vs_real_content_partial'],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.cidset_consistency')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_cidset_consistency')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_structure_conformance')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_marked_content_refs')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'artifact_nonsemantic_page_elements')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_document_language', 'normalize_document_metadata', 'set_pdfua_identification'].includes(opportunity.toolName))).toBe(true)
   })
 
   it('builds candidate opportunities with auto-runnable and blocked statuses', () => {

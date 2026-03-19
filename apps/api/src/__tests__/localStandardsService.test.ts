@@ -163,4 +163,60 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.count).toBe(4)
     expect(finding?.inferred).toBe(true)
   })
+
+  it('emits CIDSet consistency findings for explicit or inferred CID-font risk', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({ cidSetRiskFontCount: 2, cidSetExplicitFontCount: 1 }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.cidset_consistency')
+    expect(finding?.count).toBe(2)
+    expect(finding?.categoryIds).toContain('text_extractability')
+    expect(finding?.inferred).toBe(true)
+  })
+
+  it('emits inferred logical-structure findings when tags are too weak to prove content coverage', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        structTreeDepth: 1,
+        contentOrder: [],
+      }),
+      makePdfjs({ textLength: 400, hasText: true }),
+      { structure: makeStructure({ structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 }] as any }) },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeDefined()
+    expect(finding?.blocking).toBe(true)
+    expect(finding?.inferred).toBe(true)
+  })
+
+  it('emits document-language findings when qpdf and pdfjs language signals are inconsistent', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({ hasLang: true, lang: 'en-US' }),
+      makePdfjs({ lang: 'english_us' }),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.document_language')
+    expect(finding).toBeDefined()
+    expect(finding?.inferred).toBe(true)
+  })
+
+  it('emits document-language findings when language tags are non-canonical', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({ hasLang: true, lang: 'EN-US' }),
+      makePdfjs({ lang: 'EN-US' }),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.document_language')
+    expect(finding).toBeDefined()
+    expect(finding?.inferred).toBe(true)
+  })
 })
