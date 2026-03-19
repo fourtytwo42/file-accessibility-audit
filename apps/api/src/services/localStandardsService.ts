@@ -42,7 +42,7 @@ function looksLikeBrokenBookmarkTitle(title: string): boolean {
 function missingLogicalStructureFinding(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
-  structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes' | 'acrobatAltRiskNodes' | 'readingOrderNodes'> | null,
 ): LocalStandardsFinding | null {
   const evidence: string[] = []
   let count = 0
@@ -66,6 +66,8 @@ function missingLogicalStructureFinding(
   const sparseStructureSnapshot = qpdf.hasStructTree && structureNodeCount > 0 && structureNodeCount <= 1 && pdfjs.textLength > 0
   const figureCount = structure?.figures?.length ?? 0
   const imageStructNodeCount = structure?.imageStructNodes?.length ?? 0
+  const acrobatAltRiskCount = structure?.acrobatAltRiskNodes?.length ?? 0
+  const readingOrderNodeCount = structure?.readingOrderNodes?.length ?? 0
   const semanticNodeCoverageAbsent = qpdf.hasStructTree
     && pdfjs.textLength > 1000
     && qpdf.outlineCount === 0
@@ -76,8 +78,12 @@ function missingLogicalStructureFinding(
     && qpdf.images.length > 0
     && figureCount > 0
     && imageStructNodeCount === 0
+  const artifactMixingProxy = qpdf.hasStructTree
+    && acrobatAltRiskCount >= 5
+    && (qpdf.images.length > 0 || figureCount > 0)
+    && (readingOrderNodeCount === 0 || acrobatAltRiskCount >= Math.max(6, imageStructNodeCount + 3))
 
-  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent || semanticFigureCoverageAbsent)) {
+  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent || semanticFigureCoverageAbsent || artifactMixingProxy)) {
     inferred = true
     if (weakContentEvidence) {
       count += 1
@@ -99,6 +105,10 @@ function missingLogicalStructureFinding(
       count += Math.max(1, qpdf.images.length)
       evidence.push(`Detected ${figureCount} figure candidate(s) and ${qpdf.images.length} PDF image(s), but no image structure nodes were recovered from the structure snapshot.`)
     }
+    if (artifactMixingProxy) {
+      count += Math.max(1, Math.min(acrobatAltRiskCount, 10))
+      evidence.push(`Recovered ${acrobatAltRiskCount} artifact-mixing risk node(s) from the structure snapshot, which is a strong local proxy that tagged content and artifact ownership still conflict.`)
+    }
   }
 
   if (!count) return null
@@ -113,6 +123,24 @@ function missingLogicalStructureFinding(
     source: inferred ? 'composite' : 'qpdf',
     inferred,
     count,
+  }
+}
+
+function noteTagIdFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
+  const missingCount = qpdf.noteTagsMissingId ?? 0
+  if (missingCount <= 0) return null
+  const noteCount = qpdf.noteTagCount ?? missingCount
+  return {
+    key: 'pdfua.note_tag_id',
+    label: 'Note tag identifiers',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['reading_order', 'pdf_ua_compliance'],
+    confidence: 0.96,
+    evidence: [`Detected ${missingCount} /Note or role-mapped note structure element(s) without an /ID entry out of ${noteCount} inspected note tag(s).`],
+    source: 'qpdf',
+    inferred: false,
+    count: missingCount,
   }
 }
 
@@ -446,7 +474,7 @@ export function buildLocalStandardsReport(
   pdfjs: PdfjsResult,
   options?: {
     tabOrder?: TabOrderResult | null
-    structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes'> | null
+    structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes' | 'acrobatAltRiskNodes' | 'readingOrderNodes'> | null
   },
 ): LocalStandardsReport {
   const findings: LocalStandardsFinding[] = []
@@ -462,6 +490,7 @@ export function buildLocalStandardsReport(
   pushFinding(findings, pageTabsFinding(options?.tabOrder))
   pushFinding(findings, annotationAltContentsFinding(qpdf, pdfjs))
   pushFinding(findings, linkTaggingFinding(qpdf, pdfjs, options?.structure))
+  pushFinding(findings, noteTagIdFinding(qpdf))
   pushFinding(findings, fontWidthsFinding(qpdf))
   pushFinding(findings, partialArtifactFinding(qpdf, pdfjs))
 

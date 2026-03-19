@@ -39,6 +39,8 @@ export interface QpdfResult {
   cidSetRiskFontCount?: number
   cidSetExplicitFontCount?: number
   legacyWidthRiskFontCount?: number
+  noteTagCount?: number
+  noteTagsMissingId?: number
   linkAnnotationCount?: number
   linkAnnotationsMissingContents?: number
   images: Array<{ ref: string; hasAlt: boolean; altText?: string }>
@@ -100,6 +102,8 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         cidSetRiskFontCount: 0,
         cidSetExplicitFontCount: 0,
         legacyWidthRiskFontCount: 0,
+        noteTagCount: 0,
+        noteTagsMissingId: 0,
         linkAnnotationCount: 0,
         linkAnnotationsMissingContents: 0,
         images: [],
@@ -140,6 +144,8 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       cidSetRiskFontCount: 0,
       cidSetExplicitFontCount: 0,
       legacyWidthRiskFontCount: 0,
+      noteTagCount: 0,
+      noteTagsMissingId: 0,
       linkAnnotationCount: 0,
       linkAnnotationsMissingContents: 0,
       images: [],
@@ -179,6 +185,8 @@ export function parseQpdfJson(json: any): QpdfResult {
     cidSetRiskFontCount: 0,
     cidSetExplicitFontCount: 0,
     legacyWidthRiskFontCount: 0,
+    noteTagCount: 0,
+    noteTagsMissingId: 0,
     linkAnnotationCount: 0,
     linkAnnotationsMissingContents: 0,
     images: [],
@@ -199,6 +207,18 @@ export function parseQpdfJson(json: any): QpdfResult {
     for (const [ref, raw] of Object.entries(rawObjects)) {
       if (!raw || typeof raw !== 'object') continue
       objects[ref] = (raw as any).value ?? raw
+    }
+
+    const roleMapNoteAliases = new Set<string>(['/Note'])
+    for (const obj of Object.values(objects)) {
+      if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/StructTreeRoot') continue
+      const resolvedRoleMap = resolveObject(obj['/RoleMap'], objects)
+      if (!resolvedRoleMap || typeof resolvedRoleMap !== 'object') continue
+      for (const [tag, mapped] of Object.entries(resolvedRoleMap)) {
+        if (mapped === '/Note' && typeof tag === 'string') {
+          roleMapNoteAliases.add(tag)
+        }
+      }
     }
 
     // Walk all objects looking for key structures
@@ -265,6 +285,16 @@ export function parseQpdfJson(json: any): QpdfResult {
       // Structure elements (headings, tables, figures with alt)
       if (o['/S']) {
         const tag = o['/S']
+        if (typeof tag === 'string' && roleMapNoteAliases.has(tag)) {
+          result.noteTagCount = (result.noteTagCount ?? 0) + 1
+          const rawId = o['/ID']
+          const hasId = typeof rawId === 'string'
+            ? rawId.replace(/^u:/, '').trim().length > 0
+            : !!rawId
+          if (!hasId) {
+            result.noteTagsMissingId = (result.noteTagsMissingId ?? 0) + 1
+          }
+        }
         // Headings
         if (tag === '/H' || tag === '/H1' || tag === '/H2' || tag === '/H3' ||
             tag === '/H4' || tag === '/H5' || tag === '/H6') {
@@ -325,9 +355,6 @@ export function parseQpdfJson(json: any): QpdfResult {
         if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
         if (!fontHasToUnicode(o, objects)) result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
         if (fontMissingCidToGidMap(o, objects)) result.cidFontsMissingCidToGidMap = (result.cidFontsMissingCidToGidMap ?? 0) + 1
-        const cidSetRisk = fontCidSetRisk(o, objects)
-        if (cidSetRisk.risk) result.cidSetRiskFontCount = (result.cidSetRiskFontCount ?? 0) + 1
-        if (cidSetRisk.explicit) result.cidSetExplicitFontCount = (result.cidSetExplicitFontCount ?? 0) + 1
         if (fontHasLegacyWidthRisk(o, objects)) result.legacyWidthRiskFontCount = (result.legacyWidthRiskFontCount ?? 0) + 1
       }
     }
@@ -387,6 +414,10 @@ export function parseQpdfJson(json: any): QpdfResult {
       }
     }
 
+    const cidSetSignals = collectCidSetSignals(objects)
+    result.cidSetRiskFontCount = cidSetSignals.riskCount
+    result.cidSetExplicitFontCount = cidSetSignals.explicitCount
+
   } catch (err) {
     console.error('QPDF JSON parse error:', err)
     result.error = 'Failed to parse QPDF structure data'
@@ -399,6 +430,12 @@ export function parseQpdfJson(json: any): QpdfResult {
 function resolveRef(ref: string, objects: any): any {
   if (!ref || typeof ref !== 'string') return null
   return objects[ref] ?? objects[`obj:${ref}`] ?? null
+}
+
+function resolveObject(value: any, objects: any): any {
+  if (!value) return null
+  if (typeof value === 'string') return resolveRef(value, objects)
+  return value
 }
 
 function structElemHasAssociatedContent(node: any, objects: any, visited = new Set<any>()): boolean {
@@ -482,20 +519,8 @@ function fontMissingCidToGidMap(fontObj: any, objects: any): boolean {
 }
 
 function fontCidSetRisk(fontObj: any, objects: any): { risk: boolean; explicit: boolean } {
-  if (fontObj['/Subtype'] === '/CIDFontType0' || fontObj['/Subtype'] === '/CIDFontType2') {
-    return { risk: false, explicit: false }
-  }
-  const descendants = fontObj['/DescendantFonts']
-  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
-  const descendant = descendantList.length > 0
-    ? (typeof descendantList[0] === 'string' ? resolveRef(descendantList[0], objects) : descendantList[0])
-    : null
-
-  const target = descendant && typeof descendant === 'object' ? descendant : fontObj
-  if (!target || typeof target !== 'object') return { risk: false, explicit: false }
-  const targetSubtype = target['/Subtype'] || fontObj['/Subtype']
-  if (!['/CIDFontType0', '/CIDFontType2'].includes(targetSubtype)) return { risk: false, explicit: false }
-
+  const target = resolveCidFontTarget(fontObj, objects)
+  if (!target) return { risk: false, explicit: false }
   const descriptor = resolveFontDescriptor(fontObj, objects)
   const explicit = !!descriptor?.['/CIDSet']
   if (explicit) return { risk: true, explicit: true }
@@ -510,6 +535,65 @@ function fontCidSetRisk(fontObj: any, objects: any): { risk: boolean; explicit: 
   return {
     risk: looksSubsetted && (looksLegacyCidFont || missingUnicode),
     explicit: false,
+  }
+}
+
+function resolveCidFontTarget(fontObj: any, objects: any): any | null {
+  if (!fontObj || typeof fontObj !== 'object') return null
+  if (fontObj['/Subtype'] === '/CIDFontType0' || fontObj['/Subtype'] === '/CIDFontType2') {
+    return fontObj
+  }
+  const descendants = fontObj['/DescendantFonts']
+  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  for (const descendant of descendantList) {
+    const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
+    if (!resolved || typeof resolved !== 'object') continue
+    if (resolved['/Subtype'] === '/CIDFontType0' || resolved['/Subtype'] === '/CIDFontType2') {
+      return resolved
+    }
+  }
+  return null
+}
+
+function collectCidSetSignals(objects: Record<string, any>): { riskCount: number; explicitCount: number } {
+  let explicitCount = 0
+  let inferredCount = 0
+  const seenExplicit = new Set<string>()
+  const seenRisk = new Set<string>()
+
+  for (const [ref, obj] of Object.entries(objects)) {
+    if (!isFontObject(obj)) continue
+    const target = resolveCidFontTarget(obj, objects)
+    if (!target) continue
+
+    const descriptor = resolveFontDescriptor(obj, objects)
+    if (descriptor?.['/CIDSet']) {
+      const key = typeof target['/FontDescriptor'] === 'string' ? target['/FontDescriptor'] : ref
+      if (!seenExplicit.has(key)) {
+        seenExplicit.add(key)
+        explicitCount += 1
+      }
+      continue
+    }
+
+    const baseFont = String(obj['/BaseFont'] || target['/BaseFont'] || '')
+    const looksSubsetted = /^\//.test(baseFont) && baseFont.includes('+')
+    const looksLegacyCidFont = /symbol|wingdings|zapfdingbats/i.test(baseFont)
+    const missingUnicode = !fontHasToUnicode(obj, objects)
+    const missingCidToGidMap = fontMissingCidToGidMap(obj, objects)
+    if (!fontHasEmbeddedProgram(obj, objects)) continue
+    if (looksSubsetted && (looksLegacyCidFont || missingUnicode || missingCidToGidMap)) {
+      const key = ref
+      if (!seenRisk.has(key)) {
+        seenRisk.add(key)
+        inferredCount += 1
+      }
+    }
+  }
+
+  return {
+    explicitCount,
+    riskCount: explicitCount + inferredCount,
   }
 }
 

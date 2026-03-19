@@ -1180,6 +1180,78 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(findCategory(result, 'pdf_ua_compliance').score).toBe(20)
   })
 
+  it('caps the overall no-vera score when severe structure and CIDSet blockers still leave artifact gaps', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure and marked content',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
+            confidence: 0.76,
+            evidence: ['Artifact-mixing risk nodes indicate broken content ownership.'],
+            source: 'composite',
+            inferred: true,
+            count: 10,
+          },
+          {
+            key: 'pdfua.cidset_consistency',
+            label: 'CIDSet consistency',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Embedded CID font descriptors expose explicit CIDSet entries.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 2,
+          },
+          {
+            key: 'pdfua.font_embedding',
+            label: 'Font embedding',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.93,
+            evidence: ['Detected 8 font objects without embedded programs.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 8,
+          },
+          {
+            key: 'pdfua.document_language',
+            label: 'Document language tag',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.72,
+            evidence: ['Language metadata could not be confirmed across analyzers.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+        ],
+        knownGapKeys: ['pdfua.artifact_vs_real_content_partial'],
+      }),
+    )
+
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(20)
+    expect(result.overallScore).toBeLessThanOrEqual(52)
+  })
+
   it('reduces the PDF/UA category more heavily for substantial veraPDF failures', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({

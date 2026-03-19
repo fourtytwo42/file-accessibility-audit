@@ -168,4 +168,59 @@ describe('analyzeWithQpdf', () => {
     expect(result.cidSetRiskFontCount).toBe(2)
     expect(result.cidSetExplicitFontCount).toBe(1)
   })
+
+  it('counts role-mapped note tags that are missing ID entries', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/StructTreeRoot': 'obj:2 0 R',
+            '/MarkInfo': { '/Marked': true },
+          },
+        },
+        'obj:2 0 R': {
+          value: {
+            '/Type': '/StructTreeRoot',
+            '/RoleMap': {
+              '/Footnote': '/Note',
+              '/Endnote': '/Note',
+            },
+            '/K': ['obj:10 0 R', 'obj:11 0 R'],
+          },
+        },
+        'obj:10 0 R': { value: { '/S': '/Footnote' } },
+        'obj:11 0 R': { value: { '/S': '/Endnote', '/ID': 'u:note-2' } },
+      },
+    })
+
+    expect(result.noteTagCount).toBe(2)
+    expect(result.noteTagsMissingId).toBe(1)
+  })
+
+  it('detects explicit CIDSet descriptors on direct CID font objects', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/CIDFontType2',
+            '/BaseFont': '/ABCDEE+SymbolMT',
+            '/FontDescriptor': 'obj:11 0 R',
+          },
+        },
+        'obj:11 0 R': {
+          value: {
+            '/Type': '/FontDescriptor',
+            '/FontFile2': 'obj:12 0 R',
+            '/CIDSet': 'obj:13 0 R',
+          },
+        },
+      },
+    })
+
+    expect(result.cidSetRiskFontCount).toBe(1)
+    expect(result.cidSetExplicitFontCount).toBe(1)
+  })
 })

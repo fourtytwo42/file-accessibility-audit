@@ -26,7 +26,11 @@ function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
     unembeddedFontCount: 0,
     fontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
+    cidSetRiskFontCount: 0,
+    cidSetExplicitFontCount: 0,
     legacyWidthRiskFontCount: 0,
+    noteTagCount: 0,
+    noteTagsMissingId: 0,
     linkAnnotationCount: 0,
     linkAnnotationsMissingContents: 0,
     images: [],
@@ -177,6 +181,19 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.inferred).toBe(true)
   })
 
+  it('emits note-tag ID findings when note structure elements are missing /ID', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({ noteTagCount: 3, noteTagsMissingId: 2 }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.note_tag_id')
+    expect(finding?.count).toBe(2)
+    expect(finding?.inferred).toBe(false)
+    expect(finding?.categoryIds).toContain('reading_order')
+  })
+
   it('emits inferred logical-structure findings when tags are too weak to prove content coverage', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({
@@ -234,6 +251,33 @@ describe('buildLocalStandardsReport', () => {
           structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 }] as any,
           figures: [{ ref: 'obj:3 0 R', pageNumber: 1, hasAlt: false, altText: null }] as any,
           imageStructNodes: [],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeDefined()
+    expect(finding?.inferred).toBe(true)
+    expect(finding?.blocking).toBe(true)
+  })
+
+  it('emits inferred logical-structure findings for artifact-mixing risk in tagged image-heavy files', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        images: [{ ref: 'obj:2 0 R', hasAlt: false }],
+        contentOrder: [0, 1, 2],
+      }),
+      makePdfjs({ textLength: 4000, hasText: true }),
+      {
+        structure: makeStructure({
+          structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 }] as any,
+          figures: [{ ref: 'obj:3 0 R', pageNumber: 1, hasAlt: false, altText: null }] as any,
+          imageStructNodes: [{ ref: 'obj:4 0 R', tag: '/Figure', hasAlt: false }] as any,
+          acrobatAltRiskNodes: new Array(6).fill(null).map((_, index) => ({ ref: `obj:${index + 10} 0 R`, tag: '/P' })) as any,
+          readingOrderNodes: [],
         }),
       },
     )

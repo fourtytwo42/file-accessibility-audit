@@ -436,7 +436,7 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_link_structure')).toBe(true)
   })
 
-  it('maps local CIDSet, language, and logical-structure findings into planner opportunities', () => {
+  it('maps local CIDSet, note-tag, language, and logical-structure findings into planner opportunities', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({
       verapdf: {
@@ -485,6 +485,18 @@ describe('failureProfileService', () => {
             inferred: true,
             count: 1,
           },
+          {
+            key: 'pdfua.note_tag_id',
+            label: 'Note tag identifiers',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.96,
+            evidence: ['Detected Note structure elements without ID entries.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 2,
+          },
         ],
         knownGapKeys: ['pdfua.artifact_vs_real_content_partial'],
       },
@@ -499,6 +511,7 @@ describe('failureProfileService', () => {
 
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.cidset_consistency')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_cidset_consistency')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_note_tag_ids')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_structure_conformance')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_marked_content_refs')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'artifact_nonsemantic_page_elements')).toBe(true)

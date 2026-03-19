@@ -483,6 +483,19 @@ export function scoreDocument(
     computedScore = 100
   }
 
+  const blockingLocalCount = localStandards.findings
+    .filter(finding => finding.blocking)
+    .reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
+  const severeLocalStructureCap = useLocalStandardsAsPrimary
+    && (pdfUaCategory.score ?? 100) <= 20
+    && blockingLocalCount >= 20
+    && localStandards.knownGapKeys.includes('pdfua.artifact_vs_real_content_partial')
+    && localStandards.findings.some(finding => finding.key === 'pdfua.logical_structure')
+    && localStandards.findings.some(finding => finding.key === 'pdfua.cidset_consistency')
+  if (severeLocalStructureCap) {
+    computedScore = Math.min(computedScore, 52)
+  }
+
   const scoreGateApplied = !standardsClean && computedScore === 100
   const overallScore = scoreGateApplied ? 99 : computedScore
   let grade = getGrade(overallScore)
