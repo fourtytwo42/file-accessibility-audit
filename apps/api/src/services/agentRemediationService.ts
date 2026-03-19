@@ -26,6 +26,7 @@ import { buildFailureProfileArtifacts } from './failureProfileService.js'
 import { heuristicFigureAltText, planRemediationActions, TOOL_STAGE_ORDER } from './remediationPlanService.js'
 import { generateSemanticRepairBatches, hasSemanticRepairConfig, type SemanticBatchResult } from './semanticEnrichmentService.js'
 import { isOcrAvailable, ocrPdfToSearchablePdf } from './ocrService.js'
+import { runPdfStructureBackendBatch } from './pdfStructureBackend.js'
 
 function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   const summary = result.verapdf
@@ -338,6 +339,42 @@ function inspectModeForResult(result: AnalysisResult): RemediationInspectMode {
     : 'light'
 }
 
+function finalCleanupCategoryTargets(tool: string): string[] {
+  switch (tool) {
+    case 'normalize_heading_hierarchy':
+      return ['heading_structure']
+    case 'normalize_nested_figure_containers':
+      return ['alt_text']
+    case 'repair_native_link_structure':
+      return ['link_quality', 'reading_order']
+    case 'normalize_annotation_tab_order':
+    case 'set_tabs_all_annotated_pages':
+      return ['reading_order']
+    default:
+      return []
+  }
+}
+
+function finalCleanupDetails(tool: string, appliedMutations: Array<{ details: string }>, warnings: string[]): string {
+  const mutationDetails = appliedMutations.map(mutation => mutation.details).filter(Boolean)
+  if (mutationDetails.length) return mutationDetails.join(' ')
+  if (warnings.length) return warnings[0] || `Final cleanup ${tool} completed with warnings.`
+  switch (tool) {
+    case 'normalize_heading_hierarchy':
+      return 'Normalized heading hierarchy during final cleanup.'
+    case 'normalize_nested_figure_containers':
+      return 'Normalized nested figure containers during final cleanup.'
+    case 'repair_native_link_structure':
+      return 'Repaired native link structure during final cleanup.'
+    case 'normalize_annotation_tab_order':
+      return 'Normalized annotation tab order during final cleanup.'
+    case 'set_tabs_all_annotated_pages':
+      return 'Set /Tabs /S on annotated pages during final cleanup.'
+    default:
+      return `Applied final cleanup operation ${tool}.`
+  }
+}
+
 function aiFirstFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
   if (!context || !hasSemanticRepairConfig()) return []
   return context.figureCandidates.filter(candidate =>
@@ -423,8 +460,11 @@ async function runHeuristicFigureFallbackStage(input: {
     workingBuffer = outcome.buffer
     actions.push(outcome.action)
     if (outcome.action.changedDocumentBytes) {
-      currentResult = await analyzePDF(workingBuffer, currentResult.filename || 'document.pdf', { skipAdobe: true })
-      context = await inspectPdfForRemediation(workingBuffer, currentResult)
+      currentResult = await analyzePDF(workingBuffer, currentResult.filename || 'document.pdf', {
+        skipAdobe: true,
+        skipVeraPdf: true,
+      })
+      context = await inspectPdfForRemediation(workingBuffer, currentResult, { inspectMode: 'light' })
     }
   }
 
@@ -1141,14 +1181,18 @@ export async function remediatePdfWithAgent(
       throw error
     }
     options?.onProgress?.({ stage: 'Post-bootstrap alt-text inspection', percent: 73 })
-    stageContext = await inspectPdfForRemediation(workingBuffer, currentResult, {
-      inspectMode: 'alt_text_deep',
-      cache: inspectionCache,
-    })
+    stageContext = inspectModeForResult(currentResult) === 'alt_text_deep' && latestContext
+      ? latestContext
+      : await inspectPdfForRemediation(workingBuffer, currentResult, {
+        inspectMode: 'alt_text_deep',
+        cache: inspectionCache,
+      })
     latestContext = stageContext
     inspectionCache.qpdf = stageContext.qpdf
     inspectionCache.pdfjs = stageContext.pdfjs
     inspectionCache.pages = stageContext.pages
+    currentTitle = stageContext.pdfjs.title || currentTitle
+    currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
 
     const postBootstrapPlan = await planRemediationActions({
       filename,
@@ -1391,60 +1435,97 @@ export async function remediatePdfWithAgent(
   let finalCleanupChangedDocument = false
   const finalCleanupActions: RemediationActionRecord[] = []
   let cleanupContext = finalCleanupContext
-  for (const call of finalCleanupCalls) {
-    const prevResult = currentResult
-    const prevBuffer = workingBuffer
-    const outcome = await executeRemediationTool({ buffer: workingBuffer, context: cleanupContext, call })
-    let adoptedAction = outcome.action
-    let adoptedBuffer = outcome.buffer
-
-    if (nativeTaggedSafeMode && outcome.action.changedDocumentBytes) {
-      const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal, skipAdobe: true })
-      const overallScoreRegression = candidateResult.overallScore < prevResult.overallScore
-        ? `overall score regressed from ${prevResult.overallScore} to ${candidateResult.overallScore}`
-        : null
-      const regressionReason =
-        overallScoreRegression
-        || hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
-        || shouldRejectNativeVisibleRewrite(prevResult, candidateResult, outcome.action)
-      if (regressionReason) {
-        adoptedAction = {
-          ...outcome.action,
-          details: `${outcome.action.details} Rejected because it ${regressionReason}.`,
-          outcome: 'rejected',
-          autoApplied: false,
-          changedDocumentBytes: false,
-        }
-        rejectedActions.push(adoptedAction)
-        adoptedBuffer = prevBuffer
-      } else {
-        if (outcome.action.categoryTargets?.length) {
-          adoptedAction.scoreDelta = outcome.action.categoryTargets.map(categoryId => ({
-            categoryId,
-            before: scoreForCategory(prevResult, categoryId),
-            after: scoreForCategory(candidateResult, categoryId),
-          }))
-          if (!adoptedAction.scoreDelta.some(d => (d.after ?? -1) > (d.before ?? -1)) && adoptedAction.outcome === 'applied') {
-            adoptedAction.outcome = 'no_effect'
-          }
-        }
-        currentResult = candidateResult
-        finalCleanupChangedDocument = true
-        cleanupContext = await inspectPdfForRemediation(adoptedBuffer, currentResult, {
-          inspectMode: inspectModeForResult(currentResult),
-          cache: inspectionCache,
-        })
-        latestContext = cleanupContext
+  if (!nativeTaggedSafeMode) {
+    const batchResult = await runPdfStructureBackendBatch({
+      buffer: workingBuffer,
+      mutations: finalCleanupCalls.map(call => ({
+        operation: call.tool_name,
+      })),
+      inspectMode: inspectModeForResult(currentResult),
+    })
+    const operationResults = batchResult.operationResults || []
+    for (let index = 0; index < finalCleanupCalls.length; index += 1) {
+      const call = finalCleanupCalls[index]
+      const operationResult = operationResults[index]
+      const status = operationResult?.status || 'failed'
+      const changedDocumentBytes = !!operationResult?.changedDocumentBytes
+      const action: RemediationActionRecord = {
+        tool: call.tool_name,
+        target: 'document',
+        details: finalCleanupDetails(call.tool_name, operationResult?.appliedMutations || [], operationResult?.warnings || []),
+        confidence: call.confidence,
+        autoApplied: status !== 'unsupported' && status !== 'failed',
+        changedVisibleContent: false,
+        changedDocumentBytes,
+        categoryTargets: finalCleanupCategoryTargets(call.tool_name),
+        outcome: status === 'applied'
+          ? 'applied'
+          : status === 'no_effect'
+            ? 'no_effect'
+            : 'deferred',
       }
-    } else if (outcome.action.changedDocumentBytes && outcome.action.outcome !== 'rejected') {
+      finalCleanupActions.push(action)
+      actions.push(action)
+      allExecutedActions.push(action)
+    }
+    if (batchResult.changedDocumentBytes && batchResult.outputBuffer) {
+      workingBuffer = batchResult.outputBuffer
       finalCleanupChangedDocument = true
     }
+  } else {
+    for (const call of finalCleanupCalls) {
+      const prevResult = currentResult
+      const prevBuffer = workingBuffer
+      const outcome = await executeRemediationTool({ buffer: workingBuffer, context: cleanupContext, call })
+      let adoptedAction = outcome.action
+      let adoptedBuffer = outcome.buffer
 
-    workingBuffer = adoptedBuffer
-    finalCleanupActions.push(adoptedAction)
-    actions.push(adoptedAction)
-    allExecutedActions.push(adoptedAction)
-    manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+      if (outcome.action.changedDocumentBytes) {
+        const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal, skipAdobe: true })
+        const overallScoreRegression = candidateResult.overallScore < prevResult.overallScore
+          ? `overall score regressed from ${prevResult.overallScore} to ${candidateResult.overallScore}`
+          : null
+        const regressionReason =
+          overallScoreRegression
+          || hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
+          || shouldRejectNativeVisibleRewrite(prevResult, candidateResult, outcome.action)
+        if (regressionReason) {
+          adoptedAction = {
+            ...outcome.action,
+            details: `${outcome.action.details} Rejected because it ${regressionReason}.`,
+            outcome: 'rejected',
+            autoApplied: false,
+            changedDocumentBytes: false,
+          }
+          rejectedActions.push(adoptedAction)
+          adoptedBuffer = prevBuffer
+        } else {
+          if (outcome.action.categoryTargets?.length) {
+            adoptedAction.scoreDelta = outcome.action.categoryTargets.map(categoryId => ({
+              categoryId,
+              before: scoreForCategory(prevResult, categoryId),
+              after: scoreForCategory(candidateResult, categoryId),
+            }))
+            if (!adoptedAction.scoreDelta.some(d => (d.after ?? -1) > (d.before ?? -1)) && adoptedAction.outcome === 'applied') {
+              adoptedAction.outcome = 'no_effect'
+            }
+          }
+          currentResult = candidateResult
+          finalCleanupChangedDocument = true
+          cleanupContext = await inspectPdfForRemediation(adoptedBuffer, currentResult, {
+            inspectMode: inspectModeForResult(currentResult),
+            cache: inspectionCache,
+          })
+          latestContext = cleanupContext
+        }
+      }
+
+      workingBuffer = adoptedBuffer
+      finalCleanupActions.push(adoptedAction)
+      actions.push(adoptedAction)
+      allExecutedActions.push(adoptedAction)
+      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+    }
   }
 
   if (!nativeTaggedSafeMode && finalCleanupChangedDocument) {

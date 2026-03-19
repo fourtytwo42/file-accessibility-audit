@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { beforeAll, describe, it, expect } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { analyzePDF } from '../services/pdfAnalyzer.js'
@@ -15,6 +15,8 @@ import type { AnalysisResult } from '../services/pdfAnalyzer.js'
 // ---------------------------------------------------------------------------
 
 const fixturesDir = path.join(import.meta.dirname, 'fixtures')
+let accessibleResult: AnalysisResult
+let inaccessibleResult: AnalysisResult
 
 function loadFixture(filename: string): Buffer {
   return fs.readFileSync(path.join(fixturesDir, filename))
@@ -25,6 +27,13 @@ function findCategory(result: AnalysisResult, id: string) {
   if (!cat) throw new Error(`Category "${id}" not found`)
   return cat
 }
+
+beforeAll(async () => {
+  ;[accessibleResult, inaccessibleResult] = await Promise.all([
+    analyzePDF(loadFixture('accessible.pdf'), 'accessible.pdf'),
+    analyzePDF(loadFixture('inaccessible.pdf'), 'inaccessible.pdf'),
+  ])
+}, 120_000)
 
 // ---------------------------------------------------------------------------
 // Accessible PDF — syllabus_accessible.pdf
@@ -38,8 +47,7 @@ describe('integration: accessible PDF', () => {
   let result: AnalysisResult
 
   it('analyzes without errors', async () => {
-    const buffer = loadFixture('accessible.pdf')
-    result = await analyzePDF(buffer, 'accessible.pdf')
+    result = accessibleResult
     expect(result).toBeDefined()
     expect(result.warnings).toHaveLength(0)
   }, 30_000)
@@ -114,8 +122,7 @@ describe('integration: inaccessible PDF', () => {
   let result: AnalysisResult
 
   it('analyzes without errors', async () => {
-    const buffer = loadFixture('inaccessible.pdf')
-    result = await analyzePDF(buffer, 'inaccessible.pdf')
+    result = inaccessibleResult
     expect(result).toBeDefined()
   }, 30_000)
 
@@ -174,10 +181,8 @@ describe('integration: comparative scoring', () => {
   let inaccessible: AnalysisResult
 
   it('loads both PDFs', async () => {
-    [accessible, inaccessible] = await Promise.all([
-      analyzePDF(loadFixture('accessible.pdf'), 'accessible.pdf'),
-      analyzePDF(loadFixture('inaccessible.pdf'), 'inaccessible.pdf'),
-    ])
+    accessible = accessibleResult
+    inaccessible = inaccessibleResult
   }, 30_000)
 
   it('accessible PDF scores significantly higher', () => {

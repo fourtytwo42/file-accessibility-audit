@@ -10,6 +10,7 @@ const planRemediationActions = vi.fn()
 const generateSemanticRepairBatches = vi.fn()
 const isOcrAvailable = vi.fn()
 const ocrPdfToSearchablePdf = vi.fn()
+const runPdfStructureBackendBatch = vi.fn()
 
 function makeVeraPdfResult(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
   return {
@@ -74,6 +75,10 @@ vi.mock('../services/ocrService.js', () => ({
   ocrPdfToSearchablePdf,
 }))
 
+vi.mock('../services/pdfStructureBackend.js', () => ({
+  runPdfStructureBackendBatch,
+}))
+
 describe('agentRemediationService', { timeout: 15_000 }, () => {
   beforeEach(() => {
     vi.resetAllMocks()
@@ -93,6 +98,21 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         outcome: 'no_effect',
       },
       manualReviewFlags: [],
+    })
+    runPdfStructureBackendBatch.mockResolvedValue({
+      status: 'no_effect',
+      changedDocumentBytes: false,
+      appliedMutations: [],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      operationResults: [],
     })
   })
 
@@ -423,82 +443,58 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     inspectPdfForRemediation.mockResolvedValue(context)
     planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
 
-    executeRemediationTool
-      .mockResolvedValueOnce({
-        buffer: Buffer.from('pdf-cleanup-heading'),
-        action: {
-          tool: 'normalize_heading_hierarchy',
-          target: 'document',
-          details: 'heading hierarchy normalized',
-          confidence: 0.97,
-          autoApplied: true,
-          changedVisibleContent: false,
+    runPdfStructureBackendBatch.mockResolvedValueOnce({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: Buffer.from('pdf-cleanup-batch'),
+      operationResults: [
+        {
+          operation: 'normalize_heading_hierarchy',
+          status: 'no_effect',
           changedDocumentBytes: false,
-          categoryTargets: ['heading_structure'],
-          outcome: 'no_effect',
+          appliedMutations: [],
+          warnings: [],
         },
-        manualReviewFlags: [],
-      })
-      .mockResolvedValueOnce({
-        buffer: Buffer.from('pdf-cleanup-figure'),
-        action: {
-          tool: 'normalize_nested_figure_containers',
-          target: 'document',
-          details: 'nested figure containers normalized',
-          confidence: 0.97,
-          autoApplied: true,
-          changedVisibleContent: false,
+        {
+          operation: 'normalize_nested_figure_containers',
+          status: 'no_effect',
           changedDocumentBytes: false,
-          categoryTargets: ['alt_text'],
-          outcome: 'no_effect',
+          appliedMutations: [],
+          warnings: [],
         },
-        manualReviewFlags: [],
-      })
-      .mockResolvedValueOnce({
-        buffer: Buffer.from('pdf-cleanup-0'),
-        action: {
-          tool: 'repair_native_link_structure',
-          target: 'document',
-          details: 'link structure normalized',
-          confidence: 0.97,
-          autoApplied: true,
-          changedVisibleContent: false,
+        {
+          operation: 'repair_native_link_structure',
+          status: 'applied',
           changedDocumentBytes: true,
-          categoryTargets: ['link_quality', 'reading_order'],
-          outcome: 'applied',
+          appliedMutations: [{ ref: 'obj:1 0 R', details: 'link structure normalized' }],
+          warnings: [],
         },
-        manualReviewFlags: [],
-      })
-      .mockResolvedValueOnce({
-        buffer: Buffer.from('pdf-cleanup-1'),
-        action: {
-          tool: 'normalize_annotation_tab_order',
-          target: 'document',
-          details: 'annotation order normalized',
-          confidence: 0.95,
-          autoApplied: true,
-          changedVisibleContent: false,
+        {
+          operation: 'normalize_annotation_tab_order',
+          status: 'applied',
           changedDocumentBytes: true,
-          categoryTargets: ['reading_order'],
-          outcome: 'applied',
+          appliedMutations: [{ ref: 'obj:2 0 R', details: 'annotation order normalized' }],
+          warnings: [],
         },
-        manualReviewFlags: [],
-      })
-      .mockResolvedValueOnce({
-        buffer: Buffer.from('pdf-cleanup-2'),
-        action: {
-          tool: 'set_tabs_all_annotated_pages',
-          target: 'document',
-          details: 'tabs normalized',
-          confidence: 0.98,
-          autoApplied: true,
-          changedVisibleContent: false,
+        {
+          operation: 'set_tabs_all_annotated_pages',
+          status: 'applied',
           changedDocumentBytes: true,
-          categoryTargets: ['reading_order'],
-          outcome: 'applied',
+          appliedMutations: [{ ref: 'obj:3 0 R', details: 'tabs normalized' }],
+          warnings: [],
         },
-        manualReviewFlags: [],
-      })
+      ],
+    })
 
     analyzePDF.mockResolvedValue({
       ...originalResult,
@@ -511,20 +507,20 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'cleanup.pdf', originalResult)
 
-    expect(executeRemediationTool.mock.calls.map(call => call[0]?.call?.tool_name)).toEqual([
-      'normalize_heading_hierarchy',
-      'normalize_nested_figure_containers',
-      'repair_native_link_structure',
-      'normalize_annotation_tab_order',
-      'set_tabs_all_annotated_pages',
+    expect(runPdfStructureBackendBatch).toHaveBeenCalledTimes(1)
+    expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.mutations).toEqual([
+      { operation: 'normalize_heading_hierarchy' },
+      { operation: 'normalize_nested_figure_containers' },
+      { operation: 'repair_native_link_structure' },
+      { operation: 'normalize_annotation_tab_order' },
+      { operation: 'set_tabs_all_annotated_pages' },
     ])
-    expect(executeRemediationTool).toHaveBeenCalledTimes(5)
     expect(result.model.actions?.slice(-3).map(action => action.tool)).toEqual([
       'repair_native_link_structure',
       'normalize_annotation_tab_order',
       'set_tabs_all_annotated_pages',
     ])
-    expect(result.buffer.equals(Buffer.from('pdf-cleanup-2'))).toBe(true)
+    expect(result.buffer.equals(Buffer.from('pdf-cleanup-batch'))).toBe(true)
   })
 
   it('requests deep inspection only when figure or alt-text work remains', async () => {
