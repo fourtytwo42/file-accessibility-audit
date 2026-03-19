@@ -219,4 +219,28 @@ describe('buildLocalStandardsReport', () => {
     expect(finding).toBeDefined()
     expect(finding?.inferred).toBe(true)
   })
+
+  it('emits inferred logical-structure findings when figures exist without image structure nodes', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        images: [{ ref: 'obj:2 0 R', hasAlt: false }],
+      }),
+      makePdfjs({ textLength: 2000, hasText: true }),
+      {
+        structure: makeStructure({
+          structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 }] as any,
+          figures: [{ ref: 'obj:3 0 R', pageNumber: 1, hasAlt: false, altText: null }] as any,
+          imageStructNodes: [],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeDefined()
+    expect(finding?.inferred).toBe(true)
+    expect(finding?.blocking).toBe(true)
+  })
 })

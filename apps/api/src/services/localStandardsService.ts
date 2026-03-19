@@ -42,7 +42,7 @@ function looksLikeBrokenBookmarkTitle(title: string): boolean {
 function missingLogicalStructureFinding(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
-  structure?: Pick<StructureBackendMutationResult, 'structuralNodes'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes'> | null,
 ): LocalStandardsFinding | null {
   const evidence: string[] = []
   let count = 0
@@ -64,14 +64,20 @@ function missingLogicalStructureFinding(
   const weakContentEvidence = pdfjs.textLength > 0 && qpdf.contentOrder.length === 0
   const shallowStructureTree = qpdf.hasStructTree && qpdf.structTreeDepth > 0 && qpdf.structTreeDepth <= 1
   const sparseStructureSnapshot = qpdf.hasStructTree && structureNodeCount > 0 && structureNodeCount <= 1 && pdfjs.textLength > 0
+  const figureCount = structure?.figures?.length ?? 0
+  const imageStructNodeCount = structure?.imageStructNodes?.length ?? 0
   const semanticNodeCoverageAbsent = qpdf.hasStructTree
     && pdfjs.textLength > 1000
     && qpdf.outlineCount === 0
     && qpdf.headings.length === 0
     && qpdf.tables.length === 0
     && qpdf.images.length === 0
+  const semanticFigureCoverageAbsent = qpdf.hasStructTree
+    && qpdf.images.length > 0
+    && figureCount > 0
+    && imageStructNodeCount === 0
 
-  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent)) {
+  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent || semanticFigureCoverageAbsent)) {
     inferred = true
     if (weakContentEvidence) {
       count += 1
@@ -88,6 +94,10 @@ function missingLogicalStructureFinding(
     if (semanticNodeCoverageAbsent) {
       count += 1
       evidence.push('The document is tagged at the catalog level, but no headings, tables, figures, or outline structure were recoverable from local analysis despite substantial text content.')
+    }
+    if (semanticFigureCoverageAbsent) {
+      count += Math.max(1, qpdf.images.length)
+      evidence.push(`Detected ${figureCount} figure candidate(s) and ${qpdf.images.length} PDF image(s), but no image structure nodes were recovered from the structure snapshot.`)
     }
   }
 
@@ -436,7 +446,7 @@ export function buildLocalStandardsReport(
   pdfjs: PdfjsResult,
   options?: {
     tabOrder?: TabOrderResult | null
-    structure?: Pick<StructureBackendMutationResult, 'structuralNodes'> | null
+    structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes'> | null
   },
 ): LocalStandardsReport {
   const findings: LocalStandardsFinding[] = []
