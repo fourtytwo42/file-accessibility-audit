@@ -14,6 +14,7 @@ import type {
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { ALT_REMOVAL_MODES } from './altTextScoring.js'
 import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
+import type { LocalStandardsFinding } from './localStandardsService.js'
 
 interface BuildFailureProfileInput {
   analysis: AnalysisResult
@@ -31,6 +32,8 @@ interface VeraPdfFailureFamily {
   categoryIds: string[]
   classification: FailureClassification
 }
+
+type FailureFamilyDefinition = Omit<VeraPdfFailureFamily, 'pattern'>
 
 const SEMANTIC_CATEGORY_IDS = new Set(['heading_structure', 'alt_text', 'table_markup', 'link_quality'])
 const MANUAL_ONLY_CATEGORY_IDS = new Set(['text_extractability'])
@@ -270,6 +273,41 @@ function mapVeraPdfFailure(failure: AnalysisResult['verapdf']['failures'][number
   return VERA_PDF_FAILURE_FAMILIES.find(family => family.pattern.test(message)) || null
 }
 
+function familyDefinitionByKey(key: string): FailureFamilyDefinition | null {
+  const family = VERA_PDF_FAILURE_FAMILIES.find(entry => entry.key === key)
+  if (!family) return null
+  return {
+    key: family.key,
+    label: family.label,
+    nativeToolFamilies: family.nativeToolFamilies,
+    categoryIds: family.categoryIds,
+    classification: family.classification,
+  }
+}
+
+function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamilyDefinition {
+  const knownFamily = familyDefinitionByKey(finding.key)
+  if (knownFamily) return knownFamily
+
+  if (finding.key === 'pdfua.bookmark_language') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['replace_bookmarks_from_headings', 'normalize_document_metadata'],
+      categoryIds: ['bookmarks', 'title_language', 'pdf_ua_compliance'],
+      classification: 'deterministic',
+    }
+  }
+
+  return {
+    key: finding.key,
+    label: finding.label,
+    nativeToolFamilies: [],
+    categoryIds: finding.categoryIds,
+    classification: finding.blocking ? 'deterministic' : 'manual_only',
+  }
+}
+
 function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   const modes = new Map<string, FailureMode>()
 
@@ -324,6 +362,24 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
         classification: 'manual_only',
         nativeToolFamilies: [],
         evidence: unmatchedEvidence,
+      })
+    }
+  }
+
+  if (input.analysis.localStandards?.status === 'issues_detected') {
+    for (const finding of input.analysis.localStandards.findings) {
+      const family = mapLocalStandardsFinding(finding)
+      mergeMode(modes, {
+        key: family.key,
+        label: family.label,
+        source: 'local_standards',
+        count: Math.max(1, finding.count || 1),
+        categoryIds: unique([...family.categoryIds, ...finding.categoryIds]),
+        blocking: finding.blocking,
+        unmatched: false,
+        classification: family.classification,
+        nativeToolFamilies: family.nativeToolFamilies,
+        evidence: finding.evidence,
       })
     }
   }
@@ -744,7 +800,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
 
   for (const mode of failureModes) {
     const relevantToOpenIssue = mode.categoryIds.some(categoryId => issueIds.has(categoryId))
-      || (mode.key.startsWith('pdfua.') && input.analysis.verapdf.status === 'failed')
+      || (mode.key.startsWith('pdfua.') && (input.analysis.verapdf.status === 'failed' || input.analysis.localStandards?.status === 'issues_detected'))
     if (!relevantToOpenIssue) continue
     for (const toolName of mode.nativeToolFamilies) {
       if (toolName === 'set_document_title' || toolName === 'set_document_language' || toolName === 'normalize_document_metadata') continue

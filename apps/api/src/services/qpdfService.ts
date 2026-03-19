@@ -19,13 +19,26 @@ const QPDF_BIN = process.env.QPDF_PATH || (() => {
 export interface QpdfResult {
   hasStructTree: boolean
   isTagged: boolean // /MarkInfo /Marked = true in the catalog
+  hasMarkInfo?: boolean
+  marked?: boolean | null
   hasLang: boolean
   lang: string | null
   hasOutlines: boolean
   outlineCount: number
   outlineTitles: string[]
+  displayDocTitle?: boolean | null
+  metadataRef?: string | null
+  metadataTypeValid?: boolean
+  metadataSubtypeXml?: boolean
   hasAcroForm: boolean
   formFields: Array<{ hasTU: boolean; name?: string }>
+  fontCount?: number
+  unembeddedFontCount?: number
+  fontsMissingToUnicode?: number
+  cidFontsMissingCidToGidMap?: number
+  legacyWidthRiskFontCount?: number
+  linkAnnotationCount?: number
+  linkAnnotationsMissingContents?: number
   images: Array<{ ref: string; hasAlt: boolean; altText?: string }>
   headings: Array<{ level: string; tag: string }>
   tables: Array<{ hasHeaders: boolean }>
@@ -65,13 +78,26 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       return {
         hasStructTree: false,
         isTagged: false,
+        hasMarkInfo: false,
+        marked: null,
         hasLang: false,
         lang: null,
         hasOutlines: false,
         outlineCount: 0,
         outlineTitles: [],
+        displayDocTitle: null,
+        metadataRef: null,
+        metadataTypeValid: false,
+        metadataSubtypeXml: false,
         hasAcroForm: false,
         formFields: [],
+        fontCount: 0,
+        unembeddedFontCount: 0,
+        fontsMissingToUnicode: 0,
+        cidFontsMissingCidToGidMap: 0,
+        legacyWidthRiskFontCount: 0,
+        linkAnnotationCount: 0,
+        linkAnnotationsMissingContents: 0,
         images: [],
         headings: [],
         tables: [],
@@ -90,13 +116,26 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
     return {
       hasStructTree: false,
       isTagged: false,
+      hasMarkInfo: false,
+      marked: null,
       hasLang: false,
       lang: null,
       hasOutlines: false,
       outlineCount: 0,
       outlineTitles: [],
+      displayDocTitle: null,
+      metadataRef: null,
+      metadataTypeValid: false,
+      metadataSubtypeXml: false,
       hasAcroForm: false,
       formFields: [],
+      fontCount: 0,
+      unembeddedFontCount: 0,
+      fontsMissingToUnicode: 0,
+      cidFontsMissingCidToGidMap: 0,
+      legacyWidthRiskFontCount: 0,
+      linkAnnotationCount: 0,
+      linkAnnotationsMissingContents: 0,
       images: [],
       headings: [],
       tables: [],
@@ -114,13 +153,26 @@ export function parseQpdfJson(json: any): QpdfResult {
   const result: QpdfResult = {
     hasStructTree: false,
     isTagged: false,
+    hasMarkInfo: false,
+    marked: null,
     hasLang: false,
     lang: null,
     hasOutlines: false,
     outlineCount: 0,
     outlineTitles: [],
+    displayDocTitle: null,
+    metadataRef: null,
+    metadataTypeValid: false,
+    metadataSubtypeXml: false,
     hasAcroForm: false,
     formFields: [],
+    fontCount: 0,
+    unembeddedFontCount: 0,
+    fontsMissingToUnicode: 0,
+    cidFontsMissingCidToGidMap: 0,
+    legacyWidthRiskFontCount: 0,
+    linkAnnotationCount: 0,
+    linkAnnotationsMissingContents: 0,
     images: [],
     headings: [],
     tables: [],
@@ -162,13 +214,31 @@ export function parseQpdfJson(json: any): QpdfResult {
         }
         if (o['/Outlines']) result.hasOutlines = true
         if (o['/AcroForm']) result.hasAcroForm = true
+        if (o['/Metadata']) {
+          const rawMetadataRef = o['/Metadata']
+          result.metadataRef = typeof rawMetadataRef === 'string' ? rawMetadataRef : null
+        }
+        const viewerPreferences = o['/ViewerPreferences']
+        if (viewerPreferences && typeof viewerPreferences === 'object') {
+          const displayDocTitle = viewerPreferences['/DisplayDocTitle']
+          result.displayDocTitle = displayDocTitle === true || displayDocTitle === 'true'
+        }
         // /MarkInfo /Marked = true means the document is a Tagged PDF
         const markInfo = o['/MarkInfo']
         if (markInfo) {
+          result.hasMarkInfo = true
           const marked = typeof markInfo === 'object' ? markInfo['/Marked'] : null
-          if (marked === true || marked === 'true') result.isTagged = true
+          if (marked === true || marked === 'true') {
+            result.isTagged = true
+            result.marked = true
+          } else if (marked === false || marked === 'false') {
+            result.marked = false
+          }
         }
       }
+
+      if (o['/Type'] === '/Metadata') result.metadataTypeValid = true
+      if (o['/Subtype'] === '/XML') result.metadataSubtypeXml = true
 
       // Count outline entries and collect titles
       if (o['/Type'] === '/Outlines' || (o['/First'] && o['/Last'] && !o['/Parent'])) {
@@ -229,7 +299,25 @@ export function parseQpdfJson(json: any): QpdfResult {
         } else if (subtype && subtype !== '/Popup') {
           // Count all non-Widget, non-Popup annotations (Link, Text, Stamp, etc.)
           result.annotationCount++
+          if (subtype === '/Link') {
+            result.linkAnnotationCount = (result.linkAnnotationCount ?? 0) + 1
+            const rawContents = o['/Contents']
+            const hasContents = typeof rawContents === 'string'
+              ? rawContents.replace(/^u:/, '').trim().length > 0
+              : !!rawContents
+            if (!hasContents) {
+              result.linkAnnotationsMissingContents = (result.linkAnnotationsMissingContents ?? 0) + 1
+            }
+          }
         }
+      }
+
+      if (isFontObject(o)) {
+        result.fontCount = (result.fontCount ?? 0) + 1
+        if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
+        if (!fontHasToUnicode(o, objects)) result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
+        if (fontMissingCidToGidMap(o, objects)) result.cidFontsMissingCidToGidMap = (result.cidFontsMissingCidToGidMap ?? 0) + 1
+        if (fontHasLegacyWidthRisk(o, objects)) result.legacyWidthRiskFontCount = (result.legacyWidthRiskFontCount ?? 0) + 1
       }
     }
 
@@ -326,6 +414,86 @@ function structElemHasAssociatedContent(node: any, objects: any, visited = new S
   }
 
   return false
+}
+
+function isFontObject(obj: any): boolean {
+  return obj?.['/Type'] === '/Font'
+}
+
+function resolveFontDescriptor(fontObj: any, objects: any): any | null {
+  if (!fontObj || typeof fontObj !== 'object') return null
+  const directDescriptor = fontObj['/FontDescriptor']
+  if (typeof directDescriptor === 'string') return resolveRef(directDescriptor, objects)
+  if (directDescriptor && typeof directDescriptor === 'object') return directDescriptor
+
+  const descendants = fontObj['/DescendantFonts']
+  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  for (const descendant of descendantList) {
+    const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
+    if (!resolved || typeof resolved !== 'object') continue
+    const descriptor = resolved['/FontDescriptor']
+    if (typeof descriptor === 'string') return resolveRef(descriptor, objects)
+    if (descriptor && typeof descriptor === 'object') return descriptor
+  }
+
+  return null
+}
+
+function fontHasEmbeddedProgram(fontObj: any, objects: any): boolean {
+  const descriptor = resolveFontDescriptor(fontObj, objects)
+  if (!descriptor || typeof descriptor !== 'object') return false
+  return !!(descriptor['/FontFile'] || descriptor['/FontFile2'] || descriptor['/FontFile3'])
+}
+
+function fontHasToUnicode(fontObj: any, objects: any): boolean {
+  if (fontObj['/ToUnicode']) return true
+  const descendants = fontObj['/DescendantFonts']
+  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  return descendantList.some(descendant => {
+    const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
+    return !!resolved?.['/ToUnicode']
+  })
+}
+
+function fontMissingCidToGidMap(fontObj: any, objects: any): boolean {
+  const subtype = fontObj['/Subtype']
+  const descendants = fontObj['/DescendantFonts']
+  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  const descendant = descendantList.length > 0
+    ? (typeof descendantList[0] === 'string' ? resolveRef(descendantList[0], objects) : descendantList[0])
+    : null
+
+  const target = descendant && typeof descendant === 'object' ? descendant : fontObj
+  if (!target || typeof target !== 'object') return false
+  const targetSubtype = target['/Subtype'] || subtype
+  if (targetSubtype !== '/CIDFontType2') return false
+  return !target['/CIDToGIDMap']
+}
+
+function hasCustomEncoding(fontObj: any, objects: any): boolean {
+  const encoding = fontObj['/Encoding']
+  if (!encoding) return false
+  if (typeof encoding === 'string') {
+    if (!encoding.startsWith('/')) return true
+    return !['/WinAnsiEncoding', '/MacRomanEncoding', '/MacExpertEncoding', '/StandardEncoding'].includes(encoding)
+  }
+  const resolved = typeof encoding === 'string' ? resolveRef(encoding, objects) : encoding
+  return !!resolved
+}
+
+function fontHasLegacyWidthRisk(fontObj: any, objects: any): boolean {
+  if (!fontObj || typeof fontObj !== 'object') return false
+  const subtype = fontObj['/Subtype']
+  if (!['/Type1', '/TrueType', '/Type3'].includes(subtype)) return false
+  const widths = fontObj['/Widths']
+  if (!Array.isArray(widths) || widths.length === 0) return false
+  if (!fontHasEmbeddedProgram(fontObj, objects)) return false
+  const widthSpanLooksLegacy = widths.length >= 200 || widths.length === 224 || widths.length === 225 || widths.length === 256
+  if (!widthSpanLooksLegacy) return false
+  const hasUnicodeMap = fontHasToUnicode(fontObj, objects)
+  const baseFont = String(fontObj['/BaseFont'] || '')
+  const looksSubsetted = /^\//.test(baseFont) && baseFont.includes('+')
+  return !hasUnicodeMap && (looksSubsetted || hasCustomEncoding(fontObj, objects))
 }
 
 function countOutlineEntries(outline: any, objects: any, titles: string[]): number {

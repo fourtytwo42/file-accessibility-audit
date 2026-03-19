@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-19T19:57:00Z System fix: stage-2 no-vera parity layer now detects page tabs, link annotation /Contents, link tagging, and legacy font-width risk locally; provisional no-vera PDF/UA scoring was tightened for structurally broken documents. Verified with `pnpm --filter api exec vitest run src/__tests__/localStandardsService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/failureProfileService.test.ts src/__tests__/scorer.test.ts`, `pnpm --filter api build`, and full baseline parity harness `pnpm --filter api exec tsx src/scripts/compareVeraPdfCoverage.ts` (10/10 baseline files now pass parity).
 - 2026-03-19T18:51:00Z System fix: intermediate remediation re-analysis now reuses the last known veraPDF result and defers a real veraPDF CLI run to the final post-remediation analysis; verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts` and `pnpm --filter api build`
 - 2026-03-19T07:51:26Z System fix: orphaned empty /Figure alt text now scores as unresolved Acrobat risk and is auto-repaired by stripping orphaned /Alt; verified with `pnpm --filter api build`, `vitest` on qpdf parser/scorer, and targeted Acrobat-risk service tests
 - 2026-03-19T07:40:51Z System fix verification complete: API build passed, remediation service tests passed, snapshot optimization updates committed for restart-ready validation

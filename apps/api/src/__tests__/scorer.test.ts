@@ -5,6 +5,7 @@ import type { PdfjsResult } from '../services/pdfjsService.js'
 import type { VeraPdfResult } from '../services/veraPdfService.js'
 import type { StructureBackendMutationResult } from '../services/pdfStructureBackend.js'
 import type { TabOrderResult } from '../services/tabOrderService.js'
+import type { LocalStandardsReport } from '../services/localStandardsService.js'
 
 // ---------------------------------------------------------------------------
 // Helpers to build mock data
@@ -14,13 +15,23 @@ function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
   return {
     hasStructTree: false,
     isTagged: false,
+    hasMarkInfo: false,
+    marked: null,
     hasLang: false,
     lang: null,
     hasOutlines: false,
     outlineCount: 0,
     outlineTitles: [],
+    displayDocTitle: null,
+    metadataRef: null,
+    metadataTypeValid: false,
+    metadataSubtypeXml: false,
     hasAcroForm: false,
     formFields: [],
+    fontCount: 0,
+    unembeddedFontCount: 0,
+    fontsMissingToUnicode: 0,
+    cidFontsMissingCidToGidMap: 0,
     images: [],
     headings: [],
     tables: [],
@@ -28,6 +39,15 @@ function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
     contentOrder: [],
     annotationCount: 0,
     error: null,
+    ...overrides,
+  }
+}
+
+function makeLocalStandards(overrides: Partial<LocalStandardsReport> = {}): LocalStandardsReport {
+  return {
+    status: 'clear',
+    findings: [],
+    knownGapKeys: [],
     ...overrides,
   }
 }
@@ -115,8 +135,14 @@ function fullyAccessible(): { qpdf: QpdfResult; pdfjs: PdfjsResult } {
       hasStructTree: true,
       hasLang: true,
       lang: 'en-US',
+      hasMarkInfo: true,
+      marked: true,
       hasOutlines: true,
       outlineCount: 5,
+      displayDocTitle: true,
+      metadataRef: 'obj:50 0 R',
+      metadataTypeValid: true,
+      metadataSubtypeXml: true,
       headings: [
         { level: 'H1', tag: '/H1' },
         { level: 'H2', tag: '/H2' },
@@ -129,6 +155,7 @@ function fullyAccessible(): { qpdf: QpdfResult; pdfjs: PdfjsResult } {
       tables: [{ hasHeaders: true }],
       hasAcroForm: true,
       formFields: [{ hasTU: true }, { hasTU: true }],
+      fontCount: 2,
       structTreeDepth: 4,
       contentOrder: [0, 1, 2, 3, 4, 5],
     }),
@@ -229,7 +256,7 @@ describe('scoreDocument — fully accessible PDF', () => {
 describe('scoreDocument — local tab order detection', () => {
   it('reduces reading-order score when tagged pages are missing /Tabs /S', () => {
     const { qpdf, pdfjs } = fullyAccessible()
-    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, {
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, undefined, {
       tabOrder: makeTabOrder({
         annotatedPageCount: 1,
         missingTabsCount: 2,
@@ -246,7 +273,7 @@ describe('scoreDocument — local tab order detection', () => {
 
   it('reduces reading-order score when annotations are out of order', () => {
     const { qpdf, pdfjs } = fullyAccessible()
-    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, {
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, undefined, {
       tabOrder: makeTabOrder({
         annotatedPageCount: 1,
         outOfOrderPageCount: 1,
@@ -956,7 +983,7 @@ describe('scoreDocument — veraPDF integration', () => {
 
     expect(result.overallScore).toBeLessThan(100)
     expect(result.grade).toBe('B')
-    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(60)
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(90)
     expect(result.warnings.some(warning => warning.includes('veraPDF'))).toBe(true)
     expect(result.executiveSummary).toContain('could not be fully confirmed')
   })
@@ -972,6 +999,126 @@ describe('scoreDocument — veraPDF integration', () => {
 
     expect(result.overallScore).toBeLessThan(100)
     expect(result.grade).toBe('B')
+  })
+
+  it('uses local standards evidence as the primary PDF/UA gate when veraPDF is unavailable', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+        message: 'veraPDF CLI is unavailable.',
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [{
+          key: 'pdfua.font_unicode',
+          label: 'Font Unicode mapping',
+          severity: 'error',
+          blocking: true,
+          categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+          confidence: 0.9,
+          evidence: ['Detected 2 font objects without a ToUnicode map.'],
+          source: 'qpdf',
+          inferred: false,
+          count: 2,
+        }],
+      }),
+    )
+
+    expect(result.grade).toBe('B')
+    expect(result.overallScore).toBeLessThan(100)
+    expect(findCategory(result, 'text_extractability').score).toBeLessThan(100)
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(85)
+    expect(result.warnings.some(warning => warning.includes('Local standards checks'))).toBe(true)
+  })
+
+  it('does not claim a clean local PDF/UA pass when known gaps remain', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+        knownGapKeys: ['pdfua.artifact_vs_real_content_partial'],
+      }),
+    )
+
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(90)
+    expect(result.grade).toBe('B')
+  })
+
+  it('heavily caps local PDF/UA scoring when logical structure is broadly broken', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure and marked content',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
+            confidence: 0.98,
+            evidence: ['StructTreeRoot entry is not present in the document catalog.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 2,
+          },
+          {
+            key: 'pdfua.document_language',
+            label: 'Document language tag',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['No document language declaration was found.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.display_doc_title',
+            label: 'Display document title metadata',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['No meaningful document title metadata is available.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: ['pdfua.artifact_vs_real_content_partial'],
+      }),
+    )
+
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(20)
+    expect(result.overallScore).toBeLessThan(100)
   })
 
   it('reduces the PDF/UA category more heavily for substantial veraPDF failures', () => {

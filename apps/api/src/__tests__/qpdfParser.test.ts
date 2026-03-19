@@ -42,4 +42,76 @@ describe('analyzeWithQpdf', () => {
 
     expect(result.images).toEqual([{ ref: 'obj:3 0 R', hasAlt: false }])
   })
+
+  it('extracts tagged-pdf metadata and font conformance signals from qpdf json', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/StructTreeRoot': 'obj:2 0 R',
+            '/Lang': 'u:en-US',
+            '/MarkInfo': { '/Marked': true },
+            '/Metadata': 'obj:9 0 R',
+            '/ViewerPreferences': { '/DisplayDocTitle': true },
+          },
+        },
+        'obj:2 0 R': { value: { '/Type': '/StructTreeRoot' } },
+        'obj:9 0 R': { value: { '/Type': '/Metadata', '/Subtype': '/XML' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type0',
+            '/DescendantFonts': ['obj:11 0 R'],
+          },
+        },
+        'obj:11 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/CIDFontType2',
+            '/FontDescriptor': 'obj:12 0 R',
+          },
+        },
+        'obj:12 0 R': { value: { '/Type': '/FontDescriptor' } },
+      },
+    })
+
+    expect(result.hasMarkInfo).toBe(true)
+    expect(result.marked).toBe(true)
+    expect(result.displayDocTitle).toBe(true)
+    expect(result.metadataRef).toBe('obj:9 0 R')
+    expect(result.metadataTypeValid).toBe(true)
+    expect(result.metadataSubtypeXml).toBe(true)
+    expect(result.fontCount).toBeGreaterThan(0)
+    expect(result.unembeddedFontCount).toBeGreaterThan(0)
+    expect(result.fontsMissingToUnicode).toBeGreaterThan(0)
+    expect(result.cidFontsMissingCidToGidMap).toBeGreaterThan(0)
+  })
+
+  it('tracks link annotations missing contents and legacy width-risk fonts', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:2 0 R': { value: { '/Type': '/Annot', '/Subtype': '/Link', '/Rect': [0, 0, 10, 10] } },
+        'obj:3 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type1',
+            '/BaseFont': '/ABCDEF+LegacyFont',
+            '/Encoding': 'obj:9 0 R',
+            '/FirstChar': 32,
+            '/LastChar': 255,
+            '/Widths': new Array(224).fill(500),
+            '/FontDescriptor': 'obj:4 0 R',
+          },
+        },
+        'obj:4 0 R': { value: { '/Type': '/FontDescriptor', '/FontFile': 'obj:5 0 R' } },
+        'obj:9 0 R': { value: { '/Type': '/Encoding', '/Differences': [32, '/A'] } },
+      },
+    })
+
+    expect(result.linkAnnotationCount).toBe(1)
+    expect(result.linkAnnotationsMissingContents).toBe(1)
+    expect(result.legacyWidthRiskFontCount).toBe(1)
+  })
 })

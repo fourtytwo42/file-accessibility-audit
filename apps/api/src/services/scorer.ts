@@ -14,6 +14,7 @@ import type { ReadingOrderResult } from './readingOrderService.js'
 import type { ColorContrastResult } from './colorContrastService.js'
 import type { TableStructureResult } from './tableStructureService.js'
 import type { TabOrderResult } from './tabOrderService.js'
+import type { LocalStandardsFinding, LocalStandardsReport } from './localStandardsService.js'
 
 export interface HelpLink {
   label: string
@@ -38,6 +39,7 @@ export interface ScoringResult {
   isScanned: boolean
   executiveSummary: string
   verapdf: VeraPdfResult
+  localStandards?: LocalStandardsReport
   adobe?: AdobeSummary | null
   categories: CategoryResult[]
   warnings: string[]
@@ -233,6 +235,120 @@ function scorePdfUaCompliance(verapdf: VeraPdfResult): CategoryResult {
   }
 }
 
+function localStandardsWarning(report: LocalStandardsReport): string | null {
+  if (report.status !== 'issues_detected') return null
+  const blockingCount = report.findings.filter(finding => finding.blocking).reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
+  if (blockingCount > 0) return `Local standards checks detected ${blockingCount} PDF/UA-related issue${blockingCount === 1 ? '' : 's'}.`
+  return 'Local standards checks found potential PDF/UA-related issues that need review.'
+}
+
+function applyLocalStandardsEvidence(categories: CategoryResult[], report: LocalStandardsReport): CategoryResult[] {
+  if (report.status !== 'issues_detected' || !report.findings.length) return categories
+  const counts = new Map<string, number>()
+  for (const finding of report.findings) {
+    const increment = Math.max(1, finding.count || 1)
+    for (const categoryId of finding.categoryIds) {
+      counts.set(categoryId, (counts.get(categoryId) || 0) + increment)
+    }
+  }
+
+  return categories.map(category => {
+    const failureCount = counts.get(category.id) || 0
+    if (!failureCount || category.score === null) return category
+    const cappedScore = category.id === 'title_language'
+      ? failureCount > 1 ? 50 : 75
+      : category.id === 'bookmarks'
+        ? failureCount > 1 ? 40 : 60
+        : failureCount > 1 ? 40 : 60
+    const score = Math.min(category.score, cappedScore)
+    const note = `Local standards checks detected ${failureCount} related PDF/UA issue${failureCount === 1 ? '' : 's'}.`
+    return {
+      ...category,
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
+      findings: category.findings.includes(note) ? category.findings : [...category.findings, note],
+    }
+  })
+}
+
+function scorePdfUaComplianceFromLocal(report: LocalStandardsReport): CategoryResult {
+  const blockingFindings = report.findings.filter(finding => finding.blocking)
+  const blockingCount = blockingFindings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
+  const canJustifyCleanPass = report.status === 'clear' && report.knownGapKeys.length === 0
+  const logicalStructureBlocking = blockingFindings.find(finding => finding.key === 'pdfua.logical_structure')
+  const affectedCategoryCount = new Set(blockingFindings.flatMap(finding => finding.categoryIds)).size
+  const explanation = 'PDF/UA Compliance reflects standards-level evidence gathered from local PDF analyzers when veraPDF is skipped or unavailable.'
+  const helpLinks: HelpLink[] = [
+    { label: 'W3C: PDF Techniques', url: 'https://www.w3.org/WAI/WCAG21/Techniques/pdf/' },
+    { label: 'Adobe: Create and Verify PDF Accessibility', url: 'https://helpx.adobe.com/acrobat/using/create-verify-pdf-accessibility.html' },
+  ]
+
+  if (canJustifyCleanPass) {
+    return {
+      id: 'pdf_ua_compliance',
+      label: 'PDF/UA Compliance',
+      weight: SCORING_WEIGHTS.pdf_ua_compliance,
+      score: 100,
+      grade: 'A',
+      severity: 'Pass',
+      findings: ['Local standards checks did not find any PDF/UA blockers.', 'A clean pass was inferred without requiring veraPDF.'],
+      explanation,
+      helpLinks,
+    }
+  }
+
+  if (logicalStructureBlocking && (report.knownGapKeys.length > 0 || affectedCategoryCount >= 3) && blockingCount >= 4) {
+    return {
+      id: 'pdf_ua_compliance',
+      label: 'PDF/UA Compliance',
+      weight: SCORING_WEIGHTS.pdf_ua_compliance,
+      score: 20,
+      grade: getGrade(20),
+      severity: getSeverity(20),
+      findings: [
+        `Local standards checks reported ${blockingCount} PDF/UA-related issue${blockingCount === 1 ? '' : 's'}.`,
+        'The document is missing fundamental logical-structure evidence, so provisional no-vera scoring remains heavily capped.',
+      ],
+      explanation,
+      helpLinks,
+    }
+  }
+
+  if (blockingCount === 0) {
+    return {
+      id: 'pdf_ua_compliance',
+      label: 'PDF/UA Compliance',
+      weight: SCORING_WEIGHTS.pdf_ua_compliance,
+      score: 90,
+      grade: getGrade(90),
+      severity: getSeverity(90),
+      findings: [
+        'Local standards checks did not find blockers, but full standards coverage is not yet complete without veraPDF.',
+        'The document cannot be treated as a fully confirmed PDF/UA pass yet.',
+      ],
+      explanation,
+      helpLinks,
+    }
+  }
+
+  const score = blockingCount <= 2 ? 85 : blockingCount <= 10 ? 70 : blockingCount <= 25 ? 40 : 20
+  return {
+    id: 'pdf_ua_compliance',
+    label: 'PDF/UA Compliance',
+    weight: SCORING_WEIGHTS.pdf_ua_compliance,
+    score,
+    grade: getGrade(score),
+    severity: getSeverity(score),
+    findings: [
+      `Local standards checks reported ${blockingCount} PDF/UA-related issue${blockingCount === 1 ? '' : 's'}.`,
+      ...blockingFindings.slice(0, 2).flatMap(finding => finding.evidence.slice(0, 1)),
+    ],
+    explanation,
+    helpLinks,
+  }
+}
+
 interface SummaryContext {
   pdfUaScore: number
   failedChecks: number
@@ -254,6 +370,7 @@ export function scoreDocument(
   }),
   structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
   adobe?: AdobeSummary | null,
+  localStandards: LocalStandardsReport = { status: 'clear', findings: [], knownGapKeys: ['pdfua.local_coverage_unconfirmed'] },
   extras?: {
     readingOrder?: ReadingOrderResult | null
     colorContrast?: ColorContrastResult | null
@@ -268,8 +385,12 @@ export function scoreDocument(
     warnings.push('Some accessibility checks could not be completed. The results below reflect only the checks that succeeded.')
   }
   const veraPdfMessage = veraPdfWarning(verapdf)
+  const localStandardsMessage = localStandardsWarning(localStandards)
   if (veraPdfMessage && verapdf.status !== 'failed') {
     warnings.push(veraPdfMessage)
+  }
+  if (localStandardsMessage && verapdf.status !== 'failed') {
+    warnings.push(localStandardsMessage)
   }
   if (adobe?.status === 'failed') {
     warnings.push(adobe.summary)
@@ -310,15 +431,21 @@ export function scoreDocument(
   // 10. Color Contrast (4.5%)
   categories.push(scoreColorContrast(extras?.colorContrast))
 
+  const useLocalStandardsAsPrimary = verapdf.status !== 'passed' && verapdf.status !== 'failed'
   const veraPdfAdjusted = applyVeraPdfEvidence(categories, verapdf)
-  categories = veraPdfAdjusted.categories
+  categories = useLocalStandardsAsPrimary ? applyLocalStandardsEvidence(categories, localStandards) : veraPdfAdjusted.categories
   categories = applyAdobeEvidence(categories, adobe)
-  categories.push(scorePdfUaCompliance(verapdf))
+  const pdfUaCategory = useLocalStandardsAsPrimary
+    ? scorePdfUaComplianceFromLocal(localStandards)
+    : scorePdfUaCompliance(verapdf)
+  categories.push(pdfUaCategory)
   if (verapdf.status === 'failed') {
     warnings.push(veraPdfMessage || 'veraPDF detected PDF/UA compliance issues.')
     if (veraPdfAdjusted.unmatchedFailures.length) {
       warnings.push('Some veraPDF failures could not be mapped cleanly to an existing category and require manual review.')
     }
+  } else if (useLocalStandardsAsPrimary && localStandardsMessage) {
+    warnings.push(localStandardsMessage)
   }
 
   // Calculate weighted average (N/A categories excluded, weights renormalized)
@@ -329,23 +456,28 @@ export function scoreDocument(
     : 0
 
   // If veraPDF is fully clean, allow near-perfect heuristic scores to reach 100/100.
-  const veraPdfClean = verapdf.status === 'passed' && (verapdf.failedChecks || verapdf.failures.length) === 0
-  if (veraPdfClean && computedScore >= 98) {
+  const localStandardsClean = localStandards.status === 'clear' && localStandards.knownGapKeys.length === 0
+  const standardsClean = verapdf.status === 'passed'
+    ? (verapdf.failedChecks || verapdf.failures.length) === 0
+    : useLocalStandardsAsPrimary && localStandardsClean
+  if (standardsClean && computedScore >= 98) {
     computedScore = 100
   }
 
-  const scoreGateApplied = verapdf.status !== 'passed' && computedScore === 100
+  const scoreGateApplied = !standardsClean && computedScore === 100
   const overallScore = scoreGateApplied ? 99 : computedScore
   let grade = getGrade(overallScore)
-  const gradeGateApplied = verapdf.status !== 'passed' && grade === 'A'
+  const gradeGateApplied = !standardsClean && grade === 'A'
   if (gradeGateApplied) {
     grade = 'B'
   }
-  const pdfUaCategory = categories.find(category => category.id === 'pdf_ua_compliance')
-  const executiveSummary = generateSummary(overallScore, grade, isScanned, categories, verapdf, {
+  const effectiveFailedChecks = verapdf.status === 'failed'
+    ? (verapdf.failedChecks || verapdf.failures.length)
+    : localStandards.findings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
+  const executiveSummary = generateSummary(overallScore, grade, isScanned, categories, verapdf, localStandards, {
     pdfUaScore: pdfUaCategory?.score ?? 0,
-    failedChecks: verapdf.failedChecks || verapdf.failures.length,
-    standardsReducedScore: computedScore !== 100 && (verapdf.status !== 'passed' || veraPdfAdjusted.unmatchedFailures.length > 0),
+    failedChecks: effectiveFailedChecks,
+    standardsReducedScore: computedScore !== 100 && !standardsClean,
     scoreGateApplied,
     gradeGateApplied,
   })
@@ -356,6 +488,7 @@ export function scoreDocument(
     isScanned,
     executiveSummary,
     verapdf,
+    localStandards,
     adobe,
     categories,
     warnings,
@@ -1241,6 +1374,7 @@ function generateSummary(
   isScanned: boolean,
   categories: CategoryResult[],
   verapdf: VeraPdfResult,
+  localStandards: LocalStandardsReport,
   context: SummaryContext,
 ): string {
   if (isScanned) {
@@ -1270,6 +1404,12 @@ function generateSummary(
   }
 
   if (verapdf.status !== 'passed') {
+    if (localStandards.status === 'issues_detected') {
+      const gateText = context.gradeGateApplied || context.scoreGateApplied
+        ? ' Local standards findings keep the document below a fully confirmed pass.'
+        : ''
+      return `Local standards checks found ${context.failedChecks} PDF/UA-related issue${context.failedChecks === 1 ? '' : 's'}. The provisional PDF/UA compliance score is ${context.pdfUaScore}/100.${gateText}`
+    }
     const gateText = context.gradeGateApplied || context.scoreGateApplied
       ? ' Because standards validation did not complete, the document cannot receive an A or a 100 score yet.'
       : ''

@@ -6,6 +6,7 @@ import { analyzeWithVeraPdf, emptyVeraPdfResult, type VeraPdfResult } from './ve
 import { runPdfStructureBackend } from './pdfStructureBackend.js'
 import { runAdobeAccessibilityCheck } from './adobePdfServices.js'
 import type { AdobeSummary } from './documentModel.js'
+import { buildLocalStandardsReport } from './localStandardsService.js'
 import { analyzeReadingOrder, type ReadingOrderResult } from './readingOrderService.js'
 import { analyzeColorContrast, type ColorContrastResult } from './colorContrastService.js'
 import { analyzeTableStructure, type TableStructureResult } from './tableStructureService.js'
@@ -134,6 +135,10 @@ export async function analyzePDF(
       analyzeTableStructure(buffer, qpdfResult.tables?.length ?? 0, { signal: options?.signal }),
       analyzeTabOrder(buffer, { isTagged: qpdfResult.isTagged || qpdfResult.hasStructTree }),
     ])
+    const localStandards = buildLocalStandardsReport(qpdfResult, pdfjsResult, {
+      tabOrder: tabOrderResult,
+      structure: structureForScoring,
+    })
 
     // Score the document
     options?.onProgress?.({ stage: 'Scoring accessibility findings', percent: 92 })
@@ -148,7 +153,7 @@ export async function analyzePDF(
           artifacts: adobeResult.artifacts ?? null,
         }
       : null
-    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult, structureForScoring, adobeSummary, {
+    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult, structureForScoring, adobeSummary, localStandards, {
       readingOrder: readingOrderResult,
       colorContrast: colorContrastResult,
       tableStructure: tableStructureResult,

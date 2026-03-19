@@ -21,7 +21,7 @@ export interface PdfjsResult {
   lang: string | null
   hasOutlines: boolean
   outlineCount: number
-  links: Array<{ url: string; text: string }>
+  links: Array<{ url: string; text: string; contents?: string | null }>
   imageCount: number
   metadata: PdfMetadata
   error: string | null
@@ -148,7 +148,11 @@ export async function analyzeWithPdfjs(
         for (const annot of annotations) {
           if (annot.subtype === 'Link' && annot.url) {
             const linkText = getLinkDisplayText(annot, textContent.items)
-            result.links.push({ url: annot.url, text: linkText })
+            result.links.push({
+              url: annot.url,
+              text: linkText,
+              contents: typeof annot.contents === 'string' ? annot.contents : null,
+            })
           }
         }
       } catch {}

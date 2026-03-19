@@ -212,7 +212,7 @@ export interface RemediationIteration {
 }
 
 export type FailureClassification = 'deterministic' | 'semantic' | 'manual_only'
-export type FailureModeSource = 'verapdf' | 'category' | 'context' | 'composite'
+export type FailureModeSource = 'verapdf' | 'local_standards' | 'category' | 'context' | 'composite'
 export type ToolOpportunityScope = 'document' | 'page' | 'candidate' | 'candidate_group'
 export type ToolOpportunityStatus = 'auto_runnable' | 'blocked' | 'deferred' | 'already_attempted' | 'rejected' | 'no_effect'
 

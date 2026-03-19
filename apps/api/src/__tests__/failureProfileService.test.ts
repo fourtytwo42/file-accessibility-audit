@@ -75,6 +75,11 @@ function makeAnalysisResult(overrides: Partial<AnalysisResult> = {}): AnalysisRe
       { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.10, score: 70, grade: 'C', severity: 'Minor', findings: ['veraPDF detected issues'], explanation: '', helpLinks: [] },
     ] as any,
     warnings: [],
+    localStandards: {
+      status: 'clear',
+      findings: [],
+      knownGapKeys: [],
+    },
     ...overrides,
   }
 }
@@ -84,13 +89,24 @@ function makeContext(overrides: Partial<PdfRemediationContext> = {}): PdfRemedia
     analysis: makeAnalysisResult(),
     qpdf: {
       hasStructTree: true,
+      isTagged: true,
+      hasMarkInfo: true,
+      marked: true,
       hasLang: true,
       lang: 'en',
       hasOutlines: false,
       outlineCount: 0,
       outlineTitles: [],
+      displayDocTitle: true,
+      metadataRef: 'obj:1 0 R',
+      metadataTypeValid: true,
+      metadataSubtypeXml: true,
       hasAcroForm: false,
       formFields: [],
+      fontCount: 1,
+      unembeddedFontCount: 0,
+      fontsMissingToUnicode: 0,
+      cidFontsMissingCidToGidMap: 0,
       images: [],
       headings: [],
       tables: [],
@@ -287,6 +303,133 @@ describe('failureProfileService', () => {
     const unmatched = result.failureProfile.failureModes.find(mode => mode.key === 'pdfua.unmatched')
     expect(unmatched?.blocking).toBe(true)
     expect(unmatched?.classification).toBe('manual_only')
+  })
+
+  it('promotes local standards findings into canonical failure families and planner opportunities', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.font_unicode',
+            label: 'Font Unicode mapping',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Detected 2 font objects without a ToUnicode map.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 2,
+          },
+          {
+            key: 'pdfua.bookmark_language',
+            label: 'Bookmark and outline language quality',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['bookmarks', 'title_language', 'pdf_ua_compliance'],
+            confidence: 0.82,
+            evidence: ['Bookmark title appears raw or OCR-noisy.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+      categories: [
+        ...baseAnalysis.categories,
+        { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.09, score: 40, grade: 'F', severity: 'Critical', findings: ['Bookmark titles are noisy'], explanation: '', helpLinks: [] },
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.18, score: 60, grade: 'D', severity: 'Moderate', findings: ['Fonts are missing Unicode maps'], explanation: '', helpLinks: [] },
+      ] as any,
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.font_unicode' && mode.source === 'local_standards')).toBe(true)
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.bookmark_language' && mode.source === 'local_standards')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_font_unicode_maps')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'replace_bookmarks_from_headings')).toBe(true)
+  })
+
+  it('maps local page-tabs, link-tagging, and annotation-contents findings into planner opportunities', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.page_tabs',
+            label: 'Page tab order metadata',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['1 page is missing /Tabs /S.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.annotation_alt_contents',
+            label: 'Link annotation alternate descriptions',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['link_quality', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['2 links are missing /Contents.'],
+            source: 'composite',
+            inferred: false,
+            count: 2,
+          },
+          {
+            key: 'pdfua.link_tagging',
+            label: 'Link structure tagging',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['link_quality', 'reading_order', 'pdf_ua_compliance'],
+            confidence: 0.8,
+            evidence: ['Links are present but no /Link nodes were found.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'set_page_tabs')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'normalize_annotation_tab_order')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'set_link_annotation_contents')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_link_structure')).toBe(true)
   })
 
   it('builds candidate opportunities with auto-runnable and blocked statuses', () => {
