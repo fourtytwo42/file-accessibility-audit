@@ -53,6 +53,10 @@ downloads/
 Downloads/
 Mitigated/
 MitigationAttempts/
+Processed/
+/*.pdf
 apps/api/data/
 apps/api/scripts/__pycache__/
 apps/api/tmp-*.pdf
+apps/api/check_post_remediation.mts
+apps/api/check_split.mts
