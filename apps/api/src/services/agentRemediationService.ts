@@ -1406,8 +1406,12 @@ export async function remediatePdfWithAgent(
 
     if (nativeTaggedSafeMode && outcome.action.changedDocumentBytes) {
       const candidateResult = await analyzePDF(outcome.buffer, filename, { signal: options?.signal, skipAdobe: true })
+      const overallScoreRegression = candidateResult.overallScore < prevResult.overallScore
+        ? `overall score regressed from ${prevResult.overallScore} to ${candidateResult.overallScore}`
+        : null
       const regressionReason =
-        hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
+        overallScoreRegression
+        || hasNativeStandardsRegression(prevResult, candidateResult, outcome.action.tool)
         || shouldRejectNativeVisibleRewrite(prevResult, candidateResult, outcome.action)
       if (regressionReason) {
         adoptedAction = {
