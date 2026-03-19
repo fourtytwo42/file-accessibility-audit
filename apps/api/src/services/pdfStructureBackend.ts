@@ -243,6 +243,8 @@ export async function runPdfStructureBackend(input: {
 export async function runPdfStructureBackendBatch(input: {
   buffer: Buffer
   mutations: StructureBackendMutationRequest[]
+  /** Whether to include a final structure snapshot after all mutations. Default: true */
+  includeSnapshot?: boolean
   /** Snapshot mode for the final snapshot after all mutations. Default: 'light' */
   inspectMode?: 'light' | 'alt_text_deep'
 }): Promise<StructureBackendBatchResult> {
@@ -261,7 +263,7 @@ export async function runPdfStructureBackendBatch(input: {
     const requestPayload = {
       operation: 'batch_mutate' as const,
       inspectMode: input.inspectMode ?? 'light',
-      includeSnapshot: true,
+      includeSnapshot: input.includeSnapshot ?? true,
       operations: input.mutations.map(m => ({ includeSnapshot: false, ...m })),
     }
     await fs.promises.writeFile(requestPath, JSON.stringify(requestPayload, null, 2))

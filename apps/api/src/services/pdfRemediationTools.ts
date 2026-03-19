@@ -247,6 +247,7 @@ const inspectionResultCache = new Map<string, CachedPdfRemediationPayload>()
 export interface RemediationInspectionCache {
   bufferSha256?: string
   contextsByMode?: Partial<Record<RemediationInspectMode, CachedPdfRemediationPayload>>
+  pagesByHash?: Record<string, RemediationPageFact[]>
   qpdf?: QpdfResult
   pdfjs?: PdfjsResult
   pages?: RemediationPageFact[]
@@ -265,6 +266,27 @@ function getBufferSha256(buffer: Buffer): string {
   return createHash('sha256').update(buffer).digest('hex')
 }
 
+function getCachedPagesForHash(
+  cache: RemediationInspectionCache | undefined,
+  bufferSha256: string,
+): RemediationPageFact[] | undefined {
+  return cache?.pagesByHash?.[bufferSha256]
+}
+
+function setCachedPagesForHash(
+  cache: RemediationInspectionCache | undefined,
+  bufferSha256: string,
+  pages: RemediationPageFact[],
+): void {
+  if (!cache) return
+  cache.pagesByHash = {
+    ...(cache.pagesByHash || {}),
+    [bufferSha256]: pages,
+  }
+  // Preserve the legacy field as a mirror for the current buffer.
+  cache.pages = pages
+}
+
 function toInspectionContext(
   analysis: AnalysisResult,
   payload: CachedPdfRemediationPayload,
@@ -272,6 +294,27 @@ function toInspectionContext(
   return {
     analysis,
     ...payload,
+  }
+}
+
+function toInspectionPayload(input: {
+  qpdf: QpdfResult
+  pdfjs: PdfjsResult
+  pages: RemediationPageFact[]
+  structure: StructureBackendMutationResult
+}): CachedPdfRemediationPayload {
+  const readingOrderCandidates = buildReadingOrderCandidates(input.structure)
+  return {
+    qpdf: input.qpdf,
+    pdfjs: input.pdfjs,
+    pages: input.pages,
+    structure: input.structure,
+    headingCandidates: buildHeadingCandidates(input.pages, input.structure),
+    figureCandidates: buildFigureCandidates(input.pages, input.structure, input.qpdf),
+    tableCandidates: buildTableCandidates(input.pages, input.structure),
+    readingOrderCandidates,
+    readingOrderParentCandidates: buildReadingOrderParentCandidates(input.structure, readingOrderCandidates),
+    linkCandidates: buildLinkCandidates(input.pages),
   }
 }
 
@@ -292,6 +335,16 @@ export function __test_resetInspectionResultCache(): void {
 
 export function __test_getInspectionResultCacheSize(): number {
   return inspectionResultCache.size
+}
+
+let buildRemediationPageFactsCallCount = 0
+
+export function __test_resetBuildRemediationPageFactsCallCount(): void {
+  buildRemediationPageFactsCallCount = 0
+}
+
+export function __test_getBuildRemediationPageFactsCallCount(): number {
+  return buildRemediationPageFactsCallCount
 }
 
 function clamp(value: number, min = 0, max = 1): number {
@@ -879,6 +932,7 @@ function buildTableCandidates(
 }
 
 async function buildRemediationPageFacts(buffer: Buffer): Promise<RemediationPageFact[]> {
+  buildRemediationPageFactsCallCount += 1
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
   const doc = await pdfjsLib.getDocument({
     data: new Uint8Array(buffer),
@@ -964,14 +1018,15 @@ export async function inspectPdfForRemediation(
     if (perRunCache) {
       perRunCache.qpdf = cachedPayload.qpdf
       perRunCache.pdfjs = cachedPayload.pdfjs
-      perRunCache.pages = cachedPayload.pages
+      setCachedPagesForHash(perRunCache, bufferSha256, cachedPayload.pages)
     }
     return toInspectionContext(analysis, cachedPayload)
   }
 
   const qpdfPromise = options.cache?.qpdf ? Promise.resolve(options.cache.qpdf) : analyzeWithQpdf(buffer)
   const pdfjsPromise = options.cache?.pdfjs ? Promise.resolve(options.cache.pdfjs) : analyzeWithPdfjs(buffer)
-  const pagesPromise = options.cache?.pages ? Promise.resolve(options.cache.pages) : buildRemediationPageFacts(buffer)
+  const cachedPages = getCachedPagesForHash(options.cache, bufferSha256)
+  const pagesPromise = cachedPages ? Promise.resolve(cachedPages) : buildRemediationPageFacts(buffer)
   const [qpdf, pdfjs, structure, pages] = await Promise.all([
     qpdfPromise,
     pdfjsPromise,
@@ -979,20 +1034,7 @@ export async function inspectPdfForRemediation(
     pagesPromise,
   ])
 
-  const readingOrderCandidates = buildReadingOrderCandidates(structure)
-
-  const payload: CachedPdfRemediationPayload = {
-    qpdf,
-    pdfjs,
-    structure,
-    pages,
-    headingCandidates: buildHeadingCandidates(pages, structure),
-    figureCandidates: buildFigureCandidates(pages, structure, qpdf),
-    tableCandidates: buildTableCandidates(pages, structure),
-    readingOrderCandidates,
-    readingOrderParentCandidates: buildReadingOrderParentCandidates(structure, readingOrderCandidates),
-    linkCandidates: buildLinkCandidates(pages),
-  }
+  const payload = toInspectionPayload({ qpdf, pdfjs, pages, structure })
 
   if (perRunCache) {
     perRunCache.bufferSha256 = bufferSha256
@@ -1002,11 +1044,40 @@ export async function inspectPdfForRemediation(
     }
     perRunCache.qpdf = qpdf
     perRunCache.pdfjs = pdfjs
-    perRunCache.pages = pages
+    setCachedPagesForHash(perRunCache, bufferSha256, pages)
   }
   setCachedInspectionPayload(cacheKey, payload)
 
   return toInspectionContext(analysis, payload)
+}
+
+export function buildRemediationContextFromSnapshot(input: {
+  analysis: AnalysisResult
+  qpdf: QpdfResult
+  pdfjs: PdfjsResult
+  pages: RemediationPageFact[]
+  structure: StructureBackendMutationResult
+  inspectMode?: RemediationInspectMode
+  cache?: RemediationInspectionCache
+}): PdfRemediationContext {
+  const payload = toInspectionPayload({
+    qpdf: input.qpdf,
+    pdfjs: input.pdfjs,
+    pages: input.pages,
+    structure: input.structure,
+  })
+
+  if (input.cache) {
+    if (!input.cache.contextsByMode) input.cache.contextsByMode = {}
+    if (input.inspectMode) {
+      input.cache.contextsByMode[input.inspectMode] = payload
+    }
+    input.cache.qpdf = input.qpdf
+    input.cache.pdfjs = input.pdfjs
+    input.cache.pages = input.pages
+  }
+
+  return toInspectionContext(input.analysis, payload)
 }
 
 function uniqueFlag(next: ModelReviewFlag, flags: ModelReviewFlag[]): ModelReviewFlag[] {

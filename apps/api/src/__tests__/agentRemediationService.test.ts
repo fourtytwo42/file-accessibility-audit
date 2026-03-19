@@ -34,6 +34,19 @@ vi.mock('../services/pdfAnalyzer.js', () => ({
 vi.mock('../services/pdfRemediationTools.js', () => ({
   inspectPdfForRemediation,
   executeRemediationTool,
+  buildRemediationContextFromSnapshot: ({ analysis, qpdf, pdfjs, pages, structure }: any) => ({
+    analysis,
+    qpdf,
+    pdfjs,
+    pages,
+    structure,
+    headingCandidates: [],
+    figureCandidates: [],
+    tableCandidates: [],
+    readingOrderCandidates: [],
+    readingOrderParentCandidates: [],
+    linkCandidates: pages?.flatMap((page: any) => page.links || []) || [],
+  }),
   needsAltTextDeepInspection: (analysis: any) => {
     const findings = analysis?.categories?.find((category: any) => category.id === 'alt_text')?.findings || []
     const hasAcrobatAltRiskFindings = findings.some((finding: any) =>
@@ -57,8 +70,16 @@ vi.mock('../services/remediationPlanService.js', () => ({
     ['set_document_title', 1],
     ['normalize_document_metadata', 1],
     ['set_document_language', 1],
+    ['bootstrap_struct_tree', 2],
+    ['repair_malformed_bdc_operators', 2],
+    ['repair_note_tag_ids', 2],
+    ['repair_native_marked_content_refs', 2],
+    ['repair_bootstrapped_chart_content_refs', 2],
+    ['repair_structure_conformance', 1],
+    ['repair_native_link_structure', 3],
     ['set_page_tabs', 3],
     ['normalize_annotation_tab_order', 3],
+    ['repair_annotation_alt_text', 3],
     ['set_tabs_all_annotated_pages', 3],
     ['set_figure_alt_text', 5],
     ['repair_other_elements_alt_text', 5],
@@ -266,6 +287,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(planRemediationActions).toHaveBeenCalled()
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
+    expect(analyzePDF).toHaveBeenCalledTimes(2)
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
     expect(result.model.actions?.slice(0, 2).map(action => action.outcome)).toEqual(['applied', 'no_effect'])
     expect(result.model.failureProfile?.version).toBe('1')
@@ -398,6 +420,498 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
   })
 
+  it('batches contiguous document-scoped stage repairs and preserves per-tool actions', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 3,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'stage-batch.pdf',
+      pageCount: 3,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 70,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'failed', isCompliant: false, failedChecks: 2, failures: [] }),
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.2, score: 70, grade: 'C', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 75, grade: 'C', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const context = {
+      pdfjs: { title: 'Stage Batch', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(context)
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['text_extractability', 'reading_order'],
+        actions: [
+          { tool_name: 'repair_malformed_bdc_operators', arguments: { target: 'document' }, rationale: 'Repair BDC', confidence: 0.9 },
+          { tool_name: 'repair_note_tag_ids', arguments: { target: 'document' }, rationale: 'Repair note ids', confidence: 0.88 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    runPdfStructureBackendBatch.mockResolvedValueOnce({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: Buffer.from('pdf-stage-batch'),
+      operationResults: [
+        {
+          operation: 'repair_malformed_bdc_operators',
+          status: 'applied',
+          changedDocumentBytes: true,
+          appliedMutations: [{ ref: 'obj:1 0 R', details: 'bdc repaired' }],
+          warnings: [],
+        },
+        {
+          operation: 'repair_note_tag_ids',
+          status: 'applied',
+          changedDocumentBytes: true,
+          appliedMutations: [{ ref: 'obj:2 0 R', details: 'note ids repaired' }],
+          warnings: [],
+        },
+      ],
+    })
+
+    analyzePDF.mockResolvedValue({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'stage-batch.pdf', originalResult)
+
+    expect(runPdfStructureBackendBatch.mock.calls.some(call =>
+      JSON.stringify(call[0]?.mutations) === JSON.stringify([
+        { operation: 'repair_malformed_bdc_operators' },
+        { operation: 'repair_note_tag_ids' },
+      ]),
+    )).toBe(true)
+    expect(runPdfStructureBackendBatch.mock.calls.some(call =>
+      JSON.stringify(call[0]?.mutations) === JSON.stringify([
+        { operation: 'repair_malformed_bdc_operators' },
+        { operation: 'repair_note_tag_ids' },
+      ]) && call[0]?.includeSnapshot === false,
+    )).toBe(true)
+    expect(executeRemediationTool).not.toHaveBeenCalledWith(expect.objectContaining({
+      call: expect.objectContaining({ tool_name: 'repair_malformed_bdc_operators' }),
+    }))
+    expect(result.model.actions?.some(action => action.tool === 'repair_malformed_bdc_operators' && action.outcome === 'applied')).toBe(true)
+    expect(result.model.actions?.some(action => action.tool === 'repair_note_tag_ids' && action.outcome === 'applied')).toBe(true)
+  })
+
+  it('splits stage batching around non-eligible JS helpers and falls back to per-tool execution when a stage batch fails', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 3,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'stage-mixed.pdf',
+      pageCount: 3,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 1, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 74,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'failed', isCompliant: false, failedChecks: 2, failures: [] }),
+      categories: [
+        { id: 'link_quality', label: 'Links', weight: 0.1, score: 70, grade: 'C', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 70, grade: 'C', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const context = {
+      pdfjs: { title: 'Stage Mixed', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(context)
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['link_quality', 'reading_order'],
+        actions: [
+          { tool_name: 'repair_native_link_structure', arguments: { target: 'document' }, rationale: 'Repair links', confidence: 0.9 },
+          { tool_name: 'normalize_annotation_tab_order', arguments: { target: 'document' }, rationale: 'Normalize order', confidence: 0.9 },
+          { tool_name: 'set_page_tabs', arguments: { target: 'document' }, rationale: 'Set page tabs', confidence: 0.8 },
+          { tool_name: 'repair_annotation_alt_text', arguments: { target: 'document' }, rationale: 'Repair annotation alt', confidence: 0.88 },
+          { tool_name: 'set_tabs_all_annotated_pages', arguments: { target: 'document' }, rationale: 'Set tabs all pages', confidence: 0.88 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    runPdfStructureBackendBatch
+      .mockResolvedValueOnce({
+        status: 'failed',
+        changedDocumentBytes: false,
+        appliedMutations: [],
+        warnings: ['batch failed'],
+        headings: [],
+        structuralNodes: [],
+        tables: [],
+        figures: [],
+        imageStructNodes: [],
+        acrobatAltRiskNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+        operationResults: [],
+      })
+      .mockResolvedValueOnce({
+        status: 'applied',
+        changedDocumentBytes: true,
+        appliedMutations: [],
+        warnings: [],
+        headings: [],
+        structuralNodes: [],
+        tables: [],
+        figures: [],
+        imageStructNodes: [],
+        acrobatAltRiskNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+        outputBuffer: Buffer.from('pdf-mixed-final'),
+        operationResults: [
+          {
+            operation: 'repair_annotation_alt_text',
+            status: 'applied',
+            changedDocumentBytes: true,
+            appliedMutations: [{ ref: 'obj:3 0 R', details: 'annotation alt repaired' }],
+            warnings: [],
+          },
+          {
+            operation: 'set_tabs_all_annotated_pages',
+            status: 'applied',
+            changedDocumentBytes: true,
+            appliedMutations: [{ ref: 'obj:4 0 R', details: 'all tabs set' }],
+            warnings: [],
+          },
+        ],
+      })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-links'),
+        action: {
+          tool: 'repair_native_link_structure',
+          target: 'document',
+          details: 'links repaired',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['link_quality', 'reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-links-order'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'annotation order normalized',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['link_quality', 'reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-page-tabs'),
+        action: {
+          tool: 'set_page_tabs',
+          target: 'document',
+          details: 'page tabs set',
+          confidence: 0.8,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF.mockResolvedValue({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'stage-mixed.pdf', originalResult)
+
+    expect(runPdfStructureBackendBatch.mock.calls.some(call =>
+      JSON.stringify(call[0]?.mutations) === JSON.stringify([
+        { operation: 'repair_native_link_structure' },
+        { operation: 'normalize_annotation_tab_order' },
+      ]) && call[0]?.includeSnapshot === false,
+    )).toBe(true)
+    expect(runPdfStructureBackendBatch.mock.calls.some(call =>
+      JSON.stringify(call[0]?.mutations) === JSON.stringify([
+        { operation: 'repair_annotation_alt_text' },
+        { operation: 'set_tabs_all_annotated_pages' },
+      ]) && call[0]?.includeSnapshot === false,
+    )).toBe(true)
+    expect(executeRemediationTool).toHaveBeenCalledWith(expect.objectContaining({
+      call: expect.objectContaining({ tool_name: 'set_page_tabs' }),
+    }))
+    expect(executeRemediationTool).toHaveBeenCalledWith(expect.objectContaining({
+      call: expect.objectContaining({ tool_name: 'repair_native_link_structure' }),
+    }))
+    expect(result.finalResult.grade).toBe('A')
+  })
+
+  it('batches native-safe stage analysis and rejects only the regressive action', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 4,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'tagged-stage.pdf',
+      pageCount: 4,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 84,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 4,
+        failures: [{ ruleId: 'ro', specification: null, clause: null, testNumber: null, location: null, message: 'Reading order issue', categoryIds: ['reading_order'] }],
+      }),
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.2, score: 75, grade: 'C', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 80, grade: 'B', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const taggedContext = {
+      pdfjs: { title: 'Tagged Stage', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(taggedContext)
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['text_extractability', 'reading_order'],
+        actions: [
+          { tool_name: 'repair_malformed_bdc_operators', arguments: { target: 'document' }, rationale: 'Repair BDC', confidence: 0.9 },
+          { tool_name: 'repair_note_tag_ids', arguments: { target: 'document' }, rationale: 'Repair note ids', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    runPdfStructureBackendBatch.mockResolvedValueOnce({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: Buffer.from('pdf12'),
+      operationResults: [
+        {
+          operation: 'repair_malformed_bdc_operators',
+          status: 'applied',
+          changedDocumentBytes: true,
+          appliedMutations: [{ ref: 'obj:1 0 R', details: 'bdc repaired' }],
+          warnings: [],
+        },
+        {
+          operation: 'repair_note_tag_ids',
+          status: 'applied',
+          changedDocumentBytes: true,
+          appliedMutations: [{ ref: 'obj:2 0 R', details: 'note ids repaired' }],
+          warnings: [],
+        },
+      ],
+    })
+
+    executeRemediationTool
+      .mockImplementationOnce(async ({ buffer }: any) => ({
+        buffer: Buffer.concat([buffer, Buffer.from('1')]),
+        action: {
+          tool: 'repair_malformed_bdc_operators',
+          target: 'document',
+          details: 'bdc repaired',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      }))
+      .mockImplementationOnce(async ({ buffer }: any) => ({
+        buffer: Buffer.concat([buffer, Buffer.from('2')]),
+        action: {
+          tool: 'repair_note_tag_ids',
+          target: 'document',
+          details: 'note ids repaired',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      }))
+
+    analyzePDF
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 79,
+        grade: 'C',
+        verapdf: makeVeraPdfResult({
+          status: 'failed',
+          isCompliant: false,
+          failedChecks: 6,
+          failures: [
+            { ruleId: 'ro', specification: null, clause: null, testNumber: null, location: null, message: 'Reading order issue', categoryIds: ['reading_order'] },
+            { ruleId: 'note', specification: null, clause: null, testNumber: null, location: null, message: 'Note tag shall have ID entry', categoryIds: [] },
+          ],
+        }),
+        categories: [
+          { ...originalResult.categories[0] },
+          { ...originalResult.categories[1], score: 70, grade: 'C', severity: 'Moderate' },
+        ],
+      })
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 93,
+        grade: 'A',
+        verapdf: makeVeraPdfResult({
+          status: 'failed',
+          isCompliant: false,
+          failedChecks: 3,
+          failures: [{ ruleId: 'ro', specification: null, clause: null, testNumber: null, location: null, message: 'Reading order issue', categoryIds: ['reading_order'] }],
+        }),
+        categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[1] },
+        ],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'tagged-stage.pdf', originalResult)
+
+    expect(analyzePDF).toHaveBeenCalledTimes(2)
+    expect(runPdfStructureBackendBatch).toHaveBeenCalled()
+    expect(runPdfStructureBackendBatch.mock.calls.some(call =>
+      JSON.stringify(call[0]?.mutations) === JSON.stringify([
+        { operation: 'repair_malformed_bdc_operators' },
+        { operation: 'repair_note_tag_ids' },
+      ]),
+    )).toBe(true)
+    expect(executeRemediationTool.mock.calls.filter(call =>
+      ['repair_malformed_bdc_operators', 'repair_note_tag_ids'].includes(call[0]?.call?.tool_name),
+    )).toHaveLength(2)
+    expect(result.buffer.equals(Buffer.from('pdf1'))).toBe(true)
+    expect(result.model.nativeTaggedSafeMode).toBe(true)
+    expect(result.model.rejectedActions?.some(action => action.tool === 'repair_note_tag_ids')).toBe(true)
+    expect(result.model.actions?.some(action => action.tool === 'repair_malformed_bdc_operators' && action.outcome === 'applied')).toBe(true)
+    expect(result.finalResult.overallScore).toBe(93)
+  })
+
   it('always runs final tab-order cleanup before returning the remediated PDF', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
@@ -517,12 +1031,98 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       { operation: 'normalize_annotation_tab_order' },
       { operation: 'set_tabs_all_annotated_pages' },
     ])
+    expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.includeSnapshot).toBe(true)
+    expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.inspectMode).toBe('light')
     expect(result.model.actions?.slice(-3).map(action => action.tool)).toEqual([
       'repair_native_link_structure',
       'normalize_annotation_tab_order',
       'set_tabs_all_annotated_pages',
     ])
     expect(result.buffer.equals(Buffer.from('pdf-cleanup-batch'))).toBe(true)
+    expect(analyzePDF).toHaveBeenCalledTimes(1)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(1)
+  })
+
+  it('batches native-safe final cleanup into one analysis pass', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'native-cleanup.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 97,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const taggedContext = {
+      pdfjs: { title: 'Native Cleanup', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(taggedContext)
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool.mockImplementation(async ({ buffer, call }: any) => ({
+      buffer: Buffer.concat([buffer, Buffer.from(call.tool_name[0])]),
+      action: {
+        tool: call.tool_name,
+        target: 'document',
+        details: `${call.tool_name} applied`,
+        confidence: 0.95,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: call.tool_name.includes('tab') || call.tool_name.includes('link') ? ['reading_order'] : [],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    }))
+
+    analyzePDF.mockResolvedValue({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'native-cleanup.pdf', originalResult)
+
+    expect(analyzePDF).toHaveBeenCalledTimes(1)
+    expect(executeRemediationTool).toHaveBeenCalledTimes(5)
+    expect(result.model.actions?.slice(-5).map(action => action.tool)).toEqual([
+      'normalize_heading_hierarchy',
+      'normalize_nested_figure_containers',
+      'repair_native_link_structure',
+      'normalize_annotation_tab_order',
+      'set_tabs_all_annotated_pages',
+    ])
   })
 
   it('requests deep inspection only when figure or alt-text work remains', async () => {
@@ -1601,6 +2201,12 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
     expect(executeRemediationTool).toHaveBeenCalledTimes(6)
+    expect(inspectPdfForRemediation.mock.calls.some(call =>
+      call[0]?.equals?.(semanticFixedBuffer)
+      && call[1]?.overallScore === 81
+      && call[2]?.cache
+      && !call[2]?.inspectMode,
+    )).toBe(true)
     expect(result.buffer.equals(Buffer.from('semantic-fixed'))).toBe(true)
     expect(result.model.actions?.some(action => action.tool === 'create_heading_from_candidate' && action.outcome === 'applied')).toBe(true)
     expect(result.finalResult.overallScore).toBe(81)
@@ -1704,6 +2310,12 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'links.pdf', originalResult)
 
     expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
+    expect(inspectPdfForRemediation.mock.calls.some(call =>
+      call[0]?.equals?.(Buffer.from('pdf'))
+      && call[1] === originalResult
+      && call[2]?.cache
+      && !call[2]?.inspectMode,
+    )).toBe(true)
     expect(result.model.rejectedActions?.some(action => action.tool === 'rewrite_link_visible_text')).toBe(true)
     expect(result.finalResult.verapdf.failedChecks).toBe(12)
   })
@@ -1966,6 +2578,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
     expect(executeRemediationTool.mock.calls.some(call => call[0].call.arguments.generationSource === 'heuristic_fallback')).toBe(true)
+    expect(inspectPdfForRemediation.mock.calls.every(call => !call[2] || call[2].cache)).toBe(true)
     expect(result.model.actions?.some(action => action.generationSource === 'heuristic_fallback')).toBe(true)
   })
 
@@ -2241,6 +2854,12 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     await remediatePdfWithAgent(Buffer.from('pdf'), 'outline-backed-bookmarks.pdf', originalResult)
 
     expect(executeRemediationTool).toHaveBeenCalled()
+    expect(inspectPdfForRemediation.mock.calls.some(call =>
+      call[0]?.equals?.(Buffer.from('bookmark-fixed'))
+      && call[1] === originalResult
+      && call[2]?.cache
+      && !call[2]?.inspectMode,
+    )).toBe(true)
     const bookmarkCall = executeRemediationTool.mock.calls
       .map(call => call[0].call)
       .find(call => call.tool_name === 'replace_bookmarks_from_headings')

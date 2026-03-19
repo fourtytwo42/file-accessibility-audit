@@ -10,8 +10,11 @@ import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
 import {
+  buildRemediationContextFromSnapshot,
+  __test_getBuildRemediationPageFactsCallCount,
   __test_getInspectionResultCacheSize,
   __test_remapHeadingTarget,
+  __test_resetBuildRemediationPageFactsCallCount,
   __test_resetInspectionResultCache,
   executeRemediationTool,
   inspectPdfForRemediation,
@@ -121,6 +124,7 @@ function makePlannerAction(
 afterEach(() => {
   vi.restoreAllMocks()
   __test_resetInspectionResultCache()
+  __test_resetBuildRemediationPageFactsCallCount()
 })
 
 describe('pdfRemediationTools', { timeout: 120_000 }, () => {
@@ -202,37 +206,86 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'cache.pdf', { skipAdobe: true })
     const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+    const cache: any = {}
 
-    const first = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
-    const second = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const first = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light', cache })
+    const second = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light', cache })
 
     expect(backendSpy).toHaveBeenCalledTimes(1)
+    expect(__test_getBuildRemediationPageFactsCallCount()).toBe(1)
     expect(second.structure).toEqual(first.structure)
     expect(__test_getInspectionResultCacheSize()).toBeGreaterThanOrEqual(1)
   })
 
-  it('does not cross-reuse inspection cache entries across inspect modes', async () => {
+  it('reuses page facts across inspect modes for the same buffer', async () => {
     const buffer = await loadFixture('accessible.pdf')
     const analysis = await analyzePDF(buffer, 'accessible.pdf', { skipAdobe: true })
     const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+    const cache: any = {}
 
-    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
-    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
+    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light', cache })
+    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep', cache })
 
     expect(backendSpy).toHaveBeenCalledTimes(2)
+    expect(__test_getBuildRemediationPageFactsCallCount()).toBe(1)
   })
 
-  it('invalidates inspection cache when the buffer changes', async () => {
+  it('builds remediation context from a supplied snapshot without re-running inspect', async () => {
+    const buffer = await makePdfWithLink()
+    const analysis = await analyzePDF(buffer, 'snapshot.pdf', { skipAdobe: true })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+    const inspected = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    backendSpy.mockClear()
+
+    const rebuilt = buildRemediationContextFromSnapshot({
+      analysis,
+      qpdf: inspected.qpdf,
+      pdfjs: inspected.pdfjs,
+      pages: inspected.pages,
+      structure: inspected.structure,
+      inspectMode: 'light',
+      cache: {},
+    })
+
+    expect(backendSpy).not.toHaveBeenCalled()
+    expect(rebuilt.structure).toEqual(inspected.structure)
+    expect(rebuilt.linkCandidates).toEqual(inspected.linkCandidates)
+    expect(rebuilt.headingCandidates).toEqual(inspected.headingCandidates)
+    expect(rebuilt.figureCandidates).toEqual(inspected.figureCandidates)
+    expect(rebuilt.tableCandidates).toEqual(inspected.tableCandidates)
+    expect(rebuilt.readingOrderCandidates).toEqual(inspected.readingOrderCandidates)
+    expect(rebuilt.readingOrderParentCandidates).toEqual(inspected.readingOrderParentCandidates)
+  })
+
+  it('recomputes page facts when the buffer changes', async () => {
     const firstBuffer = await makePdf()
     const secondBuffer = await makePdfWithLink()
     const firstAnalysis = await analyzePDF(firstBuffer, 'first.pdf', { skipAdobe: true })
     const secondAnalysis = await analyzePDF(secondBuffer, 'second.pdf', { skipAdobe: true })
     const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+    const cache: any = {}
 
-    await inspectPdfForRemediation(firstBuffer, firstAnalysis, { inspectMode: 'light' })
-    await inspectPdfForRemediation(secondBuffer, secondAnalysis, { inspectMode: 'light' })
+    await inspectPdfForRemediation(firstBuffer, firstAnalysis, { inspectMode: 'light', cache })
+    await inspectPdfForRemediation(secondBuffer, secondAnalysis, { inspectMode: 'light', cache })
 
     expect(backendSpy).toHaveBeenCalledTimes(2)
+    expect(__test_getBuildRemediationPageFactsCallCount()).toBe(2)
+  })
+
+  it('reuses page facts from the per-run hash cache even when the inspect payload cache is missed', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'pages-hash.pdf', { skipAdobe: true })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+    const firstCache: any = {}
+    const secondCache: any = {}
+
+    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light', cache: firstCache })
+    secondCache.pagesByHash = { ...(firstCache.pagesByHash || {}) }
+
+    await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep', cache: secondCache })
+
+    expect(backendSpy).toHaveBeenCalledTimes(2)
+    expect(__test_getBuildRemediationPageFactsCallCount()).toBe(1)
   })
 
   it('evicts the oldest inspection cache entry when the process cache is full', async () => {

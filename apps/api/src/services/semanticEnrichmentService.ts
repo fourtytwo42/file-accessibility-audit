@@ -17,9 +17,10 @@ const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENR
 const PROPOSE_SEMANTIC_REPAIRS_TOOL = 'propose_semantic_repairs'
 const HEADING_BATCH_SIZE = 8
 const LINK_BATCH_SIZE = 8
-const FIGURE_BATCH_SIZE = 1
+const FIGURE_BATCH_SIZE = 4
 const TABLE_BATCH_SIZE = 3
 const BOOKMARK_BATCH_SIZE = 10
+const SEMANTIC_REQUEST_CONCURRENCY = 3
 const MAX_TEXT = 240
 const MAX_ALT_TEXT = 180
 const TOP_FAILURE_LIMIT = 2
@@ -157,6 +158,29 @@ function chunk<T>(items: T[], size: number): T[][] {
     batches.push(items.slice(index, index + size))
   }
   return batches
+}
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  worker: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  if (items.length === 0) return []
+  const limit = Math.max(1, Math.min(concurrency, items.length))
+  const results = new Array<R>(items.length)
+  let nextIndex = 0
+
+  const runWorker = async () => {
+    while (true) {
+      const currentIndex = nextIndex
+      if (currentIndex >= items.length) return
+      nextIndex += 1
+      results[currentIndex] = await worker(items[currentIndex]!, currentIndex)
+    }
+  }
+
+  await Promise.all(Array.from({ length: limit }, () => runWorker()))
+  return results
 }
 
 function clampConfidence(value: unknown): number {
@@ -457,11 +481,15 @@ async function renderPageImages(buffer: Buffer, pageNumbers: number[]): Promise<
   }).promise
   const images = new Map<number, string>()
   try {
-    for (const pageNumber of unique) {
-      if (pageNumber > doc.numPages) continue
+    const renderedPages = await Promise.all(unique.map(async pageNumber => {
+      if (pageNumber > doc.numPages) return null
       const page = await doc.getPage(pageNumber)
       const rendered = await renderPdfPageToDataUrl(page, { scale: SEMANTIC_PAGE_RENDER_SCALE, format: 'png' })
-      images.set(pageNumber, rendered.dataUrl)
+      return { pageNumber, dataUrl: rendered.dataUrl }
+    }))
+    for (const rendered of renderedPages) {
+      if (!rendered) continue
+      images.set(rendered.pageNumber, rendered.dataUrl)
     }
   } finally {
     await doc.destroy()
@@ -699,10 +727,18 @@ function splitBatch(batch: SemanticRepairBatch): SemanticRepairBatch[] {
     ].filter(entry => entry.headings.length)
   }
   if (batch.batchType === 'figures' && batch.figures.length > 1) {
-    return batch.figures.map(figure => ({ ...batch, figures: [figure] }))
+    const midpoint = Math.ceil(batch.figures.length / 2)
+    return [
+      { ...batch, figures: batch.figures.slice(0, midpoint) },
+      { ...batch, figures: batch.figures.slice(midpoint) },
+    ].filter(entry => entry.figures.length)
   }
   if (batch.batchType === 'tables' && batch.tables.length > 1) {
-    return batch.tables.map(table => ({ ...batch, tables: [table] }))
+    const midpoint = Math.ceil(batch.tables.length / 2)
+    return [
+      { ...batch, tables: batch.tables.slice(0, midpoint) },
+      { ...batch, tables: batch.tables.slice(midpoint) },
+    ].filter(entry => entry.tables.length)
   }
   return []
 }
@@ -912,10 +948,15 @@ export async function generateSemanticRepairBatches(input: {
   const pageImages = await renderPageImages(input.buffer, [...pageNumbers])
   const document = summarizeDocument(input.filename, input.title, input.language, input.analysis)
 
+  const resolvedBatches = await mapWithConcurrency(
+    batches,
+    SEMANTIC_REQUEST_CONCURRENCY,
+    async batch => resolveBatchWithFallbacks({ batch, document, pageImages }),
+  )
+
   const results: SemanticBatchResult[] = []
   const reviewFlags: ModelReviewFlag[] = []
-  for (const batch of batches) {
-    const resolved = await resolveBatchWithFallbacks({ batch, document, pageImages })
+  for (const resolved of resolvedBatches) {
     results.push(...resolved.results)
     reviewFlags.push(...resolved.reviewFlags)
   }

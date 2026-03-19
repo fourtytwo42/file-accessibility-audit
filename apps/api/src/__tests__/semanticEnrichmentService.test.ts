@@ -187,10 +187,7 @@ describe('semanticEnrichmentService', () => {
     expect(batches.map(batch => `${batch.batchType}:${batch.headings.length || batch.figures.length || batch.tables.length || batch.links.length}`)).toEqual([
       'headings:8',
       'headings:1',
-      'figures:1',
-      'figures:1',
-      'figures:1',
-      'figures:1',
+      'figures:4',
       'tables:1',
       'links:8',
       'links:1',
@@ -245,14 +242,14 @@ describe('semanticEnrichmentService', () => {
     }])
   })
 
-  it('routes each eligible figure as its own vision request with cropped image data', async () => {
+  it('batches eligible figures into one vision request with cropped image data', async () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const fetchMock = vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
       const prompt = String(body.messages?.[0]?.content || '')
       expect(prompt).toContain('Batch type: figures')
       expect(prompt).toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
-      expect((prompt.match(/"candidateId":"figure:/g) || []).length).toBe(1)
+      expect((prompt.match(/"candidateId":"figure:/g) || []).length).toBe(4)
       return {
         ok: true,
         json: async () => ({
@@ -262,7 +259,12 @@ describe('semanticEnrichmentService', () => {
                 function: {
                   name: 'propose_semantic_repairs',
                   arguments: JSON.stringify({
-                    figures: [{ candidateId: 'figure:1', decorative: false, altText: 'Chart of outcomes', confidence: 0.9, rationale: 'Visible chart.' }],
+                    figures: [
+                      { candidateId: 'figure:1', decorative: false, altText: 'Chart of outcomes 1', confidence: 0.9, rationale: 'Visible chart.' },
+                      { candidateId: 'figure:2', decorative: false, altText: 'Chart of outcomes 2', confidence: 0.9, rationale: 'Visible chart.' },
+                      { candidateId: 'figure:3', decorative: false, altText: 'Chart of outcomes 3', confidence: 0.9, rationale: 'Visible chart.' },
+                      { candidateId: 'figure:4', decorative: false, altText: 'Chart of outcomes 4', confidence: 0.9, rationale: 'Visible chart.' },
+                    ],
                   }),
                 },
               }],
@@ -287,7 +289,8 @@ describe('semanticEnrichmentService', () => {
       },
     })
 
-    expect(fetchMock).toHaveBeenCalledTimes(4)
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(cropDataUrlRegion).toHaveBeenCalledTimes(4)
     expect(cropDataUrlRegion).toHaveBeenCalledWith(
       expect.any(Buffer),
       expect.objectContaining({ x: 0, y: 0, width: 1, height: 1 }),
@@ -319,7 +322,7 @@ describe('semanticEnrichmentService', () => {
       { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
     ] as any
     const batches = buildSemanticRepairBatches({ context: makeContext(), analysis })
-    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures'])
+    expect(batches.map(batch => `${batch.batchType}:${batch.figures.length || batch.headings.length || batch.tables.length || batch.links.length}`)).toEqual(['figures:4'])
   })
 
   it('still returns bookmark cleanup batches when bookmarks are the only remaining semantic work', async () => {
@@ -335,7 +338,7 @@ describe('semanticEnrichmentService', () => {
       { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
     ] as any
     const batches = buildSemanticRepairBatches({ context: makeContext(), analysis })
-    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures', 'bookmarks'])
+    expect(batches.map(batch => `${batch.batchType}:${batch.figures.length || batch.headings.length || batch.tables.length || batch.links.length}`)).toEqual(['figures:4', 'bookmarks:1'])
   })
 
   it('uses existing outline titles as bookmark AI input when available', async () => {
@@ -588,7 +591,7 @@ describe('semanticEnrichmentService', () => {
       { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
     ] as any
     const batches = buildSemanticRepairBatches({ context: makeContext(), analysis })
-    expect(batches.map(batch => batch.batchType)).toEqual(['figures', 'figures', 'figures', 'figures'])
+    expect(batches.map(batch => `${batch.batchType}:${batch.figures.length || batch.headings.length || batch.tables.length || batch.links.length}`)).toEqual(['figures:4'])
   })
 
   it('retries oversized heading batches with smaller requests', async () => {
@@ -680,6 +683,136 @@ describe('semanticEnrichmentService', () => {
 
     expect(generated.batches).toEqual([])
     expect(generated.reviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+  })
+
+  it('splits oversized multi-figure requests before falling back to singletons', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 413,
+        text: async () => '{"error":{"message":"context_length_exceeded"}}',
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    figures: [
+                      { candidateId: 'figure:1', decorative: false, altText: 'Chart 1', confidence: 0.9, rationale: 'Visible chart.' },
+                      { candidateId: 'figure:2', decorative: false, altText: 'Chart 2', confidence: 0.9, rationale: 'Visible chart.' },
+                    ],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    figures: [
+                      { candidateId: 'figure:3', decorative: false, altText: 'Chart 3', confidence: 0.9, rationale: 'Visible chart.' },
+                      { candidateId: 'figure:4', decorative: false, altText: 'Chart 4', confidence: 0.9, rationale: 'Visible chart.' },
+                    ],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      })
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    const generated = await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        headingCandidates: [],
+        tableCandidates: [],
+        linkCandidates: [],
+      },
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    const promptSizes = fetchMock.mock.calls.map(call => {
+      const body = JSON.parse(String(call[1]?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      return (prompt.match(/"candidateId":"figure:/g) || []).length
+    })
+    expect(promptSizes).toEqual([4, 2, 2])
+    expect(generated.batches.flatMap(batch => batch.figures.map(item => item.candidateId))).toEqual([
+      'figure:1',
+      'figure:2',
+      'figure:3',
+      'figure:4',
+    ])
+  })
+
+  it('resolves independent semantic batch types concurrently while preserving output order', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const resolveOrder: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (_url, init: any) => {
+      const body = JSON.parse(String(init?.body || '{}'))
+      const prompt = String(body.messages?.[0]?.content || '')
+      const batchType = /Batch type: (\w+)/.exec(prompt)?.[1] || 'unknown'
+      const delayMs = batchType === 'figures' ? 40 : batchType === 'tables' ? 20 : 0
+      await new Promise(resolve => setTimeout(resolve, delayMs))
+      resolveOrder.push(batchType)
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    headings: batchType === 'headings' ? [{ candidateId: 'heading:1:1', level: 'H2', confidence: 0.9, rationale: 'Heading' }] : [],
+                    figures: batchType === 'figures' ? [{ candidateId: 'figure:1', decorative: false, altText: 'Chart 1', confidence: 0.9, rationale: 'Figure' }] : [],
+                    tables: batchType === 'tables' ? [{ candidateId: 'table:1', useFirstRowAsHeader: true, confidence: 0.9, rationale: 'Table' }] : [],
+                    links: batchType === 'links' ? [{ candidateId: 'link:1:1', replacementText: 'Resource', annotationContents: 'Resource link', confidence: 0.9, rationale: 'Link' }] : [],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      }
+    }) as any)
+
+    const generated = await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        headingCandidates: [makeContext().headingCandidates[0]],
+        figureCandidates: [makeContext().figureCandidates[0]],
+        tableCandidates: [makeContext().tableCandidates[0]],
+        linkCandidates: [makeContext().linkCandidates[0]],
+      },
+    })
+
+    expect(resolveOrder).not.toEqual(['headings', 'figures', 'tables', 'links'])
+    expect(generated.batches.map(batch => batch.batchType)).toEqual(['headings', 'figures', 'tables', 'links'])
   })
 
   it('returns partial results when some semantic retries succeed and others are skipped', async () => {
