@@ -828,6 +828,19 @@ def figure_candidates(pdf):
         if tag != "/Figure":
             continue
         mcids = normalized_struct_elem_mcids(obj)
+        # Skip orphaned Figure elements that have no content association (no MCIDs and no
+        # OBJR kids). These empty Figures must NOT receive alt text — Adobe's
+        # "Associated with content" check fails for /Figure elements with /Alt but no
+        # content backing them. Semantic enrichment must not touch these.
+        if not mcids:
+            kids = obj.get("/K")
+            kid_list = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if kids is not None else [])
+            has_objr = any(
+                isinstance(k, pikepdf.Dictionary) and str(k.get("/Type", "")) == "/OBJR"
+                for k in kid_list
+            )
+            if not has_objr:
+                continue
         page_obj = page_ref_for_struct_elem(obj)
         page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
         usage = page_usage.setdefault(page_ref, page_mcid_analysis(page_obj)) if page_ref and isinstance(page_obj, pikepdf.Dictionary) else {}
@@ -2910,26 +2923,63 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
 
         if mode == "orphaned_alt_empty_element":
             # Element has /Alt but no MCID/OBJR-backed content. Adobe flags this as
-            # "Associated with content - Failed". Now that QPDF scoring ignores empty
-            # /Figure alt text, we can safely strip the orphaned /Alt deterministically.
+            # "Associated with content - Failed". Remove both the /Alt AND the element
+            # itself from its parent's /K array. A /Figure with no content association
+            # is structurally invalid: keeping it (even without /Alt) causes veraPDF
+            # clause-7.3 failures (Figure must have alt text). Deleting it entirely
+            # satisfies both Adobe and veraPDF.
+            elem_ref = risk["ref"]
             existing_alt = obj.get("/Alt")
+            parent_ref = None
+            try:
+                parent_obj = obj.get("/P")
+                if isinstance(parent_obj, pikepdf.Dictionary):
+                    parent_ref = ref_string(parent_obj)
+                    parent_kids = parent_obj.get("/K")
+                    if isinstance(parent_kids, pikepdf.Array):
+                        new_kids = pikepdf.Array()
+                        removed = False
+                        for kid in parent_kids:
+                            kid_obj = kid if isinstance(kid, pikepdf.Dictionary) else (kid.get_object() if hasattr(kid, "get_object") else None)
+                            if kid_obj is not None and ref_string(kid_obj) == elem_ref:
+                                removed = True
+                            else:
+                                new_kids.append(kid)
+                        if removed:
+                            parent_obj["/K"] = new_kids
+                            changed = True
+                            repairs_applied += 1
+                            applied.append({
+                                "ref": elem_ref,
+                                "before": str(existing_alt)[:60] if existing_alt is not None else risk["tag"],
+                                "after": None,
+                                "details": (
+                                    f"Deleted orphaned {risk['tag']} element {elem_ref} from parent {parent_ref}: "
+                                    f"element has no MCID/OBJR content association. Removing it satisfies both "
+                                    f"Adobe 'Associated with content' and veraPDF clause-7.3 (Figure requires alt text)."
+                                ),
+                            })
+                            continue
+            except Exception as exc:
+                unresolved.append(f"Could not delete orphaned {risk['tag']} {elem_ref} from parent: {exc}")
+            # Fallback: if deletion failed (e.g., parent not found), at least strip /Alt.
             if existing_alt is not None:
                 try:
                     del obj["/Alt"]
                     changed = True
                     repairs_applied += 1
                     applied.append({
-                        "ref": risk["ref"],
+                        "ref": elem_ref,
                         "before": str(existing_alt)[:60],
                         "after": None,
                         "details": (
-                            f"Removed orphaned /Alt from {risk['tag']} element {risk['ref']}: "
+                            f"Removed orphaned /Alt from {risk['tag']} element {elem_ref} (parent deletion failed): "
                             f"empty structure elements must not carry alternate text "
                             f"(Adobe 'Associated with content' check)."
                         ),
                     })
                 except Exception as exc:
-                    unresolved.append(f"Could not remove orphaned /Alt from {risk['tag']} {risk['ref']}: {exc}")
+                    unresolved.append(f"Could not remove orphaned /Alt from {risk['tag']} {elem_ref}: {exc}")
             continue
 
         if mode in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:

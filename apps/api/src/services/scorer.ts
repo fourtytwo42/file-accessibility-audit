@@ -554,19 +554,23 @@ function scoreAltText(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
 
   const figures = qpdf.images.filter(img => img.ref)
 
-  // QPDF found no tagged images, but pdfjs detected image rendering operations
+  // QPDF found no tagged images, but pdfjs detected image rendering operations.
+  // Since QPDF comprehensively parses every indirect object, if it finds zero
+  // Image XObjects (/Subtype /Image), the paint operations PDF.js detected are
+  // from inline images, Form XObjects, or patterns — elements that are typically
+  // decorative and do not need individual alt text. Treat as N/A.
   if (figures.length === 0 && pdfjs.imageCount > 0) {
     return {
       id: 'alt_text',
       label: 'Alt Text on Images',
       weight: SCORING_WEIGHTS.alt_text,
-      score: 0,
-      grade: 'F',
-      severity: 'Critical',
+      score: null,
+      grade: null,
+      severity: null,
       findings: [
-        `${pdfjs.imageCount} image(s) detected in the document, but none have accessibility tags`,
-        'The images exist in the PDF but are not tagged as <Figure> elements, so screen readers cannot identify them or read any alternative text.',
-        'How to fix: In Adobe Acrobat, open the Tags panel → use the Reading Order tool (Accessibility → Reading Order) to identify images → tag each image as a Figure → right-click the <Figure> tag → Properties → add descriptive alt text.',
+        `${pdfjs.imageCount} image rendering operation(s) detected, but no taggable Image XObjects were found in the document structure.`,
+        'The detected images are likely inline images, form XObjects, or decorative patterns that do not require individual alt text — this category does not affect the score.',
+        'If this document contains informative photos or diagrams, verify manually in Adobe Acrobat\'s Tags panel that they are tagged as <Figure> elements with alt text.',
       ],
       explanation: altExplanation,
       helpLinks: altLinks,
@@ -839,6 +843,9 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
   if (effectiveFailRatio === 0 || effectiveFailingCount === 0) {
     score = 100
     findings.push('All sampled text meets WCAG contrast requirements.')
+  } else if (effectiveFailRatio < 0.01) {
+    score = 95
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
   } else if (effectiveFailRatio < 0.05) {
     score = 80
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)

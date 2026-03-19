@@ -693,15 +693,15 @@ describe('scoreHeadingStructure edge cases', () => {
 })
 
 describe('scoreAltText pdfjs fallback', () => {
-  it('qpdf finds no images but pdfjs detects images → score 0 (Critical)', () => {
+  it('qpdf finds no images but pdfjs detects images → N/A (no taggable XObjects)', () => {
     const qpdf = makeQpdf({ images: [] })
     const pdfjs = makePdfjs({ imageCount: 3 })
     const result = scoreDocument(qpdf, pdfjs)
     const cat = findCategory(result, 'alt_text')
-    expect(cat.score).toBe(0)
-    expect(cat.severity).toBe('Critical')
-    expect(cat.findings.some(f => f.includes('3 image(s) detected'))).toBe(true)
-    expect(cat.findings.some(f => f.includes('not tagged'))).toBe(true)
+    expect(cat.score).toBeNull()
+    expect(cat.severity).toBeNull()
+    expect(cat.findings.some(f => f.includes('3 image rendering operation(s)'))).toBe(true)
+    expect(cat.findings.some(f => f.includes('no taggable Image XObjects'))).toBe(true)
   })
 
   it('qpdf finds no images and pdfjs finds none either → N/A', () => {
