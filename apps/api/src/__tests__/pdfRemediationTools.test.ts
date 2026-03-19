@@ -202,6 +202,27 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(needsAltTextDeepInspection(analysis)).toBe(true)
   })
 
+  it('keeps deep alt-text inspection enabled when images are present but not tagged as figure elements', () => {
+    const analysis = {
+      categories: [
+        {
+          id: 'alt_text',
+          findings: [
+            '1 image(s) detected in the document, but none have accessibility tags',
+            'The images exist in the PDF but are not tagged as <Figure> elements, so screen readers cannot identify them or read any alternative text.',
+          ],
+          score: 0,
+        },
+      ],
+      verapdf: {
+        status: 'passed',
+        failures: [],
+      },
+    } as any
+
+    expect(needsAltTextDeepInspection(analysis)).toBe(true)
+  })
+
   it('reuses cached inspection results for the same buffer and inspect mode', async () => {
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'cache.pdf', { skipAdobe: true })

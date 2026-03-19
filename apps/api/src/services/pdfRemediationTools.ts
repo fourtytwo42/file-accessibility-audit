@@ -497,11 +497,15 @@ function textNear(lines: RemediationPageFact['textLines'], index: number): strin
 
 export function needsAltTextDeepInspection(analysis: AnalysisResult): boolean {
   const altTextCategory = analysis.categories.find(category => category.id === 'alt_text')
+  const hasUntaggedImageFindings = (altTextCategory?.findings || []).some(finding =>
+    /none have accessibility tags|not tagged as <figure>|not tagged as \/figure|images exist in the pdf but are not tagged|cannot identify them or read any alternative text/i.test(finding))
   const hasAcrobatAltRiskFindings = (altTextCategory?.findings || []).some(finding =>
     /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding))
-  if (hasAcrobatAltRiskFindings) {
+  if (hasAcrobatAltRiskFindings || hasUntaggedImageFindings) {
     // Once scoring has already surfaced Acrobat-risk ownership findings, keep deep inspection
     // enabled for follow-up remediation rounds regardless of the current category score.
+    // The same applies when analysis shows images exist but are not tagged as /Figure:
+    // that requires a structure-level ownership repair, not just missing alt text.
     return true
   }
   if (analysis.verapdf?.status !== 'failed') return false
