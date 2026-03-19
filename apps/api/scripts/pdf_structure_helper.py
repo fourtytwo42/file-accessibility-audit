@@ -1277,17 +1277,22 @@ def acrobat_alt_risk_nodes(pdf):
                 has_alt = obj.get("/Alt") is not None
                 has_mcid_kid = False
                 has_struct_kid = False
+                has_objr_kid = False
                 kid_list = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if kids is not None else [])
                 for kid in kid_list:
                     if isinstance(kid, (int, pikepdf.Integer)):
                         has_mcid_kid = True
                     elif isinstance(kid, pikepdf.Dictionary):
                         ktype = str(kid.get("/Type", ""))
-                        if ktype != "/OBJR":
+                        if ktype == "/OBJR":
+                            has_objr_kid = True
+                        else:
                             has_struct_kid = True
                             scan_orphaned_alt(kid)
-                # Flag this element if it has /Alt but no content kids of any kind
-                if has_alt and not has_mcid_kid and not has_struct_kid and node_ref not in seen_refs:
+                # Flag this element if it has /Alt but no content kids of any kind.
+                # Elements with OBJR children reference annotation objects (e.g. image
+                # hyperlinks) and are NOT truly empty — do not strip their /Alt.
+                if has_alt and not has_mcid_kid and not has_struct_kid and not has_objr_kid and node_ref not in seen_refs:
                     pg = obj.get("/Pg")
                     page_ref = ref_string(pg) if isinstance(pg, pikepdf.Dictionary) else None
                     risks.append({
