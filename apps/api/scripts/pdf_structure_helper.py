@@ -2910,57 +2910,32 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
 
         if mode == "orphaned_alt_empty_element":
             # Element has /Alt but no MCID content (empty or missing /K). This triggers
-            # Adobe's "Associated with content" failure. Simply removing /Alt would make
-            # veraPDF fail (Figure elements require /Alt). The correct fix is to remove
-            # the empty element from its parent's /K array entirely.
-            parent = obj.get("/P")
-            if not isinstance(parent, pikepdf.Dictionary):
-                unresolved.append(f"Cannot remove {risk['tag']} {risk['ref']}: no parent reference.")
-                continue
-            parent_kids = parent.get("/K")
-            if parent_kids is None:
-                unresolved.append(f"Cannot remove {risk['tag']} {risk['ref']}: parent has no /K.")
-                continue
+            # Adobe's "Associated with content" failure.
+            # - Removing /Alt makes veraPDF fail (Figure elements require /Alt).
+            # - Deleting from the struct tree hurts the alt_text score (the Figure was
+            #   contributing to the numerator of figures-with-alt).
+            # The safe fix: retag the empty element as /NonStruct and remove /Alt.
+            # /NonStruct elements do not require /Alt, so veraPDF is satisfied; and
+            # since it is no longer a /Figure it does not affect figure alt_text scoring.
             try:
-                if isinstance(parent_kids, pikepdf.Array):
-                    new_kids = [k for k in parent_kids if not (
-                        isinstance(k, pikepdf.Dictionary) and ref_string(k) == risk["ref"]
-                    )]
-                    if len(new_kids) < len(list(parent_kids)):
-                        parent["/K"] = pikepdf.Array(new_kids)
-                        changed = True
-                        repairs_applied += 1
-                        applied.append({
-                            "ref": risk["ref"],
-                            "before": str(obj.get("/Alt", ""))[:60],
-                            "after": "removed",
-                            "details": (
-                                f"Removed empty {risk['tag']} element {risk['ref']} from parent "
-                                f"{ref_string(parent)}: element had /Alt but no MCID content, "
-                                f"causing Adobe 'Associated with content' failure."
-                            ),
-                        })
-                    else:
-                        unresolved.append(f"Could not locate {risk['ref']} in parent /K to remove it.")
-                else:
-                    # Single direct child: clear /K if it matches
-                    if isinstance(parent_kids, pikepdf.Dictionary) and ref_string(parent_kids) == risk["ref"]:
-                        del parent["/K"]
-                        changed = True
-                        repairs_applied += 1
-                        applied.append({
-                            "ref": risk["ref"],
-                            "before": str(obj.get("/Alt", ""))[:60],
-                            "after": "removed",
-                            "details": (
-                                f"Removed empty {risk['tag']} element {risk['ref']} (sole child) from "
-                                f"parent {ref_string(parent)}: element had /Alt but no MCID content."
-                            ),
-                        })
-                    else:
-                        unresolved.append(f"Parent /K is not an array and does not match {risk['ref']}.")
+                before_alt = str(obj.get("/Alt", ""))[:60]
+                obj["/S"] = pikepdf.Name("/NonStruct")
+                if obj.get("/Alt") is not None:
+                    del obj["/Alt"]
+                changed = True
+                repairs_applied += 1
+                applied.append({
+                    "ref": risk["ref"],
+                    "before": before_alt,
+                    "after": "/NonStruct",
+                    "details": (
+                        f"Retagged empty {risk['tag']} element {risk['ref']} as /NonStruct and "
+                        f"removed /Alt: element had /Alt but no MCID content, causing Adobe "
+                        f"'Associated with content' failure. /NonStruct requires no /Alt."
+                    ),
+                })
             except Exception as exc:
-                unresolved.append(f"Could not remove {risk['tag']} {risk['ref']} from parent: {exc}")
+                unresolved.append(f"Could not retag {risk['tag']} {risk['ref']} as /NonStruct: {exc}")
             continue
 
         if mode in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:
