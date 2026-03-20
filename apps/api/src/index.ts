@@ -133,7 +133,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 app.listen(PORT, async () => {
   console.log(`[API] Running on http://localhost:${PORT}`)
   console.log(`[API] Environment: ${process.env.NODE_ENV || 'development'}`)
-  console.log(`[API] veraPDF default skip: ${process.env.DEFAULT_SKIP_VERAPDF ?? 'true'} (full_final analyses force live validation)`)
+  console.log('[API] veraPDF: deprecated (disabled)')
   runQueueMaintenance()
   const interval = setInterval(runQueueMaintenance, 5 * 60 * 1000)
   interval.unref?.()

@@ -23,15 +23,15 @@ vi.mock('../services/pdfjsService.js', () => ({
 vi.mock('../services/veraPdfService.js', () => ({
   analyzeWithVeraPdf,
   emptyVeraPdfResult: () => ({
-    status: 'passed',
-    executionStatus: 'ok',
-    profile: 'PDF/UA-1',
+    status: 'unavailable',
+    executionStatus: 'missing_binary',
+    profile: null,
     flavour: 'ua1',
-    isCompliant: true,
+    isCompliant: null,
     passedChecks: 0,
     failedChecks: 0,
     failures: [],
-    message: 'veraPDF passed PDF/UA validation.',
+    message: 'veraPDF validation is unavailable.',
   }),
 }))
 
@@ -179,7 +179,7 @@ describe('pdfAnalyzer', () => {
     expect(result.categories.find(category => category.id === 'table_markup')?.score).toBe(100)
   })
 
-  it('keeps full_final on the existing full analysis path', async () => {
+  it('keeps full_final on the full analysis path while still skipping veraPDF by default', async () => {
     const { analyzePDF } = await import('../services/pdfAnalyzer.js')
 
     await analyzePDF(Buffer.from('pdf'), 'full.pdf', {
@@ -187,10 +187,11 @@ describe('pdfAnalyzer', () => {
       skipAdobe: true,
     })
 
-    expect(analyzeWithVeraPdf).toHaveBeenCalledTimes(1)
+    expect(analyzeWithVeraPdf).not.toHaveBeenCalled()
     expect(analyzeReadingOrder).toHaveBeenCalledTimes(1)
     expect(analyzeColorContrast).toHaveBeenCalledTimes(1)
     expect(analyzeTableStructure).toHaveBeenCalledTimes(1)
+    expect(scoreDocument.mock.calls[0]?.[2]?.status).toBe('unavailable')
     expect(scoreDocument.mock.calls[0]?.[7]).toEqual({
       provisionalCategoryIds: [],
     })
