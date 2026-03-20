@@ -518,8 +518,15 @@ function hasFigureSemanticWork(context: PdfRemediationContext): boolean {
   return figureTargets(context).length > 0
 }
 
+function isSpecificHeadingTag(tag: string | null | undefined): boolean {
+  return /^\/?H[1-6]$/i.test(String(tag || '').trim())
+}
+
 function headingTargets(context: PdfRemediationContext): HeadingCandidate[] {
-  return context.headingCandidates.filter(candidate => candidate.repairMode === 'safe')
+  return context.headingCandidates.filter(candidate =>
+    candidate.repairMode === 'safe'
+    && !isSpecificHeadingTag(candidate.existingTag)
+  )
 }
 
 function decodeOutlineTitleForPrompt(title: string): string {

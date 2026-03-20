@@ -228,6 +228,43 @@ describe('semanticEnrichmentService', () => {
     ])
   })
 
+  it('skips candidates already tagged as specific headings', async () => {
+    const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const context = makeContext()
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = []
+    context.headingCandidates = [
+      {
+        ...context.headingCandidates[0],
+        id: 'heading:already-h2',
+        existingTag: '/H2',
+      },
+      {
+        ...context.headingCandidates[1],
+        id: 'heading:already-h1',
+        existingTag: 'H1',
+      },
+      {
+        ...context.headingCandidates[2],
+        id: 'heading:generic-h',
+        existingTag: '/H',
+      },
+      {
+        ...context.headingCandidates[3],
+        id: 'heading:paragraph',
+        existingTag: '/P',
+      },
+    ]
+
+    const batches = buildSemanticRepairBatches({ context, analysis: makeAnalysisResult() })
+    expect(batches.filter(batch => batch.batchType === 'headings')).toHaveLength(1)
+    expect(batches.find(batch => batch.batchType === 'headings')?.headings.map(entry => entry.id)).toEqual([
+      'heading:generic-h',
+      'heading:paragraph',
+    ])
+  })
+
   it('normalizes AI responses and drops unknown candidate ids', async () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     vi.stubGlobal('fetch', vi.fn(async () => ({

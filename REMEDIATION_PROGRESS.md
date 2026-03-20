@@ -12,12 +12,12 @@
 ## Current Session Snapshot
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Latest attempt path: queue item `d42bb954-6bc2-403b-9775-27442e31fcac`
-- Latest result summary: the semantic-link cap is live and the fresh rerun now progresses through stage 5 instead of wedging in semantic generation, but logs still show occasional `remediation_fast` validations paying `~45s` for forced deep structure scoring on lightweight follow-up stages.
-- Latest validation source: targeted `agentRemediationService` tests and live queue/log diagnosis completed on 2026-03-20T22:20Z
-- Next action: restart the API on the narrowed deep-structure-scoring gate and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: limiting forced deep structure scoring to genuinely structure-sensitive tools should keep the heading/bootstrap protection while removing unnecessary 45-second re-analyses from annotation/link cleanup stages
-- API restart status: restart required after the deep-structure-scoring gate change before trusting the next queue result
+- Latest attempt path: queue item `f15c15f6-3074-4276-bc03-c0b049d91e71`
+- Latest result summary: the narrowed deep-scoring gate is live and light inspections are back under a second, but the rerun is still spending time in semantic heading work because AI is proposing repairs for candidates already tagged as `H1`/`H2`, producing `H2 -> H2` no-effect actions.
+- Latest validation source: targeted `semanticEnrichmentService` tests and live queue/log diagnosis completed on 2026-03-20T22:27Z
+- Next action: rebuild/restart on the semantic heading-target filter and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: excluding already-specific heading tags from semantic heading batches will cut no-effect heading churn and let this file either finish or expose the next true blocker family
+- API restart status: restart required after the semantic heading-target filter change before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: fresh rerun progressed through stage 5 on the semantic-link cap, but logs now isolate the next throughput tax as unnecessary deep structure scoring during some `remediation_fast` validations
-- Immediate next step: restart on the narrowed deep-structure-scoring gate, rerun the same PDF, and verify the queue keeps progressing without the extra 45-second validation spikes
-- API restart/rerun confirmed for active file: pending restart; the current queue item `d42bb954-6bc2-403b-9775-27442e31fcac` is stale relative to the newest deep-structure-scoring gate change
+- Current phase: the fresh rerun is still alive in semantic generation, and logs now isolate the next waste source as semantic heading batches that include candidates already tagged as specific headings
+- Immediate next step: rebuild/restart on the semantic heading-target filter, rerun the same PDF, and confirm the semantic stage stops burning batches on already-tagged headings
+- API restart/rerun confirmed for active file: pending restart; the current queue item `f15c15f6-3074-4276-bc03-c0b049d91e71` is stale relative to the newest semantic heading filter change
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
-- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=8`
-- Next hypothesis: only bootstrap, heading normalization, and figure-structure-sensitive tools should force deep structure scoring; annotation-only alt-text and similar cleanup should stay on the light validation path
+- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=9`
+- Next hypothesis: once semantic heading batches ignore existing `H1`–`H6` targets, the remaining runtime should drop and the next completed rerun will reveal whether heading credit now lands cleanly
 
 ## Pending Files
 
@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-20T22:27:00Z Small-PDF loop fix: semantic heading batching now skips candidates already tagged as specific headings (`H1`-`H6`), preventing no-effect AI churn like `H2 -> H2` on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`. Live queue/log diagnosis on rerun `f15c15f6-3074-4276-bc03-c0b049d91e71` showed the narrowed deep-scoring gate worked, but the semantic stage was still burning time on heading proposals for candidates that were already structurally repaired. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'skips candidates already tagged as specific headings|caps semantic link batches on heavy-link documents|chunks semantic targets by type-specific batch sizes'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T21:49:00Z Small-PDF loop fix: heading target remapping now rebinds `/Link`-backed heading candidates to a safe parent text container when one exists, instead of leaving them blocked behind unsafe `/Link` wrappers. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, whose first completed rerun (`93dc3da2-b092-463e-a286-efeeba1e4442`) landed at `63/D` with `16` blocked heading candidates and evidence that most candidate targets were unsafe `/Link` nodes despite nearby safe parent `/P` structure. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps link-backed heading candidates to their safe parent text node|remaps section-backed heading candidates to the first safe descendant text node|remaps story-backed heading candidates to the first safe descendant text node|treats /Sect-backed heading candidates as safe when they are the best available structural target|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Normal-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 
 - 2026-03-20T21:35:00Z Fresh post-restart rerun: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` completed on queue item `93dc3da2-b092-463e-a286-efeeba1e4442` at `63/D`, up from `31/F` and, most importantly, no longer hangs in original analysis or semantic rounds. The deep-inspection timeout and light-fallback fixes cleared the throughput blocker. The next real blocker is structural: `16` heading candidates were blocked because they resolved to unsafe `/Link` tags or failed to map to a clean text-bearing target, and `normalize_heading_hierarchy` remained `no_effect` because no headings were ever created.

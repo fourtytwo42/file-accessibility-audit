@@ -1309,10 +1309,12 @@
 
 ## Current Stopping Point
 
-- Active file: `Downloads/Evaluation of the Lake County Adult Probation.pdf`
-- Latest rerun: `46a82a87-d8b4-4d73-952c-366a5dc7b2f0`
-- Latest result: `83/B`
+- Active file: `Downloads/FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Latest rerun: `f15c15f6-3074-4276-bc03-c0b049d91e71`
+- Latest result: still in progress (`68%`, `Generating semantic fixes`) on the newest deep-scoring-gate build
 - Current residual blocker:
-  - heading candidates are now detected and planned, but not successfully applied
+  - the semantic stage is still spending time on heading proposals for candidates that are already tagged as specific headings, producing no-effect actions like `H2 -> H2`
+- Shared fix shipped:
+  - semantic heading batching now excludes candidates whose `existingTag` is already `H1`-`H6`
 - Best next hypothesis:
-  - make `create_heading_from_candidate` recover from stale object refs by rebinding the target from current structure state using page/text/existing-tag hints before retagging
+  - cutting those already-fixed heading targets out of the AI batches will shrink semantic work enough for this file to either complete or expose the next real blocker family cleanly
