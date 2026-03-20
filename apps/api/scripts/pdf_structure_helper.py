@@ -156,6 +156,11 @@ EMBEDDABLE_FONT_FILES = {
 }
 
 LEGACY_FONT_SUBSTITUTES = {
+    # Tekton family (display sans → Arial)
+    "/Tekton": "/ArialMT",
+    "/Tekton-Bold": "/Arial-BoldMT",
+    "/Tekton-Italic": "/Arial-ItalicMT",
+    "/Tekton-BoldItalic": "/Arial-BoldItalicMT",
     # Gill Sans family (humanist sans → Arial/Segoe-like sans)
     "/GillSans": "/ArialMT",
     "/GillSans-Bold": "/Arial-BoldMT",
@@ -5060,6 +5065,23 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
                 continue
             if has_tounicode(font):
                 continue
+            if subtype == "/TrueType" and isinstance(font.get("/Encoding"), pikepdf.Dictionary):
+                derived_map = font_encoding_map(font)
+                used_codes = sorted(used_codes_by_font.get(font_ref, set()))
+                if used_codes:
+                    derived_map = {code: text for code, text in derived_map.items() if code in used_codes}
+                if derived_map and merge_tounicode_map(font, pdf, derived_map):
+                    applied.append({
+                        "ref": ref_string(font),
+                        "before": None,
+                        "after": "/ToUnicode",
+                        "details": (
+                            f"Added a ToUnicode CMap for {base_font} using the font's "
+                            f"BaseEncoding plus AGL-compliant /Differences mappings."
+                        ),
+                    })
+                    changed = True
+                    continue
             if subtype != "/TrueType" or encoding not in {"/WinAnsiEncoding", "/MacRomanEncoding"}:
                 explicit_map = SIMPLE_TRUETYPE_UNICODE_MAPS.get(base_font, {})
                 used_codes = sorted(used_codes_by_font.get(font_ref, set()))

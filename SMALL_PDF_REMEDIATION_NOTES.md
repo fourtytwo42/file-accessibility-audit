@@ -2,53 +2,61 @@
 
 ## Current Active File
 
-- `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` (`437,736` bytes)
-- Latest fresh queue item: `01f16829-3e84-4ec7-8768-82b2349496ea`
-- Latest result: `86/B`
+- `victim2.pdf`
+- Current fresh queue item: `f147229b-c8b0-4f06-ad7d-ed1db15cf132`
+- Latest completed file: `GDRAAG.pdf` -> `97/A`
 
 ## Recent Loop Summary
 
-- Baseline: `47/F`
-- First rerun: `87/B`
-- Latest rerun: `86/B`
+- `victim2.pdf`
+- Baseline: `16/F`
+- First fresh rerun: `74/C`
+- Direct post-fix probe on rebuilt artifact: `74/C -> 85/B -> 96/A`
 
 ## New System Fixes This Round
 
-- `46fc241` `Exclude decorative Acrobat cleanup figures from alt scoring`
-  - Decorative split-generated Acrobat cleanup figures no longer count as missing informative alt debt.
-
-- `6db0c35` `Force structure scoring for native alt-text validation`
-  - Native-safe validation now forces structure-aware scoring for alt-text-sensitive structure mutations.
-
-- Pending commit: native-safe heading validation fix
-  - `normalize_heading_hierarchy` now opts into deep structure scoring during native-safe validation.
-  - Per-entry native-safe culprit isolation now compares each cumulative result against the prior accepted result, preventing later cleanup tools from inheriting stale regressions.
+- In progress:
+  - TrueType Unicode recovery now repairs embedded Acrobat-era TrueType fonts that use `/Encoding << /BaseEncoding /WinAnsiEncoding /Differences [...] >>` by deriving `/ToUnicode` from the parsed encoding map instead of only handling bare `/WinAnsiEncoding` names.
+  - Added Tekton family substitute fallbacks so `embed_missing_fonts_in_place` can embed the last unembedded legacy display font on `victim2.pdf`.
 
 ## Current Blocker Hypothesis
 
-- The active file is no longer broadly blocked by missing figure alt text.
-- Current residual blockers are narrow:
-  - false `alt_text` regression during `normalize_heading_hierarchy` validation on native-tagged cleanup
-  - one remaining link annotation `/Contents` miss that still caps `link_quality` and `pdf_ua_compliance`
-- The next fresh rerun after restart should show whether the heading cleanup is now retained; if it is, the remaining work should collapse to the single link-contents blocker.
+- `victim2.pdf` exposed a real Acrobat small-report font family:
+  - embedded TrueType fonts with WinAnsi-based dictionary encodings plus AGL-compliant `/Differences` arrays but no `/ToUnicode`
+  - one remaining unembedded `/Tekton-Bold` font after the first remediation pass
+- Direct probing of the rebuilt artifact shows the shared fix sequence is sufficient:
+  - `repair_font_unicode_maps` clears the remaining six missing `/ToUnicode` maps
+  - `embed_missing_fonts_in_place` then embeds the final Tekton font
+  - combined result reaches `96/A`
 
-## Direct Artifact Probe
+## GDRAAG Result
 
-- Probed rebuilt artifact: `apps/api/data/queue-storage/rebuilt/6649eb51-031a-4eb3-9773-1bbbb9010c91.pdf`
-- Baseline analysis with `forceStructureForScoring: true`:
-  - overall `86/B`
-  - `heading_structure = 60`
-  - `alt_text = 75`
-  - `link_quality = 60`
-- Applying only `normalize_heading_hierarchy` directly to that rebuilt artifact produced:
-  - overall `92/B`
-  - `heading_structure = 100`
-  - `alt_text = 75`
-  - `link_quality = 60`
-- Conclusion:
-  - heading normalization is genuinely good for this file
-  - the queue rejection is coming from a stale/intermediate pre-final-cleanup baseline, not from the heading tool regressing real output quality
-  - the next generic fix is a deep-structure baseline refresh before native-tagged final cleanup validation
+- Queue history:
+  - `a115564d-57c4-4678-a538-5222f7ba7d4b` -> `97/A`
+- Outcome:
+  - cleared the `>95` target on the first fresh API run
+  - no new system fix required
+  - good evidence that the recent shared fixes are holding across another small-file family
+
+## bor_english Resolution
+
+- Queue history:
+  - `9d520a85-97d1-4844-890f-49a973b367ec` -> `65/D`
+  - `44a762ed-726d-4922-831a-d2b5c97c570a` -> `100/A`
+- Key findings from the first rerun:
+  - `heading_structure = 0`
+  - `text_extractability = 40`
+  - `reading_order = 70`
+  - `pdf_ua_compliance = 85`
+  - local standards still saw 2 unembedded fonts
+- Root causes:
+  - multi-column brochure layout was being collapsed into huge cross-column text lines, so headings like `Victims Bill of Rights` and `Who is covered by the Bill of Rights?` never became heading candidates
+  - `/Boton-Regular` and `/Boton-Italic` still had no embeddable fallback mapping, so the last two unembedded brochure fonts remained unresolved
+- Direct proof:
+  - a fresh inspection of the rebuilt `65/D` artifact showed no heading candidates at all even though the page text clearly contained large bold section titles
+  - page text-line dumps showed same-row cross-column merges such as headline fragments and body text combined into single lines
+- Outcome:
+  - after splitting same-row lines on large horizontal gaps and adding Boton fallbacks, the next full post-restart API rerun cleared to `100/A`
 
 ## Latest Result
 
@@ -1127,6 +1135,68 @@
     - new shared fix prepared:
       - suppress blocking `pdfua.font_embedding` findings when the only residual unembedded fonts are `/Type3` and Unicode coverage is already intact
     - next step:
-      - commit/push the Type3 scoring fix
-      - rebuild/restart the API
-      - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API again
+    - commit/push the Type3 scoring fix
+    - rebuild/restart the API
+    - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API again
+
+## Addressing Police Stress Result
+
+- Fresh rerun: queue item `68bf821c-af82-4319-acac-a442f962e5b9`
+- Result: `96/A`
+- Takeaway:
+  - the final plateau on this Acrobat-authored report family was a local-standards policy issue, not a missing remediation capability
+  - once pure residual `/Type3` display fonts with intact Unicode coverage stopped counting as blocking font-embedding debt, the file cleared cleanly
+
+## Next Random File
+
+- `Downloads/Evaluation of the Lake County Adult Probation.pdf`
+
+## Evaluation of the Lake County Adult Probation Result
+
+- Fresh baseline rerun: queue item `ac694dd6-5036-43f8-a1d9-45d6f0a52b30`
+- Baseline result: `70/C` from `37/F`
+- What the first rebuilt artifact showed:
+  - the rebuilt PDF already contained real `/Link` structure elements even though local standards still reported `pdfua.link_tagging`
+  - `repair_note_tag_ids` was auto-runnable but never executed on this `native_tagged` file because it was still routed through the disabled bootstrap stage
+  - after direct artifact inspection, the next shared fixes were clear: trust qpdf’s `/Link` struct count and reroute note-ID repair into a native stage
+- Shared fix shipped:
+  - `053d28f` `Trust qpdf link tags and reroute note ID repair`
+- Fresh post-fix rerun: queue item `614b6df0-f079-4286-9f14-93b8dd4d9751`
+- Result after fix: `83/B`
+- What improved:
+  - `link_quality`, `reading_order`, and `pdf_ua_compliance` all moved to `100`
+  - local standards dropped to one advisory `pdfua.cidset_consistency` item
+  - the file stopped being a standards-detector problem and became a clean heading-generation problem
+- New blocker family:
+  - `heading_structure` stayed at `0`
+  - the original inspection had zero heading candidates, even though direct page sampling showed real headings like `Executive Summary` and `Data Collection and Research Design`
+  - these headings were same-size as body text but used distinct font faces (`g_d2_f4` vs `g_d2_f1`) or appeared as top-of-page title lines before prose
+- Shared fix shipped:
+  - `10b681d` `Detect heading candidates from font-face cues`
+- Fresh post-fix rerun: queue item `53e10901-762f-4106-ae54-7d30e51a67b8`
+- Result after fix: still `83/B`
+- What improved:
+  - heading candidates now appear in the live plan
+  - the run now reaches `create_heading_from_candidate_no_effect_1` instead of failing earlier with no heading candidates at all
+- New blocker family:
+  - the heading candidates are good, but they all bind to refs like `obj:499 0 R` and `obj:503 0 R`
+  - by the time stage 6 runs, earlier stages have rewritten the file and those candidate refs can go stale
+- Shared fix shipped:
+  - `e74d729` `Refresh candidate context between changed stages`
+- Fresh post-fix rerun: queue item `46a82a87-d8b4-4d73-952c-366a5dc7b2f0`
+- Result after fix: still `83/B`
+- What that proved:
+  - refreshing candidate context between changed stages was necessary but not sufficient
+  - the remaining failure is now isolated to the backend heading mutation path itself
+  - live action details still show `create_heading_from_candidate` failing with `Could not resolve structural target obj:499 0 R` / `obj:503 0 R`
+  - direct inspection can see those refs during initial inspection, so the next fix needs a more resilient heading retag fallback in the backend, likely using current page/text/existing-tag context instead of only a raw object ref
+
+## Current Stopping Point
+
+- Active file: `Downloads/Evaluation of the Lake County Adult Probation.pdf`
+- Latest rerun: `46a82a87-d8b4-4d73-952c-366a5dc7b2f0`
+- Latest result: `83/B`
+- Current residual blocker:
+  - heading candidates are now detected and planned, but not successfully applied
+- Best next hypothesis:
+  - make `create_heading_from_candidate` recover from stale object refs by rebinding the target from current structure state using page/text/existing-tag hints before retagging

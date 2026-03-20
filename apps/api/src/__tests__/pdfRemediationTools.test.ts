@@ -1553,6 +1553,56 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
   }, 120_000)
 
+  it('repairs ToUnicode maps for WinAnsi dictionary TrueType fonts in small Acrobat PDFs', async () => {
+    const filename = 'A Study Gun Addendum .pdf'
+    const buffer = await loadRepoDownload(filename)
+    const beforeQpdf = await analyzeWithQpdf(buffer)
+    const before = await analyzePDF(buffer, filename)
+    const context = await inspectPdfForRemediation(buffer, before)
+
+    expect(beforeQpdf.fontsMissingToUnicode).toBeGreaterThan(0)
+    expect(beforeQpdf.type1FontsMissingToUnicode ?? 0).toBe(0)
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'repair_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Add ToUnicode maps for WinAnsi-based TrueType fonts with AGL-compliant Differences arrays.',
+        confidence: 0.9,
+      },
+    })
+
+    const afterQpdf = await analyzeWithQpdf(result.buffer)
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+    expect(afterQpdf.fontsMissingToUnicode).toBeLessThan(beforeQpdf.fontsMissingToUnicode ?? 0)
+  }, 120_000)
+
+  it('embeds Tekton legacy fonts through substitute fallbacks', async () => {
+    const buffer = await loadRepoDownload('victim2.pdf')
+    const beforeQpdf = await analyzeWithQpdf(buffer)
+    const before = await analyzePDF(buffer, 'victim2.pdf')
+    const context = await inspectPdfForRemediation(buffer, before)
+
+    expect(beforeQpdf.unembeddedFontCount).toBeGreaterThan(0)
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'embed_missing_fonts_in_place',
+        arguments: { target: 'document' },
+        rationale: 'Embed substitute programs for legacy Tekton fonts with no exact local font file.',
+        confidence: 0.9,
+      },
+    })
+
+    const afterQpdf = await analyzeWithQpdf(result.buffer)
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+    expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
+  }, 120_000)
+
   it('promotes strong image-backed paragraph figure candidates in recent tagged reports', async () => {
     const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
     const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')

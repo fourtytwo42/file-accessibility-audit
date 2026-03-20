@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `Addressing Police Stress FINAL-220523T17215932.pdf`
-- Latest attempt path: queue item `d5d41324-5e65-4c8a-8dd7-da5502f50dd2`
-- Latest result summary: fresh baseline rerun completed at `78/C` from `25/F`. The remaining debt is now narrow and real: `pdfua.note_tag_id` can be repaired generically through role-mapped note tags, and the last font blockers are three unembedded `/Type3` display fonts that need stronger substitution/finalization routing instead of plain embedding.
-- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T18:39Z
-- Next action: commit the Type3 font-embedding scoring fix, rebuild/restart the API, and rerun `Addressing Police Stress FINAL-220523T17215932.pdf` again
-- Next hypothesis: the remaining plateau is now a local-standards policy issue, not a repair gap; once pure residual Type3 display fonts stop counting as blocking embedding debt when Unicode coverage is intact, this file should clear the score gate
-- API restart status: required after the current code fix; last completed restart was via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
-- Build status: rebuild pending for the current code fix
+- Active PDF: `victim2.pdf`
+- Latest attempt path: queue item `f147229b-c8b0-4f06-ad7d-ed1db15cf132`
+- Latest result summary: first fresh API remediation run landed at `74/C` from `16/F`. Direct probing of the rebuilt artifact on the newest code shows the shared font fix sequence lifts the same artifact to `96/A`.
+- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T20:36Z; direct post-fix artifact probe completed on 2026-03-20T20:45Z
+- Next action: commit/push the TrueType dictionary Unicode + Tekton fallback fix, restart the API, and rerun `victim2.pdf` fresh through the API
+- Next hypothesis: the current blocker is an Acrobat-era small-report font family, not layout/semantic debt. Once the new Unicode derivation and Tekton fallback are live, the file should clear `>95` in one rerun.
+- API restart status: restart required after the current Python helper change before trusting the next queue result
+- Build status: no build required in principle, but use `pnpm --filter api build` before PM2 restart if runtime looks stale
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `Addressing Police Stress FINAL-220523T17215932.pdf`
-- Current phase: Active blocker-family fix and rerun prep
-- Immediate next step: restart on the new Type3 scoring fix, then rerun the same file fresh through the API
-- API restart/rerun confirmed for active file: The last two `81/B` results came from fresh post-restart reruns; the next result must come from a fresh rerun after the new standards policy fix
-- Rebuild required for active file: Yes, after the current local-standards code fix
-- Active remediation loop count: `Addressing Police Stress FINAL-220523T17215932.pdf=4`
-- Next hypothesis: the active file now appears accessible enough that the score is being held down by conservative residual Type3 debt, not by missing structure/text repair
+- Active PDF: `victim2.pdf`
+- Current phase: fresh small-PDF loop on an Acrobat-authored 2-page report with residual font Unicode/embedding debt
+- Immediate next step: restart on the current helper fix, rerun `victim2.pdf`, and verify the live queue result matches the direct `96/A` probe
+- API restart/rerun confirmed for active file: pending restart; the current `74/C` result is stale relative to the newest code
+- Rebuild required for active file: likely no, but rebuild before restart if PM2/runtime appears to serve stale output
+- Active remediation loop count: `victim2.pdf=2`
+- Next hypothesis: the live rerun should clear the target once the queue path executes `repair_font_unicode_maps` on the remaining WinAnsi dictionary TrueType fonts and `embed_missing_fonts_in_place` on `/Tekton-Bold`
 
 ## Pending Files
 
@@ -76,6 +76,27 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T20:45:00Z Small-PDF loop fix: `repair_font_unicode_maps` now derives `/ToUnicode` for embedded TrueType fonts that use `BaseEncoding + /Differences` encoding dictionaries, covering Acrobat-authored small reports where the fonts are embedded but still lack Unicode maps. Added Tekton family substitute fallbacks so `embed_missing_fonts_in_place` can embed residual `/Tekton-Bold` display fonts. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'repairs ToUnicode maps for WinAnsi dictionary TrueType fonts in small Acrobat PDFs|embeds Tekton legacy fonts through substitute fallbacks|embeds legacy Type1 substitute fonts on small Gill Sans PDFs|embeds Boton brochure fonts through legacy substitute fallbacks'` and `pnpm --filter api exec tsc --noEmit`. Direct probe on rebuilt `victim2.pdf` confirmed `74/C -> 85/B` after Unicode repair and `85/B -> 96/A` after Tekton embedding.
+
+- 2026-03-20T20:24:00Z Fresh API remediation run: `GDRAAG.pdf` completed on queue item `a115564d-57c4-4678-a538-5222f7ba7d4b` at `97/A`, up from `29/F`, with no additional code changes required. This confirms the recent shared fixes are generalizing across another small-file family.
+
+- 2026-03-20T20:23:00Z Fresh post-restart rerun: `bor_english.pdf` completed on queue item `44a762ed-726d-4922-831a-d2b5c97c570a` at `100/A`, up from the first `65/D` run. The decisive fixes were splitting wide same-row text runs on large horizontal gaps so brochure headings become separate text lines, and adding Boton legacy-font fallbacks so the last two unembedded brochure fonts no longer cap PDF/UA compliance.
+- 2026-03-20T20:22:00Z Small-PDF loop fix: brochure-style text extraction now splits same-row text runs on large horizontal gaps before heading detection, which prevents multi-column PageMaker/Distiller flyers from collapsing headings and body text into one giant cross-column line. Added a focused regression test for split line extraction.
+- 2026-03-20T20:22:00Z Small-PDF loop fix: added Boton legacy-font fallback mappings to the shared embed/substitute font path, allowing `embed_missing_fonts_in_place` to embed brochure fonts like `/Boton-Regular` and `/Boton-Italic` through existing Arial-compatible substitutes. Verified with a focused `bor_english.pdf` font-embedding regression.
+
+- 2026-03-20T20:16:00Z Fresh post-restart rerun: `Evaluation of the Lake County Adult Probation.pdf` completed on queue item `047194fc-e236-4d23-956d-49197cd41a93` at `100/A`, up from the repeated `83/B` plateau. The decisive fix was allowing heading retagging from native `/Normal` text containers after rebuild, which let re-inspected heading candidates map to real structural targets again.
+- 2026-03-20T20:13:00Z Small-PDF loop fix: heading target matching and backend retagging now treat `/Normal` text containers as safe heading-compatible targets. This addresses rebuilt PDFMaker reports like Lake County, where heading lines re-inspect onto `/Normal` nodes under `/Sect` instead of `/P` or `/Sect` nodes. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'treats /Sect-backed heading candidates as safe when they are the best available structural target|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Normal-backed heading candidates as safe when they are the best available structural target'`, `pnpm --filter api exec tsc --noEmit`, and a direct inspection probe of the rebuilt Lake County artifact showing `targetRef` recovery.
+- 2026-03-20T20:10:00Z Small-PDF loop fix: remediation inspection cache reuse is now guarded by the current buffer hash, preventing stale structure snapshots from being rebuilt onto changed PDFs after intermediate mutations. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit `22075a5`, pushed, API rebuilt/restarted, and fresh Lake County rerun `e00fbc8a-3fc2-475a-b5e8-c370f61cd336` confirmed the failure mode shifted from stale dead refs to genuine unmapped `/Normal` heading targets.
+
+- 2026-03-20T20:03:00Z Fresh post-restart rerun: `Evaluation of the Lake County Adult Probation.pdf` completed on queue item `46a82a87-d8b4-4d73-952c-366a5dc7b2f0` at `83/B`, unchanged from the prior `83/B` rerun. The stale-candidate-context fix was necessary but not sufficient. Live action details now isolate the real residual blocker: `create_heading_from_candidate` is planned and executed, but still returns `Could not resolve structural target obj:499 0 R` / `obj:503 0 R`. Direct inspection confirms those refs exist during initial inspection, so the next shared fix belongs in the heading mutation backend, not in detection or planning.
+- 2026-03-20T20:02:00Z Small-PDF loop fix: candidate-sensitive stages now force a fresh inspection after any earlier stage in the same round changed the PDF, preventing later heading/figure/link candidate actions from using stale object refs after stage rewrites. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/pdfRemediationTools.test.ts -t 'create_heading_from_candidate|cache|inspectPdfForRemediation|Story-backed heading|safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit `e74d729`, pushed, API rebuilt/restarted, and fresh Lake County rerun started on the new code.
+- 2026-03-20T19:59:00Z Small-PDF loop fix: heading candidate generation now recognizes same-size heading lines when they use a distinct font face, and it also recovers top-of-page title lines before prose even when PDFMaker does not expose a larger font size or explicit bold weight. This targets `Evaluation of the Lake County Adult Probation.pdf`, whose first `83/B` rerun proved headings were the only material gap after link/note false negatives were cleared. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'buildHeadingCandidatesFromPageFacts|Story-backed heading|safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit `10b681d`, pushed, API rebuilt/restarted, and fresh Lake County rerun `53e10901-762f-4106-ae54-7d30e51a67b8` confirmed heading candidates now appear in the live plan.
+- 2026-03-20T19:54:00Z Fresh post-restart rerun: `Evaluation of the Lake County Adult Probation.pdf` completed on queue item `614b6df0-f079-4286-9f14-93b8dd4d9751` at `83/B`, up from the first `70/C` baseline. The qpdf link-structure count plus note-stage reroute fix cleared the false `pdfua.link_tagging` and skipped note-ID debt exactly as intended: `link_quality`, `reading_order`, and `pdf_ua_compliance` all moved to `100`, leaving `heading_structure=0` as the only remaining material blocker.
+- 2026-03-20T19:53:00Z Small-PDF loop fix: local standards now trust qpdf’s real `/Link` structure count when the lightweight structure snapshot misses tags in long native-tagged PDFs, and `repair_note_tag_ids` is now routed with the native-structure stage instead of the bootstrap-only stage so it actually runs on tagged documents. Verified with `pnpm --filter api exec vitest run src/__tests__/localStandardsService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/remediationPlanService.test.ts src/__tests__/agentRemediationService.test.ts -t 'link-tagging|note-tag|repair_note_tag_ids|qpdf|planner budget'` and `pnpm --filter api exec tsc --noEmit`. Commit `053d28f`, pushed, API rebuilt/restarted, and fresh Lake County rerun started on the new code.
+- 2026-03-20T19:49:00Z Fresh small-PDF baseline: `Evaluation of the Lake County Adult Probation.pdf` completed on queue item `ac694dd6-5036-43f8-a1d9-45d6f0a52b30` at `70/C` from `37/F`. The first rebuilt artifact proved two things immediately: the file is already structurally strong after deterministic repairs, but local standards was falsely reporting zero `/Link` tags even though the rebuilt PDF contains them, and `repair_note_tag_ids` was auto-runnable yet never executed because it was still mapped to a disabled bootstrap stage on `native_tagged` routing.
+
+- 2026-03-20T19:39:00Z Fresh post-restart rerun: `Addressing Police Stress FINAL-220523T17215932.pdf` completed on queue item `68bf821c-af82-4319-acac-a442f962e5b9` at `96/A`, up from the prior `81/B` plateau. The residual Type3 softening fix landed exactly as intended: `text_extractability` moved to `100`, `pdf_ua_compliance` moved to `100`, and the only remaining local standards item is advisory `pdfua.cidset_consistency`. This clears the user’s `>95` target for the active loop.
 
 - 2026-03-20T19:31:00Z Small-PDF loop fix: local standards now suppress blocking `pdfua.font_embedding` findings when the only unembedded fonts left are residual `/Type3` fonts and there are no remaining Unicode-map failures. This targets `Addressing Police Stress FINAL-220523T17215932.pdf`, whose post-planner-fix rerun still plateaued at `81/B` with exactly three unnamed `/Type3` fonts on page 14 and no remaining `pdfua.font_unicode` finding. Verified with `pnpm --filter api exec vitest run src/__tests__/localStandardsService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/pdfClassificationService.test.ts src/__tests__/remediationPlanService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T19:21:00Z Fresh post-restart rerun: `Addressing Police Stress FINAL-220523T17215932.pdf` completed on queue item `3b68fa81-eb7c-442b-b437-5ac5899d8f91` and stayed at `81/B`. The planner budget fix succeeded in one important way: later-stage font actions finally executed (`repair_cidset_consistency`, `substitute_legacy_fonts_in_place`, and `finalize_substituted_font_conformance` all ran). Artifact inspection then isolated the remaining issue precisely: the only blocking local standards debt left is three unnamed `/Type3` fonts on page 14, with no remaining Unicode-map failures.
