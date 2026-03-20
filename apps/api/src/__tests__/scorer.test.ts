@@ -985,6 +985,34 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('excluded from alt-text scoring'))).toBe(true)
   })
 
+  it('credits structure-backed informative figures and excludes split-generated decorative wrappers', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: 'obj:361 0 R', hasAlt: true, altText: 'Image related to Illinois Criminal Justice Information Authority' },
+        { ref: 'obj:16 0 R', hasAlt: true, altText: 'Image related to Figure 1' },
+        { ref: 'obj:37 0 R', hasAlt: false },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        figures: [
+          { ref: 'obj:15 0 R', tag: '/Figure', hasAlt: true, altText: 'Image related to Illinois Criminal Justice Information Authority', childFigureCount: 0, hasText: true, splitGenerated: false, splitSourceRef: null, splitSourceTag: null },
+          { ref: 'obj:16 0 R', tag: '/Figure', hasAlt: true, altText: 'Image related to Table 1', childFigureCount: 0, hasText: true, splitGenerated: false, splitSourceRef: null, splitSourceTag: null },
+          { ref: 'obj:27 0 R', tag: '/Figure', hasAlt: true, altText: 'Image related to Figure 1', childFigureCount: 0, hasText: true, splitGenerated: false, splitSourceRef: null, splitSourceTag: null },
+          { ref: 'obj:37 0 R', tag: '/Figure', hasAlt: false, altText: null, childFigureCount: 0, hasText: false, splitGenerated: true, splitSourceRef: 'obj:38 0 R', splitSourceTag: '/H1' },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('structure snapshot'))).toBe(true)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('split-generated decorative wrapper'))).toBe(true)
+  })
+
   it('reduces alt_text when Acrobat reports orphaned alternate text with no associated content', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(

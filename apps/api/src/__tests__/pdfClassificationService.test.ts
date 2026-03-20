@@ -111,6 +111,7 @@ describe('pdfClassificationService', () => {
       fontCount: 4,
       unembeddedFontCount: 1,
       fontsMissingToUnicode: 0,
+      type1FontsMissingToUnicode: 0,
       legacyWidthRiskFontCount: 0,
       cidFontsMissingCidToGidMap: 0,
     })).toBe('needs_embedding')
@@ -119,7 +120,17 @@ describe('pdfClassificationService', () => {
       fontCount: 4,
       unembeddedFontCount: 0,
       fontsMissingToUnicode: 3,
+      type1FontsMissingToUnicode: 0,
       legacyWidthRiskFontCount: 1,
+      cidFontsMissingCidToGidMap: 0,
+    })).toBe('legacy_encoding')
+
+    expect(classifyFonts({
+      fontCount: 4,
+      unembeddedFontCount: 1,
+      fontsMissingToUnicode: 1,
+      type1FontsMissingToUnicode: 1,
+      legacyWidthRiskFontCount: 0,
       cidFontsMissingCidToGidMap: 0,
     })).toBe('legacy_encoding')
 
@@ -127,6 +138,7 @@ describe('pdfClassificationService', () => {
       fontCount: 6,
       unembeddedFontCount: 0,
       fontsMissingToUnicode: 0,
+      type1FontsMissingToUnicode: 0,
       legacyWidthRiskFontCount: 3,
       cidFontsMissingCidToGidMap: 2,
     })).toBe('needs_substitution')

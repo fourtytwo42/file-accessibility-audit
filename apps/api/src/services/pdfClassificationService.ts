@@ -102,19 +102,20 @@ export function fingerprintAuthoringTool(metadata: PdfjsResult['metadata']): Pdf
 }
 
 export function classifyFonts(qpdf: Pick<QpdfResult,
-  'fontCount' | 'unembeddedFontCount' | 'fontsMissingToUnicode' | 'legacyWidthRiskFontCount' | 'cidFontsMissingCidToGidMap'
+  'fontCount' | 'unembeddedFontCount' | 'fontsMissingToUnicode' | 'type1FontsMissingToUnicode' | 'legacyWidthRiskFontCount' | 'cidFontsMissingCidToGidMap'
 >): PdfFontProfile {
   if ((qpdf.fontCount || 0) === 0) return 'no_fonts'
   const unembedded = qpdf.unembeddedFontCount || 0
   const missingUnicode = qpdf.fontsMissingToUnicode || 0
+  const missingType1Unicode = qpdf.type1FontsMissingToUnicode || 0
   const legacyWidth = qpdf.legacyWidthRiskFontCount || 0
   const cidMissing = qpdf.cidFontsMissingCidToGidMap || 0
 
   if (legacyWidth >= 3 && cidMissing >= 2) return 'needs_substitution'
-  if (missingUnicode >= 3 || legacyWidth >= 2) return 'legacy_encoding'
+  if (missingType1Unicode > 0 || missingUnicode >= 3 || legacyWidth >= 2) return 'legacy_encoding'
   if (unembedded > 0) return 'needs_embedding'
   if (missingUnicode === 0) return 'clean'
-  return 'needs_embedding'
+  return 'legacy_encoding'
 }
 
 export function classifyScale(pageCount: number): PdfScale {
@@ -171,6 +172,7 @@ export function classifyPdfFull(input: {
       fontCount: qpdf?.fontCount || 0,
       unembeddedFontCount: qpdf?.unembeddedFontCount || 0,
       fontsMissingToUnicode: qpdf?.fontsMissingToUnicode || 0,
+      type1FontsMissingToUnicode: qpdf?.type1FontsMissingToUnicode || 0,
       legacyWidthRiskFontCount: qpdf?.legacyWidthRiskFontCount || 0,
       cidFontsMissingCidToGidMap: qpdf?.cidFontsMissingCidToGidMap || 0,
     }),

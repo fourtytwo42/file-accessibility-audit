@@ -218,6 +218,41 @@
 - What improved:
   - the `/Story` heading family was real, and the fix materially improved the score
   - heading recovery is no longer the dominant blocker on this file
+
+### Rerun After /Story Figure Wrapper + Direct Type1 Follow-up
+
+- Third queue item: `25303037-20fe-4521-864b-3cf8b30e50f4`
+- Rerun result: `84/B`
+- Improvement vs second remediated run: no score change, but the blocker diagnosis became much sharper
+- Direct rebuilt-artifact diagnosis:
+  - the queue model still showed stale heuristic no-effect figure attempts against `obj:47 0 R`, `obj:57 0 R`, and `obj:35 0 R`
+  - a fresh `alt_text_deep` inspection of the rebuilt PDF no longer shows those as the active figure state
+  - all three informative figures now already have alt text in the structure snapshot:
+    - `obj:15 0 R`
+    - `obj:16 0 R`
+    - `obj:27 0 R`
+  - the only remaining no-alt `/Figure` nodes are split-generated wrapper figures:
+    - `obj:37 0 R` from `/H1`
+    - `obj:45 0 R` from `/Story`
+  - qpdf still scores the file as `2 of 3` images with alt text because its image reconciliation only credits:
+    - `obj:361 0 R`
+    - `obj:16 0 R`
+    - and leaves `obj:37 0 R` as the unmatched no-alt image
+  - the font side is also now explicit:
+    - qpdf still reports `fontsMissingToUnicode=1`
+    - `type1FontsMissingToUnicode=1`
+    - the file is classified as `fontProfile=needs_embedding`
+    - that profile currently excludes `repair_type1_font_unicode_maps`, so the tool opportunity exists in the failure profile but never becomes a real call
+
+### System Fix In Progress
+
+- Updated `classifyFonts()` so live Type1 Unicode debt is treated as `legacy_encoding` instead of `needs_embedding`, preventing the classification layer from excluding `repair_type1_font_unicode_maps` on mixed legacy-font PDFs like this InDesign file.
+- Updated alt-text scoring so it reconciles qpdf image coverage with the richer structure snapshot:
+  - split-generated decorative wrapper figures with no text and no alt are excluded from the denominator
+  - structure-backed informative figures receive credit even when qpdf image association is lossy
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/scorer.test.ts`
+  - `pnpm --filter api exec tsc --noEmit`
 - Remaining blockers:
   - one unresolved `pdfua.font_unicode` finding for `/AkzidenzGroteskBE-Regular`
   - one remaining image without alt text after semantic prompt-budget skipping

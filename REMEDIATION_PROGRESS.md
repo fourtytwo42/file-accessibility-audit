@@ -12,15 +12,15 @@
 ## Current Session Snapshot
 
 - Active PDF: `Prescription drug November 2008.pdf`
-- Latest attempt path: queue item `5833b0a7-2dbf-42f9-a456-241ecb593e8e`
-- Latest result summary: `Prescription drug November 2008.pdf` improved from `69/D` to `84/B` after the `/Story` heading fix, confirming that native-tagged InDesign `/Story` wrappers were the dominant heading blocker. The file still misses the `>95` target because one Type1 font remains without `/ToUnicode` and one image is still missing alt text after semantic prompt-budget skipping.
-- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T16:39Z
-- Next action: rerun `Prescription drug November 2008.pdf` after the new direct Type1-Unicode follow-up and `/Story` figure-wrapper fix has been committed, pushed, and the API restarted.
-- Next hypothesis: the remaining gap is now concentrated enough that this pair of generic fixes should clear it:
-  1. direct `repair_type1_font_unicode_maps` selection whenever qpdf already reports live Type1 Unicode misses
-  2. treat `/Story` as a safe figure wrapper so the last image can be retagged and described instead of deferred
-- API restart status: PM2 restart required after the latest residual cleanup code change; next queue result must be a fresh remediation after restart
-- Build status: targeted `/Story` figure + Type1 follow-up regressions and `tsc` passed for the latest change; rebuild pending before rerun
+- Latest attempt path: queue item `25303037-20fe-4521-864b-3cf8b30e50f4`
+- Latest result summary: `Prescription drug November 2008.pdf` is still at `84/B`, but the latest blocker inspection is much narrower now. The live queue run stranded `repair_type1_font_unicode_maps` because classification labeled the file as `needs_embedding` and excluded the Type1-specific tool. The alt-text score is also stale: direct deep inspection of the rebuilt artifact shows all three informative figures already have alt text, while the remaining no-alt `/Figure` nodes are split-generated decorative wrappers.
+- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T16:46Z, followed by direct rebuilt-artifact inspection on 2026-03-20T16:56Z
+- Next action: commit/push the classification + alt-text crediting fixes, restart the API, and run a fresh remediation rerun of `Prescription drug November 2008.pdf`
+- Next hypothesis: this pair of generic fixes should clear the file above `95`:
+  1. classify live Type1 Unicode debt as `legacy_encoding` so `repair_type1_font_unicode_maps` is no longer excluded by the pipeline
+  2. reconcile alt-text scoring against the structure snapshot so split-generated decorative wrapper figures do not count against the score and structure-backed informative figures receive credit even when qpdf image reconciliation is lossy
+- API restart status: PM2 restart required after the latest scoring/classification code change; next queue result must be a fresh remediation after restart
+- Build status: targeted scorer/classification regressions and `tsc` passed for the latest change; rebuild pending before rerun
 
 ## Current Concurrency
 
@@ -33,11 +33,11 @@
 
 - Active PDF: `Prescription drug November 2008.pdf`
 - Current phase: Post-rerun blocker isolation
-- Immediate next step: commit/push/restart the API, rerun `Prescription drug November 2008.pdf`, and inspect whether the remaining font-unicode and alt-text debt clear
+- Immediate next step: commit/push/restart the API, rerun `Prescription drug November 2008.pdf`, and inspect whether the remaining Type1 font-unicode and alt-text crediting debt clear
 - API restart/rerun confirmed for active file: Not yet for the latest residual fix set
 - Rebuild required for active file: Yes, after the latest code change
-- Active remediation loop count: `Prescription drug November 2008.pdf=2`
-- Next hypothesis: a combined cleanup of the one unresolved Type1 Unicode map and the one skipped figure description should be enough to push this file over `95`
+- Active remediation loop count: `Prescription drug November 2008.pdf=3`
+- Next hypothesis: a combined cleanup of the excluded Type1 Unicode tool path and the stale alt-text denominator should be enough to push this file over `95`
 
 ## Pending Files
 

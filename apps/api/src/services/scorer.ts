@@ -388,6 +388,49 @@ interface SummaryContext {
 }
 
 type AcrobatAltRiskNode = NonNullable<StructureBackendMutationResult['acrobatAltRiskNodes']>[number]
+type StructureFigureNode = NonNullable<StructureBackendMutationResult['figures']>[number]
+
+function effectiveAltFigureStats(
+  qpdf: QpdfResult,
+  structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
+): {
+  figures: Array<{ ref: string; hasAlt: boolean; altText?: string }>
+  withAlt: number
+  wrapperExclusionCount: number
+  structureCreditApplied: boolean
+} {
+  const structureFigures = structure?.figures || []
+  const excludedWrapperRefs = new Set(
+    structureFigures
+      .filter(figure => figure.splitGenerated && !figure.hasText && !figure.hasAlt)
+      .map(figure => figure.ref),
+  )
+  const filteredQpdfFigures = qpdf.images.filter(img => img.ref && !excludedWrapperRefs.has(img.ref))
+  const informativeStructureFigures = structureFigures.filter(figure => !excludedWrapperRefs.has(figure.ref))
+  const structureTotal = informativeStructureFigures.length
+  const structureWithAlt = informativeStructureFigures.filter(figure => figure.hasAlt).length
+  const qpdfWithAlt = filteredQpdfFigures.filter(figure => figure.hasAlt).length
+  const effectiveTotal = Math.max(filteredQpdfFigures.length, structureTotal)
+  const effectiveWithAlt = Math.min(effectiveTotal, Math.max(qpdfWithAlt, structureWithAlt))
+
+  const figures = Array.from({ length: effectiveTotal }, (_, index) => {
+    const qpdfFigure = filteredQpdfFigures[index]
+    const structureFigure = informativeStructureFigures[index]
+    const hasAlt = index < effectiveWithAlt
+    return {
+      ref: qpdfFigure?.ref || structureFigure?.ref || `structure:${index}`,
+      hasAlt,
+      altText: qpdfFigure?.altText || structureFigure?.altText || undefined,
+    }
+  })
+
+  return {
+    figures,
+    withAlt: effectiveWithAlt,
+    wrapperExclusionCount: excludedWrapperRefs.size,
+    structureCreditApplied: structureWithAlt > qpdfWithAlt || structureTotal > filteredQpdfFigures.length,
+  }
+}
 
 export function scoreDocument(
   qpdf: QpdfResult,
@@ -398,7 +441,7 @@ export function scoreDocument(
     isCompliant: true,
     message: 'veraPDF passed PDF/UA validation.',
   }),
-  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures'> | null,
   adobe?: AdobeSummary | null,
   localStandards: LocalStandardsReport = { status: 'clear', findings: [], knownGapKeys: ['pdfua.local_coverage_unconfirmed'] },
   extras?: {
@@ -445,7 +488,7 @@ export function scoreDocument(
   categories.push(scoreHeadingStructure(qpdf))
 
   // 4. Alt Text on Images (15%)
-  categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, verapdf, structure?.acrobatAltRiskNodes || []))
+  categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, verapdf, structure))
 
   // 5. Bookmarks / Navigation (10%)
   categories.push(scoreBookmarks(qpdf, pdfjs))
@@ -749,7 +792,11 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
   }
 }
 
-function scoreAltText(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
+function scoreAltText(
+  qpdf: QpdfResult,
+  pdfjs: PdfjsResult,
+  structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
+): CategoryResult {
   const altLinks: CategoryResult['helpLinks'] = [
     { label: 'Adobe: Add Alt Text to Images', url: 'https://helpx.adobe.com/acrobat/using/editing-document-structure-content-tags.html#add_alternate_text_to_links_and_figures' },
     { label: 'WCAG 1.1.1: Non-text Content', url: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html' },
@@ -757,7 +804,12 @@ function scoreAltText(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
   ]
   const altExplanation = 'Alternative text (alt text) is a short text description attached to each image in the document. Screen readers read this description aloud so that blind and low-vision users can understand visual content. Every informative image needs alt text. Decorative images (borders, spacers) should be marked as artifacts instead.'
 
-  const figures = qpdf.images.filter(img => img.ref)
+  const {
+    figures,
+    withAlt,
+    wrapperExclusionCount,
+    structureCreditApplied,
+  } = effectiveAltFigureStats(qpdf, structure)
 
   // QPDF found no tagged images, but pdfjs detected image rendering operations.
   // Since QPDF comprehensively parses every indirect object, if it finds zero
@@ -799,7 +851,6 @@ function scoreAltText(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
     }
   }
 
-  const withAlt = figures.filter(f => f.hasAlt).length
   const score = withAlt === 0 ? 0 : Math.round((withAlt / figures.length) * 100)
   const findings: string[] = []
 
@@ -814,6 +865,12 @@ function scoreAltText(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResult {
     findings.push(`${missing} image(s) are missing alt text`)
     findings.push('How to fix: In Adobe Acrobat, open the Tags panel → find the <Figure> tag for each image → right-click → Properties → enter a description in the "Alternate Text" field.')
     findings.push('Tip: Good alt text is concise and describes the purpose of the image, not just its appearance. For example, "Bar chart showing 2024 crime rates by county" rather than "chart".')
+  }
+  if (wrapperExclusionCount > 0) {
+    findings.push(`${wrapperExclusionCount} split-generated decorative wrapper figure(s) were excluded from alt-text scoring.`)
+  }
+  if (structureCreditApplied) {
+    findings.push('Tagged figure descriptions recovered from the structure snapshot were used to reconcile image alt-text coverage.')
   }
 
   return {
@@ -846,9 +903,10 @@ function scoreAltTextWithAcrobatRisk(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
   verapdf: VeraPdfResult,
-  acrobatAltRiskNodes: AcrobatAltRiskNode[] = [],
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures'> | null,
 ): CategoryResult {
-  const category = scoreAltText(qpdf, pdfjs)
+  const acrobatAltRiskNodes = structure?.acrobatAltRiskNodes || []
+  const category = scoreAltText(qpdf, pdfjs, structure)
   if (!acrobatAltRiskNodes.length) return category
 
   const findings = [
@@ -898,8 +956,7 @@ function scoreAltTextWithAcrobatRisk(
   // graphics carry no semantic information. Do not cap the score for these.
   const substantiveRiskNodes = acrobatAltRiskNodes.filter(n => !n.graphicsLikelyDecorative)
   if (!substantiveRiskNodes.length) {
-    const figures = qpdf.images.filter(img => img.ref)
-    const withAlt = figures.filter(fig => fig.hasAlt).length
+    const { figures, withAlt } = effectiveAltFigureStats(qpdf, structure)
     const missingWithoutAlt = Math.max(0, figures.length - withAlt)
     const decorativeAllowance = Math.min(acrobatAltRiskNodes.length, missingWithoutAlt)
     const informativeFigureCount = figures.length - decorativeAllowance
@@ -934,8 +991,7 @@ function scoreAltTextWithAcrobatRisk(
       ],
     }
   }
-  const figures = qpdf.images.filter(img => img.ref)
-  const figuresWithAlt = figures.filter(fig => fig.hasAlt).length
+  const { figures, withAlt: figuresWithAlt } = effectiveAltFigureStats(qpdf, structure)
   const missingFigureCount = Math.max(0, figures.length - figuresWithAlt)
   const allDetectedFiguresHaveAlt = figures.length > 0 && figures.every(fig => fig.hasAlt)
   // If any mixed text/graphics node contains content-bearing (non-decorative) graphics, apply the strict cap.
