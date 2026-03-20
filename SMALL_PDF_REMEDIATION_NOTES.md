@@ -1351,3 +1351,19 @@
 - Generic fix applied:
   - semantic `set_link_annotation_contents` calls now batch through `runPdfStructureBackendBatch()` using the same mutation builder as deterministic stages
   - this should collapse the remaining heavy-link semantic mutation loop on Acrobat reports like `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+
+## Follow-up Semantic Link Scope Finding
+
+- Fresh clean rerun `11703760-5b7d-4139-b119-6d8f03c99bd6` proved the process is no longer crashing, but it still plateaued at `68%` in `Generating semantic fixes` after stage 5.
+- Live logs showed the remaining workload was not provider startup or deterministic link mutation anymore. It was semantic churn:
+  - many fast `remediation_fast` analyses continued to fire
+  - the queue record stopped advancing
+  - semantic link generation was still targeting links whose only issue was missing annotation `/Contents`
+- Root cause:
+  - `buildSemanticRepairBatches()` was including any link candidate with `rawUrl || !annotationContents`
+  - deterministic link repair already owns the `/Contents` backlog generically
+  - heavy-link PDFs were therefore paying semantic/AI cost for work that should stay deterministic
+- Generic fix applied:
+  - semantic link batching now only targets `rawUrl` links
+  - deterministic-only `/Contents` debt is excluded from semantic batching entirely
+  - this should sharply reduce semantic churn on Acrobat/PDFMaker bibliography-heavy reports without giving up deterministic `/Contents` repair coverage

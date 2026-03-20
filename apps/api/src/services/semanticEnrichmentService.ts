@@ -675,7 +675,9 @@ function tableTargets(context: PdfRemediationContext): TableCandidate[] {
 
 function linkTargets(context: PdfRemediationContext): LinkCandidate[] {
   return context.linkCandidates
-    .filter(candidate => candidate.rawUrl || !candidate.annotationContents)
+    // Deterministic repair already handles missing annotation /Contents at scale.
+    // Keep semantic link work focused on raw-URL links that may need visible-text cleanup.
+    .filter(candidate => candidate.rawUrl)
     .slice(0, MAX_SEMANTIC_LINK_TARGETS)
 }
 

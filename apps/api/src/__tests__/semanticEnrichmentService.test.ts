@@ -228,6 +228,35 @@ describe('semanticEnrichmentService', () => {
     ])
   })
 
+  it('skips semantic link batches for deterministic-only annotation contents debt', async () => {
+    const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const context = makeContext()
+    context.headingCandidates = []
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = Array.from({ length: 12 }, (_, index) => ({
+      id: `link:det:${index + 1}`,
+      pageNumber: 1,
+      url: `https://example.com/det-${index + 1}`,
+      text: `Reference ${index + 1}`,
+      bbox: { x: 0, y: 0.2, width: 0.4, height: 0.05 },
+      annotationIndex: index,
+      annotationContents: null,
+      rawUrl: false,
+      suggestedText: null,
+    }))
+    const analysis = makeAnalysisResult()
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 25, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+
+    const batches = buildSemanticRepairBatches({ context, analysis })
+    expect(batches).toEqual([])
+  })
+
   it('skips candidates already tagged as specific headings', async () => {
     const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const context = makeContext()
