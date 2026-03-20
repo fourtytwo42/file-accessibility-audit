@@ -67,7 +67,7 @@ export interface HeadingCandidate {
   unsafeReason?: string
 }
 
-const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/Story', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
+const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/Story', '/Normal', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
 const UNSAFE_HEADING_TAGS = ['/Link', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
 const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Story', '/Shape', '/InlineShape', '/Normal'] as const
 const UNSAFE_FIGURE_TAGS = ['/TD', '/TH', '/TR', '/Table', '/TOCI', '/TOC', '/Link', '/L', '/LI'] as const

@@ -2931,6 +2931,48 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:story')).toBe(true)
   }, 15_000)
 
+  it('treats /Normal-backed heading candidates as safe when they are the best available structural target', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'example.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const heuristicContext: PdfRemediationContext = {
+      ...context,
+      headingCandidates: [
+        {
+          id: 'heading:normal',
+          pageNumber: 1,
+          text: 'Normal heading',
+          bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+          fontSize: 18,
+          fontWeight: 'bold',
+          nearbyContext: ['Body'],
+          targetRef: 'obj:29 0 R',
+          existingTag: '/Normal',
+          repairMode: 'safe',
+        },
+      ],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'example.pdf',
+      analysis: {
+        ...analysis,
+        categories: analysis.categories.map(category =>
+          category.id === 'heading_structure' ? { ...category, score: 0 } : category),
+      },
+      context: heuristicContext,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:normal')).toBe(true)
+  }, 15_000)
+
 
   it('promotes chapter-style headings to H1 in heuristic mode', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
