@@ -1788,6 +1788,33 @@ export async function remediatePdfWithAgent(
       })
     }
 
+    if ((context.qpdf.unembeddedFontCount ?? 0) > 0) {
+      residualCalls.push({
+        tool_name: 'embed_missing_fonts_in_place',
+        arguments: { target: 'document' },
+        rationale: 'Final cleanup: retry embedding for any fonts still lacking embedded programs after later mutations.',
+        confidence: 0.9,
+      })
+    }
+
+    if ((context.qpdf.fontsMissingToUnicode ?? 0) > 0) {
+      residualCalls.push({
+        tool_name: 'repair_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Final cleanup: add ToUnicode maps for fonts still missing Unicode coverage after later mutations.',
+        confidence: 0.92,
+      })
+    }
+
+    if ((context.qpdf.type1FontsMissingToUnicode ?? 0) > 0) {
+      residualCalls.push({
+        tool_name: 'repair_type1_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Final cleanup: retry Type1/Type3 Unicode recovery after later font cleanup changed the remaining font set.',
+        confidence: 0.9,
+      })
+    }
+
     if (context.linkCandidates.some(candidate => !(candidate.annotationContents || '').trim())) {
       for (const candidate of context.linkCandidates.filter(entry => !(entry.annotationContents || '').trim())) {
         residualCalls.push({

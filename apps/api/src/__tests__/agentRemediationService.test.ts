@@ -1190,6 +1190,74 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(finalTools).toContain('set_link_annotation_contents')
   })
 
+  it('retries residual font cleanup before final scoring when qpdf still reports font debt', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'font-cleanup.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 97,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      categories: [
+        { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.095, score: 90, grade: 'B', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Font Cleanup', lang: 'en', links: [], imageCount: 0, metadata: pdfMetadata },
+      qpdf: {
+        lang: 'en',
+        headings: [],
+        tables: [],
+        images: [],
+        formFields: [],
+        hasStructTree: true,
+        outlineCount: 0,
+        structTreeDepth: 2,
+        unembeddedFontCount: 1,
+        fontsMissingToUnicode: 2,
+        type1FontsMissingToUnicode: 1,
+      },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    analyzePDF.mockResolvedValue(originalResult)
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'font-cleanup.pdf', originalResult)
+
+    const calledTools = executeRemediationTool.mock.calls
+      .map(call => call?.[0]?.call?.tool_name)
+      .filter(Boolean)
+    expect(calledTools).toContain('embed_missing_fonts_in_place')
+    expect(calledTools).toContain('repair_font_unicode_maps')
+    expect(calledTools).toContain('repair_type1_font_unicode_maps')
+  })
+
   it('requests deep inspection only when figure or alt-text work remains', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
