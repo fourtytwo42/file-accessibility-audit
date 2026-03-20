@@ -6574,6 +6574,58 @@ def mutate_normalize_heading_hierarchy(pdf, mutation):
     return True, applied, []
 
 
+def mutate_set_link_annotation_contents(pdf, mutation):
+    page_number = int(mutation.get("pageNumber") or 0)
+    annotation_index = mutation.get("annotationIndex")
+    contents = str(mutation.get("contents") or "").strip()
+    if page_number < 1 or annotation_index is None or not contents:
+        return False, [], ["set_link_annotation_contents requires pageNumber, annotationIndex, and non-empty contents."]
+
+    try:
+        target_link_index = int(annotation_index)
+    except Exception:
+        return False, [], ["set_link_annotation_contents requires a numeric annotationIndex."]
+
+    if page_number > len(pdf.pages):
+        return False, [], [f"Page {page_number} is out of range for set_link_annotation_contents."]
+
+    page = pdf.pages[page_number - 1]
+    annots = page.obj.get("/Annots")
+    if not isinstance(annots, pikepdf.Array):
+        return False, [], [f"Page {page_number} has no annotations for set_link_annotation_contents."]
+
+    link_index = -1
+    for annot_ref in annots:
+        try:
+            annot = pdf.get_object(annot_ref.objgen) if hasattr(annot_ref, 'objgen') else annot_ref
+        except Exception:
+            annot = annot_ref
+        if not isinstance(annot, pikepdf.Dictionary):
+            annot = annot_ref
+        if not isinstance(annot, pikepdf.Dictionary):
+            continue
+        if str(annot.get("/Subtype") or "") != "/Link":
+            continue
+        link_index += 1
+        if link_index != target_link_index:
+            continue
+
+        before = annot.get("/Contents")
+        before_text = str(before).strip() if before is not None else None
+        if before_text == contents:
+            return False, [], [f"Link annotation {page_number}:{target_link_index} already has matching /Contents."]
+
+        annot["/Contents"] = pikepdf.String(contents)
+        return True, [{
+            "ref": ref_string(annot),
+            "before": before_text,
+            "after": contents,
+            "details": f'Set link annotation /Contents to "{contents}".',
+        }], []
+
+    return False, [], [f"Could not find link annotation {page_number}:{target_link_index} for set_link_annotation_contents."]
+
+
 def mutate_normalize_nested_figure_containers(pdf, mutation):
     applied = []
     for obj in iter_struct_elems(pdf):
@@ -7158,6 +7210,8 @@ def dispatch_single_operation(pdf, operation, request):
         return mutate_create_heading_from_candidate(pdf, request)
     elif operation == "normalize_heading_hierarchy":
         return mutate_normalize_heading_hierarchy(pdf, request)
+    elif operation == "set_link_annotation_contents":
+        return mutate_set_link_annotation_contents(pdf, request)
     elif operation == "normalize_nested_figure_containers":
         return mutate_normalize_nested_figure_containers(pdf, request)
     elif operation == "retag_node":

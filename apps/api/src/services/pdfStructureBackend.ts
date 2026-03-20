@@ -32,6 +32,7 @@ export interface StructureBackendMutationRequest {
     | 'repair_note_tag_ids'
     | 'repair_native_marked_content_refs'
     | 'repair_native_link_structure'
+    | 'set_link_annotation_contents'
     | 'repair_bootstrapped_chart_content_refs'
     | 'repair_native_figure_semantics'
     | 'repair_other_elements_alt_text'
@@ -64,7 +65,10 @@ export interface StructureBackendMutationRequest {
   targetRef?: string
   level?: string
   text?: string
+  contents?: string
   altText?: string
+  pageNumber?: number
+  annotationIndex?: number
   pageImageCount?: number
   textDensityHint?: 'low' | 'medium' | 'high'
   imageEvidence?: 'strong' | 'vector' | 'weak'

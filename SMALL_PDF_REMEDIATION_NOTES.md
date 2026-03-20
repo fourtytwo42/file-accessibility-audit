@@ -1013,6 +1013,28 @@
   - findings still reported `28 of 35 image(s) have alternative text` and `7 image(s) are missing alt text`
 - That means the remaining gap is now most likely in the final qpdf image association / denominator logic rather than raw remediation capability.
 
+## Traffic Report Follow-up
+
+- Active file: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Latest completed fresh rerun before the current code change: queue item `fb4aedac-efec-4d65-9d52-c6aad863be22` -> `92/B`
+- Narrowed remaining blockers on that rerun:
+  - `alt_text = 75`
+  - `link_quality = 60`
+  - `pdf_ua_compliance = 85`
+  - exactly one real link annotation still missing `/Contents`
+- Root cause found after direct artifact probing:
+  - the inspection path was already narrowed to the real missing annotation
+  - the old TypeScript `set_link_annotation_contents` mutator still reported `applied` on the active traffic-report artifact, but the saved PDF left object `383 0 R` without `/Contents`
+  - direct backend probing showed the Python helper was initially missing synthetic/direct annotation objects because pikepdf exposed them with `objgen=(0,0)`
+- New shared fix prepared:
+  - `set_link_annotation_contents` now routes through the Python structure backend
+  - the backend mutator now falls back to the original annotation object when `get_object()` does not produce a real dictionary
+  - focused link mutation + re-inspection regression tests now pass
+- Next live step:
+  - commit/push this backend link-write fix
+  - restart the API
+  - rerun the active traffic report fresh before touching the residual Acrobat alt-text cap
+
 ## Stopping Point
 
 - Current score is exactly `95`, not above `95`.

@@ -1282,25 +1282,16 @@ function annotationMatchesCandidate(
 }
 
 async function setLinkAnnotationContents(buffer: Buffer, candidate: LinkCandidate, contents: string): Promise<Buffer> {
-  const pdfDoc = await PDFDocument.load(buffer, { updateMetadata: false, ignoreEncryption: true })
-  const page = pdfDoc.getPage(candidate.pageNumber - 1)
-  const annots = page.node.lookupMaybe(PDFName.of('Annots'), PDFArray)
-  if (!annots) return buffer
-
-  let linkAnnotationIndex = -1
-  for (let index = 0; index < annots.size(); index++) {
-    const annotRef = annots.get(index)
-    const annot = pdfDoc.context.lookup(annotRef, PDFDict)
-    if (!annot) continue
-    const subtype = annot.get(PDFName.of('Subtype'))
-    if (String(subtype) !== '/Link') continue
-    linkAnnotationIndex += 1
-    if (!annotationMatchesCandidate(annot, candidate, page, linkAnnotationIndex)) continue
-    annot.set(PDFName.of('Contents'), PDFHexString.fromText(contents))
-    return Buffer.from(await pdfDoc.save())
-  }
-
-  return buffer
+  const result = await runPdfStructureBackend({
+    buffer,
+    mutation: {
+      operation: 'set_link_annotation_contents',
+      pageNumber: candidate.pageNumber,
+      annotationIndex: candidate.annotationIndex,
+      contents,
+    },
+  })
+  return result.outputBuffer || buffer
 }
 
 function absoluteRect(page: { getWidth(): number; getHeight(): number }, bbox: BoundingBox) {
