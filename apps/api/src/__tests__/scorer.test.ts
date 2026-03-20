@@ -945,7 +945,7 @@ describe('scoreLinkQuality edge cases', () => {
 })
 
 describe('scoreDocument — veraPDF integration', () => {
-  it('caps a would-be A when veraPDF reports structural failures', () => {
+  it('adds a veraPDF warning when veraPDF reports structural failures but local standards are primary', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
       status: 'failed',
@@ -965,14 +965,15 @@ describe('scoreDocument — veraPDF integration', () => {
       message: 'veraPDF detected 2 PDF/UA compliance issues.',
     }))
 
-    expect(result.grade).toBe('B')
-    expect(result.overallScore).toBeLessThan(100)
-    expect(findCategory(result, 'text_extractability').score).toBeLessThan(100)
-    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(85)
-    expect(result.executiveSummary).toContain('close to PDF/UA compliant')
+    // With useLocalStandardsAsPrimary=true, veraPDF failures only add a warning.
+    // Local standards (default: clear) govern grade and score.
+    expect(result.grade).toBe('A')
+    expect(result.overallScore).toBe(100)
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(100)
+    expect(result.warnings.some(w => w.includes('veraPDF'))).toBe(true)
   })
 
-  it('adds a warning when veraPDF is unavailable, keeps heuristic scoring, but blocks A', () => {
+  it('adds a warning when veraPDF is unavailable, allows grade A when local standards are clear', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
       status: 'unavailable',
@@ -981,14 +982,15 @@ describe('scoreDocument — veraPDF integration', () => {
       message: 'veraPDF CLI is unavailable.',
     }))
 
-    expect(result.overallScore).toBeLessThan(100)
-    expect(result.grade).toBe('B')
-    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(90)
+    // With useLocalStandardsAsPrimary=true, unavailable veraPDF only adds a warning.
+    // Local standards (default: clear) govern grade and score.
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(100)
     expect(result.warnings.some(warning => warning.includes('veraPDF'))).toBe(true)
-    expect(result.executiveSummary).toContain('could not be fully confirmed')
   })
 
-  it('prevents a perfect score when veraPDF does not pass', () => {
+  it('allows grade A when veraPDF errors but local standards are clear', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
       status: 'error',
@@ -997,8 +999,10 @@ describe('scoreDocument — veraPDF integration', () => {
       message: 'veraPDF failed unexpectedly.',
     }))
 
-    expect(result.overallScore).toBeLessThan(100)
-    expect(result.grade).toBe('B')
+    // With useLocalStandardsAsPrimary=true, a veraPDF execution error does not cap the grade.
+    // Local standards (default: clear) remain the primary evidence.
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
   })
 
   it('uses local standards evidence as the primary PDF/UA gate when veraPDF is unavailable', () => {
@@ -1252,7 +1256,7 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.overallScore).toBeLessThanOrEqual(52)
   })
 
-  it('reduces the PDF/UA category more heavily for substantial veraPDF failures', () => {
+  it('keeps grade A when veraPDF reports many failures but local standards are clear', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(qpdf, pdfjs, makeVeraPdf({
       status: 'failed',
@@ -1272,8 +1276,11 @@ describe('scoreDocument — veraPDF integration', () => {
       message: 'veraPDF detected 12 PDF/UA compliance issues.',
     }))
 
-    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(40)
-    expect(result.executiveSummary).toContain('materially non-compliant')
+    // With useLocalStandardsAsPrimary=true, veraPDF failures alone do not reduce the pdf_ua score.
+    // Local standards (default: clear) determine the pdf_ua category result.
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(100)
+    expect(result.grade).toBe('A')
+    expect(result.warnings.some(w => w.includes('veraPDF'))).toBe(true)
   })
 })
 

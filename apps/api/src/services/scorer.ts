@@ -281,7 +281,11 @@ function scorePdfUaComplianceFromLocal(report: LocalStandardsReport): CategoryRe
   const blockingCount = blockingFindings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
   // Treat as clean when either there are no findings, or only non-blocking advisory findings remain.
   // Advisory (non-blocking) findings like inferred CIDSet proxies do not represent confirmed failures.
-  const canJustifyCleanPass = report.knownGapKeys.length === 0
+  // Administrative gap keys like 'pdfua.local_coverage_unconfirmed' do not block a clean pass —
+  // only semantic gap keys that represent confirmed partial coverage gaps do.
+  const SEMANTIC_GAP_KEYS = new Set(['pdfua.artifact_vs_real_content_partial'])
+  const hasSemanticGapKey = report.knownGapKeys.some(k => SEMANTIC_GAP_KEYS.has(k))
+  const canJustifyCleanPass = !hasSemanticGapKey
     && (report.status === 'clear' || report.findings.every(f => !f.blocking))
   const logicalStructureBlocking = blockingFindings.find(finding => finding.key === 'pdfua.logical_structure')
   const cidsetBlocking = blockingFindings.find(finding => finding.key === 'pdfua.cidset_consistency')
@@ -491,7 +495,11 @@ export function scoreDocument(
 
   // If local standards are clean (no findings, or only non-blocking advisory findings remain),
   // allow near-perfect heuristic scores to reach 100/100.
-  const localStandardsClean = localStandards.knownGapKeys.length === 0
+  // Administrative gap keys like 'pdfua.local_coverage_unconfirmed' do not block a clean pass —
+  // only semantic gap keys that represent confirmed partial coverage gaps do.
+  const SEMANTIC_GAP_KEYS_DOC = new Set(['pdfua.artifact_vs_real_content_partial'])
+  const hasSemanticGapKeyDoc = localStandards.knownGapKeys.some(k => SEMANTIC_GAP_KEYS_DOC.has(k))
+  const localStandardsClean = !hasSemanticGapKeyDoc
     && (localStandards.status === 'clear' || localStandards.findings.every(f => !f.blocking))
   const standardsClean = localStandardsClean
   if (standardsClean && computedScore >= 98) {
