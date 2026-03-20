@@ -10,6 +10,7 @@ import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
 import {
+  buildHeadingCandidatesFromPageFacts,
   buildRemediationContextFromSnapshot,
   __test_isSemanticAiEligibleDeferredFigureCandidate,
   __test_getBuildRemediationPageFactsCallCount,
@@ -25,6 +26,7 @@ import {
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
 import type { RemediationActionRecord, RemediationToolName } from '../services/documentModel.js'
 import { planRemediationActions } from '../services/remediationPlanService.js'
+import type { StructureBackendMutationResult } from '../services/pdfStructureBackend.js'
 
 const FIXTURES_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
 const DOWNLOADS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Processed/Before')
@@ -134,6 +136,83 @@ async function loadDownloadFixture(name: string): Promise<Buffer> {
 async function loadRepoDownload(name: string): Promise<Buffer> {
   return fs.promises.readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Downloads', name))
 }
+
+describe('buildHeadingCandidatesFromPageFacts', () => {
+  it('detects same-size heading lines when they use a distinct font face', () => {
+    const structure = {
+      structuralNodes: [
+        { ref: 'obj:10 0 R', tag: '/Sect', orderIndex: 0 },
+        { ref: 'obj:11 0 R', tag: '/P', orderIndex: 1 },
+      ],
+    } as StructureBackendMutationResult
+
+    const candidates = buildHeadingCandidatesFromPageFacts([
+      {
+        pageNumber: 1,
+        width: 612,
+        height: 792,
+        imageCount: 0,
+        links: [],
+        textLines: [
+          {
+            text: 'Data Collection and Research Design',
+            bbox: { x: 0.1, y: 0.8, width: 0.5, height: 0.03 },
+            fontSize: 12,
+            fontWeight: 'normal',
+            fontName: 'g_d0_f3',
+          },
+          {
+            text: 'This paragraph continues with normal body copy and should not become a heading candidate because it is prose.',
+            bbox: { x: 0.1, y: 0.74, width: 0.8, height: 0.03 },
+            fontSize: 12,
+            fontWeight: 'normal',
+            fontName: 'g_d0_f1',
+          },
+        ],
+      },
+    ], structure)
+
+    expect(candidates.map(candidate => candidate.text)).toContain('Data Collection and Research Design')
+    expect(candidates[0]?.repairMode).toBe('safe')
+  })
+
+  it('detects a top-of-page title line before prose even without bold or larger font size', () => {
+    const structure = {
+      structuralNodes: [
+        { ref: 'obj:20 0 R', tag: '/Story', orderIndex: 0 },
+        { ref: 'obj:21 0 R', tag: '/P', orderIndex: 1 },
+      ],
+    } as StructureBackendMutationResult
+
+    const candidates = buildHeadingCandidatesFromPageFacts([
+      {
+        pageNumber: 5,
+        width: 612,
+        height: 792,
+        imageCount: 0,
+        links: [],
+        textLines: [
+          {
+            text: 'Executive Summary',
+            bbox: { x: 0.1, y: 0.9, width: 0.3, height: 0.03 },
+            fontSize: 12,
+            fontWeight: 'normal',
+            fontName: 'g_d0_f1',
+          },
+          {
+            text: 'This report describes the implementation and short-term impact evaluation of the program and continues as normal prose.',
+            bbox: { x: 0.1, y: 0.84, width: 0.8, height: 0.03 },
+            fontSize: 12,
+            fontWeight: 'normal',
+            fontName: 'g_d0_f1',
+          },
+        ],
+      },
+    ], structure)
+
+    expect(candidates.map(candidate => candidate.text)).toContain('Executive Summary')
+  })
+})
 
 function makePlannerAction(
   tool: RemediationToolName,

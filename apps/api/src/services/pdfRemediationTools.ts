@@ -41,6 +41,7 @@ export interface RemediationPageFact {
     bbox: BoundingBox
     fontSize: number
     fontWeight: 'normal' | 'bold'
+    fontName?: string | null
   }>
   links: Array<{
     url: string
@@ -58,6 +59,7 @@ export interface HeadingCandidate {
   bbox: BoundingBox
   fontSize: number
   fontWeight: 'normal' | 'bold'
+  fontName?: string | null
   nearbyContext: string[]
   targetRef?: string | null
   existingTag?: string | null
@@ -325,7 +327,7 @@ function toInspectionPayload(input: {
     pdfjs: input.pdfjs,
     pages: input.pages,
     structure: input.structure,
-    headingCandidates: buildHeadingCandidates(input.pages, input.structure),
+    headingCandidates: buildHeadingCandidatesFromPageFacts(input.pages, input.structure),
     figureCandidates: buildFigureCandidates(input.pages, input.structure, input.qpdf),
     tableCandidates: buildTableCandidates(input.pages, input.structure),
     readingOrderCandidates,
@@ -465,6 +467,7 @@ function extractTextLines(textContent: any, pageWidth: number, pageHeight: numbe
         width,
         height,
         fontSize: Math.max(8, Math.round(height)),
+        fontName: typeof item.fontName === 'string' ? item.fontName : null,
       }
     })
     .sort((a: { y: number; x: number }, b: { y: number; x: number }) => (b.y - a.y) || (a.x - b.x))
@@ -487,6 +490,12 @@ function extractTextLines(textContent: any, pageWidth: number, pageHeight: numbe
     const ordered = [...line].sort((a, b) => a.x - b.x)
     const text = ordered.map(item => item.text).join(' ').replace(/\s+/g, ' ').trim()
     const fontSize = Math.round(ordered.reduce((sum, item) => sum + item.fontSize, 0) / ordered.length)
+    const fontNameCounts = new Map<string, number>()
+    for (const item of ordered) {
+      const key = item.fontName || ''
+      fontNameCounts.set(key, (fontNameCounts.get(key) || 0) + 1)
+    }
+    const dominantFontName = [...fontNameCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null
     const minX = Math.min(...ordered.map(item => item.x))
     const maxX = Math.max(...ordered.map(item => item.x + item.width))
     const maxY = Math.max(...ordered.map(item => item.y))
@@ -496,6 +505,7 @@ function extractTextLines(textContent: any, pageWidth: number, pageHeight: numbe
       bbox: toNormalizedBbox(minX, minY, maxX - minX, maxY - minY, pageWidth, pageHeight),
       fontSize,
       fontWeight: fontSize > medianFont * 1.15 ? 'bold' as const : 'normal' as const,
+      fontName: dominantFontName,
     }
   }).slice(0, 120)
 }
@@ -545,7 +555,41 @@ function normalizeHeadingLevels(levels: string[]): string[] {
   })
 }
 
-function buildHeadingCandidates(
+function looksLikeTitleCaseHeading(text: string): boolean {
+  if (!text || text.length > 120) return false
+  if (/[.!?]\s+[A-Z]/.test(text)) return false
+  const tokens = text.split(/\s+/).filter(Boolean)
+  if (!tokens.length) return false
+  const alphaTokens = tokens.filter(token => /[A-Za-z]/.test(token))
+  if (!alphaTokens.length) return false
+  const titleLikeTokens = alphaTokens.filter(token =>
+    /^[A-Z0-9]/.test(token)
+    || /^(of|the|and|for|to|in|on|with|by|at|a|an|or|but|from|into|over|under|via|ii|iii|iv|v|vi|vii|viii|ix|x)$/i.test(token),
+  )
+  return titleLikeTokens.length / alphaTokens.length >= 0.8
+}
+
+function hasDistinctHeadingFont(
+  line: RemediationPageFact['textLines'][number],
+  dominantFontName: string | null,
+): boolean {
+  return !!line.fontName && !!dominantFontName && line.fontName !== dominantFontName
+}
+
+function isTopOfPageHeadingCandidate(
+  line: RemediationPageFact['textLines'][number],
+  index: number,
+  lines: RemediationPageFact['textLines'],
+): boolean {
+  if (index > 2) return false
+  if (line.bbox.y < 0.68) return false
+  if (!looksLikeTitleCaseHeading(line.text)) return false
+  const nextLine = lines[index + 1]
+  if (!nextLine) return true
+  return nextLine.text.length >= 60 || looksLikeProseHeadingText(nextLine.text)
+}
+
+export function buildHeadingCandidatesFromPageFacts(
   pages: RemediationPageFact[],
   structure: StructureBackendMutationResult,
 ): HeadingCandidate[] {
@@ -556,16 +600,24 @@ function buildHeadingCandidates(
   for (const page of pages) {
     const fontSizes = page.textLines.map(line => line.fontSize).sort((a, b) => a - b)
     const medianFont = fontSizes.length ? fontSizes[Math.floor(fontSizes.length / 2)] : 12
+    const fontNameCounts = new Map<string, number>()
+    for (const line of page.textLines) {
+      const key = line.fontName || ''
+      fontNameCounts.set(key, (fontNameCounts.get(key) || 0) + 1)
+    }
+    const dominantFontName = [...fontNameCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null
 
     page.textLines.forEach((line, index) => {
       const normalizedText = normalizeHeadingText(line.text)
+      const distinctFont = hasDistinctHeadingFont(line, dominantFontName)
+      const topOfPageHeading = isTopOfPageHeadingCandidate(line, index, page.textLines)
       const headingLike =
         normalizedText.length >= 3 &&
         normalizedText.length <= 120 &&
         !isRawUrl(normalizedText) &&
         !normalizedText.startsWith('•') &&
         !looksLikeProseHeadingText(normalizedText) &&
-        (line.fontWeight === 'bold' || line.fontSize >= medianFont + 2)
+        (line.fontWeight === 'bold' || line.fontSize >= medianFont + 2 || distinctFont || topOfPageHeading)
 
       if (!headingLike) return
       const rawTarget = structuralTargets[targetIndex] || null
@@ -577,6 +629,7 @@ function buildHeadingCandidates(
         bbox: line.bbox,
         fontSize: line.fontSize,
         fontWeight: line.fontWeight,
+        fontName: line.fontName,
         nearbyContext: textNear(page.textLines, index),
         targetRef: target?.ref || null,
         existingTag: target?.tag || rawTarget?.tag || null,
