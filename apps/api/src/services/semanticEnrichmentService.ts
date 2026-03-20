@@ -22,6 +22,7 @@ const TABLE_BATCH_SIZE = 3
 const BOOKMARK_BATCH_SIZE = 10
 const MAX_SEMANTIC_LINK_TARGETS = 32
 const SEMANTIC_REQUEST_CONCURRENCY = 3
+const SEMANTIC_REQUEST_TIMEOUT_MS = Number(process.env.SEMANTIC_REQUEST_TIMEOUT_MS || 45_000)
 const MAX_TEXT = 240
 const MAX_ALT_TEXT = 180
 const TOP_FAILURE_LIMIT = 2
@@ -272,110 +273,124 @@ function buildPrompt(input: {
 }
 
 async function openAiCompatJsonResponse(messages: any[]): Promise<any> {
-  const response = await fetch(`${OPENAI_COMPAT_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENAI_COMPAT_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: OPENAI_COMPAT_MODEL,
-      temperature: 0.1,
-      tools: [{
-        type: 'function',
-        function: {
-          name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
-          description: 'Return semantic accessibility repair proposals for specific PDF targets.',
-          parameters: {
-            type: 'object',
-            additionalProperties: false,
-            properties: {
-              headings: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: false,
-                  required: ['candidateId', 'level', 'confidence', 'rationale'],
-                  properties: {
-                    candidateId: { type: 'string' },
-                    level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
-                    confidence: { type: 'number' },
-                    rationale: { type: 'string' },
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(new Error(`semantic request timed out after ${SEMANTIC_REQUEST_TIMEOUT_MS}ms`)), SEMANTIC_REQUEST_TIMEOUT_MS)
+  let response: Response
+  try {
+    response = await fetch(`${OPENAI_COMPAT_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${OPENAI_COMPAT_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: OPENAI_COMPAT_MODEL,
+        temperature: 0.1,
+        tools: [{
+          type: 'function',
+          function: {
+            name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
+            description: 'Return semantic accessibility repair proposals for specific PDF targets.',
+            parameters: {
+              type: 'object',
+              additionalProperties: false,
+              properties: {
+                headings: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['candidateId', 'level', 'confidence', 'rationale'],
+                    properties: {
+                      candidateId: { type: 'string' },
+                      level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
+                      confidence: { type: 'number' },
+                      rationale: { type: 'string' },
+                    },
                   },
                 },
-              },
-              figures: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: false,
-                  required: ['candidateId', 'decorative', 'altText', 'confidence', 'rationale'],
-                  properties: {
-                    candidateId: { type: 'string' },
-                    decorative: { type: 'boolean' },
-                    altText: { type: 'string' },
-                    confidence: { type: 'number' },
-                    rationale: { type: 'string' },
+                figures: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['candidateId', 'decorative', 'altText', 'confidence', 'rationale'],
+                    properties: {
+                      candidateId: { type: 'string' },
+                      decorative: { type: 'boolean' },
+                      altText: { type: 'string' },
+                      confidence: { type: 'number' },
+                      rationale: { type: 'string' },
+                    },
                   },
                 },
-              },
-              tables: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: false,
-                  required: ['candidateId', 'useFirstRowAsHeader', 'confidence', 'rationale'],
-                  properties: {
-                    candidateId: { type: 'string' },
-                    useFirstRowAsHeader: { type: 'boolean' },
-                    confidence: { type: 'number' },
-                    rationale: { type: 'string' },
+                tables: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['candidateId', 'useFirstRowAsHeader', 'confidence', 'rationale'],
+                    properties: {
+                      candidateId: { type: 'string' },
+                      useFirstRowAsHeader: { type: 'boolean' },
+                      confidence: { type: 'number' },
+                      rationale: { type: 'string' },
+                    },
                   },
                 },
-              },
-              links: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: false,
-                  required: ['candidateId', 'replacementText', 'annotationContents', 'confidence', 'rationale'],
-                  properties: {
-                    candidateId: { type: 'string' },
-                    replacementText: { type: 'string' },
-                    annotationContents: { type: 'string' },
-                    confidence: { type: 'number' },
-                    rationale: { type: 'string' },
+                links: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['candidateId', 'replacementText', 'annotationContents', 'confidence', 'rationale'],
+                    properties: {
+                      candidateId: { type: 'string' },
+                      replacementText: { type: 'string' },
+                      annotationContents: { type: 'string' },
+                      confidence: { type: 'number' },
+                      rationale: { type: 'string' },
+                    },
                   },
                 },
-              },
-              bookmarks: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: false,
-                  required: ['candidateId', 'title', 'level', 'confidence', 'rationale'],
-                  properties: {
-                    candidateId: { type: 'string' },
-                    title: { type: 'string' },
-                    level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
-                    confidence: { type: 'number' },
-                    rationale: { type: 'string' },
+                bookmarks: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['candidateId', 'title', 'level', 'confidence', 'rationale'],
+                    properties: {
+                      candidateId: { type: 'string' },
+                      title: { type: 'string' },
+                      level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
+                      confidence: { type: 'number' },
+                      rationale: { type: 'string' },
+                    },
                   },
                 },
               },
             },
           },
+        }],
+        tool_choice: {
+          type: 'function',
+          function: {
+            name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
+          },
         },
-      }],
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
-        },
-      },
-      messages,
-    }),
-  })
+        messages,
+      }),
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error || '')
+    if (/aborted|timed out/i.test(message)) {
+      throw new Error(`semantic provider request timed out: ${message}`)
+    }
+    throw error
+  } finally {
+    clearTimeout(timeout)
+  }
 
   if (!response.ok) {
     const bodyText = await response.text().catch(() => '')

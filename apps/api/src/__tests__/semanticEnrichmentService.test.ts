@@ -932,4 +932,36 @@ describe('semanticEnrichmentService', () => {
     expect(generated.batches[0]?.batchType).toBe('headings')
     expect(generated.reviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
   })
+
+  it('times out hung semantic provider requests instead of waiting indefinitely', async () => {
+    vi.useFakeTimers()
+    process.env.SEMANTIC_REQUEST_TIMEOUT_MS = '5'
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    vi.stubGlobal('fetch', vi.fn((_url, init: any) => new Promise((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => {
+        reject(init.signal.reason || new Error('aborted'))
+      })
+    })) as any)
+
+    const promise = generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        figureCandidates: [],
+        tableCandidates: [],
+        linkCandidates: [],
+        headingCandidates: [makeContext().headingCandidates[0]],
+      },
+    })
+
+    const rejection = expect(promise).rejects.toThrow(/semantic provider request timed out/i)
+    await vi.advanceTimersByTimeAsync(10)
+    await rejection
+    delete process.env.SEMANTIC_REQUEST_TIMEOUT_MS
+    vi.useRealTimers()
+  })
 })

@@ -13,11 +13,11 @@
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
 - Latest attempt path: queue item `f15c15f6-3074-4276-bc03-c0b049d91e71`
-- Latest result summary: the narrowed deep-scoring gate is live and light inspections are back under a second, but the rerun is still spending time in semantic heading work because AI is proposing repairs for candidates already tagged as `H1`/`H2`, producing `H2 -> H2` no-effect actions.
-- Latest validation source: targeted `semanticEnrichmentService` tests and live queue/log diagnosis completed on 2026-03-20T22:27Z
-- Next action: rebuild/restart on the semantic heading-target filter and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: excluding already-specific heading tags from semantic heading batches will cut no-effect heading churn and let this file either finish or expose the next true blocker family
-- API restart status: restart required after the semantic heading-target filter change before trusting the next queue result
+- Latest result summary: the semantic heading filter is live, but the rerun still stalled in `Generating semantic fixes`; the next bottleneck is that the OpenAI-compatible semantic request path had no timeout, so a hung provider call could pin the queue indefinitely.
+- Latest validation source: targeted `semanticEnrichmentService` tests and live queue/log diagnosis completed on 2026-03-20T22:35Z
+- Next action: rebuild/restart on the semantic-request timeout guard and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: timing out hung semantic provider calls should let the agent fall back cleanly instead of freezing at `68%`, which will either finish this PDF or expose the next real blocker family
+- API restart status: restart required after the semantic-request timeout change before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: the fresh rerun is still alive in semantic generation, and logs now isolate the next waste source as semantic heading batches that include candidates already tagged as specific headings
-- Immediate next step: rebuild/restart on the semantic heading-target filter, rerun the same PDF, and confirm the semantic stage stops burning batches on already-tagged headings
-- API restart/rerun confirmed for active file: pending restart; the current queue item `f15c15f6-3074-4276-bc03-c0b049d91e71` is stale relative to the newest semantic heading filter change
+- Current phase: the requeued rerun progressed through stage 5 and then stalled again at `Generating semantic fixes`; the next bottleneck is a hung semantic-provider request rather than local analysis time
+- Immediate next step: rebuild/restart on the semantic-request timeout guard, rerun the same PDF, and confirm the queue fails fast or falls back instead of pinning at `68%`
+- API restart/rerun confirmed for active file: pending restart; the current queue item `f15c15f6-3074-4276-bc03-c0b049d91e71` is stale relative to the newest semantic timeout change
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
 - Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=9`
-- Next hypothesis: once semantic heading batches ignore existing `H1`–`H6` targets, the remaining runtime should drop and the next completed rerun will reveal whether heading credit now lands cleanly
+- Next hypothesis: once hung semantic requests time out, the queue should stop freezing in semantic generation and either complete with heuristic/manual fallbacks or reveal the next true remediation blocker
 
 ## Pending Files
 
@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-20T22:35:00Z Small-PDF loop fix: the OpenAI-compatible semantic repair request path now has a hard timeout guard, so hung provider calls fail fast instead of pinning the queue in `Generating semantic fixes` indefinitely. Live diagnosis on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the deep-scoring and heading-batch fixes were working, but rerun `f15c15f6-3074-4276-bc03-c0b049d91e71` still stalled at `68%` while local inspections remained fast; that isolated the next bottleneck to a semantic-provider hang. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'times out hung semantic provider requests instead of waiting indefinitely|skips candidates already tagged as specific headings|caps semantic link batches on heavy-link documents'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T22:27:00Z Small-PDF loop fix: semantic heading batching now skips candidates already tagged as specific headings (`H1`-`H6`), preventing no-effect AI churn like `H2 -> H2` on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`. Live queue/log diagnosis on rerun `f15c15f6-3074-4276-bc03-c0b049d91e71` showed the narrowed deep-scoring gate worked, but the semantic stage was still burning time on heading proposals for candidates that were already structurally repaired. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'skips candidates already tagged as specific headings|caps semantic link batches on heavy-link documents|chunks semantic targets by type-specific batch sizes'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T21:49:00Z Small-PDF loop fix: heading target remapping now rebinds `/Link`-backed heading candidates to a safe parent text container when one exists, instead of leaving them blocked behind unsafe `/Link` wrappers. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, whose first completed rerun (`93dc3da2-b092-463e-a286-efeeba1e4442`) landed at `63/D` with `16` blocked heading candidates and evidence that most candidate targets were unsafe `/Link` nodes despite nearby safe parent `/P` structure. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps link-backed heading candidates to their safe parent text node|remaps section-backed heading candidates to the first safe descendant text node|remaps story-backed heading candidates to the first safe descendant text node|treats /Sect-backed heading candidates as safe when they are the best available structural target|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Normal-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 

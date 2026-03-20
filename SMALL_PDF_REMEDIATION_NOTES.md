@@ -1313,8 +1313,10 @@
 - Latest rerun: `f15c15f6-3074-4276-bc03-c0b049d91e71`
 - Latest result: still in progress (`68%`, `Generating semantic fixes`) on the newest deep-scoring-gate build
 - Current residual blocker:
-  - the semantic stage is still spending time on heading proposals for candidates that are already tagged as specific headings, producing no-effect actions like `H2 -> H2`
-- Shared fix shipped:
+- Current residual blocker:
+  - the semantic stage can still hang on a provider call even after the heading-target filter, leaving the queue stuck at `68%` with no completed result
+- Shared fixes shipped:
   - semantic heading batching now excludes candidates whose `existingTag` is already `H1`-`H6`
+  - semantic provider requests now time out instead of waiting indefinitely
 - Best next hypothesis:
-  - cutting those already-fixed heading targets out of the AI batches will shrink semantic work enough for this file to either complete or expose the next real blocker family cleanly
+  - once hung semantic requests fail fast, this file should either complete with fallback behavior or reveal the next true blocker family cleanly
