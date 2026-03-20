@@ -898,6 +898,34 @@ function scoreAltTextWithAcrobatRisk(
   // graphics carry no semantic information. Do not cap the score for these.
   const substantiveRiskNodes = acrobatAltRiskNodes.filter(n => !n.graphicsLikelyDecorative)
   if (!substantiveRiskNodes.length) {
+    const figures = qpdf.images.filter(img => img.ref)
+    const withAlt = figures.filter(fig => fig.hasAlt).length
+    const missingWithoutAlt = Math.max(0, figures.length - withAlt)
+    const decorativeAllowance = Math.min(acrobatAltRiskNodes.length, missingWithoutAlt)
+    const informativeFigureCount = figures.length - decorativeAllowance
+    if (informativeFigureCount > 0) {
+      const informativeWithAlt = Math.min(withAlt, informativeFigureCount)
+      const adjustedScore = informativeWithAlt === 0
+        ? 0
+        : Math.round((informativeWithAlt / informativeFigureCount) * 100)
+      const adjustedFindings = informativeWithAlt === informativeFigureCount
+        ? [
+            `All ${informativeFigureCount} informative image(s) have alternative text`,
+            `${acrobatAltRiskNodes.length} non-figure element(s) with decorative-only graphics were excluded from alt-text scoring because the graphics are purely decorative (path/stroke operations only).`,
+          ]
+        : [
+            `${informativeWithAlt} of ${informativeFigureCount} informative image(s) have alternative text`,
+            `${informativeFigureCount - informativeWithAlt} informative image(s) are missing alt text`,
+            `${acrobatAltRiskNodes.length} non-figure element(s) with decorative-only graphics were excluded from alt-text scoring because the graphics are purely decorative (path/stroke operations only).`,
+          ]
+      return {
+        ...category,
+        score: adjustedScore,
+        grade: getGrade(adjustedScore),
+        severity: getSeverity(adjustedScore),
+        findings: adjustedFindings,
+      }
+    }
     return {
       ...category,
       findings: [

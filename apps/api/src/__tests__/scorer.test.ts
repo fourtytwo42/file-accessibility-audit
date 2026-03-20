@@ -807,6 +807,54 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').grade).not.toBe('A')
   })
 
+  it('excludes decorative non-figure graphics from alt-text scoring when informative figures are already described', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true },
+        { ref: '11 0 R', hasAlt: true },
+        { ref: '12 0 R', hasAlt: false },
+        { ref: '13 0 R', hasAlt: false },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'obj:12 0 R',
+            tag: '/P',
+            pageRef: 'obj:5 0 R',
+            mcids: [3],
+            hasText: true,
+            hasGraphics: true,
+            graphicsLikelyDecorative: true,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+          {
+            ref: 'obj:13 0 R',
+            tag: '/P',
+            pageRef: 'obj:5 0 R',
+            mcids: [4],
+            hasText: true,
+            hasGraphics: true,
+            graphicsLikelyDecorative: true,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('excluded from alt-text scoring'))).toBe(true)
+  })
+
   it('reduces alt_text when Acrobat reports orphaned alternate text with no associated content', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(

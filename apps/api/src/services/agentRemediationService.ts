@@ -593,9 +593,31 @@ function standardsValidationImproved(previous: AnalysisResult, next: AnalysisRes
   if (previousStatus !== 'passed' && nextStatus === 'passed') return true
   const previousFailedChecks = previous.verapdf?.failedChecks
   const nextFailedChecks = next.verapdf?.failedChecks
-  return typeof previousFailedChecks === 'number'
+  if (typeof previousFailedChecks === 'number'
     && typeof nextFailedChecks === 'number'
-    && nextFailedChecks < previousFailedChecks
+    && nextFailedChecks < previousFailedChecks) {
+    return true
+  }
+
+  const previousLocalBlocking = previous.localStandards?.findings
+    ?.filter(finding => finding.blocking)
+    .reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0) ?? 0
+  const nextLocalBlocking = next.localStandards?.findings
+    ?.filter(finding => finding.blocking)
+    .reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0) ?? 0
+  if (nextLocalBlocking < previousLocalBlocking) return true
+
+  const previousBlockingKeys = new Set(
+    previous.localStandards?.findings
+      ?.filter(finding => finding.blocking)
+      .map(finding => finding.key) ?? [],
+  )
+  const nextBlockingKeys = new Set(
+    next.localStandards?.findings
+      ?.filter(finding => finding.blocking)
+      .map(finding => finding.key) ?? [],
+  )
+  return [...previousBlockingKeys].some(key => !nextBlockingKeys.has(key))
 }
 
 function applyScoreDelta(action: RemediationActionRecord, previous: AnalysisResult, next: AnalysisResult): boolean {

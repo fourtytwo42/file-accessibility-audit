@@ -2493,6 +2493,156 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.finalResult.overallScore).toBe(100)
   })
 
+  it('accepts a flat-score stage when blocking local standards findings improve', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'local-standards-flat.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 75,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+        passedChecks: 0,
+        failedChecks: 0,
+        failures: [],
+      }),
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.font_unicode',
+            label: 'Font Unicode mapping',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Detected 13 font object(s) without a ToUnicode map.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 13,
+          },
+        ],
+        knownGapKeys: [],
+      },
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.175, score: 40, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.095, score: 40, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Local Standards Flat', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['pdf_ua_compliance'],
+        actions: [
+          { tool_name: 'repair_font_unicode_maps', arguments: {}, rationale: 'repair fonts', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool.mockResolvedValueOnce({
+      buffer: Buffer.from('pdf-font-fix'),
+      action: {
+        tool: 'repair_font_unicode_maps',
+        target: 'document',
+        details: 'fonts updated',
+        confidence: 0.9,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    for (let i = 0; i < 5; i += 1) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-font-fix'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'cleanup',
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
+
+    analyzePDF
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 75,
+        grade: 'B',
+        localStandards: {
+          status: 'issues_detected',
+          findings: [],
+          knownGapKeys: [],
+        },
+        categories: [
+          { ...originalResult.categories[0], score: 40, grade: 'F', severity: 'Moderate' },
+          { ...originalResult.categories[1], score: 40, grade: 'F', severity: 'Moderate' },
+        ],
+      })
+      .mockResolvedValue({
+        ...originalResult,
+        overallScore: 75,
+        grade: 'B',
+        localStandards: {
+          status: 'issues_detected',
+          findings: [],
+          knownGapKeys: [],
+        },
+        categories: [
+          { ...originalResult.categories[0], score: 40, grade: 'F', severity: 'Moderate' },
+          { ...originalResult.categories[1], score: 40, grade: 'F', severity: 'Moderate' },
+        ],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'local-standards-flat.pdf', originalResult)
+
+    expect(result.model.rejectedActions || []).toHaveLength(0)
+    expect(result.buffer.equals(Buffer.from('pdf-font-fix'))).toBe(true)
+  })
+
   it('skips semantic AI when semantic categories are already all complete and no AI-first figures exist', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

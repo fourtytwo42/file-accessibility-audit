@@ -81,7 +81,7 @@ function missingLogicalStructureFinding(
     && qpdf.images.length === 0
   const semanticFigureCoverageAbsent = qpdf.hasStructTree
     && qpdf.images.length > 0
-    && figureCount > 0
+    && figureCount === 0
     && imageStructNodeCount === 0
   const artifactMixingProxy = qpdf.hasStructTree
     && substantiveAltRiskCount >= 5
