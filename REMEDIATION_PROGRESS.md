@@ -12,12 +12,12 @@
 ## Current Session Snapshot
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Latest attempt path: queue item `ff6aab29-d62d-479c-8da5-366241e50c83`
-- Latest result summary: heading remap plus reserved heading planner budget are live, but the fresh rerun is now spending most of its time in semantic link generation instead of finishing quickly. Local probing shows this file generates `26` semantic batches, including `19` link batches for `146` link candidates.
-- Latest validation source: targeted `remediationPlanService` plus `semanticEnrichmentService` tests and live queue/log diagnosis completed on 2026-03-20T22:14Z
-- Next action: restart the API on the new semantic-link cap fix and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: bounding semantic link batching on heavy-link PDFs should keep deterministic link `/Contents` repair coverage while letting heading, figure, and bookmark semantic work complete fast enough to raise the remediated score above the current `63/D` plateau
-- API restart status: restart required after the semantic-link cap change before trusting the next queue result
+- Latest attempt path: queue item `d42bb954-6bc2-403b-9775-27442e31fcac`
+- Latest result summary: the semantic-link cap is live and the fresh rerun now progresses through stage 5 instead of wedging in semantic generation, but logs still show occasional `remediation_fast` validations paying `~45s` for forced deep structure scoring on lightweight follow-up stages.
+- Latest validation source: targeted `agentRemediationService` tests and live queue/log diagnosis completed on 2026-03-20T22:20Z
+- Next action: restart the API on the narrowed deep-structure-scoring gate and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: limiting forced deep structure scoring to genuinely structure-sensitive tools should keep the heading/bootstrap protection while removing unnecessary 45-second re-analyses from annotation/link cleanup stages
+- API restart status: restart required after the deep-structure-scoring gate change before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: fresh rerun progressed past heading starvation but is effectively wedged in heavy semantic link work after reaching `Generating semantic fixes`
-- Immediate next step: restart on the new semantic-link cap fix, rerun the same PDF, and verify the queue completes semantic work instead of burning time on `19` link batches
-- API restart/rerun confirmed for active file: pending restart; the current queue item `ff6aab29-d62d-479c-8da5-366241e50c83` is stale relative to the newest semantic-link cap change
+- Current phase: fresh rerun progressed through stage 5 on the semantic-link cap, but logs now isolate the next throughput tax as unnecessary deep structure scoring during some `remediation_fast` validations
+- Immediate next step: restart on the narrowed deep-structure-scoring gate, rerun the same PDF, and verify the queue keeps progressing without the extra 45-second validation spikes
+- API restart/rerun confirmed for active file: pending restart; the current queue item `d42bb954-6bc2-403b-9775-27442e31fcac` is stale relative to the newest deep-structure-scoring gate change
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
-- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=7`
-- Next hypothesis: heavy-link Acrobat reports should cap semantic link batching and rely on deterministic link repairs for the long tail, so heading/figure/bookmark semantic work can finish quickly and the remediation loop can converge
+- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=8`
+- Next hypothesis: only bootstrap, heading normalization, and figure-structure-sensitive tools should force deep structure scoring; annotation-only alt-text and similar cleanup should stay on the light validation path
 
 ## Pending Files
 
@@ -83,6 +83,7 @@
 
 - 2026-03-20T22:04:00Z Small-PDF loop fix: deterministic planning now reserves part of the action budget for safe heading candidates when `heading_structure` is still unresolved, so stage-3 link candidate floods cannot starve `create_heading_from_candidate` out of the plan. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, where the fresh post-remap rerun (`71d056a0-3f18-4fba-b680-8c92a52124d6`) still finished at `63/D` even though all 16 heading candidates had become auto-runnable and safe; none were executed because the deterministic action budget was consumed earlier by link-annotation content repairs. Verified with `pnpm --filter api exec vitest run src/__tests__/remediationPlanService.test.ts -t 'reserves room for safe heading candidates before link candidate floods consume the action budget|reserves room for document-scoped fixes before candidate floods consume the action budget|reorders deterministic opportunities using historical reliability'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T22:14:00Z Small-PDF loop fix: semantic link batching is now capped at `32` targets on heavy-link documents so link-heavy Acrobat reports do not spend most of the semantic stage on model-generated link rewrites that deterministic `/Contents` repair already covers. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, whose fresh rerun (`ff6aab29-d62d-479c-8da5-366241e50c83`) progressed past heading starvation but stalled in semantic generation; direct local probing showed `26` semantic batches total, including `19` link batches for `146` link candidates. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'caps semantic link batches on heavy-link documents|chunks semantic targets by type-specific batch sizes'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
+- 2026-03-20T22:20:00Z Small-PDF loop fix: narrowed forced deep structure scoring so `remediation_fast` validation only pays the expensive structure-inspect path for genuinely structure-sensitive tools instead of every action that happens to target `alt_text`. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, whose fresh rerun (`d42bb954-6bc2-403b-9775-27442e31fcac`) progressed through stage 5 on the new semantic-link cap but still logged intermittent `~45s` `remediation_fast` analyses caused by `forceStructureForScoring` on lightweight follow-up stages. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'does not force deep structure scoring for annotation-only alt-text cleanup|keeps heading normalization when native-safe validation needs deep structure scoring|forces deep structure scoring when validating bootstrap stages'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 
 - 2026-03-20T21:27:00Z Small-PDF loop fix: `inspectPdfForRemediation()` now falls back to `light` inspection when an `alt_text_deep` structure inspection fails, instead of repeatedly re-requesting the same pathological deep snapshot. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfStructureBackend.test.ts src/__tests__/pdfRemediationTools.test.ts -t 'falls back to light inspection when alt_text_deep inspection fails|fails fast on pathological alt_text_deep inspections|keeps longer timeouts for light inspect and heavy alt-text repair mutations'` and `pnpm --filter api exec tsc --noEmit`. Live logs for `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the first timeout fix moved the queue past original analysis, but repeated `structureInspect ~45000ms` runs were still occurring inside remediation-fast analysis.
 

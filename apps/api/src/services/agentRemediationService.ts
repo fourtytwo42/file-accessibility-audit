@@ -312,8 +312,7 @@ function batchActionDetails(
 
 function requiresDeepStructureScoring(actions: Array<Pick<RemediationActionRecord, 'tool' | 'categoryTargets'>>): boolean {
   return actions.some(action =>
-    DEEP_STRUCTURE_SCORING_TOOLS.has(action.tool)
-    || action.categoryTargets?.includes('alt_text'),
+    DEEP_STRUCTURE_SCORING_TOOLS.has(action.tool),
   )
 }
 

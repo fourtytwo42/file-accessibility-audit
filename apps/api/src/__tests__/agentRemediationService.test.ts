@@ -1300,6 +1300,95 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.actions?.some(action => action.tool === 'normalize_heading_hierarchy' && action.outcome !== 'rejected')).toBe(true)
   })
 
+  it('does not force deep structure scoring for annotation-only alt-text cleanup', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'annotation-alt-only.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 1, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 82,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Annotation alt', lang: 'en', links: [], imageCount: 0, metadata: pdfMetadata },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+    })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['alt_text'],
+        actions: [
+          { tool_name: 'repair_annotation_alt_text', arguments: { target: 'annotations' }, rationale: 'annotation alt', confidence: 0.95 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool.mockResolvedValueOnce({
+      buffer: Buffer.from('annotation-alt'),
+      action: {
+        tool: 'repair_annotation_alt_text',
+        target: 'document',
+        details: 'annotation alt repaired',
+        confidence: 0.95,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['alt_text'],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    analyzePDF.mockImplementation(async (_buffer: Buffer, _filename: string, options?: any) => ({
+      ...originalResult,
+      overallScore: options?.analysisProfile === 'remediation_fast' ? 90 : 90,
+      grade: 'A',
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        { ...originalResult.categories[1] },
+      ],
+    }))
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'annotation-alt-only.pdf', originalResult)
+
+    expect(analyzePDF.mock.calls.some(([, , options]) =>
+      options?.analysisProfile === 'remediation_fast'
+      && options?.forceStructureForScoring === true,
+    )).toBe(false)
+  })
+
   it('retries residual font cleanup before final scoring when qpdf still reports font debt', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

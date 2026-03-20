@@ -3,7 +3,7 @@
 ## Current Active File
 
 - `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current fresh queue item: `ff6aab29-d62d-479c-8da5-366241e50c83`
+- Current fresh queue item: `d42bb954-6bc2-403b-9775-27442e31fcac`
 - Latest completed file: `McLean-2.pdf` -> `100/A`
 
 ## Recent Loop Summary
@@ -118,6 +118,18 @@
 - Generic fix applied:
   - cap semantic link batching to the first `32` link targets on heavy-link documents
   - keep semantic headings, figures, and bookmarks active so the semantic stage still improves the categories that actually need model help
+
+## Follow-up Validation Timing Finding
+
+- Fresh rerun `d42bb954-6bc2-403b-9775-27442e31fcac` progressed much farther on the semantic-link cap and reached stage `5`
+- New bottleneck isolated from PM2 timings:
+  - some `remediation_fast` validations still took about `45s`
+  - those slow validations had `forceStructureForScoring = true`
+  - the trigger was too broad: any action targeting `alt_text` could force deep structure scoring, even when the action was not actually structure-sensitive
+- Generic fix applied:
+  - keep deep structure scoring for bootstrap, heading normalization, and the explicit deep-structure tool set
+  - stop forcing it for lightweight annotation-only alt-text cleanup
+  - preserve the existing deep-score protections for bootstrap and native heading validation with targeted tests
 
 ## CMVoga Resolution
 
