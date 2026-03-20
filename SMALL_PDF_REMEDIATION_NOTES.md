@@ -257,6 +257,23 @@
   - `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts`
   - `pnpm --filter api exec tsc --noEmit`
 
+### Rerun After Decorative Figure Scoring Fix
+
+- Second queue item: `d573b1fb-4583-473e-be09-c83423d408aa`
+- Rerun result: `87/B`
+- Outcome:
+  - the score did not move, which ruled out a final-score-only problem
+  - the rejected `repair_other_elements_alt_text` action still carried the same `alt_text score regressed from 11 to 8` reason
+  - that exposed the deeper blind spot: native-safe intermediate validation still uses `remediation_fast`, and that fast profile was not running structure scoring at all
+
+### System Fix In Progress 2
+
+- Added `forceStructureForScoring` to `analyzePDF()` so `remediation_fast` analysis can include a structure snapshot when needed.
+- Updated native-safe intermediate validation to force structure scoring for figure/Acrobat alt-text repair actions, so stage acceptance now sees the same decorative-figure evidence the final scorer sees.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts`
+  - `pnpm --filter api exec tsc --noEmit`
+
 ### Rerun After /Story Figure Wrapper + Direct Type1 Follow-up
 
 - Third queue item: `25303037-20fe-4521-864b-3cf8b30e50f4`

@@ -130,6 +130,7 @@ export async function analyzePDF(
     skipVeraPdf?: boolean
     inheritedVeraPdf?: VeraPdfResult
     analysisProfile?: AnalysisProfile
+    forceStructureForScoring?: boolean
   },
 ): Promise<AnalysisResult> {
   await acquireSemaphore()
@@ -173,7 +174,7 @@ export async function analyzePDF(
     }
 
     const linkSummary = summarizeLinkTextQuality(pdfjsResult.links)
-    const structureForScoring = analysisProfile === 'full_final'
+    const structureForScoring = (analysisProfile === 'full_final' || options?.forceStructureForScoring)
       && qpdfResult.hasStructTree
       && (pdfjsResult.imageCount > 0 || qpdfResult.images.length > 0 || qpdfResult.headings.length > 0)
       ? await measure(timings, 'structureInspect', () => runPdfStructureBackend({

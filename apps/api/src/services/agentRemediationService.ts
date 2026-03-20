@@ -68,13 +68,17 @@ async function analyzeIntermediatePdf(
   buffer: Buffer,
   filename: string,
   baselineResult: AnalysisResult,
-  signal?: AbortSignal,
+  options?: {
+    signal?: AbortSignal
+    forceStructureForScoring?: boolean
+  },
 ): Promise<AnalysisResult> {
   return analyzePDF(buffer, filename, {
     analysisProfile: 'remediation_fast',
-    signal,
+    signal: options?.signal,
     skipAdobe: true,
     inheritedVeraPdf: baselineResult.verapdf,
+    forceStructureForScoring: options?.forceStructureForScoring,
   })
 }
 
@@ -113,6 +117,15 @@ const DEEP_DIRTY_TOOLS = new Set<string>([
   'set_tabs_all_annotated_pages',
   'set_table_header_cells',
   'create_heading_from_candidate',
+])
+
+const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
+  'set_figure_alt_text',
+  'retag_as_figure_and_set_alt',
+  'mark_figure_decorative',
+  'repair_native_figure_semantics',
+  'repair_other_elements_alt_text',
+  'normalize_nested_figure_containers',
 ])
 
 const METADATA_ONLY_TOOLS = new Set<string>([
@@ -283,6 +296,13 @@ function batchActionDetails(
     default:
       return fallbackDetails
   }
+}
+
+function requiresDeepStructureScoring(actions: Array<Pick<RemediationActionRecord, 'tool' | 'categoryTargets'>>): boolean {
+  return actions.some(action =>
+    DEEP_STRUCTURE_SCORING_TOOLS.has(action.tool)
+    || action.categoryTargets?.includes('alt_text'),
+  )
 }
 
 function buildBatchMutationForCall(
@@ -1705,9 +1725,15 @@ export async function remediatePdfWithAgent(
   const analyzeIntermediate = async (
     buffer: Buffer,
     baselineResult: AnalysisResult,
+    analysisOptions?: {
+      forceStructureForScoring?: boolean
+    },
   ): Promise<AnalysisResult> => {
     remediationTimings.intermediateAnalyses += 1
-    return analyzeIntermediatePdf(buffer, filename, baselineResult, options?.signal)
+    return analyzeIntermediatePdf(buffer, filename, baselineResult, {
+      signal: options?.signal,
+      forceStructureForScoring: analysisOptions?.forceStructureForScoring,
+    })
   }
 
   const runAcrobatOwnershipConvergence = async (): Promise<void> => {
@@ -2219,7 +2245,9 @@ export async function remediatePdfWithAgent(
         break
       }
 
-      const analyzedAttempt = await analyzeIntermediate(attemptBuffer, checkpointResult)
+      const analyzedAttempt = await analyzeIntermediate(attemptBuffer, checkpointResult, {
+        forceStructureForScoring: requiresDeepStructureScoring(attemptEntries.map(entry => entry.action)),
+      })
       const attemptRegressionReason = nativeStageRegressionReason(
         checkpointResult,
         analyzedAttempt,
@@ -2262,7 +2290,9 @@ export async function remediatePdfWithAgent(
       for (const [position, { entry, index }] of changedEntries.entries()) {
         const analyzedEntry = position === changedEntries.length - 1
           ? analyzedAttempt
-          : await analyzeIntermediate(entry.afterBuffer, checkpointResult)
+          : await analyzeIntermediate(entry.afterBuffer, checkpointResult, {
+              forceStructureForScoring: requiresDeepStructureScoring([entry.action]),
+            })
         const entryRegressionReason = nativeStageRegressionReason(
           checkpointResult,
           analyzedEntry,

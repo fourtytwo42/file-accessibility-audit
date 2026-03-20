@@ -15,8 +15,8 @@
 - Latest attempt path: queue item `8b8908c7-d56e-4a43-9d49-e71f20bd335e`
 - Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` finished its first fresh loop at `87/B`. The remaining score gap is concentrated in `alt_text=40` and `link_quality=60`. The highest-leverage blocker is a rejected `repair_other_elements_alt_text` pass that retagged graphics-only `/P` nodes as decorative `/Figure` wrappers, but our scorer still counted those decorative repairs as missing-alt figures and rejected the stage.
 - Latest validation source: Fresh API remediation rerun completed on 2026-03-20T17:02Z
-- Next action: rebuild/restart after the decorative-figure scoring fix, then rerun `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
-- Next hypothesis: once decorative Acrobat-cleanup figures are excluded from the alt-text denominator, the previously rejected `repair_other_elements_alt_text` stage should be accepted and push this modern report above `95`
+- Next action: rebuild/restart after the native-safe deep-structure scoring fix, then rerun `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Next hypothesis: the native-safe validator was still using `remediation_fast` without structure scoring, so it could not see decorative Acrobat-cleanup figures. Forcing structure scoring on mid-loop alt-text repairs should finally allow `repair_other_elements_alt_text` to be accepted on this file.
 - API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
 - Build status: `pnpm --filter api build` completed before the successful rerun
 
@@ -31,11 +31,11 @@
 
 - Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
 - Current phase: Active blocker fix for first-loop `87/B` result
-- Immediate next step: restart the API and rerun the active file after the decorative Acrobat-cleanup scoring fix
+- Immediate next step: restart the API and rerun the active file after the native-safe deep-structure scoring fix
 - API restart/rerun confirmed for active file: Yes, restart completed immediately before selecting the next file
 - Rebuild required for active file: No further rebuild currently required
-- Active remediation loop count: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf=2`
-- Next hypothesis: decorative graphics retagged by `repair_other_elements_alt_text` need to be excluded from alt-text scoring just like split-generated decorative wrappers; this should unblock acceptance of the Acrobat cleanup stage on modern PDFMaker reports
+- Active remediation loop count: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf=3`
+- Next hypothesis: native-safe intermediate analysis must force deep structure scoring for figure/Acrobat alt-text repairs, otherwise the validator sees the old fast-profile score and keeps rejecting a useful repair
 
 ## Pending Files
 
@@ -77,6 +77,8 @@
 
 ## Recent Events
 
+- 2026-03-20T17:12:00Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `d573b1fb-4583-473e-be09-c83423d408aa` and stayed at `87/B`. That confirmed the first scorer-side decorative-figure fix was not enough by itself. The next diagnosis was precise: native-safe stage validation still uses `remediation_fast` intermediate analysis, and that fast profile does not run structure scoring, so `repair_other_elements_alt_text` was still being judged against the old `11 -> 8` alt-text regression snapshot.
+- 2026-03-20T17:15:00Z Small-PDF loop fix: `remediation_fast` analysis can now be forced to include structure scoring, and native-safe intermediate validation now enables that deeper scoring path specifically for figure/Acrobat alt-text repairs. This targets the modern PDFMaker blocker exposed by `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`, where the mid-loop validator could not see decorative Acrobat-cleanup figures even though the final scorer now understands them. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T17:07:00Z Small-PDF loop fix: the structure backend now carries `graphicsLikelyDecorative` on recovered `/Figure` nodes, and alt-text scoring excludes those decorative Acrobat-cleanup figures from the denominator the same way it already excludes split-generated decorative wrappers. This targets `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`, where `repair_other_elements_alt_text` was correctly retagging graphics-only `/P` nodes as decorative `/Figure alt=""` wrappers but the stage was still being rejected because the scorer treated them as new missing-alt figures. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T17:02:55Z Fresh small-PDF baseline: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `8b8908c7-d56e-4a43-9d49-e71f20bd335e` at `87/B` from `47/F`. The remaining blocker family is narrow and modern-report-specific: `repair_other_elements_alt_text` did real Acrobat ownership cleanup but was rejected because alt-text scoring regressed from `11` to `8` after decorative graphics-only `/P` elements were retagged as `/Figure alt=""`, while one link annotation `/Contents` issue still caps `link_quality` and `pdf_ua_compliance`.
 
