@@ -106,6 +106,24 @@ function makeStructure(overrides: Partial<StructureBackendMutationResult> = {}):
 }
 
 describe('buildLocalStandardsReport', () => {
+  it('prefers qpdf link contents evidence over pdfjs null contents when qpdf sees populated annotations', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        linkAnnotationCount: 1,
+        linkAnnotationsMissingContents: 0,
+      }),
+      makePdfjs({
+        links: [{ url: 'https://example.com', text: 'Example', contents: null }],
+      }),
+      {
+        tabOrder: makeTabOrder(),
+        structure: makeStructure(),
+      },
+    )
+
+    expect(report.findings.some(entry => entry.key === 'pdfua.annotation_alt_contents')).toBe(false)
+  })
+
   it('emits page-tabs findings from tab-order analysis', () => {
     const report = buildLocalStandardsReport(makeQpdf(), makePdfjs(), {
       tabOrder: makeTabOrder({

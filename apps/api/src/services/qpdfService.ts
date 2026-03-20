@@ -223,6 +223,7 @@ export function parseQpdfJson(json: any): QpdfResult {
     }
 
     const roleMapNoteAliases = new Set<string>(['/Note'])
+    const descendantFontRefs = new Set<string>()
     for (const obj of Object.values(objects)) {
       if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/StructTreeRoot') continue
       const resolvedRoleMap = resolveObject(obj['/RoleMap'], objects)
@@ -230,6 +231,28 @@ export function parseQpdfJson(json: any): QpdfResult {
       for (const [tag, mapped] of Object.entries(resolvedRoleMap)) {
         if (mapped === '/Note' && typeof tag === 'string') {
           roleMapNoteAliases.add(tag)
+        }
+      }
+    }
+
+    for (const [ref, obj] of Object.entries(objects)) {
+      if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/Font') continue
+      const descendants = (obj as any)['/DescendantFonts']
+      const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+      for (const descendant of descendantList) {
+        if (typeof descendant === 'string') {
+          descendantFontRefs.add(descendant)
+          descendantFontRefs.add(descendant.replace(/^obj:/, ''))
+          descendantFontRefs.add(descendant.startsWith('obj:') ? descendant : `obj:${descendant}`)
+          continue
+        }
+        if (descendant && typeof descendant === 'object') {
+          const descendantRef = Object.entries(objects).find(([, candidate]) => candidate === descendant)?.[0]
+          if (descendantRef) {
+            descendantFontRefs.add(descendantRef)
+            descendantFontRefs.add(descendantRef.replace(/^obj:/, ''))
+            descendantFontRefs.add(descendantRef.startsWith('obj:') ? descendantRef : `obj:${descendantRef}`)
+          }
         }
       }
     }
@@ -363,7 +386,7 @@ export function parseQpdfJson(json: any): QpdfResult {
         }
       }
 
-      if (isFontObject(o)) {
+      if (isFontObject(o) && !descendantFontRefs.has(ref)) {
         result.fontCount = (result.fontCount ?? 0) + 1
         if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
         const missingToUnicode = !fontHasToUnicode(o, objects)

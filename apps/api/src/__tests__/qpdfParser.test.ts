@@ -288,6 +288,44 @@ describe('analyzeWithQpdf', () => {
     expect(result.type1FontsMissingToUnicode).toBe(2)
   })
 
+  it('does not double-count descendant CID fonts when the Type0 parent already has ToUnicode', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type0',
+            '/BaseFont': '/ABCDEF+SymbolMT',
+            '/Encoding': '/Identity-H',
+            '/ToUnicode': 'obj:14 0 R',
+            '/DescendantFonts': ['obj:11 0 R'],
+          },
+        },
+        'obj:11 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/CIDFontType0',
+            '/BaseFont': '/ABCDEF+SymbolMT',
+            '/FontDescriptor': 'obj:12 0 R',
+          },
+        },
+        'obj:12 0 R': {
+          value: {
+            '/Type': '/FontDescriptor',
+            '/FontFile3': 'obj:13 0 R',
+          },
+        },
+        'obj:14 0 R': { stream: { dict: {} } },
+      },
+    })
+
+    expect(result.fontCount).toBe(1)
+    expect(result.unembeddedFontCount).toBe(0)
+    expect(result.fontsMissingToUnicode).toBe(0)
+    expect(result.type1FontsMissingToUnicode).toBe(0)
+  })
+
   it('detects Image XObjects from QPDF v2 stream objects (no value wrapper)', () => {
     const result = parseQpdfJson({
       objects: {

@@ -400,7 +400,9 @@ function pageTabsFinding(tabOrder: TabOrderResult | null | undefined): LocalStan
 
 function annotationAltContentsFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalStandardsFinding | null {
   const missingFromLinks = pdfjs.links.filter(link => !(link.contents || '').trim()).length
-  const missingCount = Math.max(missingFromLinks, qpdf.linkAnnotationsMissingContents ?? 0)
+  const missingCount = (qpdf.linkAnnotationCount ?? 0) > 0
+    ? (qpdf.linkAnnotationsMissingContents ?? 0)
+    : missingFromLinks
   if (missingCount <= 0) return null
   return {
     key: 'pdfua.annotation_alt_contents',

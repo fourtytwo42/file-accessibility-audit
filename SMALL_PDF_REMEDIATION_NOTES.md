@@ -90,6 +90,16 @@
   - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'repairs legacy Gxx subset glyph names in small Distiller PDFs|repairs derivable Type1 ToUnicode maps on annual-report PDFs'`
   - `pnpm --filter api exec tsc --noEmit`
 
+### Loop 1 Rerun After Fix Set 3
+
+- Fourth queue item: `c361f9ca-0829-4195-991e-b8f2cd3a66ce`
+- Rerun result: `100/A`
+- Improvement vs third remediated run: `88 -> 100`
+- Outcome:
+  - the final `pdfua.font_unicode` blocker cleared
+  - the legacy `Gxx` subset-glyph fallback successfully generalized to this Distiller/PageMaker pattern
+  - `juv probation.pdf` now exceeds the session target and can serve as a reusable regression case for small legacy PDFs with single-symbol Type1 custom encodings
+
 ## Pattern Notes
 
 - Early small legacy PDFs may cluster around this pattern:
@@ -97,3 +107,43 @@
   - PageMaker/Distiller-era metadata
   - legacy font Unicode gaps
   - bootstrap succeeds partially, but local standards still do not recognize enough semantic image/figure structure afterward
+  - custom Type1 subset glyph names like `G8b` may survive the generic Unicode pass and need a deterministic hexadecimal fallback in the Type1 repair path
+
+## Active PDF Loop 2
+
+- Selected PDF: `Downloads/2025FirearmProhibitorsReport-250626T19175938.pdf`
+- Selection method: next random pick from `find Downloads -size -700k | shuf`
+- File size: `388946` bytes
+- First queue item: `a9467479-f311-4c99-b90b-221dbc73202a`
+- Initial result: `61/D`
+- First remediated result: `76/C`
+- Processing window: started `2026-03-20T08:17:53Z`, completed `2026-03-20T08:19:15Z`
+- Current status: needs detector cleanup and likely figure-retagging improvements before rerun
+
+### Loop 2 Findings
+
+- The remediated file already has strong structure:
+  - tagged document
+  - structure depth `5`
+  - headings `100`
+  - tables `100`
+  - reading order `100`
+- The biggest remaining score drag is split between:
+  - `alt_text`: `40` with `16` of `27` images still missing alt text
+  - `text_extractability`: `40`
+  - `pdf_ua_compliance`: `70`
+  - `link_quality`: `60`
+- Two detector mismatches were confirmed on the downloaded remediated artifact:
+  - `qpdf` reports `0` link annotations missing `/Contents`, but local standards still emitted `pdfua.annotation_alt_contents` because `pdfjs` link metadata left `contents: null`
+  - the remediated file's remaining missing-font signal appears inflated by a descendant CID font being counted as a standalone font object even though the Type0 parent already carries `/ToUnicode`
+- The high-impact real remediation gap appears to be figure promotion:
+  - many candidates have `imageEvidence: "strong"` but remain `repairMode: "defer"` on `/P` nodes with `no_figure_evidence`
+  - this suggests a retagging gate inconsistency for image-backed paragraph containers
+
+### System Fix in Progress 4
+
+- Updated `localStandardsService` to prefer `qpdf`'s authoritative link-annotation `/Contents` count whenever `qpdf` has actual link annotation data, instead of taking the maximum with `pdfjs`'s often-null `contents` field.
+- Updated `qpdfService` to stop double-counting descendant CID fonts as standalone font objects when the Type0 parent already owns the font family, which removes false `font_unicode` hits from descendant-only objects.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/localStandardsService.test.ts`
+  - `pnpm --filter api exec tsc --noEmit`
