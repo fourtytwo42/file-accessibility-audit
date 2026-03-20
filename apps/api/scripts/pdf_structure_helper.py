@@ -2182,7 +2182,7 @@ def mirror_alt_text_to_matching_struct_elems(pdf, source_obj, alt_text):
     return applied
 
 
-def remove_alt_from_descendants(node, skip_ref=None):
+def remove_alt_from_descendants(node, skip_ref=None, preserve_leaf_figure_alt=False):
     applied = []
     visited = set()
 
@@ -2194,8 +2194,14 @@ def remove_alt_from_descendants(node, skip_ref=None):
             return
         if node_ref:
             visited.add(node_ref)
+        tag = str(value.get("/S"))
+        kids = value.get("/K")
+        child_values = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if isinstance(kids, pikepdf.Dictionary) else [])
+        child_figure_count = sum(1 for child in child_values if isinstance(child, pikepdf.Dictionary) and str(child.get("/S")) == "/Figure")
+        if preserve_leaf_figure_alt and tag == "/Figure" and child_figure_count == 0:
+            return
         if skip_ref and node_ref == skip_ref:
-            kids = value.get("/K")
+            pass
         else:
             raw_alt = value.get("/Alt")
             existing_alt = str(raw_alt).replace("u:", "") if raw_alt is not None else None
@@ -2210,7 +2216,6 @@ def remove_alt_from_descendants(node, skip_ref=None):
                     "after": None,
                     "details": f"Removed nested alternate text from descendant element {node_ref}.",
                 })
-            kids = value.get("/K")
         if isinstance(kids, pikepdf.Array):
             for child in kids:
                 visit(child)
@@ -6879,7 +6884,7 @@ def mutate_set_figure_alt_text(pdf, mutation):
         "after": alt_text,
         "details": f"Set alternate text on {before_tag} element {ref_string(obj)} to \"{alt_text}\".",
     }]
-    applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj)))
+    applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj), preserve_leaf_figure_alt=True))
     applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, obj, alt_text))
     return True, applied, []
 
@@ -6939,7 +6944,7 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
             "after": alt_text,
             "details": f"Wrapped content of {ref_string(obj)} in a child /Figure and set alt text to \"{alt_text}\".",
         }]
-        applied.extend(remove_alt_from_descendants(figure, skip_ref=ref_string(figure)))
+        applied.extend(remove_alt_from_descendants(figure, skip_ref=ref_string(figure), preserve_leaf_figure_alt=True))
         applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, figure, alt_text))
         return True, applied, []
     if ancestry & UNSAFE_FIGURE_ANCESTRY:
@@ -6971,7 +6976,7 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
             "after": alt_text,
             "details": f"Wrapped content under {ref_string(obj)} in a child /Figure despite unsafe ancestry and set alt text to \"{alt_text}\".",
         }]
-        applied.extend(remove_alt_from_descendants(figure, skip_ref=ref_string(figure)))
+        applied.extend(remove_alt_from_descendants(figure, skip_ref=ref_string(figure), preserve_leaf_figure_alt=True))
         applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, figure, alt_text))
         return True, applied, []
     obj["/S"] = pikepdf.Name("/Figure")
@@ -6982,7 +6987,7 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
         "after": alt_text,
         "details": f"Retagged {ref_string(obj)} as /Figure and set alt text to \"{alt_text}\".",
     }]
-    applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj)))
+    applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj), preserve_leaf_figure_alt=True))
     applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, obj, alt_text))
     return True, applied, []
 
