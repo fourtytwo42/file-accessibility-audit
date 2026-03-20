@@ -5872,6 +5872,7 @@ def mutate_embed_missing_fonts_in_place(pdf, mutation):
     changed = False
     embedded = {}
     metrics_cache = {}
+    used_codes_by_font = collect_used_codes_by_font(pdf)
 
     for page in pdf.pages:
         resources = page.obj.get("/Resources")
@@ -5896,6 +5897,21 @@ def mutate_embed_missing_fonts_in_place(pdf, mutation):
             fallback_score = None
             if not font_path and subtype == "/TrueType":
                 fallback_name, font_path, fallback_width_map, fallback_score = best_embeddable_fallback_for_font(font, metrics_cache)
+            if not font_path:
+                font_ref = ref_string(font) or str(id(font))
+                used_codes = sorted(used_codes_by_font.get(font_ref, set()))
+                if used_codes and set(used_codes).issubset({32}):
+                    fallback_name = "/ArialMT"
+                    font_path = font_file_path(fallback_name)
+                    if font_path:
+                        cache_key = str(font_path)
+                        metrics = metrics_cache.get(cache_key)
+                        if metrics is None:
+                            metrics = parse_ttf_metrics(font_path)
+                            metrics_cache[cache_key] = metrics
+                        if metrics:
+                            encoding_map, glyph_name_map, _ = derive_encoding_map_for_used_codes(font, font_ref, used_codes_by_font)
+                            fallback_width_map = derive_width_map(metrics, encoding_map, glyph_name_map) if encoding_map else None
             if not font_path:
                 warnings.append(f"No embeddable font file was found for {base_font}.")
                 continue
