@@ -11,13 +11,13 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `Southern Illinois Drug Task Force.pdf`
-- Latest attempt path: queue item `86d97265-01e8-4f1a-871b-92ac9f57b02a`
-- Latest result summary: the first fresh run of `Southern Illinois Drug Task Force.pdf` landed at `89/B`. The remaining unresolved issues are `Bookmarks / Navigation` and `Color Contrast`, and the real bug is that bookmark generation improved the targeted `bookmarks` category from `0 -> 100` but was still rejected because the intermediate overall score stayed flat at `52`.
-- Latest validation source: Fresh API remediation rerun of `Southern Illinois Drug Task Force.pdf` completed on 2026-03-20T20:58Z; action-log diagnosis and local acceptance-fix verification completed on 2026-03-20T21:02Z
-- Next action: commit/push the flat-score targeted-category acceptance fix, restart the API, and rerun `Southern Illinois Drug Task Force.pdf` fresh through the API
-- Next hypothesis: once the bookmark stage is accepted for real targeted-category improvements, this file should clear `>95` and likely reach `100/A`, leaving only the unavoidable color-contrast signal
-- API restart status: restart required after the current acceptance-rule change before trusting the next queue result
+- Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Latest attempt path: queue item `7d696f91-78dc-4d44-ad18-f710812916c8`
+- Latest result summary: two fresh API attempts on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` stalled in `Original analysis: Extracting page 16 of 16` with `updatedAt` never advancing. Direct local diagnosis showed `qpdf`, `pdfjs`, `readingOrder`, `tableStructure`, and `colorContrast` all complete quickly, while the structure-backend `inspect alt_text_deep` helper goes CPU-bound for minutes.
+- Latest validation source: direct service probes completed on 2026-03-20T21:17Z
+- Next action: commit/push the faster `alt_text_deep` structure-inspection timeout, restart the API, and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: this file family is blocked by pathological deep structure inspection, not by true remediation complexity; once that helper fails fast, the queue should complete normally
+- API restart status: restart required after the current structure-backend timeout change before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `Southern Illinois Drug Task Force.pdf`
-- Current phase: second small-PDF loop on a Distiller-era report whose first fresh run stalled because bookmark generation was falsely rejected by a flat overall-score gate
-- Immediate next step: restart on the current acceptance-rule fix, rerun `Southern Illinois Drug Task Force.pdf`, and verify the live queue result keeps the bookmark stage
-- API restart/rerun confirmed for active file: pending restart; the current `89/B` result is stale relative to the newest code
-- Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart to avoid stale output
-- Active remediation loop count: `Southern Illinois Drug Task Force.pdf=2`
-- Next hypothesis: the live rerun should clear once stages that improve targeted categories like `bookmarks` are accepted even when the transient overall score is unchanged
+- Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Current phase: second small-PDF loop blocked by a repeatable full-analysis hang in `inspect alt_text_deep`
+- Immediate next step: restart on the current timeout fix, rerun the same PDF, and verify the queue no longer stalls in original analysis
+- API restart/rerun confirmed for active file: pending restart; both current queue items are stale relative to the newest timeout change
+- Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
+- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=3`
+- Next hypothesis: failing fast on pathological deep structure inspection will restore throughput without harming normal small-PDF runs, because typical `alt_text_deep` inspections are finishing in 10-12 seconds on 32-page files
 
 ## Pending Files
 
@@ -76,6 +76,15 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T21:17:00Z Small-PDF loop fix: reduced the structure-backend timeout for `inspect alt_text_deep` from `300000ms` to `45000ms` so pathological deep structure snapshots fail fast instead of pinning CPU and stalling the queue for five minutes. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfStructureBackend.test.ts` and `pnpm --filter api exec tsc --noEmit`. Direct probes on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed `qpdf`, `pdfjs`, `readingOrder`, `tableStructure`, and `colorContrast` all completed normally, while both full `analyzePDF(...)` and direct `runPdfStructureBackend({ operation: 'inspect', inspectMode: 'alt_text_deep' })` hung in the Python helper.
+
+- 2026-03-20T21:10:00Z Fresh API remediation run: `McLean-2.pdf` completed on queue item `2e16e502-cdc3-4b8d-ae63-da1a43fc312e` at `100/A`, up from `24/F`, with no additional code changes required. Another playbook-backed first-pass success on the current stack.
+- 2026-03-20T21:10:00Z Fresh API remediation run: `McLean-2.pdf` completed on queue item `2e16e502-cdc3-4b8d-ae63-da1a43fc312e` at `100/A`, up from `24/F`, with no additional code changes required. Another playbook-backed first-pass success on the current stack.
+
+- 2026-03-20T21:08:00Z Fresh API remediation run: `Wabash-2.pdf` completed on queue item `d544bad6-cd7f-4996-9427-73a25baff825` at `100/A`, up from `24/F`, with no additional code changes required. This is another strong confirmation that the current playbook, font, and acceptance fixes are holding across the small-PDF campaign.
+
+- 2026-03-20T21:04:00Z Fresh post-restart rerun: `Southern Illinois Drug Task Force.pdf` completed on queue item `51c91b3c-5aef-44d2-83f1-a56677129c55` at `100/A`, up from the first `89/B` run. The bookmark cleanup stage now survives because targeted-category improvements are accepted even when the transient overall score is flat.
 
 - 2026-03-20T21:02:00Z Small-PDF loop fix: stage acceptance now keeps non-regressive stages that materially improve one of their targeted categories even when the temporary overall score is flat. This covers bookmark cleanup and similar semantic/document fixes whose category gain can be real before the aggregate score catches up. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'accepts a flat-score stage when a targeted category improves without regressions'` and `pnpm --filter api exec tsc --noEmit`. Diagnosis on `Southern Illinois Drug Task Force.pdf` showed `replace_bookmarks_from_headings` was creating a real outline and improving `bookmarks` from `0 -> 100`, but the stage was rejected solely because the intermediate overall score stayed `52 -> 52`.
 

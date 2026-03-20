@@ -18,6 +18,13 @@ const HELPER_PATH = path.resolve(
   '../../scripts/pdf_structure_helper.py',
 )
 
+function structureBackendTimeoutMs(mutation: StructureBackendMutationRequest): number {
+  if (mutation.operation === 'repair_other_elements_alt_text') return 900_000
+  if (mutation.operation === 'inspect' && mutation.inspectMode === 'alt_text_deep') return 45_000
+  if (mutation.operation === 'inspect') return 120_000
+  return 60_000
+}
+
 export interface StructureBackendMutationRequest {
   operation:
     | 'inspect'
@@ -175,13 +182,7 @@ export async function runPdfStructureBackend(input: {
   mutation: StructureBackendMutationRequest
 }): Promise<StructureBackendMutationResult> {
   ensureHelperExists()
-  const timeoutMs = input.mutation.operation === 'repair_other_elements_alt_text'
-    ? 900_000
-    : input.mutation.operation === 'inspect' && input.mutation.inspectMode === 'alt_text_deep'
-      ? 300_000
-      : input.mutation.operation === 'inspect'
-        ? 120_000
-        : 60_000
+  const timeoutMs = structureBackendTimeoutMs(input.mutation)
 
   const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pdf-struct-'))
   const inputPath = path.join(tmpRoot, `${randomUUID()}.pdf`)
@@ -238,6 +239,8 @@ export async function runPdfStructureBackend(input: {
     try { fs.rmSync(tmpRoot, { recursive: true, force: true }) } catch {}
   }
 }
+
+export const __test_structureBackendTimeoutMs = structureBackendTimeoutMs
 
 /**
  * Run multiple mutations in a single Python subprocess invocation.

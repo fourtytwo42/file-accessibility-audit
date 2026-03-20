@@ -2,16 +2,16 @@
 
 ## Current Active File
 
-- `Southern Illinois Drug Task Force.pdf`
-- Current fresh queue item: `86d97265-01e8-4f1a-871b-92ac9f57b02a`
-- Latest completed file: `CMVoga.pdf` -> `100/A`
+- `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Current fresh queue item: `7d696f91-78dc-4d44-ad18-f710812916c8`
+- Latest completed file: `McLean-2.pdf` -> `100/A`
 
 ## Recent Loop Summary
 
-- `Southern Illinois Drug Task Force.pdf`
-- Baseline: in progress
-- First fresh rerun: pending
-- Previous resolved file: `CMVoga.pdf` moved `18/F -> 80/B -> 100/A`
+- `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Baseline: stalled in original analysis
+- First fresh rerun: stalled in original analysis
+- Previous resolved file: `McLean-2.pdf` moved `24/F -> 100/A`
 
 ## New System Fixes This Round
 
@@ -21,20 +21,21 @@
 
 ## Current Blocker Hypothesis
 
-- `CMVoga.pdf` is resolved at `100/A`.
-- `Southern Illinois Drug Task Force.pdf` exposed a different shared issue:
-  - the first fresh run finished at `89/B`
-  - final unresolved issues were only `Bookmarks / Navigation` and `Color Contrast`
-  - `replace_bookmarks_from_headings` actually created a real outline and improved the targeted `bookmarks` score from `0 -> 100`
-  - the stage was still rejected because the temporary overall score stayed `52 -> 52`
+- `Southern Illinois Drug Task Force.pdf`, `Wabash-2.pdf`, and `McLean-2.pdf` are all resolved at `100/A`.
+- `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` exposed a throughput blocker rather than a normal scoring blocker:
+  - two API attempts froze at `Original analysis: Extracting page 16 of 16`
+  - `updatedAt` never advanced after the start timestamp
+  - direct probes proved `qpdf`, `pdfjs`, `readingOrder`, `tableStructure`, and `colorContrast` are all fast
+  - both full `analyzePDF(...)` and direct `runPdfStructureBackend({ operation: 'inspect', inspectMode: 'alt_text_deep' })` drove `pdf_structure_helper.py` CPU-bound for minutes
 - Shared fix in progress:
-  - stage acceptance now keeps non-regressive stages that improve one of their targeted categories even when the transient overall score is flat
-  - this should unblock bookmark cleanup and similar category-specific document fixes
+  - cut `inspect alt_text_deep` timeout from 5 minutes to 45 seconds so pathological structure snapshots fail fast instead of stalling the queue
+  - rerun the same file fresh after restart and inspect the real completed result
 
 ## Southern Illinois Drug Task Force Result
 
 - Queue history:
   - `86d97265-01e8-4f1a-871b-92ac9f57b02a` -> `89/B`
+  - `51c91b3c-5aef-44d2-83f1-a56677129c55` -> `100/A`
 - Root cause:
   - bookmark generation was real, but the acceptance gate rolled it back because it only trusted overall-score movement at that moment
   - action details showed `replace_bookmarks_from_headings` creating `/Outlines` plus multiple bookmark entries, with `scoreDelta` recording `bookmarks 0 -> 100`
@@ -42,6 +43,39 @@
   - keep the bookmark stage on rerun
   - leave `Color Contrast` as the only likely residual issue
   - push the file above `95`, likely to `100/A`
+- Actual outcome:
+  - the fresh post-restart rerun cleared directly to `100/A`
+
+## Wabash-2 Result
+
+- Queue history:
+  - `d544bad6-cd7f-4996-9427-73a25baff825` -> `100/A`
+- Outcome:
+  - cleared the target on the first fresh API run
+  - no new system fix required
+  - another strong signal that the current system fixes are generalizing across the small-file slice
+
+## McLean-2 Result
+
+- Queue history:
+  - `2e16e502-cdc3-4b8d-ae63-da1a43fc312e` -> `100/A`
+- Outcome:
+  - cleared the target on the first fresh API run
+  - no new system fix required
+  - another playbook-backed confirmation that the current stack is holding across this document family
+
+## FINAL GUN HOMICIDE PDF Result
+
+- Queue history:
+  - `ebc9c6fd-ec89-43ad-b120-9302798e0c6a` -> stalled in original analysis
+  - `7d696f91-78dc-4d44-ad18-f710812916c8` -> stalled in original analysis
+- Root cause diagnosis:
+  - the hang is not in `pdfjs`, `qpdf`, `readingOrder`, `tableStructure`, or `colorContrast`
+  - the pathological step is `runPdfStructureBackend({ operation: 'inspect', inspectMode: 'alt_text_deep' })`
+  - live `ps` inspection showed multiple `pdf_structure_helper.py` processes pinned at ~100% CPU for minutes on this file
+- Expected outcome after fix:
+  - queue should stop stalling in original analysis
+  - if the file still lands below `95`, then inspect the real completed blocker family instead of the current hang
 
 ## CMVoga Resolution
 
