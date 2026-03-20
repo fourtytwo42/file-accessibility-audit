@@ -453,8 +453,62 @@ export const REMEDIATION = {
    * - All scoring proceeds without Adobe evidence (no score caps from Adobe findings)
    *
    * SAFE TO CHANGE: Yes — flip back to true when quota resets or new credentials are loaded.
-   */
+  */
   ENABLE_ADOBE_API: false,
+
+  /**
+   * Maximum number of deterministic remediation rounds before the pipeline
+   * stops replanning and falls through to final validation/cleanup.
+   *
+   * SAFE TO CHANGE: Yes — lower values reduce latency, higher values allow
+   * more recovery attempts at the cost of significantly longer runtimes.
+   */
+  MAX_REMEDIATION_ROUNDS: 3,
+
+  /**
+   * Minimum category score gain required for a changed stage to count as
+   * progress when standards validation does not improve.
+   *
+   * SAFE TO CHANGE: Yes — increase to stop earlier on small improvements,
+   * decrease to keep iterating on minor wins.
+   */
+  MIN_SCORE_IMPROVEMENT_TO_CONTINUE: 1,
+
+  /**
+   * Maximum number of consecutive changed stages that may produce no
+   * standards or targeted-category improvement before remediation stops.
+   *
+   * SAFE TO CHANGE: Yes — lower values stop sooner, higher values allow
+   * more speculative repair attempts.
+   */
+  MAX_NO_PROGRESS_STAGES: 2,
+
+  /**
+   * Maximum number of repeated Acrobat ownership repair passes allowed inside
+   * a single remediation round while risks continue to shrink.
+   *
+   * SAFE TO CHANGE: Yes — higher values allow more convergence on deeply
+   * tangled legacy structure trees but increase runtime.
+   */
+  MAX_ACROBAT_OWNERSHIP_PASSES_PER_ROUND: 4,
+
+  /**
+   * Minimum Acrobat ownership risk-count reduction required to justify one
+   * more dedicated ownership repair pass in the same round.
+   *
+   * SAFE TO CHANGE: Yes — increase to stop sooner, decrease to squeeze out
+   * smaller structural improvements.
+   */
+  MIN_ACROBAT_RISK_REDUCTION_TO_CONTINUE: 1,
+
+  /**
+   * Minimum number of structural remediation rounds to allow when Acrobat
+   * ownership risks or visually detected untagged tables still remain.
+   *
+   * SAFE TO CHANGE: Yes — keeps round-one flat scores from ending a repair
+   * campaign before structural fixes have time to converge.
+   */
+  MIN_STRUCTURAL_ROUNDS: 2,
 } as const
 
 // ---------------------------------------------------------------------------

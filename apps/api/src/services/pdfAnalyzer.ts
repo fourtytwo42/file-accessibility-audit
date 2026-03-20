@@ -69,6 +69,56 @@ export interface AnalysisResult extends ScoringResult {
   }
 }
 
+export type AnalysisProfile = 'full_final' | 'remediation_fast'
+
+type AnalysisTimingKey =
+  | 'qpdf'
+  | 'verapdf'
+  | 'adobe'
+  | 'pdfjs'
+  | 'structureInspect'
+  | 'readingOrder'
+  | 'colorContrast'
+  | 'tableStructure'
+  | 'tabOrder'
+  | 'scoring'
+
+function durationMs(start: number): number {
+  return Date.now() - start
+}
+
+async function measure<T>(
+  timings: Partial<Record<AnalysisTimingKey, number>>,
+  key: AnalysisTimingKey,
+  work: () => Promise<T>,
+): Promise<T> {
+  const startedAt = Date.now()
+  try {
+    return await work()
+  } finally {
+    timings[key] = durationMs(startedAt)
+  }
+}
+
+function logAnalysisTimings(input: {
+  filename: string
+  analysisProfile: AnalysisProfile
+  skipAdobe: boolean
+  skipVeraPdf: boolean
+  timings: Partial<Record<AnalysisTimingKey, number>>
+  totalMs: number
+}): void {
+  console.log(JSON.stringify({
+    scope: 'pdf_analysis_timing',
+    filename: input.filename,
+    analysisProfile: input.analysisProfile,
+    skipAdobe: input.skipAdobe,
+    skipVeraPdf: input.skipVeraPdf,
+    totalMs: input.totalMs,
+    timingsMs: input.timings,
+  }))
+}
+
 export async function analyzePDF(
   buffer: Buffer,
   filename: string,
@@ -79,28 +129,32 @@ export async function analyzePDF(
     skipAdobe?: boolean
     skipVeraPdf?: boolean
     inheritedVeraPdf?: VeraPdfResult
+    analysisProfile?: AnalysisProfile
   },
 ): Promise<AnalysisResult> {
   await acquireSemaphore()
 
   try {
+    const startedAt = Date.now()
+    const analysisProfile = options?.analysisProfile || 'full_final'
     const skipVeraPdf = options?.skipVeraPdf ?? ANALYSIS.DEFAULT_SKIP_VERAPDF
+    const timings: Partial<Record<AnalysisTimingKey, number>> = {}
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
     const [qpdfResult, veraPdfResult, adobeResult, pdfjsResult] = await Promise.all([
-      analyzeWithQpdf(buffer, { signal: options?.signal }),
+      measure(timings, 'qpdf', () => analyzeWithQpdf(buffer, { signal: options?.signal })),
       options?.inheritedVeraPdf
-        ? Promise.resolve(options.inheritedVeraPdf)
+        ? measure(timings, 'verapdf', () => Promise.resolve(options.inheritedVeraPdf))
         : skipVeraPdf
-          ? Promise.resolve(emptyVeraPdfResult())
-          : getVeraPdfCached(buffer, options?.signal),
+          ? measure(timings, 'verapdf', () => Promise.resolve(emptyVeraPdfResult()))
+          : measure(timings, 'verapdf', () => getVeraPdfCached(buffer, options?.signal)),
       (options?.skipAdobe || !REMEDIATION.ENABLE_ADOBE_API)
-        ? Promise.resolve(null)
-        : runAdobeAccessibilityCheck({
+        ? measure(timings, 'adobe', () => Promise.resolve(null))
+        : measure(timings, 'adobe', () => runAdobeAccessibilityCheck({
             buffer,
             filename,
             artifactsDir: options?.artifactsDir,
-          }),
-      analyzeWithPdfjs(buffer, {
+          })),
+      measure(timings, 'pdfjs', () => analyzeWithPdfjs(buffer, {
         signal: options?.signal,
         onProgress(progress) {
           const scaled = 20 + Math.round(progress.percent * 0.65)
@@ -109,7 +163,7 @@ export async function analyzePDF(
             percent: Math.min(85, scaled),
           })
         },
-      }),
+      })),
     ])
 
     if (options?.signal?.aborted) {
@@ -119,22 +173,29 @@ export async function analyzePDF(
     }
 
     const linkSummary = summarizeLinkTextQuality(pdfjsResult.links)
-    const structureForScoring = qpdfResult.hasStructTree && (pdfjsResult.imageCount > 0 || qpdfResult.images.length > 0 || qpdfResult.headings.length > 0)
-      ? await runPdfStructureBackend({
+    const structureForScoring = analysisProfile === 'full_final'
+      && qpdfResult.hasStructTree
+      && (pdfjsResult.imageCount > 0 || qpdfResult.images.length > 0 || qpdfResult.headings.length > 0)
+      ? await measure(timings, 'structureInspect', () => runPdfStructureBackend({
           buffer,
           mutation: {
             operation: 'inspect',
             inspectMode: 'alt_text_deep',
           },
-        })
+        }))
       : null
 
-    // Run new accessibility detection modules in parallel
     const [readingOrderResult, colorContrastResult, tableStructureResult, tabOrderResult] = await Promise.all([
-      analyzeReadingOrder(buffer, { signal: options?.signal }),
-      analyzeColorContrast(buffer, { signal: options?.signal }),
-      analyzeTableStructure(buffer, qpdfResult.tables?.length ?? 0, { signal: options?.signal }),
-      analyzeTabOrder(buffer, { isTagged: qpdfResult.isTagged || qpdfResult.hasStructTree }),
+      analysisProfile === 'remediation_fast'
+        ? measure(timings, 'readingOrder', () => Promise.resolve(null))
+        : measure(timings, 'readingOrder', () => analyzeReadingOrder(buffer, { signal: options?.signal })),
+      analysisProfile === 'remediation_fast'
+        ? measure(timings, 'colorContrast', () => Promise.resolve(null))
+        : measure(timings, 'colorContrast', () => analyzeColorContrast(buffer, { signal: options?.signal })),
+      analysisProfile === 'remediation_fast'
+        ? measure(timings, 'tableStructure', () => Promise.resolve(null))
+        : measure(timings, 'tableStructure', () => analyzeTableStructure(buffer, qpdfResult.tables?.length ?? 0, { signal: options?.signal })),
+      measure(timings, 'tabOrder', () => analyzeTabOrder(buffer, { isTagged: qpdfResult.isTagged || qpdfResult.hasStructTree })),
     ])
     const localStandards = buildLocalStandardsReport(qpdfResult, pdfjsResult, {
       tabOrder: tabOrderResult,
@@ -154,15 +215,28 @@ export async function analyzePDF(
           artifacts: adobeResult.artifacts ?? null,
         }
       : null
-    const scoringResult = scoreDocument(qpdfResult, pdfjsResult, veraPdfResult, structureForScoring, adobeSummary, localStandards, {
-      readingOrder: readingOrderResult,
-      colorContrast: colorContrastResult,
-      tableStructure: tableStructureResult,
-      tabOrder: tabOrderResult,
-    })
+    const scoringResult = await measure(timings, 'scoring', () => Promise.resolve(scoreDocument(
+      qpdfResult,
+      pdfjsResult,
+      veraPdfResult,
+      structureForScoring,
+      adobeSummary,
+      localStandards,
+      {
+        readingOrder: readingOrderResult,
+        colorContrast: colorContrastResult,
+        tableStructure: tableStructureResult,
+        tabOrder: tabOrderResult,
+      },
+      {
+        provisionalCategoryIds: analysisProfile === 'remediation_fast'
+          ? ['reading_order', 'color_contrast']
+          : [],
+      },
+    )))
     options?.onProgress?.({ stage: 'Finalizing report', percent: 100 })
 
-    return {
+    const result: AnalysisResult = {
       filename,
       pageCount: pdfjsResult.pageCount,
       fileType: 'pdf',
@@ -176,6 +250,15 @@ export async function analyzePDF(
       },
       ...scoringResult,
     }
+    logAnalysisTimings({
+      filename,
+      analysisProfile,
+      skipAdobe: !!options?.skipAdobe || !REMEDIATION.ENABLE_ADOBE_API,
+      skipVeraPdf,
+      timings,
+      totalMs: durationMs(startedAt),
+    })
+    return result
   } finally {
     releaseSemaphore()
   }

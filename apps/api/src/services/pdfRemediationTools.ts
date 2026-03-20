@@ -918,14 +918,16 @@ function buildTableCandidates(
       ? pages.find(entry => entry.pageNumber === pageHints[0]) || null
       : null
     const nearbyContext = page?.textLines.slice(0, 8).map(line => line.text).filter(Boolean) || []
-    const hasTargets = table.firstRowCellRefs.length > 0
+    const hasHeaders = table.headerCellRefs.length > 0
+    const canUseBackendRowRecovery = !!table.ref && !hasHeaders
+    const hasTargets = table.firstRowCellRefs.length > 0 || canUseBackendRowRecovery
     return {
       id: `table:${index + 1}`,
       ref: table.ref,
       pageNumberHints: pageHints,
       firstRowCellRefs: table.firstRowCellRefs,
       headerCellRefs: table.headerCellRefs,
-      hasHeaders: table.headerCellRefs.length > 0,
+      hasHeaders,
       repairMode: hasTargets ? 'safe' : 'defer',
       nearbyContext,
       unsafeReason: hasTargets
@@ -998,10 +1000,12 @@ export async function inspectPdfForRemediation(
   analysis: AnalysisResult,
   options: RemediationInspectOptions = {},
 ): Promise<PdfRemediationContext> {
+  const startedAt = Date.now()
   const inspectMode = options.inspectMode || (needsAltTextDeepInspection(analysis) ? 'alt_text_deep' : 'light')
   const bufferSha256 = getBufferSha256(buffer)
   const cacheKey = inspectionCacheKey(bufferSha256, inspectMode)
   const perRunCache = options.cache
+  let cacheHit: 'none' | 'per_run' | 'process' = 'none'
   if (perRunCache) {
     if (perRunCache.bufferSha256 !== bufferSha256) {
       perRunCache.bufferSha256 = bufferSha256
@@ -1009,12 +1013,21 @@ export async function inspectPdfForRemediation(
     }
     const cachedContext = perRunCache.contextsByMode?.[inspectMode]
     if (cachedContext) {
+      cacheHit = 'per_run'
+      console.log(JSON.stringify({
+        scope: 'pdf_inspection_timing',
+        filename: analysis.filename,
+        inspectMode,
+        cacheHit,
+        totalMs: Date.now() - startedAt,
+      }))
       return toInspectionContext(analysis, cachedContext)
     }
   }
 
   const cachedPayload = inspectionResultCache.get(cacheKey)
   if (cachedPayload) {
+    cacheHit = 'process'
     perRunCache && (perRunCache.contextsByMode = {
       ...(perRunCache.contextsByMode || {}),
       [inspectMode]: cachedPayload,
@@ -1024,6 +1037,13 @@ export async function inspectPdfForRemediation(
       perRunCache.pdfjs = cachedPayload.pdfjs
       setCachedPagesForHash(perRunCache, bufferSha256, cachedPayload.pages)
     }
+    console.log(JSON.stringify({
+      scope: 'pdf_inspection_timing',
+      filename: analysis.filename,
+      inspectMode,
+      cacheHit,
+      totalMs: Date.now() - startedAt,
+    }))
     return toInspectionContext(analysis, cachedPayload)
   }
 
@@ -1051,6 +1071,14 @@ export async function inspectPdfForRemediation(
     setCachedPagesForHash(perRunCache, bufferSha256, pages)
   }
   setCachedInspectionPayload(cacheKey, payload)
+
+  console.log(JSON.stringify({
+    scope: 'pdf_inspection_timing',
+    filename: analysis.filename,
+    inspectMode,
+    cacheHit,
+    totalMs: Date.now() - startedAt,
+  }))
 
   return toInspectionContext(analysis, payload)
 }
@@ -2045,6 +2073,12 @@ export async function executeRemediationTool(input: {
     }
     case 'set_link_annotation_contents': {
       const candidate = context.linkCandidates.find(entry => entry.id === args.candidateId)
+        || context.linkCandidates.find(entry =>
+          Number.isFinite(Number(args.pageNumber))
+          && Number.isFinite(Number(args.annotationIndex))
+          && entry.pageNumber === Number(args.pageNumber)
+          && entry.annotationIndex === Number(args.annotationIndex),
+        )
       const contents = String(args.contents || args.replacementText || candidate?.suggestedText || candidate?.text || '').trim()
       if (!candidate || !contents) {
         const deferred = deferredAction(

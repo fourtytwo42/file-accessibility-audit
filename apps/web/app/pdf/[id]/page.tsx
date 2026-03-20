@@ -19,6 +19,7 @@ export default function PdfDetailPage() {
   const itemId = params.id
   const { item, isLoading, error, mutate } = useQueueItem(itemId)
   const { versions } = useQueueVersions(itemId)
+  const elapsed = useProcessingElapsed(item?.processingStartedAt, item?.completedAt, item?.state === 'processing')
 
   if (isLoading) {
     return <main className="page-shell py-10">Loading PDF detail...</main>
@@ -27,8 +28,6 @@ export default function PdfDetailPage() {
   if (error || !item) {
     return <main className="page-shell py-10">Unable to load PDF detail.</main>
   }
-
-  const elapsed = useProcessingElapsed(item.processingStartedAt, item.completedAt, item.state === 'processing')
 
   return (
     <main className="page-shell space-y-6 pb-20">

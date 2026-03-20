@@ -139,7 +139,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })
   })
 
-  it('refreshes inspection context after document-changing actions within the same iteration', async () => {
+  it('keeps metadata-only updates on cached inspection context and uses fast intermediate analysis', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
       creator: null,
@@ -263,7 +263,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         manualReviewFlags: [],
       }))
       .mockImplementationOnce(async ({ context, buffer }: any) => ({
-        buffer: Buffer.concat([buffer, Buffer.from(context.figureCandidates[0].targetRef === 'obj:new 0 R' ? '2' : 'x')]),
+        buffer: Buffer.concat([buffer, Buffer.from('2')]),
         action: {
           tool: 'set_figure_alt_text',
           target: 'document',
@@ -272,9 +272,9 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           confidence: 0.8,
           autoApplied: true,
           changedVisibleContent: false,
-          changedDocumentBytes: context.figureCandidates[0].targetRef === 'obj:new 0 R',
+          changedDocumentBytes: true,
           categoryTargets: ['alt_text'],
-          outcome: context.figureCandidates[0].targetRef === 'obj:new 0 R' ? 'applied' : 'no_effect',
+          outcome: 'applied',
         },
         manualReviewFlags: [],
       }))
@@ -289,10 +289,17 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
     expect(analyzePDF).toHaveBeenCalledTimes(3)
     expect(analyzePDF.mock.calls[0]?.[2]).toMatchObject({
+      analysisProfile: 'remediation_fast',
       skipAdobe: true,
       inheritedVeraPdf: originalResult.verapdf,
     })
+    expect(analyzePDF.mock.calls[1]?.[2]).toMatchObject({
+      analysisProfile: 'remediation_fast',
+      skipAdobe: true,
+      inheritedVeraPdf: refreshedResult.verapdf,
+    })
     expect(analyzePDF.mock.calls.at(-1)?.[2]).toMatchObject({
+      analysisProfile: 'full_final',
       skipAdobe: true,
     })
     expect(analyzePDF.mock.calls.at(-1)?.[2]?.inheritedVeraPdf).toBeUndefined()
@@ -2902,6 +2909,113 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           targetRef: null,
         }],
       },
+    })
+  })
+
+  it('applies semantic table-header repair using the table ref when first-row cells were not extracted', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const originalResult: AnalysisResult = {
+      filename: 'outline-backed-table.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata: {
+        creator: null,
+        producer: null,
+        creationDate: null,
+        modDate: null,
+        pdfVersion: '1.7',
+        isEncrypted: false,
+        keywords: null,
+        author: null,
+        subject: null,
+        pageCount: 1,
+      },
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 82,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 40, grade: 'F', severity: 'Critical', findings: ['Missing table headers'], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Annual report', lang: 'en', pageCount: 1 },
+      qpdf: {
+        lang: 'en',
+        headings: [],
+        tables: [],
+        images: [],
+        formFields: [],
+        hasStructTree: true,
+        outlineCount: 0,
+        outlineTitles: [],
+        structTreeDepth: 2,
+      },
+      figureCandidates: [],
+      tableCandidates: [{
+        id: 'table:1',
+        ref: 'obj:30 0 R',
+        pageNumberHints: [1],
+        firstRowCellRefs: [],
+        headerCellRefs: [],
+        hasHeaders: false,
+        repairMode: 'safe',
+        nearbyContext: ['Example table'],
+      }],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    generateSemanticRepairBatches.mockResolvedValue({
+      batches: [{
+        batchType: 'tables',
+        headings: [],
+        figures: [],
+        tables: [{
+          candidateId: 'table:1',
+          useFirstRowAsHeader: true,
+          confidence: 0.96,
+          rationale: 'The first visible row is the header row.',
+        }],
+        links: [],
+        bookmarks: [],
+      }],
+      reviewFlags: [],
+    })
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('table-fixed'),
+      action: {
+        tool: 'set_table_header_cells',
+        target: 'table obj:30 0 R',
+        details: 'AI table cleanup',
+        confidence: 0.96,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['table_markup'],
+        generationSource: 'semantic_ai',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+    analyzePDF.mockResolvedValue(originalResult)
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'outline-backed-table.pdf', originalResult)
+
+    const tableCall = executeRemediationTool.mock.calls
+      .map(call => call[0].call)
+      .find(call => call.tool_name === 'set_table_header_cells')
+    expect(tableCall).toMatchObject({
+      tool_name: 'set_table_header_cells',
+      arguments: { targets: ['obj:30 0 R'] },
     })
   })
 

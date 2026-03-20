@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `2019 Illinois Methamphetamine Study-191218T21562198.pdf`, `2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Latest attempt path: `MitigationAttempts/2019 Illinois Methamphetamine Study-191218T21562198/attempt-001.pdf`, `MitigationAttempts/2025FirearmProhibitorsReport-250626T19175938/attempt-001.pdf`
-- Latest result summary: 1 file(s) fully mitigated; latest completed: 2001-2020 SFS Full Year End Report-220520T19141184.pdf
-- Latest validation source: Fresh API remediation plus visual compare
-- Next action: Autofix the current blocker batch, restart API, and rerun affected PDFs
-- Next hypothesis: Generic remediation gap needs a system fix
-- API restart status: Last restart recorded at 2026-03-19T07:40:51Z
-- Build status: `pnpm --filter api build` passed on 2026-03-19T07:40:30Z; PM2 API restarted successfully afterward
+- Active PDF: `2007 Annual Report Final.pdf`
+- Latest attempt path: `MitigationAttempts/2007 Annual Report Final/attempt-013.pdf`
+- Latest result summary: fresh annual-report rerun on the new convergence/finalization path finished at `50/F` with `veraPDF: failed`; latest completed: 2001-2020 SFS Full Year End Report-220520T19141184.pdf
+- Latest validation source: Fresh API remediation rerun after PM2 restart
+- Next action: Patch the authoritative final-validation blockers exposed by `attempt-013`: PDF/UA metadata identification, native heading hierarchy / unmatched veraPDF structure issues, and over-penalized visual-table detection before rerunning `2007 Annual Report Final.pdf`
+- Next hypothesis: The new final `full_final + veraPDF` pass is now correctly surfacing latent standards failures that the older no-vera path hid, so the next wins are in standards-conformance repair and scoring-credit correctness rather than more intermediate-loop work
+- API restart status: PM2 API restarted successfully at 2026-03-20T01:09Z before the fresh `attempt-013` rerun
+- Build status: `pnpm --filter api build` passed on 2026-03-20T01:08Z; PM2 API restarted successfully afterward
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `2019 Illinois Methamphetamine Study-191218T21562198.pdf`, `2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Current phase: Autofix / rerun loop
-- Immediate next step: Run Codex autofix on failure packets, then restart PM2 API and rerun
+- Active PDF: `2007 Annual Report Final.pdf`
+- Current phase: System fix / rerun loop
+- Immediate next step: Fix the final authoritative blockers still visible on `attempt-013` and rerun from `Downloads/`
 - API restart/rerun confirmed for active file: Yes
 - Rebuild required for active file: No
-- Active remediation loop count: 2019 Illinois Methamphetamine Study-191218T21562198.pdf=1, 2025FirearmProhibitorsReport-250626T19175938.pdf=1
-- Next hypothesis: 2006CHRIAuditReport.pdf: score --, grade --, veraPDF failed
+- Active remediation loop count: `2007 Annual Report Final.pdf=13`
+- Next hypothesis: clear qpdf/local metadata identification and structural heading/read-order mismatches so the authoritative veraPDF-backed final analysis no longer collapses the score after local repairs
 
 ## Pending Files
 
@@ -76,6 +76,10 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T01:16:00Z System fix: annual-report remediation now includes an explicit Acrobat ownership convergence pass, a final residual repair bundle for metadata/link/table cleanup, stronger link-annotation candidate remapping, relaxed small mixed-MCID split eligibility, and new structural convergence controls in `audit.config.ts`. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/failureProfileService.test.ts src/__tests__/pdfRemediationTools.test.ts src/__tests__/config.test.ts`, `pnpm --filter api build`, PM2 API restart, and a fresh rerun to `MitigationAttempts/2007 Annual Report Final/attempt-013.pdf`. Runtime improved as intended: intermediate analyses now stayed in roughly `0.3s-0.6s`, and the full remediation completed in `188601ms` with `10` intermediate analyses, `25` light inspections, `5` deep inspections, and `3` rounds. Remaining blocker: the authoritative final pass now forces veraPDF and exposes much larger standards debt than the prior no-vera score showed, so `attempt-013.pdf` finished at `50/F` with `veraPDF failed`, `33` remaining Acrobat alternate-text risks, `47` visually detected untagged tables, `pdfua.metadata_identification`, `pdfua.document_language`, and `pdfua.logical_structure` still unresolved.
+
+- 2026-03-20T00:16:05Z System fix: wrapped `/TBody` table structures are now recognized by both table candidate discovery and `set_table_header_cells`, and Acrobat-risk container detection now recognizes child struct elements exposed via `/S` tags rather than requiring `/Type /StructElem`. The Acrobat-risk repair cap was also lifted from 12 repairs per run to a document-sized batch. Verified with `pnpm --filter api build`, direct backend checks on `MitigationAttempts/2007 Annual Report Final/attempt-007.pdf` showing `set_table_header_cells` now applies on formerly no-effect table refs and `repair_other_elements_alt_text` now applies 25 changes instead of 12, followed by fresh PM2 API restarts and reruns through `attempt-008.pdf`. Remaining blocker: latest rerun still finishes at `56/F` with Acrobat alt-risk nodes still reported at `46`, so the unsplittable mixed text/graphics ownership family remains unresolved.
 
 - 2026-03-19T22:43:30Z API default changed: veraPDF is now skipped by default for standard analysis requests via `ANALYSIS.DEFAULT_SKIP_VERAPDF`, with `DEFAULT_SKIP_VERAPDF=false` available as an environment override to restore the old behavior. Verified with `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api build`, `pm2 restart file-audit-api --update-env`, and a smoke analysis of `ADAM2.pdf` showing `veraStatus: unavailable` on a default `analyzePDF(...)` call.
 - 2026-03-19T22:34:30Z API restart: `pm2 restart file-audit-api` completed after the stage-4 parity detector/scoring update; new API process is online for fresh no-vera parity validation.

@@ -667,7 +667,25 @@ def get_child_dicts(parent):
     kids = parent.get("/K") if isinstance(parent, pikepdf.Dictionary) else None
     if isinstance(kids, pikepdf.Array):
         return [child for child in kids if isinstance(child, pikepdf.Dictionary)]
+    if isinstance(kids, pikepdf.Dictionary):
+        return [kids]
     return []
+
+
+def table_row_dicts(table_obj):
+    rows = []
+    for child in get_child_dicts(table_obj):
+        tag = str(child.get("/S"))
+        if tag == "/TR":
+            rows.append(child)
+            continue
+        if tag in {"/THead", "/TBody", "/TFoot"}:
+            rows.extend([
+                row
+                for row in get_child_dicts(child)
+                if isinstance(row, pikepdf.Dictionary) and str(row.get("/S")) == "/TR"
+            ])
+    return rows
 
 
 def child_refs_and_tags(parent):
@@ -777,14 +795,14 @@ def table_candidates(pdf):
         first_row_cell_refs = []
         header_cell_refs = []
         kids = obj.get("/K")
-        if isinstance(kids, pikepdf.Array) and len(kids) > 0:
-            first_row = kids[0]
-            if isinstance(first_row, pikepdf.Dictionary):
-                row_kids = first_row.get("/K")
-                if isinstance(row_kids, pikepdf.Array):
-                    for cell in row_kids:
-                        if isinstance(cell, pikepdf.Dictionary):
-                            first_row_cell_refs.append(ref_string(cell))
+        row_nodes = table_row_dicts(obj)
+        if row_nodes:
+            first_row = row_nodes[0]
+            for cell in get_child_dicts(first_row):
+                if isinstance(cell, pikepdf.Dictionary):
+                    ref = ref_string(cell)
+                    if ref:
+                        first_row_cell_refs.append(ref)
         collect_header_refs(kids, header_cell_refs)
         tables.append({
             "ref": ref_string(obj),
@@ -1190,6 +1208,7 @@ def struct_elem_mcid_info(pdf):
         mcids = normalized_struct_elem_mcids(obj)
         if not mcids:
             continue
+        direct_mcids = direct_struct_elem_mcids(obj)
         page_obj = page_ref_for_struct_elem(obj)
         if not isinstance(page_obj, pikepdf.Dictionary):
             continue
@@ -1199,6 +1218,8 @@ def struct_elem_mcid_info(pdf):
         usage = page_usage_by_ref.setdefault(page_ref, page_mcid_analysis(page_obj))
         has_graphics = any(usage.get(mcid, {}).get("hasGraphics") for mcid in mcids)
         has_text = any(usage.get(mcid, {}).get("hasText") for mcid in mcids)
+        direct_has_graphics = any(usage.get(mcid, {}).get("hasGraphics") for mcid in direct_mcids)
+        direct_has_text = any(usage.get(mcid, {}).get("hasText") for mcid in direct_mcids)
         split_safe = any(usage.get(mcid, {}).get("splitSafe") for mcid in mcids)
         graphics_likely_decorative = all(usage.get(mcid, {}).get("graphicsLikelyDecorative") for mcid in mcids) if has_graphics else False
         operator_pattern = next((usage.get(mcid, {}).get("operatorPattern") for mcid in mcids if usage.get(mcid, {}).get("operatorPattern")), None)
@@ -1208,8 +1229,11 @@ def struct_elem_mcid_info(pdf):
             "obj": obj,
             "pageRef": page_ref,
             "mcids": list(mcids),
+            "directMcids": list(direct_mcids),
             "hasText": has_text,
             "hasGraphics": has_graphics,
+            "directHasText": direct_has_text,
+            "directHasGraphics": direct_has_graphics,
             "splitSafe": split_safe,
             "graphicsLikelyDecorative": graphics_likely_decorative,
             "operatorPattern": operator_pattern,
@@ -1231,20 +1255,26 @@ def acrobat_alt_risk_nodes(pdf):
         has_struct_children = False
         if isinstance(k_value, pikepdf.Array):
           has_struct_children = any(
-              isinstance(item, pikepdf.Dictionary) and str(item.get("/Type")) == "/StructElem"
+              isinstance(item, pikepdf.Dictionary) and (
+                  str(item.get("/Type")) == "/StructElem"
+                  or item.get("/S") is not None
+              )
               for item in k_value
           )
         elif isinstance(k_value, pikepdf.Dictionary):
-          has_struct_children = str(k_value.get("/Type")) == "/StructElem"
+          has_struct_children = (
+              str(k_value.get("/Type")) == "/StructElem"
+              or k_value.get("/S") is not None
+          )
         duplicates = [candidate["ref"] for candidate in grouped.get((entry["pageRef"], tuple(entry["mcids"])), []) if candidate["ref"] != entry["ref"]]
         ownership_mode = None
         if duplicates:
             ownership_mode = "duplicate_mcid_ownership"
-        elif entry["hasText"]:
+        elif entry.get("directHasText") and entry.get("directHasGraphics"):
             ownership_mode = "mixed_text_graphics_same_mcid"
-        elif entry["tag"] != "/Figure":
+        elif entry.get("directHasGraphics") and entry["tag"] != "/Figure":
             ownership_mode = "graphics_only_nonfigure"
-        if entry["tag"] in ACROBAT_ALT_RISK_CONTAINER_TAGS and has_struct_children:
+        if entry["tag"] in ACROBAT_ALT_RISK_CONTAINER_TAGS and has_struct_children and entry.get("directMcids"):
             ownership_mode = "container_with_graphics_descendants" if duplicates or entry["hasGraphics"] else ownership_mode
         if entry["tag"] == "/Figure":
             continue
@@ -2001,6 +2031,30 @@ def normalized_struct_elem_mcids(obj):
     return tuple(sorted(set(mcid for mcid in mcids if isinstance(mcid, int))))
 
 
+def direct_struct_elem_mcids(obj):
+    kids = obj.get("/K") if isinstance(obj, pikepdf.Dictionary) else None
+    mcids = []
+    if isinstance(kids, int):
+        mcids.append(int(kids))
+    elif isinstance(kids, pikepdf.Array):
+        for item in kids:
+            if isinstance(item, int):
+                mcids.append(int(item))
+            elif isinstance(item, pikepdf.Dictionary) and str(item.get("/Type", "")) == "/MCR":
+                mcid = item.get("/MCID")
+                try:
+                    mcids.append(int(mcid))
+                except Exception:
+                    pass
+    elif isinstance(kids, pikepdf.Dictionary) and str(kids.get("/Type", "")) == "/MCR":
+        mcid = kids.get("/MCID")
+        try:
+            mcids.append(int(mcid))
+        except Exception:
+            pass
+    return tuple(sorted(set(mcid for mcid in mcids if isinstance(mcid, int))))
+
+
 def alt_text_for_matching_page_mcid_struct_elem(pdf, page_obj, mcids):
     page_ref = ref_string(page_obj)
     for candidate in iter_struct_elems(pdf):
@@ -2161,7 +2215,7 @@ def _has_child_with_mcid(child, mcid):
     return False
 
 
-def remove_duplicate_scalar_mcids_from_elem(elem):
+def remove_duplicate_direct_mcids_from_elem(elem):
     kids = elem.get("/K")
     if isinstance(kids, int):
         elem["/K"] = pikepdf.Array()
@@ -2181,6 +2235,15 @@ def remove_duplicate_scalar_mcids_from_elem(elem):
         if isinstance(child, int):
             if any(_has_child_with_mcid(other, int(child)) for other in kids if other is not child):
                 removed.append(int(child))
+                continue
+        elif isinstance(child, pikepdf.Dictionary) and str(child.get("/Type", "")) == "/MCR":
+            mcid = child.get("/MCID")
+            try:
+                mcid = int(mcid)
+            except Exception:
+                mcid = None
+            if mcid is not None and any(_has_child_with_mcid(other, mcid) for other in kids if other is not child):
+                removed.append(mcid)
                 continue
         rewritten.append(child)
     if not removed:
@@ -2300,7 +2363,16 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
 
     group = groups[group_index][1]
     split_info = split_group_into_text_and_graphics_segments(group)
-    if not split_info or not split_info.get("splitSafe"):
+    visible_segments = [
+        segment for segment in (split_info.get("segments") or [])
+        if segment.get("kind") == "text" or segment.get("hasVisibleGraphics")
+    ] if split_info else []
+    relaxed_split_safe = bool(
+        split_info
+        and split_info.get("operatorPattern") in {"graphics_then_text", "text_then_graphics"}
+        and len(visible_segments) <= 2
+    )
+    if not split_info or (not split_info.get("splitSafe") and not relaxed_split_safe):
         return False, [], [f"{risk['tag']} {risk['ref']} remains in mode mixed_text_graphics_same_mcid."], []
 
     segments = split_info.get("segments") or []
@@ -2450,13 +2522,15 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
     unresolved = []
     max_repairs = mutation.get("maxRepairsPerRun")
     try:
-        max_repairs = max(1, int(max_repairs)) if max_repairs is not None else 12
+        max_repairs = max(1, int(max_repairs)) if max_repairs is not None else None
     except Exception:
-        max_repairs = 12
+        max_repairs = None
     repairs_applied = 0
     risks = acrobat_alt_risk_nodes(pdf)
     if not risks:
         return False, [], ["No Acrobat-style alternate-text ownership risks were detected."]
+    if max_repairs is None:
+        max_repairs = max(32, len(risks))
 
     normalization_changed = False
     for risk in risks:
@@ -2466,7 +2540,7 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
         obj = resolve_obj(pdf, risk.get("ref"))
         if not isinstance(obj, pikepdf.Dictionary):
             continue
-        removed_changed, removed_mcids = remove_duplicate_scalar_mcids_from_elem(obj)
+        removed_changed, removed_mcids = remove_duplicate_direct_mcids_from_elem(obj)
         if removed_changed:
             changed = True
             normalization_changed = True
@@ -6511,7 +6585,7 @@ def mutate_set_table_header_cells(pdf, mutation):
         table_obj = resolve_obj(pdf, table["ref"])
         row_nodes = []
         if isinstance(table_obj, pikepdf.Dictionary):
-            row_nodes = [row for row in get_child_dicts(table_obj) if str(row.get("/S")) == "/TR"]
+            row_nodes = table_row_dicts(table_obj)
             if row_nodes:
                 def cell_span(cell):
                     try:

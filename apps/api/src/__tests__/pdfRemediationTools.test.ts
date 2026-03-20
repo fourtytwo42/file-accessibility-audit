@@ -278,6 +278,99 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(rebuilt.readingOrderParentCandidates).toEqual(inspected.readingOrderParentCandidates)
   })
 
+  it('marks table candidates as safe when the backend can recover header rows from the table node', async () => {
+    const analysis = await analyzePDF(await makePdf(), 'snapshot.pdf', { skipAdobe: true })
+
+    const rebuilt = buildRemediationContextFromSnapshot({
+      analysis,
+      qpdf: {
+        hasStructTree: true,
+        isTagged: true,
+        hasMarkInfo: true,
+        marked: true,
+        hasLang: true,
+        lang: 'en',
+        hasOutlines: false,
+        outlineCount: 0,
+        outlineTitles: [],
+        displayDocTitle: true,
+        metadataRef: 'obj:1 0 R',
+        metadataTypeValid: true,
+        metadataSubtypeXml: true,
+        hasAcroForm: false,
+        formFields: [],
+        annotationCount: 0,
+        fontCount: 1,
+        unembeddedFontCount: 0,
+        fontsMissingToUnicode: 0,
+        cidFontsMissingCidToGidMap: 0,
+        images: [],
+        headings: [],
+        tables: [],
+        structTreeDepth: 3,
+        contentOrder: [0],
+        error: null,
+      },
+      pdfjs: {
+        pageCount: 1,
+        hasText: true,
+        textLength: 50,
+        title: null,
+        author: null,
+        subject: null,
+        lang: 'en',
+        hasOutlines: false,
+        outlineCount: 0,
+        links: [],
+        imageCount: 0,
+        metadata: {
+          creator: null,
+          producer: null,
+          creationDate: null,
+          modDate: null,
+          pdfVersion: '1.7',
+          isEncrypted: false,
+          keywords: null,
+          author: null,
+          subject: null,
+          pageCount: 1,
+        },
+        error: null,
+      },
+      pages: [{
+        pageNumber: 1,
+        width: 612,
+        height: 792,
+        imageCount: 0,
+        textLines: [{ text: 'Example table', bbox: { x: 0.1, y: 0.2, width: 0.3, height: 0.03 }, fontSize: 12, fontWeight: 'bold' }],
+        links: [],
+      }],
+      structure: {
+        structuralNodes: [],
+        headings: [],
+        figures: [],
+        imageStructNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+        tables: [{
+          ref: 'obj:30 0 R',
+          pageNumberHints: [1],
+          firstRowCellRefs: [],
+          headerCellRefs: [],
+        }],
+      } as any,
+    })
+
+    expect(rebuilt.tableCandidates).toEqual([
+      expect.objectContaining({
+        ref: 'obj:30 0 R',
+        firstRowCellRefs: [],
+        hasHeaders: false,
+        repairMode: 'safe',
+      }),
+    ])
+  })
+
   it('recomputes page facts when the buffer changes', async () => {
     const firstBuffer = await makePdf()
     const secondBuffer = await makePdfWithLink()

@@ -771,6 +771,71 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
   })
 
+  it('keeps Acrobat-risk repair auto-runnable after a prior applied document pass when risks remain', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 88,
+      grade: 'B',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'passed',
+        isCompliant: true,
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? {
+              ...category,
+              score: 60,
+              grade: 'D',
+              severity: 'Moderate',
+              findings: ['Acrobat-risk non-figure graphics ownership remains.'],
+            }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [
+            {
+              ref: 'obj:20 0 R',
+              tag: '/Shape',
+              pageRef: 'obj:1 0 R',
+              mcids: [12],
+              hasText: false,
+              hasGraphics: true,
+              parentTagPath: ['/Document'],
+              ownershipMode: 'graphics_only_nonfigure',
+              splitSafe: false,
+              operatorPattern: 'graphics_then_text',
+              duplicateOwnerRefs: [],
+            },
+          ],
+        } as any,
+      }),
+      actions: [
+        {
+          tool: 'repair_other_elements_alt_text',
+          target: 'document',
+          details: 'First Acrobat-risk repair pass',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['alt_text'],
+          outcome: 'applied',
+        } as RemediationActionRecord,
+      ],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
   it('does not emit blocked semantic failure modes once those categories are already complete', () => {
     const analysis = makeAnalysisResult({
       overallScore: 100,

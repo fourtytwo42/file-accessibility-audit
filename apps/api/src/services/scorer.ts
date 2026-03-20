@@ -45,6 +45,8 @@ export interface ScoringResult {
   warnings: string[]
 }
 
+type ProvisionalCategoryId = 'reading_order' | 'color_contrast'
+
 export function isRawUrlLinkText(text: string): boolean {
   return /^(https?:\/\/|www\.)/i.test(text.trim())
 }
@@ -396,9 +398,13 @@ export function scoreDocument(
     tableStructure?: TableStructureResult | null
     tabOrder?: TabOrderResult | null
   },
+  options?: {
+    provisionalCategoryIds?: ProvisionalCategoryId[]
+  },
 ): ScoringResult {
   let categories: CategoryResult[] = []
   const warnings: string[] = []
+  const provisionalCategoryIds = new Set(options?.provisionalCategoryIds || [])
 
   if (qpdf.error) {
     warnings.push('Some accessibility checks could not be completed. The results below reflect only the checks that succeeded.')
@@ -445,10 +451,14 @@ export function scoreDocument(
   categories.push(scoreFormAccessibility(qpdf))
 
   // 9. Reading Order (5%)
-  categories.push(scoreReadingOrder(qpdf, extras?.readingOrder, extras?.tabOrder, verapdf))
+  categories.push(provisionalCategoryIds.has('reading_order')
+    ? provisionalCategoryResult('reading_order', 'Reading Order', SCORING_WEIGHTS.reading_order, 'Reading-order scoring is provisional during fast remediation analysis.')
+    : scoreReadingOrder(qpdf, extras?.readingOrder, extras?.tabOrder, verapdf))
 
   // 10. Color Contrast (4.5%)
-  categories.push(scoreColorContrast(extras?.colorContrast))
+  categories.push(provisionalCategoryIds.has('color_contrast')
+    ? provisionalCategoryResult('color_contrast', 'Color Contrast', SCORING_WEIGHTS.color_contrast, 'Color-contrast scoring is provisional during fast remediation analysis.')
+    : scoreColorContrast(extras?.colorContrast))
 
   const useLocalStandardsAsPrimary = verapdf.status !== 'passed' && verapdf.status !== 'failed'
   const veraPdfAdjusted = applyVeraPdfEvidence(categories, verapdf)
@@ -524,6 +534,25 @@ export function scoreDocument(
     adobe,
     categories,
     warnings,
+  }
+}
+
+function provisionalCategoryResult(
+  id: ProvisionalCategoryId,
+  label: string,
+  weight: number,
+  finding: string,
+): CategoryResult {
+  return {
+    id,
+    label,
+    weight,
+    score: null,
+    grade: null,
+    severity: null,
+    findings: [finding],
+    explanation: 'This category was intentionally skipped during the fast remediation loop and will be recomputed during final validation.',
+    helpLinks: [],
   }
 }
 

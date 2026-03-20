@@ -576,7 +576,7 @@ function deriveOpportunityStatus(
       : action.target === target),
   )
   if (
-    prior?.outcome === 'no_effect'
+    prior
     && opportunity.toolName === 'repair_other_elements_alt_text'
     && opportunity.derivedFromFailureModeKeys.includes('acrobat.other_elements_alt_text')
   ) {

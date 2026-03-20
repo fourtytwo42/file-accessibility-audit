@@ -481,7 +481,12 @@ function buildDeterministicCall(input: {
       if (!candidateId || !contents.trim()) return null
       return {
         tool_name: 'set_link_annotation_contents',
-        arguments: { candidateId, contents: contents.trim() },
+        arguments: {
+          candidateId,
+          pageNumber: candidate?.pageNumber,
+          annotationIndex: candidate?.annotationIndex,
+          contents: contents.trim(),
+        },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
       }
