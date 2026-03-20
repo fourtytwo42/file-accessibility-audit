@@ -899,6 +899,15 @@ function heuristicEligibleFigureCandidates(context: Awaited<ReturnType<typeof in
   )
 }
 
+function shouldRetryLateHeuristicFigureCandidate(
+  candidate: PdfRemediationContext['figureCandidates'][number],
+  previousActionNames: string[],
+): boolean {
+  const attemptedSetAlt = previousActionNames.includes(`set_figure_alt_text:${candidate.id}`)
+  if (!attemptedSetAlt) return true
+  return candidate.repairMode === 'retag_then_set_alt'
+}
+
 function aiEligibleFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
   if (!context) return []
   return context.figureCandidates.filter(candidate =>
@@ -988,8 +997,7 @@ async function runHeuristicFigureFallbackStage(input: {
   let usedInheritedVeraPdf = false
 
   for (const candidate of candidates) {
-    const key = `set_figure_alt_text:${candidate.id}`
-    if (input.previousActionNames.includes(key)) continue
+    if (!shouldRetryLateHeuristicFigureCandidate(candidate, input.previousActionNames)) continue
     const call = {
       tool_name: 'set_figure_alt_text' as const,
       arguments: {
@@ -3016,7 +3024,7 @@ export async function remediatePdfWithAgent(
   if (lateAltPassNeeded) {
     const lateAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
     const lateHeuristicFigureCandidates = heuristicEligibleFigureCandidates(lateAltContext)
-      .filter(candidate => !previousActionNames.includes(`set_figure_alt_text:${candidate.id}`))
+      .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
 
     if (lateHeuristicFigureCandidates.length > 0) {
       stagesRun.add(92)

@@ -257,3 +257,31 @@
   - the next generic fixes should target:
     - page-backed/full-page figure candidates that should be treated as redundant/decorative or safely retagged in bulk
     - the last persistent font family that survives `embed_missing_fonts_in_place` + `repair_font_unicode_maps` + `repair_cidset_consistency`
+
+### System Fix in Progress 10
+
+- Softened the Acrobat-risk alt-text cap when only one `splitSafe` mixed text/graphics node remains and the document already has at least moderate base alt-text coverage.
+- This preserves the strong penalty for broad Acrobat-risk ownership debt, but stops a single near-repairable residual node from pinning otherwise strong documents at `alt_text=40`.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts -t 'reduces alt_text when Acrobat-risk non-figure graphics ownership remains even if veraPDF passes|uses a softer Acrobat-risk cap when only one split-safe mixed node remains|excludes decorative non-figure graphics from alt-text scoring when informative figures are already described'`
+  - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 10
+
+- Tenth queue item: `d78ba297-ba48-401c-9228-fc95199a9b99`
+- Rerun result: `92/A`
+- Improvement vs ninth remediated run: `92 -> 92` (no change)
+- Fresh diagnosis from the remediated artifact:
+  - fonts are now fully clean (`unembeddedFontCount=0`, `fontsMissingToUnicode=0`)
+  - the remaining score gap is entirely `alt_text`
+  - only `6 of 13` images have alt text
+  - the scorer soft-cap did not apply because the fresh rerun still had low base alt coverage, even though only `1` non-decorative mixed Acrobat-risk node remained
+  - reinspection shows candidate `figure:13` (`obj:48 0 R`) matures from blocked `text_heavy_candidate` to `retag_then_set_alt` by the end of the run, but the late fallback still skipped it because `previousActionNames` remembered the earlier blocked attempt
+
+### System Fix in Progress 11
+
+- Updated late heuristic figure fallback so candidates are retried when they were blocked earlier in the same run but later reinspection upgrades them to `retag_then_set_alt`.
+- This is aimed at Acrobat-authored reports where strong image-backed `/P` containers only become safely retaggable after other cleanup has already run.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'retries a late figure candidate when it becomes retaggable after an earlier blocked attempt|keeps the native result when semantic generation overflows'`
+  - `pnpm --filter api exec tsc --noEmit`

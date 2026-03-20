@@ -3298,6 +3298,151 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.actions?.some(action => action.generationSource === 'heuristic_fallback')).toBe(true)
   })
 
+  it('retries a late figure candidate when it becomes retaggable after an earlier blocked attempt', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 7,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'late-retag.pdf',
+      pageCount: 7,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 82,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 1,
+        failures: [{ ruleId: 'alt', specification: null, clause: null, testNumber: null, location: null, message: 'Missing alt text', categoryIds: ['alt_text'] }],
+      }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 40, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce({
+        pdfjs: { title: 'Late retry', lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:48 0 R', hasAlt: false }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [{
+          id: 'figure:1',
+          pageNumber: 7,
+          targetRef: 'obj:48 0 R',
+          bbox: { x: 0, y: 0, width: 1, height: 1 },
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          surroundingText: ['Direction section chart'],
+          repairMode: 'defer',
+          targetTag: '/P',
+          unsafeReason: 'text_heavy_candidate: Target obj:48 0 R appears text-heavy and is not safe to retag as /Figure.',
+          pageImageCount: 0,
+          textDensityHint: 'high',
+          imageEvidence: 'strong',
+        }],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      })
+      .mockResolvedValue({
+        pdfjs: { title: 'Late retry', lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:48 0 R', hasAlt: false }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [{
+          id: 'figure:1',
+          pageNumber: 7,
+          targetRef: 'obj:48 0 R',
+          bbox: { x: 0, y: 0, width: 1, height: 1 },
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          surroundingText: ['Direction section chart'],
+          repairMode: 'retag_then_set_alt',
+          targetTag: '/P',
+          pageImageCount: 0,
+          textDensityHint: 'high',
+          imageEvidence: 'strong',
+        }],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      })
+
+    planRemediationActions.mockResolvedValue({
+      done: false,
+      unresolvedIssues: ['alt_text'],
+      actions: [
+        { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:1', altText: 'Initial alt text' }, rationale: 'Initial figure pass', confidence: 0.8 },
+      ],
+    })
+    generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 7',
+          candidateId: 'figure:1',
+          details: 'text_heavy_candidate: Target obj:48 0 R appears text-heavy and is not safe to retag as /Figure.',
+          confidence: 0.8,
+          autoApplied: false,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 7',
+          candidateId: 'figure:1',
+          details: 'late heuristic retry',
+          confidence: 0.55,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          generationSource: 'heuristic_fallback',
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'late-retag.pdf', originalResult)
+
+    expect(executeRemediationTool.mock.calls.some(call =>
+      call[0].call.arguments?.candidateId === 'figure:1'
+      && call[0].call.arguments?.generationSource === 'heuristic_fallback'
+    )).toBe(true)
+    expect(result.model.actions?.some(action =>
+      action.candidateId === 'figure:1' && action.generationSource === 'heuristic_fallback'
+    )).toBe(true)
+  })
+
   it('does not stop at A/pass when deterministic Acrobat-risk repair is still auto-runnable', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
