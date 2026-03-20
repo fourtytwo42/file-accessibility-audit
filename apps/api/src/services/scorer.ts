@@ -878,11 +878,22 @@ function scoreAltTextWithAcrobatRisk(
     }
   }
 
+  // Nodes that are purely decorative (path/stroke-only — borders, underlines, lines) do not
+  // represent real accessibility failures: the text in the MCID is still accessible and the
+  // graphics carry no semantic information. Do not cap the score for these.
+  const substantiveRiskNodes = acrobatAltRiskNodes.filter(n => !n.graphicsLikelyDecorative)
+  if (!substantiveRiskNodes.length) {
+    return {
+      ...category,
+      findings: [
+        ...category.findings,
+        `${acrobatAltRiskNodes.length} non-figure element(s) with decorative-only graphics were detected but do not require alternate text — the graphics are purely decorative (path/stroke operations only).`,
+      ],
+    }
+  }
   // If any mixed text/graphics node contains content-bearing (non-decorative) graphics, apply the strict cap.
-  // Purely decorative nodes (borders, lines — path/stroke ops only) are less severe since text is still
-  // accessible via MCIDs; cap at 60 to reflect the remaining Acrobat conformance risk without over-penalizing.
-  const hasNonDecorativeMixedContent = acrobatAltRiskNodes.some(
-    n => n.ownershipMode === 'mixed_text_graphics_same_mcid' && !n.graphicsLikelyDecorative
+  const hasNonDecorativeMixedContent = substantiveRiskNodes.some(
+    n => n.ownershipMode === 'mixed_text_graphics_same_mcid'
   )
   const scoreCap = hasNonDecorativeMixedContent ? 40 : 60
   const baseScore = category.score === null ? 100 : category.score

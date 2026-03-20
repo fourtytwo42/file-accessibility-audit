@@ -460,8 +460,12 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   // Determine unresolved alt risk nodes. The resolution semantics differ by mode:
   // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved when /Alt IS present (needs removal)
   // - all other modes: unresolved when /Alt is NOT present (needs addition)
+  // Exclude purely decorative nodes (path/stroke-only graphics — borders, underlines, lines):
+  // they share MCIDs with text but carry no semantic information, so they do not require alt text
+  // and are not real accessibility failures.
   const unresolvedAltRiskNodes = acrobatAltRiskNodes.filter(node =>
-    ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt
+    !node.graphicsLikelyDecorative
+    && (ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt)
   )
   if (unresolvedAltRiskNodes.length) {
     const hasDeterministicRepair = unresolvedAltRiskNodes.some(node =>
