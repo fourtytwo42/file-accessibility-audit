@@ -211,9 +211,8 @@ export function parseQpdfJson(json: any): QpdfResult {
       if (r.value !== undefined) {
         objects[ref] = r.value
       } else if (r.stream?.dict !== undefined) {
-        // Stream object: expose the stream dict so /Type, /Subtype etc. are accessible,
-        // and also attach a sentinel so callers can tell this is a stream object.
-        objects[ref] = { ...r.stream.dict, __isStream: true }
+        // Stream object: expose the stream dict so /Type, /Subtype etc. are directly accessible.
+        objects[ref] = r.stream.dict
       } else {
         objects[ref] = r
       }
