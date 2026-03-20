@@ -3254,11 +3254,14 @@ export async function remediatePdfWithAgent(
   const postAnalysisAltPassNeeded = !skipDirectToFinalCleanup
     && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
   if (postAnalysisAltPassNeeded) {
-    const postAnalysisAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
-    const postAnalysisHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postAnalysisAltContext)
-      .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+    let postAnalysisSweepCount = 0
+    while (postAnalysisSweepCount < 3 && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100) {
+      const postAnalysisAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+      const postAnalysisHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postAnalysisAltContext)
+        .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
 
-    if (postAnalysisHeuristicFigureCandidates.length > 0) {
+      if (postAnalysisHeuristicFigureCandidates.length === 0) break
+
       stagesRun.add(94)
       const postAnalysisAltStageStartResult = currentResult
       const postAnalysisAltStage = await runHeuristicFigureFallbackStage({
@@ -3268,6 +3271,7 @@ export async function remediatePdfWithAgent(
         previousActionNames,
         inspectionCache,
       })
+      const changedResidualFigures = postAnalysisAltStage.actions.some(action => action.changedDocumentBytes)
       if (!postAnalysisAltStage.buffer.equals(workingBuffer)) {
         workingBuffer = postAnalysisAltStage.buffer
       }
@@ -3287,16 +3291,16 @@ export async function remediatePdfWithAgent(
         stageNumber: 94,
         standardsImproved: standardsValidationImproved(postAnalysisAltStageStartResult, currentResult),
       })
-      if (postAnalysisAltStage.actions.some(action => action.changedDocumentBytes)) {
-        currentResult = await analyzePDF(workingBuffer, filename, {
-          analysisProfile: 'full_final',
-          signal: options?.signal,
-          skipAdobe: true,
-          skipVeraPdf: true,
-        })
-        currentResultHasFreshVeraPdf = true
-      }
+      if (!changedResidualFigures) break
+      currentResult = await analyzePDF(workingBuffer, filename, {
+        analysisProfile: 'full_final',
+        signal: options?.signal,
+        skipAdobe: true,
+        skipVeraPdf: true,
+      })
+      currentResultHasFreshVeraPdf = true
       latestContext = null
+      postAnalysisSweepCount += 1
     }
   }
 
