@@ -3104,7 +3104,6 @@ export async function remediatePdfWithAgent(
       analysisProfile: 'full_final',
       signal: options?.signal,
       skipAdobe: true,
-      skipVeraPdf: true,
     })
     currentResultHasFreshVeraPdf = true
     latestContext = null
