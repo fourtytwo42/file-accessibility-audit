@@ -252,6 +252,12 @@ LEGACY_FONT_SUBSTITUTES = {
     "/BaskervilleBE-LightItalic": "/Georgia-Italic",
     "/BaskervilleBE-BoldItalic": "/Georgia-BoldItalic",
     "/BaskervilleBE-SmBdIt": "/Georgia-BoldItalic",
+    # Boton brochure fonts (display sans → Arial)
+    "/Boton": "/ArialMT",
+    "/Boton-Regular": "/ArialMT",
+    "/Boton-Italic": "/Arial-ItalicMT",
+    "/Boton-Bold": "/Arial-BoldMT",
+    "/Boton-BoldItalic": "/Arial-BoldItalicMT",
     # Prefix catch-alls — these must come LAST so exact entries above take priority
     "/Frutiger": "/SegoeUI-Regular",
     "/AkzidenzGroteskBE": "/IBMPlexSans-Regular",

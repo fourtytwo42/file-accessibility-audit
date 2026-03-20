@@ -471,6 +471,7 @@ function extractTextLines(textContent: any, pageWidth: number, pageHeight: numbe
       }
     })
     .sort((a: { y: number; x: number }, b: { y: number; x: number }) => (b.y - a.y) || (a.x - b.x))
+  type TextItem = (typeof items)[number]
 
   const lines: Array<typeof items> = []
   for (const item of items) {
@@ -486,29 +487,57 @@ function extractTextLines(textContent: any, pageWidth: number, pageHeight: numbe
     ? [...items].map(item => item.fontSize).sort((a: number, b: number) => a - b)[Math.floor(items.length / 2)]
     : 12
 
-  return lines.map(line => {
+  const splitOrderedLine = (ordered: TextItem[]): TextItem[][] => {
+    if (ordered.length <= 1) return [ordered]
+    const segments: TextItem[][] = []
+    let current: TextItem[] = [ordered[0]!]
+    for (let index = 1; index < ordered.length; index += 1) {
+      const previous = current[current.length - 1]!
+      const next = ordered[index]!
+      const gap = next.x - (previous.x + previous.width)
+      const gapThreshold = Math.max(
+        60,
+        Math.round(Math.max(previous.fontSize, next.fontSize) * 3),
+        Math.round(pageWidth * 0.06),
+      )
+      if (gap > gapThreshold) {
+        segments.push(current)
+        current = [next]
+      } else {
+        current.push(next)
+      }
+    }
+    if (current.length) segments.push(current)
+    return segments
+  }
+
+  return lines.flatMap(line => {
     const ordered = [...line].sort((a, b) => a.x - b.x)
-    const text = ordered.map(item => item.text).join(' ').replace(/\s+/g, ' ').trim()
-    const fontSize = Math.round(ordered.reduce((sum, item) => sum + item.fontSize, 0) / ordered.length)
-    const fontNameCounts = new Map<string, number>()
-    for (const item of ordered) {
-      const key = item.fontName || ''
-      fontNameCounts.set(key, (fontNameCounts.get(key) || 0) + 1)
-    }
-    const dominantFontName = [...fontNameCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null
-    const minX = Math.min(...ordered.map(item => item.x))
-    const maxX = Math.max(...ordered.map(item => item.x + item.width))
-    const maxY = Math.max(...ordered.map(item => item.y))
-    const minY = Math.min(...ordered.map(item => item.y - item.height))
-    return {
-      text,
-      bbox: toNormalizedBbox(minX, minY, maxX - minX, maxY - minY, pageWidth, pageHeight),
-      fontSize,
-      fontWeight: fontSize > medianFont * 1.15 ? 'bold' as const : 'normal' as const,
-      fontName: dominantFontName,
-    }
+    return splitOrderedLine(ordered).map((segment: TextItem[]) => {
+      const text = segment.map(item => item.text).join(' ').replace(/\s+/g, ' ').trim()
+      const fontSize = Math.round(segment.reduce((sum: number, item: TextItem) => sum + item.fontSize, 0) / segment.length)
+      const fontNameCounts = new Map<string, number>()
+      for (const item of segment) {
+        const key = item.fontName || ''
+        fontNameCounts.set(key, (fontNameCounts.get(key) || 0) + 1)
+      }
+      const dominantFontName = [...fontNameCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null
+      const minX = Math.min(...segment.map((item: TextItem) => item.x))
+      const maxX = Math.max(...segment.map((item: TextItem) => item.x + item.width))
+      const maxY = Math.max(...segment.map((item: TextItem) => item.y))
+      const minY = Math.min(...segment.map((item: TextItem) => item.y - item.height))
+      return {
+        text,
+        bbox: toNormalizedBbox(minX, minY, maxX - minX, maxY - minY, pageWidth, pageHeight),
+        fontSize,
+        fontWeight: fontSize > medianFont * 1.15 ? 'bold' as const : 'normal' as const,
+        fontName: dominantFontName,
+      }
+    })
   }).slice(0, 120)
 }
+
+export const __test_extractTextLines = extractTextLines
 
 function findLinkTextFromRect(annotation: any, items: any[]): string {
   return getLinkDisplayText(annotation, items)

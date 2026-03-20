@@ -10,6 +10,7 @@ import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
 import {
+  __test_extractTextLines,
   buildHeadingCandidatesFromPageFacts,
   buildRemediationContextFromSnapshot,
   __test_isSemanticAiEligibleDeferredFigureCandidate,
@@ -138,6 +139,21 @@ async function loadRepoDownload(name: string): Promise<Buffer> {
 }
 
 describe('buildHeadingCandidatesFromPageFacts', () => {
+  it('splits wide same-row text runs into separate lines before heading detection', () => {
+    const textLines = __test_extractTextLines({
+      items: [
+        { str: 'Victims Bill of Rights', width: 210, height: 27, transform: [1, 0, 0, 1, 310, 460], fontName: 'g_d0_f11' },
+        { str: 'Who is covered by the Bill of Rights?', width: 240, height: 14, transform: [1, 0, 0, 1, 520, 400], fontName: 'g_d0_f8' },
+        { str: 'A victim has the right to be treated fairly.', width: 260, height: 11, transform: [1, 0, 0, 1, 520, 380], fontName: 'g_d0_f9' },
+        { str: 'Illinois Constitution protections are summarized here.', width: 250, height: 11, transform: [1, 0, 0, 1, 40, 380], fontName: 'g_d0_f6' },
+      ],
+    }, 1008, 612)
+
+    expect(textLines.map(line => line.text)).toContain('Victims Bill of Rights')
+    expect(textLines.map(line => line.text)).toContain('Who is covered by the Bill of Rights?')
+    expect(textLines.some(line => /Victims Bill of Rights.*Who is covered/.test(line.text))).toBe(false)
+  })
+
   it('detects same-size heading lines when they use a distinct font face', () => {
     const structure = {
       structuralNodes: [
@@ -1504,6 +1520,30 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         tool_name: 'embed_missing_fonts_in_place',
         arguments: { target: 'document' },
         rationale: 'Embed substitute programs for legacy Type1 fonts with no exact local font file.',
+        confidence: 0.9,
+      },
+    })
+
+    const afterQpdf = await analyzeWithQpdf(result.buffer)
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+    expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
+  }, 120_000)
+
+  it('embeds Boton brochure fonts through legacy substitute fallbacks', async () => {
+    const buffer = await loadRepoDownload('bor_english.pdf')
+    const beforeQpdf = await analyzeWithQpdf(buffer)
+    const before = await analyzePDF(buffer, 'bor_english.pdf')
+    const context = await inspectPdfForRemediation(buffer, before)
+
+    expect(beforeQpdf.unembeddedFontCount).toBeGreaterThan(0)
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'embed_missing_fonts_in_place',
+        arguments: { target: 'document' },
+        rationale: 'Embed substitute programs for legacy brochure fonts with no exact local font file.',
         confidence: 0.9,
       },
     })
