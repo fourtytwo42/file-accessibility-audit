@@ -125,6 +125,7 @@ const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
   'mark_figure_decorative',
   'repair_native_figure_semantics',
   'repair_other_elements_alt_text',
+  'normalize_heading_hierarchy',
   'normalize_nested_figure_containers',
 ])
 
@@ -2286,6 +2287,7 @@ export async function remediatePdfWithAgent(
       let culpritIndex = changedEntries.at(-1)?.index ?? 0
       let culpritReason = attemptRegressionReason
       let lastGoodResult = checkpointResult
+      let priorResultForEntry = checkpointResult
 
       for (const [position, { entry, index }] of changedEntries.entries()) {
         const analyzedEntry = position === changedEntries.length - 1
@@ -2294,7 +2296,7 @@ export async function remediatePdfWithAgent(
               forceStructureForScoring: requiresDeepStructureScoring([entry.action]),
             })
         const entryRegressionReason = nativeStageRegressionReason(
-          checkpointResult,
+          priorResultForEntry,
           analyzedEntry,
           [entry.action],
           { includeOverallScoreRegression: stageOptions?.includeOverallScoreRegression },
@@ -2305,6 +2307,7 @@ export async function remediatePdfWithAgent(
           break
         }
         lastGoodResult = analyzedEntry
+        priorResultForEntry = analyzedEntry
       }
 
       const acceptedEntries = attemptEntries.slice(0, culpritIndex)

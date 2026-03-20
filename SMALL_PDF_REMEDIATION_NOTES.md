@@ -1,5 +1,37 @@
 # Small PDF Remediation Notes
 
+## Current Active File
+
+- `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` (`437,736` bytes)
+- Latest fresh queue item: `01f16829-3e84-4ec7-8768-82b2349496ea`
+- Latest result: `86/B`
+
+## Recent Loop Summary
+
+- Baseline: `47/F`
+- First rerun: `87/B`
+- Latest rerun: `86/B`
+
+## New System Fixes This Round
+
+- `46fc241` `Exclude decorative Acrobat cleanup figures from alt scoring`
+  - Decorative split-generated Acrobat cleanup figures no longer count as missing informative alt debt.
+
+- `6db0c35` `Force structure scoring for native alt-text validation`
+  - Native-safe validation now forces structure-aware scoring for alt-text-sensitive structure mutations.
+
+- Pending commit: native-safe heading validation fix
+  - `normalize_heading_hierarchy` now opts into deep structure scoring during native-safe validation.
+  - Per-entry native-safe culprit isolation now compares each cumulative result against the prior accepted result, preventing later cleanup tools from inheriting stale regressions.
+
+## Current Blocker Hypothesis
+
+- The active file is no longer broadly blocked by missing figure alt text.
+- Current residual blockers are narrow:
+  - false `alt_text` regression during `normalize_heading_hierarchy` validation on native-tagged cleanup
+  - one remaining link annotation `/Contents` miss that still caps `link_quality` and `pdf_ua_compliance`
+- The next fresh rerun after restart should show whether the heading cleanup is now retained; if it is, the remaining work should collapse to the single link-contents blocker.
+
 ## Session
 
 - Date: `2026-03-20`
@@ -273,6 +305,28 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Rerun After Native-Safe Deep-Structure Scoring Fix
+
+- Third queue item: `01f16829-3e84-4ec7-8768-82b2349496ea`
+- Rerun result: `86/B`
+- What improved:
+  - `alt_text` moved from `40` to `75`
+  - the final score now explicitly says all detected figures already have alternate text
+  - this confirms the native-safe validator can now see the residual Acrobat ownership state instead of the old `11 -> 8` fast-analysis regression
+- What still fails:
+  - residual Acrobat ownership debt still caps `alt_text` at `75`
+  - `link_quality = 60` from one remaining annotation `/Contents` issue
+  - `pdf_ua_compliance = 85` from that same local standards issue
+  - `heading_structure` dropped to `60` because `normalize_heading_hierarchy` was rejected with an attempt-level `alt_text` regression reason
+
+### Current Hypothesis
+
+- The next shared blocker is no longer figure-alt generation itself.
+- The next shared blocker is native-safe acceptance/attribution on late structure cleanup for modern PDFMaker reports:
+  - residual Acrobat ownership debt should likely be scored or routed more softly once all figures already have alt text
+  - native-safe culprit isolation should not blame a later heading-normalization action for an earlier attempt-level `alt_text` regression
+  - one remaining link annotation `/Contents` miss still needs a narrower final-cleanup or candidate-selection fix
 
 ### Rerun After /Story Figure Wrapper + Direct Type1 Follow-up
 

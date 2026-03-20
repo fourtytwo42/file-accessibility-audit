@@ -12,11 +12,11 @@
 ## Current Session Snapshot
 
 - Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
-- Latest attempt path: queue item `8b8908c7-d56e-4a43-9d49-e71f20bd335e`
-- Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` finished its first fresh loop at `87/B`. The remaining score gap is concentrated in `alt_text=40` and `link_quality=60`. The highest-leverage blocker is a rejected `repair_other_elements_alt_text` pass that retagged graphics-only `/P` nodes as decorative `/Figure` wrappers, but our scorer still counted those decorative repairs as missing-alt figures and rejected the stage.
-- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T17:02Z
-- Next action: rebuild/restart after the native-safe deep-structure scoring fix, then rerun `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
-- Next hypothesis: the native-safe validator was still using `remediation_fast` without structure scoring, so it could not see decorative Acrobat-cleanup figures. Forcing structure scoring on mid-loop alt-text repairs should finally allow `repair_other_elements_alt_text` to be accepted on this file.
+- Latest attempt path: queue item `01f16829-3e84-4ec7-8768-82b2349496ea`
+- Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` improved its `alt_text` category from `40` to `75`, proving the native-safe deep-structure scoring fix is live. The file still landed at `86/B` because the remaining blocker family shifted: all figures now have alt text, but residual Acrobat ownership debt still caps `alt_text` at `75`, one link annotation `/Contents` issue still caps `link_quality` and `pdf_ua_compliance`, and `normalize_heading_hierarchy` is now being rejected because the native-safe culprit isolation attributes an attempt-level `alt_text` regression to the later heading action.
+- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T17:17Z
+- Next action: inspect the latest action ordering/candidate state for queue item `01f16829-3e84-4ec7-8768-82b2349496ea` and patch the next generic blocker
+- Next hypothesis: the next shared fix is likely one of two related native-safe issues on modern PDFMaker reports: (1) soften or reroute residual Acrobat ownership debt once all figures already have alt text, and/or (2) prevent native-safe culprit isolation from blaming a later heading-normalization action for an earlier attempt-level `alt_text` regression
 - API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
 - Build status: `pnpm --filter api build` completed before the successful rerun
 
@@ -31,11 +31,11 @@
 
 - Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
 - Current phase: Active blocker fix for first-loop `87/B` result
-- Immediate next step: restart the API and rerun the active file after the native-safe deep-structure scoring fix
+- Immediate next step: inspect the latest `86/B` action/rejection ordering on the active file before applying the next fix
 - API restart/rerun confirmed for active file: Yes, restart completed immediately before selecting the next file
 - Rebuild required for active file: No further rebuild currently required
-- Active remediation loop count: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf=3`
-- Next hypothesis: native-safe intermediate analysis must force deep structure scoring for figure/Acrobat alt-text repairs, otherwise the validator sees the old fast-profile score and keeps rejecting a useful repair
+- Active remediation loop count: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf=4`
+- Next hypothesis: native-safe culprit isolation is now too coarse for late structure cleanup on this file, and the remaining Acrobat residual cap plus one unresolved link `/Contents` issue are the last barriers to `>95`
 
 ## Pending Files
 
@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-20T17:17:09Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `01f16829-3e84-4ec7-8768-82b2349496ea` at `86/B`. This confirmed the second fix is live: `alt_text` improved from `40` to `75`, and the final score now explicitly says all detected figures have alternate text while residual Acrobat ownership debt is being scored as structure debt. The next blockers are narrower: one unresolved link annotation `/Contents` issue, the residual Acrobat cap, and a new `normalize_heading_hierarchy` rejection caused by native-safe attempt-level attribution.
 - 2026-03-20T17:12:00Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `d573b1fb-4583-473e-be09-c83423d408aa` and stayed at `87/B`. That confirmed the first scorer-side decorative-figure fix was not enough by itself. The next diagnosis was precise: native-safe stage validation still uses `remediation_fast` intermediate analysis, and that fast profile does not run structure scoring, so `repair_other_elements_alt_text` was still being judged against the old `11 -> 8` alt-text regression snapshot.
 - 2026-03-20T17:15:00Z Small-PDF loop fix: `remediation_fast` analysis can now be forced to include structure scoring, and native-safe intermediate validation now enables that deeper scoring path specifically for figure/Acrobat alt-text repairs. This targets the modern PDFMaker blocker exposed by `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`, where the mid-loop validator could not see decorative Acrobat-cleanup figures even though the final scorer now understands them. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T17:07:00Z Small-PDF loop fix: the structure backend now carries `graphicsLikelyDecorative` on recovered `/Figure` nodes, and alt-text scoring excludes those decorative Acrobat-cleanup figures from the denominator the same way it already excludes split-generated decorative wrappers. This targets `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`, where `repair_other_elements_alt_text` was correctly retagging graphics-only `/P` nodes as decorative `/Figure alt=""` wrappers but the stage was still being rejected because the scorer treated them as new missing-alt figures. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
@@ -162,16 +163,16 @@
 
 ## Current Session Snapshot
 
-- Active file: `2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Active loop: `7`
-- Latest attempt queue item: `1c842cd6-00b0-492c-9b3b-fce0ee37780d`
-- Latest remediated result: `79/C` after fresh rerun with veraPDF intentionally disabled
-- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-run7.json`
-- Restart status: completed after commit `1eeae85` and before rerun `1c842cd6-00b0-492c-9b3b-fce0ee37780d`
+- Active file: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Active loop: `3`
+- Latest attempt queue item: `01f16829-3e84-4ec7-8768-82b2349496ea`
+- Latest remediated result: `86/B` after fresh rerun with veraPDF intentionally disabled
+- Latest attempt artifact: `apps/api/data/queue-storage/models/01f16829-3e84-4ec7-8768-82b2349496ea.json`
+- Restart status: new restart still pending for the next rerun after commit for native-safe deep-structure heading validation
 
 ## Current Focus
 
-- Identify the next generic fix for `2025FirearmProhibitorsReport-250626T19175938.pdf`, which is now split between page-backed/full-page figure debt and one persistent font embedding/Unicode blocker.
+- Keep the active traffic-report file on the loop and clear the remaining native-tagged cleanup blockers: false `alt_text` regression during heading normalization plus one residual link `/Contents` miss.
 
 ## Retry Checkpoint
 
@@ -186,8 +187,13 @@
 - Updated hypothesis: figure promotion alone is insufficient because the document is still routed through `heuristic_only` semantic cleanup; the broader fix is to stop classifying semantically weak documents as `well_tagged`.
 - Latest hypothesis: even with `full_ai` enabled, the semantic stage was still blind to most of the backlog because it excluded deferred `text_heavy_candidate` figures from batching. The next rerun should tell us whether widening that AI eligibility finally moves the `alt_text` score.
 - Updated hypothesis after loop 7: the remaining figure backlog is dominated by page-backed/full-page image candidates that surface late and likely need a dedicated redundancy/decorative or bulk-retag rule, while the remaining `text_extractability` cap comes from one font family that current embedding/Unicode repair does not actually clear.
+- New small-PDF checkpoint: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` improved from `47/F` to `87/B`, then to `86/B` after deeper native-safe structure validation. The current blocker family is no longer broad figure debt; it is a false `alt_text` regression during `normalize_heading_hierarchy`, plus one remaining link annotation `/Contents` issue that caps `link_quality` and `pdf_ua_compliance`.
+- Latest hypothesis: native-safe validation needs deep structure scoring for `normalize_heading_hierarchy`, and per-entry culprit isolation should compare each cumulative analysis against the prior accepted state instead of always against the stage-start result.
 
 ## Recent Events
+
+- 2026-03-20T17:27:00Z Small-PDF loop fix: native-safe stage validation now forces deep structure scoring for `normalize_heading_hierarchy`, and native-safe culprit isolation now compares each changed entry against the prior accepted analysis instead of the stage-start analysis. This prevents later structure cleanups from inheriting stale `alt_text` regressions and fixes false heading-cleanup rejections on native-tagged reports. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart were still pending at this checkpoint.
+- 2026-03-20T17:17:09Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `01f16829-3e84-4ec7-8768-82b2349496ea` at `86/B`. `alt_text` improved to `75` and all detected figures now have alternate text, but `normalize_heading_hierarchy` was incorrectly rejected with `Rejected because it alt_text score regressed from 100 to 75.` One remaining `annotation /Contents` standards miss still caps `link_quality=60` and `pdf_ua_compliance=85`.
 
 - 2026-03-20T08:56:38Z Fresh post-restart rerun: `2025FirearmProhibitorsReport-250626T19175938.pdf` completed on queue item `1c842cd6-00b0-492c-9b3b-fce0ee37780d` at `79/C`. The new late figure fallback pass did move the alt-text findings from `13 of 27` to `14 of 27` images with alt text, but the overall grade remained unchanged because `alt_text` is still `40` and the last font embedding/Unicode blockers still cap `text_extractability`.
 - 2026-03-20T09:12:00Z Small-PDF loop fix: softened the Acrobat-risk alt-text cap when only one split-safe mixed text/graphics node remains on an otherwise stronger document, so near-complete files are no longer pinned at `alt_text=40` by a single residual repairable node. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts -t 'reduces alt_text when Acrobat-risk non-figure graphics ownership remains even if veraPDF passes|uses a softer Acrobat-risk cap when only one split-safe mixed node remains|excludes decorative non-figure graphics from alt-text scoring when informative figures are already described'` and `pnpm --filter api exec tsc --noEmit`. Commit `acad053`; PM2 restart pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.

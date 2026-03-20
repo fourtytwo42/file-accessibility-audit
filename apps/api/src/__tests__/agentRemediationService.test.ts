@@ -1190,6 +1190,112 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(finalTools).toContain('set_link_annotation_contents')
   })
 
+  it('keeps heading normalization when native-safe validation needs deep structure scoring', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'heading-cleanup.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 97,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.1, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const taggedContext = {
+      pdfjs: { title: 'Heading Cleanup', lang: 'en', links: [], imageCount: 1, metadata: pdfMetadata },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:img 0 R', hasAlt: true }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [{ id: 'figure:1', pageNumber: 1, surroundingText: [], splitGenerated: false, informativeHint: 'informative', repairMode: 'safe' }],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(taggedContext)
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool
+      .mockImplementationOnce(async ({ buffer }: any) => ({
+        buffer: Buffer.concat([buffer, Buffer.from('h')]),
+        action: {
+          tool: 'normalize_heading_hierarchy',
+          target: 'document',
+          details: 'heading normalized',
+          confidence: 0.97,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['heading_structure'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      }))
+      .mockImplementation(async ({ buffer, call }: any) => ({
+        buffer,
+        action: {
+          tool: call.tool_name,
+          target: 'document',
+          details: `${call.tool_name} no-op`,
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: call.tool_name === 'normalize_nested_figure_containers'
+            ? ['alt_text']
+            : call.tool_name === 'repair_native_link_structure'
+              ? ['link_quality', 'reading_order']
+              : ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      }))
+
+    analyzePDF.mockImplementation(async (_buffer: Buffer, _filename: string, options?: any) => {
+      const usedDeepScoring = !!options?.forceStructureForScoring
+      return {
+        ...originalResult,
+        overallScore: usedDeepScoring ? 100 : 92,
+        grade: 'A',
+        categories: [
+          { ...originalResult.categories[0], score: usedDeepScoring ? 100 : 75, grade: usedDeepScoring ? 'A' : 'C', severity: usedDeepScoring ? 'Pass' : 'Moderate' },
+          { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[2] },
+        ],
+      }
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'heading-cleanup.pdf', originalResult)
+
+    expect(analyzePDF.mock.calls.some(call => call[2]?.forceStructureForScoring === true)).toBe(true)
+    expect(result.model.rejectedActions?.some(action => action.tool === 'normalize_heading_hierarchy')).toBe(false)
+    expect(result.model.actions?.some(action => action.tool === 'normalize_heading_hierarchy' && action.outcome !== 'rejected')).toBe(true)
+  })
+
   it('retries residual font cleanup before final scoring when qpdf still reports font debt', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
