@@ -1035,6 +1035,43 @@
   - restart the API
   - rerun the active traffic report fresh before touching the residual Acrobat alt-text cap
 
+## Traffic Report Result
+
+- Fresh post-restart rerun: queue item `3ba09754-94ab-4a27-b8bc-9ce3b9eab74c`
+- Result: `96/A`
+- Category outcome:
+  - `text_extractability = 100`
+  - `title_language = 100`
+  - `heading_structure = 100`
+  - `link_quality = 100`
+  - `reading_order = 100`
+  - `pdf_ua_compliance = 100`
+  - `alt_text = 75`
+- What the backend link-write fix proved:
+  - the last real `/Contents` blocker was persistence, not planning or inspection
+  - once the mutation moved into the Python structure backend, the traffic-report family cleared the user target without any further scoring changes
+- Next random sub-700k file selected:
+  - `Downloads/GTF-juvenilesentencing.pdf`
+
+## GTF-juvenilesentencing
+
+- Fresh baseline queue item: `2c974ae2-4d74-4703-9b4e-118b446e8ad1`
+- First fresh result: `45/F` from `26/F`
+- Immediate blocker diagnosis:
+  - the run only kept metadata fixes
+  - `bootstrap_struct_tree` was rejected with `Rejected because targeted category regressed by 10 points`
+- Direct probes showed the rejection was false:
+  - raw bootstrap on the original file moves `26/F -> 67/D`
+  - after metadata, shallow `remediation_fast` sees bootstrap as `43 -> 73` but falsely drops `text_extractability 50 -> 40` and `pdf_ua_compliance 70 -> 20`
+  - the same post-bootstrap buffer with `forceStructureForScoring: true` scores at `98`, with `text_extractability=100`, `heading_structure=100`, `alt_text=100`, and `pdf_ua_compliance=85`
+- Shared fix prepared:
+  - `bootstrap_struct_tree` is now treated like other structure-heavy tools during non-native stage validation
+  - stage acceptance now requests deeper structure-aware intermediate scoring for bootstrap stages instead of trusting shallow `remediation_fast` alone
+- Next live step:
+  - commit/push this bootstrap validation fix
+  - restart the API
+  - rerun `GTF-juvenilesentencing.pdf` fresh
+
 ## Stopping Point
 
 - Current score is exactly `95`, not above `95`.

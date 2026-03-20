@@ -120,6 +120,7 @@ const DEEP_DIRTY_TOOLS = new Set<string>([
 ])
 
 const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
+  'bootstrap_struct_tree',
   'set_figure_alt_text',
   'retag_as_figure_and_set_alt',
   'mark_figure_decorative',
@@ -2462,7 +2463,9 @@ export async function remediatePdfWithAgent(
       }
 
       if (!nativeTaggedSafeMode && stageChangedDocument) {
-        const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult)
+        const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
+          forceStructureForScoring: requiresDeepStructureScoring(stageActions),
+        })
         const isAcrobatAltRepair = stageActions.some(
           action => action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
         )
@@ -2696,7 +2699,9 @@ export async function remediatePdfWithAgent(
 
     // Non-native mode: single analysis per stage (instead of per action)
     if (!nativeTaggedSafeMode && stageChangedDocument) {
-      const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult)
+      const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
+        forceStructureForScoring: requiresDeepStructureScoring(stageActions),
+      })
       // repair_other_elements_alt_text fixes Adobe Acrobat issues not reflected in our score model
       const isAcrobatAltRepair = stageActions.some(
         a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied',
@@ -2899,7 +2904,9 @@ export async function remediatePdfWithAgent(
       }
 
       if (!nativeTaggedSafeMode && stageChangedDocument) {
-        const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult)
+        const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
+          forceStructureForScoring: requiresDeepStructureScoring(stageActions),
+        })
         const isAcrobatAltRepair = stageActions.some(a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied')
         const acceptanceDecision = evaluateStageAcceptance(stageStartResult, analyzedStage, stageActions)
         const stageImprovedStandards = acceptanceDecision.standardsImproved

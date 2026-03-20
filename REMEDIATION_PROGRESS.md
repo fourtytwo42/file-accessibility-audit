@@ -12,11 +12,11 @@
 ## Current Session Snapshot
 
 - Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
-- Latest attempt path: queue item `fb4aedac-efec-4d65-9d52-c6aad863be22`
-- Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` is currently plateaued at `92/B` after the native heading-validation fixes landed. `heading_structure` and `text_extractability` are now `100`, but one real link annotation `/Contents` miss still caps `link_quality=60` and `pdf_ua_compliance=85`, and residual Acrobat ownership debt still caps `alt_text=75`.
-- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T17:48Z
-- Next action: restart the API on the new backend link-write fix and run a fresh remediation rerun on the active traffic report
-- Next hypothesis: the Python structure backend now owns `set_link_annotation_contents`, so the remaining real standards blocker should finally persist on disk; if the rerun still misses `>95`, the next shared fix will be the residual Acrobat alt-text cap rather than links
+- Latest attempt path: queue item `3ba09754-94ab-4a27-b8bc-9ce3b9eab74c`
+- Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` cleared the user target on a fresh post-restart rerun at `96/A`. The backend link `/Contents` write fix landed: `link_quality` rose to `100`, `pdf_ua_compliance` rose to `100`, and the only remaining non-perfect category is the residual Acrobat-owned `alt_text=75` cap.
+- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T18:02Z
+- Next action: start the next random sub-700k PDF through the API and use this new baseline to find the next generic blocker family
+- Next hypothesis: the next reusable win is likely no longer links; the next sub-700k file will probably expose either another residual Acrobat alt-text-cap family or a separate legacy font/bookmark edge
 - API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
 - Build status: `pnpm --filter api build` completed before the successful rerun
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
-- Current phase: Active blocker fix for persistent `92/B` result
-- Immediate next step: rebuild/restart the API and rerun the active file on the new backend link `/Contents` mutation path
+- Active PDF: `GTF-juvenilesentencing.pdf`
+- Current phase: Bootstrap-stage acceptance fix
+- Immediate next step: restart on the new deep bootstrap validation fix and rerun `GTF-juvenilesentencing.pdf` fresh through the API
 - API restart/rerun confirmed for active file: Yes, restart completed immediately before selecting the next file
 - Rebuild required for active file: No further rebuild currently required
-- Active remediation loop count: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf=8`
-- Next hypothesis: link `/Contents` persistence was the actual remaining standards bug; once that is fixed in the Python backend write path, the active file should either jump again or cleanly isolate the last Acrobat residual-cap problem
+- Active remediation loop count: `GTF-juvenilesentencing.pdf=2`
+- Next hypothesis: the active file is being held down by a false bootstrap-stage regression in `remediation_fast`; deeper structure-aware intermediate scoring should let the high-value bootstrap stage stick
 
 ## Pending Files
 
@@ -77,6 +77,8 @@
 
 ## Recent Events
 
+- 2026-03-20T18:02:00Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `3ba09754-94ab-4a27-b8bc-9ce3b9eab74c` at `96/A`. The backend `set_link_annotation_contents` write-path fix is live: `link_quality` improved to `100`, `pdf_ua_compliance` improved to `100`, and the remaining score gap is now only the residual Acrobat alt-text cap (`alt_text=75`).
+- 2026-03-20T18:10:00Z Small-PDF loop fix: non-native stage acceptance now forces deeper structure-aware intermediate scoring for `bootstrap_struct_tree` stages instead of validating them on the shallow `remediation_fast` profile alone. This fixes the `GTF-juvenilesentencing.pdf` family, where bootstrap was clearly beneficial (`43 -> 73` in fast scoring and `98` when structure-aware) but was still being rejected because the shallow intermediate profile falsely dropped `text_extractability` and `pdf_ua_compliance`. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'forces deep structure scoring when validating bootstrap stages'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T17:59:00Z Small-PDF loop fix: `set_link_annotation_contents` now writes through the Python structure backend instead of the old pdf-lib mutation path, and the backend now falls back correctly when annotations are direct objects with `objgen=(0,0)`. This fixes the modern PDFMaker traffic-report family where the tool claimed it had set `/Contents` but the saved PDF still left object `383 0 R` blank. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'sets link annotation /Contents without rewriting visible text|sets link annotation /Contents using the link-only annotation ordinal when non-link annotations come first|re-inspects link annotation /Contents from raw PDF objects after mutation'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T17:17:09Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `01f16829-3e84-4ec7-8768-82b2349496ea` at `86/B`. This confirmed the second fix is live: `alt_text` improved from `40` to `75`, and the final score now explicitly says all detected figures have alternate text while residual Acrobat ownership debt is being scored as structure debt. The next blockers are narrower: one unresolved link annotation `/Contents` issue, the residual Acrobat cap, and a new `normalize_heading_hierarchy` rejection caused by native-safe attempt-level attribution.
 - 2026-03-20T17:12:00Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `d573b1fb-4583-473e-be09-c83423d408aa` and stayed at `87/B`. That confirmed the first scorer-side decorative-figure fix was not enough by itself. The next diagnosis was precise: native-safe stage validation still uses `remediation_fast` intermediate analysis, and that fast profile does not run structure scoring, so `repair_other_elements_alt_text` was still being judged against the old `11 -> 8` alt-text regression snapshot.

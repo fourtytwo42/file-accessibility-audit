@@ -4206,6 +4206,134 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(executeRemediationTool.mock.calls.some(call => call[0].call.tool_name === 'set_document_title')).toBe(true)
   })
 
+  it('forces deep structure scoring when validating bootstrap stages', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'untagged-bootstrap.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 43,
+      grade: 'F',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'failed', isCompliant: false, failedChecks: 10 }),
+      categories: [
+        { id: 'text_extractability', label: 'Text', weight: 0.2, score: 50, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'title_language', label: 'Title', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'heading_structure', label: 'Headings', weight: 0.1, score: 0, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'alt_text', label: 'Alt', weight: 0.15, score: 0, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading', weight: 0.15, score: 0, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'pdf_ua_compliance', label: 'PDF/UA', weight: 0.3, score: 70, grade: 'C', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      localStandards: { status: 'issues_detected', findings: [], knownGapKeys: [] },
+      failureModes: [],
+      detectedIssues: [],
+      warnings: [],
+      categoryScores: {
+        text_extractability: 50,
+        title_language: 100,
+        heading_structure: 0,
+        alt_text: 0,
+        reading_order: 0,
+        pdf_ua_compliance: 70,
+      },
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Newsletter 5', lang: 'en', hasText: true, textLength: 1200, links: [], imageCount: 6, metadata: pdfMetadata },
+      qpdf: {
+        lang: 'en',
+        headings: [],
+        tables: [],
+        images: [{ ref: 'img:1' }],
+        formFields: [],
+        hasStructTree: false,
+        hasMarkInfo: false,
+        outlineCount: 0,
+        outlineTitles: [],
+        structTreeDepth: 0,
+      },
+      figureCandidates: [{ id: 'figure:1', pageNumber: 1, targetRef: '10 0 R', existingTag: 'P', bbox: { x: 0, y: 0, width: 1, height: 1 }, pageImageCount: 1, pageHasText: true, informativeHint: 'informative', imageEvidence: 'strong', surroundingText: '', pageTextSnippet: '', pageLineCount: 2, pageGraphicGroupCount: 1, pageStructuredFigureCount: 0, targetHasText: false, targetTextLength: 0, parentTagPath: [], repairMode: 'retag_then_set_alt' }],
+      tableCandidates: [],
+      headingCandidates: [{ id: 'heading:1', pageNumber: 1, text: 'Juvenile sentencing', existingTag: null }],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['logical_structure'],
+        actions: [
+          { tool_name: 'bootstrap_struct_tree', arguments: { target: 'document' }, rationale: 'bootstrap', confidence: 0.95 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool.mockResolvedValueOnce({
+      buffer: Buffer.from('bootstrapped'),
+      action: {
+        tool: 'bootstrap_struct_tree',
+        target: 'document',
+        details: 'bootstrapped',
+        confidence: 0.95,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['text_extractability', 'heading_structure', 'alt_text', 'reading_order', 'pdf_ua_compliance'],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    analyzePDF.mockImplementation(async (_buffer: Buffer, _filename: string, options?: any) => {
+      if (options?.analysisProfile === 'remediation_fast') {
+        return {
+          ...originalResult,
+          overallScore: options?.forceStructureForScoring ? 98 : 73,
+          categories: originalResult.categories.map((category: any) => {
+            if (category.id === 'text_extractability') return { ...category, score: options?.forceStructureForScoring ? 100 : 40, grade: 'A', severity: 'Pass' }
+            if (category.id === 'heading_structure') return { ...category, score: 100, grade: 'A', severity: 'Pass' }
+            if (category.id === 'alt_text') return { ...category, score: 100, grade: 'A', severity: 'Pass' }
+            if (category.id === 'reading_order') return { ...category, score: 40, grade: 'D', severity: 'Moderate' }
+            if (category.id === 'pdf_ua_compliance') return { ...category, score: options?.forceStructureForScoring ? 85 : 20, grade: 'B', severity: 'Moderate' }
+            return category
+          }),
+        }
+      }
+      return {
+        ...originalResult,
+        overallScore: 98,
+        grade: 'A',
+        categories: originalResult.categories.map((category: any) => ({ ...category, score: category.id === 'reading_order' ? 40 : 100, grade: 'A', severity: 'Pass' })),
+      }
+    })
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'untagged-bootstrap.pdf', originalResult)
+
+    expect(analyzePDF.mock.calls.some(([, , options]) =>
+      options?.analysisProfile === 'remediation_fast'
+      && options?.forceStructureForScoring === true,
+    )).toBe(true)
+  })
+
   it('uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
