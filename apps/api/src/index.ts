@@ -12,7 +12,6 @@ import logsRoutes from './routes/logs.js'
 import queueRoutes from './routes/queue.js'
 import { recoverInterruptedProcessing } from './services/queueManager.js'
 import { cleanupExpiredQueueItems, failStaleUploads } from './services/queueStore.js'
-import { probeVeraPdf } from './services/veraPdfService.js'
 
 // Import db to trigger table creation on startup
 import './db/sqlite.js'
@@ -32,7 +31,7 @@ const PORT = Number(process.env.PORT) || 6103
 const isProduction = process.env.NODE_ENV === 'production'
 let veraPdfStatus: { available: boolean; message: string } = {
   available: false,
-  message: 'veraPDF probe has not run yet.',
+  message: 'veraPDF is deprecated and disabled.',
 }
 
 // Trust proxy — behind nginx in production, behind Nuxt proxy in development
@@ -96,7 +95,7 @@ function extendedHealthPayload() {
   return {
     ...healthPayload(),
     validators: {
-      veraPdf: veraPdfStatus.available ? 'available' : 'unavailable',
+      veraPdf: 'deprecated',
     },
   }
 }
@@ -132,8 +131,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
 app.listen(PORT, async () => {
   console.log(`[API] Running on http://localhost:${PORT}`)
   console.log(`[API] Environment: ${process.env.NODE_ENV || 'development'}`)
-  veraPdfStatus = await probeVeraPdf()
-  console.log(`[API] veraPDF: ${veraPdfStatus.available ? 'available' : 'unavailable'}${veraPdfStatus.message ? ` (${veraPdfStatus.message})` : ''}`)
+  console.log('[API] veraPDF: deprecated (disabled)')
   runQueueMaintenance()
   const interval = setInterval(runQueueMaintenance, 5 * 60 * 1000)
   interval.unref?.()

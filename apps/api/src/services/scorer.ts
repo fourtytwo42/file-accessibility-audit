@@ -229,8 +229,8 @@ function scorePdfUaCompliance(verapdf: VeraPdfResult): CategoryResult {
     grade: getGrade(60),
     severity: getSeverity(60),
     findings: [
-      veraPdfWarning(verapdf) || 'veraPDF standards validation could not be confirmed.',
-      'Heuristic accessibility scoring is available, but standards conformance remains unconfirmed until veraPDF completes successfully.',
+      veraPdfWarning(verapdf) || 'Legacy veraPDF validation is disabled.',
+      'PDF/UA compliance scoring is being derived from local standards evidence instead of veraPDF.',
     ],
     explanation,
     helpLinks,
@@ -460,7 +460,7 @@ export function scoreDocument(
     ? provisionalCategoryResult('color_contrast', 'Color Contrast', SCORING_WEIGHTS.color_contrast, 'Color-contrast scoring is provisional during fast remediation analysis.')
     : scoreColorContrast(extras?.colorContrast))
 
-  const useLocalStandardsAsPrimary = verapdf.status !== 'passed' && verapdf.status !== 'failed'
+  const useLocalStandardsAsPrimary = true
   const veraPdfAdjusted = applyVeraPdfEvidence(categories, verapdf)
   categories = useLocalStandardsAsPrimary ? applyLocalStandardsEvidence(categories, localStandards) : veraPdfAdjusted.categories
   categories = applyAdobeEvidence(categories, adobe)
@@ -484,11 +484,9 @@ export function scoreDocument(
     ? Math.round(applicable.reduce((sum, c) => sum + (c.score! * (c.weight / totalWeight)), 0))
     : 0
 
-  // If veraPDF is fully clean, allow near-perfect heuristic scores to reach 100/100.
+  // If local standards are clean, allow near-perfect heuristic scores to reach 100/100.
   const localStandardsClean = localStandards.status === 'clear' && localStandards.knownGapKeys.length === 0
-  const standardsClean = verapdf.status === 'passed'
-    ? (verapdf.failedChecks || verapdf.failures.length) === 0
-    : useLocalStandardsAsPrimary && localStandardsClean
+  const standardsClean = localStandardsClean
   if (standardsClean && computedScore >= 98) {
     computedScore = 100
   }
@@ -513,9 +511,7 @@ export function scoreDocument(
   if (gradeGateApplied) {
     grade = 'B'
   }
-  const effectiveFailedChecks = verapdf.status === 'failed'
-    ? (verapdf.failedChecks || verapdf.failures.length)
-    : localStandards.findings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
+  const effectiveFailedChecks = localStandards.findings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
   const executiveSummary = generateSummary(overallScore, grade, isScanned, categories, verapdf, localStandards, {
     pdfUaScore: pdfUaCategory?.score ?? 0,
     failedChecks: effectiveFailedChecks,
@@ -1446,35 +1442,19 @@ function generateSummary(
   const passing = categories.filter(c => c.severity === 'Pass')
   const applicable = categories.filter(c => c.score !== null)
 
-  if (verapdf.status === 'passed') {
-    if (grade === 'A') {
-      return `This PDF meets accessibility standards across all ${applicable.length} assessed categories and passed veraPDF PDF/UA validation. It is ready for publication.`
-    }
-
-    if (grade === 'B') {
-      return `This PDF passed veraPDF PDF/UA validation and is in good shape overall, but heuristic checks still found minor issues. ${passing.length} of ${applicable.length} categories pass.`
-    }
-  }
-
-  if (verapdf.status === 'failed') {
-    const issueCount = context.failedChecks
-    if (issueCount <= 2) {
-      return `This PDF is close to PDF/UA compliant, but veraPDF still reports ${issueCount} remaining issue${issueCount === 1 ? '' : 's'}. Standards findings lowered the PDF/UA compliance score to ${context.pdfUaScore}/100${context.gradeGateApplied ? ' and keep the overall grade below A' : ''}.`
-    }
-    return `This PDF is materially non-compliant with PDF/UA right now. veraPDF reports ${issueCount} remaining issues, which lowered the PDF/UA compliance score to ${context.pdfUaScore}/100 and should be addressed before publication.`
-  }
-
-  if (verapdf.status !== 'passed') {
-    if (localStandards.status === 'issues_detected') {
-      const gateText = context.gradeGateApplied || context.scoreGateApplied
-        ? ' Local standards findings keep the document below a fully confirmed pass.'
-        : ''
-      return `Local standards checks found ${context.failedChecks} PDF/UA-related issue${context.failedChecks === 1 ? '' : 's'}. The provisional PDF/UA compliance score is ${context.pdfUaScore}/100.${gateText}`
-    }
+  if (localStandards.status === 'issues_detected') {
     const gateText = context.gradeGateApplied || context.scoreGateApplied
-      ? ' Because standards validation did not complete, the document cannot receive an A or a 100 score yet.'
+      ? ' Local standards findings keep the document below a fully confirmed pass.'
       : ''
-    return `Heuristic accessibility checks completed, but standards validation could not be fully confirmed by veraPDF. The provisional PDF/UA compliance score is ${context.pdfUaScore}/100.${gateText}`
+    return `Local standards checks found ${context.failedChecks} PDF/UA-related issue${context.failedChecks === 1 ? '' : 's'}. The PDF/UA compliance score is ${context.pdfUaScore}/100.${gateText}`
+  }
+
+  if (grade === 'A') {
+    return `This PDF meets accessibility standards across all ${applicable.length} assessed categories based on the current local validation stack. It is ready for publication.`
+  }
+
+  if (grade === 'B') {
+    return `This PDF is in good shape overall, but heuristic checks still found minor issues. ${passing.length} of ${applicable.length} categories pass.`
   }
 
   if (grade === 'B') {

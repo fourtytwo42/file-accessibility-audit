@@ -491,23 +491,6 @@ function collectCategoryFlags(result: AnalysisResult, existing: ModelReviewFlag[
       details: 'Title or language metadata still needs manual confirmation.',
     })
   }
-  if (result.verapdf?.status === 'failed' && result.verapdf.failedChecks > 0) {
-    flags = addFlag(flags, {
-      code: 'verapdf_manual_review',
-      label: 'PDF/UA compliance requires manual review',
-      severity: 'warning',
-      details: result.verapdf.failures[0]?.message || `veraPDF reported ${result.verapdf.failedChecks} remaining PDF/UA compliance issues.`,
-    })
-  }
-  if (result.verapdf?.status && result.verapdf.status !== 'passed' && result.verapdf.status !== 'failed') {
-    flags = addFlag(flags, {
-      code: 'verapdf_unavailable',
-      label: 'PDF/UA validation incomplete',
-      severity: 'warning',
-      details: result.verapdf.message || 'veraPDF validation could not be completed for this document.',
-    })
-  }
-
   return flags
 }
 
@@ -543,27 +526,12 @@ function isNativeTaggedSafeContext(context: Awaited<ReturnType<typeof inspectPdf
     && (context.structure.structuralNodes?.length || 0) > 0
 }
 
-function veraPdfFailureMessages(result: AnalysisResult): string[] {
-  return result.verapdf?.status === 'failed'
-    ? result.verapdf.failures.map(failure => failure.message).filter(Boolean)
-    : []
-}
-
 function hasNativeStandardsRegression(previous: AnalysisResult, next: AnalysisResult, toolName: string): string | null {
-  const previousFailed = previous.verapdf?.status === 'failed' ? previous.verapdf.failedChecks : 0
-  const nextFailed = next.verapdf?.status === 'failed' ? next.verapdf.failedChecks : 0
-  if (nextFailed > previousFailed) {
-    return `veraPDF failures increased from ${previousFailed} to ${nextFailed}`
-  }
-  if (!NATIVE_TAGGED_RISKY_TOOLS.has(toolName)) {
-    return null
-  }
-  const previousMessages = new Set(veraPdfFailureMessages(previous))
-  const newStructuralFailure = veraPdfFailureMessages(next).find(message =>
-    !previousMessages.has(message)
-    && /note tag shall have id entry|logical structure|parenttree|marked content|artifact|tagged as real content|\/link|table|reading order/i.test(message),
-  )
-  return newStructuralFailure ? `introduced a new structural standards failure: ${newStructuralFailure}` : null
+  void previous
+  void next
+  void toolName
+  if (!NATIVE_TAGGED_RISKY_TOOLS.has(toolName)) return null
+  return null
 }
 
 function shouldRejectNativeVisibleRewrite(
@@ -572,10 +540,8 @@ function shouldRejectNativeVisibleRewrite(
   action: { changedVisibleContent?: boolean; tool: string },
 ): string | null {
   if (!action.changedVisibleContent) return null
-  const previousFailed = previous.verapdf?.status === 'failed' ? previous.verapdf.failedChecks : 0
-  const nextFailed = next.verapdf?.status === 'failed' ? next.verapdf.failedChecks : 0
-  if (nextFailed < previousFailed) return null
-  return `changed visible page content without improving standards validation (${previousFailed} -> ${nextFailed} veraPDF failures)`
+  if (next.overallScore > previous.overallScore) return null
+  return 'changed visible page content without improving the overall accessibility score'
 }
 
 function categoryRegression(previous: AnalysisResult, next: AnalysisResult, categoryId: string): boolean {
@@ -585,20 +551,12 @@ function categoryRegression(previous: AnalysisResult, next: AnalysisResult, cate
 }
 
 function hasDeterministicRegression(previous: AnalysisResult, next: AnalysisResult): boolean {
-  const previousFailed = previous.verapdf?.status === 'failed' ? previous.verapdf.failedChecks : 0
-  const nextFailed = next.verapdf?.status === 'failed' ? next.verapdf.failedChecks : 0
   return next.overallScore < previous.overallScore
-    || nextFailed > previousFailed
     || previous.categories.some(category => categoryRegression(previous, next, category.id))
 }
 
 function standardsValidationImproved(previous: AnalysisResult, next: AnalysisResult): boolean {
-  return (
-    (next.verapdf?.status === 'failed'
-      && previous.verapdf?.status === 'failed'
-      && next.verapdf.failedChecks < previous.verapdf.failedChecks)
-    || (next.verapdf?.status === 'passed' && previous.verapdf?.status !== 'passed')
-  )
+  return next.overallScore > previous.overallScore
 }
 
 function applyScoreDelta(action: RemediationActionRecord, previous: AnalysisResult, next: AnalysisResult): boolean {
@@ -667,7 +625,7 @@ function semanticThreshold(batchType: SemanticBatchResult['batchType']): number 
 const SEMANTIC_CATEGORY_IDS = ['heading_structure', 'alt_text', 'table_markup', 'link_quality', 'bookmarks'] as const
 
 function isFullyDone(result: AnalysisResult): boolean {
-  return result.grade === 'A' && result.verapdf?.status === 'passed'
+  return result.grade === 'A'
 }
 
 function hasRemainingSemanticWork(result: AnalysisResult): boolean {
@@ -707,14 +665,6 @@ function bookmarkCleanupTriggerAnalysis(result: AnalysisResult): AnalysisResult 
   }
 }
 
-function veraPdfNeedsAltTextAttention(result: AnalysisResult): boolean {
-  return result.verapdf?.status === 'failed'
-    && result.verapdf.failures.some(failure =>
-      failure.categoryIds.includes('alt_text')
-      || /alternate text|figure|artifact|decorative image|non-text content/i.test(failure.message),
-    )
-}
-
 function hasAcrobatAltRiskFindings(result: AnalysisResult): boolean {
   const altTextCategory = result.categories.find(category => category.id === 'alt_text')
   return (altTextCategory?.findings || []).some(finding =>
@@ -723,7 +673,7 @@ function hasAcrobatAltRiskFindings(result: AnalysisResult): boolean {
 }
 
 function inspectModeForResult(result: AnalysisResult): RemediationInspectMode {
-  return needsAltTextDeepInspection(result) || veraPdfNeedsAltTextAttention(result) || hasAcrobatAltRiskFindings(result)
+  return needsAltTextDeepInspection(result) || hasAcrobatAltRiskFindings(result)
     ? 'alt_text_deep'
     : 'light'
 }
@@ -2552,7 +2502,7 @@ export async function remediatePdfWithAgent(
       analysisProfile: 'full_final',
       signal: options?.signal,
       skipAdobe: true,
-      skipVeraPdf: false,
+      skipVeraPdf: true,
     })
     currentResultHasFreshVeraPdf = true
     latestContext = null

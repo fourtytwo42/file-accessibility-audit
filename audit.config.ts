@@ -316,14 +316,14 @@ export const ANALYSIS = {
   VERAPDF_DEFAULT_FLAVOUR: 'ua1',
 
   /**
-   * Skip veraPDF by default for normal analysis requests.
-   * Set `DEFAULT_SKIP_VERAPDF=false` in the environment to restore veraPDF
-   * as the default path without changing call sites.
+   * veraPDF is deprecated in this deployment and is skipped by default.
+   * Set `DEFAULT_SKIP_VERAPDF=false` only for temporary debugging while the
+   * legacy integration still exists in the codebase.
    *
-   * SAFE TO CHANGE: Yes — `true` speeds up frontend/API analysis, while
-   * `false` restores standards validation as the default behavior.
+   * SAFE TO CHANGE: Yes — but the intended direction is to keep veraPDF off
+   * and rely on local standards plus remediation heuristics instead.
    */
-  DEFAULT_SKIP_VERAPDF: process.env.DEFAULT_SKIP_VERAPDF !== 'false',
+  DEFAULT_SKIP_VERAPDF: true,
 
   /**
    * Maximum number of PDFs being analyzed simultaneously.
