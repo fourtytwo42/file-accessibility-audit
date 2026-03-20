@@ -484,6 +484,42 @@ export const REMEDIATION = {
   MAX_NO_PROGRESS_STAGES: 2,
 
   /**
+   * Default reliability multiplier used when a tool has insufficient
+   * historical execution data for ranking.
+   *
+   * SAFE TO CHANGE: Yes — lower values make unproven tools rank later,
+   * higher values keep them closer to their static planner confidence.
+   */
+  TOOL_RELIABILITY_DEFAULT: 0.85,
+
+  /**
+   * Minimum number of historical attempts required before class-specific
+   * tool reliability can override the global tool fallback.
+   *
+   * SAFE TO CHANGE: Yes — lower values adapt faster, higher values reduce
+   * sensitivity to small-sample noise.
+   */
+  TOOL_RELIABILITY_MIN_ATTEMPTS: 3,
+
+  /**
+   * Minimum overall score at which deterministic replanning may stop early
+   * and hand off directly to the existing final cleanup batch.
+   *
+   * SAFE TO CHANGE: Yes — raise to be more conservative, lower to shortcut
+   * more aggressively into cleanup.
+   */
+  EARLY_EXIT_SCORE_THRESHOLD: 98,
+
+  /**
+   * Largest allowed targeted-category regression for a stage that still
+   * improves overall score or standards validation.
+   *
+   * SAFE TO CHANGE: Yes — lower values are stricter, higher values tolerate
+   * more localized regression in exchange for net forward progress.
+   */
+  NET_BENEFIT_MAX_CATEGORY_REGRESSION: 5,
+
+  /**
    * Maximum number of repeated Acrobat ownership repair passes allowed inside
    * a single remediation round while risks continue to shrink.
    *

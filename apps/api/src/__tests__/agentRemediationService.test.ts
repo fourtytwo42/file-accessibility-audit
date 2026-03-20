@@ -11,6 +11,30 @@ const generateSemanticRepairBatches = vi.fn()
 const isOcrAvailable = vi.fn()
 const ocrPdfToSearchablePdf = vi.fn()
 const runPdfStructureBackendBatch = vi.fn()
+const recordToolOutcomes = vi.fn()
+const classifyPdf = vi.fn(() => 'native_tagged')
+const buildFailureSignature = vi.fn(() => ({ failureModeKeys: [], pdfClass: 'tagged', hash: 'sig' }))
+const findUsablePlaybookBySignatureHash = vi.fn(() => null)
+const createPlaybookRun = vi.fn((input: any) => ({
+  id: 'playbook-run-1',
+  playbookId: input.playbook.id,
+  failureSignatureHash: input.failureSignature.hash,
+  pdfClass: input.failureSignature.pdfClass,
+  matchedExact: true,
+  outcome: 'pending',
+  initialScore: input.initialScore,
+  finalScore: null,
+  createdAt: '2026-03-20T00:00:00.000Z',
+  updatedAt: '2026-03-20T00:00:00.000Z',
+  completedAt: null,
+}))
+const finalizePlaybookRun = vi.fn((input: any) => ({
+  ...input.run,
+  outcome: input.outcome,
+  finalScore: input.finalScore,
+}))
+const learnFromSuccessfulRemediation = vi.fn()
+const deriveDeterministicCall = vi.fn()
 
 function makeVeraPdfResult(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
   return {
@@ -65,7 +89,6 @@ vi.mock('../services/pdfRemediationTools.js', () => ({
 
 vi.mock('../services/remediationPlanService.js', () => ({
   planRemediationActions,
-  heuristicFigureAltText: (_candidateId: string, _context: unknown) => 'Image related to County outcomes chart',
   TOOL_STAGE_ORDER: new Map([
     ['set_document_title', 1],
     ['normalize_document_metadata', 1],
@@ -102,11 +125,38 @@ vi.mock('../services/pdfStructureBackend.js', () => ({
   runPdfStructureBackendBatch,
 }))
 
+vi.mock('../services/toolReliabilityService.js', () => ({
+  recordToolOutcomes,
+  classifyPdf,
+}))
+
+vi.mock('../services/playbookService.js', () => ({
+  buildFailureSignature,
+  findUsablePlaybookBySignatureHash,
+  createPlaybookRun,
+  finalizePlaybookRun,
+  learnFromSuccessfulRemediation,
+}))
+
+vi.mock('../services/remediationCallDerivationService.js', () => ({
+  heuristicFigureAltText: (_candidateId: string, _context: unknown) => 'Image related to County outcomes chart',
+  deriveDeterministicCall,
+}))
+
 describe('agentRemediationService', { timeout: 15_000 }, () => {
   beforeEach(() => {
     vi.resetAllMocks()
     generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
     isOcrAvailable.mockResolvedValue(false)
+    classifyPdf.mockReturnValue('native_tagged')
+    buildFailureSignature.mockReturnValue({ failureModeKeys: [], pdfClass: 'tagged', hash: 'sig' })
+    findUsablePlaybookBySignatureHash.mockReturnValue(null)
+    deriveDeterministicCall.mockImplementation(({ opportunity }: any) => ({
+      tool_name: opportunity.toolName,
+      arguments: { target: 'document' },
+      rationale: opportunity.reason,
+      confidence: opportunity.confidence,
+    }))
     executeRemediationTool.mockResolvedValue({
       buffer: Buffer.from('pdf'),
       action: {
@@ -304,7 +354,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })
     expect(analyzePDF.mock.calls.at(-1)?.[2]?.inheritedVeraPdf).toBeUndefined()
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
-    expect(result.model.actions?.slice(0, 2).map(action => action.outcome)).toEqual(['applied', 'no_effect'])
+    expect(result.model.actions?.slice(0, 2).map(action => action.outcome)).toEqual(['applied', 'rejected'])
     expect(result.model.failureProfile?.version).toBe('1')
     expect(result.model.failureProfile?.toolOpportunities.length).toBeGreaterThanOrEqual(0)
     expect(result.model.plannerEvidence).toBeTruthy()
@@ -1530,7 +1580,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'native.pdf', originalResult)
 
-    expect(result.buffer.equals(Buffer.from('pdf-1'))).toBe(true)
+    expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
     expect(result.model.processingPath).toBe('agent_patch')
     expect(result.model.pathFallbacks).toEqual([])
     expect(result.finalResult.grade).toBe('F')
@@ -1958,6 +2008,507 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
     expect(result.finalResult.grade).toBe('A')
     expect(result.finalResult.verapdf.status).toBe('passed')
+  })
+
+  it('short-circuits additional deterministic replanning at 98+ and goes straight to final cleanup', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'early-exit.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 90,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 2,
+      }),
+      categories: [
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 90, grade: 'B', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'bookmarks', label: 'Bookmarks', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Early Exit', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    })
+
+    planRemediationActions.mockResolvedValueOnce({
+      done: false,
+      unresolvedIssues: ['reading_order'],
+      actions: [
+        { tool_name: 'normalize_annotation_tab_order', arguments: { target: 'document' }, rationale: 'Normalize tabs', confidence: 0.9 },
+      ],
+    })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-98'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'normalized',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    for (let i = 0; i < 5; i += 1) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-clean-final'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'cleanup',
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
+
+    analyzePDF
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 98,
+        grade: 'A',
+        categories: [
+          { ...originalResult.categories[0], score: 98, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[1] },
+        ],
+      })
+      .mockResolvedValue({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[1] },
+        ],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'early-exit.pdf', originalResult)
+
+    expect(planRemediationActions).toHaveBeenCalledTimes(1)
+    expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
+    expect(result.finalResult.overallScore).toBe(100)
+  })
+
+  it('uses an exact-match playbook fast path before calling the planner', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'playbook.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 60,
+      grade: 'D',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 3,
+      }),
+      categories: [
+        { id: 'title_language', label: 'Document Title & Language', weight: 0.15, score: 50, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: null, lang: '' },
+      qpdf: { lang: '', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, hasMarkInfo: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    })
+
+    findUsablePlaybookBySignatureHash.mockReturnValue({
+      id: 'playbook-1',
+      failureSignatureHash: 'sig',
+      failureModeKeys: ['category.title_language'],
+      pdfClass: 'untagged',
+      toolSequence: [{ tool: 'set_document_title', scope: 'document', stage: 1 }],
+      hasImages: false,
+      hasForms: false,
+      hasTables: false,
+      pageCountRange: 'small',
+      initialScore: 60,
+      finalScore: 100,
+      successCount: 2,
+      failureCount: 0,
+      totalAttempts: 2,
+      avgRounds: 1,
+      status: 'validated',
+      createdAt: '2026-03-20T00:00:00.000Z',
+      updatedAt: '2026-03-20T00:00:00.000Z',
+      lastUsedAt: null,
+    } as any)
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-playbook'),
+        action: {
+          tool: 'set_document_title',
+          target: 'document',
+          details: 'title updated',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['title_language'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    for (let i = 0; i < 5; i += 1) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-playbook'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'cleanup',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
+
+    analyzePDF
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        ],
+      })
+      .mockResolvedValue({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        ],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'playbook.pdf', originalResult)
+
+    expect(findUsablePlaybookBySignatureHash).toHaveBeenCalledWith('sig')
+    expect(planRemediationActions).not.toHaveBeenCalled()
+    expect(createPlaybookRun).toHaveBeenCalled()
+    expect(finalizePlaybookRun).toHaveBeenCalled()
+    expect(result.finalResult.grade).toBe('A')
+  })
+
+  it('falls back to the planner when an exact-match playbook does not finish remediation', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'playbook-fallback.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 60,
+      grade: 'D',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 3,
+      }),
+      categories: [
+        { id: 'title_language', label: 'Document Title & Language', weight: 0.15, score: 50, grade: 'F', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: null, lang: '' },
+      qpdf: { lang: '', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, hasMarkInfo: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    })
+
+    findUsablePlaybookBySignatureHash.mockReturnValue({
+      id: 'playbook-2',
+      failureSignatureHash: 'sig',
+      failureModeKeys: ['category.title_language'],
+      pdfClass: 'untagged',
+      toolSequence: [{ tool: 'set_document_title', scope: 'document', stage: 1 }],
+      hasImages: false,
+      hasForms: false,
+      hasTables: false,
+      pageCountRange: 'small',
+      initialScore: 60,
+      finalScore: 100,
+      successCount: 2,
+      failureCount: 0,
+      totalAttempts: 2,
+      avgRounds: 1,
+      status: 'validated',
+      createdAt: '2026-03-20T00:00:00.000Z',
+      updatedAt: '2026-03-20T00:00:00.000Z',
+      lastUsedAt: null,
+    } as any)
+
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('pdf-failed-playbook'),
+      action: {
+        tool: 'set_document_title',
+        target: 'document',
+        details: 'title updated',
+        confidence: 0.9,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['title_language'],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['title_language'],
+        actions: [{ tool_name: 'set_document_language', arguments: { language: 'en' }, rationale: 'planner fallback', confidence: 0.9 }],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    analyzePDF
+      .mockResolvedValueOnce(originalResult)
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        ],
+      })
+      .mockResolvedValue({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+        ],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'playbook-fallback.pdf', originalResult)
+
+    expect(finalizePlaybookRun).toHaveBeenCalledWith(expect.objectContaining({
+      outcome: 'failed',
+    }))
+    expect(planRemediationActions).toHaveBeenCalled()
+    expect(result.finalResult.grade).toBe('A')
+  })
+
+  it('accepts a non-native stage with positive net benefit despite a small targeted regression', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'net-benefit.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 97,
+      grade: 'A',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 2,
+      }),
+      categories: [
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.135, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 97, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Net Benefit', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: false, outlineCount: 0, structTreeDepth: 0 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [] },
+    })
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        done: false,
+        unresolvedIssues: ['reading_order'],
+        actions: [
+          { tool_name: 'set_document_title', arguments: { title: 'Net Benefit' }, rationale: 'adjust', confidence: 0.9 },
+        ],
+      })
+      .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-net-benefit'),
+        action: {
+          tool: 'set_document_title',
+          target: 'document',
+          details: 'title updated',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['heading_structure', 'reading_order'],
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    for (let i = 0; i < 5; i += 1) {
+      executeRemediationTool.mockResolvedValueOnce({
+        buffer: Buffer.from('pdf-net-benefit'),
+        action: {
+          tool: 'normalize_annotation_tab_order',
+          target: 'document',
+          details: 'cleanup',
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['reading_order'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+    }
+
+    analyzePDF
+      .mockResolvedValueOnce({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 96, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+        ],
+      })
+      .mockResolvedValue({
+        ...originalResult,
+        overallScore: 100,
+        grade: 'A',
+        verapdf: makeVeraPdfResult(),
+        categories: [
+          { ...originalResult.categories[0], score: 96, grade: 'A', severity: 'Pass' },
+          { ...originalResult.categories[1], score: 100, grade: 'A', severity: 'Pass' },
+        ],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'net-benefit.pdf', originalResult)
+
+    expect(result.model.rejectedActions || []).toHaveLength(0)
+    expect(result.model.actions?.some(action => action.tool === 'set_document_title' && action.outcome === 'applied')).toBe(true)
+    expect(result.finalResult.overallScore).toBe(100)
   })
 
   it('skips semantic AI when semantic categories are already all complete and no AI-first figures exist', async () => {
@@ -2405,10 +2956,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       readingOrderParentCandidates: [],
       structure: { structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Sect', orderIndex: 0 }] },
     }
-    inspectPdfForRemediation
-      .mockResolvedValueOnce(taggedContext)
-      .mockResolvedValueOnce(taggedContext)
-      .mockResolvedValueOnce(taggedContext)
+    inspectPdfForRemediation.mockResolvedValue(taggedContext)
 
     planRemediationActions
       .mockResolvedValueOnce({
@@ -2447,7 +2995,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           { ruleId: 'rule-note', specification: null, clause: null, testNumber: null, location: null, message: 'Note tag shall have ID entry', categoryIds: [] },
         ],
       }),
-    })
+    }).mockResolvedValue(originalResult)
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'tagged.pdf', originalResult)
 

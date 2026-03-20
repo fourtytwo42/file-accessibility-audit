@@ -111,6 +111,65 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_queue_items_client ON queue_items(client_id);
   CREATE INDEX IF NOT EXISTS idx_queue_items_client_state ON queue_items(client_id, state);
   CREATE INDEX IF NOT EXISTS idx_queue_items_expires ON queue_items(expires_at);
+
+  CREATE TABLE IF NOT EXISTS tool_outcomes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tool_name TEXT NOT NULL,
+    pdf_class TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    round_number INTEGER NOT NULL,
+    stage_number INTEGER NOT NULL,
+    overall_score_before INTEGER,
+    overall_score_after INTEGER,
+    category_deltas_json TEXT,
+    reliability_success INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_tool_outcomes_tool ON tool_outcomes(tool_name);
+  CREATE INDEX IF NOT EXISTS idx_tool_outcomes_tool_pdf_class ON tool_outcomes(tool_name, pdf_class);
+
+  CREATE TABLE IF NOT EXISTS playbook_entries (
+    id TEXT PRIMARY KEY,
+    failure_signature_hash TEXT NOT NULL,
+    failure_mode_keys TEXT NOT NULL,
+    pdf_class TEXT NOT NULL,
+    tool_sequence TEXT NOT NULL,
+    has_images INTEGER NOT NULL DEFAULT 0,
+    has_forms INTEGER NOT NULL DEFAULT 0,
+    has_tables INTEGER NOT NULL DEFAULT 0,
+    page_count_range TEXT NOT NULL DEFAULT 'medium',
+    initial_score INTEGER NOT NULL,
+    final_score INTEGER NOT NULL,
+    success_count INTEGER NOT NULL DEFAULT 1,
+    failure_count INTEGER NOT NULL DEFAULT 0,
+    total_attempts INTEGER NOT NULL DEFAULT 1,
+    avg_rounds REAL NOT NULL DEFAULT 1.0,
+    status TEXT NOT NULL DEFAULT 'candidate',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_used_at DATETIME
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_playbook_sig ON playbook_entries(failure_signature_hash);
+  CREATE INDEX IF NOT EXISTS idx_playbook_status ON playbook_entries(status);
+
+  CREATE TABLE IF NOT EXISTS playbook_runs (
+    id TEXT PRIMARY KEY,
+    playbook_id TEXT NOT NULL,
+    failure_signature_hash TEXT NOT NULL,
+    pdf_class TEXT NOT NULL,
+    matched_exact INTEGER NOT NULL DEFAULT 1,
+    outcome TEXT NOT NULL DEFAULT 'pending',
+    initial_score INTEGER NOT NULL,
+    final_score INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME,
+    FOREIGN KEY (playbook_id) REFERENCES playbook_entries(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_playbook_runs_playbook ON playbook_runs(playbook_id);
 `)
 
 function ensureColumn(table: string, column: string, definition: string): void {
@@ -151,5 +210,7 @@ ensureColumn('queue_items', 'path_fallbacks_json', 'TEXT')
 ensureColumn('queue_items', 'adobe_summary_json', 'TEXT')
 ensureColumn('queue_items', 'original_adobe_summary_json', 'TEXT')
 ensureColumn('queue_items', 'rebuilt_adobe_summary_json', 'TEXT')
+ensureColumn('tool_outcomes', 'playbook_id', 'TEXT')
+ensureColumn('tool_outcomes', 'playbook_run_id', 'TEXT')
 
 export default db

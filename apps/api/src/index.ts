@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js'
 import analyzeRoutes from './routes/analyze.js'
 import reportsRoutes from './routes/reports.js'
 import logsRoutes from './routes/logs.js'
+import playbooksRoutes from './routes/playbooks.js'
 import queueRoutes from './routes/queue.js'
 import { recoverInterruptedProcessing } from './services/queueManager.js'
 import { cleanupExpiredQueueItems, failStaleUploads } from './services/queueStore.js'
@@ -72,6 +73,7 @@ app.use('/api', queueRoutes)
 app.use('/api', analyzeRoutes)
 app.use('/api', reportsRoutes)
 app.use('/api', logsRoutes)
+app.use('/api', playbooksRoutes)
 
 // Health check — also serves as the root API response
 const startedAt = new Date()

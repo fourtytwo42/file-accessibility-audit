@@ -244,6 +244,70 @@ export interface ToolOpportunity {
   derivedFromFailureModeKeys: string[]
 }
 
+export type ToolReliabilitySource = 'tool_and_class' | 'tool_global' | 'default'
+
+export interface ToolReliabilitySummary {
+  toolName: RemediationToolName
+  pdfClass: 'scanned' | 'native_tagged' | 'partially_tagged' | 'untagged_digital' | 'form_heavy'
+  attempts: number
+  successes: number
+  reliability: number
+  source: ToolReliabilitySource
+}
+
+export type PlaybookPdfClass = 'tagged' | 'partially_tagged' | 'untagged' | 'scanned'
+export type PlaybookStatus = 'candidate' | 'validated' | 'hardened' | 'deprecated'
+export type PlaybookPageCountRange = 'small' | 'medium' | 'large'
+export type PlaybookRunOutcome = 'pending' | 'succeeded' | 'failed'
+
+export interface FailureSignature {
+  failureModeKeys: string[]
+  pdfClass: PlaybookPdfClass
+  hash: string
+}
+
+export interface PlaybookStep {
+  tool: RemediationToolName
+  scope: ToolOpportunityScope
+  stage: number
+}
+
+export interface PlaybookEntry {
+  id: string
+  failureSignatureHash: string
+  failureModeKeys: string[]
+  pdfClass: PlaybookPdfClass
+  toolSequence: PlaybookStep[]
+  hasImages: boolean
+  hasForms: boolean
+  hasTables: boolean
+  pageCountRange: PlaybookPageCountRange
+  initialScore: number
+  finalScore: number
+  successCount: number
+  failureCount: number
+  totalAttempts: number
+  avgRounds: number
+  status: PlaybookStatus
+  createdAt: string
+  updatedAt: string
+  lastUsedAt: string | null
+}
+
+export interface PlaybookRun {
+  id: string
+  playbookId: string
+  failureSignatureHash: string
+  pdfClass: PlaybookPdfClass
+  matchedExact: boolean
+  outcome: PlaybookRunOutcome
+  initialScore: number
+  finalScore: number | null
+  createdAt: string
+  updatedAt: string
+  completedAt: string | null
+}
+
 export interface PlannerEvidenceSummary {
   topFailureModeKeys: string[]
   topAutoRunnableOpportunityKeys: string[]
