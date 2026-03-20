@@ -707,7 +707,7 @@ function buildFigureCandidates(
   const explicitFigures = structure.figures
     .filter(figure => !((figure.childFigureCount || 0) > 0))
     .map((figure, index) => {
-    const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
+    const page = imagePages[index] || pages[index] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const informativeHint = figure.splitGenerated ? 'decorative' as const : (surroundingText.length > 0 ? 'informative' as const : 'unknown' as const)
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
@@ -744,7 +744,7 @@ function buildFigureCandidates(
     }
     })
   const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
-    const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
+    const page = imagePages[index] || pages[index] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
     const evidence = (page?.imageCount || 0) > 0 ? 'strong' as const : 'vector' as const
@@ -775,7 +775,7 @@ function buildFigureCandidates(
     .map((image, index) => ({ image, index }))
     .filter(({ image }) => !!image.ref && !explicitRefs.has(image.ref) && !nestedFigureContainerRefs.has(image.ref))
     .map(({ image, index }) => {
-      const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || pages[0] || null
+      const page = imagePages[index] || pages[index] || null
       const imageFallback = image.ref || null
       const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
       const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const

@@ -1319,7 +1319,6 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       entry.targetTag === '/P'
       && entry.imageEvidence === 'strong'
       && entry.repairMode === 'retag_then_set_alt')
-
     expect(candidate).toBeTruthy()
   }, 120_000)
 
