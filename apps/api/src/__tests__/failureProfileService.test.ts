@@ -355,6 +355,7 @@ describe('failureProfileService', () => {
     const context = makeContext({ analysis })
     context.qpdf.hasLang = false
     context.qpdf.lang = null
+    context.qpdf.type1FontsMissingToUnicode = 3
 
     const result = buildFailureProfileArtifacts({
       analysis,
@@ -366,6 +367,7 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.font_unicode' && mode.source === 'local_standards')).toBe(true)
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'pdfua.bookmark_language' && mode.source === 'local_standards')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_font_unicode_maps')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_type1_font_unicode_maps')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'replace_bookmarks_from_headings')).toBe(true)
   })
 

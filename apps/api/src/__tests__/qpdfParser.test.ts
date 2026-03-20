@@ -247,6 +247,47 @@ describe('analyzeWithQpdf', () => {
     expect(result.metadataSubtypeXml).toBe(true)
   })
 
+  it('counts Type1 and Type3 fonts that are still missing ToUnicode maps', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type1',
+            '/BaseFont': '/ABCDEE+GillSans',
+            '/Encoding': '/WinAnsiEncoding',
+            '/FontDescriptor': 'obj:11 0 R',
+          },
+        },
+        'obj:11 0 R': { value: { '/Type': '/FontDescriptor', '/FontFile': 'obj:12 0 R' } },
+        'obj:20 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type3',
+            '/BaseFont': '/XYZABC+LegacyType3',
+            '/Encoding': '/WinAnsiEncoding',
+            '/FontDescriptor': 'obj:21 0 R',
+          },
+        },
+        'obj:21 0 R': { value: { '/Type': '/FontDescriptor', '/FontFile3': 'obj:22 0 R' } },
+        'obj:30 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/TrueType',
+            '/BaseFont': '/ABCDEE+Arial',
+            '/Encoding': '/WinAnsiEncoding',
+            '/FontDescriptor': 'obj:31 0 R',
+          },
+        },
+        'obj:31 0 R': { value: { '/Type': '/FontDescriptor', '/FontFile2': 'obj:32 0 R' } },
+      },
+    })
+
+    expect(result.fontsMissingToUnicode).toBe(3)
+    expect(result.type1FontsMissingToUnicode).toBe(2)
+  })
+
   it('detects Image XObjects from QPDF v2 stream objects (no value wrapper)', () => {
     const result = parseQpdfJson({
       objects: {

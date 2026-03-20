@@ -47,6 +47,28 @@
   - `pnpm exec vitest run src/__tests__/localStandardsService.test.ts src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts`
   - `pnpm exec tsc --noEmit`
 
+### Loop 1 Rerun After Fix Set 1
+
+- Second queue item: `ef6a1748-a92d-4666-bd11-fbb8c98d53e3`
+- Rerun result: `82/B`
+- Improvement vs first remediated run: `63 -> 82`
+- Remaining blockers after fix set 1:
+  - `pdfua.font_unicode`: reduced from `13` to `7`, now the dominant blocker
+  - `text_extractability`: still capped at `40` because local standards still map the remaining Unicode failures into this category
+  - `pdf_ua_compliance`: now `70`, driven almost entirely by the remaining `7` Type1 font Unicode failures
+- Concrete diagnosis from downloaded remediated artifact:
+  - all remaining missing `/ToUnicode` maps are `Type1` fonts
+  - the generic `repair_font_unicode_maps` fixed the TrueType subset fonts
+  - the planner still did not run `repair_type1_font_unicode_maps` because its trigger was tied to document length rather than actual Type1 evidence
+
+### System Fix in Progress 2
+
+- Added a `type1FontsMissingToUnicode` signal to `qpdfService`.
+- Updated `failureProfileService` so `repair_type1_font_unicode_maps` is offered whenever actual Type1/Type3 fonts remain without `/ToUnicode`, even on small PDFs.
+- Verification:
+  - `pnpm exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/failureProfileService.test.ts src/__tests__/localStandardsService.test.ts src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts`
+  - `pnpm exec tsc --noEmit`
+
 ## Pattern Notes
 
 - Early small legacy PDFs may cluster around this pattern:

@@ -825,13 +825,15 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   if (
-    input.analysis.pageCount >= 10
-    && failureModeByKey.has('pdfua.font_unicode')
+    failureModeByKey.has('pdfua.font_unicode')
+    && ((input.context.qpdf.type1FontsMissingToUnicode ?? 0) > 0 || input.analysis.pageCount >= 10)
     && !failureModeByKey.has('pdfua.type1_unicode')
   ) {
     addOpportunity(opportunities, {
       toolName: 'repair_type1_font_unicode_maps',
-      reason: 'Large legacy PDFs with persistent font Unicode failures often need a Type1/Type3-specific Unicode recovery pass.',
+      reason: (input.context.qpdf.type1FontsMissingToUnicode ?? 0) > 0
+        ? `Detected ${(input.context.qpdf.type1FontsMissingToUnicode ?? 0)} Type1/Type3 font object(s) still missing ToUnicode maps, so a Type1/Type3-specific Unicode recovery pass is warranted.`
+        : 'Large legacy PDFs with persistent font Unicode failures often need a Type1/Type3-specific Unicode recovery pass.',
       scope: 'document',
       candidateIds: [],
       candidateGroupIds: [],

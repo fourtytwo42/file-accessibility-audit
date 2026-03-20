@@ -35,6 +35,7 @@ export interface QpdfResult {
   fontCount?: number
   unembeddedFontCount?: number
   fontsMissingToUnicode?: number
+  type1FontsMissingToUnicode?: number
   cidFontsMissingCidToGidMap?: number
   cidSetRiskFontCount?: number
   cidSetExplicitFontCount?: number
@@ -98,6 +99,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         fontCount: 0,
         unembeddedFontCount: 0,
         fontsMissingToUnicode: 0,
+        type1FontsMissingToUnicode: 0,
         cidFontsMissingCidToGidMap: 0,
         cidSetRiskFontCount: 0,
         cidSetExplicitFontCount: 0,
@@ -140,6 +142,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       fontCount: 0,
       unembeddedFontCount: 0,
       fontsMissingToUnicode: 0,
+      type1FontsMissingToUnicode: 0,
       cidFontsMissingCidToGidMap: 0,
       cidSetRiskFontCount: 0,
       cidSetExplicitFontCount: 0,
@@ -181,6 +184,7 @@ export function parseQpdfJson(json: any): QpdfResult {
     fontCount: 0,
     unembeddedFontCount: 0,
     fontsMissingToUnicode: 0,
+    type1FontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
     cidSetRiskFontCount: 0,
     cidSetExplicitFontCount: 0,
@@ -362,7 +366,14 @@ export function parseQpdfJson(json: any): QpdfResult {
       if (isFontObject(o)) {
         result.fontCount = (result.fontCount ?? 0) + 1
         if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
-        if (!fontHasToUnicode(o, objects)) result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
+        const missingToUnicode = !fontHasToUnicode(o, objects)
+        if (missingToUnicode) {
+          result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
+          const subtype = String(o['/Subtype'] || '')
+          if (subtype === '/Type1' || subtype === '/Type3') {
+            result.type1FontsMissingToUnicode = (result.type1FontsMissingToUnicode ?? 0) + 1
+          }
+        }
         if (fontMissingCidToGidMap(o, objects)) result.cidFontsMissingCidToGidMap = (result.cidFontsMissingCidToGidMap ?? 0) + 1
         if (fontHasLegacyWidthRisk(o, objects)) result.legacyWidthRiskFontCount = (result.legacyWidthRiskFontCount ?? 0) + 1
       }
