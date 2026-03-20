@@ -1105,6 +1105,15 @@
   - role-mapped note IDs are now repairable in the Python backend
   - qpdf/classification now track unembedded `/Type3` fonts separately so they escalate into `needs_substitution`
 - Next step:
-  - commit/push the note + Type3 fix
-  - rebuild/restart the API
-  - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API
+  - rerun completed on queue item `dfb571a0-7d91-4a60-8f3a-44357546bfb4`
+  - result improved to `81/B`
+  - note repair landed exactly as expected: all six role-mapped note IDs were assigned and `reading_order` rose to `100`
+  - remaining blocker is planner starvation, not missing mutation support:
+    - the live rerun still spent its full 32-action budget on `set_link_annotation_contents`
+    - stronger document-scoped font actions (`repair_cidset_consistency`, `substitute_legacy_fonts_in_place`, `finalize_substituted_font_conformance`) never executed
+  - new shared fix prepared:
+    - deterministic planning now reserves an initial pass for document/page-scoped actions before candidate floods consume the action budget
+  - next step:
+    - commit/push the planner budget fix
+    - rebuild/restart the API
+    - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API again

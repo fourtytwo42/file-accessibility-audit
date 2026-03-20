@@ -358,4 +358,134 @@ describe('remediationPlanService', () => {
 
     expect(plan.actions.map(action => action.tool_name)).toEqual(['set_document_title'])
   })
+
+  it('reserves room for document-scoped fixes before candidate floods consume the action budget', async () => {
+    const candidateOpportunities = Array.from({ length: 40 }, (_, index) => ({
+      key: `link-${index}`,
+      toolName: 'set_link_annotation_contents',
+      reason: `Set link contents ${index}`,
+      scope: 'candidate',
+      candidateIds: [`link:1:${index}`],
+      candidateGroupIds: [],
+      pageNumbers: [1],
+      categoryTargets: ['link_quality'],
+      confidence: 0.9,
+      status: 'auto_runnable',
+      derivedFromFailureModeKeys: ['pdfua.annotation_alt_contents'],
+    }))
+
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'D',
+        analysisScore: 65,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 1,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'pdfua.annotation_alt_contents',
+            label: 'Link annotation alternate descriptions',
+            source: 'local_standards',
+            count: 40,
+            categoryIds: ['link_quality', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+          {
+            key: 'pdfua.font_embedding',
+            label: 'Font embedding',
+            source: 'local_standards',
+            count: 3,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          ...candidateOpportunities,
+          {
+            key: 'embed-fonts',
+            toolName: 'embed_missing_fonts_in_place',
+            reason: 'Embed missing fonts',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.85,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.font_embedding'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 2,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 41,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'crowded.pdf',
+      analysis: {
+        overallScore: 65,
+        grade: 'D',
+        isScanned: false,
+        pageCount: 4,
+        categories: [
+          { id: 'link_quality', label: 'Links', score: 40, severity: 'Critical' },
+          { id: 'text_extractability', label: 'Text', score: 40, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 60, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 3, formFields: [], unembeddedFontCount: 3 },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: candidateOpportunities.map((_, index) => ({
+          id: `link:1:${index}`,
+          pageNumber: 1,
+          annotationIndex: index,
+          rect: { x: 0.1, y: 0.1, width: 0.2, height: 0.02 },
+          url: `https://example.com/${index}`,
+          text: `Link ${index}`,
+          contents: null,
+          visibleText: `Link ${index}`,
+          nearbyText: [],
+        })),
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions).toHaveLength(32)
+    expect(plan.actions.some(action => action.tool_name === 'embed_missing_fonts_in_place')).toBe(true)
+  })
 })

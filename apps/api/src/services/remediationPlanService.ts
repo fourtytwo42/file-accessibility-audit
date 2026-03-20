@@ -216,6 +216,10 @@ function dedupeActions(actions: RemediationToolCall[]): RemediationToolCall[] {
   return next
 }
 
+function isCandidateFloodOpportunity(opportunity: ToolOpportunity): boolean {
+  return opportunity.scope === 'candidate' || opportunity.scope === 'candidate_group'
+}
+
 function isNativeTaggedSafeContext(context: PdfRemediationContext): boolean {
   return context.qpdf.hasStructTree
     && context.qpdf.structTreeDepth > 0
@@ -501,32 +505,40 @@ async function deterministicActions(input: {
   })
 
   let changed = true
-  while (changed && selected.length < MAX_ACTIONS) {
-    changed = false
-    for (const opportunity of orderedOpportunities) {
-      if (selected.length >= MAX_ACTIONS) break
-      if (selectedOpportunityKeys.has(opportunity.key)) continue
-      if (!isOpportunitySelectable({
-        opportunity,
-        analysis: input.analysis,
-        context: input.context,
-        actions: input.actions,
-        selectedActions: selected,
-        autoRunnableOpportunities,
-      })) {
-        continue
+  const selectionPasses = [
+    (opportunity: ToolOpportunity) => !isCandidateFloodOpportunity(opportunity),
+    (_opportunity: ToolOpportunity) => true,
+  ]
+  for (const includeOpportunity of selectionPasses) {
+    changed = true
+    while (changed && selected.length < MAX_ACTIONS) {
+      changed = false
+      for (const opportunity of orderedOpportunities) {
+        if (selected.length >= MAX_ACTIONS) break
+        if (!includeOpportunity(opportunity)) continue
+        if (selectedOpportunityKeys.has(opportunity.key)) continue
+        if (!isOpportunitySelectable({
+          opportunity,
+          analysis: input.analysis,
+          context: input.context,
+          actions: input.actions,
+          selectedActions: selected,
+          autoRunnableOpportunities,
+        })) {
+          continue
+        }
+        const call = buildDeterministicCall({
+          filename: input.filename,
+          analysis: input.analysis,
+          context: input.context,
+          opportunity,
+          selectedActions: selected,
+        })
+        if (!call) continue
+        selected.push(call)
+        selectedOpportunityKeys.add(opportunity.key)
+        changed = true
       }
-      const call = buildDeterministicCall({
-        filename: input.filename,
-        analysis: input.analysis,
-        context: input.context,
-        opportunity,
-        selectedActions: selected,
-      })
-      if (!call) continue
-      selected.push(call)
-      selectedOpportunityKeys.add(opportunity.key)
-      changed = true
     }
   }
 
