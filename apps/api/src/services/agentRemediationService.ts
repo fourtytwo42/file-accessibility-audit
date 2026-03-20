@@ -3251,6 +3251,55 @@ export async function remediatePdfWithAgent(
     latestContext = null
   }
 
+  const postAnalysisAltPassNeeded = !skipDirectToFinalCleanup
+    && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
+  if (postAnalysisAltPassNeeded) {
+    const postAnalysisAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+    const postAnalysisHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postAnalysisAltContext)
+      .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+
+    if (postAnalysisHeuristicFigureCandidates.length > 0) {
+      stagesRun.add(94)
+      const postAnalysisAltStageStartResult = currentResult
+      const postAnalysisAltStage = await runHeuristicFigureFallbackStage({
+        buffer: workingBuffer,
+        result: currentResult,
+        context: postAnalysisAltContext,
+        previousActionNames,
+        inspectionCache,
+      })
+      if (!postAnalysisAltStage.buffer.equals(workingBuffer)) {
+        workingBuffer = postAnalysisAltStage.buffer
+      }
+      currentResult = postAnalysisAltStage.result
+      currentResultHasFreshVeraPdf = !postAnalysisAltStage.usedInheritedVeraPdf
+      actions.push(...postAnalysisAltStage.actions)
+      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, postAnalysisAltStage.manualReviewFlags)
+      for (const action of postAnalysisAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...postAnalysisAltStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ]))
+      persistStageToolOutcomes(postAnalysisAltStage.actions, {
+        previous: postAnalysisAltStageStartResult,
+        next: currentResult,
+        roundNumber: round,
+        stageNumber: 94,
+        standardsImproved: standardsValidationImproved(postAnalysisAltStageStartResult, currentResult),
+      })
+      if (postAnalysisAltStage.actions.some(action => action.changedDocumentBytes)) {
+        currentResult = await analyzePDF(workingBuffer, filename, {
+          analysisProfile: 'full_final',
+          signal: options?.signal,
+          skipAdobe: true,
+          skipVeraPdf: true,
+        })
+        currentResultHasFreshVeraPdf = true
+      }
+      latestContext = null
+    }
+  }
+
   previousActionNames = Array.from(new Set([
     ...previousActionNames,
     ...finalCleanupActions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
