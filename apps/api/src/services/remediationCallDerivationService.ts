@@ -68,7 +68,7 @@ function headingLevelForCandidate(candidateId: string, context: PdfRemediationCo
 export function heuristicFigureAltText(candidateId: string, context: PdfRemediationContext): string {
   const candidate = context.figureCandidates.find(entry => entry.id === candidateId)
   if (!candidate) return 'Image'
-  if (candidate.splitGenerated || candidate.informativeHint !== 'informative') {
+  if (candidate.splitGenerated || candidate.informativeHint === 'decorative') {
     return `Decorative image on page ${candidate.pageNumber}`
   }
   if (candidate.surroundingText[0]) {

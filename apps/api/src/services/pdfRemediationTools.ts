@@ -214,7 +214,7 @@ export interface TableCandidate {
 }
 
 function bootstrapFigureAltText(candidate: FigureCandidate): string {
-  if (candidate.splitGenerated || candidate.informativeHint !== 'informative') {
+  if (candidate.splitGenerated || candidate.informativeHint === 'decorative') {
     return `Decorative image on page ${candidate.pageNumber}`
   }
   if (candidate.surroundingText[0]) {

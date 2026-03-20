@@ -214,7 +214,7 @@ function looksLikeStageBatchProseHeadingText(text: string): boolean {
 }
 
 function stageBatchBootstrapFigureAltText(candidate: PdfRemediationContext['figureCandidates'][number]): string {
-  if (candidate.splitGenerated || candidate.informativeHint !== 'informative') {
+  if (candidate.splitGenerated || candidate.informativeHint === 'decorative') {
     return `Decorative image on page ${candidate.pageNumber}`
   }
   if (candidate.surroundingText[0]) {
@@ -3199,6 +3199,46 @@ export async function remediatePdfWithAgent(
   })
 
   await runFinalResidualRepairs()
+
+  const postCleanupAltPassNeeded = !skipDirectToFinalCleanup
+    && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
+  if (postCleanupAltPassNeeded) {
+    const postCleanupAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+    const postCleanupHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postCleanupAltContext)
+      .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+
+    if (postCleanupHeuristicFigureCandidates.length > 0) {
+      stagesRun.add(93)
+      const postCleanupAltStageStartResult = currentResult
+      const postCleanupAltStage = await runHeuristicFigureFallbackStage({
+        buffer: workingBuffer,
+        result: currentResult,
+        context: postCleanupAltContext,
+        previousActionNames,
+        inspectionCache,
+      })
+      if (!postCleanupAltStage.buffer.equals(workingBuffer)) {
+        workingBuffer = postCleanupAltStage.buffer
+      }
+      currentResult = postCleanupAltStage.result
+      currentResultHasFreshVeraPdf = !postCleanupAltStage.usedInheritedVeraPdf
+      actions.push(...postCleanupAltStage.actions)
+      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, postCleanupAltStage.manualReviewFlags)
+      for (const action of postCleanupAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...postCleanupAltStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ]))
+      latestContext = await inspectRemediationContext(workingBuffer, currentResult)
+      persistStageToolOutcomes(postCleanupAltStage.actions, {
+        previous: postCleanupAltStageStartResult,
+        next: currentResult,
+        roundNumber: round,
+        stageNumber: 93,
+        standardsImproved: standardsValidationImproved(postCleanupAltStageStartResult, currentResult),
+      })
+    }
+  }
 
   if (!workingBuffer.equals(originalBuffer)) {
     currentResult = await analyzePDF(workingBuffer, filename, {
