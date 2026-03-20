@@ -109,6 +109,38 @@
   - bootstrap succeeds partially, but local standards still do not recognize enough semantic image/figure structure afterward
   - custom Type1 subset glyph names like `G8b` may survive the generic Unicode pass and need a deterministic hexadecimal fallback in the Type1 repair path
 
+## Active PDF Loop: `SPTDVoga.pdf`
+
+- Selected PDF: `Downloads/SPTDVoga.pdf`
+- Selection method: next random pick from `find Downloads -size -700k | shuf`
+- File size: `368165` bytes
+- First queue item: `eaea85da-2c62-45d2-8c20-d34a5360e039`
+- Initial result: `32/F`
+- First remediated result: `76/C`
+- Current status: needs shared legacy Type1 font-program embedding fix before rerun
+
+### Findings
+
+- veraPDF remained intentionally unavailable throughout the run.
+- The strongest remaining debt is concentrated in five legacy Type1 fonts that are still unembedded:
+  - `/GillSans`
+  - `/GillSans-Bold`
+  - `/GillSans-BoldItalic`
+  - `/GillSans-Italic`
+  - `/NewCenturySchlbk-Bold`
+- The remediated artifact already has `/ToUnicode` on these fonts, so the gap is no longer Unicode derivation; it is font-program embedding.
+- The existing helper already had a legacy substitute map for New Century Schoolbook, but `embed_missing_fonts_in_place` was not using that substitute map for this path.
+- The Gill Sans family had no substitute entries at all, even though local Arial-based substitutes are available on the host.
+
+### System Fix In Progress
+
+- Added Gill Sans family mappings to `LEGACY_FONT_SUBSTITUTES` in `pdf_structure_helper.py`.
+- Updated `embed_missing_fonts_in_place` to consult `legacy_substitute_font_name()` when no exact local font file exists, instead of only using exact-file and narrow fallback paths.
+- Added a regression on `Downloads/SPTDVoga.pdf` proving `embed_missing_fonts_in_place` reduces the unembedded font count for this small legacy Type1 family.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'embeds legacy Type1 substitute fonts on small Gill Sans PDFs|repairs legacy Gxx subset glyph names in small Distiller PDFs'`
+  - `pnpm --filter api exec tsc --noEmit`
+
 ## Active PDF Loop 2
 
 - Selected PDF: `Downloads/2025FirearmProhibitorsReport-250626T19175938.pdf`
@@ -416,6 +448,80 @@
 - If it still stays below `95`, the next step is not another scoring change by default:
   - directly identify the one unresolved figure candidate
   - patch the late/final figure execution path so that last image gets alt text instead of only softening its score
+
+### Loop 5 Final Rerun After Fix 17
+
+- Third queue item: `52b0829d-9988-4fb3-b5af-ffb5310c21a7`
+- Final result: `96/A`
+- Improvement vs second remediated run: `91 -> 96`
+- Final state:
+  - `text_extractability=100`
+  - `pdf_ua_compliance=100`
+  - `alt_text=75`
+  - remaining local standards are only non-blocking `CIDSet` warnings
+- Reusable lesson:
+  - modern PDFMaker/Word reports can be near-complete while still carrying one residual image description miss plus many Acrobat-owned non-figure graphics wrappers
+  - that shape should not be scored like a total alt-text failure once figure coverage is already strong
+
+## Active PDF Loop 6
+
+- Selected PDF: `Downloads/Cook County DMR_Part I.pdf`
+- Selection method: next random pick from the current sub-700k pool
+- Current status: completed at `100/A`
+
+### Loop 6 Initial API Run
+
+- First queue item: `ed34e3a1-5faa-4e98-be2f-a0dcb552cb14`
+- Initial/remediated result: `23/F -> 100/A`
+- What this confirmed:
+  - the current shared system generalized cleanly to a 124-page legacy PDFWriter county report
+  - no new code changes were needed
+  - heading recovery, bookmark generation, tab normalization, table cleanup, decorative-graphic exclusion, and local standards all converged in one pass
+- Reusable lesson:
+  - the recent system changes are now strong enough that some long legacy reports can clear on the first remediation loop, which is exactly the compounding behavior we want
+
+## Active PDF Loop 7
+
+- Selected PDF: `Downloads/GTF_Juvenile_Criminal_Records_072011.pdf`
+- Selection method: next random pick from the current sub-700k pool
+- Current status: completed at `97/A`
+
+### Loop 7 Initial API Run
+
+- First queue item: `0baca56c-f4cb-498f-8651-6f7a4401e591`
+- Initial/remediated result: `48/F -> 97/A`
+- What this confirmed:
+  - the current shared system generalized cleanly to a small InDesign-produced report/newsletter
+  - no new code changes were needed
+  - semantic figure fallback, heading normalization, and local standards all converged well enough on the first pass
+- Residual outcome:
+  - the file is over target at `97`
+  - remaining debt is just one unresolved image description while local standards are already clear
+- Reusable lesson:
+  - the current system is now handling several distinct small-PDF families above the user target on the first loop, which is exactly the compounding behavior the convergence work was meant to unlock
+
+## Active PDF Loop 8
+
+- Selected PDF: `Downloads/Redeploy Illinois Macon County.pdf`
+- Selection method: next random pick from the current sub-700k pool
+- Current status: completed at `100/A`
+
+### Loop 8 Initial API Run
+
+- First queue item: `aa98c67f-8705-4c11-af2b-2ea53538fc3c`
+- Initial/remediated result: `28/F -> 100/A`
+- What this confirmed:
+  - the current shared system generalized cleanly to another long Distiller-era county report
+  - no new code changes were needed
+  - heading recovery, bookmarks, tab normalization, and local standards all converged in one pass
+- Reusable lesson:
+  - the current system is now clearing multiple long county/government report families on the first pass, not just short modern PDFs
+
+## Active PDF Loop 9
+
+- Selected PDF: `Downloads/SPTDVoga.pdf`
+- Selection method: next random pick from the current sub-700k pool
+- Current status: selected for the next API grade/remediate/grade loop
 
 - Stopped unmatched figure candidates from inheriting arbitrary last-page text context in `buildFigureCandidates()`. When a figure ref cannot be tied to a real image-bearing page, the inspection path now leaves that context empty instead of borrowing unrelated prose from the last page.
 - Real-artifact spot check on `firearm-prohibitors-remediated-v5.pdf` after this code change showed the strong `/P` backlog shift from `1 retaggable / 12 deferred` to `8 retaggable / 5 deferred`, confirming the stray page-context bug was real.

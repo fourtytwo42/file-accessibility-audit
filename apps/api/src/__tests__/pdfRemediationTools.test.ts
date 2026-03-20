@@ -1310,6 +1310,30 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.fontsMissingToUnicode).toBeLessThan(beforeQpdf.fontsMissingToUnicode ?? 0)
   }, 120_000)
 
+  it('embeds legacy Type1 substitute fonts on small Gill Sans PDFs', async () => {
+    const buffer = await loadRepoDownload('SPTDVoga.pdf')
+    const beforeQpdf = await analyzeWithQpdf(buffer)
+    const before = await analyzePDF(buffer, 'SPTDVoga.pdf')
+    const context = await inspectPdfForRemediation(buffer, before)
+
+    expect(beforeQpdf.unembeddedFontCount).toBeGreaterThan(0)
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'embed_missing_fonts_in_place',
+        arguments: { target: 'document' },
+        rationale: 'Embed substitute programs for legacy Type1 fonts with no exact local font file.',
+        confidence: 0.9,
+      },
+    })
+
+    const afterQpdf = await analyzeWithQpdf(result.buffer)
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+    expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
+  }, 120_000)
+
   it('promotes strong image-backed paragraph figure candidates in recent tagged reports', async () => {
     const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
     const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')

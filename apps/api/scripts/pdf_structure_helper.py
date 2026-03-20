@@ -156,6 +156,11 @@ EMBEDDABLE_FONT_FILES = {
 }
 
 LEGACY_FONT_SUBSTITUTES = {
+    # Gill Sans family (humanist sans → Arial/Segoe-like sans)
+    "/GillSans": "/ArialMT",
+    "/GillSans-Bold": "/Arial-BoldMT",
+    "/GillSans-Italic": "/Arial-ItalicMT",
+    "/GillSans-BoldItalic": "/Arial-BoldItalicMT",
     # Optima family (humanist sans → Noto Sans)
     "/Optima": "/SegoeUI-Regular",
     "/Optima-Bold": "/SegoeUI-Bold",
@@ -5897,6 +5902,20 @@ def mutate_embed_missing_fonts_in_place(pdf, mutation):
             fallback_score = None
             if not font_path and subtype == "/TrueType":
                 fallback_name, font_path, fallback_width_map, fallback_score = best_embeddable_fallback_for_font(font, metrics_cache)
+            if not font_path:
+                fallback_name = legacy_substitute_font_name(base_font)
+                font_path = font_file_path(fallback_name) if fallback_name else None
+                if font_path:
+                    font_ref = ref_string(font) or str(id(font))
+                    encoding_map, glyph_name_map, used_codes = derive_encoding_map_for_used_codes(font, font_ref, used_codes_by_font)
+                    if used_codes:
+                        cache_key = str(font_path)
+                        metrics = metrics_cache.get(cache_key)
+                        if metrics is None:
+                            metrics = parse_ttf_metrics(font_path)
+                            metrics_cache[cache_key] = metrics
+                        if metrics and encoding_map:
+                            fallback_width_map = derive_width_map(metrics, encoding_map, glyph_name_map)
             if not font_path:
                 font_ref = ref_string(font) or str(id(font))
                 used_codes = sorted(used_codes_by_font.get(font_ref, set()))
