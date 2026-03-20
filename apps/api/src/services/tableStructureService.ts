@@ -21,7 +21,14 @@ export interface TableStructureResult {
   detectedTables: number | null
   taggedTables: number
   untaggedTables: number | null
-  tableDetails: Array<{ tableIndex: number; rows: number; cols: number }>
+  highConfidenceUntaggedTables?: number | null
+  advisoryUntaggedTables?: number | null
+  tableDetails: Array<{
+    tableIndex: number
+    rows: number
+    cols: number
+    confidence?: 'high' | 'low'
+  }>
   warnings: string[]
 }
 
@@ -61,6 +68,8 @@ export async function analyzeTableStructure(
         detectedTables: null,
         taggedTables: taggedTableCount,
         untaggedTables: null,
+        highConfidenceUntaggedTables: null,
+        advisoryUntaggedTables: null,
         tableDetails: [],
         warnings: raw.warnings ?? [],
       }
@@ -71,6 +80,8 @@ export async function analyzeTableStructure(
         detectedTables: null,
         taggedTables: taggedTableCount,
         untaggedTables: null,
+        highConfidenceUntaggedTables: null,
+        advisoryUntaggedTables: null,
         tableDetails: [],
         warnings: raw.warnings ?? [],
       }
@@ -81,10 +92,13 @@ export async function analyzeTableStructure(
       detectedTables: raw.detected_tables ?? null,
       taggedTables: raw.tagged_tables ?? taggedTableCount,
       untaggedTables: raw.untagged_tables ?? null,
+      highConfidenceUntaggedTables: raw.high_confidence_untagged_tables ?? raw.untagged_tables ?? null,
+      advisoryUntaggedTables: raw.advisory_untagged_tables ?? 0,
       tableDetails: (raw.table_details ?? []).map((t: any) => ({
         tableIndex: t.table_index,
         rows: t.rows,
         cols: t.cols,
+        confidence: t.confidence === 'low' ? 'low' : 'high',
       })),
       warnings: raw.warnings ?? [],
     }
@@ -100,6 +114,8 @@ export async function analyzeTableStructure(
         detectedTables: null,
         taggedTables: taggedTableCount,
         untaggedTables: null,
+        highConfidenceUntaggedTables: null,
+        advisoryUntaggedTables: null,
         tableDetails: [],
         warnings: ['Table structure analysis timed out.'],
       }
@@ -109,6 +125,8 @@ export async function analyzeTableStructure(
       detectedTables: null,
       taggedTables: taggedTableCount,
       untaggedTables: null,
+      highConfidenceUntaggedTables: null,
+      advisoryUntaggedTables: null,
       tableDetails: [],
       warnings: [err?.message ?? 'Unknown error'],
     }

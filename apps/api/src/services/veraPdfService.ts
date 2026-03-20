@@ -78,7 +78,7 @@ export function emptyVeraPdfResult(overrides: Partial<VeraPdfResult> = {}): Vera
     passedChecks: 0,
     failedChecks: 0,
     failures: [],
-    message: 'veraPDF validation is deprecated and disabled.',
+    message: 'veraPDF validation is unavailable.',
     ...overrides,
   }
 }

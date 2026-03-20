@@ -67,7 +67,7 @@ export interface HeadingCandidate {
 
 const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
 const UNSAFE_HEADING_TAGS = ['/Link', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
-const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Shape', '/InlineShape'] as const
+const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Shape', '/InlineShape', '/Normal'] as const
 const UNSAFE_FIGURE_TAGS = ['/TD', '/TH', '/TR', '/Table', '/TOCI', '/TOC', '/Link', '/L', '/LI'] as const
 const LEGACY_HEADING_TAG_RE = /^\/heading\s+(\d+)$/i
 const WINDOWS_FONT_CANDIDATES = [
@@ -163,7 +163,7 @@ export interface FigureCandidate {
   parentTagPath?: string[]
   pageImageCount: number
   textDensityHint: 'low' | 'medium' | 'high'
-  imageEvidence: 'strong' | 'weak'
+  imageEvidence: 'strong' | 'vector' | 'weak'
   containsText?: boolean
   splitGenerated?: boolean
   splitSourceRef?: string | null
@@ -616,7 +616,7 @@ function buildFigureCandidates(
         targetTag,
         parentTagPath,
         unsafeReason: imageEvidence === 'weak'
-          ? 'no_image_evidence: Figure candidate did not map to an editable structure element with strong image evidence.'
+          ? 'no_figure_evidence: Figure candidate did not map to an editable structure element with strong figure evidence.'
           : 'Figure candidate did not map to an editable structure element.',
       }
     }
@@ -661,12 +661,13 @@ function buildFigureCandidates(
       }
     }
     if (targetTag && SAFE_FIGURE_TAGS.includes(targetTag as (typeof SAFE_FIGURE_TAGS)[number])) {
-      if (pageImageCount <= 0 || imageEvidence !== 'strong') {
+      const hasStrongFigureEvidence = imageEvidence === 'strong' || imageEvidence === 'vector'
+      if ((!hasStrongFigureEvidence) || (pageImageCount <= 0 && imageEvidence !== 'vector')) {
         return {
           repairMode: 'defer' as const,
           targetTag,
           parentTagPath,
-          unsafeReason: `no_image_evidence: Target ${targetRef} does not have strong enough image evidence for automatic figure retagging.`,
+          unsafeReason: `no_figure_evidence: Target ${targetRef} does not have strong enough figure evidence for automatic figure retagging.`,
         }
       }
       if (textDensityHint === 'high' && targetTag !== '/TextBox' && surroundingText.join(' ').length > 220) {
@@ -736,7 +737,8 @@ function buildFigureCandidates(
     const page = imagePages[index] || pages[Math.min(index, pages.length - 1)] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
-    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, 'strong', surroundingText.length > 0 ? 'informative' as const : 'unknown' as const, false, null, false)
+    const evidence = (page?.imageCount || 0) > 0 ? 'strong' as const : 'vector' as const
+    const classification = classifyFigureTarget(node.ref, page?.imageCount || 0, surroundingText, textDensityHint, evidence, surroundingText.length > 0 ? 'informative' as const : 'unknown' as const, false, null, false)
     return {
       id: `figure:image-node:${index + 1}`,
       pageNumber: page?.pageNumber || 1,
@@ -752,7 +754,7 @@ function buildFigureCandidates(
       parentTagPath: classification.parentTagPath,
       pageImageCount: page?.imageCount || 0,
       textDensityHint,
-      imageEvidence: 'strong' as const,
+      imageEvidence: evidence,
       containsText: !!node.hasText,
     }
   })
@@ -773,7 +775,9 @@ function buildFigureCandidates(
           .filter(node => [...SAFE_FIGURE_TAGS, '/Figure', '/TD', '/TOCI'].includes(node.tag as any))
           [index] || null
       const targetRef = structuralFallback?.ref || imageFallback || null
-      const imageEvidence = structuralFallback || image.ref ? 'strong' as const : 'weak' as const
+      const imageEvidence = structuralFallback?.tag && !image.ref
+        ? 'vector' as const
+        : (structuralFallback || image.ref ? 'strong' as const : 'weak' as const)
       const classification = classifyFigureTarget(targetRef, page?.imageCount || 0, surroundingText, textDensityHint, imageEvidence, surroundingText.length ? 'informative' as const : 'unknown' as const)
       return {
         id: `figure:${explicitFigures.length + index + 1}`,
@@ -808,7 +812,9 @@ function buildFigureCandidates(
     const targetRef = structuralFallback?.ref || imageFallback || null
     const surroundingText = page.textLines.slice(0, 4).map(line => line.text)
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
-    const imageEvidence = structuralFallback ? 'strong' as const : 'weak' as const
+    const imageEvidence = structuralFallback?.tag && !imageFallback
+      ? 'vector' as const
+      : (structuralFallback ? 'strong' as const : 'weak' as const)
     const classification = classifyFigureTarget(targetRef, page.imageCount, surroundingText, textDensityHint, imageEvidence, page.textLines.length ? 'informative' as const : 'unknown' as const)
     return {
       id: `figure:${index + 1}`,

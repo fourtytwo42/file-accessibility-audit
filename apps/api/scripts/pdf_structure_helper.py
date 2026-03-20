@@ -18,8 +18,8 @@ except Exception:
 
 
 HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Sect", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
-FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct", "/Shape", "/InlineShape"}
-SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Shape", "/InlineShape"}
+FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct", "/Shape", "/InlineShape", "/Normal"}
+SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Shape", "/InlineShape", "/Normal"}
 UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link", "/L", "/LI"}
 FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/P", "/Span", "/Div", "/NonStruct", "/TextBox"}
 LEGACY_HEADING_TAG_RE = re.compile(r"^/heading\s+(\d+)$", re.IGNORECASE)
@@ -948,6 +948,8 @@ def page_mcid_usage(page_obj):
                     "splitSafe": False,
                     "graphicsLikelyDecorative": False,
                     "operatorPattern": None,
+                    "textOpCount": 0,
+                    "graphicsOpCount": 0,
                 })
             continue
         if operator == "EMC":
@@ -968,11 +970,15 @@ def page_mcid_usage(page_obj):
                 "splitSafe": False,
                 "graphicsLikelyDecorative": False,
                 "operatorPattern": None,
+                "textOpCount": 0,
+                "graphicsOpCount": 0,
             })
             if has_text:
                 entry["hasText"] = True
+                entry["textOpCount"] = int(entry.get("textOpCount") or 0) + 1
             if has_graphics:
                 entry["hasGraphics"] = True
+                entry["graphicsOpCount"] = int(entry.get("graphicsOpCount") or 0) + 1
     return usage
 
 
@@ -1133,6 +1139,8 @@ def page_mcid_analysis(page_obj):
             "splitSafe": False,
             "graphicsLikelyDecorative": False,
             "operatorPattern": None,
+            "textOpCount": 0,
+            "graphicsOpCount": 0,
         })
         entry["splitSafe"] = bool(split_info["splitSafe"])
         entry["graphicsLikelyDecorative"] = bool(split_info["graphicsLikelyDecorative"])
@@ -1171,6 +1179,10 @@ def image_struct_candidates(pdf):
             "parentTagPath": parent_tag_path(obj),
             "mcids": mcids,
             "hasText": has_text,
+            "graphicsDominant": (
+                sum(int(usage.get(mcid, {}).get("graphicsOpCount") or 0) for mcid in mcids)
+                >= max(3, sum(int(usage.get(mcid, {}).get("textOpCount") or 0) for mcid in mcids) * 3)
+            ),
         }
         key = (page_ref, tuple(mcids))
         current = candidates.get(key)
@@ -1220,9 +1232,21 @@ def struct_elem_mcid_info(pdf):
         has_text = any(usage.get(mcid, {}).get("hasText") for mcid in mcids)
         direct_has_graphics = any(usage.get(mcid, {}).get("hasGraphics") for mcid in direct_mcids)
         direct_has_text = any(usage.get(mcid, {}).get("hasText") for mcid in direct_mcids)
+        direct_text_op_count = sum(int(usage.get(mcid, {}).get("textOpCount") or 0) for mcid in direct_mcids)
+        direct_graphics_op_count = sum(int(usage.get(mcid, {}).get("graphicsOpCount") or 0) for mcid in direct_mcids)
         split_safe = any(usage.get(mcid, {}).get("splitSafe") for mcid in mcids)
         graphics_likely_decorative = all(usage.get(mcid, {}).get("graphicsLikelyDecorative") for mcid in mcids) if has_graphics else False
         operator_pattern = next((usage.get(mcid, {}).get("operatorPattern") for mcid in mcids if usage.get(mcid, {}).get("operatorPattern")), None)
+        graphics_dominant = direct_has_graphics and (
+            not direct_has_text
+            or direct_graphics_op_count >= max(3, direct_text_op_count * 3)
+            or (
+                len(direct_mcids) == 1
+                and operator_pattern in {"graphics_then_text", "text_then_graphics"}
+                and direct_text_op_count <= 1
+                and direct_graphics_op_count >= 2
+            )
+        )
         entry = {
             "ref": ref_string(obj),
             "tag": tag,
@@ -1236,6 +1260,9 @@ def struct_elem_mcid_info(pdf):
             "directHasGraphics": direct_has_graphics,
             "splitSafe": split_safe,
             "graphicsLikelyDecorative": graphics_likely_decorative,
+            "graphicsDominant": graphics_dominant,
+            "textOpCount": direct_text_op_count,
+            "graphicsOpCount": direct_graphics_op_count,
             "operatorPattern": operator_pattern,
             "parentTagPath": parent_tag_path(obj),
         }
@@ -1271,7 +1298,15 @@ def acrobat_alt_risk_nodes(pdf):
         if duplicates:
             ownership_mode = "duplicate_mcid_ownership"
         elif entry.get("directHasText") and entry.get("directHasGraphics"):
-            ownership_mode = "mixed_text_graphics_same_mcid"
+            has_unsafe_ancestry = any(tag in UNSAFE_FIGURE_ANCESTRY for tag in (entry.get("parentTagPath") or []))
+            if (
+                entry.get("graphicsDominant")
+                and entry["tag"] in SAFE_FIGURE_RETAG_TAGS
+                and not has_unsafe_ancestry
+            ):
+                ownership_mode = "graphics_only_nonfigure"
+            else:
+                ownership_mode = "mixed_text_graphics_same_mcid"
         elif entry.get("directHasGraphics") and entry["tag"] != "/Figure":
             ownership_mode = "graphics_only_nonfigure"
         if entry["tag"] in ACROBAT_ALT_RISK_CONTAINER_TAGS and has_struct_children and entry.get("directMcids"):
@@ -1293,6 +1328,9 @@ def acrobat_alt_risk_nodes(pdf):
             "hasAlt": has_alt,
             "splitSafe": entry.get("splitSafe", False),
             "graphicsLikelyDecorative": entry.get("graphicsLikelyDecorative", False),
+            "graphicsDominant": entry.get("graphicsDominant", False),
+            "textOpCount": entry.get("textOpCount", 0),
+            "graphicsOpCount": entry.get("graphicsOpCount", 0),
             "operatorPattern": entry.get("operatorPattern"),
             "parentTagPath": entry["parentTagPath"],
             "ownershipMode": ownership_mode,
@@ -6731,10 +6769,10 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
         page_image_count = 0
     if text_density == "high" and before_tag != "/TextBox":
         return False, [], [f"text_heavy_candidate: Target {target_ref} appears text-heavy and is not safe to retag as /Figure."]
-    if image_evidence and image_evidence != "strong":
-        return False, [], [f"no_image_evidence: Target {target_ref} does not have strong enough image evidence for automatic figure retagging."]
-    if page_image_count <= 0:
-        return False, [], [f"no_image_evidence: Page context for {target_ref} does not indicate any renderable images."]
+    if image_evidence and image_evidence not in {"strong", "vector"}:
+        return False, [], [f"no_figure_evidence: Target {target_ref} does not have strong enough figure evidence for automatic figure retagging."]
+    if page_image_count <= 0 and image_evidence != "vector":
+        return False, [], [f"no_figure_evidence: Page context for {target_ref} does not indicate any renderable figure evidence."]
     if before_tag not in SAFE_FIGURE_RETAG_TAGS:
         if before_tag not in FIGURE_WRAP_TAGS:
             return False, [], [f"Target {target_ref} has tag {before_tag} and is not safe to retag as /Figure."]

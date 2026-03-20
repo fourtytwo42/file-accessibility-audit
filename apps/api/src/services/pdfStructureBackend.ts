@@ -67,7 +67,7 @@ export interface StructureBackendMutationRequest {
   altText?: string
   pageImageCount?: number
   textDensityHint?: 'low' | 'medium' | 'high'
-  imageEvidence?: 'strong' | 'weak'
+  imageEvidence?: 'strong' | 'vector' | 'weak'
   parentRef?: string
   orderedTargets?: string[]
   expectedDisorderBefore?: number
@@ -115,7 +115,7 @@ export interface StructureBackendMutationResult {
     splitSourceRef?: string | null
     splitSourceTag?: string | null
   }>
-  imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[]; hasText?: boolean }>
+  imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[]; hasText?: boolean; graphicsDominant?: boolean }>
   acrobatAltRiskNodes?: Array<{
     ref: string
     tag: string
@@ -126,6 +126,9 @@ export interface StructureBackendMutationResult {
     hasAlt?: boolean
     splitSafe?: boolean
     graphicsLikelyDecorative?: boolean
+    graphicsDominant?: boolean
+    textOpCount?: number
+    graphicsOpCount?: number
     operatorPattern?: 'text_then_graphics' | 'graphics_then_text' | 'interleaved' | null
     parentTagPath?: string[]
     ownershipMode?: 'mixed_text_graphics_same_mcid' | 'graphics_only_nonfigure' | 'duplicate_mcid_ownership' | 'container_with_graphics_descendants' | 'orphaned_alt_empty_element' | 'nonfigure_with_alt' | 'untagged_image_mcid' | 'untagged_image_direct'

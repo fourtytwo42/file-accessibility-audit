@@ -137,7 +137,8 @@ export async function analyzePDF(
   try {
     const startedAt = Date.now()
     const analysisProfile = options?.analysisProfile || 'full_final'
-    const skipVeraPdf = options?.skipVeraPdf ?? ANALYSIS.DEFAULT_SKIP_VERAPDF
+    const skipVeraPdf = options?.skipVeraPdf
+      ?? (analysisProfile === 'full_final' ? false : ANALYSIS.DEFAULT_SKIP_VERAPDF)
     const timings: Partial<Record<AnalysisTimingKey, number>> = {}
     options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 10 })
     const [qpdfResult, veraPdfResult, adobeResult, pdfjsResult] = await Promise.all([

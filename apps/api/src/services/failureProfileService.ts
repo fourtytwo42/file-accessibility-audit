@@ -450,7 +450,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       categoryIds: ['alt_text'],
       blocking: false,
       unmatched: false,
-      classification: blockedFigures.some(candidate => /^unsafe_|^no_image_evidence/i.test(candidate.unsafeReason || '')) ? 'manual_only' : 'semantic',
+      classification: blockedFigures.some(candidate => /^unsafe_|^no_(image|figure)_evidence/i.test(candidate.unsafeReason || '')) ? 'manual_only' : 'semantic',
       nativeToolFamilies: ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'],
       evidence: blockedFigures.map(candidate => candidate.unsafeReason || candidate.id).slice(0, 3),
     })
@@ -471,6 +471,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     const hasDeterministicRepair = unresolvedAltRiskNodes.some(node =>
       node.ownershipMode === 'duplicate_mcid_ownership'
       || node.ownershipMode === 'container_with_graphics_descendants'
+      || node.ownershipMode === 'graphics_only_nonfigure'
       // split-safe: can rewrite content stream to separate text and graphics MCIDs
       || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe)
       // orphaned_alt_empty_element: remove /Alt from empty element with no content

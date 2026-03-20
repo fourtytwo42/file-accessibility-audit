@@ -187,6 +187,7 @@ describe('pdfAnalyzer', () => {
       skipAdobe: true,
     })
 
+    expect(analyzeWithVeraPdf).toHaveBeenCalledTimes(1)
     expect(analyzeReadingOrder).toHaveBeenCalledTimes(1)
     expect(analyzeColorContrast).toHaveBeenCalledTimes(1)
     expect(analyzeTableStructure).toHaveBeenCalledTimes(1)

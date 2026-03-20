@@ -904,6 +904,47 @@ describe('scoreTableMarkup edge cases', () => {
     const result = scoreDocument(qpdf, pdfjs)
     expect(findCategory(result, 'table_markup').score).toBe(40)
   })
+
+  it('keeps score 100 when visual-only table detections are advisory', () => {
+    const qpdf = makeQpdf({
+      tables: [{ hasHeaders: true }, { hasHeaders: true }],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, makeLocalStandards(), {
+      tableStructure: {
+        status: 'ok',
+        detectedTables: 5,
+        taggedTables: 2,
+        untaggedTables: 0,
+        highConfidenceUntaggedTables: 0,
+        advisoryUntaggedTables: 3,
+        tableDetails: [],
+        warnings: [],
+      },
+    })
+    expect(findCategory(result, 'table_markup').score).toBe(100)
+    expect(findCategory(result, 'table_markup').findings.some(finding => finding.includes('advisory only'))).toBe(true)
+  })
+
+  it('softens score when only a few high-confidence untagged tables remain', () => {
+    const qpdf = makeQpdf({
+      tables: [{ hasHeaders: true }, { hasHeaders: true }],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, makeLocalStandards(), {
+      tableStructure: {
+        status: 'ok',
+        detectedTables: 4,
+        taggedTables: 2,
+        untaggedTables: 2,
+        highConfidenceUntaggedTables: 2,
+        advisoryUntaggedTables: 0,
+        tableDetails: [],
+        warnings: [],
+      },
+    })
+    expect(findCategory(result, 'table_markup').score).toBe(85)
+  })
 })
 
 describe('scoreLinkQuality edge cases', () => {

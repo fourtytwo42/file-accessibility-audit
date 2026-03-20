@@ -1142,11 +1142,14 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
     findings.push(`All ${qpdf.tables.length} table(s) have proper header tags (TH)`)
 
     let score = 100
-    // Apply secondary signal from visual table detection
-    if (tableStructure?.status === 'ok' && (tableStructure.untaggedTables ?? 0) > 0) {
-      const n = tableStructure.untaggedTables!
-      findings.push(`${n} table(s) detected visually that have no PDF tags. Screen readers cannot access these tables.`)
-      score = 70
+    const highConfidenceUntagged = tableStructure?.highConfidenceUntaggedTables ?? tableStructure?.untaggedTables ?? 0
+    const advisoryUntagged = tableStructure?.advisoryUntaggedTables ?? 0
+    if (tableStructure?.status === 'ok' && highConfidenceUntagged > 0) {
+      findings.push(`${highConfidenceUntagged} high-confidence table(s) were detected visually without matching PDF tags. Screen readers may miss these data tables.`)
+      score = highConfidenceUntagged <= 2 ? 85 : 70
+    }
+    if (tableStructure?.status === 'ok' && advisoryUntagged > 0) {
+      findings.push(`${advisoryUntagged} low-confidence visual table detection(s) were treated as advisory only.`)
     }
 
     return {
@@ -1172,8 +1175,14 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
 
   // Apply secondary signal from visual table detection
   if (tableStructure?.status === 'ok' && (tableStructure.untaggedTables ?? 0) > 0) {
-    const n = tableStructure.untaggedTables!
-    findings.push(`${n} table(s) detected visually that have no PDF tags. Screen readers cannot access these tables.`)
+    const highConfidenceUntagged = tableStructure.highConfidenceUntaggedTables ?? tableStructure.untaggedTables ?? 0
+    const advisoryUntagged = tableStructure.advisoryUntaggedTables ?? 0
+    if (highConfidenceUntagged > 0) {
+      findings.push(`${highConfidenceUntagged} high-confidence table(s) were detected visually without matching PDF tags. Screen readers may miss these data tables.`)
+    }
+    if (advisoryUntagged > 0) {
+      findings.push(`${advisoryUntagged} low-confidence visual table detection(s) were treated as advisory only.`)
+    }
   }
 
   return {

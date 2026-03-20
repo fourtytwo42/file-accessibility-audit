@@ -199,6 +199,56 @@ def analyze_table_structure(pdf_path, request):
     """Detect tables visually using tabula-py and compare against tagged table count."""
     tagged_table_count = request.get("taggedTableCount", 0)
 
+    def classify_detected_table(df):
+        try:
+            rows, cols = df.shape
+        except Exception:
+            return "low"
+        if rows < 2 or cols < 2:
+            return "low"
+
+        normalized = df.fillna("") if hasattr(df, "fillna") else df
+        try:
+            values = normalized.values.tolist()
+        except Exception:
+            values = []
+
+        non_empty = 0
+        numeric_like = 0
+        short_like = 0
+        unique_values = set()
+        for row in values:
+            for cell in row:
+                text = str(cell).strip()
+                if not text:
+                    continue
+                non_empty += 1
+                unique_values.add(text)
+                compact = text.replace(",", "").replace("$", "").replace("%", "")
+                if compact.replace(".", "", 1).isdigit():
+                    numeric_like += 1
+                if len(text) <= 2:
+                    short_like += 1
+
+        total_cells = max(1, rows * cols)
+        fill_ratio = non_empty / total_cells
+        numeric_ratio = numeric_like / max(1, non_empty)
+        short_ratio = short_like / max(1, non_empty)
+        unique_ratio = len(unique_values) / max(1, non_empty)
+
+        likely_layout_grid = cols == 2 and rows <= 4 and fill_ratio < 0.8
+        likely_chart_legend = rows <= 4 and cols <= 3 and short_ratio >= 0.45
+        likely_sparse_rule_block = fill_ratio < 0.35
+        likely_key_value_block = cols == 2 and numeric_ratio < 0.15 and unique_ratio < 0.7
+
+        if likely_layout_grid or likely_chart_legend or likely_sparse_rule_block or likely_key_value_block:
+            return "low"
+        if rows >= 3 and cols >= 3 and fill_ratio >= 0.4:
+            return "high"
+        if rows >= 4 and cols >= 2 and fill_ratio >= 0.6 and unique_ratio >= 0.5:
+            return "high"
+        return "low"
+
     try:
         import tabula
     except ImportError:
@@ -235,24 +285,36 @@ def analyze_table_structure(pdf_path, request):
                 pass
 
         detected_count = len(tables)
-        untagged = max(0, detected_count - tagged_table_count)
+        high_confidence = 0
+        low_confidence = 0
 
         table_details = []
         for i, t in enumerate(tables[:20]):
             try:
+                confidence = classify_detected_table(t)
+                if confidence == "high":
+                    high_confidence += 1
+                else:
+                    low_confidence += 1
                 rows = t.shape[0] if hasattr(t, 'shape') else 0
                 cols = t.shape[1] if hasattr(t, 'shape') else 0
-                table_details.append({"table_index": i, "rows": rows, "cols": cols})
+                table_details.append({"table_index": i, "rows": rows, "cols": cols, "confidence": confidence})
             except Exception:
                 pass
+
+        high_confidence_untagged = max(0, high_confidence - max(0, tagged_table_count))
+        advisory_untagged = low_confidence
+        untagged = high_confidence_untagged
 
         return {
             "status": "ok",
             "detected_tables": detected_count,
             "tagged_tables": tagged_table_count,
             "untagged_tables": untagged,
+            "high_confidence_untagged_tables": high_confidence_untagged,
+            "advisory_untagged_tables": advisory_untagged,
             "table_details": table_details,
-            "warnings": [],
+            "warnings": [] if advisory_untagged == 0 else [f"{advisory_untagged} low-confidence visual table detection(s) were suppressed as advisory."],
         }
 
     except Exception as exc:

@@ -319,6 +319,14 @@ function hasSemanticOrManualOnlyIssues(failureModes: FailureMode[]): boolean {
   return failureModes.some(mode => mode.classification !== 'deterministic')
 }
 
+function actionAttemptOutcome(
+  tool: RemediationToolName,
+  actions: RemediationActionRecord[],
+): RemediationActionRecord['outcome'] | null {
+  const prior = [...actions].reverse().find(action => action.tool === tool)
+  return prior?.outcome ?? null
+}
+
 function buildDeterministicCall(input: {
   filename: string
   analysis: AnalysisResult
@@ -349,6 +357,15 @@ function isOpportunitySelectable(input: {
   const useBootstrappedChartConformance = shouldUseBootstrappedChartConformance({ analysis, context, actions, selectedActions })
   const hasAutoNativeMarkedContent = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_marked_content_refs')
   const hasAutoNativeLinkRepair = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_link_structure')
+  const repairFontUnicodeOutcome = actionAttemptOutcome('repair_font_unicode_maps', actions)
+  const repairCidSetOutcome = actionAttemptOutcome('repair_cidset_consistency', actions)
+  const persistentLegacyFontFailures = opportunity.derivedFromFailureModeKeys.some(key =>
+    key === 'pdfua.font_unicode'
+    || key === 'pdfua.type1_unicode'
+    || key === 'pdfua.cid_symbol_fonts'
+    || key === 'pdfua.cidset_consistency'
+    || key === 'pdfua.font_widths',
+  )
 
   switch (opportunity.toolName) {
     case 'repair_bootstrapped_chart_content_refs':
@@ -378,15 +395,21 @@ function isOpportunitySelectable(input: {
           || attemptedOrPlanned('repair_cid_symbol_font_maps', actions, selectedActions)
         )
     case 'substitute_legacy_fonts_in_place':
-      return (
+      return persistentLegacyFontFailures
+        && (
         (
           analysis.pageCount >= 10
           && attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
         )
         || (
           opportunity.derivedFromFailureModeKeys.includes('pdfua.cidset_consistency')
-          && attemptedOrPlanned('repair_cidset_consistency', actions, selectedActions)
+          && (
+            attemptedOrPlanned('repair_cidset_consistency', actions, selectedActions)
+            || repairCidSetOutcome === 'no_effect'
+            || repairCidSetOutcome === 'applied'
+          )
         )
+        || repairFontUnicodeOutcome === 'no_effect'
       )
         && attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
         && (
@@ -394,7 +417,8 @@ function isOpportunitySelectable(input: {
           || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
         )
     case 'finalize_substituted_font_conformance':
-      return attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
+      return persistentLegacyFontFailures
+        && attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
     case 'adobe_auto_tag':
       return !attemptedOrPlanned('adobe_auto_tag', actions, selectedActions)
     case 'set_document_title':
