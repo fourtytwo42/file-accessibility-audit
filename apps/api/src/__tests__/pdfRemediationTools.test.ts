@@ -579,6 +579,16 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(target?.ref).toBe('obj:14 0 R')
   })
 
+  it('remaps story-backed heading candidates to the first safe descendant text node', () => {
+    const target = __test_remapHeadingTarget([
+      { ref: 'obj:19 0 R', tag: '/Story', parentRef: 'obj:7 0 R', orderIndex: 0, parentTagPath: ['None'] },
+      { ref: 'obj:20 0 R', tag: '/Shape', parentRef: 'obj:19 0 R', orderIndex: 1, parentTagPath: ['/Story', 'None'] },
+      { ref: 'obj:21 0 R', tag: '/TextBox', parentRef: 'obj:19 0 R', orderIndex: 2, parentTagPath: ['/Story', 'None'] },
+    ], 0)
+
+    expect(target?.ref).toBe('obj:21 0 R')
+  })
+
   it('normalizes legacy PDFMaker heading styles into usable heading levels', () => {
     expect(normalizedExistingHeadingLevel('/heading 1')).toBe('H1')
     expect(normalizedExistingHeadingLevel('/heading 4')).toBe('H4')
@@ -2672,6 +2682,49 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:sect')).toBe(true)
   }, 15_000)
+
+  it('treats /Story-backed heading candidates as safe when they are the best available structural target', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'example.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const heuristicContext: PdfRemediationContext = {
+      ...context,
+      headingCandidates: [
+        {
+          id: 'heading:story',
+          pageNumber: 1,
+          text: 'Story heading',
+          bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+          fontSize: 18,
+          fontWeight: 'bold',
+          nearbyContext: ['Body'],
+          targetRef: 'obj:19 0 R',
+          existingTag: '/Story',
+          repairMode: 'safe',
+        },
+      ],
+    }
+
+    const plan = await planRemediationActions({
+      filename: 'example.pdf',
+      analysis: {
+        ...analysis,
+        categories: analysis.categories.map(category =>
+          category.id === 'heading_structure' ? { ...category, score: 0 } : category),
+      },
+      context: heuristicContext,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'create_heading_from_candidate' && action.arguments.candidateId === 'heading:story')).toBe(true)
+  }, 15_000)
+
 
   it('promotes chapter-style headings to H1 in heuristic mode', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {

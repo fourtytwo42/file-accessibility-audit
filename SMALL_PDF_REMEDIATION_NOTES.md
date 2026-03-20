@@ -141,6 +141,75 @@
   - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'embeds legacy Type1 substitute fonts on small Gill Sans PDFs|repairs legacy Gxx subset glyph names in small Distiller PDFs'`
   - `pnpm --filter api exec tsc --noEmit`
 
+### Loop Result After Gill Sans Fix
+
+- Second queue item: `85051089-e52c-4154-9252-1ba1f847bae4`
+- Rerun result: `100/A`
+- Improvement vs first remediated run: `76 -> 100`
+- Outcome:
+  - the remaining legacy Type1 embedding debt cleared
+  - the substitute embedding path now generalizes to Gill Sans and New Century Schoolbook families
+  - `SPTDVoga.pdf` now serves as a regression case for small Acrobat Distiller/PageMaker documents with embeddable legacy Type1 fonts but no exact local font files
+
+## Next Random Small PDF
+
+- Selected PDF: `Downloads/Johnson-2.pdf`
+- Selection method: next random pick from `find Downloads -size -700k | shuf`
+- File size: under `700k` (selected from the live random candidate list)
+- Current status: completed on first fresh API loop at `100/A` from `24/F`
+
+### Johnson-2 Result
+
+- Queue item: `68d508cf-38c3-4fa6-aced-9ab5c03340bb`
+- Outcome: `100/A`
+- Notes:
+  - no new system fix was needed
+  - this is another confirmation that the current playbook/classification/font fixes are generalizing well across small legacy PDFs
+
+## Next Random Small PDF
+
+- Selected PDF: `Downloads/treatment_matching.pdf`
+- Selection method: next random pick from `find Downloads -size -700k | shuf`
+- File size: under `700k` (selected from the live random candidate list)
+- Current status: completed on first fresh API loop at `100/A` from `26/F`
+
+### treatment_matching Result
+
+- Queue item: `db211227-fb38-4394-a69e-30f9d77c5b97`
+- Outcome: `100/A`
+- Notes:
+  - no new system fix was needed
+  - another confirmation that the current system is generalizing well across very small legacy PDFs
+
+## Next Random Small PDF
+
+- Selected PDF: `Downloads/Prescription drug November 2008.pdf`
+- Selection method: next random pick from `find Downloads -size -700k | shuf`
+- File size: under `700k` (selected from the live random candidate list)
+- Current status: first fresh API loop finished at `69/D`; shared `/Story` heading fix in progress before rerun
+
+### Prescription Drug November 2008 Findings
+
+- Queue item: `3794391a-6e09-4058-8c3d-d9f7064b4b2d`
+- Initial/remediated: `32/F -> 69/D`
+- Dominant remaining blockers:
+  - `heading_structure = 0`
+  - `text_extractability = 60`
+  - `alt_text = 67`
+  - `pdf_ua_compliance = 85`
+- Concrete diagnosis:
+  - the remaining local standards debt is only `1` `pdfua.font_unicode` finding
+  - the highest-leverage score drag is heading recovery, not fonts
+  - semantic heading candidates were repeatedly proposed, but the backend rejected them because the structural targets were `/Story` containers and `create_heading_from_candidate` did not treat `/Story` as heading-compatible
+
+### System Fix In Progress
+
+- Added `/Story` to the shared safe heading-tag set in both TypeScript planning logic and the Python structure backend.
+- Updated heading-target remapping so `/Story` wrappers are treated like `/Sect`, allowing the first safe descendant text-bearing node to be used when available.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps story-backed heading candidates to the first safe descendant text node|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Sect-backed heading candidates as safe when they are the best available structural target'`
+  - `pnpm --filter api exec tsc --noEmit`
+
 ## Active PDF Loop 2
 
 - Selected PDF: `Downloads/2025FirearmProhibitorsReport-250626T19175938.pdf`

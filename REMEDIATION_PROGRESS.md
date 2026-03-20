@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `SPTDVoga.pdf`
-- Latest attempt path: queue item `eaea85da-2c62-45d2-8c20-d34a5360e039`
-- Latest result summary: `SPTDVoga.pdf` completed the first fresh remediation loop at `76/C` from `32/F`; the dominant remaining debt is five legacy Type1 fonts that still lack embeddable local font programs.
-- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T16:28Z
-- Next action: rerun `SPTDVoga.pdf` after the new legacy Gill Sans/New Century substitute embedding fix has been committed, pushed, and the API restarted.
-- Next hypothesis: the current blocker family is a generic legacy Type1 embedding gap, not a one-off PDF quirk, because `embed_missing_fonts_in_place` was not consulting the existing substitute-font map for Type1 fonts like Gill Sans.
-- API restart status: PM2 restart required after the latest font-embedding code change; next queue result must be a fresh remediation after restart
-- Build status: targeted regression and `tsc` passed for the latest font-embedding change; rebuild pending before rerun
+- Active PDF: `Prescription drug November 2008.pdf`
+- Latest attempt path: queue item `3794391a-6e09-4058-8c3d-d9f7064b4b2d`
+- Latest result summary: `Prescription drug November 2008.pdf` completed the first fresh remediation loop at `69/D` from `32/F`, exposing a new native-tagged InDesign heading family where semantic heading candidates map to `/Story` containers that the heading retag tool currently rejects.
+- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T16:32Z
+- Next action: rerun `Prescription drug November 2008.pdf` after the new `/Story` heading-compatibility fix has been committed, pushed, and the API restarted.
+- Next hypothesis: allowing safe `/Story` containers to participate in heading promotion like `/Sect` should clear the dominant `heading_structure=0` failure on this InDesign bulletin family and unlock most of the remaining score gap.
+- API restart status: PM2 restart required after the latest heading-compatibility code change; next queue result must be a fresh remediation after restart
+- Build status: targeted `/Story` heading regressions and `tsc` passed for the latest change; rebuild pending before rerun
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `SPTDVoga.pdf`
-- Current phase: Applying generic font-embedding fix, then fresh rerun
-- Immediate next step: commit/push/restart the API, run a fresh remediation of `SPTDVoga.pdf`, and inspect whether the remaining unembedded-font blockers clear
+- Active PDF: `Prescription drug November 2008.pdf`
+- Current phase: Applying generic heading-compatibility fix, then fresh rerun
+- Immediate next step: commit/push/restart the API, run a fresh remediation of `Prescription drug November 2008.pdf`, and inspect whether the `/Story` heading blockers clear
 - API restart/rerun confirmed for active file: Not yet for the latest fix
-- Rebuild required for active file: Yes, after the latest Python helper change
-- Active remediation loop count: `SPTDVoga.pdf=1`
-- Next hypothesis: wiring `embed_missing_fonts_in_place` through `legacy_substitute_font_name()` and adding Gill Sans mappings should clear this small Distiller/PDFWriter-style Type1 family and generalize to similar legacy sans/serif PDFs
+- Rebuild required for active file: Yes, after the latest code change
+- Active remediation loop count: `Prescription drug November 2008.pdf=1`
+- Next hypothesis: safe `/Story` container heading promotion will fix the dominant `heading_structure` failure; if the file still lands below `95` afterward, the remaining gap will likely be the single unresolved Type1 Unicode map plus one skipped figure description
 
 ## Pending Files
 
@@ -77,6 +77,11 @@
 
 ## Recent Events
 
+- 2026-03-20T16:39:10Z Small-PDF loop fix: safe heading promotion now treats `/Story` containers like `/Sect` for native-tagged documents, so heading candidates backed by `/Story` wrappers can be remapped to safe descendants or retagged directly when appropriate. This targets `Prescription drug November 2008.pdf`, whose first rerun stalled at `69/D` because all heading candidates mapped to `/Story` and were rejected as unsafe. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps story-backed heading candidates to the first safe descendant text node|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Sect-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
+- 2026-03-20T16:32:28Z Fresh small-PDF baseline: `Prescription drug November 2008.pdf` completed on queue item `3794391a-6e09-4058-8c3d-d9f7064b4b2d` at `69/D` from `32/F`. The dominant remaining failures are `heading_structure=0`, `text_extractability=60`, `alt_text=67`, and one residual `pdfua.font_unicode` finding. The highest-leverage new blocker family is heading promotion on native-tagged InDesign `/Story` containers: the planner kept proposing `create_heading_from_candidate`, but the backend rejected each target as “not safe to retag as a heading.”
+- 2026-03-20T16:30:29Z Fresh small-PDF pass: `treatment_matching.pdf` completed on queue item `db211227-fb38-4394-a69e-30f9d77c5b97` at `100/A` on the first remediation loop, from `26/F`. This is another strong generalization check on a very small legacy report with no additional code changes required.
+- 2026-03-20T16:28:14Z Fresh small-PDF pass: `Johnson-2.pdf` completed on queue item `68d508cf-38c3-4fa6-aced-9ab5c03340bb` at `100/A` on the first remediation loop, from `24/F`. This is another strong generalization check: the current system handled yet another small legacy report/profile family end-to-end with no new code changes.
+- 2026-03-20T16:25:26Z Fresh post-restart rerun: `SPTDVoga.pdf` completed on queue item `85051089-e52c-4154-9252-1ba1f847bae4` at `100/A`. The legacy substitute-embedding fix landed exactly as intended: the remediated output now embeds Gill Sans and New Century substitute programs cleanly enough to clear `text_extractability` and `pdf_ua_compliance`, leaving only minor reading-order/color-contrast warnings outside the score gate.
 - 2026-03-20T16:28:42Z Small-PDF loop fix: `embed_missing_fonts_in_place` now consults the legacy substitute-font map for missing local font programs, and the substitute map now includes the Gill Sans family (`/GillSans`, `/GillSans-Bold`, `/GillSans-Italic`, `/GillSans-BoldItalic`) in addition to the existing New Century Schoolbook fallbacks. This closes the shared gap exposed by `SPTDVoga.pdf`, where five legacy Type1 fonts had `/ToUnicode` maps but no embeddable local font file. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'embeds legacy Type1 substitute fonts on small Gill Sans PDFs|repairs legacy Gxx subset glyph names in small Distiller PDFs'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 
 - 2026-03-20T16:19:14Z Fresh small-PDF pass: `Redeploy Illinois Macon County.pdf` completed on queue item `aa98c67f-8705-4c11-af2b-2ea53538fc3c` at `100/A` on the first remediation loop. This is another strong generalization check: the current shared system handled a 73-page Distiller-era county report end-to-end with no additional code changes, including headings, bookmarks, tab normalization, and local PDF/UA cleanup.

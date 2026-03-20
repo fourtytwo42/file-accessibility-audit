@@ -65,7 +65,7 @@ export interface HeadingCandidate {
   unsafeReason?: string
 }
 
-const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
+const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/Story', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
 const UNSAFE_HEADING_TAGS = ['/Link', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
 const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Shape', '/InlineShape', '/Normal'] as const
 const UNSAFE_FIGURE_TAGS = ['/TD', '/TH', '/TR', '/Table', '/TOCI', '/TOC', '/Link', '/L', '/LI'] as const
@@ -122,18 +122,24 @@ function remapHeadingTarget(
 ): StructureBackendMutationResult['structuralNodes'][number] | null {
   const initial = structuralNodes[startIndex] || null
   if (!initial) return null
-  if (isSafeHeadingTag(initial.tag) && initial.tag !== '/Sect') return initial
-  if (initial.tag === '/Sect' && initial.ref) {
+  if (isSafeHeadingTag(initial.tag) && initial.tag !== '/Sect' && initial.tag !== '/Story') return initial
+  if ((initial.tag === '/Sect' || initial.tag === '/Story') && initial.ref) {
     for (let index = startIndex + 1; index < structuralNodes.length; index++) {
       const candidate = structuralNodes[index]
       if (!candidate) break
-      const inSection = candidate.parentRef === initial.ref || candidate.parentTagPath?.includes('/Sect')
+      const inSection = candidate.parentRef === initial.ref
+        || candidate.parentTagPath?.includes('/Sect')
+        || candidate.parentTagPath?.includes('/Story')
       if (!inSection) {
         if (candidate.orderIndex > initial.orderIndex + 12) break
         continue
       }
       if (isSafeHeadingTag(candidate.tag)) return candidate
-      if (candidate.parentRef !== initial.ref && !candidate.parentTagPath?.includes('/Sect')) break
+      if (
+        candidate.parentRef !== initial.ref
+        && !candidate.parentTagPath?.includes('/Sect')
+        && !candidate.parentTagPath?.includes('/Story')
+      ) break
     }
   }
   const limit = Math.min(6, structuralNodes.length)
@@ -143,7 +149,7 @@ function remapHeadingTarget(
     const previous = structuralNodes[startIndex - offset]
     if (previous && isSafeHeadingTag(previous.tag)) return previous
   }
-  return initial.tag === '/Sect' ? initial : null
+  return initial.tag === '/Sect' || initial.tag === '/Story' ? initial : null
 }
 
 export const __test_remapHeadingTarget = remapHeadingTarget

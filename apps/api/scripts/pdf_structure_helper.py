@@ -17,7 +17,7 @@ except Exception:
     UV2AGL = {}
 
 
-HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Sect", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
+HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Sect", "/Story", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"}
 FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct", "/Shape", "/InlineShape", "/Normal"}
 SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Shape", "/InlineShape", "/Normal"}
 UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link", "/L", "/LI"}
