@@ -130,6 +130,16 @@ const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
   'normalize_nested_figure_containers',
 ])
 
+const CANDIDATE_SENSITIVE_TOOLS = new Set<string>([
+  'create_heading_from_candidate',
+  'set_table_header_cells',
+  'set_figure_alt_text',
+  'retag_as_figure_and_set_alt',
+  'mark_figure_decorative',
+  'reorder_structure_children',
+  'set_link_annotation_contents',
+])
+
 const METADATA_ONLY_TOOLS = new Set<string>([
   'set_document_title',
   'set_document_language',
@@ -2650,6 +2660,9 @@ export async function remediatePdfWithAgent(
 	    let stopAfterRound = false
 	    for (const [stageNum, stageCalls] of orderedStages) {
 	      if (!stageEnabled(stageNum)) continue
+      if (roundChangedDocument || stageCalls.some(call => CANDIDATE_SENSITIVE_TOOLS.has(call.tool_name))) {
+        stageContext = await inspectRemediationContext(workingBuffer, currentResult, inspectModeForResult(currentResult))
+      }
 	      remediationTimings.stagesExecuted += 1
       if (options?.signal?.aborted) {
         const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
