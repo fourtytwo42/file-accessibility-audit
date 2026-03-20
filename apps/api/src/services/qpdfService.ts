@@ -225,6 +225,12 @@ export function parseQpdfJson(json: any): QpdfResult {
     const roleMapNoteAliases = new Set<string>(['/Note'])
     const descendantFontRefs = new Set<string>()
     const softMaskImageRefs = new Set<string>()
+    const pendingFigureEntries: Array<{
+      ref: string
+      hasAlt: boolean
+      altText?: string
+      hasAssociatedContent: boolean
+    }> = []
     for (const obj of Object.values(objects)) {
       if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/StructTreeRoot') continue
       const resolvedRoleMap = resolveObject(obj['/RoleMap'], objects)
@@ -359,19 +365,7 @@ export function parseQpdfJson(json: any): QpdfResult {
           const altText = typeof rawAlt === 'string' ? rawAlt.replace(/^u:/, '') : undefined
           const hasAlt = altText !== undefined && altText !== ''
           const hasAssociatedContent = structElemHasAssociatedContent(o, objects)
-          // Try to match to an image
-          if (result.images.length > 0 && hasAlt && hasAssociatedContent) {
-            const unmatched = result.images.find(img => !img.hasAlt)
-            if (unmatched) {
-              unmatched.hasAlt = true
-              unmatched.altText = altText
-            }
-          }
-          // Only count figures with real associated content. Empty /Figure elements with /Alt
-          // are Adobe "Associated with content" failures and must not satisfy alt-text scoring.
-          if (hasAssociatedContent && !result.images.some(img => img.ref === ref)) {
-            result.images.push({ ref, hasAlt, altText })
-          }
+          pendingFigureEntries.push({ ref, hasAlt, altText, hasAssociatedContent })
         }
 
       }
@@ -466,6 +460,25 @@ export function parseQpdfJson(json: any): QpdfResult {
         walkStructTreeForMCIDs(structRoot, objects, pageRefToIndex, result.contentOrder, null)
       } else {
         result.structTreeDepth = calculateTreeDepth(objects)
+      }
+    }
+
+    const claimedRawImageRefs = new Set<string>()
+    for (const figure of pendingFigureEntries) {
+      if (!figure.hasAssociatedContent) continue
+      const matchingRawImage = result.images.find(img => !claimedRawImageRefs.has(img.ref))
+      if (matchingRawImage) {
+        claimedRawImageRefs.add(matchingRawImage.ref)
+        if (figure.hasAlt) {
+          matchingRawImage.hasAlt = true
+          matchingRawImage.altText = figure.altText
+        }
+        continue
+      }
+      // Only count figures with real associated content. Empty /Figure elements with /Alt
+      // are Adobe "Associated with content" failures and must not satisfy alt-text scoring.
+      if (!result.images.some(img => img.ref === figure.ref)) {
+        result.images.push({ ref: figure.ref, hasAlt: figure.hasAlt, altText: figure.altText })
       }
     }
 

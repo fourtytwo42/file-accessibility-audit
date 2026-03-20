@@ -43,6 +43,27 @@ describe('analyzeWithQpdf', () => {
     expect(result.images).toEqual([{ ref: 'obj:3 0 R', hasAlt: false }])
   })
 
+  it('reconciles associated figure alt text onto a raw image without double-counting when figure objects appear first', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog', '/StructTreeRoot': 'obj:2 0 R', '/MarkInfo': { '/Marked': true } } },
+        'obj:2 0 R': { value: { '/Type': '/StructTreeRoot', '/K': ['obj:10 0 R'] } },
+        'obj:10 0 R': {
+          value: {
+            '/S': '/Figure',
+            '/Alt': 'u:Program logo',
+            '/K': { '/Type': '/OBJR', '/Obj': 'obj:3 0 R' },
+          },
+        },
+        'obj:3 0 R': { value: { '/Subtype': '/Image' } },
+      },
+    })
+
+    expect(result.images).toEqual([
+      { ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' },
+    ])
+  })
+
   it('extracts tagged-pdf metadata and font conformance signals from qpdf json', () => {
     const result = parseQpdfJson({
       objects: {
