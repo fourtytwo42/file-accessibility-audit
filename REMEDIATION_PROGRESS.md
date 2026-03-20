@@ -12,12 +12,12 @@
 ## Current Session Snapshot
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Latest attempt path: queue item `85b9884f-5b43-4a12-a686-0671843a2275`
-- Latest result summary: the 45-second `alt_text_deep` timeout fixed the original-analysis freeze and let the queue progress into real remediation stages, but the same file still bogged down later because the workflow kept re-requesting deep inspection during semantic processing. A second fallback fix now downgrades failed `alt_text_deep` inspections to `light` inspection immediately.
-- Latest validation source: targeted `pdfStructureBackend` and `pdfRemediationTools` tests plus live queue/log diagnosis completed on 2026-03-20T21:27Z
-- Next action: commit/push the deep-inspection fallback fix, restart the API, and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: the combination of fast-fail timeout plus fallback-to-light should finally yield a completed queue result for this file rather than another stall
-- API restart status: restart required after the current deep-inspection fallback change before trusting the next queue result
+- Latest attempt path: queue item `93dc3da2-b092-463e-a286-efeeba1e4442`
+- Latest result summary: the deep-inspection timeout plus fallback fixes worked and the file now completes, but it is still at `63/D`. The remaining blocker family is native heading creation on Acrobat-tagged content where heading candidates bind to long runs of `/Link` wrappers and stay blocked even though safe parent `/P` containers exist.
+- Latest validation source: targeted `pdfRemediationTools` tests plus live queue/model diagnosis completed on 2026-03-20T21:49Z
+- Next action: restart the API on the new heading-target remap fix and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: remapping `/Link`-backed heading candidates to their safe parent text container should unblock heading creation and lift `heading_structure`, `reading_order`, and `pdf_ua_compliance` on the next live rerun
+- API restart status: restart required after the current heading-target remap change before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: third small-PDF loop blocked by repeated re-entry into failed `alt_text_deep` inspection during semantic work
-- Immediate next step: restart on the current fallback fix, rerun the same PDF, and verify the queue can complete without repeatedly stalling on deep inspection
-- API restart/rerun confirmed for active file: pending restart; the current queue item `85b9884f-5b43-4a12-a686-0671843a2275` is stale relative to the newest fallback change
+- Current phase: completed first real rerun at `63/D`; now blocked on heading candidates resolving onto unsafe `/Link` containers in a native-tagged Acrobat structure tree
+- Immediate next step: restart on the new heading-target remap fix, rerun the same PDF, and verify the queue now creates headings instead of deferring them all
+- API restart/rerun confirmed for active file: pending restart; the current queue item `93dc3da2-b092-463e-a286-efeeba1e4442` is stale relative to the newest heading-target remap change
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
-- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=4`
-- Next hypothesis: when `alt_text_deep` fails, reusing `light` inspection should preserve momentum and keep semantic/final cleanup loops from re-triggering the same 45-second backend timeout
+- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=5`
+- Next hypothesis: when heading candidates initially land on `/Link` structure nodes, remapping them to the safe parent `/P` container should let `create_heading_from_candidate` run on this Acrobat pattern instead of blocking 16 headings at planning time
 
 ## Pending Files
 
@@ -76,6 +76,10 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T21:49:00Z Small-PDF loop fix: heading target remapping now rebinds `/Link`-backed heading candidates to a safe parent text container when one exists, instead of leaving them blocked behind unsafe `/Link` wrappers. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, whose first completed rerun (`93dc3da2-b092-463e-a286-efeeba1e4442`) landed at `63/D` with `16` blocked heading candidates and evidence that most candidate targets were unsafe `/Link` nodes despite nearby safe parent `/P` structure. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps link-backed heading candidates to their safe parent text node|remaps section-backed heading candidates to the first safe descendant text node|remaps story-backed heading candidates to the first safe descendant text node|treats /Sect-backed heading candidates as safe when they are the best available structural target|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Normal-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
+
+- 2026-03-20T21:35:00Z Fresh post-restart rerun: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` completed on queue item `93dc3da2-b092-463e-a286-efeeba1e4442` at `63/D`, up from `31/F` and, most importantly, no longer hangs in original analysis or semantic rounds. The deep-inspection timeout and light-fallback fixes cleared the throughput blocker. The next real blocker is structural: `16` heading candidates were blocked because they resolved to unsafe `/Link` tags or failed to map to a clean text-bearing target, and `normalize_heading_hierarchy` remained `no_effect` because no headings were ever created.
 
 - 2026-03-20T21:27:00Z Small-PDF loop fix: `inspectPdfForRemediation()` now falls back to `light` inspection when an `alt_text_deep` structure inspection fails, instead of repeatedly re-requesting the same pathological deep snapshot. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfStructureBackend.test.ts src/__tests__/pdfRemediationTools.test.ts -t 'falls back to light inspection when alt_text_deep inspection fails|fails fast on pathological alt_text_deep inspections|keeps longer timeouts for light inspect and heavy alt-text repair mutations'` and `pnpm --filter api exec tsc --noEmit`. Live logs for `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the first timeout fix moved the queue past original analysis, but repeated `structureInspect ~45000ms` runs were still occurring inside remediation-fast analysis.
 

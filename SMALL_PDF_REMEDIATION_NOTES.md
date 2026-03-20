@@ -3,7 +3,7 @@
 ## Current Active File
 
 - `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current fresh queue item: `85b9884f-5b43-4a12-a686-0671843a2275`
+- Current fresh queue item: `93dc3da2-b092-463e-a286-efeeba1e4442`
 - Latest completed file: `McLean-2.pdf` -> `100/A`
 
 ## Recent Loop Summary
@@ -12,6 +12,7 @@
 - Baseline: stalled in original analysis
 - First fresh rerun: stalled in original analysis
 - Second fresh rerun after timeout fix: progressed into remediation but still re-triggered repeated `alt_text_deep` failures during semantic processing
+- Latest completed rerun after timeout + fallback: `31/F -> 63/D`
 - Previous resolved file: `McLean-2.pdf` moved `24/F -> 100/A`
 
 ## New System Fixes This Round
@@ -31,7 +32,7 @@
 - Shared fix in progress:
   - cut `inspect alt_text_deep` timeout from 5 minutes to 45 seconds so pathological structure snapshots fail fast instead of stalling the queue
   - when `alt_text_deep` still fails, immediately fall back to `light` inspection instead of repeatedly re-requesting the same pathological deep snapshot
-  - rerun the same file fresh after restart and inspect the real completed result
+  - now that the queue completes, the next shared fix is heading-target remapping for Acrobat PDFs where heading lines initially bind to `/Link` wrappers instead of safe text-bearing parents
 
 ## Southern Illinois Drug Task Force Result
 
@@ -72,14 +73,20 @@
   - `ebc9c6fd-ec89-43ad-b120-9302798e0c6a` -> stalled in original analysis
   - `7d696f91-78dc-4d44-ad18-f710812916c8` -> stalled in original analysis
   - `85b9884f-5b43-4a12-a686-0671843a2275` -> progressed after timeout fix, then bogged down during semantic work on repeated deep-inspection failures
+  - `93dc3da2-b092-463e-a286-efeeba1e4442` -> `63/D`
 - Root cause diagnosis:
   - the hang is not in `pdfjs`, `qpdf`, `readingOrder`, `tableStructure`, or `colorContrast`
   - the pathological step is `runPdfStructureBackend({ operation: 'inspect', inspectMode: 'alt_text_deep' })`
   - live `ps` inspection showed multiple `pdf_structure_helper.py` processes pinned at ~100% CPU for minutes on this file
-- Expected outcome after fix:
-  - queue should stop stalling in original analysis
-  - remediation loops should stop re-triggering the same failing deep inspection after the first timeout
-  - if the file still lands below `95`, then inspect the real completed blocker family instead of the current hang
+- Throughput fix outcome:
+  - queue no longer stalls in original analysis
+  - remediation loops no longer get trapped in repeated failing deep inspection
+  - first real completed result is `63/D`
+- Current blocker family after throughput fix:
+  - `16` heading candidates are blocked
+  - most blocked headings resolve to unsafe `/Link` tags even though safe parent `/P` containers exist nearby
+  - `normalize_heading_hierarchy` stays `no_effect` because no headings are ever created
+  - next shared fix is to remap `/Link`-backed heading candidates to their safe parent text node before planning/mutation
 
 ## CMVoga Resolution
 

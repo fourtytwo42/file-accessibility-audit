@@ -751,6 +751,16 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(target?.ref).toBe('obj:21 0 R')
   })
 
+  it('remaps link-backed heading candidates to their safe parent text node', () => {
+    const target = __test_remapHeadingTarget([
+      { ref: 'obj:434 0 R', tag: '/Link', parentRef: 'obj:473 0 R', orderIndex: 19, parentTagPath: ['/P', '/Sect', '/Part', '/Document', 'None'] },
+      { ref: 'obj:435 0 R', tag: '/Link', parentRef: 'obj:473 0 R', orderIndex: 20, parentTagPath: ['/P', '/Sect', '/Part', '/Document', 'None'] },
+      { ref: 'obj:473 0 R', tag: '/P', parentRef: 'obj:468 0 R', orderIndex: 38, parentTagPath: ['/Sect', '/Part', '/Document', 'None'] },
+    ], 0)
+
+    expect(target?.ref).toBe('obj:473 0 R')
+  })
+
   it('normalizes legacy PDFMaker heading styles into usable heading levels', () => {
     expect(normalizedExistingHeadingLevel('/heading 1')).toBe('H1')
     expect(normalizedExistingHeadingLevel('/heading 4')).toBe('H4')

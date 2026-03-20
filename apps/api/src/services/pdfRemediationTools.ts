@@ -124,7 +124,18 @@ function remapHeadingTarget(
 ): StructureBackendMutationResult['structuralNodes'][number] | null {
   const initial = structuralNodes[startIndex] || null
   if (!initial) return null
+  const structuralByRef = new Map(
+    structuralNodes
+      .filter((node): node is NonNullable<typeof node> => !!node?.ref)
+      .map(node => [node.ref as string, node]),
+  )
   if (isSafeHeadingTag(initial.tag) && initial.tag !== '/Sect' && initial.tag !== '/Story') return initial
+  if (initial.parentRef) {
+    const parent = structuralByRef.get(initial.parentRef)
+    if (parent && isSafeHeadingTag(parent.tag) && parent.tag !== '/Sect' && parent.tag !== '/Story') {
+      return parent
+    }
+  }
   if ((initial.tag === '/Sect' || initial.tag === '/Story') && initial.ref) {
     for (let index = startIndex + 1; index < structuralNodes.length; index++) {
       const candidate = structuralNodes[index]
@@ -144,12 +155,28 @@ function remapHeadingTarget(
       ) break
     }
   }
-  const limit = Math.min(6, structuralNodes.length)
+  const limit = Math.min(48, structuralNodes.length)
   for (let offset = 1; offset <= limit; offset++) {
     const next = structuralNodes[startIndex + offset]
-    if (next && isSafeHeadingTag(next.tag)) return next
+    if (
+      next
+      && isSafeHeadingTag(next.tag)
+      && (
+        next.parentRef === initial.parentRef
+        || next.parentRef === initial.ref
+        || next.parentTagPath?.some(tag => initial.parentTagPath?.includes(tag))
+      )
+    ) return next
     const previous = structuralNodes[startIndex - offset]
-    if (previous && isSafeHeadingTag(previous.tag)) return previous
+    if (
+      previous
+      && isSafeHeadingTag(previous.tag)
+      && (
+        previous.parentRef === initial.parentRef
+        || previous.parentRef === initial.ref
+        || previous.parentTagPath?.some(tag => initial.parentTagPath?.includes(tag))
+      )
+    ) return previous
   }
   return initial.tag === '/Sect' || initial.tag === '/Story' ? initial : null
 }
