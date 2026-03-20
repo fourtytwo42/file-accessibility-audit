@@ -662,7 +662,7 @@ function buildFigureCandidates(
     }
     if (targetTag && SAFE_FIGURE_TAGS.includes(targetTag as (typeof SAFE_FIGURE_TAGS)[number])) {
       const hasStrongFigureEvidence = imageEvidence === 'strong' || imageEvidence === 'vector'
-      if ((!hasStrongFigureEvidence) || (pageImageCount <= 0 && imageEvidence !== 'vector')) {
+      if (!hasStrongFigureEvidence) {
         return {
           repairMode: 'defer' as const,
           targetTag,

@@ -1309,6 +1309,19 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.fontsMissingToUnicode).toBeLessThan(beforeQpdf.fontsMissingToUnicode ?? 0)
   }, 120_000)
 
+  it('promotes strong image-backed paragraph figure candidates in recent tagged reports', async () => {
+    const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
+    const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
+
+    const candidate = context.figureCandidates.find(entry =>
+      entry.targetTag === '/P'
+      && entry.imageEvidence === 'strong'
+      && entry.repairMode === 'retag_then_set_alt')
+
+    expect(candidate).toBeTruthy()
+  }, 120_000)
+
   it('substitutes missing legacy annual-report fonts with metric-aware embedded fallbacks', async () => {
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const before = await analyzePDF(buffer, '99anreport.pdf')

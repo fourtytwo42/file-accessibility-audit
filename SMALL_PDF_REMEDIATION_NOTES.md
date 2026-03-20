@@ -147,3 +147,23 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/localStandardsService.test.ts`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 4
+
+- Second queue item: `60fb95a3-e9a8-47b8-b585-6ef70bcac866`
+- Rerun result: `79/C`
+- Improvement vs first remediated run: `76 -> 79`
+- What changed:
+  - detector cleanup removed some false-positive evidence from the local standards path
+  - the file still remains well below target, so the remaining blocker set is now mostly real remediation debt rather than parser noise
+- Current dominant hypothesis:
+  - the next high-leverage fix is in figure promotion / retagging
+  - many image-backed candidates remain stuck on `/P` nodes with `imageEvidence: "strong"` but `repairMode: "defer"` and `no_figure_evidence`, which points to an internal gate inconsistency for safe retagging of paragraph-wrapped images
+
+### System Fix in Progress 5
+
+- Removed the extra `pageImageCount > 0` requirement from the safe figure-retagging gate when a candidate already has `imageEvidence: "strong"` or `"vector"`.
+- Added a regression test on `2025FirearmProhibitorsReport-250626T19175938.pdf` that confirms at least one strong image-backed `/P` candidate is now promoted to `retag_then_set_alt`.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|repairs legacy Gxx subset glyph names in small Distiller PDFs'`
+  - `pnpm --filter api exec tsc --noEmit`

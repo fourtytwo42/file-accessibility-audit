@@ -130,15 +130,15 @@
 ## Current Session Snapshot
 
 - Active file: `2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Active loop: `1`
-- Latest attempt queue item: `a9467479-f311-4c99-b90b-221dbc73202a`
-- Latest remediated result: `76/C` after fresh rerun with veraPDF intentionally disabled
-- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-remediated-v1.pdf`
-- Restart status: pending after the latest local-standards detector cleanup
+- Active loop: `2`
+- Latest attempt queue item: `60fb95a3-e9a8-47b8-b585-6ef70bcac866`
+- Latest remediated result: `79/C` after fresh rerun with veraPDF intentionally disabled
+- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-run2.json`
+- Restart status: pending after the latest figure-promotion fix
 
 ## Current Focus
 
-- Clean up false local-standards evidence on `2025FirearmProhibitorsReport-250626T19175938.pdf`, rerun it, and then attack the remaining real figure-retagging/alt-text gap.
+- Rerun `2025FirearmProhibitorsReport-250626T19175938.pdf` after the figure-promotion fix and measure how much of the remaining `alt_text` gap closes.
 
 ## Retry Checkpoint
 
@@ -148,9 +148,13 @@
 - Loop 4: `88/B -> 100/A`
 - Confirmed hypothesis: the final remaining font-unicode blocker was a generic legacy Distiller/PageMaker subset-glyph naming pattern (`/Differences [1 /G8b]`) that the Type1 Unicode repair path needed to decode.
 - New loop 2 baseline: `2025FirearmProhibitorsReport-250626T19175938.pdf` improved only to `76/C`; first diagnosis shows false-positive link `/Contents` and descendant-font Unicode findings mixed with a real figure-retagging backlog.
+- Loop 2 rerun after detector cleanup: `76/C -> 79/C`; detector issues were real but not dominant, and the remaining score gap is now clearly concentrated in image/figure remediation.
+- New hypothesis: strong image-backed `/P` candidates were being incorrectly held back by a `pageImageCount` gate even after they already had strong figure evidence; promoting those candidates should materially raise the `alt_text` category on rerun.
 
 ## Recent Events
 
+- 2026-03-20T08:26:00Z Small-PDF loop fix: safe figure-retagging no longer requires `pageImageCount > 0` once a candidate already has `strong` or `vector` figure evidence. Added a regression on `2025FirearmProhibitorsReport-250626T19175938.pdf` proving a strong image-backed `/P` candidate is promoted to `retag_then_set_alt`. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|repairs legacy Gxx subset glyph names in small Distiller PDFs'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
+- 2026-03-20T08:24:52Z Fresh post-restart rerun: `2025FirearmProhibitorsReport-250626T19175938.pdf` completed on queue item `60fb95a3-e9a8-47b8-b585-6ef70bcac866` at `79/C`. This confirms the local-standards detector cleanup helped, but the file remains primarily blocked by real figure/alt-text remediation debt rather than parser noise.
 - 2026-03-20T08:23:00Z Small-PDF loop fix: local standards now trust `qpdf` as the source of truth for link annotation `/Contents` when `qpdf` detected link annotations, avoiding false `annotation_alt_contents` findings from `pdfjs`'s null link-contents field. `qpdfService` also no longer double-counts descendant CID fonts as standalone fonts when the Type0 parent already owns the family, preventing false `font_unicode` findings from descendant-only objects. Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/localStandardsService.test.ts` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-20T08:17:00Z Fresh post-restart rerun: `juv probation.pdf` completed on queue item `c361f9ca-0829-4195-991e-b8f2cd3a66ce` at `100/A` after the Type1 `Gxx` subset-glyph decoder fix. This confirms the small-PDF loop fix closed the final font-unicode blocker for this Distiller/PageMaker family.
 - 2026-03-20T08:18:00Z Small-PDF loop fix: the Type1 Unicode repair path now decodes legacy subset glyph names in `Gxx` hexadecimal form when deriving `/ToUnicode` maps, covering the remaining one-byte custom-encoding blocker in `juv probation.pdf`. Added a regression test on `Downloads/juv probation.pdf` to verify `repair_type1_font_unicode_maps` reduces the missing Type1 Unicode count for this small Distiller/PageMaker pattern. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'repairs legacy Gxx subset glyph names in small Distiller PDFs|repairs derivable Type1 ToUnicode maps on annual-report PDFs'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `juv probation.pdf`.
