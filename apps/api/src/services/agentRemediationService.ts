@@ -2952,6 +2952,10 @@ export async function remediatePdfWithAgent(
     actions.push(...semanticStage.actions)
     manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, semanticStage.manualReviewFlags)
     for (const action of semanticStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+    previousActionNames = Array.from(new Set([
+      ...previousActionNames,
+      ...semanticStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+    ]))
     persistStageToolOutcomes(semanticStage.actions, {
       previous: semanticStageStartResult,
       next: currentResult,
@@ -3005,6 +3009,46 @@ export async function remediatePdfWithAgent(
       stageNumber: 91,
       standardsImproved: standardsValidationImproved(bookmarkStageStartResult, currentResult),
     })
+  }
+
+  const lateAltPassNeeded = !skipDirectToFinalCleanup
+    && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
+  if (lateAltPassNeeded) {
+    const lateAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+    const lateHeuristicFigureCandidates = heuristicEligibleFigureCandidates(lateAltContext)
+      .filter(candidate => !previousActionNames.includes(`set_figure_alt_text:${candidate.id}`))
+
+    if (lateHeuristicFigureCandidates.length > 0) {
+      stagesRun.add(92)
+      const lateAltStageStartResult = currentResult
+      const lateAltStage = await runHeuristicFigureFallbackStage({
+        buffer: workingBuffer,
+        result: currentResult,
+        context: lateAltContext,
+        previousActionNames,
+        inspectionCache,
+      })
+      if (!lateAltStage.buffer.equals(workingBuffer)) {
+        workingBuffer = lateAltStage.buffer
+      }
+      currentResult = lateAltStage.result
+      currentResultHasFreshVeraPdf = !lateAltStage.usedInheritedVeraPdf
+      actions.push(...lateAltStage.actions)
+      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, lateAltStage.manualReviewFlags)
+      for (const action of lateAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...lateAltStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ]))
+      latestContext = await inspectRemediationContext(workingBuffer, currentResult)
+      persistStageToolOutcomes(lateAltStage.actions, {
+        previous: lateAltStageStartResult,
+        next: currentResult,
+        roundNumber: round,
+        stageNumber: 92,
+        standardsImproved: standardsValidationImproved(lateAltStageStartResult, currentResult),
+      })
+    }
   }
 
   const finalCleanupContext = semanticStageChangedDocument || !latestContext
