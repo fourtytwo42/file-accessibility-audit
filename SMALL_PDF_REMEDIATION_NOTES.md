@@ -3,7 +3,7 @@
 ## Current Active File
 
 - `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current fresh queue item: `d42bb954-6bc2-403b-9775-27442e31fcac`
+- Current fresh queue item: `7d25d683-8c68-4038-b0f9-4f797cbc91ef`
 - Latest completed file: `McLean-2.pdf` -> `100/A`
 
 ## Recent Loop Summary
@@ -32,7 +32,7 @@
 - Shared fix in progress:
   - cut `inspect alt_text_deep` timeout from 5 minutes to 45 seconds so pathological structure snapshots fail fast instead of stalling the queue
   - when `alt_text_deep` still fails, immediately fall back to `light` inspection instead of repeatedly re-requesting the same pathological deep snapshot
-  - now that the queue completes, the next shared fix is heading-target remapping for Acrobat PDFs where heading lines initially bind to `/Link` wrappers instead of safe text-bearing parents
+  - now that deep structure scoring is no longer the dominant bottleneck, the next shared fix is batching heavy link `/Contents` mutations so the runtime stops thrashing through tiny one-by-one validation loops
 
 ## Southern Illinois Drug Task Force Result
 
@@ -118,6 +118,25 @@
 - Generic fix applied:
   - cap semantic link batching to the first `32` link targets on heavy-link documents
   - keep semantic headings, figures, and bookmarks active so the semantic stage still improves the categories that actually need model help
+
+## Follow-up Link Mutation Throughput Finding
+
+- Fresh rerun `7d25d683-8c68-4038-b0f9-4f797cbc91ef` still looked wedged at `68%`, but direct local profiling showed semantic batch generation itself finishes quickly:
+  - `full_final` analysis: about `52.7s` total, with the expected one-time deep structure snapshot
+  - `inspect(light)`: `766ms`
+  - `buildSemanticRepairBatches`: `1ms`
+  - `generateSemanticRepairBatches`: `7729ms`
+- Live PM2 logs on the same build showed the remaining churn is lots of repeated:
+  - `inspectMode:"light"` at about `0.5s`
+  - `analysisProfile:"remediation_fast"` at about `0.27s - 0.30s`
+- Root cause:
+  - the queue is no longer hung in semantic generation or deep structure scoring
+  - the remaining runtime tax is repeated one-by-one mutation plus validation on heavy link `/Contents` work
+  - `set_link_annotation_contents` already existed in the structure backend but was not participating in the shared stage batch executor
+- Generic fix applied:
+  - add `set_link_annotation_contents` to the stage-batching tool set
+  - derive a backend batch mutation for it from `candidateId/pageNumber/annotationIndex/contents`
+  - this should help deterministic stages and final cleanup collapse many tiny link-mutation loops into one backend batch on heavy-link PDFs
 
 ## Follow-up Validation Timing Finding
 

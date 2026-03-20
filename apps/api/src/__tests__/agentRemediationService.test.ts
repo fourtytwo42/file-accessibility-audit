@@ -100,6 +100,7 @@ vi.mock('../services/remediationPlanService.js', () => ({
     ['repair_bootstrapped_chart_content_refs', 2],
     ['repair_structure_conformance', 1],
     ['repair_native_link_structure', 3],
+    ['set_link_annotation_contents', 3],
     ['set_page_tabs', 3],
     ['normalize_annotation_tab_order', 3],
     ['repair_annotation_alt_text', 3],
@@ -405,7 +406,14 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       tableCandidates: [],
       headingCandidates: [],
       pages: [],
-      linkCandidates: [],
+      linkCandidates: [{
+        id: 'link:1',
+        pageNumber: 1,
+        annotationIndex: 0,
+        text: 'Example',
+        url: 'https://example.com',
+        annotationContents: null,
+      }],
       readingOrderCandidates: [],
       readingOrderParentCandidates: [],
       structure: {},
@@ -577,7 +585,6 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
       ],
     })
-
     analyzePDF.mockResolvedValue({
       ...originalResult,
       overallScore: 100,

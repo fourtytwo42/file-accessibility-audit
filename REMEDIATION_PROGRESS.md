@@ -12,13 +12,13 @@
 ## Current Session Snapshot
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Latest attempt path: queue item `f15c15f6-3074-4276-bc03-c0b049d91e71`
-- Latest result summary: the semantic timeout guard is live, but the active rerun still exposed a second runtime tax: `analyzePDF()` was asking for `alt_text_deep` structure snapshots even during `remediation_fast` forced structure scoring, which kept injecting `~45s` `structureInspect` spikes into the validation loop.
-- Latest validation source: targeted `pdfAnalyzer` tests and live queue/log diagnosis completed on 2026-03-20T22:44Z
-- Next action: rebuild/restart on the analysis-side structure-inspection mode fix and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: using `light` structure inspection for `remediation_fast` validation, plus falling back from deep to light in `full_final`, should remove the remaining 45-second structure spikes and let this file either complete or reveal the next true blocker family
-- API restart status: restart required after the analysis-side structure-inspection fix before trusting the next queue result
-- Build status: `pnpm --filter api build` will be run before the next PM2 restart
+- Latest attempt path: queue item `7d25d683-8c68-4038-b0f9-4f797cbc91ef`
+- Latest result summary: the deep-structure validation tax is now gone, but the live queue is still spending too long in repeated small mutation/validation loops on this heavy-link Acrobat report. Local profiling shows semantic batch generation itself only takes about `7.7s`, so the next runtime win is batching link `/Contents` mutations through the structure backend instead of mutating them one-by-one.
+- Latest validation source: targeted `agentRemediationService` tests, `tsc`, direct semantic profiling, and live PM2 log diagnosis completed on 2026-03-20T22:55Z
+- Next action: commit/push the link `/Contents` stage-batching fix, rebuild/restart, cancel the stale in-flight queue item, and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: batching `set_link_annotation_contents` in the main stage executor should collapse hundreds of tiny mutation/inspection cycles on heavy-link PDFs and let this file finally reach a real completed remediated score on the latest stack
+- API restart status: restart required after the new batching fix before trusting the next queue result
+- Build status: `pnpm --filter api build` should be run before the next PM2 restart
 
 ## Current Concurrency
 
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: the fresh rerun reached semantic generation on the timeout-enabled build, but logs still show `remediation_fast` and `full_final` occasionally paying `~45s` for `structureInspect`; this is now isolated to the analysis-side deep-inspection choice rather than the semantic provider path alone
-- Immediate next step: rebuild/restart on the analysis-side structure-inspection mode fix, rerun the same PDF, and confirm the validation loop stays on light structure scoring during `remediation_fast`
-- API restart/rerun confirmed for active file: pending restart; the current queue item `2531dc74-ccc4-4ab0-bd45-a8adeb5a2392` is stale relative to the newest analysis-side structure-inspection change
+- Current phase: the runtime bottleneck has moved from deep structure inspection to repeated one-by-one link annotation mutations on a heavy-link Acrobat report
+- Immediate next step: deploy the `set_link_annotation_contents` batching fix, rerun the same PDF, and confirm the validation loop no longer burns time on hundreds of tiny link-mutation cycles
+- API restart/rerun confirmed for active file: pending restart; the current queue item `7d25d683-8c68-4038-b0f9-4f797cbc91ef` is stale relative to the newest stage-batching change
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
-- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=9`
-- Next hypothesis: once `remediation_fast` stops forcing deep structure snapshots, the queue should stop paying 45-second validation spikes and the semantic timeout guard can do its intended job if the provider hangs again
+- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=10`
+- Next hypothesis: once `set_link_annotation_contents` joins the shared backend batch path, heavy-link PDFs should stop thrashing the mutation/inspection loop and expose the next true scoring blocker instead of a runtime bottleneck
 
 ## Pending Files
 
@@ -76,6 +76,8 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T22:55:00Z Small-PDF loop fix: `set_link_annotation_contents` now participates in the shared stage batching path, so heavy-link PDFs can apply link annotation `/Contents` repairs through one backend batch instead of one mutation at a time. Live PM2 logs on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the earlier deep-structure fix worked, but the queue was still chewing through long runs of `remediation_fast + inspect(light)` cycles; direct local profiling showed semantic batch generation itself completed in `7729ms`, which isolated the remaining tax to per-action mutation churn rather than semantic generation. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'batches contiguous document-scoped stage repairs and preserves per-tool actions|batches native-safe final cleanup into one analysis pass'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 
 - 2026-03-20T22:44:00Z Small-PDF loop fix: `analyzePDF()` now uses `light` structure inspection for `remediation_fast` forced structure scoring, and `full_final` deep inspection now falls back to `light` if the deep snapshot fails. Live logs on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the semantic timeout guard was necessary but not sufficient because `remediation_fast` validations were still repeatedly paying `~45s` on `structureInspect` due to an unconditional `alt_text_deep` request whenever structure scoring was enabled. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfAnalyzer.test.ts -t 'uses remediation_fast to skip the heavy auxiliary analyzers and mark skipped categories provisional|uses light structure inspection when remediation_fast forces structure scoring|falls back to light structure inspection when deep final inspection fails|keeps full_final on the full analysis path while still skipping veraPDF by default'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T22:35:00Z Small-PDF loop fix: the OpenAI-compatible semantic repair request path now has a hard timeout guard, so hung provider calls fail fast instead of pinning the queue in `Generating semantic fixes` indefinitely. Live diagnosis on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the deep-scoring and heading-batch fixes were working, but rerun `f15c15f6-3074-4276-bc03-c0b049d91e71` still stalled at `68%` while local inspections remained fast; that isolated the next bottleneck to a semantic-provider hang. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'times out hung semantic provider requests instead of waiting indefinitely|skips candidates already tagged as specific headings|caps semantic link batches on heavy-link documents'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.

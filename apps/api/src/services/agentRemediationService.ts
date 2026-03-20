@@ -97,6 +97,7 @@ const STAGE_BATCHABLE_TOOLS = new Set<RemediationToolCall['tool_name']>([
   'repair_bootstrapped_chart_content_refs',
   'repair_structure_conformance',
   'repair_native_link_structure',
+  'set_link_annotation_contents',
   'normalize_annotation_tab_order',
   'repair_annotation_alt_text',
   'set_tabs_all_annotated_pages',
@@ -376,6 +377,26 @@ function buildBatchMutationForCall(
     case 'repair_annotation_alt_text':
     case 'set_tabs_all_annotated_pages':
       return { operation: call.tool_name }
+    case 'set_link_annotation_contents': {
+      const candidateId = typeof call.arguments?.candidateId === 'string' ? call.arguments.candidateId : null
+      const candidate = candidateId
+        ? context.linkCandidates.find(entry => entry.id === candidateId)
+        : null
+      const pageNumber = Number(call.arguments?.pageNumber ?? candidate?.pageNumber)
+      const annotationIndex = Number(call.arguments?.annotationIndex ?? candidate?.annotationIndex)
+      const contents = typeof call.arguments?.contents === 'string'
+        ? call.arguments.contents.trim()
+        : ''
+      if (!Number.isFinite(pageNumber) || pageNumber < 1 || !Number.isFinite(annotationIndex) || annotationIndex < 0 || !contents) {
+        return null
+      }
+      return {
+        operation: 'set_link_annotation_contents',
+        pageNumber,
+        annotationIndex,
+        contents,
+      }
+    }
     default:
       return null
   }
