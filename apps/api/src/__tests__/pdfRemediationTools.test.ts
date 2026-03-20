@@ -377,6 +377,47 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(__test_getBuildRemediationPageFactsCallCount()).toBe(1)
   })
 
+  it('falls back to light inspection when alt_text_deep inspection fails', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'fallback.pdf', { skipAdobe: true })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend')
+      .mockResolvedValueOnce({
+        status: 'failed',
+        changedDocumentBytes: false,
+        appliedMutations: [],
+        warnings: ['Structure backend failed.'],
+        headings: [],
+        structuralNodes: [],
+        tables: [],
+        figures: [],
+        imageStructNodes: [],
+        acrobatAltRiskNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+      } as any)
+      .mockResolvedValueOnce({
+        status: 'applied',
+        changedDocumentBytes: false,
+        appliedMutations: [],
+        warnings: [],
+        headings: [],
+        structuralNodes: [],
+        tables: [],
+        figures: [],
+        imageStructNodes: [],
+        acrobatAltRiskNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+      } as any)
+
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
+
+    expect(backendSpy).toHaveBeenCalledTimes(2)
+    expect(backendSpy.mock.calls[0]?.[0]?.mutation.inspectMode).toBe('alt_text_deep')
+    expect(backendSpy.mock.calls[1]?.[0]?.mutation.inspectMode).toBe('light')
+    expect(context.structure.structuralNodes).toEqual([])
+  })
+
   it('builds remediation context from a supplied snapshot without re-running inspect', async () => {
     const buffer = await makePdfWithLink()
     const analysis = await analyzePDF(buffer, 'snapshot.pdf', { skipAdobe: true })

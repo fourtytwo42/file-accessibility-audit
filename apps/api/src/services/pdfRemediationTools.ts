@@ -1176,31 +1176,37 @@ export async function inspectPdfForRemediation(
   const pdfjsPromise = options.cache?.pdfjs ? Promise.resolve(options.cache.pdfjs) : analyzeWithPdfjs(buffer)
   const cachedPages = getCachedPagesForHash(options.cache, bufferSha256)
   const pagesPromise = cachedPages ? Promise.resolve(cachedPages) : buildRemediationPageFacts(buffer)
-  const [qpdf, pdfjs, structure, pages] = await Promise.all([
+  const [qpdf, pdfjs, initialStructure, pages] = await Promise.all([
     qpdfPromise,
     pdfjsPromise,
     runPdfStructureBackend({ buffer, mutation: { operation: 'inspect', inspectMode } }),
     pagesPromise,
   ])
+  const structure = inspectMode === 'alt_text_deep' && initialStructure.status === 'failed'
+    ? await runPdfStructureBackend({ buffer, mutation: { operation: 'inspect', inspectMode: 'light' } })
+    : initialStructure
+  const effectiveInspectMode = inspectMode === 'alt_text_deep' && initialStructure.status === 'failed'
+    ? 'light'
+    : inspectMode
 
   const payload = toInspectionPayload({ qpdf, pdfjs, pages, structure })
 
   if (perRunCache) {
     perRunCache.bufferSha256 = bufferSha256
-    perRunCache.contextsByMode = {
-      ...(perRunCache.contextsByMode || {}),
-      [inspectMode]: payload,
+      perRunCache.contextsByMode = {
+        ...(perRunCache.contextsByMode || {}),
+        [effectiveInspectMode]: payload,
+      }
+      perRunCache.qpdf = qpdf
+      perRunCache.pdfjs = pdfjs
+      setCachedPagesForHash(perRunCache, bufferSha256, pages)
     }
-    perRunCache.qpdf = qpdf
-    perRunCache.pdfjs = pdfjs
-    setCachedPagesForHash(perRunCache, bufferSha256, pages)
-  }
-  setCachedInspectionPayload(cacheKey, payload)
+  setCachedInspectionPayload(inspectionCacheKey(bufferSha256, effectiveInspectMode), payload)
 
   console.log(JSON.stringify({
     scope: 'pdf_inspection_timing',
     filename: analysis.filename,
-    inspectMode,
+    inspectMode: effectiveInspectMode,
     cacheHit,
     totalMs: Date.now() - startedAt,
   }))
