@@ -119,6 +119,15 @@ function logAnalysisTimings(input: {
   }))
 }
 
+function structureInspectModeForAnalysis(input: {
+  analysisProfile: AnalysisProfile
+  forceStructureForScoring?: boolean
+}): 'light' | 'alt_text_deep' {
+  if (input.analysisProfile === 'remediation_fast') return 'light'
+  if (input.forceStructureForScoring) return 'light'
+  return 'alt_text_deep'
+}
+
 export async function analyzePDF(
   buffer: Buffer,
   filename: string,
@@ -177,13 +186,29 @@ export async function analyzePDF(
     const structureForScoring = (analysisProfile === 'full_final' || options?.forceStructureForScoring)
       && qpdfResult.hasStructTree
       && (pdfjsResult.imageCount > 0 || qpdfResult.images.length > 0 || qpdfResult.headings.length > 0)
-      ? await measure(timings, 'structureInspect', () => runPdfStructureBackend({
-          buffer,
-          mutation: {
-            operation: 'inspect',
-            inspectMode: 'alt_text_deep',
-          },
-        }))
+      ? await measure(timings, 'structureInspect', async () => {
+          const inspectMode = structureInspectModeForAnalysis({
+            analysisProfile,
+            forceStructureForScoring: options?.forceStructureForScoring,
+          })
+          const initial = await runPdfStructureBackend({
+            buffer,
+            mutation: {
+              operation: 'inspect',
+              inspectMode,
+            },
+          })
+          if (inspectMode === 'alt_text_deep' && initial.status === 'failed') {
+            return runPdfStructureBackend({
+              buffer,
+              mutation: {
+                operation: 'inspect',
+                inspectMode: 'light',
+              },
+            })
+          }
+          return initial
+        })
       : null
 
     const [readingOrderResult, colorContrastResult, tableStructureResult, tabOrderResult] = await Promise.all([

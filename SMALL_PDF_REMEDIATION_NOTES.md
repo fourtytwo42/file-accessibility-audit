@@ -1318,5 +1318,6 @@
 - Shared fixes shipped:
   - semantic heading batching now excludes candidates whose `existingTag` is already `H1`-`H6`
   - semantic provider requests now time out instead of waiting indefinitely
+  - `analyzePDF()` now uses `light` structure inspection for `remediation_fast` forced structure scoring and falls back from deep to light on the final pass if deep inspection fails
 - Best next hypothesis:
-  - once hung semantic requests fail fast, this file should either complete with fallback behavior or reveal the next true blocker family cleanly
+  - once fast validation stops requesting deep structure snapshots, this file should either complete on the timeout-enabled build or reveal the next true blocker family cleanly

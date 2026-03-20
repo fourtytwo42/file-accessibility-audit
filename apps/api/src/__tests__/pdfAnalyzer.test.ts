@@ -179,6 +179,152 @@ describe('pdfAnalyzer', () => {
     expect(result.categories.find(category => category.id === 'table_markup')?.score).toBe(100)
   })
 
+  it('uses light structure inspection when remediation_fast forces structure scoring', async () => {
+    const { analyzePDF } = await import('../services/pdfAnalyzer.js')
+    analyzeWithQpdf.mockResolvedValue({
+      error: null,
+      hasStructTree: true,
+      hasMarkInfo: true,
+      marked: true,
+      isTagged: true,
+      structTreeDepth: 2,
+      images: [{ ref: 'img1' }],
+      headings: [],
+      tables: [],
+      contentOrder: [],
+      outlineCount: 0,
+      formFields: [],
+      hasAcroForm: false,
+    })
+    analyzeWithPdfjs.mockResolvedValue({
+      pageCount: 2,
+      imageCount: 1,
+      hasText: true,
+      textLength: 100,
+      title: 'Example',
+      lang: 'en',
+      metadata: {
+        creator: null,
+        producer: null,
+        creationDate: null,
+        modDate: null,
+        pdfVersion: '1.7',
+        isEncrypted: false,
+        keywords: null,
+        author: null,
+        subject: null,
+        pageCount: 2,
+      },
+      links: [],
+      hasOutlines: false,
+    })
+
+    await analyzePDF(Buffer.from('pdf'), 'fast-structure.pdf', {
+      analysisProfile: 'remediation_fast',
+      skipAdobe: true,
+      forceStructureForScoring: true,
+    })
+
+    expect(runPdfStructureBackend).toHaveBeenCalledTimes(1)
+    expect(runPdfStructureBackend).toHaveBeenCalledWith({
+      buffer: Buffer.from('pdf'),
+      mutation: {
+        operation: 'inspect',
+        inspectMode: 'light',
+      },
+    })
+  })
+
+  it('falls back to light structure inspection when deep final inspection fails', async () => {
+    const { analyzePDF } = await import('../services/pdfAnalyzer.js')
+    analyzeWithQpdf.mockResolvedValue({
+      error: null,
+      hasStructTree: true,
+      hasMarkInfo: true,
+      marked: true,
+      isTagged: true,
+      structTreeDepth: 2,
+      images: [{ ref: 'img1' }],
+      headings: [],
+      tables: [],
+      contentOrder: [],
+      outlineCount: 0,
+      formFields: [],
+      hasAcroForm: false,
+    })
+    analyzeWithPdfjs.mockResolvedValue({
+      pageCount: 2,
+      imageCount: 1,
+      hasText: true,
+      textLength: 100,
+      title: 'Example',
+      lang: 'en',
+      metadata: {
+        creator: null,
+        producer: null,
+        creationDate: null,
+        modDate: null,
+        pdfVersion: '1.7',
+        isEncrypted: false,
+        keywords: null,
+        author: null,
+        subject: null,
+        pageCount: 2,
+      },
+      links: [],
+      hasOutlines: false,
+    })
+    runPdfStructureBackend
+      .mockResolvedValueOnce({
+        status: 'failed',
+        changedDocumentBytes: false,
+        appliedMutations: [],
+        warnings: ['timed out'],
+        structuralNodes: [],
+        figures: [],
+        imageStructNodes: [],
+        acrobatAltRiskNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+        headings: [],
+        tables: [],
+      })
+      .mockResolvedValueOnce({
+        status: 'no_effect',
+        changedDocumentBytes: false,
+        appliedMutations: [],
+        warnings: [],
+        structuralNodes: [],
+        figures: [],
+        imageStructNodes: [],
+        acrobatAltRiskNodes: [],
+        readingOrderNodes: [],
+        readingOrderParents: [],
+        headings: [],
+        tables: [],
+      })
+
+    await analyzePDF(Buffer.from('pdf'), 'full-fallback.pdf', {
+      analysisProfile: 'full_final',
+      skipAdobe: true,
+    })
+
+    expect(runPdfStructureBackend).toHaveBeenNthCalledWith(1, {
+      buffer: Buffer.from('pdf'),
+      mutation: {
+        operation: 'inspect',
+        inspectMode: 'alt_text_deep',
+      },
+    })
+    expect(runPdfStructureBackend).toHaveBeenNthCalledWith(2, {
+      buffer: Buffer.from('pdf'),
+      mutation: {
+        operation: 'inspect',
+        inspectMode: 'light',
+      },
+    })
+  })
+
   it('keeps full_final on the full analysis path while still skipping veraPDF by default', async () => {
     const { analyzePDF } = await import('../services/pdfAnalyzer.js')
 

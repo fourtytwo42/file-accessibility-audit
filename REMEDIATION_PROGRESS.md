@@ -13,11 +13,11 @@
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
 - Latest attempt path: queue item `f15c15f6-3074-4276-bc03-c0b049d91e71`
-- Latest result summary: the semantic heading filter is live, but the rerun still stalled in `Generating semantic fixes`; the next bottleneck is that the OpenAI-compatible semantic request path had no timeout, so a hung provider call could pin the queue indefinitely.
-- Latest validation source: targeted `semanticEnrichmentService` tests and live queue/log diagnosis completed on 2026-03-20T22:35Z
-- Next action: rebuild/restart on the semantic-request timeout guard and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: timing out hung semantic provider calls should let the agent fall back cleanly instead of freezing at `68%`, which will either finish this PDF or expose the next real blocker family
-- API restart status: restart required after the semantic-request timeout change before trusting the next queue result
+- Latest result summary: the semantic timeout guard is live, but the active rerun still exposed a second runtime tax: `analyzePDF()` was asking for `alt_text_deep` structure snapshots even during `remediation_fast` forced structure scoring, which kept injecting `~45s` `structureInspect` spikes into the validation loop.
+- Latest validation source: targeted `pdfAnalyzer` tests and live queue/log diagnosis completed on 2026-03-20T22:44Z
+- Next action: rebuild/restart on the analysis-side structure-inspection mode fix and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
+- Next hypothesis: using `light` structure inspection for `remediation_fast` validation, plus falling back from deep to light in `full_final`, should remove the remaining 45-second structure spikes and let this file either complete or reveal the next true blocker family
+- API restart status: restart required after the analysis-side structure-inspection fix before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: the requeued rerun progressed through stage 5 and then stalled again at `Generating semantic fixes`; the next bottleneck is a hung semantic-provider request rather than local analysis time
-- Immediate next step: rebuild/restart on the semantic-request timeout guard, rerun the same PDF, and confirm the queue fails fast or falls back instead of pinning at `68%`
-- API restart/rerun confirmed for active file: pending restart; the current queue item `f15c15f6-3074-4276-bc03-c0b049d91e71` is stale relative to the newest semantic timeout change
+- Current phase: the fresh rerun reached semantic generation on the timeout-enabled build, but logs still show `remediation_fast` and `full_final` occasionally paying `~45s` for `structureInspect`; this is now isolated to the analysis-side deep-inspection choice rather than the semantic provider path alone
+- Immediate next step: rebuild/restart on the analysis-side structure-inspection mode fix, rerun the same PDF, and confirm the validation loop stays on light structure scoring during `remediation_fast`
+- API restart/rerun confirmed for active file: pending restart; the current queue item `2531dc74-ccc4-4ab0-bd45-a8adeb5a2392` is stale relative to the newest analysis-side structure-inspection change
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
 - Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=9`
-- Next hypothesis: once hung semantic requests time out, the queue should stop freezing in semantic generation and either complete with heuristic/manual fallbacks or reveal the next true remediation blocker
+- Next hypothesis: once `remediation_fast` stops forcing deep structure snapshots, the queue should stop paying 45-second validation spikes and the semantic timeout guard can do its intended job if the provider hangs again
 
 ## Pending Files
 
@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-20T22:44:00Z Small-PDF loop fix: `analyzePDF()` now uses `light` structure inspection for `remediation_fast` forced structure scoring, and `full_final` deep inspection now falls back to `light` if the deep snapshot fails. Live logs on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the semantic timeout guard was necessary but not sufficient because `remediation_fast` validations were still repeatedly paying `~45s` on `structureInspect` due to an unconditional `alt_text_deep` request whenever structure scoring was enabled. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfAnalyzer.test.ts -t 'uses remediation_fast to skip the heavy auxiliary analyzers and mark skipped categories provisional|uses light structure inspection when remediation_fast forces structure scoring|falls back to light structure inspection when deep final inspection fails|keeps full_final on the full analysis path while still skipping veraPDF by default'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T22:35:00Z Small-PDF loop fix: the OpenAI-compatible semantic repair request path now has a hard timeout guard, so hung provider calls fail fast instead of pinning the queue in `Generating semantic fixes` indefinitely. Live diagnosis on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` showed the deep-scoring and heading-batch fixes were working, but rerun `f15c15f6-3074-4276-bc03-c0b049d91e71` still stalled at `68%` while local inspections remained fast; that isolated the next bottleneck to a semantic-provider hang. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'times out hung semantic provider requests instead of waiting indefinitely|skips candidates already tagged as specific headings|caps semantic link batches on heavy-link documents'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T22:27:00Z Small-PDF loop fix: semantic heading batching now skips candidates already tagged as specific headings (`H1`-`H6`), preventing no-effect AI churn like `H2 -> H2` on `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`. Live queue/log diagnosis on rerun `f15c15f6-3074-4276-bc03-c0b049d91e71` showed the narrowed deep-scoring gate worked, but the semantic stage was still burning time on heading proposals for candidates that were already structurally repaired. Verified with `pnpm --filter api exec vitest run src/__tests__/semanticEnrichmentService.test.ts -t 'skips candidates already tagged as specific headings|caps semantic link batches on heavy-link documents|chunks semantic targets by type-specific batch sizes'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T21:49:00Z Small-PDF loop fix: heading target remapping now rebinds `/Link`-backed heading candidates to a safe parent text container when one exists, instead of leaving them blocked behind unsafe `/Link` wrappers. This targets `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`, whose first completed rerun (`93dc3da2-b092-463e-a286-efeeba1e4442`) landed at `63/D` with `16` blocked heading candidates and evidence that most candidate targets were unsafe `/Link` nodes despite nearby safe parent `/P` structure. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps link-backed heading candidates to their safe parent text node|remaps section-backed heading candidates to the first safe descendant text node|remaps story-backed heading candidates to the first safe descendant text node|treats /Sect-backed heading candidates as safe when they are the best available structural target|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Normal-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
