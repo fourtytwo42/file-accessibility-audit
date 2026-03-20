@@ -849,6 +849,42 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').score).toBe(60)
   })
 
+  it('uses a residual Acrobat-risk cap when all detected figures already have alt text', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true },
+        { ref: '11 0 R', hasAlt: true },
+        { ref: '12 0 R', hasAlt: true },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'obj:42 0 R',
+            tag: '/P',
+            pageRef: 'obj:5 0 R',
+            mcids: [31, 32],
+            hasText: true,
+            hasGraphics: true,
+            splitSafe: false,
+            graphicsLikelyDecorative: false,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(75)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('residual structure debt'))).toBe(true)
+  })
+
   it('excludes decorative non-figure graphics from alt-text scoring when informative figures are already described', () => {
     const qpdf = makeQpdf({
       images: [

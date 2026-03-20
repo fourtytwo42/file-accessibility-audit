@@ -934,11 +934,27 @@ function scoreAltTextWithAcrobatRisk(
       ],
     }
   }
+  const figures = qpdf.images.filter(img => img.ref)
+  const allDetectedFiguresHaveAlt = figures.length > 0 && figures.every(fig => fig.hasAlt)
   // If any mixed text/graphics node contains content-bearing (non-decorative) graphics, apply the strict cap.
   const hasNonDecorativeMixedContent = substantiveRiskNodes.some(
     n => n.ownershipMode === 'mixed_text_graphics_same_mcid'
   )
   const baseScore = category.score === null ? 100 : category.score
+  if (baseScore === 100 && allDetectedFiguresHaveAlt) {
+    const scoreCap = hasNonDecorativeMixedContent ? 75 : 85
+    const score = Math.min(baseScore, scoreCap)
+    return {
+      ...category,
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
+      findings: [
+        ...findings,
+        'All detected /Figure elements already have alternate text, so Acrobat-risk ownership debt is being scored as residual structure debt rather than missing figure descriptions.',
+      ],
+    }
+  }
   const scoreCap = hasNonDecorativeMixedContent
     ? (
         substantiveRiskNodes.length === 1
