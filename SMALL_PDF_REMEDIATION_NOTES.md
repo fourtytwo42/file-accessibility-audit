@@ -3,7 +3,7 @@
 ## Current Active File
 
 - `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current fresh queue item: `7d25d683-8c68-4038-b0f9-4f797cbc91ef`
+- Current fresh queue item: `ae0190c8-aff7-41b9-8c22-75f08fc666e4`
 - Latest completed file: `McLean-2.pdf` -> `100/A`
 
 ## Recent Loop Summary
@@ -1340,3 +1340,14 @@
   - `analyzePDF()` now uses `light` structure inspection for `remediation_fast` forced structure scoring and falls back from deep to light on the final pass if deep inspection fails
 - Best next hypothesis:
   - once fast validation stops requesting deep structure snapshots, this file should either complete on the timeout-enabled build or reveal the next true blocker family cleanly
+
+## Follow-up Semantic Link Mutation Finding
+
+- Fresh rerun `ae0190c8-aff7-41b9-8c22-75f08fc666e4` progressed cleanly into stage 6 after deterministic link batching, then stalled again at `Generating semantic fixes`.
+- Direct profiling and live logs narrowed that down further:
+  - semantic batch generation itself is fast (`generateSemanticRepairBatches` completed in about `7.7s`)
+  - deterministic-stage batching is working
+  - the remaining churn is in semantic-stage application, where semantic link `/Contents` repairs were still being executed one-by-one
+- Generic fix applied:
+  - semantic `set_link_annotation_contents` calls now batch through `runPdfStructureBackendBatch()` using the same mutation builder as deterministic stages
+  - this should collapse the remaining heavy-link semantic mutation loop on Acrobat reports like `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`

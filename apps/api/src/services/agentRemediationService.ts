@@ -1213,6 +1213,137 @@ async function runSemanticEnrichmentStage(input: {
   let currentResult = input.result
   let usedInheritedVeraPdf = false
 
+  const executeSemanticCalls = async (
+    plannedCalls: Array<{
+      key: string
+      categoryTargets: string[]
+      call: Parameters<typeof executeRemediationTool>[0]['call']
+    }>,
+    batchContext: Awaited<ReturnType<typeof inspectPdfForRemediation>>,
+  ): Promise<{
+    buffer: Buffer
+    actions: RemediationActionRecord[]
+    manualReviewFlags: ModelReviewFlag[]
+    changedDocument: boolean
+    context: Awaited<ReturnType<typeof inspectPdfForRemediation>>
+  }> => {
+    let working = workingBuffer
+    let context = batchContext
+    let changedDocument = false
+    const actions: RemediationActionRecord[] = []
+    let flags: ModelReviewFlag[] = []
+    let index = 0
+
+    while (index < plannedCalls.length) {
+      const current = plannedCalls[index]!
+      const currentCall = current.call as RemediationToolCall
+      const currentMutation = buildBatchMutationForCall(currentCall, context)
+
+      if (!currentMutation) {
+        const outcome = await executeRemediationTool({
+          buffer: working,
+          context,
+          call: current.call,
+        })
+        working = outcome.buffer
+        actions.push(outcome.action)
+        flags = mergeManualReviewFlags(flags, outcome.manualReviewFlags)
+        changedDocument = changedDocument || !!outcome.action.changedDocumentBytes
+        if (outcome.action.changedDocumentBytes) {
+          context = await inspectPdfForRemediation(working, currentResult, {
+            cache: input.inspectionCache,
+          })
+        }
+        index += 1
+        continue
+      }
+
+      const cluster: typeof plannedCalls = [current]
+      let lookahead = index + 1
+      while (lookahead < plannedCalls.length) {
+        const next = plannedCalls[lookahead]!
+        const nextMutation = buildBatchMutationForCall(next.call as RemediationToolCall, context)
+        if (!nextMutation) break
+        cluster.push(next)
+        lookahead += 1
+      }
+
+      if (cluster.length === 1) {
+        const outcome = await executeRemediationTool({
+          buffer: working,
+          context,
+          call: current.call,
+        })
+        working = outcome.buffer
+        actions.push(outcome.action)
+        flags = mergeManualReviewFlags(flags, outcome.manualReviewFlags)
+        changedDocument = changedDocument || !!outcome.action.changedDocumentBytes
+        if (outcome.action.changedDocumentBytes) {
+          context = await inspectPdfForRemediation(working, currentResult, {
+            cache: input.inspectionCache,
+          })
+        }
+        index += 1
+        continue
+      }
+
+      const mutations = cluster.map(entry => buildBatchMutationForCall(entry.call as RemediationToolCall, context)!)
+      const batchResult = await runPdfStructureBackendBatch({
+        buffer: working,
+        mutations,
+        includeSnapshot: false,
+        inspectMode: inspectModeForResult(currentResult),
+      })
+      const operationResults = batchResult.operationResults || []
+      const validBatch = batchResult.status !== 'failed'
+        && operationResults.length === cluster.length
+        && (!operationResults.some(result => result.changedDocumentBytes) || !!batchResult.outputBuffer)
+
+      if (!validBatch) {
+        for (const planned of cluster) {
+          const outcome = await executeRemediationTool({
+            buffer: working,
+            context,
+            call: planned.call,
+          })
+          working = outcome.buffer
+          actions.push(outcome.action)
+          flags = mergeManualReviewFlags(flags, outcome.manualReviewFlags)
+          changedDocument = changedDocument || !!outcome.action.changedDocumentBytes
+          if (outcome.action.changedDocumentBytes) {
+            context = await inspectPdfForRemediation(working, currentResult, {
+              cache: input.inspectionCache,
+            })
+          }
+        }
+        index = lookahead
+        continue
+      }
+
+      const batchActions = cluster.map((planned, clusterIndex) => {
+        const translated = toBatchActionRecord({
+          call: planned.call as RemediationToolCall,
+          operationResult: operationResults[clusterIndex],
+        })
+        flags = mergeManualReviewFlags(flags, translated.manualReviewFlags)
+        return translated.action
+      })
+      actions.push(...batchActions)
+      if (batchResult.outputBuffer) {
+        working = batchResult.outputBuffer
+      }
+      if (operationResults.some(result => result.changedDocumentBytes)) {
+        changedDocument = true
+        context = await inspectPdfForRemediation(working, currentResult, {
+          cache: input.inspectionCache,
+        })
+      }
+      index = lookahead
+    }
+
+    return { buffer: working, actions, manualReviewFlags: flags, changedDocument, context }
+  }
+
   for (const batch of batches) {
     const batchThreshold = semanticThreshold(batch.batchType)
     const deferredActions: RemediationActionRecord[] = []
@@ -1409,32 +1540,17 @@ async function runSemanticEnrichmentStage(input: {
     input.onProgress?.({ stage: `Applying semantic fixes: ${batch.batchType}`, percent: 89 })
     const batchStartBuffer = workingBuffer
     const batchStartResult = currentResult
-    let batchContext = context
     const batchActions: RemediationActionRecord[] = []
-    let batchBuffer = workingBuffer
-    let batchChanged = false
-    let batchFlags: ModelReviewFlag[] = []
-
-    for (const planned of plannedCalls) {
-      const outcome = await executeRemediationTool({
-        buffer: batchBuffer,
-        context: batchContext,
-        call: planned.call,
-      })
-      batchBuffer = outcome.buffer
-      batchActions.push(outcome.action)
-      batchFlags = mergeManualReviewFlags(batchFlags, outcome.manualReviewFlags)
-      batchChanged = batchChanged || !!outcome.action.changedDocumentBytes
-      if (outcome.action.changedDocumentBytes) {
-        batchContext = await inspectPdfForRemediation(batchBuffer, batchStartResult, {
-          cache: input.inspectionCache,
-        })
-      }
-    }
+    const executedBatch = await executeSemanticCalls(plannedCalls, context)
+    const batchBuffer = executedBatch.buffer
+    const batchChanged = executedBatch.changedDocument
+    const batchFlags = executedBatch.manualReviewFlags
+    batchActions.push(...executedBatch.actions)
 
     if (!batchChanged) {
       acceptedActions.push(...batchActions)
       manualReviewFlags.push(...batchFlags)
+      context = executedBatch.context
       continue
     }
 

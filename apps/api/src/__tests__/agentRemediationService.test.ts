@@ -3313,6 +3313,126 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.finalResult.verapdf.failedChecks).toBe(12)
   })
 
+  it('batches semantic link annotation content repairs through the structure backend', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 4,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'semantic-links.pdf',
+      pageCount: 4,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 2, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 70,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 4,
+        failures: [{ ruleId: 'links', specification: null, clause: null, testNumber: null, location: null, message: 'Link issue', categoryIds: [] }],
+      }),
+      categories: [
+        { id: 'link_quality', label: 'Link Quality', weight: 0.15, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    const context = {
+      pdfjs: { title: 'Links', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [
+        { id: 'link:1', pageNumber: 1, annotationIndex: 0, text: 'First', url: 'https://example.com/1', annotationContents: null, rawUrl: false, suggestedText: 'First link' },
+        { id: 'link:2', pageNumber: 1, annotationIndex: 1, text: 'Second', url: 'https://example.com/2', annotationContents: null, rawUrl: false, suggestedText: 'Second link' },
+      ],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    }
+
+    inspectPdfForRemediation.mockResolvedValue(context)
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: ['link_quality'], actions: [] })
+    generateSemanticRepairBatches.mockResolvedValue({
+      batches: [{
+        batchType: 'links',
+        headings: [],
+        figures: [],
+        tables: [],
+        links: [
+          { candidateId: 'link:1', replacementText: 'First', annotationContents: 'First link', confidence: 0.92, rationale: 'First label.' },
+          { candidateId: 'link:2', replacementText: 'Second', annotationContents: 'Second link', confidence: 0.91, rationale: 'Second label.' },
+        ],
+      }],
+      reviewFlags: [],
+    })
+    runPdfStructureBackendBatch.mockResolvedValueOnce({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: Buffer.from('semantic-links-batched'),
+      operationResults: [
+        {
+          operation: 'set_link_annotation_contents',
+          status: 'applied',
+          changedDocumentBytes: true,
+          appliedMutations: [{ ref: 'obj:1 0 R', details: 'first link contents repaired' }],
+          warnings: [],
+        },
+        {
+          operation: 'set_link_annotation_contents',
+          status: 'applied',
+          changedDocumentBytes: true,
+          appliedMutations: [{ ref: 'obj:2 0 R', details: 'second link contents repaired' }],
+          warnings: [],
+        },
+      ],
+    })
+    analyzePDF.mockImplementation(async (_buffer: Buffer, _filename: string, options?: { inheritedVeraPdf?: VeraPdfResult }) => ({
+      ...originalResult,
+      overallScore: 100,
+      grade: 'A',
+      verapdf: options?.inheritedVeraPdf ?? makeVeraPdfResult(),
+      categories: [
+        { ...originalResult.categories[0], score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    }))
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'semantic-links.pdf', originalResult)
+
+    expect(runPdfStructureBackendBatch.mock.calls.some(call =>
+      Array.isArray(call[0]?.mutations)
+      && call[0].mutations.filter((mutation: any) => mutation?.operation === 'set_link_annotation_contents').length === 2,
+    )).toBe(true)
+    expect(executeRemediationTool).not.toHaveBeenCalledWith(expect.objectContaining({
+      call: expect.objectContaining({ tool_name: 'set_link_annotation_contents' }),
+    }))
+    expect(result.model.actions?.filter(action => action.tool === 'set_link_annotation_contents' && action.outcome === 'applied')).toHaveLength(2)
+  })
+
   it('rejects regressive structure mutations for already-tagged native PDFs', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
