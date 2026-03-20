@@ -3298,6 +3298,96 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.actions?.some(action => action.generationSource === 'heuristic_fallback')).toBe(true)
   })
 
+  it('uses heuristic alt-text fallback when semantic provider fetch fails', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'figure-fetch-fallback.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 75,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'unavailable',
+        isCompliant: null,
+        failedChecks: 0,
+        failures: [],
+      }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 40, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Fallback', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [{
+        id: 'figure:1',
+        pageNumber: 2,
+        targetRef: 'obj:21 0 R',
+        bbox: { x: 0, y: 0, width: 1, height: 1 },
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['County outcomes chart'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      }],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    generateSemanticRepairBatches.mockRejectedValue(new Error('fetch failed'))
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('pdf'),
+      action: {
+        tool: 'set_figure_alt_text',
+        target: 'page 2',
+        candidateId: 'figure:1',
+        details: 'heuristic fallback after provider failure',
+        confidence: 0.55,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: false,
+        categoryTargets: ['alt_text'],
+        generationSource: 'heuristic_fallback',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'figure-fetch-fallback.pdf', originalResult)
+
+    expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
+    expect(executeRemediationTool.mock.calls.some(call => call[0].call.arguments.generationSource === 'heuristic_fallback')).toBe(true)
+    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+    expect(result.model.manualReviewFlags.some(flag => /semantic figure generation failed.*fetch failed/i.test(flag.details))).toBe(true)
+  })
+
   it('retries a late figure candidate when it becomes retaggable after an earlier blocked attempt', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

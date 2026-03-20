@@ -948,6 +948,12 @@ function isSemanticStageTooLargeError(error: unknown): boolean {
   return /context_length_exceeded|length limit exceeded|request too large|payload too large|semantic repair request failed:\s*413/i.test(message)
 }
 
+function isSemanticStageRecoverableProviderError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error || '')
+  return isSemanticStageTooLargeError(error)
+    || /fetch failed|networkerror|econnreset|econnrefused|etimedout|socket hang up/i.test(message)
+}
+
 function semanticDeferredAction(input: {
   tool: RemediationActionRecord['tool']
   target: string
@@ -1085,7 +1091,7 @@ async function runSemanticEnrichmentStage(input: {
       context,
     })
   } catch (error) {
-    if (!isSemanticStageTooLargeError(error)) {
+    if (!isSemanticStageRecoverableProviderError(error)) {
       throw error
     }
     if (aiFirstFigureCandidates(context).length > 0) {
@@ -1102,7 +1108,7 @@ async function runSemanticEnrichmentStage(input: {
           code: 'semantic_enrichment_skipped',
           label: 'Semantic enrichment skipped',
           severity: 'warning',
-          details: `Semantic figure generation overflowed, so heuristic alt-text fallback was used instead: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
+          details: `${isSemanticStageTooLargeError(error) ? 'Semantic figure generation overflowed' : 'Semantic figure generation failed'}; heuristic alt-text fallback was used instead: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
         }],
       }
     }
@@ -1114,7 +1120,7 @@ async function runSemanticEnrichmentStage(input: {
         code: 'semantic_enrichment_skipped',
         label: 'Semantic enrichment skipped',
         severity: 'warning',
-        details: `Skipped semantic enrichment because the provider rejected the request as too large: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
+        details: `${isSemanticStageTooLargeError(error) ? 'Skipped semantic enrichment because the provider rejected the request as too large' : 'Skipped semantic enrichment because the provider request failed'}: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
       }],
       usedInheritedVeraPdf: false,
     }
