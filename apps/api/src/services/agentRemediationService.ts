@@ -970,6 +970,7 @@ function shouldRetryLateHeuristicFigureCandidate(
   const attemptedSetAlt = previousActionNames.includes(`set_figure_alt_text:${candidate.id}`)
   if (!attemptedSetAlt) return true
   return candidate.repairMode === 'retag_then_set_alt'
+    || (candidate.repairMode === 'set_alt' && candidate.targetTag === '/Figure' && !candidate.hasAlt)
 }
 
 function aiEligibleFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {

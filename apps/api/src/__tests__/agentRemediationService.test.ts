@@ -4681,4 +4681,143 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(decision.reason).toBeNull()
   })
 
+  it('retries unresolved set_alt figure candidates during the late heuristic pass', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'late-set-alt.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 80,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'unavailable', executionStatus: 'missing_binary', failedChecks: 0, failures: [] }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text', weight: 0.15, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:435 0 R', hasAlt: false }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [{
+          id: 'figure:7',
+          pageNumber: 7,
+          targetRef: 'obj:435 0 R',
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          pageImageCount: 1,
+          textDensityHint: 'high',
+          imageEvidence: 'strong',
+          surroundingText: ['County outcomes chart'],
+          parentTagPath: ['/Figure', '/Story'],
+        }],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      })
+      .mockResolvedValue({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:435 0 R', hasAlt: false }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [{
+          id: 'figure:7',
+          pageNumber: 7,
+          targetRef: 'obj:435 0 R',
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          pageImageCount: 1,
+          textDensityHint: 'high',
+          imageEvidence: 'strong',
+          surroundingText: ['County outcomes chart'],
+          parentTagPath: ['/Figure', '/Story'],
+        }],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      })
+
+    planRemediationActions.mockResolvedValue({
+      done: false,
+      unresolvedIssues: ['alt_text'],
+      actions: [
+        { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:7', altText: 'Initial alt text' }, rationale: 'Initial figure pass', confidence: 0.8 },
+      ],
+    })
+    generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 7',
+          candidateId: 'figure:7',
+          details: 'first pass no effect',
+          confidence: 0.8,
+          autoApplied: false,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 7',
+          candidateId: 'figure:7',
+          details: 'late heuristic retry for unresolved /Figure',
+          confidence: 0.55,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          generationSource: 'heuristic_fallback',
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'late-set-alt.pdf', originalResult)
+
+    expect(executeRemediationTool.mock.calls.some(call =>
+      call[0].call.arguments?.candidateId === 'figure:7'
+      && call[0].call.arguments?.generationSource === 'heuristic_fallback'
+    )).toBe(true)
+    expect(result.model.actions?.some(action =>
+      action.candidateId === 'figure:7' && action.generationSource === 'heuristic_fallback'
+    )).toBe(true)
+  })
+
 })
