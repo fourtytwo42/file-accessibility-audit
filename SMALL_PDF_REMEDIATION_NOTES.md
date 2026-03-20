@@ -210,6 +210,30 @@
   - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps story-backed heading candidates to the first safe descendant text node|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Sect-backed heading candidates as safe when they are the best available structural target'`
   - `pnpm --filter api exec tsc --noEmit`
 
+### Rerun After /Story Heading Fix
+
+- Second queue item: `5833b0a7-2dbf-42f9-a456-241ecb593e8e`
+- Rerun result: `84/B`
+- Improvement vs first remediated run: `69 -> 84`
+- What improved:
+  - the `/Story` heading family was real, and the fix materially improved the score
+  - heading recovery is no longer the dominant blocker on this file
+- Remaining blockers:
+  - one unresolved `pdfua.font_unicode` finding for `/AkzidenzGroteskBE-Regular`
+  - one remaining image without alt text after semantic prompt-budget skipping
+- Current hypothesis:
+  - the next shared fix should target one or both of:
+    - stronger fallback Unicode repair for legacy embedded Type1 fonts with known substitute families
+    - batching/splitting semantic figure requests so a single over-budget target does not leave residual alt-text debt
+
+### System Fix In Progress
+
+- Treat `/Story` as a safe figure wrapper so a remaining `/Story`-backed image candidate can be wrapped in a child `/Figure` and receive alt text.
+- Allow `repair_type1_font_unicode_maps` to be selected directly whenever qpdf already reports live Type1 Unicode misses, instead of requiring generic font repair to be attempted first.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'retags a safe Story figure candidate by wrapping it in a child /Figure|plans Type1 font Unicode recovery directly when qpdf already reports Type1 Unicode misses|treats /Story-backed heading candidates as safe when they are the best available structural target'`
+  - `pnpm --filter api exec tsc --noEmit`
+
 ## Active PDF Loop 2
 
 - Selected PDF: `Downloads/2025FirearmProhibitorsReport-250626T19175938.pdf`

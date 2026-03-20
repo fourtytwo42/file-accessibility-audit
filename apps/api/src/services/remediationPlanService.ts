@@ -383,6 +383,7 @@ function isOpportunitySelectable(input: {
       return true
     case 'repair_type1_font_unicode_maps':
       return attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+        || (context.qpdf.type1FontsMissingToUnicode ?? 0) > 0
         || opportunity.derivedFromFailureModeKeys.includes('pdfua.type1_unicode')
     case 'repair_cidset_consistency':
       return attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)

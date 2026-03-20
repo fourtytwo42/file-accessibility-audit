@@ -12,13 +12,15 @@
 ## Current Session Snapshot
 
 - Active PDF: `Prescription drug November 2008.pdf`
-- Latest attempt path: queue item `3794391a-6e09-4058-8c3d-d9f7064b4b2d`
-- Latest result summary: `Prescription drug November 2008.pdf` completed the first fresh remediation loop at `69/D` from `32/F`, exposing a new native-tagged InDesign heading family where semantic heading candidates map to `/Story` containers that the heading retag tool currently rejects.
-- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T16:32Z
-- Next action: rerun `Prescription drug November 2008.pdf` after the new `/Story` heading-compatibility fix has been committed, pushed, and the API restarted.
-- Next hypothesis: allowing safe `/Story` containers to participate in heading promotion like `/Sect` should clear the dominant `heading_structure=0` failure on this InDesign bulletin family and unlock most of the remaining score gap.
-- API restart status: PM2 restart required after the latest heading-compatibility code change; next queue result must be a fresh remediation after restart
-- Build status: targeted `/Story` heading regressions and `tsc` passed for the latest change; rebuild pending before rerun
+- Latest attempt path: queue item `5833b0a7-2dbf-42f9-a456-241ecb593e8e`
+- Latest result summary: `Prescription drug November 2008.pdf` improved from `69/D` to `84/B` after the `/Story` heading fix, confirming that native-tagged InDesign `/Story` wrappers were the dominant heading blocker. The file still misses the `>95` target because one Type1 font remains without `/ToUnicode` and one image is still missing alt text after semantic prompt-budget skipping.
+- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T16:39Z
+- Next action: rerun `Prescription drug November 2008.pdf` after the new direct Type1-Unicode follow-up and `/Story` figure-wrapper fix has been committed, pushed, and the API restarted.
+- Next hypothesis: the remaining gap is now concentrated enough that this pair of generic fixes should clear it:
+  1. direct `repair_type1_font_unicode_maps` selection whenever qpdf already reports live Type1 Unicode misses
+  2. treat `/Story` as a safe figure wrapper so the last image can be retagged and described instead of deferred
+- API restart status: PM2 restart required after the latest residual cleanup code change; next queue result must be a fresh remediation after restart
+- Build status: targeted `/Story` figure + Type1 follow-up regressions and `tsc` passed for the latest change; rebuild pending before rerun
 
 ## Current Concurrency
 
@@ -30,12 +32,12 @@
 ## Current Focus
 
 - Active PDF: `Prescription drug November 2008.pdf`
-- Current phase: Applying generic heading-compatibility fix, then fresh rerun
-- Immediate next step: commit/push/restart the API, run a fresh remediation of `Prescription drug November 2008.pdf`, and inspect whether the `/Story` heading blockers clear
-- API restart/rerun confirmed for active file: Not yet for the latest fix
+- Current phase: Post-rerun blocker isolation
+- Immediate next step: commit/push/restart the API, rerun `Prescription drug November 2008.pdf`, and inspect whether the remaining font-unicode and alt-text debt clear
+- API restart/rerun confirmed for active file: Not yet for the latest residual fix set
 - Rebuild required for active file: Yes, after the latest code change
-- Active remediation loop count: `Prescription drug November 2008.pdf=1`
-- Next hypothesis: safe `/Story` container heading promotion will fix the dominant `heading_structure` failure; if the file still lands below `95` afterward, the remaining gap will likely be the single unresolved Type1 Unicode map plus one skipped figure description
+- Active remediation loop count: `Prescription drug November 2008.pdf=2`
+- Next hypothesis: a combined cleanup of the one unresolved Type1 Unicode map and the one skipped figure description should be enough to push this file over `95`
 
 ## Pending Files
 
@@ -77,6 +79,8 @@
 
 ## Recent Events
 
+- 2026-03-20T16:45:12Z Small-PDF loop fix: figure repair now treats `/Story` as a safe wrapper tag that can be wrapped in a child `/Figure`, and the planner now selects `repair_type1_font_unicode_maps` directly whenever qpdf already reports live Type1 Unicode misses. This targets the residual `Prescription drug November 2008.pdf` blockers after the heading fix: one `/Story`-wrapped figure still missing alt text and one unresolved Type1 Unicode finding for `/AkzidenzGroteskBE-Regular`. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'retags a safe Story figure candidate by wrapping it in a child /Figure|plans Type1 font Unicode recovery directly when qpdf already reports Type1 Unicode misses|treats /Story-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
+- 2026-03-20T16:39:36Z Fresh post-restart rerun: `Prescription drug November 2008.pdf` completed on queue item `5833b0a7-2dbf-42f9-a456-241ecb593e8e` at `84/B`, up from `69/D`. The `/Story` heading compatibility fix worked: `heading_structure` is no longer the dominant blocker. The remaining score gap is now concentrated in `text_extractability=60`, `alt_text=67`, and `pdf_ua_compliance=85`, driven by one unresolved `pdfua.font_unicode` finding (`/AkzidenzGroteskBE-Regular`) and one still-missing figure description after semantic prompt-budget skipping.
 - 2026-03-20T16:39:10Z Small-PDF loop fix: safe heading promotion now treats `/Story` containers like `/Sect` for native-tagged documents, so heading candidates backed by `/Story` wrappers can be remapped to safe descendants or retagged directly when appropriate. This targets `Prescription drug November 2008.pdf`, whose first rerun stalled at `69/D` because all heading candidates mapped to `/Story` and were rejected as unsafe. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps story-backed heading candidates to the first safe descendant text node|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Sect-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T16:32:28Z Fresh small-PDF baseline: `Prescription drug November 2008.pdf` completed on queue item `3794391a-6e09-4058-8c3d-d9f7064b4b2d` at `69/D` from `32/F`. The dominant remaining failures are `heading_structure=0`, `text_extractability=60`, `alt_text=67`, and one residual `pdfua.font_unicode` finding. The highest-leverage new blocker family is heading promotion on native-tagged InDesign `/Story` containers: the planner kept proposing `create_heading_from_candidate`, but the backend rejected each target as “not safe to retag as a heading.”
 - 2026-03-20T16:30:29Z Fresh small-PDF pass: `treatment_matching.pdf` completed on queue item `db211227-fb38-4394-a69e-30f9d77c5b97` at `100/A` on the first remediation loop, from `26/F`. This is another strong generalization check on a very small legacy report with no additional code changes required.

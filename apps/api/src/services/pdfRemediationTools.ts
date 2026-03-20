@@ -67,7 +67,7 @@ export interface HeadingCandidate {
 
 const SAFE_HEADING_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Sect', '/Story', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6'] as const
 const UNSAFE_HEADING_TAGS = ['/Link', '/L', '/LI', '/Lbl', '/TOC', '/TOCI', '/Table', '/TR', '/TH', '/TD'] as const
-const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Shape', '/InlineShape', '/Normal'] as const
+const SAFE_FIGURE_TAGS = ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Story', '/Shape', '/InlineShape', '/Normal'] as const
 const UNSAFE_FIGURE_TAGS = ['/TD', '/TH', '/TR', '/Table', '/TOCI', '/TOC', '/Link', '/L', '/LI'] as const
 const LEGACY_HEADING_TAG_RE = /^\/heading\s+(\d+)$/i
 const WINDOWS_FONT_CANDIDATES = [

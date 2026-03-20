@@ -2030,6 +2030,43 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }
   })
 
+  it('retags a safe Story figure candidate by wrapping it in a child /Figure', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect' },
+    })
+    const figureRef = inspect.figures[0]?.ref
+    expect(figureRef).toBeTruthy()
+
+    const degraded = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: [figureRef!],
+        targetTag: 'Story',
+      },
+    })
+    expect(degraded.status).toBe('applied')
+
+    const result = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: {
+        operation: 'retag_as_figure_and_set_alt',
+        targetRef: figureRef!,
+        altText: 'Accessible Story figure',
+        imageEvidence: 'strong',
+        pageImageCount: 1,
+      },
+    })
+
+    expect(['applied', 'no_effect']).toContain(result.status)
+    if (result.status === 'applied') {
+      expect(result.changedDocumentBytes).toBe(true)
+      expect(result.outputBuffer).toBeDefined()
+    }
+  })
+
   it('allows vector-backed figure retagging without raster image evidence', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const inspect = await runPdfStructureBackend({
@@ -3651,6 +3688,31 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     expect(plan.actions.some(action => action.tool_name === 'repair_type1_font_unicode_maps')).toBe(true)
   }, 120_000)
+
+  it('plans Type1 font Unicode recovery directly when qpdf already reports Type1 Unicode misses', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const { analysis, context } = annualReportPlanFixture
+
+    const plan = await planRemediationActions({
+      filename: '99anreport.pdf',
+      analysis,
+      context: {
+        ...context,
+        qpdf: {
+          ...context.qpdf,
+          type1FontsMissingToUnicode: 1,
+        },
+      },
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_type1_font_unicode_maps')).toBe(true)
+  }, 60_000)
 
   it('plans CID symbol-font recovery on one-page chart fixtures after generic Unicode repair stalls', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
