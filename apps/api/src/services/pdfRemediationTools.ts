@@ -962,6 +962,7 @@ function buildTableCandidates(
 async function buildRemediationPageFacts(buffer: Buffer): Promise<RemediationPageFact[]> {
   buildRemediationPageFactsCallCount += 1
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  const pdfLibDoc = await PDFDocument.load(buffer, { updateMetadata: false, ignoreEncryption: true })
   const doc = await pdfjsLib.getDocument({
     data: new Uint8Array(buffer),
     useSystemFonts: true,
@@ -978,11 +979,31 @@ async function buildRemediationPageFacts(buffer: Buffer): Promise<RemediationPag
       const viewport = page.getViewport({ scale: 1 })
       const textContent = await page.getTextContent()
       const annotations = await page.getAnnotations().catch(() => [])
+      const pdfLibPage = pdfLibDoc.getPage(pageNumber - 1)
+      const rawAnnots = pdfLibPage.node.lookupMaybe(PDFName.of('Annots'), PDFArray)
+      const linkContentsByOrdinal: Array<string | null> = []
+      if (rawAnnots) {
+        for (let rawIndex = 0; rawIndex < rawAnnots.size(); rawIndex++) {
+          const annot = pdfLibDoc.context.lookup(rawAnnots.get(rawIndex), PDFDict)
+          if (!annot || String(annot.get(PDFName.of('Subtype'))) !== '/Link') continue
+          const rawContents = annot.get(PDFName.of('Contents'))
+          let contents: string | null = null
+          if (rawContents && typeof (rawContents as { decodeText?: unknown }).decodeText === 'function') {
+            contents = (rawContents as PDFHexString | PDFString).decodeText()
+          } else if (rawContents) {
+            const text = String(rawContents)
+            contents = text && text !== 'undefined' ? text : null
+          }
+          linkContentsByOrdinal.push(contents && contents.trim() ? contents : null)
+        }
+      }
       const links = annotations
         .filter((annotation: any) => annotation?.subtype === 'Link' && Array.isArray(annotation?.rect) && annotation.rect.length === 4)
         .map((annotation: any, annotationIndex: number) => {
           const [x1, y1, x2, y2] = annotation.rect
           const linkTarget = String(annotation.url || annotation.unsafeUrl || annotation.dest || annotation.action || `#page-${pageNumber}-link-${annotationIndex + 1}`)
+          const pdfJsContents = typeof annotation.contents === 'string' ? annotation.contents : null
+          const rawContents = linkContentsByOrdinal[annotationIndex] || null
           return {
             url: linkTarget,
             text: findLinkTextFromRect(annotation, textContent.items as any[]) || linkTarget,
@@ -995,7 +1016,7 @@ async function buildRemediationPageFacts(buffer: Buffer): Promise<RemediationPag
               viewport.height,
             ),
             annotationIndex,
-            contents: typeof annotation.contents === 'string' ? annotation.contents : null,
+            contents: pdfJsContents && pdfJsContents.trim() ? pdfJsContents : rawContents,
           }
         })
       const ops = await page.getOperatorList()

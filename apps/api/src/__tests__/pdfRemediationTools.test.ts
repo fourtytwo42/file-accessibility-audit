@@ -1073,6 +1073,34 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(decodedSecond).toBe('Example report link')
   }, 30_000)
 
+  it('re-inspects link annotation /Contents from raw PDF objects after mutation', async () => {
+    const buffer = await makePdfWithMixedAnnotations()
+    const analysis = await analyzePDF(buffer, 'mixed-annots.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const candidate = context.linkCandidates[0]
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_link_annotation_contents',
+        arguments: {
+          candidateId: candidate!.id,
+          contents: 'Example report link',
+        },
+        rationale: 'Set alternate description on the link annotation.',
+        confidence: 0.9,
+      },
+    })
+
+    const refreshed = await inspectPdfForRemediation(
+      result.buffer,
+      await analyzePDF(result.buffer, 'mixed-annots.pdf', { skipVeraPdf: true }),
+      { inspectMode: 'light' },
+    )
+    expect(refreshed.linkCandidates[0]?.annotationContents).toBe('Example report link')
+  }, 30_000)
+
   it('normalizes metadata and writes PDF/UA identification on the original PDF', async () => {
     const buffer = await makePdf()
     const analysis = await analyzePDF(buffer, 'untitled-example.pdf')

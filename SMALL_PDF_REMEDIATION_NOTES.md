@@ -76,6 +76,20 @@
   - `set_link_annotation_contents()` now matches using link-only ordinals
   - added regression test with a preceding `/Text` annotation
 
+## Follow-up Link Finding
+
+- Fresh rerun `298701f0-c6e7-45a5-a2b4-e67df3fb5e99` still finished at `92/B`
+- That proved the link-ordinal fix was necessary but not sufficient
+- Direct comparison showed:
+  - qpdf/pikepdf sees `/Contents` on 9 of the 10 page-3 links
+  - `inspectPdfForRemediation()` still rebuilt all 10 page-3 link candidates with `annotationContents: null`
+- Root cause:
+  - `pdfjs` is dropping link `/Contents` on this Acrobat/PDFMaker report pattern
+  - our link-candidate builder was trusting `pdfjs` alone for annotation contents
+- Generic fix applied:
+  - `buildRemediationPageFacts()` now reconciles link `/Contents` from raw PDF annotation objects using `pdf-lib` whenever `pdfjs` omits them
+  - added regression test proving a mutated link annotation re-inspects with the saved `/Contents`
+
 ## Session
 
 - Date: `2026-03-20`
