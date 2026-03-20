@@ -402,7 +402,11 @@ function effectiveAltFigureStats(
   const structureFigures = structure?.figures || []
   const excludedWrapperRefs = new Set(
     structureFigures
-      .filter(figure => figure.splitGenerated && !figure.hasText && !figure.hasAlt)
+      .filter(figure =>
+        !figure.hasAlt
+        && !figure.hasText
+        && (figure.splitGenerated || figure.graphicsLikelyDecorative)
+      )
       .map(figure => figure.ref),
   )
   const filteredQpdfFigures = qpdf.images.filter(img => img.ref && !excludedWrapperRefs.has(img.ref))

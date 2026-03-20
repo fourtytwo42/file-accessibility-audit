@@ -1013,6 +1013,32 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('split-generated decorative wrapper'))).toBe(true)
   })
 
+  it('excludes decorative Acrobat-cleanup figures from alt-text scoring', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: 'obj:58 0 R', hasAlt: true, altText: 'Illinois seal' },
+        { ref: 'obj:132 0 R', hasAlt: false },
+        { ref: 'obj:141 0 R', hasAlt: false },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        figures: [
+          { ref: 'obj:58 0 R', tag: '/Figure', hasAlt: true, altText: 'Illinois seal', childFigureCount: 0, hasText: true, graphicsLikelyDecorative: false, splitGenerated: false, splitSourceRef: null, splitSourceTag: null },
+          { ref: 'obj:132 0 R', tag: '/Figure', hasAlt: false, altText: '', childFigureCount: 0, hasText: false, graphicsLikelyDecorative: true, splitGenerated: false, splitSourceRef: null, splitSourceTag: null },
+          { ref: 'obj:141 0 R', tag: '/Figure', hasAlt: false, altText: '', childFigureCount: 0, hasText: false, graphicsLikelyDecorative: true, splitGenerated: false, splitSourceRef: null, splitSourceTag: null },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('wrapper figure'))).toBe(true)
+  })
+
   it('reduces alt_text when Acrobat reports orphaned alternate text with no associated content', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(

@@ -11,16 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `Prescription drug November 2008.pdf`
-- Latest attempt path: queue item `25303037-20fe-4521-864b-3cf8b30e50f4`
-- Latest result summary: `Prescription drug November 2008.pdf` is still at `84/B`, but the latest blocker inspection is much narrower now. The live queue run stranded `repair_type1_font_unicode_maps` because classification labeled the file as `needs_embedding` and excluded the Type1-specific tool. The alt-text score is also stale: direct deep inspection of the rebuilt artifact shows all three informative figures already have alt text, while the remaining no-alt `/Figure` nodes are split-generated decorative wrappers.
-- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T16:46Z, followed by direct rebuilt-artifact inspection on 2026-03-20T16:56Z
-- Next action: commit/push the classification + alt-text crediting fixes, restart the API, and run a fresh remediation rerun of `Prescription drug November 2008.pdf`
-- Next hypothesis: this pair of generic fixes should clear the file above `95`:
-  1. classify live Type1 Unicode debt as `legacy_encoding` so `repair_type1_font_unicode_maps` is no longer excluded by the pipeline
-  2. reconcile alt-text scoring against the structure snapshot so split-generated decorative wrapper figures do not count against the score and structure-backed informative figures receive credit even when qpdf image reconciliation is lossy
-- API restart status: PM2 restart required after the latest scoring/classification code change; next queue result must be a fresh remediation after restart
-- Build status: targeted scorer/classification regressions and `tsc` passed for the latest change; rebuild pending before rerun
+- Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Latest attempt path: queue item `8b8908c7-d56e-4a43-9d49-e71f20bd335e`
+- Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` finished its first fresh loop at `87/B`. The remaining score gap is concentrated in `alt_text=40` and `link_quality=60`. The highest-leverage blocker is a rejected `repair_other_elements_alt_text` pass that retagged graphics-only `/P` nodes as decorative `/Figure` wrappers, but our scorer still counted those decorative repairs as missing-alt figures and rejected the stage.
+- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T17:02Z
+- Next action: rebuild/restart after the decorative-figure scoring fix, then rerun `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Next hypothesis: once decorative Acrobat-cleanup figures are excluded from the alt-text denominator, the previously rejected `repair_other_elements_alt_text` stage should be accepted and push this modern report above `95`
+- API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
+- Build status: `pnpm --filter api build` completed before the successful rerun
 
 ## Current Concurrency
 
@@ -31,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `Prescription drug November 2008.pdf`
-- Current phase: Post-rerun blocker isolation
-- Immediate next step: commit/push/restart the API, rerun `Prescription drug November 2008.pdf`, and inspect whether the remaining Type1 font-unicode and alt-text crediting debt clear
-- API restart/rerun confirmed for active file: Not yet for the latest residual fix set
-- Rebuild required for active file: Yes, after the latest code change
-- Active remediation loop count: `Prescription drug November 2008.pdf=3`
-- Next hypothesis: a combined cleanup of the excluded Type1 Unicode tool path and the stale alt-text denominator should be enough to push this file over `95`
+- Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Current phase: Active blocker fix for first-loop `87/B` result
+- Immediate next step: restart the API and rerun the active file after the decorative Acrobat-cleanup scoring fix
+- API restart/rerun confirmed for active file: Yes, restart completed immediately before selecting the next file
+- Rebuild required for active file: No further rebuild currently required
+- Active remediation loop count: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf=2`
+- Next hypothesis: decorative graphics retagged by `repair_other_elements_alt_text` need to be excluded from alt-text scoring just like split-generated decorative wrappers; this should unblock acceptance of the Acrobat cleanup stage on modern PDFMaker reports
 
 ## Pending Files
 
@@ -79,6 +77,11 @@
 
 ## Recent Events
 
+- 2026-03-20T17:07:00Z Small-PDF loop fix: the structure backend now carries `graphicsLikelyDecorative` on recovered `/Figure` nodes, and alt-text scoring excludes those decorative Acrobat-cleanup figures from the denominator the same way it already excludes split-generated decorative wrappers. This targets `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`, where `repair_other_elements_alt_text` was correctly retagging graphics-only `/P` nodes as decorative `/Figure alt=""` wrappers but the stage was still being rejected because the scorer treated them as new missing-alt figures. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
+- 2026-03-20T17:02:55Z Fresh small-PDF baseline: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `8b8908c7-d56e-4a43-9d49-e71f20bd335e` at `87/B` from `47/F`. The remaining blocker family is narrow and modern-report-specific: `repair_other_elements_alt_text` did real Acrobat ownership cleanup but was rejected because alt-text scoring regressed from `11` to `8` after decorative graphics-only `/P` elements were retagged as `/Figure alt=""`, while one link annotation `/Contents` issue still caps `link_quality` and `pdf_ua_compliance`.
+
+- 2026-03-20T16:59:20Z Fresh post-restart rerun: `Prescription drug November 2008.pdf` completed on queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2` at `100/A`, up from `84/B`. The live rerun confirmed both new generic fixes: `repair_type1_font_unicode_maps` now runs on this mixed InDesign/Type1 family, and structure-aware alt-text reconciliation now credits all informative figures while excluding split-generated decorative wrapper figures from the denominator.
+- 2026-03-20T16:56:54Z Small-PDF loop fix: Type1 Unicode debt now classifies as `legacy_encoding` instead of being hidden under `needs_embedding`, preventing `repair_type1_font_unicode_maps` from being excluded by classification on mixed legacy-font PDFs. Alt-text scoring now reconciles qpdf image coverage with the structure snapshot, excluding split-generated decorative wrapper figures and crediting structure-backed informative figures when qpdf image association is lossy. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/scorer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit `b2ee13c`, pushed to GitHub, rebuilt, and PM2 restarted before rerun `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`.
 - 2026-03-20T16:45:12Z Small-PDF loop fix: figure repair now treats `/Story` as a safe wrapper tag that can be wrapped in a child `/Figure`, and the planner now selects `repair_type1_font_unicode_maps` directly whenever qpdf already reports live Type1 Unicode misses. This targets the residual `Prescription drug November 2008.pdf` blockers after the heading fix: one `/Story`-wrapped figure still missing alt text and one unresolved Type1 Unicode finding for `/AkzidenzGroteskBE-Regular`. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'retags a safe Story figure candidate by wrapping it in a child /Figure|plans Type1 font Unicode recovery directly when qpdf already reports Type1 Unicode misses|treats /Story-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T16:39:36Z Fresh post-restart rerun: `Prescription drug November 2008.pdf` completed on queue item `5833b0a7-2dbf-42f9-a456-241ecb593e8e` at `84/B`, up from `69/D`. The `/Story` heading compatibility fix worked: `heading_structure` is no longer the dominant blocker. The remaining score gap is now concentrated in `text_extractability=60`, `alt_text=67`, and `pdf_ua_compliance=85`, driven by one unresolved `pdfua.font_unicode` finding (`/AkzidenzGroteskBE-Regular`) and one still-missing figure description after semantic prompt-budget skipping.
 - 2026-03-20T16:39:10Z Small-PDF loop fix: safe heading promotion now treats `/Story` containers like `/Sect` for native-tagged documents, so heading candidates backed by `/Story` wrappers can be remapped to safe descendants or retagged directly when appropriate. This targets `Prescription drug November 2008.pdf`, whose first rerun stalled at `69/D` because all heading candidates mapped to `/Story` and were rejected as unsafe. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'remaps story-backed heading candidates to the first safe descendant text node|treats /Story-backed heading candidates as safe when they are the best available structural target|treats /Sect-backed heading candidates as safe when they are the best available structural target'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.

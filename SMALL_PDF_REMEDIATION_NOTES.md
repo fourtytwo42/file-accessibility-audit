@@ -219,6 +219,44 @@
   - the `/Story` heading family was real, and the fix materially improved the score
   - heading recovery is no longer the dominant blocker on this file
 
+### Final Rerun After Type1 Routing + Structure-Aware Alt Credit
+
+- Final queue item: `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
+- Final rerun result: `100/A`
+- Outcome:
+  - the mixed InDesign/Type1 family now routes through `repair_type1_font_unicode_maps` correctly
+  - structure-aware alt-text reconciliation excluded split-generated decorative wrappers and credited the informative figures that already had alt text
+  - `Prescription drug November 2008.pdf` now serves as a regression case for native-tagged InDesign reports with `/Story` wrappers, residual Type1 Unicode debt, and decorative wrapper figures
+
+## Next Random Small PDF
+
+- Selected PDF: `Downloads/Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Selection method: next random pick from `find Downloads -size -700k | shuf`
+- File size: `437736` bytes
+- First queue item: `8b8908c7-d56e-4a43-9d49-e71f20bd335e`
+- Initial/remediated: `47/F -> 87/B`
+- Current status: needs a shared modern-report Acrobat graphics scoring fix before rerun
+
+### Traffic and Pedestrian Task Force Findings
+
+- Dominant remaining blockers:
+  - `alt_text = 40`
+  - `link_quality = 60`
+  - `pdf_ua_compliance = 85`
+- Concrete diagnosis:
+  - only `1` blocking local standards issue remains: `pdfua.annotation_alt_contents`
+  - the largest score gap is from the rejected `repair_other_elements_alt_text` stage, not from font or heading debt
+  - that stage did real work: it removed duplicate MCID ownership and retagged multiple graphics-only `/P` nodes as decorative `/Figure alt=""` wrappers
+  - the stage was still rejected because alt-text scoring regressed from `11` to `8`, which means our scorer was counting those decorative Acrobat-cleanup figures as new missing-alt figures instead of excluding them like other decorative wrappers
+
+### System Fix In Progress
+
+- Extended the structure snapshot so recovered `/Figure` nodes now carry `graphicsLikelyDecorative`.
+- Updated alt-text scoring to exclude those decorative Acrobat-cleanup figures from the denominator the same way it already excludes split-generated decorative wrappers.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts`
+  - `pnpm --filter api exec tsc --noEmit`
+
 ### Rerun After /Story Figure Wrapper + Direct Type1 Follow-up
 
 - Third queue item: `25303037-20fe-4521-864b-3cf8b30e50f4`
@@ -253,6 +291,28 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/scorer.test.ts`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Final Rerun After Type1 Routing + Alt-Text Reconciliation
+
+- Fourth queue item: `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
+- Rerun result: `100/A`
+- Improvement vs third remediated run: `84 -> 100`
+- Outcome:
+  - the live pipeline now actually executes `repair_type1_font_unicode_maps` on this mixed InDesign/Type1 family
+  - the final unresolved `/AkzidenzGroteskBE-Regular` Unicode blocker cleared
+  - alt-text scoring now reflects the true structure state:
+    - all 3 informative figures credited with alt text
+    - 2 split-generated decorative wrapper figures excluded from the denominator
+  - `Prescription drug November 2008.pdf` is now a strong regression case for:
+    - mixed `needs_embedding + Type1 Unicode` font profiles
+    - qpdf/structure-image reconciliation drift after successful figure remediation
+
+## Next Random Small PDF
+
+- Selected PDF: `Downloads/Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
+- Selection method: fresh random pick from `find Downloads -size -700k | shuf -n 1`
+- File size: under `700k` (selected from the live random candidate set)
+- Current status: queued for first fresh API remediation loop
 - Remaining blockers:
   - one unresolved `pdfua.font_unicode` finding for `/AkzidenzGroteskBE-Regular`
   - one remaining image without alt text after semantic prompt-budget skipping

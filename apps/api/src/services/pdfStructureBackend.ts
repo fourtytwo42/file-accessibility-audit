@@ -111,6 +111,7 @@ export interface StructureBackendMutationResult {
     pageRef?: string | null
     mcids?: number[]
     hasText?: boolean
+    graphicsLikelyDecorative?: boolean
     splitGenerated?: boolean
     splitSourceRef?: string | null
     splitSourceTag?: string | null

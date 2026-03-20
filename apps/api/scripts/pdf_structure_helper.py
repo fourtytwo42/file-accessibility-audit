@@ -919,6 +919,7 @@ def figure_candidates(pdf):
             "pageRef": page_ref,
             "mcids": mcids,
             "hasText": has_text,
+            "graphicsLikelyDecorative": all(usage.get(mcid, {}).get("graphicsLikelyDecorative") for mcid in mcids) if has_graphics else False,
             "splitGenerated": split_generated,
             "splitSourceRef": split_source_ref,
             "splitSourceTag": split_source_tag,
