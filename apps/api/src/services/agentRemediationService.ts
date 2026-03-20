@@ -1697,8 +1697,10 @@ export async function remediatePdfWithAgent(
     const dirtyForMode = inspectMode === 'alt_text_deep'
       ? inspectionState.deepAltDirty
       : inspectionState.structureDirty
+    const cacheMatchesCurrentBuffer = inspectionState.bufferSha256 === nextBufferSha256
+      && inspectionCache.bufferSha256 === nextBufferSha256
 
-    if (!dirtyForMode && requestedPayload) {
+    if (!dirtyForMode && requestedPayload && cacheMatchesCurrentBuffer) {
       const reused = buildRemediationContextFromSnapshot({
         analysis,
         qpdf: requestedPayload.qpdf,

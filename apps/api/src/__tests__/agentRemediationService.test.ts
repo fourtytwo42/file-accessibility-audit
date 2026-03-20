@@ -421,6 +421,10 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         ...lightContext,
         pdfjs: { title: 'Batched Fixed', lang: 'en' },
       })
+      .mockResolvedValueOnce({
+        ...lightContext,
+        pdfjs: { title: 'Batched Fixed', lang: 'en' },
+      })
 
     planRemediationActions
       .mockResolvedValueOnce({
@@ -478,8 +482,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'batched.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(3)
-    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light'])
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(4)
+    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light', 'light'])
     expect(analyzePDF).toHaveBeenCalledTimes(3)
     expect(result.finalResult.grade).toBe('A')
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
