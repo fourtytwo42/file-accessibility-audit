@@ -224,6 +224,7 @@ export function parseQpdfJson(json: any): QpdfResult {
 
     const roleMapNoteAliases = new Set<string>(['/Note'])
     const descendantFontRefs = new Set<string>()
+    const softMaskImageRefs = new Set<string>()
     for (const obj of Object.values(objects)) {
       if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/StructTreeRoot') continue
       const resolvedRoleMap = resolveObject(obj['/RoleMap'], objects)
@@ -232,6 +233,16 @@ export function parseQpdfJson(json: any): QpdfResult {
         if (mapped === '/Note' && typeof tag === 'string') {
           roleMapNoteAliases.add(tag)
         }
+      }
+    }
+
+    for (const [ref, obj] of Object.entries(objects)) {
+      if (!obj || typeof obj !== 'object' || obj['/Subtype'] !== '/Image') continue
+      const softMaskRef = (obj as any)['/SMask']
+      if (typeof softMaskRef === 'string') {
+        softMaskImageRefs.add(softMaskRef)
+        softMaskImageRefs.add(softMaskRef.replace(/^obj:/, ''))
+        softMaskImageRefs.add(softMaskRef.startsWith('obj:') ? softMaskRef : `obj:${softMaskRef}`)
       }
     }
 
@@ -312,6 +323,9 @@ export function parseQpdfJson(json: any): QpdfResult {
       // Image XObjects
       if (o['/Subtype'] === '/Image' || o['/Subtype'] === '/Form') {
         if (o['/Subtype'] === '/Image') {
+          const isSoftMaskOnly = softMaskImageRefs.has(ref)
+          const isStencilMask = o['/ImageMask'] === true || o['/ImageMask'] === 'true'
+          if (isSoftMaskOnly || isStencilMask) continue
           result.images.push({ ref, hasAlt: false })
         }
       }

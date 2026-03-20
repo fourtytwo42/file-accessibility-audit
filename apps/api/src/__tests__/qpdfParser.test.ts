@@ -378,4 +378,35 @@ describe('analyzeWithQpdf', () => {
     expect(result.images).toHaveLength(1)
     expect(result.images[0].ref).toBe('obj:5 0 R')
   })
+
+  it('does not count soft-mask image streams as standalone images requiring alt text', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:5 0 R': {
+          stream: {
+            dict: {
+              '/Subtype': '/Image',
+              '/Width': 100,
+              '/Height': 100,
+              '/SMask': 'obj:6 0 R',
+            },
+          },
+        },
+        'obj:6 0 R': {
+          stream: {
+            dict: {
+              '/Subtype': '/Image',
+              '/Width': 100,
+              '/Height': 100,
+              '/ColorSpace': '/DeviceGray',
+            },
+          },
+        },
+      },
+    })
+
+    expect(result.images).toHaveLength(1)
+    expect(result.images[0].ref).toBe('obj:5 0 R')
+  })
 })
