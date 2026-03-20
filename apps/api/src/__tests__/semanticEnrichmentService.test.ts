@@ -758,13 +758,34 @@ describe('semanticEnrichmentService', () => {
     expect(generated.batches.flatMap(batch => batch.headings.map(item => item.candidateId))).toEqual(['heading:1:1', 'heading:1:2'])
   })
 
-  it('skips oversized single-target figure requests instead of throwing', async () => {
+  it('retries oversized single-target figure requests without page images before skipping', async () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
-    vi.stubGlobal('fetch', vi.fn(async () => ({
-      ok: false,
-      status: 413,
-      text: async () => '{"error":{"message":"context_length_exceeded"}}',
-    })) as any)
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 413,
+        text: async () => '{"error":{"message":"context_length_exceeded"}}',
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              tool_calls: [{
+                function: {
+                  name: 'propose_semantic_repairs',
+                  arguments: JSON.stringify({
+                    figures: [
+                      { candidateId: 'figure:1', decorative: false, altText: 'Chart 1', confidence: 0.9, rationale: 'Visible chart.' },
+                    ],
+                  }),
+                },
+              }],
+            },
+          }],
+        }),
+      })
+    vi.stubGlobal('fetch', fetchMock as any)
 
     const generated = await generateSemanticRepairBatches({
       buffer: Buffer.from('pdf'),
@@ -781,8 +802,15 @@ describe('semanticEnrichmentService', () => {
       },
     })
 
-    expect(generated.batches).toEqual([])
-    expect(generated.reviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    const firstRequestBody = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))
+    const secondRequestBody = JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))
+    const firstPrompt = String(firstRequestBody.messages?.[0]?.content || '')
+    const secondPrompt = String(secondRequestBody.messages?.[0]?.content || '')
+    expect(firstPrompt).toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
+    expect(secondPrompt).not.toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
+    expect(generated.batches.flatMap(batch => batch.figures.map(item => item.candidateId))).toEqual(['figure:1'])
+    expect(generated.reviewFlags).toEqual([])
   })
 
   it('splits oversized multi-figure requests before falling back to singletons', async () => {

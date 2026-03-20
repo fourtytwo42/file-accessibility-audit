@@ -881,8 +881,9 @@ async function resolveBatchWithFallbacks(input: {
   batch: SemanticRepairBatch
   document: SemanticDocumentSummary
   pageImages: Map<number, string>
+  stripImages?: boolean
 }): Promise<{ results: SemanticBatchResult[]; reviewFlags: ModelReviewFlag[] }> {
-  const prepared = await buildBatchInputs(input.batch, input.pageImages)
+  const prepared = await buildBatchInputs(input.batch, input.stripImages ? new Map() : input.pageImages)
   const estimatedSize = estimateBatchSize({
     document: input.document,
     batchType: input.batch.batchType,
@@ -903,11 +904,21 @@ async function resolveBatchWithFallbacks(input: {
           batch: smallerBatch,
           document: input.document,
           pageImages: input.pageImages,
+          stripImages: input.stripImages,
         })
         results.push(...resolved.results)
         reviewFlags.push(...resolved.reviewFlags)
       }
       return { results, reviewFlags }
+    }
+
+    if (!input.stripImages && input.batch.batchType === 'figures' && prepared.figures.some(figure => Boolean(figure.imageDataUrl))) {
+      return resolveBatchWithFallbacks({
+        batch: input.batch,
+        document: input.document,
+        pageImages: input.pageImages,
+        stripImages: true,
+      })
     }
 
     return {
@@ -950,11 +961,21 @@ async function resolveBatchWithFallbacks(input: {
           batch: smallerBatch,
           document: input.document,
           pageImages: input.pageImages,
+          stripImages: input.stripImages,
         })
         results.push(...resolved.results)
         reviewFlags.push(...resolved.reviewFlags)
       }
       return { results, reviewFlags }
+    }
+
+    if (!input.stripImages && input.batch.batchType === 'figures' && prepared.figures.some(figure => Boolean(figure.imageDataUrl))) {
+      return resolveBatchWithFallbacks({
+        batch: input.batch,
+        document: input.document,
+        pageImages: input.pageImages,
+        stripImages: true,
+      })
     }
 
     return {

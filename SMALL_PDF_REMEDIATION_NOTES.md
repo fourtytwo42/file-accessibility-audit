@@ -1417,3 +1417,4 @@
 - Shared fix shipped:
   - alt-text scoring now collapses split-generated informative figure variants onto a single canonical source ref before computing effective coverage
   - this should stop wrapper/child figure variants from inflating the denominator on Acrobat/InDesign files like `DNA testing.pdf`
+- `DNA testing.pdf`: first pass was `22/F -> 93/A`; scorer-side split-figure collapse fix (`488aeef`) did not move the live score. Remaining blocker stayed in `alt_text`, with one figure semantic target still skipped due prompt budget. Next shared fix retries oversized singleton figure semantic requests without cropped page images instead of skipping them outright.
