@@ -167,3 +167,23 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|repairs legacy Gxx subset glyph names in small Distiller PDFs'`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 5
+
+- Third queue item: `0b5c1c04-154b-4528-9c43-58e70152b4b3`
+- Rerun result: `79/C`
+- Improvement vs second remediated run: `79 -> 79` (no material score change)
+- Deeper diagnosis:
+  - only `1` of `27` figure candidates is now `retag_then_set_alt`
+  - `12` candidates still defer with `text_heavy_candidate`
+  - the run reported `semantic_strategy_heuristic_only`, so the AI semantic path never ran
+  - the file is being routed too conservatively for its remaining semantic debt
+
+### System Fix in Progress 6
+
+- Tightened `well_tagged` classification so a document only gets heuristic-only semantic routing when semantic-heavy categories are already healthy.
+- The new rule requires `alt_text`, `heading_structure`, `table_markup`, and `link_quality` to be at least `80` (when present); otherwise the document stays `native_tagged` and keeps `full_ai` semantic routing.
+- Added a regression test proving a deep, well-tagged document with `alt_text: 40` is classified as `native_tagged`, not `well_tagged`.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/agentRemediationService.test.ts -t 'classifies structural states including well-tagged documents|uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment'`
+  - `pnpm --filter api exec tsc --noEmit`

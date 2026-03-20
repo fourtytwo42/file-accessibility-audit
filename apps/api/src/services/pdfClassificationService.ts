@@ -41,10 +41,19 @@ export function classifyStructure(input: {
   const categoryScores = input.analysis.categories
     .map(category => category.score)
     .filter((score): score is number => typeof score === 'number')
+  const categoryScoreById = new Map(
+    input.analysis.categories.map(category => [category.id, category.score]),
+  )
+  const semanticCategoriesHealthy = ['alt_text', 'heading_structure', 'table_markup', 'link_quality']
+    .every(categoryId => {
+      const score = categoryScoreById.get(categoryId)
+      return score == null || score >= 80
+    })
   if (
     (input.qpdf.structTreeDepth || 0) >= 3
     && (input.qpdf.headings?.length || 0) > 0
     && median(categoryScores) >= 80
+    && semanticCategoriesHealthy
   ) {
     return 'well_tagged'
   }

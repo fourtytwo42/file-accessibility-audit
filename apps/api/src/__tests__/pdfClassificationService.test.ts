@@ -42,6 +42,21 @@ describe('pdfClassificationService', () => {
       pdfjs: { hasText: true },
       qpdf: { hasStructTree: true, structTreeDepth: 3, hasMarkInfo: true, headings: [{ level: 'H1', tag: 'H1' }] },
     })).toBe('well_tagged')
+
+    expect(classifyStructure({
+      analysis: {
+        isScanned: false,
+        categories: [
+          { id: 'title_language', score: 100 },
+          { id: 'heading_structure', score: 100 },
+          { id: 'reading_order', score: 100 },
+          { id: 'alt_text', score: 40 },
+          { id: 'pdf_ua_compliance', score: 85 },
+        ],
+      } as any,
+      pdfjs: { hasText: true },
+      qpdf: { hasStructTree: true, structTreeDepth: 4, hasMarkInfo: true, headings: [{ level: 'H1', tag: 'H1' }] },
+    })).toBe('native_tagged')
   })
 
   it('fingerprints authoring tools and font health', () => {

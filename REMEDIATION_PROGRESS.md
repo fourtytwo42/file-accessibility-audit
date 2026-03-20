@@ -130,15 +130,15 @@
 ## Current Session Snapshot
 
 - Active file: `2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Active loop: `2`
-- Latest attempt queue item: `60fb95a3-e9a8-47b8-b585-6ef70bcac866`
+- Active loop: `3`
+- Latest attempt queue item: `0b5c1c04-154b-4528-9c43-58e70152b4b3`
 - Latest remediated result: `79/C` after fresh rerun with veraPDF intentionally disabled
-- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-run2.json`
-- Restart status: pending after the latest figure-promotion fix
+- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-run3.json`
+- Restart status: pending after the latest classification fix
 
 ## Current Focus
 
-- Rerun `2025FirearmProhibitorsReport-250626T19175938.pdf` after the figure-promotion fix and measure how much of the remaining `alt_text` gap closes.
+- Rerun `2025FirearmProhibitorsReport-250626T19175938.pdf` after the classification fix so it uses `full_ai` semantic routing instead of heuristic-only cleanup.
 
 ## Retry Checkpoint
 
@@ -150,9 +150,11 @@
 - New loop 2 baseline: `2025FirearmProhibitorsReport-250626T19175938.pdf` improved only to `76/C`; first diagnosis shows false-positive link `/Contents` and descendant-font Unicode findings mixed with a real figure-retagging backlog.
 - Loop 2 rerun after detector cleanup: `76/C -> 79/C`; detector issues were real but not dominant, and the remaining score gap is now clearly concentrated in image/figure remediation.
 - New hypothesis: strong image-backed `/P` candidates were being incorrectly held back by a `pageImageCount` gate even after they already had strong figure evidence; promoting those candidates should materially raise the `alt_text` category on rerun.
+- Updated hypothesis: figure promotion alone is insufficient because the document is still routed through `heuristic_only` semantic cleanup; the broader fix is to stop classifying semantically weak documents as `well_tagged`.
 
 ## Recent Events
 
+- 2026-03-20T08:31:00Z Small-PDF loop fix: `well_tagged` classification now requires semantic-heavy categories to already be healthy, so documents with deep structure but poor alt text/link/table semantics stay in `native_tagged` and continue using `full_ai` semantic routing. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/agentRemediationService.test.ts -t 'classifies structural states including well-tagged documents|uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-20T08:26:00Z Small-PDF loop fix: safe figure-retagging no longer requires `pageImageCount > 0` once a candidate already has `strong` or `vector` figure evidence. Added a regression on `2025FirearmProhibitorsReport-250626T19175938.pdf` proving a strong image-backed `/P` candidate is promoted to `retag_then_set_alt`. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|repairs legacy Gxx subset glyph names in small Distiller PDFs'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-20T08:24:52Z Fresh post-restart rerun: `2025FirearmProhibitorsReport-250626T19175938.pdf` completed on queue item `60fb95a3-e9a8-47b8-b585-6ef70bcac866` at `79/C`. This confirms the local-standards detector cleanup helped, but the file remains primarily blocked by real figure/alt-text remediation debt rather than parser noise.
 - 2026-03-20T08:23:00Z Small-PDF loop fix: local standards now trust `qpdf` as the source of truth for link annotation `/Contents` when `qpdf` detected link annotations, avoiding false `annotation_alt_contents` findings from `pdfjs`'s null link-contents field. `qpdfService` also no longer double-counts descendant CID fonts as standalone fonts when the Type0 parent already owns the family, preventing false `font_unicode` findings from descendant-only objects. Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/localStandardsService.test.ts` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
