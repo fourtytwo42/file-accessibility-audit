@@ -1249,11 +1249,11 @@ function annotationMatchesCandidate(
   annot: PDFDict,
   candidate: LinkCandidate,
   page: { getWidth(): number; getHeight(): number },
-  annotationIndex: number,
+  linkAnnotationIndex: number,
 ): boolean {
   const subtype = annot.get(PDFName.of('Subtype'))
   if (String(subtype) !== '/Link') return false
-  if (annotationIndex === candidate.annotationIndex) return true
+  if (linkAnnotationIndex === candidate.annotationIndex) return true
   const rectArray = annot.lookup(PDFName.of('Rect'), PDFArray)
   if (!rectArray || rectArray.size() !== 4) return false
   const values = [0, 1, 2, 3].map(position => Number(rectArray.get(position)))
@@ -1266,10 +1266,15 @@ async function setLinkAnnotationContents(buffer: Buffer, candidate: LinkCandidat
   const annots = page.node.lookupMaybe(PDFName.of('Annots'), PDFArray)
   if (!annots) return buffer
 
+  let linkAnnotationIndex = -1
   for (let index = 0; index < annots.size(); index++) {
     const annotRef = annots.get(index)
     const annot = pdfDoc.context.lookup(annotRef, PDFDict)
-    if (!annot || !annotationMatchesCandidate(annot, candidate, page, index)) continue
+    if (!annot) continue
+    const subtype = annot.get(PDFName.of('Subtype'))
+    if (String(subtype) !== '/Link') continue
+    linkAnnotationIndex += 1
+    if (!annotationMatchesCandidate(annot, candidate, page, linkAnnotationIndex)) continue
     annot.set(PDFName.of('Contents'), PDFHexString.fromText(contents))
     return Buffer.from(await pdfDoc.save())
   }

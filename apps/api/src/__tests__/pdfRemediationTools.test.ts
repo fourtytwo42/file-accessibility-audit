@@ -65,6 +65,32 @@ async function makePdfWithLink(): Promise<Buffer> {
   return Buffer.from(await doc.save())
 }
 
+async function makePdfWithMixedAnnotations(): Promise<Buffer> {
+  const doc = await PDFDocument.create()
+  const page = doc.addPage([612, 792])
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  page.drawText('https://example.com/report', { x: 72, y: 720, size: 12, font })
+  const textAnnotation = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Text'),
+    Rect: [40, 740, 60, 760],
+    Contents: PDFString.of('note'),
+  })
+  const action = doc.context.obj({
+    S: PDFName.of('URI'),
+    URI: PDFString.of('https://example.com/report'),
+  })
+  const linkAnnotation = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [72, 716, 220, 732],
+    Border: [0, 0, 0],
+    A: action,
+  })
+  page.node.set(PDFName.of('Annots'), doc.context.obj([textAnnotation, linkAnnotation]))
+  return Buffer.from(await doc.save())
+}
+
 async function makePdfWithOutOfOrderLinks(): Promise<Buffer> {
   const doc = await PDFDocument.create()
   const page = doc.addPage([612, 792])
@@ -1009,6 +1035,42 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
     expect(result.action.outcome).toBe('applied')
     expect(decoded).toBe('Example report link')
+  }, 30_000)
+
+  it('sets link annotation /Contents using the link-only annotation ordinal when non-link annotations come first', async () => {
+    const buffer = await makePdfWithMixedAnnotations()
+    const analysis = await analyzePDF(buffer, 'mixed-annots.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const candidate = context.linkCandidates[0]
+    expect(candidate?.annotationIndex).toBe(0)
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_link_annotation_contents',
+        arguments: {
+          candidateId: candidate!.id,
+          contents: 'Example report link',
+        },
+        rationale: 'Set alternate description on the link annotation.',
+        confidence: 0.9,
+      },
+    })
+
+    const nextDoc = await PDFDocument.load(result.buffer, { ignoreEncryption: true })
+    const annots = nextDoc.getPage(0).node.lookupMaybe(PDFName.of('Annots'), PDFArray)
+    const firstAnnot = annots && nextDoc.context.lookup(annots.get(0), PDFDict)
+    const secondAnnot = annots && nextDoc.context.lookup(annots.get(1), PDFDict)
+    const firstContents = firstAnnot?.lookup(PDFName.of('Contents')) as PDFHexString | PDFString | undefined
+    const secondContents = secondAnnot?.lookup(PDFName.of('Contents')) as PDFHexString | PDFString | undefined
+    const decodedSecond = secondContents && 'decodeText' in secondContents ? secondContents.decodeText() : String(secondContents)
+
+    expect(result.action.outcome).toBe('applied')
+    expect(firstAnnot?.get(PDFName.of('Subtype'))?.toString()).toBe('/Text')
+    expect(firstContents && 'decodeText' in firstContents ? firstContents.decodeText() : String(firstContents)).toBe('note')
+    expect(secondAnnot?.get(PDFName.of('Subtype'))?.toString()).toBe('/Link')
+    expect(decodedSecond).toBe('Example report link')
   }, 30_000)
 
   it('normalizes metadata and writes PDF/UA identification on the original PDF', async () => {

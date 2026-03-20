@@ -50,6 +50,32 @@
   - the queue rejection is coming from a stale/intermediate pre-final-cleanup baseline, not from the heading tool regressing real output quality
   - the next generic fix is a deep-structure baseline refresh before native-tagged final cleanup validation
 
+## Latest Result
+
+- Fresh rerun `8d38939d-10f3-4211-a3f7-d4b536173152` finished at `92/B`
+- Improvements confirmed:
+  - `heading_structure = 100`
+  - `text_extractability = 100`
+  - `alt_text = 75`
+- Remaining hard blocker:
+  - `link_quality = 60`
+  - `pdf_ua_compliance = 85`
+  - exactly `1` true link annotation still missing `/Contents`
+
+## Link Root Cause
+
+- Direct pikepdf inspection of the rebuilt `92/B` artifact found:
+  - `14` total `/Link` annotations
+  - `1` true missing `/Contents`
+  - missing annotation: page `3`, link ordinal `9`, object `(383 0)`
+- Root cause:
+  - `pdfjs` builds `annotationIndex` after filtering to `/Link` annotations only
+  - `set_link_annotation_contents()` was matching against the raw `/Annots` array index
+  - if a non-link annotation appears earlier in `/Annots`, the tool can report `applied` while mutating the wrong annotation
+- Generic fix applied:
+  - `set_link_annotation_contents()` now matches using link-only ordinals
+  - added regression test with a preceding `/Text` annotation
+
 ## Session
 
 - Date: `2026-03-20`
