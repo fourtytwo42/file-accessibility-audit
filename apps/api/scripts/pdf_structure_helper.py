@@ -3703,8 +3703,16 @@ def mutate_repair_note_tag_ids(pdf, mutation):
     applied = []
     changed = False
     counter = 1
+    role_map = {}
+    struct_root = get_struct_tree_root(pdf)
+    if isinstance(struct_root, pikepdf.Dictionary):
+        raw_role_map = struct_root.get("/RoleMap")
+        if isinstance(raw_role_map, pikepdf.Dictionary):
+            role_map = raw_role_map
     for obj in iter_struct_elems(pdf):
-        if str(obj.get("/S")) not in {"/Note", "/Footnote"}:
+        struct_type = obj.get("/S")
+        mapped_type = role_map.get(struct_type) if struct_type is not None else None
+        if str(struct_type) not in {"/Note", "/Footnote"} and str(mapped_type) != "/Note":
             continue
         current_id = obj.get("/ID")
         if current_id is not None and str(current_id).strip():

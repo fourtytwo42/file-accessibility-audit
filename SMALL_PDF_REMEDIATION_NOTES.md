@@ -1072,10 +1072,39 @@
   - restart the API
   - rerun `GTF-juvenilesentencing.pdf` fresh
 
+## GTF-juvenilesentencing Result
+
+- Fresh post-restart rerun: queue item `bb1c55ec-5bd0-422d-a81c-8c1784d3e38d`
+- Result: `100/A`
+- What the bootstrap scoring fix proved:
+  - the file was never fundamentally hard; the shared bug was that bootstrap-heavy structure gains were being judged on too-shallow an intermediate profile
+  - once bootstrap validation used deeper structure-aware scoring, the high-value stage stuck and the file cleared end-to-end
+
+## 2010 MV Annual Report Result
+
+- Fresh rerun: queue item `f6b3f139-ad93-4049-9b84-a54ccdf9354f`
+- Result: `100/A`
+- Takeaway:
+  - the recent annual-report hardening work plus the newer bootstrap/link fixes generalized back to an older difficult annual-report family that had previously stalled much lower
+
+## Next Random File
+
+- `Downloads/Addressing Police Stress FINAL-220523T17215932.pdf`
+
 ## Stopping Point
 
-- Current score is exactly `95`, not above `95`.
-- The next step should inspect why those seven page-1 candidates are still skipped even after the final post-cleanup pass:
-  - either they emerge only after the last full-final analysis
-  - or the execution path is silently no-op/rejecting them
-  - or qpdf is still counting duplicate/decorative page-1 image XObjects after structure repair
+- Fresh baseline rerun: queue item `d5d41324-5e65-4c8a-8dd7-da5502f50dd2`
+- Result: `78/C` from `25/F`
+- What improved:
+  - headings, links, and general structural cleanup are already strong on the first live pass
+  - the file is no longer broad-pipeline hard; the remaining debt is concentrated in notes and fonts
+- Residual blocker family:
+  - `repair_note_tag_ids` returned `no_effect`, but direct inspection showed the file uses role-mapped `/Endnote -> /Note` tags with six missing `/ID` values
+  - qpdf still reports three real unembedded `/Type3` display fonts (`/BebasNeueBold`, `/BebasNeueRegular` twice), which the classifier was routing into plain `needs_embedding` instead of the stronger substitution/finalization lane
+- New shared fixes prepared:
+  - role-mapped note IDs are now repairable in the Python backend
+  - qpdf/classification now track unembedded `/Type3` fonts separately so they escalate into `needs_substitution`
+- Next step:
+  - commit/push the note + Type3 fix
+  - rebuild/restart the API
+  - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API

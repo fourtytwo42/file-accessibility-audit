@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf`
-- Latest attempt path: queue item `3ba09754-94ab-4a27-b8bc-9ce3b9eab74c`
-- Latest result summary: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` cleared the user target on a fresh post-restart rerun at `96/A`. The backend link `/Contents` write fix landed: `link_quality` rose to `100`, `pdf_ua_compliance` rose to `100`, and the only remaining non-perfect category is the residual Acrobat-owned `alt_text=75` cap.
-- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T18:02Z
-- Next action: start the next random sub-700k PDF through the API and use this new baseline to find the next generic blocker family
-- Next hypothesis: the next reusable win is likely no longer links; the next sub-700k file will probably expose either another residual Acrobat alt-text-cap family or a separate legacy font/bookmark edge
-- API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
-- Build status: `pnpm --filter api build` completed before the successful rerun
+- Active PDF: `Addressing Police Stress FINAL-220523T17215932.pdf`
+- Latest attempt path: queue item `d5d41324-5e65-4c8a-8dd7-da5502f50dd2`
+- Latest result summary: fresh baseline rerun completed at `78/C` from `25/F`. The remaining debt is now narrow and real: `pdfua.note_tag_id` can be repaired generically through role-mapped note tags, and the last font blockers are three unembedded `/Type3` display fonts that need stronger substitution/finalization routing instead of plain embedding.
+- Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T18:39Z
+- Next action: commit the role-mapped note repair plus Type3 font-classification fix, rebuild/restart the API, and rerun `Addressing Police Stress FINAL-220523T17215932.pdf`
+- Next hypothesis: once role-mapped note IDs are repaired and unembedded `/Type3` fonts escalate into the substitution/finalization path, this file should clear `reading_order` and `text_extractability`/`pdf_ua_compliance` together instead of stalling in the high `70s`
+- API restart status: required after the current code fix; last completed restart was via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
+- Build status: rebuild pending for the current code fix
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `GTF-juvenilesentencing.pdf`
-- Current phase: Bootstrap-stage acceptance fix
-- Immediate next step: restart on the new deep bootstrap validation fix and rerun `GTF-juvenilesentencing.pdf` fresh through the API
-- API restart/rerun confirmed for active file: Yes, restart completed immediately before selecting the next file
-- Rebuild required for active file: No further rebuild currently required
-- Active remediation loop count: `GTF-juvenilesentencing.pdf=2`
-- Next hypothesis: the active file is being held down by a false bootstrap-stage regression in `remediation_fast`; deeper structure-aware intermediate scoring should let the high-value bootstrap stage stick
+- Active PDF: `Addressing Police Stress FINAL-220523T17215932.pdf`
+- Current phase: Active blocker-family fix and rerun prep
+- Immediate next step: restart on the new role-mapped-note + Type3 font escalation fix, then rerun the same file fresh through the API
+- API restart/rerun confirmed for active file: Baseline run confirmed; next result must come from a fresh rerun after restart
+- Rebuild required for active file: Yes, after the current code fix
+- Active remediation loop count: `Addressing Police Stress FINAL-220523T17215932.pdf=2`
+- Next hypothesis: the active file is now blocked by two concrete generic gaps, not broad pipeline weakness
 
 ## Pending Files
 
@@ -77,6 +77,10 @@
 
 ## Recent Events
 
+- 2026-03-20T18:55:00Z Small-PDF loop fix: `repair_note_tag_ids` now honors role-mapped note structure elements (`/RoleMap` aliases like `/Endnote -> /Note`) instead of only literal `/Note` and `/Footnote` tags, and qpdf/classification now track unembedded `/Type3` fonts separately so they escalate into the stronger substitution/finalization path rather than getting stuck in the plain `needs_embedding` lane. This targets `Addressing Police Stress FINAL-220523T17215932.pdf`, whose fresh `78/C` rerun narrowed to six role-mapped note IDs plus three unembedded `/Type3` display fonts (`/BebasNeue*`). Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/pdfClassificationService.test.ts`, `pnpm --filter api exec tsc --noEmit`, and a direct probe that applied note IDs to all six role-mapped note tags on the rebuilt artifact. Commit/push/rebuild/restart pending before the next fresh rerun.
+- 2026-03-20T18:39:00Z Fresh small-PDF baseline: `Addressing Police Stress FINAL-220523T17215932.pdf` completed on queue item `d5d41324-5e65-4c8a-8dd7-da5502f50dd2` at `78/C` from `25/F`. The residual blocker family is precise: `repair_note_tag_ids` claimed `no_effect` because the file uses role-mapped `/Endnote` note tags, and qpdf still reports three real unembedded `/Type3` display fonts (`/BebasNeue*`) after the standard font repair chain. Those are the next shared system fixes before rerunning.
+
+- 2026-03-20T18:18:00Z Fresh post-restart rerun: `2010 MV Annual Report.pdf` completed on queue item `f6b3f139-ad93-4049-9b84-a54ccdf9354f` at `100/A`. This confirms the current annual-report path is no longer stuck in the old `59-62` range for this file family; the combined figure-evidence, table suppression, font, and bootstrap-stage-validation improvements now clear this specific 2010 annual-report case end-to-end on a fresh live run.
 - 2026-03-20T18:02:00Z Fresh post-restart rerun: `Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf` completed on queue item `3ba09754-94ab-4a27-b8bc-9ce3b9eab74c` at `96/A`. The backend `set_link_annotation_contents` write-path fix is live: `link_quality` improved to `100`, `pdf_ua_compliance` improved to `100`, and the remaining score gap is now only the residual Acrobat alt-text cap (`alt_text=75`).
 - 2026-03-20T18:10:00Z Small-PDF loop fix: non-native stage acceptance now forces deeper structure-aware intermediate scoring for `bootstrap_struct_tree` stages instead of validating them on the shallow `remediation_fast` profile alone. This fixes the `GTF-juvenilesentencing.pdf` family, where bootstrap was clearly beneficial (`43 -> 73` in fast scoring and `98` when structure-aware) but was still being rejected because the shallow intermediate profile falsely dropped `text_extractability` and `pdf_ua_compliance`. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'forces deep structure scoring when validating bootstrap stages'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T17:59:00Z Small-PDF loop fix: `set_link_annotation_contents` now writes through the Python structure backend instead of the old pdf-lib mutation path, and the backend now falls back correctly when annotations are direct objects with `objgen=(0,0)`. This fixes the modern PDFMaker traffic-report family where the tool claimed it had set `/Contents` but the saved PDF still left object `383 0 R` blank. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'sets link annotation /Contents without rewriting visible text|sets link annotation /Contents using the link-only annotation ordinal when non-link annotations come first|re-inspects link annotation /Contents from raw PDF objects after mutation'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.

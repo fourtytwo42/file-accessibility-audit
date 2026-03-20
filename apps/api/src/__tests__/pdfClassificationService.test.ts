@@ -110,6 +110,7 @@ describe('pdfClassificationService', () => {
     expect(classifyFonts({
       fontCount: 4,
       unembeddedFontCount: 1,
+      unembeddedType3FontCount: 0,
       fontsMissingToUnicode: 0,
       type1FontsMissingToUnicode: 0,
       legacyWidthRiskFontCount: 0,
@@ -118,7 +119,18 @@ describe('pdfClassificationService', () => {
 
     expect(classifyFonts({
       fontCount: 4,
+      unembeddedFontCount: 1,
+      unembeddedType3FontCount: 1,
+      fontsMissingToUnicode: 0,
+      type1FontsMissingToUnicode: 0,
+      legacyWidthRiskFontCount: 0,
+      cidFontsMissingCidToGidMap: 0,
+    })).toBe('needs_substitution')
+
+    expect(classifyFonts({
+      fontCount: 4,
       unembeddedFontCount: 0,
+      unembeddedType3FontCount: 0,
       fontsMissingToUnicode: 3,
       type1FontsMissingToUnicode: 0,
       legacyWidthRiskFontCount: 1,
@@ -128,6 +140,7 @@ describe('pdfClassificationService', () => {
     expect(classifyFonts({
       fontCount: 4,
       unembeddedFontCount: 1,
+      unembeddedType3FontCount: 0,
       fontsMissingToUnicode: 1,
       type1FontsMissingToUnicode: 1,
       legacyWidthRiskFontCount: 0,
@@ -137,6 +150,7 @@ describe('pdfClassificationService', () => {
     expect(classifyFonts({
       fontCount: 6,
       unembeddedFontCount: 0,
+      unembeddedType3FontCount: 0,
       fontsMissingToUnicode: 0,
       type1FontsMissingToUnicode: 0,
       legacyWidthRiskFontCount: 3,
@@ -177,6 +191,7 @@ describe('pdfClassificationService', () => {
           noteTagCount: 0,
           fontCount: 3,
           unembeddedFontCount: 0,
+          unembeddedType3FontCount: 0,
           fontsMissingToUnicode: 0,
           legacyWidthRiskFontCount: 0,
           cidFontsMissingCidToGidMap: 0,

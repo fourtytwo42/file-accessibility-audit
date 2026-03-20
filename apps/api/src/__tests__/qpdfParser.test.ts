@@ -136,6 +136,27 @@ describe('analyzeWithQpdf', () => {
     expect(result.legacyWidthRiskFontCount).toBe(1)
   })
 
+  it('tracks unembedded Type3 fonts separately so display-font debt can escalate', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:3 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type3',
+            '/BaseFont': '/ABCDEE+BebasNeueBold',
+            '/FontDescriptor': 'obj:4 0 R',
+          },
+        },
+        'obj:4 0 R': { value: { '/Type': '/FontDescriptor' } },
+      },
+    })
+
+    expect(result.fontCount).toBe(1)
+    expect(result.unembeddedFontCount).toBe(1)
+    expect(result.unembeddedType3FontCount).toBe(1)
+  })
+
   it('tracks explicit and inferred CIDSet risk signals for CID fonts', () => {
     const result = parseQpdfJson({
       objects: {
@@ -429,6 +450,33 @@ describe('analyzeWithQpdf', () => {
     expect(result.unembeddedFontCount).toBe(0)
     expect(result.fontsMissingToUnicode).toBe(0)
     expect(result.cidFontsMissingCidToGidMap).toBe(0)
+  })
+
+  it('unwraps referenced font descriptors before checking embedded programs', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/TrueType',
+            '/BaseFont': '/ExampleEmbedded',
+            '/FontDescriptor': 'obj:11 0 R',
+          },
+        },
+        'obj:11 0 R': {
+          stream: {
+            dict: {
+              '/Type': '/FontDescriptor',
+              '/FontFile2': 'obj:12 0 R',
+            },
+          },
+        },
+      },
+    })
+
+    expect(result.fontCount).toBe(1)
+    expect(result.unembeddedFontCount).toBe(0)
   })
 
   it('detects Image XObjects from QPDF v2 stream objects (no value wrapper)', () => {

@@ -34,6 +34,7 @@ export interface QpdfResult {
   formFields: Array<{ hasTU: boolean; name?: string }>
   fontCount?: number
   unembeddedFontCount?: number
+  unembeddedType3FontCount?: number
   fontsMissingToUnicode?: number
   type1FontsMissingToUnicode?: number
   cidFontsMissingCidToGidMap?: number
@@ -98,6 +99,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         formFields: [],
         fontCount: 0,
         unembeddedFontCount: 0,
+        unembeddedType3FontCount: 0,
         fontsMissingToUnicode: 0,
         type1FontsMissingToUnicode: 0,
         cidFontsMissingCidToGidMap: 0,
@@ -141,6 +143,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       formFields: [],
       fontCount: 0,
       unembeddedFontCount: 0,
+      unembeddedType3FontCount: 0,
       fontsMissingToUnicode: 0,
       type1FontsMissingToUnicode: 0,
       cidFontsMissingCidToGidMap: 0,
@@ -183,6 +186,7 @@ export function parseQpdfJson(json: any): QpdfResult {
     formFields: [],
     fontCount: 0,
     unembeddedFontCount: 0,
+    unembeddedType3FontCount: 0,
     fontsMissingToUnicode: 0,
     type1FontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
@@ -411,7 +415,12 @@ export function parseQpdfJson(json: any): QpdfResult {
 
       if (isFontObject(o) && !descendantFontRefs.has(ref) && !ignoredFormDefaultFontRefs.has(ref)) {
         result.fontCount = (result.fontCount ?? 0) + 1
-        if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
+        if (!fontHasEmbeddedProgram(o, objects)) {
+          result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
+          if (String(o['/Subtype'] || '') === '/Type3') {
+            result.unembeddedType3FontCount = (result.unembeddedType3FontCount ?? 0) + 1
+          }
+        }
         const missingToUnicode = !fontHasToUnicode(o, objects)
         if (missingToUnicode) {
           result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
@@ -514,7 +523,11 @@ export function parseQpdfJson(json: any): QpdfResult {
 // Resolve a ref like "9 0 R" to its object, trying both "obj:9 0 R" and "9 0 R" key formats
 function resolveRef(ref: string, objects: any): any {
   if (!ref || typeof ref !== 'string') return null
-  return objects[ref] ?? objects[`obj:${ref}`] ?? null
+  const resolved = objects[ref] ?? objects[`obj:${ref}`] ?? null
+  if (!resolved || typeof resolved !== 'object') return resolved
+  if (resolved.value && typeof resolved.value === 'object') return resolved.value
+  if (resolved.stream?.dict && typeof resolved.stream.dict === 'object') return resolved.stream.dict
+  return resolved
 }
 
 function addCanonicalRef(target: Set<string>, ref: unknown): void {
