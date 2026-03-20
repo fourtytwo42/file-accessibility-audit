@@ -938,8 +938,16 @@ function scoreAltTextWithAcrobatRisk(
   const hasNonDecorativeMixedContent = substantiveRiskNodes.some(
     n => n.ownershipMode === 'mixed_text_graphics_same_mcid'
   )
-  const scoreCap = hasNonDecorativeMixedContent ? 40 : 60
   const baseScore = category.score === null ? 100 : category.score
+  const scoreCap = hasNonDecorativeMixedContent
+    ? (
+        substantiveRiskNodes.length === 1
+        && substantiveRiskNodes[0]?.splitSafe
+        && baseScore >= 60
+          ? 60
+          : 40
+      )
+    : 60
   const score = Math.min(baseScore, scoreCap)
 
   return {

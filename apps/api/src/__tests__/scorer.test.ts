@@ -807,6 +807,48 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').grade).not.toBe('A')
   })
 
+  it('uses a softer Acrobat-risk cap when only one split-safe mixed node remains', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true },
+        { ref: '11 0 R', hasAlt: true },
+        { ref: '12 0 R', hasAlt: true },
+        { ref: '13 0 R', hasAlt: true },
+        { ref: '14 0 R', hasAlt: true },
+        { ref: '15 0 R', hasAlt: true },
+        { ref: '16 0 R', hasAlt: true },
+        { ref: '17 0 R', hasAlt: false },
+        { ref: '18 0 R', hasAlt: false },
+        { ref: '19 0 R', hasAlt: false },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'obj:42 0 R',
+            tag: '/P',
+            pageRef: 'obj:5 0 R',
+            mcids: [31, 32],
+            hasText: true,
+            hasGraphics: true,
+            splitSafe: true,
+            graphicsLikelyDecorative: false,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(60)
+  })
+
   it('excludes decorative non-figure graphics from alt-text scoring when informative figures are already described', () => {
     const qpdf = makeQpdf({
       images: [
