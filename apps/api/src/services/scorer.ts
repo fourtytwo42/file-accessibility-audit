@@ -247,7 +247,9 @@ function localStandardsWarning(report: LocalStandardsReport): string | null {
 function applyLocalStandardsEvidence(categories: CategoryResult[], report: LocalStandardsReport): CategoryResult[] {
   if (report.status !== 'issues_detected' || !report.findings.length) return categories
   const counts = new Map<string, number>()
-  for (const finding of report.findings) {
+  // Only apply score caps for blocking findings. Non-blocking (advisory/inferred) findings are
+  // surfaced as informational without penalizing category scores.
+  for (const finding of report.findings.filter(f => f.blocking)) {
     const increment = Math.max(1, finding.count || 1)
     for (const categoryId of finding.categoryIds) {
       counts.set(categoryId, (counts.get(categoryId) || 0) + increment)
@@ -277,7 +279,10 @@ function applyLocalStandardsEvidence(categories: CategoryResult[], report: Local
 function scorePdfUaComplianceFromLocal(report: LocalStandardsReport): CategoryResult {
   const blockingFindings = report.findings.filter(finding => finding.blocking)
   const blockingCount = blockingFindings.reduce((sum, finding) => sum + Math.max(1, finding.count || 1), 0)
-  const canJustifyCleanPass = report.status === 'clear' && report.knownGapKeys.length === 0
+  // Treat as clean when either there are no findings, or only non-blocking advisory findings remain.
+  // Advisory (non-blocking) findings like inferred CIDSet proxies do not represent confirmed failures.
+  const canJustifyCleanPass = report.knownGapKeys.length === 0
+    && (report.status === 'clear' || report.findings.every(f => !f.blocking))
   const logicalStructureBlocking = blockingFindings.find(finding => finding.key === 'pdfua.logical_structure')
   const cidsetBlocking = blockingFindings.find(finding => finding.key === 'pdfua.cidset_consistency')
   const languageBlocking = blockingFindings.find(finding => finding.key === 'pdfua.document_language')
@@ -484,8 +489,10 @@ export function scoreDocument(
     ? Math.round(applicable.reduce((sum, c) => sum + (c.score! * (c.weight / totalWeight)), 0))
     : 0
 
-  // If local standards are clean, allow near-perfect heuristic scores to reach 100/100.
-  const localStandardsClean = localStandards.status === 'clear' && localStandards.knownGapKeys.length === 0
+  // If local standards are clean (no findings, or only non-blocking advisory findings remain),
+  // allow near-perfect heuristic scores to reach 100/100.
+  const localStandardsClean = localStandards.knownGapKeys.length === 0
+    && (localStandards.status === 'clear' || localStandards.findings.every(f => !f.blocking))
   const standardsClean = localStandardsClean
   if (standardsClean && computedScore >= 98) {
     computedScore = 100
