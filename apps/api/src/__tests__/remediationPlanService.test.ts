@@ -246,4 +246,116 @@ describe('remediationPlanService', () => {
 
     expect(plan.actions.map(action => action.tool_name)).toEqual(['repair_structure_conformance'])
   })
+
+  it('filters excluded tools from deterministic planning when pipeline classification disallows them', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 88,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 1,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'category.alt_text',
+          label: 'Alt text',
+          source: 'category',
+          count: 1,
+          categoryIds: ['alt_text'],
+          blocking: false,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: [],
+          evidence: [],
+        }],
+        toolOpportunities: [
+          {
+            key: 'figure',
+            toolName: 'set_figure_alt_text',
+            reason: 'Add alt text',
+            scope: 'candidate',
+            candidateIds: ['figure:1'],
+            candidateGroupIds: [],
+            pageNumbers: [1],
+            categoryTargets: ['alt_text'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.alt_text'],
+          },
+          {
+            key: 'title',
+            toolName: 'set_document_title',
+            reason: 'Set title',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['title_language'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.title_language'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'example.pdf',
+      analysis: {
+        overallScore: 88,
+        grade: 'B',
+        isScanned: false,
+        categories: [{ id: 'alt_text', label: 'Alt text', score: 70, severity: 'Moderate' }],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 3, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [{ id: 'figure:1', pageNumber: 1, surroundingText: [], splitGenerated: false, informativeHint: 'informative', repairMode: 'safe' }],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+      pipelineConfig: {
+        stages: {
+          metadata: true,
+          structureBootstrap: false,
+          linkStructure: true,
+          fonts: false,
+          nativeStructure: true,
+          safeCandidates: true,
+        },
+        excludedTools: ['set_figure_alt_text'],
+        maxRounds: 2,
+        earlyExitScore: 95,
+        semanticStrategy: 'heuristic_only',
+      },
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual(['set_document_title'])
+  })
 })

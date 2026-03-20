@@ -4,12 +4,15 @@ import type {
   AppliedChange,
   DocumentModel,
   ModelReviewFlag,
+  PdfClassification,
+  PipelineConfig,
   PlaybookEntry,
   PlaybookRun,
   ReconstructionOutput,
   RemediationActionRecord,
   RemediationIteration,
   RemediationToolCall,
+  SemanticStrategy,
   SuggestedChange,
   VeraPdfSummary,
 } from './documentModel.js'
@@ -38,6 +41,7 @@ import {
 } from './pdfStructureBackend.js'
 import { REMEDIATION } from '#config'
 import { classifyPdf, recordToolOutcomes, type PdfClass } from './toolReliabilityService.js'
+import { buildPipelineConfig, classifyPdfFull, RECLASSIFICATION_TRIGGER_TOOLS } from './pdfClassificationService.js'
 import {
   buildFailureSignature,
   createPlaybookRun,
@@ -711,8 +715,8 @@ function cleanupEligibleCategoryIds(): Set<string> {
   ])
 }
 
-function canExitEarlyToFinalCleanup(result: AnalysisResult): boolean {
-  if (result.overallScore < REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD) return false
+function canExitEarlyToFinalCleanup(result: AnalysisResult, threshold: number = REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD): boolean {
+  if (result.overallScore < threshold) return false
   const remaining = result.categories
     .filter(category => typeof category.score === 'number' && category.score < 100)
     .map(category => category.id)
@@ -866,21 +870,29 @@ function finalCleanupDetails(tool: string, appliedMutations: Array<{ details: st
   }
 }
 
-function aiFirstFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
-  if (!context || !hasSemanticRepairConfig()) return []
+function heuristicEligibleFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
+  if (!context) return []
   return context.figureCandidates.filter(candidate =>
     candidate.repairMode !== 'defer' && candidate.informativeHint !== 'decorative'
   )
+}
+
+function aiFirstFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
+  if (!hasSemanticRepairConfig()) return []
+  return heuristicEligibleFigureCandidates(context)
 }
 
 function shouldRunSemanticStage(
   result: AnalysisResult,
   originalResult: AnalysisResult,
   context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null,
+  semanticStrategy: SemanticStrategy = 'full_ai',
 ): boolean {
+  if (semanticStrategy === 'skip') return false
   if (originalResult.isScanned) return false
-  if (aiFirstFigureCandidates(context).length > 0) return true
+  if ((semanticStrategy === 'heuristic_only' ? heuristicEligibleFigureCandidates(context) : aiFirstFigureCandidates(context)).length > 0) return true
   if (isFullyDone(result)) return false
+  if (semanticStrategy === 'heuristic_only') return false
   return hasRemainingSemanticWork(result)
 }
 
@@ -926,7 +938,7 @@ async function runHeuristicFigureFallbackStage(input: {
   manualReviewFlags: ModelReviewFlag[]
   usedInheritedVeraPdf: boolean
 }> {
-  const candidates = aiFirstFigureCandidates(input.context)
+  const candidates = heuristicEligibleFigureCandidates(input.context)
   if (!candidates.length) {
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
   }
@@ -979,6 +991,7 @@ async function runSemanticEnrichmentStage(input: {
   signal?: AbortSignal
   onProgress?: (progress: { stage: string; percent: number }) => void
   rejectedActions: RemediationActionRecord[]
+  semanticStrategy?: SemanticStrategy
 }): Promise<{
   buffer: Buffer
   result: AnalysisResult
@@ -986,8 +999,30 @@ async function runSemanticEnrichmentStage(input: {
   manualReviewFlags: ModelReviewFlag[]
   usedInheritedVeraPdf: boolean
 }> {
-  if (!shouldRunSemanticStage(input.result, input.originalResult, input.context)) {
+  const semanticStrategy = input.semanticStrategy || 'full_ai'
+  if (!shouldRunSemanticStage(input.result, input.originalResult, input.context, semanticStrategy)) {
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
+  }
+
+  if (semanticStrategy === 'heuristic_only') {
+    const fallback = await runHeuristicFigureFallbackStage({
+      buffer: input.buffer,
+      result: input.result,
+      context: input.context,
+      previousActionNames: input.previousActionNames,
+      inspectionCache: input.inspectionCache,
+    })
+    return {
+      ...fallback,
+      manualReviewFlags: fallback.actions.length
+        ? [{
+            code: 'semantic_strategy_heuristic_only',
+            label: 'Heuristic semantic fallback applied',
+            severity: 'warning',
+            details: 'Classification selected heuristic-only semantic routing, so AI semantic generation was skipped.',
+          }]
+        : [],
+    }
   }
 
   let context = input.context
@@ -1422,6 +1457,9 @@ export async function remediatePdfWithAgent(
   let playbookInitialContext: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null = null
   let playbookInitialSignature: ReturnType<typeof buildFailureSignature> | null = null
   let latestContext: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null = null
+  let currentClassification: PdfClassification | undefined
+  let currentPipelineConfig: PipelineConfig | undefined
+  const stagesRun = new Set<number>()
   const inspectionCache: RemediationInspectionCache = {}
   const inspectionState: InspectionDirtinessState = {
     structureDirty: true,
@@ -1437,6 +1475,67 @@ export async function remediatePdfWithAgent(
     stagesExecuted: 0,
   }
   let pdfClass: PdfClass = classifyPdf({ analysis: originalResult, context: null })
+
+  const refreshClassification = (analysis: AnalysisResult, context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): void => {
+    currentClassification = classifyPdfFull({
+      analysis,
+      context: context
+        ? {
+            qpdf: context.qpdf,
+            pdfjs: context.pdfjs,
+          }
+        : null,
+    })
+    currentPipelineConfig = buildPipelineConfig(currentClassification)
+    pdfClass = classifyPdf({ analysis, context })
+  }
+
+  const stageEnabled = (stageNum: number): boolean => {
+    if (!currentPipelineConfig) return true
+    switch (stageNum) {
+      case 1: return currentPipelineConfig.stages.metadata
+      case 2: return currentPipelineConfig.stages.structureBootstrap
+      case 3: return currentPipelineConfig.stages.linkStructure
+      case 4: return currentPipelineConfig.stages.fonts
+      case 5: return currentPipelineConfig.stages.nativeStructure
+      case 6: return currentPipelineConfig.stages.safeCandidates
+      default: return true
+    }
+  }
+
+  const filterCallsForPipeline = (calls: RemediationToolCall[]): RemediationToolCall[] => {
+    if (!currentPipelineConfig) return calls
+    const excluded = new Set(currentPipelineConfig.excludedTools)
+    return calls.filter(call => !excluded.has(call.tool_name))
+  }
+
+  const maybeRefreshClassificationFromStage = async (stageActions: RemediationActionRecord[]): Promise<void> => {
+    if (!stageActions.some(action =>
+      action.changedDocumentBytes
+      && action.outcome !== 'rejected'
+      && RECLASSIFICATION_TRIGGER_TOOLS.has(action.tool),
+    )) {
+      return
+    }
+    stageContext = await inspectRemediationContext(workingBuffer, currentResult, inspectModeForResult(currentResult))
+    currentTitle = stageContext.pdfjs.title || currentTitle
+    currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
+    refreshClassification(currentResult, stageContext)
+  }
+
+  const currentPipelineSummary = (): NonNullable<DocumentModel['pipelineConfig']> | null => {
+    if (!currentPipelineConfig) return null
+    return {
+      stagesRun: [...stagesRun].sort((a, b) => a - b),
+      excludedToolCount: currentPipelineConfig.excludedTools.length,
+      maxRounds: currentPipelineConfig.maxRounds,
+      earlyExitScore: currentPipelineConfig.earlyExitScore,
+      semanticStrategy: currentPipelineConfig.semanticStrategy,
+      structuralClass: currentClassification?.structuralClass || 'untagged_digital',
+      authoringTool: currentClassification?.authoringTool || 'unknown',
+      fontProfile: currentClassification?.fontProfile || 'needs_embedding',
+    }
+  }
 
   const persistStageToolOutcomes = (
     stageActions: RemediationActionRecord[],
@@ -1522,7 +1621,7 @@ export async function remediatePdfWithAgent(
       })
       latestContext = reused
       syncInspectionCache(reused)
-      pdfClass = classifyPdf({ analysis, context: reused })
+      refreshClassification(analysis, reused)
       inspectionState.bufferSha256 = nextBufferSha256
       inspectionState.lastInspectMode = inspectMode
       inspectionState.semanticDirty = false
@@ -1535,7 +1634,7 @@ export async function remediatePdfWithAgent(
     })
     latestContext = inspected
     syncInspectionCache(inspected)
-    pdfClass = classifyPdf({ analysis, context: inspected })
+    refreshClassification(analysis, inspected)
     inspectionState.bufferSha256 = nextBufferSha256
     inspectionState.lastInspectMode = inspectMode
     inspectionState.structureDirty = false
@@ -1665,10 +1764,11 @@ export async function remediatePdfWithAgent(
       }
     }
 
-    if (!residualCalls.length) return
+    const filteredResidualCalls = filterCallsForPipeline(residualCalls)
+    if (!filteredResidualCalls.length) return
 
     let changed = false
-    for (const call of residualCalls) {
+    for (const call of filteredResidualCalls) {
       const outcome = await executeRemediationTool({
         buffer: workingBuffer,
         context,
@@ -2159,8 +2259,9 @@ export async function remediatePdfWithAgent(
 
   const buildOrderedStages = (calls: RemediationToolCall[]): [number, RemediationToolCall[]][] => {
     const stageMap = new Map<number, RemediationToolCall[]>()
-    for (const call of calls) {
+    for (const call of filterCallsForPipeline(calls)) {
       const stageNum = TOOL_STAGE_ORDER.get(call.tool_name as any) ?? 99
+      if (!stageEnabled(stageNum)) continue
       if (!stageMap.has(stageNum)) stageMap.set(stageNum, [])
       stageMap.get(stageNum)!.push(call)
     }
@@ -2197,12 +2298,14 @@ export async function remediatePdfWithAgent(
       selectedCalls.push(call)
     }
 
-    return selectedCalls
+    return filterCallsForPipeline(selectedCalls)
   }
 
   const executePlaybookStages = async (playbook: PlaybookEntry): Promise<boolean> => {
     const playbookStages = [...new Set(playbook.toolSequence.map(step => step.stage))].sort((a, b) => a - b)
     for (const stageNum of playbookStages) {
+      if (!stageEnabled(stageNum)) continue
+      stagesRun.add(stageNum)
       const stageSteps = playbook.toolSequence.filter(step => step.stage === stageNum)
       stageContext = await inspectRemediationContext(workingBuffer, currentResult, inspectModeForResult(currentResult))
       const stageCalls = derivePlaybookStageCalls(playbook, stageSteps)
@@ -2297,6 +2400,7 @@ export async function remediatePdfWithAgent(
         stageContext = await inspectRemediationContext(workingBuffer, currentResult)
         currentTitle = stageContext.pdfjs.title || currentTitle
         currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
+        await maybeRefreshClassificationFromStage(stageActions)
       } else if (stageChangedDocument) {
         persistStageToolOutcomes(stageActions, {
           previous: stageStartResult,
@@ -2307,6 +2411,7 @@ export async function remediatePdfWithAgent(
           playbookId: playbook.id,
           playbookRunId: matchedPlaybookRun?.id || null,
         })
+        await maybeRefreshClassificationFromStage(stageActions)
       }
 
       previousActionNames = Array.from(new Set([
@@ -2385,13 +2490,14 @@ export async function remediatePdfWithAgent(
       iteration: 1,
       actions,
       rejectedActions,
+      pipelineConfig: currentPipelineConfig,
     })
   }
 
   let consecutiveNoProgressStages = 0
   let lastPlanSignature = JSON.stringify(plan.actions.map(call => `${call.tool_name}:${JSON.stringify(call.arguments || {})}`))
 
-  while (!playbookFastPathSucceeded && round <= REMEDIATION.MAX_REMEDIATION_ROUNDS) {
+  while (!playbookFastPathSucceeded && round <= (currentPipelineConfig?.maxRounds || REMEDIATION.MAX_REMEDIATION_ROUNDS)) {
     remediationTimings.roundsExecuted += 1
     let orderedStages: [number, PlanResult['actions']][]
     if (round === 1) {
@@ -2409,6 +2515,7 @@ export async function remediatePdfWithAgent(
         iteration: round,
         actions,
         rejectedActions,
+        pipelineConfig: currentPipelineConfig,
       })
       if (plan.actions.length === 0 || plan.done) break
       const planSignature = JSON.stringify(plan.actions.map(call => `${call.tool_name}:${JSON.stringify(call.arguments || {})}`))
@@ -2419,17 +2526,19 @@ export async function remediatePdfWithAgent(
       orderedStages = buildOrderedStages(plan.actions)
     }
 
-    let roundChangedDocument = false
-    let stopAfterRound = false
-    for (const [stageNum, stageCalls] of orderedStages) {
-      remediationTimings.stagesExecuted += 1
+	    let roundChangedDocument = false
+	    let stopAfterRound = false
+	    for (const [stageNum, stageCalls] of orderedStages) {
+	      if (!stageEnabled(stageNum)) continue
+	      remediationTimings.stagesExecuted += 1
       if (options?.signal?.aborted) {
         const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
         error.aborted = true
         throw error
       }
 
-      options?.onProgress?.({ stage: `Applying PDF fixes (stage ${stageNum})`, percent: 35 + stageNum * 5 })
+	      options?.onProgress?.({ stage: `Applying PDF fixes (stage ${stageNum})`, percent: 35 + stageNum * 5 })
+	      stagesRun.add(stageNum)
     const stageStartBuffer = workingBuffer
     const stageStartResult = currentResult
     const stageActions: RemediationActionRecord[] = []
@@ -2523,10 +2632,11 @@ export async function remediatePdfWithAgent(
           previous: stageStartResult,
           next: analyzedStage,
           roundNumber: round,
-          stageNumber: stageNum,
-          standardsImproved: stageImprovedStandards,
-        })
-      }
+	        stageNumber: stageNum,
+	        standardsImproved: stageImprovedStandards,
+	      })
+	      await maybeRefreshClassificationFromStage(stageActions)
+	    }
       stageContext = await inspectRemediationContext(workingBuffer, currentResult)
       currentTitle = stageContext.pdfjs.title || currentTitle
       currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
@@ -2562,9 +2672,9 @@ export async function remediatePdfWithAgent(
       consecutiveNoProgressStages = 0
     }
 
-    if (stageChangedDocument) {
-      const checkpointModel: DocumentModel = {
-        version: '6',
+	    if (stageChangedDocument) {
+	      const checkpointModel: DocumentModel = {
+	        version: '6',
         processingPath: 'agent_patch',
         pathFallbacks,
         title: currentTitle,
@@ -2578,10 +2688,12 @@ export async function remediatePdfWithAgent(
         visibleContentChangePolicy,
         originalVeraPdf: summarizeVeraPdf(originalResult),
         remediatedVeraPdf: summarizeVeraPdf(currentResult),
-        failureProfile: plan.failureProfile,
-        plannerEvidence: plan.plannerEvidence,
-        finalAudit: {
-          overallScore: currentResult.overallScore,
+	        failureProfile: plan.failureProfile,
+	        plannerEvidence: plan.plannerEvidence,
+	        classification: currentClassification || null,
+	        pipelineConfig: currentPipelineSummary(),
+	        finalAudit: {
+	          overallScore: currentResult.overallScore,
           grade: currentResult.grade,
           unresolvedIssues: unresolvedIssues(currentResult),
         },
@@ -2598,10 +2710,10 @@ export async function remediatePdfWithAgent(
     const bootstrapWasApplied = actions.some(a => a.tool === 'bootstrap_struct_tree' && a.outcome === 'applied')
     const altTextStillBroken = (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
     const altRepairAlreadyApplied = actions.some(a => a.tool === 'repair_other_elements_alt_text' && (a.outcome === 'applied' || a.outcome === 'no_effect'))
-    if (canExitEarlyToFinalCleanup(currentResult)) {
-      skipDirectToFinalCleanup = true
-      break
-    }
+	    if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
+	      skipDirectToFinalCleanup = true
+	      break
+	    }
     if (round > 1 && !roundChangedDocument && (!needsStructuralPersistenceRound(currentResult, latestContext) || round >= REMEDIATION.MIN_STRUCTURAL_ROUNDS)) break
     if (stopAfterRound) break
     // Post-bootstrap second pass (round 1 only): when bootstrap created a struct tree, re-inspect for alt risks and run stages 5+.
@@ -2616,14 +2728,15 @@ export async function remediatePdfWithAgent(
     currentTitle = stageContext.pdfjs.title || currentTitle
     currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
 
-    const postBootstrapPlan = await planRemediationActions({
-      filename,
-      analysis: currentResult,
-      context: stageContext,
-      iteration: 2,
-      actions,
-      rejectedActions,
-    })
+	    const postBootstrapPlan = await planRemediationActions({
+	      filename,
+	      analysis: currentResult,
+	      context: stageContext,
+	      iteration: 2,
+	      actions,
+	      rejectedActions,
+	      pipelineConfig: currentPipelineConfig,
+	    })
 
     // Only execute stages 5+ (alt text, figures, semantic fixes)
     const postBootstrapStageMap = new Map<number, typeof postBootstrapPlan.actions>()
@@ -2635,13 +2748,15 @@ export async function remediatePdfWithAgent(
     }
     const postBootstrapStages = [...postBootstrapStageMap.entries()].sort(([a], [b]) => a - b)
 
-    for (const [stageNum, stageCalls] of postBootstrapStages) {
-      if (options?.signal?.aborted) {
+	    for (const [stageNum, stageCalls] of postBootstrapStages) {
+	      if (!stageEnabled(stageNum)) continue
+	      if (options?.signal?.aborted) {
         const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
         error.aborted = true
         throw error
       }
-      options?.onProgress?.({ stage: `Post-bootstrap fixes (stage ${stageNum})`, percent: 75 + stageNum })
+	      options?.onProgress?.({ stage: `Post-bootstrap fixes (stage ${stageNum})`, percent: 75 + stageNum })
+	      stagesRun.add(stageNum)
       const stageStartBuffer = workingBuffer
       const stageStartResult = currentResult
       const stageActions: RemediationActionRecord[] = []
@@ -2713,22 +2828,24 @@ export async function remediatePdfWithAgent(
             standardsImproved: stageImprovedStandards,
           })
         }
-        stageContext = await inspectRemediationContext(workingBuffer, currentResult)
-        const postBootstrapMetadataHints = applyMetadataCallHints(stageCalls, stageActions, {
-          title: currentTitle,
-          language: currentLanguage,
-        })
-        currentTitle = postBootstrapMetadataHints.title
-        currentLanguage = postBootstrapMetadataHints.language
-      } else if (stageChangedDocument) {
-        persistStageToolOutcomes(stageActions, {
+	        stageContext = await inspectRemediationContext(workingBuffer, currentResult)
+	        const postBootstrapMetadataHints = applyMetadataCallHints(stageCalls, stageActions, {
+	          title: currentTitle,
+	          language: currentLanguage,
+	        })
+	        currentTitle = postBootstrapMetadataHints.title
+	        currentLanguage = postBootstrapMetadataHints.language
+	        await maybeRefreshClassificationFromStage(stageActions)
+	      } else if (stageChangedDocument) {
+	        persistStageToolOutcomes(stageActions, {
           previous: stageStartResult,
           next: currentResult,
           roundNumber: round,
-          stageNumber: stageNum,
-          standardsImproved: false,
-        })
-      }
+	          stageNumber: stageNum,
+	          standardsImproved: false,
+	        })
+	        await maybeRefreshClassificationFromStage(stageActions)
+	      }
 
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
@@ -2736,10 +2853,10 @@ export async function remediatePdfWithAgent(
       ]))
     }
     }
-    if (canExitEarlyToFinalCleanup(currentResult)) {
-      skipDirectToFinalCleanup = true
-      break
-    }
+	    if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
+	      skipDirectToFinalCleanup = true
+	      break
+	    }
     if (needsStructuralPersistenceRound(currentResult, latestContext) && round < REMEDIATION.MIN_STRUCTURAL_ROUNDS) {
       round += 1
       continue
@@ -2761,7 +2878,8 @@ export async function remediatePdfWithAgent(
   })
 
   let semanticStageChangedDocument = false
-  if (!skipDirectToFinalCleanup && shouldRunSemanticStage(currentResult, originalResult, latestContext)) {
+  if (!skipDirectToFinalCleanup && shouldRunSemanticStage(currentResult, originalResult, latestContext, currentPipelineConfig?.semanticStrategy || 'full_ai')) {
+    stagesRun.add(90)
     const semanticStageStartResult = currentResult
     const semanticContext = inspectModeForResult(currentResult) === 'alt_text_deep'
       ? await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
@@ -2780,6 +2898,7 @@ export async function remediatePdfWithAgent(
       signal: options?.signal,
       onProgress: options?.onProgress,
       rejectedActions,
+      semanticStrategy: currentPipelineConfig?.semanticStrategy || 'full_ai',
     })
     semanticStageChangedDocument = !semanticStage.buffer.equals(workingBuffer)
     if (semanticStageChangedDocument) {
@@ -2799,7 +2918,8 @@ export async function remediatePdfWithAgent(
     })
   }
 
-  if (!skipDirectToFinalCleanup && shouldRunBookmarkCleanup(currentResult, originalResult, latestContext)) {
+  if (!skipDirectToFinalCleanup && (currentPipelineConfig?.semanticStrategy || 'full_ai') === 'full_ai' && shouldRunBookmarkCleanup(currentResult, originalResult, latestContext)) {
+    stagesRun.add(91)
     const bookmarkStageStartResult = currentResult
     const bookmarkContext = latestContext || await inspectRemediationContext(workingBuffer, currentResult, 'light')
 
@@ -2819,6 +2939,7 @@ export async function remediatePdfWithAgent(
       signal: options?.signal,
       onProgress: options?.onProgress,
       rejectedActions,
+      semanticStrategy: 'full_ai',
     })
 
     if (!bookmarkStage.buffer.equals(workingBuffer)) {
@@ -2849,7 +2970,7 @@ export async function remediatePdfWithAgent(
   latestContext = finalCleanupContext
   const finalCleanupStartResult = currentResult
 
-  const finalCleanupCalls = [
+  const finalCleanupCalls = filterCallsForPipeline([
     {
       tool_name: 'normalize_heading_hierarchy' as const,
       arguments: { target: 'document' },
@@ -2880,16 +3001,17 @@ export async function remediatePdfWithAgent(
       rationale: 'Final cleanup: set /Tabs /S on all annotated or tagged pages before saving the remediated PDF.',
       confidence: 0.98,
     },
-  ]
+  ])
 
   let finalCleanupChangedDocument = false
   const finalCleanupActions: RemediationActionRecord[] = []
   let cleanupContext = finalCleanupContext
+  stagesRun.add(99)
   if (!nativeTaggedSafeMode) {
     const batchResult = await runPdfStructureBackendBatch({
       buffer: workingBuffer,
       mutations: finalCleanupCalls.map(call => ({
-        operation: call.tool_name,
+        operation: call.tool_name as StructureBackendMutationRequest['operation'],
       })),
       includeSnapshot: true,
       inspectMode: 'light',
@@ -2998,6 +3120,7 @@ export async function remediatePdfWithAgent(
     : finalCleanupChangedDocument || !latestContext
     ? await inspectRemediationContext(workingBuffer, currentResult)
     : latestContext
+  refreshClassification(currentResult, finalContext)
   const finalProfileArtifacts = buildFailureProfileArtifacts({
     analysis: currentResult,
     context: finalContext,
@@ -3021,6 +3144,8 @@ export async function remediatePdfWithAgent(
     visibleContentChangePolicy,
     failureProfile: finalProfileArtifacts.failureProfile,
     plannerEvidence: finalProfileArtifacts.plannerEvidence,
+    classification: currentClassification || null,
+    pipelineConfig: currentPipelineSummary(),
     finalAudit: {
       overallScore: currentResult.overallScore,
       grade: currentResult.grade,

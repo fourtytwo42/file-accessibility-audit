@@ -2,6 +2,7 @@ import { REMEDIATION } from '#config'
 import db from '../db/sqlite.js'
 import type { RemediationActionRecord, RemediationToolName, ToolReliabilitySummary } from './documentModel.js'
 import type { AnalysisResult } from './pdfAnalyzer.js'
+import { classifyPdfFull, toReliabilityPdfClass } from './pdfClassificationService.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 
 export type PdfClass = ToolReliabilitySummary['pdfClass']
@@ -52,13 +53,14 @@ export function classifyPdf(input: {
   analysis: AnalysisResult
   context?: Pick<PdfRemediationContext, 'qpdf' | 'structure'> | null
 }): PdfClass {
-  if (input.analysis.isScanned) return 'scanned'
-  if ((input.context?.qpdf?.formFields?.length || 0) > 0) return 'form_heavy'
-  const hasStructTree = !!input.context?.qpdf?.hasStructTree
-  const structuralNodes = input.context?.structure?.structuralNodes?.length || 0
-  if (hasStructTree && structuralNodes > 0) return 'native_tagged'
-  if (hasStructTree) return 'partially_tagged'
-  return 'untagged_digital'
+  return toReliabilityPdfClass(classifyPdfFull({
+    analysis: input.analysis,
+    context: input.context
+      ? {
+          qpdf: input.context.qpdf as any,
+        }
+      : null,
+  }))
 }
 
 export function recordToolOutcomes(records: ToolOutcomeRecord[]): void {

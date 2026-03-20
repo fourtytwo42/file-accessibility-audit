@@ -2,6 +2,7 @@ import { REMEDIATION } from '#config'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import type {
   FailureMode,
+  PipelineConfig,
   RemediationActionRecord,
   RemediationToolCall,
   RemediationToolName,
@@ -415,6 +416,7 @@ async function deterministicActions(input: {
   iteration: number
   actions: RemediationActionRecord[]
   rejectedActions: RemediationActionRecord[]
+  pipelineConfig?: PipelineConfig | null
 }): Promise<{ actions: RemediationToolCall[]; artifacts: ReturnType<typeof buildFailureProfileArtifacts> }> {
   const artifacts = buildFailureProfileArtifacts({
     analysis: input.analysis,
@@ -430,6 +432,7 @@ async function deterministicActions(input: {
   })
   const autoRunnableOpportunities = failureProfile.toolOpportunities.filter(opportunity =>
     opportunity.status === 'auto_runnable'
+    && !(input.pipelineConfig?.excludedTools || []).includes(opportunity.toolName)
     && (
       input.iteration <= 1
       || opportunityTargetsActiveIssue({
@@ -614,6 +617,7 @@ export async function planRemediationActions(input: {
   iteration: number
   actions: RemediationActionRecord[]
   rejectedActions: RemediationActionRecord[]
+  pipelineConfig?: PipelineConfig | null
 }): Promise<RemediationPlanResult> {
   const unresolvedIssues = issueCategoryIds(input.analysis)
   const { actions: deterministic, artifacts } = await deterministicActions(input)

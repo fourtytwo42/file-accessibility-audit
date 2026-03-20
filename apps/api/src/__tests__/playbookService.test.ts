@@ -31,14 +31,14 @@ describe('playbookService', () => {
       failureProfile: {
         failureModes: [{ key: 'b' }, { key: 'a' }],
       } as any,
-      analysis: { isScanned: false } as any,
+      analysis: { isScanned: false, categories: [], pdfMetadata: { pdfVersion: '1.7' } } as any,
       context: { qpdf: { hasStructTree: true, structTreeDepth: 2, hasMarkInfo: true } } as any,
     })
     const signatureB = buildFailureSignature({
       failureProfile: {
         failureModes: [{ key: 'a' }, { key: 'b' }],
       } as any,
-      analysis: { isScanned: false } as any,
+      analysis: { isScanned: false, categories: [], pdfMetadata: { pdfVersion: '1.7' } } as any,
       context: { qpdf: { hasStructTree: true, structTreeDepth: 2, hasMarkInfo: true } } as any,
     })
 

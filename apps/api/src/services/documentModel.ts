@@ -259,6 +259,55 @@ export type PlaybookPdfClass = 'tagged' | 'partially_tagged' | 'untagged' | 'sca
 export type PlaybookStatus = 'candidate' | 'validated' | 'hardened' | 'deprecated'
 export type PlaybookPageCountRange = 'small' | 'medium' | 'large'
 export type PlaybookRunOutcome = 'pending' | 'succeeded' | 'failed'
+export type PdfStructuralClass = 'scanned' | 'untagged_digital' | 'partially_tagged' | 'native_tagged' | 'well_tagged'
+export type PdfTextDensity = 'none' | 'sparse' | 'normal' | 'dense'
+export type PdfAuthoringTool =
+  | 'microsoft_word'
+  | 'adobe_indesign'
+  | 'adobe_acrobat'
+  | 'libreoffice'
+  | 'latex'
+  | 'chrome_print'
+  | 'scanner'
+  | 'crystal_reports'
+  | 'government_cms'
+  | 'unknown'
+export type PdfFontProfile = 'clean' | 'needs_embedding' | 'legacy_encoding' | 'needs_substitution' | 'no_fonts'
+export type PdfScale = 'tiny' | 'small' | 'medium' | 'large' | 'massive'
+export type PdfRemediationDepth = 'polish' | 'moderate' | 'major' | 'rebuild'
+export type SemanticStrategy = 'full_ai' | 'heuristic_only' | 'skip'
+
+export interface PdfClassification {
+  structuralClass: PdfStructuralClass
+  contentProfile: {
+    textDensity: PdfTextDensity
+    hasImages: boolean
+    hasComplexTables: boolean
+    hasSimpleTables: boolean
+    hasForms: boolean
+    hasLinks: boolean
+    hasFootnotes: boolean
+  }
+  authoringTool: PdfAuthoringTool
+  fontProfile: PdfFontProfile
+  scale: PdfScale
+  remediationDepth: PdfRemediationDepth
+}
+
+export interface PipelineConfig {
+  stages: {
+    metadata: boolean
+    structureBootstrap: boolean
+    linkStructure: boolean
+    fonts: boolean
+    nativeStructure: boolean
+    safeCandidates: boolean
+  }
+  excludedTools: RemediationToolName[]
+  maxRounds: number
+  earlyExitScore: number
+  semanticStrategy: SemanticStrategy
+}
 
 export interface FailureSignature {
   failureModeKeys: string[]
@@ -364,6 +413,17 @@ export interface DocumentModel {
   remediatedAdobe?: AdobeSummary | null
   failureProfile?: FailureProfile | null
   plannerEvidence?: PlannerEvidenceSummary | null
+  classification?: PdfClassification | null
+  pipelineConfig?: {
+    stagesRun: number[]
+    excludedToolCount: number
+    maxRounds: number
+    earlyExitScore: number
+    semanticStrategy: SemanticStrategy
+    structuralClass: PdfStructuralClass
+    authoringTool: PdfAuthoringTool
+    fontProfile: PdfFontProfile
+  } | null
   manualReviewFlags: ModelReviewFlag[]
   aiAppliedChanges: AppliedChange[]
   aiSuggestedChanges: SuggestedChange[]

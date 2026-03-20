@@ -15,8 +15,8 @@ import type {
   ToolOpportunityScope,
 } from './documentModel.js'
 import type { AnalysisResult } from './pdfAnalyzer.js'
+import { classifyPdfFull, toPlaybookPdfClass } from './pdfClassificationService.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
-import type { QpdfResult } from './qpdfService.js'
 
 type PlaybookEntryRow = {
   id: string
@@ -114,10 +114,14 @@ export function classifyPlaybookPdf(input: {
   analysis: AnalysisResult
   context: Pick<PdfRemediationContext, 'qpdf'> | null
 }): PlaybookPdfClass {
-  if (input.analysis.isScanned) return 'scanned'
-  if (!input.context?.qpdf?.hasStructTree) return 'untagged'
-  if ((input.context.qpdf.structTreeDepth || 0) <= 1 || !input.context.qpdf.hasMarkInfo) return 'partially_tagged'
-  return 'tagged'
+  return toPlaybookPdfClass(classifyPdfFull({
+    analysis: input.analysis,
+    context: input.context
+      ? {
+          qpdf: input.context.qpdf,
+        }
+      : null,
+  }))
 }
 
 export function pageCountRange(pageCount: number): PlaybookPageCountRange {
