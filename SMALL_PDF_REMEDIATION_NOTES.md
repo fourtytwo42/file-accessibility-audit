@@ -88,6 +88,20 @@
   - `normalize_heading_hierarchy` stays `no_effect` because no headings are ever created
   - next shared fix is to remap `/Link`-backed heading candidates to their safe parent text node before planning/mutation
 
+## Follow-up Heading Finding
+
+- Fresh rerun `71d056a0-3f18-4fba-b680-8c92a52124d6` still finished at `63/D`
+- The `/Link` remap fix did work:
+  - all first `16` heading candidates are now `repairMode = safe`
+  - all first `16` heading opportunities are `auto_runnable`
+  - semantic batch construction now includes two heading batches of `8` candidates each
+- New root cause:
+  - `create_heading_from_candidate` still never executed in the live run
+  - deterministic planner evidence shows heading opportunities are top auto-runnable, but stage-3 link `/Contents` candidate floods consume the 32-action cap before stage-6 heading actions are selected
+- Generic fix applied:
+  - reserve part of the deterministic action budget for safe heading candidates when `heading_structure` is still unresolved
+  - this should let heading creation finally compete with large link-candidate batches on Acrobat-native reports
+
 ## CMVoga Resolution
 
 - Queue history:

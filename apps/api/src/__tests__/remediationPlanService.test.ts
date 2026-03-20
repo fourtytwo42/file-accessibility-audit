@@ -488,6 +488,142 @@ describe('remediationPlanService', () => {
     expect(plan.actions).toHaveLength(32)
     expect(plan.actions.some(action => action.tool_name === 'embed_missing_fonts_in_place')).toBe(true)
   })
+
+  it('reserves room for safe heading candidates before link candidate floods consume the action budget', async () => {
+    const linkCandidateOpportunities = Array.from({ length: 40 }, (_, index) => ({
+      key: `link-${index}`,
+      toolName: 'set_link_annotation_contents',
+      reason: `Set link contents ${index}`,
+      scope: 'candidate',
+      candidateIds: [`link:1:${index}`],
+      candidateGroupIds: [],
+      pageNumbers: [1],
+      categoryTargets: ['link_quality'],
+      confidence: 0.9,
+      status: 'auto_runnable',
+      derivedFromFailureModeKeys: ['pdfua.annotation_alt_contents'],
+    }))
+    const headingOpportunities = Array.from({ length: 12 }, (_, index) => ({
+      key: `heading-${index}`,
+      toolName: 'create_heading_from_candidate',
+      reason: `Create heading ${index}`,
+      scope: 'candidate',
+      candidateIds: [`heading:1:${index}`],
+      candidateGroupIds: [],
+      pageNumbers: [1],
+      categoryTargets: ['heading_structure'],
+      confidence: 0.7,
+      status: 'auto_runnable',
+      derivedFromFailureModeKeys: ['category.heading_structure'],
+    }))
+
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'D',
+        analysisScore: 63,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'category.heading_structure',
+            label: 'Heading Structure',
+            source: 'category',
+            count: 1,
+            categoryIds: ['heading_structure'],
+            blocking: true,
+            unmatched: false,
+            classification: 'semantic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+          {
+            key: 'pdfua.annotation_alt_contents',
+            label: 'Link annotation alternate descriptions',
+            source: 'local_standards',
+            count: 40,
+            categoryIds: ['link_quality', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          ...linkCandidateOpportunities,
+          ...headingOpportunities,
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 1,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 52,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'heading-crowded.pdf',
+      analysis: {
+        overallScore: 63,
+        grade: 'D',
+        isScanned: false,
+        pageCount: 16,
+        categories: [
+          { id: 'heading_structure', label: 'Heading', score: 0, severity: 'Critical' },
+          { id: 'link_quality', label: 'Links', score: 40, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 20, severity: 'Critical' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: headingOpportunities.map((_, index) => ({
+          id: `heading:1:${index}`,
+          pageNumber: 1,
+          text: `Heading ${index}`,
+          nearbyContext: [],
+          targetRef: `obj:${500 + index} 0 R`,
+          existingTag: '/P',
+          repairMode: 'safe',
+        })),
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: linkCandidateOpportunities.map((_, index) => ({
+          id: `link:1:${index}`,
+          pageNumber: 1,
+          annotationIndex: index,
+          url: `https://example.com/${index}`,
+          text: `Link ${index}`,
+          suggestedText: `Link ${index}`,
+        })),
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions).toHaveLength(32)
+    expect(plan.actions.filter(action => action.tool_name === 'create_heading_from_candidate').length).toBeGreaterThan(0)
+  })
   it('plans finalize_substituted_font_conformance after embed and unicode repair for persistent legacy font failures', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {

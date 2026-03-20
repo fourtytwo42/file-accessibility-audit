@@ -19,6 +19,7 @@ const OPENAI_COMPAT_API_KEY = process.env.OPENAI_COMPAT_API_KEY || process.env.O
 const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENROUTER_MODEL || 'gpt-5.1-codex-mini'
 const PLAN_REMEDIATION_TOOL = 'plan_pdf_remediation'
 const MAX_ACTIONS = 32
+const RESERVED_HEADING_ACTIONS = 8
 
 const STRUCTURE_BOOTSTRAP_STAGE = new Set<RemediationToolName>([
   'bootstrap_struct_tree',
@@ -514,18 +515,34 @@ async function deterministicActions(input: {
     return a.key.localeCompare(b.key)
   })
 
-  let changed = true
-  const selectionPasses = [
-    (opportunity: ToolOpportunity) => !isCandidateFloodOpportunity(opportunity),
-    (_opportunity: ToolOpportunity) => true,
+  const headingStructureUnresolved = issueCategoryIds(input.analysis).includes('heading_structure')
+  const selectionPasses: Array<{
+    includeOpportunity: (opportunity: ToolOpportunity) => boolean
+    maxSelections?: number
+  }> = [
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        headingStructureUnresolved
+        && opportunity.toolName === 'create_heading_from_candidate'
+        && opportunity.scope === 'candidate',
+      maxSelections: RESERVED_HEADING_ACTIONS,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) => !isCandidateFloodOpportunity(opportunity),
+    },
+    {
+      includeOpportunity: (_opportunity: ToolOpportunity) => true,
+    },
   ]
-  for (const includeOpportunity of selectionPasses) {
-    changed = true
+  for (const selectionPass of selectionPasses) {
+    let changed = true
+    let passSelections = 0
     while (changed && selected.length < MAX_ACTIONS) {
       changed = false
       for (const opportunity of orderedOpportunities) {
         if (selected.length >= MAX_ACTIONS) break
-        if (!includeOpportunity(opportunity)) continue
+        if (selectionPass.maxSelections !== undefined && passSelections >= selectionPass.maxSelections) break
+        if (!selectionPass.includeOpportunity(opportunity)) continue
         if (selectedOpportunityKeys.has(opportunity.key)) continue
         if (!isOpportunitySelectable({
           opportunity,
@@ -547,6 +564,7 @@ async function deterministicActions(input: {
         if (!call) continue
         selected.push(call)
         selectedOpportunityKeys.add(opportunity.key)
+        passSelections += 1
         changed = true
       }
     }
