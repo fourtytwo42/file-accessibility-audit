@@ -20,6 +20,7 @@ const LINK_BATCH_SIZE = 8
 const FIGURE_BATCH_SIZE = 4
 const TABLE_BATCH_SIZE = 3
 const BOOKMARK_BATCH_SIZE = 10
+const MAX_SEMANTIC_LINK_TARGETS = 32
 const SEMANTIC_REQUEST_CONCURRENCY = 3
 const MAX_TEXT = 240
 const MAX_ALT_TEXT = 180
@@ -651,7 +652,9 @@ function tableTargets(context: PdfRemediationContext): TableCandidate[] {
 }
 
 function linkTargets(context: PdfRemediationContext): LinkCandidate[] {
-  return context.linkCandidates.filter(candidate => candidate.rawUrl || !candidate.annotationContents)
+  return context.linkCandidates
+    .filter(candidate => candidate.rawUrl || !candidate.annotationContents)
+    .slice(0, MAX_SEMANTIC_LINK_TARGETS)
 }
 
 export function buildSemanticRepairBatches(input: {

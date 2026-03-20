@@ -3,7 +3,7 @@
 ## Current Active File
 
 - `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current fresh queue item: `93dc3da2-b092-463e-a286-efeeba1e4442`
+- Current fresh queue item: `ff6aab29-d62d-479c-8da5-366241e50c83`
 - Latest completed file: `McLean-2.pdf` -> `100/A`
 
 ## Recent Loop Summary
@@ -101,6 +101,23 @@
 - Generic fix applied:
   - reserve part of the deterministic action budget for safe heading candidates when `heading_structure` is still unresolved
   - this should let heading creation finally compete with large link-candidate batches on Acrobat-native reports
+
+## Follow-up Semantic Throughput Finding
+
+- Fresh rerun `ff6aab29-d62d-479c-8da5-366241e50c83` progressed farther on the new heading-budget fix, but effectively wedged in `Generating semantic fixes`
+- Direct local batching probe showed the current semantic workload is dominated by links:
+  - `16` heading candidates
+  - `9` figure candidates
+  - `146` link candidates
+  - `26` semantic batches total
+  - `19` of those `26` batches are link batches
+- Root cause:
+  - deterministic link repair already handles the long tail of annotation `/Contents` work
+  - semantic link generation was still trying to process nearly the full link backlog on a heavy-link Acrobat report
+  - that made semantic generation disproportionately slow relative to the remaining score gain
+- Generic fix applied:
+  - cap semantic link batching to the first `32` link targets on heavy-link documents
+  - keep semantic headings, figures, and bookmarks active so the semantic stage still improves the categories that actually need model help
 
 ## CMVoga Resolution
 

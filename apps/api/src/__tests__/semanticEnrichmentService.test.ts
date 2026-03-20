@@ -194,6 +194,40 @@ describe('semanticEnrichmentService', () => {
     ])
   })
 
+  it('caps semantic link batches on heavy-link documents', async () => {
+    const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const context = makeContext()
+    context.headingCandidates = []
+    context.figureCandidates = []
+    context.tableCandidates = []
+    context.linkCandidates = Array.from({ length: 146 }, (_, index) => ({
+      id: `link:1:${index + 1}`,
+      pageNumber: 1 + Math.floor(index / 10),
+      url: `https://example.com/${index + 1}`,
+      text: `https://example.com/${index + 1}`,
+      bbox: { x: 0, y: 0.2, width: 0.4, height: 0.05 },
+      annotationIndex: index,
+      annotationContents: null,
+      rawUrl: true,
+      suggestedText: 'example resource',
+    }))
+    const analysis = makeAnalysisResult()
+    analysis.categories = [
+      { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'table_markup', label: 'Table Markup', weight: 0.1, score: 100, grade: 'A', severity: 'Pass', findings: [], explanation: '', helpLinks: [] },
+      { id: 'link_quality', label: 'Link Quality', weight: 0.1, score: 25, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+    ] as any
+
+    const batches = buildSemanticRepairBatches({ context, analysis })
+    expect(batches.map(batch => `${batch.batchType}:${batch.links.length}`)).toEqual([
+      'links:8',
+      'links:8',
+      'links:8',
+      'links:8',
+    ])
+  })
+
   it('normalizes AI responses and drops unknown candidate ids', async () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     vi.stubGlobal('fetch', vi.fn(async () => ({
