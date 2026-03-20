@@ -223,6 +223,16 @@ function bootstrapFigureAltText(candidate: FigureCandidate): string {
   return `Image on page ${candidate.pageNumber}`
 }
 
+function isSemanticAiEligibleDeferredFigureCandidate(candidate: FigureCandidate | null | undefined): boolean {
+  if (!candidate || candidate.repairMode !== 'defer') return false
+  if (candidate.informativeHint === 'decorative') return false
+  if (!(candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector')) return false
+  if (!candidate.unsafeReason?.startsWith('text_heavy_candidate:')) return false
+  return !!candidate.targetTag && SAFE_FIGURE_TAGS.includes(candidate.targetTag as (typeof SAFE_FIGURE_TAGS)[number])
+}
+
+export const __test_isSemanticAiEligibleDeferredFigureCandidate = isSemanticAiEligibleDeferredFigureCandidate
+
 export interface PdfRemediationContext {
   analysis: AnalysisResult
   qpdf: QpdfResult
@@ -1935,7 +1945,9 @@ export async function executeRemediationTool(input: {
         )
         return { buffer, ...deferred }
       }
-      if (candidate.repairMode === 'defer') {
+      const semanticAiOverrideAllowed = args.generationSource === 'semantic_ai'
+        && isSemanticAiEligibleDeferredFigureCandidate(candidate)
+      if (candidate.repairMode === 'defer' && !semanticAiOverrideAllowed) {
         const unsafeCode = candidate.unsafeReason?.split(':', 1)[0]?.trim() || 'figure_candidate_unsafe'
         const deferred = deferredAction(
           baseAction,
@@ -1947,9 +1959,10 @@ export async function executeRemediationTool(input: {
         return { buffer, ...deferred }
       }
       const altText = typeof args.altText === 'string' ? args.altText.trim() : ''
+      const needsRetag = candidate.repairMode === 'retag_then_set_alt' || semanticAiOverrideAllowed
       const operation = call.tool_name === 'mark_figure_decorative'
-        ? (candidate.repairMode === 'retag_then_set_alt' ? 'retag_as_figure_and_set_alt' : 'mark_figure_decorative')
-        : (call.tool_name === 'retag_as_figure_and_set_alt' || candidate.repairMode === 'retag_then_set_alt'
+        ? (needsRetag ? 'retag_as_figure_and_set_alt' : 'mark_figure_decorative')
+        : (call.tool_name === 'retag_as_figure_and_set_alt' || needsRetag
           ? 'retag_as_figure_and_set_alt'
           : 'set_figure_alt_text')
       let result = await runPdfStructureBackend({

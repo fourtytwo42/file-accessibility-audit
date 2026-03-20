@@ -497,9 +497,18 @@ async function renderPageImages(buffer: Buffer, pageNumbers: number[]): Promise<
   return images
 }
 
+function isSemanticAiEligibleDeferredFigureCandidate(candidate: FigureCandidate): boolean {
+  return candidate.repairMode === 'defer'
+    && candidate.informativeHint !== 'decorative'
+    && (candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector')
+    && !!candidate.targetTag
+    && ['/P', '/Span', '/Div', '/NonStruct', '/TextBox', '/Shape', '/InlineShape', '/Normal'].includes(candidate.targetTag)
+    && !!candidate.unsafeReason?.startsWith('text_heavy_candidate:')
+}
+
 function figureTargets(context: PdfRemediationContext): FigureCandidate[] {
   return context.figureCandidates.filter(candidate =>
-    candidate.repairMode !== 'defer'
+    (candidate.repairMode !== 'defer' || isSemanticAiEligibleDeferredFigureCandidate(candidate))
     && candidate.informativeHint !== 'decorative'
   )
 }

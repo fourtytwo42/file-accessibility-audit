@@ -187,3 +187,21 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/agentRemediationService.test.ts -t 'classifies structural states including well-tagged documents|uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment'`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 6
+
+- Fourth queue item: `7ce83422-8014-4a01-ab12-0377b529ca8b`
+- Rerun result: `79/C`
+- Improvement vs third remediated run: `79 -> 79` (no material score change)
+- Deeper diagnosis:
+  - the run did reach `Generating semantic fixes`, so `full_ai` semantic routing is now active
+  - despite that, the final output still had `13 of 27 image(s) have alternative text` and `14` missing
+  - semantic AI still had too little access to the real backlog because figure batching only included candidates with `repairMode !== 'defer'`
+
+### System Fix in Progress 7
+
+- Expanded semantic figure eligibility so AI can review strong-evidence deferred figure candidates whose only blocker is the conservative `text_heavy_candidate` gate.
+- Allowed semantic-AI-generated figure repairs to override that specific defer reason during execution, while keeping other deferred/unsafe figure cases blocked.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts src/__tests__/agentRemediationService.test.ts -t 'allows semantic AI to override text-heavy defer for strong figure evidence|promotes strong image-backed paragraph figure candidates in recent tagged reports|still runs semantic AI for eligible figures even when semantic categories are complete'`
+  - `pnpm --filter api exec tsc --noEmit`

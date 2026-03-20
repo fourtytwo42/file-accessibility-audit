@@ -130,15 +130,15 @@
 ## Current Session Snapshot
 
 - Active file: `2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Active loop: `3`
-- Latest attempt queue item: `0b5c1c04-154b-4528-9c43-58e70152b4b3`
+- Active loop: `4`
+- Latest attempt queue item: `7ce83422-8014-4a01-ab12-0377b529ca8b`
 - Latest remediated result: `79/C` after fresh rerun with veraPDF intentionally disabled
-- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-run3.json`
-- Restart status: pending after the latest classification fix
+- Latest attempt artifact: `/tmp/pdfaf-small-loop/firearm-prohibitors-run4.json`
+- Restart status: pending after the latest semantic figure-eligibility fix
 
 ## Current Focus
 
-- Rerun `2025FirearmProhibitorsReport-250626T19175938.pdf` after the classification fix so it uses `full_ai` semantic routing instead of heuristic-only cleanup.
+- Rerun `2025FirearmProhibitorsReport-250626T19175938.pdf` after widening semantic figure eligibility so AI can act on the real text-heavy image backlog.
 
 ## Retry Checkpoint
 
@@ -151,9 +151,11 @@
 - Loop 2 rerun after detector cleanup: `76/C -> 79/C`; detector issues were real but not dominant, and the remaining score gap is now clearly concentrated in image/figure remediation.
 - New hypothesis: strong image-backed `/P` candidates were being incorrectly held back by a `pageImageCount` gate even after they already had strong figure evidence; promoting those candidates should materially raise the `alt_text` category on rerun.
 - Updated hypothesis: figure promotion alone is insufficient because the document is still routed through `heuristic_only` semantic cleanup; the broader fix is to stop classifying semantically weak documents as `well_tagged`.
+- Latest hypothesis: even with `full_ai` enabled, the semantic stage was still blind to most of the backlog because it excluded deferred `text_heavy_candidate` figures from batching. The next rerun should tell us whether widening that AI eligibility finally moves the `alt_text` score.
 
 ## Recent Events
 
+- 2026-03-20T08:37:00Z Small-PDF loop fix: semantic AI can now review strong-evidence deferred figure candidates whose only blocker is the conservative `text_heavy_candidate` gate, and semantic-AI-generated figure actions may override that single defer reason during execution. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts src/__tests__/agentRemediationService.test.ts -t 'allows semantic AI to override text-heavy defer for strong figure evidence|promotes strong image-backed paragraph figure candidates in recent tagged reports|still runs semantic AI for eligible figures even when semantic categories are complete'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-20T08:31:00Z Small-PDF loop fix: `well_tagged` classification now requires semantic-heavy categories to already be healthy, so documents with deep structure but poor alt text/link/table semantics stay in `native_tagged` and continue using `full_ai` semantic routing. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/agentRemediationService.test.ts -t 'classifies structural states including well-tagged documents|uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-20T08:26:00Z Small-PDF loop fix: safe figure-retagging no longer requires `pageImageCount > 0` once a candidate already has `strong` or `vector` figure evidence. Added a regression on `2025FirearmProhibitorsReport-250626T19175938.pdf` proving a strong image-backed `/P` candidate is promoted to `retag_then_set_alt`. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|repairs legacy Gxx subset glyph names in small Distiller PDFs'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-20T08:24:52Z Fresh post-restart rerun: `2025FirearmProhibitorsReport-250626T19175938.pdf` completed on queue item `60fb95a3-e9a8-47b8-b585-6ef70bcac866` at `79/C`. This confirms the local-standards detector cleanup helped, but the file remains primarily blocked by real figure/alt-text remediation debt rather than parser noise.

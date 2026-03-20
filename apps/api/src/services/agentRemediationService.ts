@@ -899,9 +899,25 @@ function heuristicEligibleFigureCandidates(context: Awaited<ReturnType<typeof in
   )
 }
 
+function aiEligibleFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
+  if (!context) return []
+  return context.figureCandidates.filter(candidate =>
+    candidate.informativeHint !== 'decorative'
+    && (
+      candidate.repairMode !== 'defer'
+      || (
+        candidate.repairMode === 'defer'
+        && (candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector')
+        && !!candidate.targetTag
+        && candidate.unsafeReason?.startsWith('text_heavy_candidate:')
+      )
+    )
+  )
+}
+
 function aiFirstFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
   if (!hasSemanticRepairConfig()) return []
-  return heuristicEligibleFigureCandidates(context)
+  return aiEligibleFigureCandidates(context)
 }
 
 function shouldRunSemanticStage(
@@ -1163,7 +1179,12 @@ async function runSemanticEnrichmentStage(input: {
         const details = proposal.decorative
           ? `AI figure proposal (${Math.round(proposal.confidence * 100)}%): mark as decorative. ${proposal.rationale}`
           : `AI figure proposal (${Math.round(proposal.confidence * 100)}%): ${proposal.altText}. ${proposal.rationale}`
-        if (!candidate || candidate.repairMode === 'defer' || input.previousActionNames.includes(key) || proposal.confidence < batchThreshold || (!proposal.decorative && !proposal.altText)) {
+        const semanticAiEligibleDeferredCandidate = !!candidate
+          && candidate.repairMode === 'defer'
+          && (candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector')
+          && !!candidate.targetTag
+          && candidate.unsafeReason?.startsWith('text_heavy_candidate:')
+        if (!candidate || (candidate.repairMode === 'defer' && !semanticAiEligibleDeferredCandidate) || input.previousActionNames.includes(key) || proposal.confidence < batchThreshold || (!proposal.decorative && !proposal.altText)) {
           deferredActions.push(semanticDeferredAction({
             tool,
             target: `page ${candidate?.pageNumber || 0}`,

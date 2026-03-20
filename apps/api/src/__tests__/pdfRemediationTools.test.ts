@@ -11,6 +11,7 @@ import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
 import {
   buildRemediationContextFromSnapshot,
+  __test_isSemanticAiEligibleDeferredFigureCandidate,
   __test_getBuildRemediationPageFactsCallCount,
   __test_getInspectionResultCacheSize,
   __test_remapHeadingTarget,
@@ -1321,6 +1322,26 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
     expect(candidate).toBeTruthy()
   }, 120_000)
+
+  it('allows semantic AI to override text-heavy defer for strong figure evidence', () => {
+    expect(__test_isSemanticAiEligibleDeferredFigureCandidate({
+      id: 'figure:1',
+      pageNumber: 1,
+      targetRef: 'obj:1 0 R',
+      bbox: null,
+      hasAlt: false,
+      altText: null,
+      informativeHint: 'informative',
+      surroundingText: ['Long surrounding text'],
+      repairMode: 'defer',
+      targetTag: '/P',
+      unsafeReason: 'text_heavy_candidate: Target obj:1 0 R appears text-heavy and is not safe to retag as /Figure.',
+      parentTagPath: [],
+      pageImageCount: 0,
+      textDensityHint: 'high',
+      imageEvidence: 'strong',
+    })).toBe(true)
+  })
 
   it('substitutes missing legacy annual-report fonts with metric-aware embedded fallbacks', async () => {
     const buffer = await loadDownloadFixture('99anreport.pdf')
