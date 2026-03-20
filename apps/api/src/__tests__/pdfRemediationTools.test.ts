@@ -1352,6 +1352,21 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.changedDocumentBytes).toBe(true)
   }, 120_000)
 
+  it('keeps strong paragraph figure candidates promotable even with long surrounding text', async () => {
+    const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
+    const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
+
+    const candidate = context.figureCandidates.find(entry =>
+      entry.targetTag === '/P'
+      && entry.imageEvidence === 'strong'
+      && entry.pageImageCount === 0
+      && entry.surroundingText.join(' ').length > 220)
+
+    expect(candidate).toBeTruthy()
+    expect(candidate?.repairMode).toBe('retag_then_set_alt')
+  }, 120_000)
+
   it('allows semantic AI to override text-heavy defer for strong figure evidence', () => {
     expect(__test_isSemanticAiEligibleDeferredFigureCandidate({
       id: 'figure:1',

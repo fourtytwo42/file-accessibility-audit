@@ -680,7 +680,7 @@ function buildFigureCandidates(
           unsafeReason: `no_figure_evidence: Target ${targetRef} does not have strong enough figure evidence for automatic figure retagging.`,
         }
       }
-      if (textDensityHint === 'high' && targetTag !== '/TextBox' && surroundingText.join(' ').length > 220) {
+      if (!hasStrongFigureEvidence && textDensityHint === 'high' && targetTag !== '/TextBox' && surroundingText.join(' ').length > 220) {
         return {
           repairMode: 'defer' as const,
           targetTag,
@@ -1772,7 +1772,7 @@ export async function executeRemediationTool(input: {
       }))
       const figures = context.figureCandidates
         .filter(candidate =>
-          candidate.pageImageCount > 0
+          (candidate.pageImageCount > 0 || candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector')
           && candidate.informativeHint !== 'decorative'
           && Number.isFinite(candidate.pageNumber)
         )
