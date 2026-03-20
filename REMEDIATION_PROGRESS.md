@@ -126,3 +126,27 @@
 
 - This file is orchestrator-managed and updated continuously during unattended runs.
 - Use `MitigationAttempts/orchestrator-state.json` for the full machine-readable campaign state.
+
+## Current Session Snapshot
+
+- Active file: `juv probation.pdf`
+- Active loop: `4`
+- Latest attempt queue item: `8d610c2d-66ff-446e-af13-7bf2adbf7be3`
+- Latest remediated result: `88/B` after fresh rerun with veraPDF intentionally disabled
+- Latest attempt artifact: `/tmp/pdfaf-small-loop/juv-probation-remediated-v3.pdf`
+- Restart status: pending after the latest Type1 glyph-name repair change
+
+## Current Focus
+
+- Push `juv probation.pdf` above `95/100` by clearing the final legacy Type1 Unicode blocker that remains after the first two small-PDF remediation fixes.
+
+## Retry Checkpoint
+
+- Loop 1: `26/F -> 63/D`
+- Loop 2: `63/D -> 82/B`
+- Loop 3: `82/B -> 88/B`
+- Current hypothesis: the final remaining font-unicode blocker is a generic legacy Distiller/PageMaker subset-glyph naming pattern (`/Differences [1 /G8b]`) that the Type1 Unicode repair path did not decode.
+
+## Recent Events
+
+- 2026-03-20T08:18:00Z Small-PDF loop fix: the Type1 Unicode repair path now decodes legacy subset glyph names in `Gxx` hexadecimal form when deriving `/ToUnicode` maps, covering the remaining one-byte custom-encoding blocker in `juv probation.pdf`. Added a regression test on `Downloads/juv probation.pdf` to verify `repair_type1_font_unicode_maps` reduces the missing Type1 Unicode count for this small Distiller/PageMaker pattern. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'repairs legacy Gxx subset glyph names in small Distiller PDFs|repairs derivable Type1 ToUnicode maps on annual-report PDFs'` and `pnpm --filter api exec tsc --noEmit`. API rebuild/restart still pending before the next fresh rerun of `juv probation.pdf`.

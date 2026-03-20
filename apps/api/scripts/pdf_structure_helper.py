@@ -4739,6 +4739,16 @@ def glyph_name_to_unicode(name):
         return None
     if cleaned in GLYPH_NAME_UNICODE:
         return GLYPH_NAME_UNICODE[cleaned]
+    legacy_subset_match = re.fullmatch(r"[Gg]([0-9A-Fa-f]{2,4})", cleaned)
+    if legacy_subset_match:
+        try:
+            subset_code = int(legacy_subset_match.group(1), 16)
+            if 0 <= subset_code <= 0xFF:
+                return bytes([subset_code]).decode("cp1252")
+            if 0 <= subset_code <= 0x10FFFF and not (0xD800 <= subset_code <= 0xDFFF):
+                return chr(subset_code)
+        except Exception:
+            return None
     if len(cleaned) == 1:
         return cleaned
     if cleaned.startswith("uni") and len(cleaned) >= 7:

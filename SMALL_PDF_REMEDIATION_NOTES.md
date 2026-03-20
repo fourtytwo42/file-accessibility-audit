@@ -69,6 +69,27 @@
   - `pnpm exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/failureProfileService.test.ts src/__tests__/localStandardsService.test.ts src/__tests__/scorer.test.ts src/__tests__/agentRemediationService.test.ts`
   - `pnpm exec tsc --noEmit`
 
+### Loop 1 Rerun After Fix Set 2
+
+- Third queue item: `8d610c2d-66ff-446e-af13-7bf2adbf7be3`
+- Rerun result: `88/B`
+- Improvement vs second remediated run: `82 -> 88`
+- Remaining blocker after fix set 2:
+  - `pdfua.font_unicode`: reduced from `7` to `1`
+- Concrete diagnosis from the downloaded remediated artifact:
+  - the last unresolved font is Type1 font `/FLCKCD+TT946O00`
+  - it is used on page 4 for a single one-byte custom-encoding text run
+  - its `/Encoding /Differences` payload contains glyph name `/G8b`
+  - the Type1 repair path did run, but our glyph-name decoder could not map legacy `Gxx` subset names into Unicode
+
+### System Fix in Progress 3
+
+- Added a legacy Type1 subset glyph fallback in `pdf_structure_helper.py` so glyph names like `G8b` deterministically decode from their hexadecimal subset code when deriving Type1 `/ToUnicode` maps.
+- Added a regression test that uses `Downloads/juv probation.pdf` directly and verifies `repair_type1_font_unicode_maps` reduces the missing Type1 Unicode count on this small Distiller/PageMaker pattern.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'repairs legacy Gxx subset glyph names in small Distiller PDFs|repairs derivable Type1 ToUnicode maps on annual-report PDFs'`
+  - `pnpm --filter api exec tsc --noEmit`
+
 ## Pattern Notes
 
 - Early small legacy PDFs may cluster around this pattern:

@@ -104,6 +104,10 @@ async function loadDownloadFixture(name: string): Promise<Buffer> {
   return fs.promises.readFile(path.join(DOWNLOADS_DIR, name))
 }
 
+async function loadRepoDownload(name: string): Promise<Buffer> {
+  return fs.promises.readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Downloads', name))
+}
+
 function makePlannerAction(
   tool: RemediationToolName,
   target = 'document',
@@ -1278,6 +1282,31 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const after = await analyzePDF(result.buffer, '99anreport.pdf')
     expect(['applied', 'no_effect']).toContain(result.action.outcome)
     expect(after.verapdf.failedChecks).toBeLessThanOrEqual(before.verapdf.failedChecks)
+  }, 120_000)
+
+  it('repairs legacy Gxx subset glyph names in small Distiller PDFs', async () => {
+    const buffer = await loadRepoDownload('juv probation.pdf')
+    const beforeQpdf = await analyzeWithQpdf(buffer)
+    const before = await analyzePDF(buffer, 'juv probation.pdf')
+    const context = await inspectPdfForRemediation(buffer, before)
+
+    expect(beforeQpdf.type1FontsMissingToUnicode).toBeGreaterThan(0)
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'repair_type1_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Add Type1 ToUnicode maps for legacy subset glyph-name encodings.',
+        confidence: 0.9,
+      },
+    })
+
+    const afterQpdf = await analyzeWithQpdf(result.buffer)
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+    expect(afterQpdf.type1FontsMissingToUnicode).toBeLessThan(beforeQpdf.type1FontsMissingToUnicode ?? 0)
+    expect(afterQpdf.fontsMissingToUnicode).toBeLessThan(beforeQpdf.fontsMissingToUnicode ?? 0)
   }, 120_000)
 
   it('substitutes missing legacy annual-report fonts with metric-aware embedded fallbacks', async () => {
