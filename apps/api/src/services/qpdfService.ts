@@ -237,9 +237,7 @@ export function parseQpdfJson(json: any): QpdfResult {
 
     for (const [ref, obj] of Object.entries(objects)) {
       if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/Font') continue
-      const descendants = (obj as any)['/DescendantFonts']
-      const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
-      for (const descendant of descendantList) {
+      for (const descendant of resolveDescendantFonts(obj, objects)) {
         if (typeof descendant === 'string') {
           descendantFontRefs.add(descendant)
           descendantFontRefs.add(descendant.replace(/^obj:/, ''))
@@ -511,15 +509,39 @@ function isFontObject(obj: any): boolean {
   return obj?.['/Type'] === '/Font'
 }
 
+function resolveDescendantFonts(fontObj: any, objects: any): any[] {
+  if (!fontObj || typeof fontObj !== 'object') return []
+  const descendants = fontObj['/DescendantFonts']
+  const directList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  const resolved: any[] = []
+
+  for (const descendant of directList) {
+    if (typeof descendant === 'string') {
+      const byRef = resolveRef(descendant, objects)
+      if (Array.isArray(byRef)) {
+        resolved.push(...byRef)
+      } else {
+        resolved.push(descendant)
+      }
+      continue
+    }
+    if (Array.isArray(descendant)) {
+      resolved.push(...descendant)
+      continue
+    }
+    resolved.push(descendant)
+  }
+
+  return resolved
+}
+
 function resolveFontDescriptor(fontObj: any, objects: any): any | null {
   if (!fontObj || typeof fontObj !== 'object') return null
   const directDescriptor = fontObj['/FontDescriptor']
   if (typeof directDescriptor === 'string') return resolveRef(directDescriptor, objects)
   if (directDescriptor && typeof directDescriptor === 'object') return directDescriptor
 
-  const descendants = fontObj['/DescendantFonts']
-  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
-  for (const descendant of descendantList) {
+  for (const descendant of resolveDescendantFonts(fontObj, objects)) {
     const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
     if (!resolved || typeof resolved !== 'object') continue
     const descriptor = resolved['/FontDescriptor']
@@ -538,9 +560,7 @@ function fontHasEmbeddedProgram(fontObj: any, objects: any): boolean {
 
 function fontHasToUnicode(fontObj: any, objects: any): boolean {
   if (fontObj['/ToUnicode']) return true
-  const descendants = fontObj['/DescendantFonts']
-  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
-  return descendantList.some(descendant => {
+  return resolveDescendantFonts(fontObj, objects).some(descendant => {
     const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
     return !!resolved?.['/ToUnicode']
   })
@@ -548,8 +568,7 @@ function fontHasToUnicode(fontObj: any, objects: any): boolean {
 
 function fontMissingCidToGidMap(fontObj: any, objects: any): boolean {
   const subtype = fontObj['/Subtype']
-  const descendants = fontObj['/DescendantFonts']
-  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
+  const descendantList = resolveDescendantFonts(fontObj, objects)
   const descendant = descendantList.length > 0
     ? (typeof descendantList[0] === 'string' ? resolveRef(descendantList[0], objects) : descendantList[0])
     : null
@@ -586,9 +605,7 @@ function resolveCidFontTarget(fontObj: any, objects: any): any | null {
   if (fontObj['/Subtype'] === '/CIDFontType0' || fontObj['/Subtype'] === '/CIDFontType2') {
     return fontObj
   }
-  const descendants = fontObj['/DescendantFonts']
-  const descendantList = Array.isArray(descendants) ? descendants : descendants ? [descendants] : []
-  for (const descendant of descendantList) {
+  for (const descendant of resolveDescendantFonts(fontObj, objects)) {
     const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
     if (!resolved || typeof resolved !== 'object') continue
     if (resolved['/Subtype'] === '/CIDFontType0' || resolved['/Subtype'] === '/CIDFontType2') {

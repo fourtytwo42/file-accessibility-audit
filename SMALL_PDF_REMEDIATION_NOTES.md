@@ -205,3 +205,55 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts src/__tests__/agentRemediationService.test.ts -t 'allows semantic AI to override text-heavy defer for strong figure evidence|promotes strong image-backed paragraph figure candidates in recent tagged reports|still runs semantic AI for eligible figures even when semantic categories are complete'`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 7
+
+- Fifth queue item: `683b19e6-5cfe-4b69-a3e4-8f730947b78a`
+- Rerun result: `79/C`
+- Improvement vs fourth remediated run: `79 -> 79` (no overall score change)
+- Deeper diagnosis from the downloaded remediated artifact:
+  - the final remediated PDF still surfaced `27` figure candidates with `19` missing alt text
+  - only `1` strong-image `/P` candidate had become `retag_then_set_alt`, while `12` strong-image `/P` candidates still deferred
+  - the blocked candidates were inheriting unrelated page prose because figure candidates without a reliable image-page match fell back to arbitrary page text, manufacturing false `text_heavy_candidate` deferrals
+
+### System Fix in Progress 8
+
+- Stopped unmatched figure candidates from inheriting arbitrary last-page text context in `buildFigureCandidates()`. When a figure ref cannot be tied to a real image-bearing page, the inspection path now leaves that context empty instead of borrowing unrelated prose from the last page.
+- Real-artifact spot check on `firearm-prohibitors-remediated-v5.pdf` after this code change showed the strong `/P` backlog shift from `1 retaggable / 12 deferred` to `8 retaggable / 5 deferred`, confirming the stray page-context bug was real.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|allows semantic AI to override text-heavy defer for strong figure evidence'`
+  - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 8
+
+- Sixth queue item: `64ade95c-c1df-4d33-be0e-959bed24b388`
+- Rerun result: `79/C`
+- Improvement vs fifth remediated run: `79 -> 79` (no overall score change)
+- Deeper diagnosis:
+  - the figure-candidate state improved after the run, but the newly promotable candidates were surfacing too late to be acted on within the same remediation cycle
+  - the final action list still only touched the earlier `/Figure` set plus one deferred text-heavy candidate
+
+### System Fix in Progress 9
+
+- Added a late heuristic figure fallback pass in `agentRemediationService` after the main semantic stage, gated on `alt_text` still being below `100` and fresh heuristic-eligible figure candidates remaining.
+- Also started recording semantic-stage actions into `previousActionNames` immediately so later cleanup passes do not re-propose the exact same semantic figure work.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'still runs semantic AI for eligible figures even when semantic categories are complete|uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment|triggers post-bootstrap alt-text inspection'`
+  - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 9
+
+- Seventh queue item: `1c842cd6-00b0-492c-9b3b-fce0ee37780d`
+- Rerun result: `79/C`
+- Improvement vs sixth remediated run: `79 -> 79` (overall unchanged, but figure coverage improved slightly)
+- What changed:
+  - `alt_text` findings improved from `13 of 27` to `14 of 27` images with alt text
+  - the new late pass successfully applied additional figure-alt actions on `/Figure` elements `obj:114 0 R`, `obj:115 0 R`, `obj:118 0 R`, `obj:119 0 R`, `obj:121 0 R`, and `obj:126 0 R`
+  - four newly surfaced text-heavy candidates (`obj:112 0 R`, `obj:141 0 R`, `obj:48 0 R`, `obj:62 0 R`) were reached by the late pass but still ended in `no_effect`
+- Current blocker summary after loop 7:
+  - the remaining score gap is split between two real blocker families:
+    - `alt_text`: still `40`, now `13` images missing alt text
+    - `text_extractability` / `pdf_ua_compliance`: still held down by `1` unembedded font and `1` missing `ToUnicode` map
+  - the next generic fixes should target:
+    - page-backed/full-page figure candidates that should be treated as redundant/decorative or safely retagged in bulk
+    - the last persistent font family that survives `embed_missing_fonts_in_place` + `repair_font_unicode_maps` + `repair_cidset_consistency`
