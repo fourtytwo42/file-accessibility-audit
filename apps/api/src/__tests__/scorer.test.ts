@@ -1013,6 +1013,29 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('split-generated decorative wrapper'))).toBe(true)
   })
 
+  it('collapses split-generated informative figure variants onto one canonical image for alt-text credit', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: 'obj:500 0 R', hasAlt: false },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        figures: [
+          { ref: 'obj:601 0 R', tag: '/Figure', hasAlt: true, altText: 'Informative figure alt', childFigureCount: 0, hasText: true, splitGenerated: true, splitSourceRef: 'obj:500 0 R', splitSourceTag: '/Story' },
+          { ref: 'obj:602 0 R', tag: '/Figure', hasAlt: true, altText: 'Informative figure alt', childFigureCount: 0, hasText: true, splitGenerated: true, splitSourceRef: 'obj:500 0 R', splitSourceTag: '/Story' },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('structure snapshot'))).toBe(true)
+  })
+
   it('excludes decorative Acrobat-cleanup figures from alt-text scoring', () => {
     const qpdf = makeQpdf({
       images: [

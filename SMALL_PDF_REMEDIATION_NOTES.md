@@ -1367,3 +1367,53 @@
   - semantic link batching now only targets `rawUrl` links
   - deterministic-only `/Contents` debt is excluded from semantic batching entirely
   - this should sharply reduce semantic churn on Acrobat/PDFMaker bibliography-heavy reports without giving up deterministic `/Contents` repair coverage
+
+## Successful Rerun After Semantic Link Scope Fix
+
+- Fresh post-restart rerun: `7bc5a59d-19a3-404a-b312-37e78b454cd5`
+- File: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Result: `100/A` from `31/F`
+- What this proved:
+  - the remaining stage-6 plateau was not a hidden crash anymore
+  - semantic link scope was the last meaningful hot loop on this file family
+  - once AI stopped targeting deterministic-only `/Contents` debt, the run completed cleanly on the same shared stack
+- Operational note:
+  - total wall time for the successful rerun was roughly 4m51s, which is comfortably inside the user’s 15-minute window and much healthier than the prior semantic stalls
+
+## Next Active Small PDF
+
+- Active file: `Downloads/methethnography.pdf`
+- Reason chosen: fresh random sub-700k PDF after the `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` success
+
+## methethnography.pdf
+
+- Queue item: `e5464496-90fa-4149-a31f-742e6eb0d0cb`
+- Result: `27/F -> 100/A`
+- Outcome:
+  - first-pass success on the current stack
+  - no new system fix required
+  - confirms the current small-PDF path remains fast and stable after the heavy-link semantic fix
+
+## Next Active Small PDF
+
+- Active file: `Downloads/DNA testing.pdf`
+- Reason chosen: next fresh random sub-700k PDF after the immediate `methethnography.pdf` success
+
+## DNA testing.pdf
+
+- Queue item: `ea557252-c8a9-423a-8127-8dece6f2e887`
+- First-pass result: `22/F -> 93/A`
+- What improved automatically:
+  - metadata/title/language fully recovered
+  - page tabs normalized
+  - most Type1 Unicode recovery landed
+  - headings were created successfully from `/Story` containers
+  - native reading-order repair applied
+  - heuristic figure fallback added several missing figure alts
+- Remaining blocker family:
+  - score gap is concentrated in `alt_text`
+  - completed output still shows split/duplicate figure variants being counted in the effective image denominator
+  - queue result and direct rebuilt-artifact inspection both point to a reconciliation problem more than a raw capability problem
+- Shared fix shipped:
+  - alt-text scoring now collapses split-generated informative figure variants onto a single canonical source ref before computing effective coverage
+  - this should stop wrapper/child figure variants from inflating the denominator on Acrobat/InDesign files like `DNA testing.pdf`

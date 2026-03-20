@@ -400,6 +400,26 @@ function effectiveAltFigureStats(
   structureCreditApplied: boolean
 } {
   const structureFigures = structure?.figures || []
+  const collapseFigureVariants = <T extends { ref: string; hasAlt: boolean; altText?: string | null; splitSourceRef?: string | null }>(
+    figures: T[],
+  ): Array<{ ref: string; hasAlt: boolean; altText?: string }> => {
+    const byCanonicalRef = new Map<string, { ref: string; hasAlt: boolean; altText?: string }>()
+    for (const figure of figures) {
+      const canonicalRef = figure.splitSourceRef || figure.ref
+      const existing = byCanonicalRef.get(canonicalRef)
+      if (!existing) {
+        byCanonicalRef.set(canonicalRef, {
+          ref: canonicalRef,
+          hasAlt: !!figure.hasAlt,
+          altText: figure.altText || undefined,
+        })
+        continue
+      }
+      existing.hasAlt = existing.hasAlt || !!figure.hasAlt
+      if (!existing.altText && figure.altText) existing.altText = figure.altText
+    }
+    return [...byCanonicalRef.values()]
+  }
   const excludedWrapperRefs = new Set(
     structureFigures
       .filter(figure =>
@@ -409,8 +429,26 @@ function effectiveAltFigureStats(
       )
       .map(figure => figure.ref),
   )
-  const filteredQpdfFigures = qpdf.images.filter(img => img.ref && !excludedWrapperRefs.has(img.ref))
-  const informativeStructureFigures = structureFigures.filter(figure => !excludedWrapperRefs.has(figure.ref))
+  const filteredQpdfFigures = collapseFigureVariants(
+    qpdf.images
+      .filter((img): img is typeof img & { ref: string } => !!img.ref && !excludedWrapperRefs.has(img.ref))
+      .map(img => ({
+        ref: img.ref,
+        hasAlt: img.hasAlt,
+        altText: img.altText,
+        splitSourceRef: null,
+      })),
+  )
+  const informativeStructureFigures = collapseFigureVariants(
+    structureFigures
+      .filter(figure => !excludedWrapperRefs.has(figure.ref))
+      .map(figure => ({
+        ref: figure.ref,
+        hasAlt: figure.hasAlt,
+        altText: figure.altText,
+        splitSourceRef: figure.splitSourceRef || null,
+      })),
+  )
   const structureTotal = informativeStructureFigures.length
   const structureWithAlt = informativeStructureFigures.filter(figure => figure.hasAlt).length
   const qpdfWithAlt = filteredQpdfFigures.filter(figure => figure.hasAlt).length
