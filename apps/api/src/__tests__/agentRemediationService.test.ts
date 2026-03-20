@@ -4431,4 +4431,38 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     )).toBe(true)
   })
 
+  it('accepts a flat-score stage when a targeted category improves without regressions', async () => {
+    const { __test_evaluateStageAcceptance } = await import('../services/agentRemediationService.js')
+    const previous = {
+      overallScore: 52,
+      verapdf: { status: 'unavailable', failures: [] },
+      categories: [
+        { id: 'bookmarks', score: 0, grade: 'F', severity: 'Moderate' },
+        { id: 'heading_structure', score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    } as any
+    const next = {
+      overallScore: 52,
+      verapdf: { status: 'unavailable', failures: [] },
+      categories: [
+        { id: 'bookmarks', score: 100, grade: 'A', severity: 'Pass' },
+        { id: 'heading_structure', score: 100, grade: 'A', severity: 'Pass' },
+      ],
+    } as any
+    const decision = __test_evaluateStageAcceptance(previous, next, [{
+      tool: 'replace_bookmarks_from_headings',
+      target: 'document',
+      details: 'Created bookmarks.',
+      confidence: 0.8,
+      autoApplied: true,
+      changedVisibleContent: false,
+      changedDocumentBytes: true,
+      categoryTargets: ['bookmarks'],
+      outcome: 'applied',
+    }] as any)
+
+    expect(decision.accept).toBe(true)
+    expect(decision.reason).toBeNull()
+  })
+
 })

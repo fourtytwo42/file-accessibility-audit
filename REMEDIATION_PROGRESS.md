@@ -11,13 +11,13 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `CMVoga.pdf`
-- Latest attempt path: queue item `8ab42dd1-424a-4513-a3c1-2009e2dd510e`
-- Latest result summary: `victim2.pdf` cleared to `96/A`, `Cook County DMR_Part II.pdf` cleared to `100/A`, and the campaign moved directly to `CMVoga.pdf`, whose first fresh run finished at `80/B`. Direct probing of the rebuilt artifact proved the remaining debt is solved by `finalize_substituted_font_conformance`, exposing a planner/classification routing gap rather than a backend limitation.
-- Latest validation source: Fresh API remediation rerun of `CMVoga.pdf` completed on 2026-03-20T20:54Z; direct post-run artifact probe completed immediately afterward
-- Next action: commit/push the planner/classification final-font-cleanup fix, restart the API, and rerun `CMVoga.pdf` fresh through the API
-- Next hypothesis: the live rerun should clear to `100/A` once legacy-encoding PDFs are allowed to plan `finalize_substituted_font_conformance` after embed plus Unicode repair, even without an explicit substitution step
-- API restart status: restart required after the current planner/classification change before trusting the next queue result
+- Active PDF: `Southern Illinois Drug Task Force.pdf`
+- Latest attempt path: queue item `86d97265-01e8-4f1a-871b-92ac9f57b02a`
+- Latest result summary: the first fresh run of `Southern Illinois Drug Task Force.pdf` landed at `89/B`. The remaining unresolved issues are `Bookmarks / Navigation` and `Color Contrast`, and the real bug is that bookmark generation improved the targeted `bookmarks` category from `0 -> 100` but was still rejected because the intermediate overall score stayed flat at `52`.
+- Latest validation source: Fresh API remediation rerun of `Southern Illinois Drug Task Force.pdf` completed on 2026-03-20T20:58Z; action-log diagnosis and local acceptance-fix verification completed on 2026-03-20T21:02Z
+- Next action: commit/push the flat-score targeted-category acceptance fix, restart the API, and rerun `Southern Illinois Drug Task Force.pdf` fresh through the API
+- Next hypothesis: once the bookmark stage is accepted for real targeted-category improvements, this file should clear `>95` and likely reach `100/A`, leaving only the unavoidable color-contrast signal
+- API restart status: restart required after the current acceptance-rule change before trusting the next queue result
 - Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `CMVoga.pdf`
-- Current phase: second small-PDF loop on a legacy-encoding brochure that stalled at residual font-embedding debt after the first fresh run
-- Immediate next step: restart on the current planner/classification fix, rerun `CMVoga.pdf`, and verify the live queue result matches the direct `100/A` probe
-- API restart/rerun confirmed for active file: pending restart; the current `80/B` result is stale relative to the newest code
+- Active PDF: `Southern Illinois Drug Task Force.pdf`
+- Current phase: second small-PDF loop on a Distiller-era report whose first fresh run stalled because bookmark generation was falsely rejected by a flat overall-score gate
+- Immediate next step: restart on the current acceptance-rule fix, rerun `Southern Illinois Drug Task Force.pdf`, and verify the live queue result keeps the bookmark stage
+- API restart/rerun confirmed for active file: pending restart; the current `89/B` result is stale relative to the newest code
 - Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart to avoid stale output
-- Active remediation loop count: `CMVoga.pdf=2`
-- Next hypothesis: the live rerun should clear once residual `pdfua.font_embedding` debt can trigger `finalize_substituted_font_conformance` after embed and Unicode repair
+- Active remediation loop count: `Southern Illinois Drug Task Force.pdf=2`
+- Next hypothesis: the live rerun should clear once stages that improve targeted categories like `bookmarks` are accepted even when the transient overall score is unchanged
 
 ## Pending Files
 
@@ -76,6 +76,12 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T21:02:00Z Small-PDF loop fix: stage acceptance now keeps non-regressive stages that materially improve one of their targeted categories even when the temporary overall score is flat. This covers bookmark cleanup and similar semantic/document fixes whose category gain can be real before the aggregate score catches up. Verified with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'accepts a flat-score stage when a targeted category improves without regressions'` and `pnpm --filter api exec tsc --noEmit`. Diagnosis on `Southern Illinois Drug Task Force.pdf` showed `replace_bookmarks_from_headings` was creating a real outline and improving `bookmarks` from `0 -> 100`, but the stage was rejected solely because the intermediate overall score stayed `52 -> 52`.
+
+- 2026-03-20T20:58:00Z Fresh API remediation run: `Southern Illinois Drug Task Force.pdf` completed on queue item `86d97265-01e8-4f1a-871b-92ac9f57b02a` at `89/B`, up from `23/F`. The final audit showed only `Bookmarks / Navigation` and `Color Contrast` unresolved; direct action-log inspection proved bookmark generation succeeded structurally but was rolled back by flat-score stage acceptance.
+
+- 2026-03-20T20:57:00Z Fresh post-restart rerun: `CMVoga.pdf` completed on queue item `eb25ad55-dd0e-4197-9a45-da90d29391b5` at `100/A`, up from the first `80/B` run. The live queue path now plans and executes `finalize_substituted_font_conformance` after embed plus Unicode repair on legacy-encoding PDFs, exactly matching the direct artifact probe. The next random small file, `Southern Illinois Drug Task Force.pdf`, was queued immediately after on `86d97265-01e8-4f1a-871b-92ac9f57b02a`.
 
 - 2026-03-20T20:55:00Z Small-PDF loop fix: `legacy_encoding` classification no longer excludes `finalize_substituted_font_conformance`, and planner selection now treats residual `pdfua.font_embedding` as a persistent legacy-font failure that can schedule finalization after `embed_missing_fonts_in_place` plus Unicode repair, even without an explicit substitution step. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/remediationPlanService.test.ts -t 'keeps finalize_substituted_font_conformance available for legacy-encoding font profiles|plans finalize_substituted_font_conformance after embed and unicode repair for persistent legacy font failures'` and `pnpm --filter api exec tsc --noEmit`. Direct probe on rebuilt `CMVoga.pdf` confirmed the missing finalization step lifts the file from `80/B` to `100/A`.
 

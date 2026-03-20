@@ -682,6 +682,15 @@ function worstTargetedRegression(stageActions: RemediationActionRecord[], previo
   }, 0)
 }
 
+function hasTargetedCategoryImprovement(previous: AnalysisResult, next: AnalysisResult, stageActions: RemediationActionRecord[]): boolean {
+  const targetedCategories = [...new Set(stageActions.flatMap(action => action.categoryTargets || []))]
+  return targetedCategories.some(categoryId => {
+    const before = scoreForCategory(previous, categoryId)
+    const after = scoreForCategory(next, categoryId)
+    return typeof before === 'number' && typeof after === 'number' && after > before
+  })
+}
+
 function nativeStageRegressionReason(
   previous: AnalysisResult,
   next: AnalysisResult,
@@ -732,6 +741,7 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
 
   const standardsImproved = standardsValidationImproved(previous, next)
   const worstRegression = worstTargetedRegression(stageActions, previous, next)
+  const targetedCategoryImproved = hasTargetedCategoryImprovement(previous, next, stageActions)
   if (worstRegression <= -REMEDIATION.NET_BENEFIT_MAX_CATEGORY_REGRESSION) {
     return {
       accept: false,
@@ -740,7 +750,7 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
       worstTargetedRegression: worstRegression,
     }
   }
-  if (next.overallScore > previous.overallScore || standardsImproved) {
+  if (next.overallScore > previous.overallScore || standardsImproved || targetedCategoryImproved) {
     return {
       accept: true,
       reason: null,
@@ -756,6 +766,8 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
     worstTargetedRegression: worstRegression,
   }
 }
+
+export const __test_evaluateStageAcceptance = evaluateStageAcceptance
 
 function cleanupEligibleCategoryIds(): Set<string> {
   return new Set([

@@ -2,16 +2,16 @@
 
 ## Current Active File
 
-- `CMVoga.pdf`
-- Current fresh queue item: `8ab42dd1-424a-4513-a3c1-2009e2dd510e`
-- Latest completed file: `Cook County DMR_Part II.pdf` -> `100/A`
+- `Southern Illinois Drug Task Force.pdf`
+- Current fresh queue item: `86d97265-01e8-4f1a-871b-92ac9f57b02a`
+- Latest completed file: `CMVoga.pdf` -> `100/A`
 
 ## Recent Loop Summary
 
-- `CMVoga.pdf`
-- Baseline: `18/F`
-- First fresh rerun: `80/B`
-- Direct probe on rebuilt artifact: `80/B -> 100/A` via `finalize_substituted_font_conformance`
+- `Southern Illinois Drug Task Force.pdf`
+- Baseline: in progress
+- First fresh rerun: pending
+- Previous resolved file: `CMVoga.pdf` moved `18/F -> 80/B -> 100/A`
 
 ## New System Fixes This Round
 
@@ -21,13 +21,41 @@
 
 ## Current Blocker Hypothesis
 
-- `Cook County DMR_Part II.pdf` is resolved at `100/A`.
-- `CMVoga.pdf` exposed a planner/classification routing gap rather than a backend gap:
-  - the first fresh run finished at `80/B` with only residual font-embedding debt and reading-order warning
-  - direct probing of the rebuilt artifact proved `finalize_substituted_font_conformance` alone clears the remaining font debt and reaches `100/A`
+- `CMVoga.pdf` is resolved at `100/A`.
+- `Southern Illinois Drug Task Force.pdf` exposed a different shared issue:
+  - the first fresh run finished at `89/B`
+  - final unresolved issues were only `Bookmarks / Navigation` and `Color Contrast`
+  - `replace_bookmarks_from_headings` actually created a real outline and improved the targeted `bookmarks` score from `0 -> 100`
+  - the stage was still rejected because the temporary overall score stayed `52 -> 52`
 - Shared fix in progress:
-  - `legacy_encoding` classification now keeps `finalize_substituted_font_conformance` available
-  - planner now treats residual `pdfua.font_embedding` debt as a persistent legacy-font failure and can schedule finalization after `embed_missing_fonts_in_place` plus Unicode repair, even if no explicit substitution step ran
+  - stage acceptance now keeps non-regressive stages that improve one of their targeted categories even when the transient overall score is flat
+  - this should unblock bookmark cleanup and similar category-specific document fixes
+
+## Southern Illinois Drug Task Force Result
+
+- Queue history:
+  - `86d97265-01e8-4f1a-871b-92ac9f57b02a` -> `89/B`
+- Root cause:
+  - bookmark generation was real, but the acceptance gate rolled it back because it only trusted overall-score movement at that moment
+  - action details showed `replace_bookmarks_from_headings` creating `/Outlines` plus multiple bookmark entries, with `scoreDelta` recording `bookmarks 0 -> 100`
+- Expected outcome after fix:
+  - keep the bookmark stage on rerun
+  - leave `Color Contrast` as the only likely residual issue
+  - push the file above `95`, likely to `100/A`
+
+## CMVoga Resolution
+
+- Queue history:
+  - `8ab42dd1-424a-4513-a3c1-2009e2dd510e` -> `80/B`
+  - `eb25ad55-dd0e-4197-9a45-da90d29391b5` -> `100/A`
+- Root cause:
+  - planner/classification routing excluded `finalize_substituted_font_conformance` on `legacy_encoding` PDFs unless an explicit substitution step had already occurred
+  - direct probing proved the rebuilt artifact was already repairable; the live queue path just never planned the last step
+- Shared fix:
+  - `legacy_encoding` classification now leaves `finalize_substituted_font_conformance` available
+  - planner now treats residual `pdfua.font_embedding` as persistent legacy-font debt and can schedule finalization after embed plus Unicode repair
+- Outcome:
+  - the first fresh post-restart rerun cleared straight to `100/A`
 
 ## GDRAAG Result
 
