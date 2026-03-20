@@ -2377,6 +2377,54 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }
   })
 
+  it('does not rewrap a Story figure candidate when a descendant /Figure already has alt text', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect' },
+    })
+    const figureRef = inspect.figures[0]?.ref
+    expect(figureRef).toBeTruthy()
+
+    const degraded = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: [figureRef!],
+        targetTag: 'Story',
+      },
+    })
+    expect(degraded.status).toBe('applied')
+
+    const firstWrap = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: {
+        operation: 'retag_as_figure_and_set_alt',
+        targetRef: figureRef!,
+        altText: 'Accessible Story figure',
+        imageEvidence: 'strong',
+        pageImageCount: 1,
+      },
+    })
+
+    expect(['applied', 'no_effect']).toContain(firstWrap.status)
+    const wrappedBuffer = firstWrap.outputBuffer || degraded.outputBuffer!
+
+    const secondWrap = await runPdfStructureBackend({
+      buffer: wrappedBuffer,
+      mutation: {
+        operation: 'retag_as_figure_and_set_alt',
+        targetRef: figureRef!,
+        altText: 'Accessible Story figure',
+        imageEvidence: 'strong',
+        pageImageCount: 1,
+      },
+    })
+
+    expect(secondWrap.status).toBe('no_effect')
+    expect(secondWrap.changedDocumentBytes).toBe(false)
+  })
+
   it('allows vector-backed figure retagging without raster image evidence', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const inspect = await runPdfStructureBackend({

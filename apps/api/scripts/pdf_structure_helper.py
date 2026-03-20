@@ -2231,6 +2231,41 @@ def remove_alt_from_descendants(node, skip_ref=None, preserve_leaf_figure_alt=Fa
     return applied
 
 
+def has_descendant_leaf_figure_with_alt(node):
+    visited = set()
+
+    def visit(value):
+        if not isinstance(value, pikepdf.Dictionary):
+            return False
+        node_ref = ref_string(value)
+        if node_ref and node_ref in visited:
+            return False
+        if node_ref:
+            visited.add(node_ref)
+        tag = str(value.get("/S"))
+        kids = value.get("/K")
+        child_values = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if isinstance(kids, pikepdf.Dictionary) else [])
+        child_figure_count = sum(1 for child in child_values if isinstance(child, pikepdf.Dictionary) and str(child.get("/S")) == "/Figure")
+        if tag == "/Figure" and child_figure_count == 0:
+            raw_alt = value.get("/Alt")
+            alt_text = str(raw_alt).replace("u:", "").strip() if raw_alt is not None else ""
+            if alt_text:
+                return True
+        for child in child_values:
+            if visit(child):
+                return True
+        return False
+
+    kids = node.get("/K") if isinstance(node, pikepdf.Dictionary) else None
+    if isinstance(kids, pikepdf.Array):
+        for child in kids:
+            if visit(child):
+                return True
+    elif isinstance(kids, pikepdf.Dictionary):
+        return visit(kids)
+    return False
+
+
 def ensure_page_content_struct_elem(pdf, document, page_obj):
     page_ref = ref_string(page_obj)
     existing = get_child_dicts(document)
@@ -6919,6 +6954,8 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
         original_k = obj.get("/K")
         if original_k is None:
             return False, [], [f"Target {target_ref} has tag {before_tag} but does not expose content to wrap in a /Figure child."]
+        if has_descendant_leaf_figure_with_alt(obj):
+            return False, [], [f"Target {target_ref} already contains a descendant /Figure with alternate text."]
         figure = pdf.make_indirect(pikepdf.Dictionary({
             "/Type": pikepdf.Name("/StructElem"),
             "/S": pikepdf.Name("/Figure"),
@@ -6951,6 +6988,8 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
         original_k = obj.get("/K")
         if original_k is None:
             return False, [], [f"unsafe_ancestry: Target {target_ref} is nested under {', '.join(sorted(ancestry & UNSAFE_FIGURE_ANCESTRY))} and does not expose content to wrap in a /Figure child."]
+        if has_descendant_leaf_figure_with_alt(obj):
+            return False, [], [f"Target {target_ref} already contains a descendant /Figure with alternate text."]
         figure = pdf.make_indirect(pikepdf.Dictionary({
             "/Type": pikepdf.Name("/StructElem"),
             "/S": pikepdf.Name("/Figure"),
