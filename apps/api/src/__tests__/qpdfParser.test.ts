@@ -309,6 +309,50 @@ describe('analyzeWithQpdf', () => {
     expect(result.type1FontsMissingToUnicode).toBe(2)
   })
 
+  it('ignores empty AcroForm default-resource fonts when there are no form fields', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/AcroForm': 'obj:4 0 R',
+          },
+        },
+        'obj:4 0 R': {
+          value: {
+            '/Fields': [],
+            '/DR': {
+              '/Font': {
+                '/Helv': 'obj:70 0 R',
+                '/ZaDb': 'obj:71 0 R',
+              },
+            },
+          },
+        },
+        'obj:70 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type1',
+            '/BaseFont': '/Helvetica',
+          },
+        },
+        'obj:71 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type1',
+            '/BaseFont': '/ZapfDingbats',
+          },
+        },
+      },
+    })
+
+    expect(result.hasAcroForm).toBe(true)
+    expect(result.formFields).toHaveLength(0)
+    expect(result.fontCount).toBe(0)
+    expect(result.unembeddedFontCount).toBe(0)
+    expect(result.fontsMissingToUnicode).toBe(0)
+  })
+
   it('does not double-count descendant CID fonts when the Type0 parent already has ToUnicode', () => {
     const result = parseQpdfJson({
       objects: {

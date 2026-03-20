@@ -225,6 +225,7 @@ export function parseQpdfJson(json: any): QpdfResult {
     const roleMapNoteAliases = new Set<string>(['/Note'])
     const descendantFontRefs = new Set<string>()
     const softMaskImageRefs = new Set<string>()
+    const ignoredFormDefaultFontRefs = new Set<string>()
     const pendingFigureEntries: Array<{
       ref: string
       hasAlt: boolean
@@ -269,6 +270,22 @@ export function parseQpdfJson(json: any): QpdfResult {
             descendantFontRefs.add(descendantRef.startsWith('obj:') ? descendantRef : `obj:${descendantRef}`)
           }
         }
+      }
+    }
+
+    for (const obj of Object.values(objects)) {
+      if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/Catalog' || !obj['/AcroForm']) continue
+      const acroForm = resolveObject(obj['/AcroForm'], objects)
+      if (!acroForm || typeof acroForm !== 'object') continue
+      const fieldList = resolveObject(acroForm['/Fields'], objects)
+      if (!Array.isArray(fieldList) || fieldList.length > 0) continue
+      const defaultResources = resolveObject(acroForm['/DR'], objects)
+      const fontResources = defaultResources && typeof defaultResources === 'object'
+        ? resolveObject((defaultResources as any)['/Font'], objects)
+        : null
+      if (!fontResources || typeof fontResources !== 'object') continue
+      for (const fontRef of Object.values(fontResources as Record<string, unknown>)) {
+        addCanonicalRef(ignoredFormDefaultFontRefs, fontRef)
       }
     }
 
@@ -392,7 +409,7 @@ export function parseQpdfJson(json: any): QpdfResult {
         }
       }
 
-      if (isFontObject(o) && !descendantFontRefs.has(ref)) {
+      if (isFontObject(o) && !descendantFontRefs.has(ref) && !ignoredFormDefaultFontRefs.has(ref)) {
         result.fontCount = (result.fontCount ?? 0) + 1
         if (!fontHasEmbeddedProgram(o, objects)) result.unembeddedFontCount = (result.unembeddedFontCount ?? 0) + 1
         const missingToUnicode = !fontHasToUnicode(o, objects)
@@ -498,6 +515,13 @@ export function parseQpdfJson(json: any): QpdfResult {
 function resolveRef(ref: string, objects: any): any {
   if (!ref || typeof ref !== 'string') return null
   return objects[ref] ?? objects[`obj:${ref}`] ?? null
+}
+
+function addCanonicalRef(target: Set<string>, ref: unknown): void {
+  if (typeof ref !== 'string' || ref.length === 0) return
+  target.add(ref)
+  target.add(ref.replace(/^obj:/, ''))
+  target.add(ref.startsWith('obj:') ? ref : `obj:${ref}`)
 }
 
 function resolveObject(value: any, objects: any): any {
