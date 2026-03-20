@@ -3129,6 +3129,15 @@ export async function remediatePdfWithAgent(
     ? await inspectRemediationContext(workingBuffer, currentResult)
     : latestContext
   latestContext = finalCleanupContext
+  const needsFinalCleanupStructureBaseline = nativeTaggedSafeMode && (
+    (scoreForCategory(currentResult, 'heading_structure') ?? 100) < 100
+    || acrobatOwnershipRiskCount(finalCleanupContext) > 0
+  )
+  if (needsFinalCleanupStructureBaseline) {
+    currentResult = await analyzeIntermediate(workingBuffer, currentResult, {
+      forceStructureForScoring: true,
+    })
+  }
   const finalCleanupStartResult = currentResult
 
   const finalCleanupCalls = filterCallsForPipeline([

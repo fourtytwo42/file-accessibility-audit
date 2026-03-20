@@ -32,6 +32,24 @@
   - one remaining link annotation `/Contents` miss that still caps `link_quality` and `pdf_ua_compliance`
 - The next fresh rerun after restart should show whether the heading cleanup is now retained; if it is, the remaining work should collapse to the single link-contents blocker.
 
+## Direct Artifact Probe
+
+- Probed rebuilt artifact: `apps/api/data/queue-storage/rebuilt/6649eb51-031a-4eb3-9773-1bbbb9010c91.pdf`
+- Baseline analysis with `forceStructureForScoring: true`:
+  - overall `86/B`
+  - `heading_structure = 60`
+  - `alt_text = 75`
+  - `link_quality = 60`
+- Applying only `normalize_heading_hierarchy` directly to that rebuilt artifact produced:
+  - overall `92/B`
+  - `heading_structure = 100`
+  - `alt_text = 75`
+  - `link_quality = 60`
+- Conclusion:
+  - heading normalization is genuinely good for this file
+  - the queue rejection is coming from a stale/intermediate pre-final-cleanup baseline, not from the heading tool regressing real output quality
+  - the next generic fix is a deep-structure baseline refresh before native-tagged final cleanup validation
+
 ## Session
 
 - Date: `2026-03-20`
