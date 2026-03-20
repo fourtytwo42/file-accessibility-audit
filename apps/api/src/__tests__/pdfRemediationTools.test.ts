@@ -1322,6 +1322,36 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(candidate).toBeTruthy()
   }, 120_000)
 
+  it('retags strong image-backed paragraph figure candidates even when page image count is unavailable', async () => {
+    const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
+    const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
+
+    const candidate = context.figureCandidates.find(entry =>
+      entry.targetTag === '/P'
+      && entry.imageEvidence === 'strong'
+      && entry.repairMode === 'retag_then_set_alt')
+    expect(candidate).toBeTruthy()
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_figure_alt_text',
+        arguments: {
+          candidateId: candidate!.id,
+          altText: 'Image related to direction section chart',
+          generationSource: 'heuristic_fallback',
+        },
+        rationale: 'Regression coverage for strong paragraph figure retagging.',
+        confidence: 0.55,
+      },
+    })
+
+    expect(result.action.outcome).toBe('applied')
+    expect(result.action.changedDocumentBytes).toBe(true)
+  }, 120_000)
+
   it('allows semantic AI to override text-heavy defer for strong figure evidence', () => {
     expect(__test_isSemanticAiEligibleDeferredFigureCandidate({
       id: 'figure:1',

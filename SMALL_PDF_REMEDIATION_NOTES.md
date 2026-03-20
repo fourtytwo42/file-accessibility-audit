@@ -285,3 +285,21 @@
 - Verification:
   - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'retries a late figure candidate when it becomes retaggable after an earlier blocked attempt|keeps the native result when semantic generation overflows'`
   - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 2 Rerun After Fix Set 11
+
+- Eleventh queue item: `39181786-c374-48de-8a8e-ad6f9beb598c`
+- Rerun result: `92/A`
+- Improvement vs tenth remediated run: `92 -> 92` (no change)
+- Fresh diagnosis from the remediated artifact:
+  - the late retry did happen: `obj:48 0 R` now appears twice in the suggested/no-effect alt-text actions, which means the skip bug is fixed
+  - however, direct inspection of the remediated artifact still shows `figure:13` classified as `retag_then_set_alt` while a direct tool execution against the same final artifact returns `text_heavy_candidate`
+  - this proves the remaining mismatch is no longer in planner sequencing; it is in the Python `retag_as_figure_and_set_alt` safety gate itself
+
+### System Fix in Progress 12
+
+- Aligned the Python `retag_as_figure_and_set_alt` mutator with the newer strong-evidence classifier so safe `/P` candidates with `imageEvidence=strong` are no longer rejected purely because page image count is unavailable or the surrounding paragraph is text-dense.
+- Added a real-PDF regression on `Downloads/2025FirearmProhibitorsReport-250626T19175938.pdf` proving a strong image-backed paragraph candidate can now be executed through `executeRemediationTool(...)` instead of returning `text_heavy_candidate`.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'promotes strong image-backed paragraph figure candidates in recent tagged reports|retags strong image-backed paragraph figure candidates even when page image count is unavailable'`
+  - `pnpm --filter api exec tsc --noEmit`

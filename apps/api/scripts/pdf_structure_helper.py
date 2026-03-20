@@ -6772,16 +6772,17 @@ def mutate_retag_as_figure_and_set_alt(pdf, mutation):
     ancestry = set(parent_tag_path(obj) + [before_tag])
     text_density = str(mutation.get("textDensityHint") or "").strip().lower()
     image_evidence = str(mutation.get("imageEvidence") or "").strip().lower()
+    strong_figure_evidence = image_evidence in {"strong", "vector"}
     page_image_count = mutation.get("pageImageCount")
     try:
         page_image_count = int(page_image_count) if page_image_count is not None else 0
     except Exception:
         page_image_count = 0
-    if text_density == "high" and before_tag != "/TextBox":
+    if text_density == "high" and before_tag != "/TextBox" and not strong_figure_evidence:
         return False, [], [f"text_heavy_candidate: Target {target_ref} appears text-heavy and is not safe to retag as /Figure."]
-    if image_evidence and image_evidence not in {"strong", "vector"}:
+    if image_evidence and not strong_figure_evidence:
         return False, [], [f"no_figure_evidence: Target {target_ref} does not have strong enough figure evidence for automatic figure retagging."]
-    if page_image_count <= 0 and image_evidence != "vector":
+    if page_image_count <= 0 and not strong_figure_evidence:
         return False, [], [f"no_figure_evidence: Page context for {target_ref} does not indicate any renderable figure evidence."]
     if before_tag not in SAFE_FIGURE_RETAG_TAGS:
         if before_tag not in FIGURE_WRAP_TAGS:
