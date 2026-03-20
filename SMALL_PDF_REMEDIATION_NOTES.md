@@ -384,6 +384,39 @@
   - one real missing image alt-text item
   - residual Acrobat-style non-figure graphics ownership
 
+### Loop 5 Rerun After Fix 16
+
+- Second queue item: `c71f8cd0-03a2-4511-ace6-43dd58eef668`
+- Rerun result: `91/A`
+- Improvement vs first remediated run: `77 -> 91`
+- What changed:
+  - `text_extractability` jumped from `40` to `100`
+  - `pdf_ua_compliance` jumped from `70` to `100`
+  - the empty-form `/Helv` + `/ZaDb` false positives disappeared exactly as expected
+- Remaining blocker summary:
+  - `alt_text` is still `40`
+  - findings now say `5 of 6 image(s) have alternative text`
+  - only `1` image is still missing alt text
+  - the score is still being hard-capped by Acrobat-style mixed text/graphics ownership findings on a PDFMaker/Word report that is otherwise nearly complete
+
+### System Fix 17
+
+- Softened the residual Acrobat-risk alt-text cap for near-complete modern reports when:
+  - detected figure coverage is already strong
+  - only one detected figure is still missing alt text
+  - substantive Acrobat mixed text/graphics debt remains
+- This preserves the strong penalty for broad unresolved figure debt, but stops near-complete reports from being scored like total alt-text failures when only one image description is still missing.
+- Verification:
+  - `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts -t "uses a softer residual Acrobat-risk cap when only one figure is still missing alt text|uses a residual Acrobat-risk cap when all detected figures already have alt text|uses a softer Acrobat-risk cap when only one split-safe mixed node remains"`
+  - `pnpm --filter api exec tsc --noEmit`
+
+### Loop 5 Next Hypothesis 2
+
+- The next fresh rerun should clear the user target because the file is now down to residual Acrobat-risk ownership debt plus one missing image description.
+- If it still stays below `95`, the next step is not another scoring change by default:
+  - directly identify the one unresolved figure candidate
+  - patch the late/final figure execution path so that last image gets alt text instead of only softening its score
+
 - Stopped unmatched figure candidates from inheriting arbitrary last-page text context in `buildFigureCandidates()`. When a figure ref cannot be tied to a real image-bearing page, the inspection path now leaves that context empty instead of borrowing unrelated prose from the last page.
 - Real-artifact spot check on `firearm-prohibitors-remediated-v5.pdf` after this code change showed the strong `/P` backlog shift from `1 retaggable / 12 deferred` to `8 retaggable / 5 deferred`, confirming the stray page-context bug was real.
 - Verification:

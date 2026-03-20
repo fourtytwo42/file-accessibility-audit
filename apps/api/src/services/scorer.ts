@@ -935,6 +935,8 @@ function scoreAltTextWithAcrobatRisk(
     }
   }
   const figures = qpdf.images.filter(img => img.ref)
+  const figuresWithAlt = figures.filter(fig => fig.hasAlt).length
+  const missingFigureCount = Math.max(0, figures.length - figuresWithAlt)
   const allDetectedFiguresHaveAlt = figures.length > 0 && figures.every(fig => fig.hasAlt)
   // If any mixed text/graphics node contains content-bearing (non-decorative) graphics, apply the strict cap.
   const hasNonDecorativeMixedContent = substantiveRiskNodes.some(
@@ -952,6 +954,24 @@ function scoreAltTextWithAcrobatRisk(
       findings: [
         ...findings,
         'All detected /Figure elements already have alternate text, so Acrobat-risk ownership debt is being scored as residual structure debt rather than missing figure descriptions.',
+      ],
+    }
+  }
+  if (
+    hasNonDecorativeMixedContent
+    && figures.length >= 4
+    && missingFigureCount === 1
+    && baseScore >= 80
+  ) {
+    const score = Math.min(baseScore, 75)
+    return {
+      ...category,
+      score,
+      grade: getGrade(score),
+      severity: getSeverity(score),
+      findings: [
+        ...findings,
+        'Most detected figures already have alternate text, so the remaining Acrobat-style ownership debt is being scored with a softer residual cap while one image description is still unresolved.',
       ],
     }
   }

@@ -885,6 +885,58 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('residual structure debt'))).toBe(true)
   })
 
+  it('uses a softer residual Acrobat-risk cap when only one figure is still missing alt text', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true },
+        { ref: '11 0 R', hasAlt: true },
+        { ref: '12 0 R', hasAlt: true },
+        { ref: '13 0 R', hasAlt: true },
+        { ref: '14 0 R', hasAlt: true },
+        { ref: '15 0 R', hasAlt: false },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'obj:42 0 R',
+            tag: '/P',
+            pageRef: 'obj:5 0 R',
+            mcids: [31, 32],
+            hasText: true,
+            hasGraphics: true,
+            splitSafe: false,
+            graphicsLikelyDecorative: false,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+          {
+            ref: 'obj:43 0 R',
+            tag: '/P',
+            pageRef: 'obj:5 0 R',
+            mcids: [41, 42],
+            hasText: true,
+            hasGraphics: true,
+            splitSafe: false,
+            graphicsLikelyDecorative: false,
+            parentTagPath: ['/Document'],
+            ownershipMode: 'mixed_text_graphics_same_mcid',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(75)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('one image description is still unresolved'))).toBe(true)
+  })
+
   it('excludes decorative non-figure graphics from alt-text scoring when informative figures are already described', () => {
     const qpdf = makeQpdf({
       images: [
