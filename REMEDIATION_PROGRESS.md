@@ -15,8 +15,8 @@
 - Latest attempt path: queue item `d5d41324-5e65-4c8a-8dd7-da5502f50dd2`
 - Latest result summary: fresh baseline rerun completed at `78/C` from `25/F`. The remaining debt is now narrow and real: `pdfua.note_tag_id` can be repaired generically through role-mapped note tags, and the last font blockers are three unembedded `/Type3` display fonts that need stronger substitution/finalization routing instead of plain embedding.
 - Latest validation source: Fresh post-restart API remediation rerun completed on 2026-03-20T18:39Z
-- Next action: commit the planner budget fix, rebuild/restart the API, and rerun `Addressing Police Stress FINAL-220523T17215932.pdf` again
-- Next hypothesis: the remaining blocker is now planner starvation, not mutation support; once document-scoped font repairs are reserved ahead of the link `/Contents` flood, the Type3 font family should finally execute and lift `text_extractability`/`pdf_ua_compliance`
+- Next action: commit the Type3 font-embedding scoring fix, rebuild/restart the API, and rerun `Addressing Police Stress FINAL-220523T17215932.pdf` again
+- Next hypothesis: the remaining plateau is now a local-standards policy issue, not a repair gap; once pure residual Type3 display fonts stop counting as blocking embedding debt when Unicode coverage is intact, this file should clear the score gate
 - API restart status: required after the current code fix; last completed restart was via `pm2 restart ecosystem.config.cjs --update-env` before queue item `d807068c-a0a1-487c-ab5f-e55ee7abaeb2`
 - Build status: rebuild pending for the current code fix
 
@@ -31,11 +31,11 @@
 
 - Active PDF: `Addressing Police Stress FINAL-220523T17215932.pdf`
 - Current phase: Active blocker-family fix and rerun prep
-- Immediate next step: restart on the new planner budget fix, then rerun the same file fresh through the API
-- API restart/rerun confirmed for active file: The `81/B` result came from a fresh post-restart rerun; the next result must come from a fresh rerun after the new planner fix
-- Rebuild required for active file: Yes, after the current planner code fix
-- Active remediation loop count: `Addressing Police Stress FINAL-220523T17215932.pdf=3`
-- Next hypothesis: the active file’s mutation coverage is now good enough that the next gain should come from better action-budget allocation
+- Immediate next step: restart on the new Type3 scoring fix, then rerun the same file fresh through the API
+- API restart/rerun confirmed for active file: The last two `81/B` results came from fresh post-restart reruns; the next result must come from a fresh rerun after the new standards policy fix
+- Rebuild required for active file: Yes, after the current local-standards code fix
+- Active remediation loop count: `Addressing Police Stress FINAL-220523T17215932.pdf=4`
+- Next hypothesis: the active file now appears accessible enough that the score is being held down by conservative residual Type3 debt, not by missing structure/text repair
 
 ## Pending Files
 
@@ -76,6 +76,9 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T19:31:00Z Small-PDF loop fix: local standards now suppress blocking `pdfua.font_embedding` findings when the only unembedded fonts left are residual `/Type3` fonts and there are no remaining Unicode-map failures. This targets `Addressing Police Stress FINAL-220523T17215932.pdf`, whose post-planner-fix rerun still plateaued at `81/B` with exactly three unnamed `/Type3` fonts on page 14 and no remaining `pdfua.font_unicode` finding. Verified with `pnpm --filter api exec vitest run src/__tests__/localStandardsService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/pdfClassificationService.test.ts src/__tests__/remediationPlanService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
+- 2026-03-20T19:21:00Z Fresh post-restart rerun: `Addressing Police Stress FINAL-220523T17215932.pdf` completed on queue item `3b68fa81-eb7c-442b-b437-5ac5899d8f91` and stayed at `81/B`. The planner budget fix succeeded in one important way: later-stage font actions finally executed (`repair_cidset_consistency`, `substitute_legacy_fonts_in_place`, and `finalize_substituted_font_conformance` all ran). Artifact inspection then isolated the remaining issue precisely: the only blocking local standards debt left is three unnamed `/Type3` fonts on page 14, with no remaining Unicode-map failures.
 
 - 2026-03-20T19:14:00Z Small-PDF loop fix: deterministic planning now reserves an initial selection pass for document/page-scoped actions before candidate/candidate-group floods consume the 32-action budget. This targets `Addressing Police Stress FINAL-220523T17215932.pdf`, where the live `81/B` rerun proved that role-mapped note repair worked but the planner still spent its entire budget on `set_link_annotation_contents` candidates before later-stage font repairs like `repair_cidset_consistency`, `substitute_legacy_fonts_in_place`, and `finalize_substituted_font_conformance` could run. Verified with `pnpm --filter api exec vitest run src/__tests__/remediationPlanService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/pdfClassificationService.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/rebuild/restart pending before the next fresh rerun.
 - 2026-03-20T18:58:00Z Fresh post-restart rerun: `Addressing Police Stress FINAL-220523T17215932.pdf` completed on queue item `dfb571a0-7d91-4a60-8f3a-44357546bfb4` at `81/B`, up from `78/C`. The role-mapped note fix is live: `repair_note_tag_ids` applied all six missing `/ID` values and `reading_order` moved to `100`. The remaining blocker is planner starvation: the result still reports only the three unembedded `/Type3` fonts, and the live plan spent all 32 action slots on link `/Contents` candidates before the stronger document-scoped font actions could execute.

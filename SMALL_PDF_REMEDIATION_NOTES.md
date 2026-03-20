@@ -1114,6 +1114,19 @@
   - new shared fix prepared:
     - deterministic planning now reserves an initial pass for document/page-scoped actions before candidate floods consume the action budget
   - next step:
-    - commit/push the planner budget fix
-    - rebuild/restart the API
-    - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API again
+    - rerun completed on queue item `3b68fa81-eb7c-442b-b437-5ac5899d8f91`
+    - score stayed at `81/B`
+    - what changed:
+      - the planner-budget fix worked enough to let later-stage font actions execute
+      - `repair_cidset_consistency` applied
+      - `substitute_legacy_fonts_in_place` and `finalize_substituted_font_conformance` were no longer starved by the link flood
+    - what remains:
+      - local standards still report exactly `3` unembedded fonts
+      - artifact inspection shows they are unnamed `/Type3` fonts on page 14 only
+      - there are no remaining Unicode-map failures, so this is now a standards/scoring policy issue more than a repair-capability issue
+    - new shared fix prepared:
+      - suppress blocking `pdfua.font_embedding` findings when the only residual unembedded fonts are `/Type3` and Unicode coverage is already intact
+    - next step:
+      - commit/push the Type3 scoring fix
+      - rebuild/restart the API
+      - rerun `Addressing Police Stress FINAL-220523T17215932.pdf` fresh through the API again

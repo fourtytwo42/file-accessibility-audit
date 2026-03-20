@@ -290,6 +290,13 @@ function bookmarkLanguageFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalSta
 
 function fontEmbeddingFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
   if ((qpdf.unembeddedFontCount ?? 0) <= 0) return null
+  const unembeddedType3 = qpdf.unembeddedType3FontCount ?? 0
+  const onlyResidualType3FontsRemain = unembeddedType3 > 0
+    && unembeddedType3 === (qpdf.unembeddedFontCount ?? 0)
+    && (qpdf.fontsMissingToUnicode ?? 0) === 0
+  if (onlyResidualType3FontsRemain) {
+    return null
+  }
   return {
     key: 'pdfua.font_embedding',
     label: 'Font embedding',

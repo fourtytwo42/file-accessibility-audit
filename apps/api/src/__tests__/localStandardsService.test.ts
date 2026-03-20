@@ -24,6 +24,7 @@ function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
     formFields: [],
     fontCount: 1,
     unembeddedFontCount: 0,
+    unembeddedType3FontCount: 0,
     fontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
     cidSetRiskFontCount: 0,
@@ -184,6 +185,20 @@ describe('buildLocalStandardsReport', () => {
     const finding = report.findings.find(entry => entry.key === 'pdfua.font_widths')
     expect(finding?.count).toBe(4)
     expect(finding?.inferred).toBe(true)
+  })
+
+  it('suppresses blocking font-embedding findings when only residual Type3 fonts remain and Unicode is intact', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        unembeddedFontCount: 3,
+        unembeddedType3FontCount: 3,
+        fontsMissingToUnicode: 0,
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    expect(report.findings.some(entry => entry.key === 'pdfua.font_embedding')).toBe(false)
   })
 
   it('emits CIDSet consistency findings for explicit or inferred CID-font risk', () => {
