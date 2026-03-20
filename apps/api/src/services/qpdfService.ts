@@ -44,6 +44,7 @@ export interface QpdfResult {
   noteTagCount?: number
   noteTagsMissingId?: number
   linkAnnotationCount?: number
+  linkStructCount?: number
   linkAnnotationsMissingContents?: number
   images: Array<{ ref: string; hasAlt: boolean; altText?: string }>
   headings: Array<{ level: string; tag: string }>
@@ -109,6 +110,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         noteTagCount: 0,
         noteTagsMissingId: 0,
         linkAnnotationCount: 0,
+        linkStructCount: 0,
         linkAnnotationsMissingContents: 0,
         images: [],
         headings: [],
@@ -153,6 +155,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       noteTagCount: 0,
       noteTagsMissingId: 0,
       linkAnnotationCount: 0,
+      linkStructCount: 0,
       linkAnnotationsMissingContents: 0,
       images: [],
       headings: [],
@@ -196,6 +199,7 @@ export function parseQpdfJson(json: any): QpdfResult {
     noteTagCount: 0,
     noteTagsMissingId: 0,
     linkAnnotationCount: 0,
+    linkStructCount: 0,
     linkAnnotationsMissingContents: 0,
     images: [],
     headings: [],
@@ -369,6 +373,9 @@ export function parseQpdfJson(json: any): QpdfResult {
           if (!hasId) {
             result.noteTagsMissingId = (result.noteTagsMissingId ?? 0) + 1
           }
+        }
+        if (tag === '/Link') {
+          result.linkStructCount = (result.linkStructCount ?? 0) + 1
         }
         // Headings
         if (tag === '/H' || tag === '/H1' || tag === '/H2' || tag === '/H3' ||

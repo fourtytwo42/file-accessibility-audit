@@ -432,7 +432,9 @@ function linkTaggingFinding(
 ): LocalStandardsFinding | null {
   const linkCount = Math.max(pdfjs.links.length, qpdf.linkAnnotationCount ?? 0)
   if (linkCount <= 0) return null
-  const linkNodeCount = structure?.structuralNodes?.filter(node => node.tag === '/Link').length ?? 0
+  const snapshotLinkNodeCount = structure?.structuralNodes?.filter(node => node.tag === '/Link').length ?? 0
+  const qpdfLinkNodeCount = qpdf.linkStructCount ?? 0
+  const linkNodeCount = Math.max(snapshotLinkNodeCount, qpdfLinkNodeCount)
   if (qpdf.hasStructTree && linkNodeCount >= linkCount) return null
 
   const evidence: string[] = []
@@ -441,7 +443,7 @@ function linkTaggingFinding(
   } else if (!linkNodeCount) {
     evidence.push('Link annotations are present but no /Link structure elements were found in the inspected structure snapshot.')
   } else {
-    evidence.push(`Detected ${linkCount} link annotation(s) but only ${linkNodeCount} /Link structure element(s) in the inspected structure snapshot.`)
+    evidence.push(`Detected ${linkCount} link annotation(s) but only ${linkNodeCount} /Link structure element(s) across qpdf and the inspected structure snapshot.`)
   }
 
   return {

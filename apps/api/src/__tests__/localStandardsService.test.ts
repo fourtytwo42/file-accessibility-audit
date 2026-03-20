@@ -33,6 +33,7 @@ function makeQpdf(overrides: Partial<QpdfResult> = {}): QpdfResult {
     noteTagCount: 0,
     noteTagsMissingId: 0,
     linkAnnotationCount: 0,
+    linkStructCount: 0,
     linkAnnotationsMissingContents: 0,
     images: [],
     headings: [],
@@ -173,6 +174,26 @@ describe('buildLocalStandardsReport', () => {
     const finding = report.findings.find(entry => entry.key === 'pdfua.link_tagging')
     expect(finding).toBeDefined()
     expect(finding?.categoryIds).toContain('reading_order')
+  })
+
+  it('suppresses link-tagging findings when qpdf confirms matching /Link structure nodes', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        linkAnnotationCount: 3,
+        linkStructCount: 3,
+      }),
+      makePdfjs({
+        links: [
+          { url: 'https://example.com/a', text: 'A', contents: 'A' },
+          { url: 'https://example.com/b', text: 'B', contents: 'B' },
+          { url: 'https://example.com/c', text: 'C', contents: 'C' },
+        ],
+      }),
+      { structure: makeStructure({ structuralNodes: [] as any }) },
+    )
+
+    expect(report.findings.some(entry => entry.key === 'pdfua.link_tagging')).toBe(false)
   })
 
   it('emits inferred font-width findings from risky legacy simple fonts', () => {

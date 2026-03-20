@@ -23,7 +23,6 @@ const MAX_ACTIONS = 32
 const STRUCTURE_BOOTSTRAP_STAGE = new Set<RemediationToolName>([
   'bootstrap_struct_tree',
   'repair_malformed_bdc_operators',
-  'repair_note_tag_ids',
   'repair_native_marked_content_refs',
   'repair_bootstrapped_chart_content_refs',
   'repair_structure_conformance',
@@ -51,6 +50,7 @@ const FONT_STAGE = new Set<RemediationToolName>([
 
 const NATIVE_STRUCTURE_STAGE = new Set<RemediationToolName>([
   'adobe_auto_tag',
+  'repair_note_tag_ids',
   'repair_other_elements_alt_text',
   'repair_native_figure_semantics',
   'repair_native_table_headers',
@@ -83,7 +83,6 @@ export const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['set_document_language', 1],
   ['bootstrap_struct_tree', 2],
   ['repair_malformed_bdc_operators', 2],
-  ['repair_note_tag_ids', 2],
   ['repair_native_marked_content_refs', 2],
   ['repair_bootstrapped_chart_content_refs', 2],
   ['repair_structure_conformance', 2],
@@ -101,6 +100,7 @@ export const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['repair_cidset_consistency', 4],
   ['substitute_legacy_fonts_in_place', 4],
   ['finalize_substituted_font_conformance', 4],
+  ['repair_note_tag_ids', 5],
   ['repair_other_elements_alt_text', 5],
   ['adobe_auto_tag', 5],
   ['repair_native_figure_semantics', 5],
@@ -124,7 +124,6 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['set_document_language', 3],
   ['bootstrap_struct_tree', 0],
   ['repair_malformed_bdc_operators', 1],
-  ['repair_note_tag_ids', 1],
   ['repair_native_marked_content_refs', 2],
   ['repair_bootstrapped_chart_content_refs', 3],
   ['repair_structure_conformance', 4],
@@ -142,6 +141,7 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['repair_cidset_consistency', 5],
   ['substitute_legacy_fonts_in_place', 6],
   ['finalize_substituted_font_conformance', 7],
+  ['repair_note_tag_ids', 0],
   ['repair_other_elements_alt_text', 0],
   ['adobe_auto_tag', 0],
   ['repair_native_figure_semantics', 0],
