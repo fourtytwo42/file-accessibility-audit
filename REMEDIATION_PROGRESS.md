@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `victim2.pdf`
-- Latest attempt path: queue item `f147229b-c8b0-4f06-ad7d-ed1db15cf132`
-- Latest result summary: first fresh API remediation run landed at `74/C` from `16/F`. Direct probing of the rebuilt artifact on the newest code shows the shared font fix sequence lifts the same artifact to `96/A`.
-- Latest validation source: Fresh API remediation rerun completed on 2026-03-20T20:36Z; direct post-fix artifact probe completed on 2026-03-20T20:45Z
-- Next action: commit/push the TrueType dictionary Unicode + Tekton fallback fix, restart the API, and rerun `victim2.pdf` fresh through the API
-- Next hypothesis: the current blocker is an Acrobat-era small-report font family, not layout/semantic debt. Once the new Unicode derivation and Tekton fallback are live, the file should clear `>95` in one rerun.
-- API restart status: restart required after the current Python helper change before trusting the next queue result
-- Build status: no build required in principle, but use `pnpm --filter api build` before PM2 restart if runtime looks stale
+- Active PDF: `CMVoga.pdf`
+- Latest attempt path: queue item `8ab42dd1-424a-4513-a3c1-2009e2dd510e`
+- Latest result summary: `victim2.pdf` cleared to `96/A`, `Cook County DMR_Part II.pdf` cleared to `100/A`, and the campaign moved directly to `CMVoga.pdf`, whose first fresh run finished at `80/B`. Direct probing of the rebuilt artifact proved the remaining debt is solved by `finalize_substituted_font_conformance`, exposing a planner/classification routing gap rather than a backend limitation.
+- Latest validation source: Fresh API remediation rerun of `CMVoga.pdf` completed on 2026-03-20T20:54Z; direct post-run artifact probe completed immediately afterward
+- Next action: commit/push the planner/classification final-font-cleanup fix, restart the API, and rerun `CMVoga.pdf` fresh through the API
+- Next hypothesis: the live rerun should clear to `100/A` once legacy-encoding PDFs are allowed to plan `finalize_substituted_font_conformance` after embed plus Unicode repair, even without an explicit substitution step
+- API restart status: restart required after the current planner/classification change before trusting the next queue result
+- Build status: `pnpm --filter api build` will be run before the next PM2 restart
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `victim2.pdf`
-- Current phase: fresh small-PDF loop on an Acrobat-authored 2-page report with residual font Unicode/embedding debt
-- Immediate next step: restart on the current helper fix, rerun `victim2.pdf`, and verify the live queue result matches the direct `96/A` probe
-- API restart/rerun confirmed for active file: pending restart; the current `74/C` result is stale relative to the newest code
-- Rebuild required for active file: likely no, but rebuild before restart if PM2/runtime appears to serve stale output
-- Active remediation loop count: `victim2.pdf=2`
-- Next hypothesis: the live rerun should clear the target once the queue path executes `repair_font_unicode_maps` on the remaining WinAnsi dictionary TrueType fonts and `embed_missing_fonts_in_place` on `/Tekton-Bold`
+- Active PDF: `CMVoga.pdf`
+- Current phase: second small-PDF loop on a legacy-encoding brochure that stalled at residual font-embedding debt after the first fresh run
+- Immediate next step: restart on the current planner/classification fix, rerun `CMVoga.pdf`, and verify the live queue result matches the direct `100/A` probe
+- API restart/rerun confirmed for active file: pending restart; the current `80/B` result is stale relative to the newest code
+- Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart to avoid stale output
+- Active remediation loop count: `CMVoga.pdf=2`
+- Next hypothesis: the live rerun should clear once residual `pdfua.font_embedding` debt can trigger `finalize_substituted_font_conformance` after embed and Unicode repair
 
 ## Pending Files
 
@@ -76,6 +76,12 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-20T20:55:00Z Small-PDF loop fix: `legacy_encoding` classification no longer excludes `finalize_substituted_font_conformance`, and planner selection now treats residual `pdfua.font_embedding` as a persistent legacy-font failure that can schedule finalization after `embed_missing_fonts_in_place` plus Unicode repair, even without an explicit substitution step. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfClassificationService.test.ts src/__tests__/remediationPlanService.test.ts -t 'keeps finalize_substituted_font_conformance available for legacy-encoding font profiles|plans finalize_substituted_font_conformance after embed and unicode repair for persistent legacy font failures'` and `pnpm --filter api exec tsc --noEmit`. Direct probe on rebuilt `CMVoga.pdf` confirmed the missing finalization step lifts the file from `80/B` to `100/A`.
+
+- 2026-03-20T20:51:00Z Fresh API remediation run: `Cook County DMR_Part II.pdf` completed on queue item `2acd664a-1071-4b1d-b2ab-b24d8c3f1efd` at `100/A`, up from `22/F`, with no additional code changes required. This confirmed the Acrobat TrueType Unicode + Tekton fallback fix generalized cleanly to another small report family.
+
+- 2026-03-20T20:46:00Z Fresh post-restart rerun: `victim2.pdf` completed on queue item `ea2cadb0-5259-4b2c-ad4b-cbf6fb2382fc` at `96/A`, up from the first `74/C` run. The new TrueType dictionary `/ToUnicode` derivation cleared the six remaining embedded-font Unicode failures, and the Tekton fallback embedded the last unembedded font. The next random small file, `Cook County DMR_Part II.pdf`, was queued immediately after on `2acd664a-1071-4b1d-b2ab-b24d8c3f1efd`.
 
 - 2026-03-20T20:45:00Z Small-PDF loop fix: `repair_font_unicode_maps` now derives `/ToUnicode` for embedded TrueType fonts that use `BaseEncoding + /Differences` encoding dictionaries, covering Acrobat-authored small reports where the fonts are embedded but still lack Unicode maps. Added Tekton family substitute fallbacks so `embed_missing_fonts_in_place` can embed residual `/Tekton-Bold` display fonts. Verified with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t 'repairs ToUnicode maps for WinAnsi dictionary TrueType fonts in small Acrobat PDFs|embeds Tekton legacy fonts through substitute fallbacks|embeds legacy Type1 substitute fonts on small Gill Sans PDFs|embeds Boton brochure fonts through legacy substitute fallbacks'` and `pnpm --filter api exec tsc --noEmit`. Direct probe on rebuilt `victim2.pdf` confirmed `74/C -> 85/B` after Unicode repair and `85/B -> 96/A` after Tekton embedding.
 

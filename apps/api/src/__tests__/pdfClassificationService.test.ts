@@ -237,4 +237,26 @@ describe('pdfClassificationService', () => {
     expect(classifyScale(50)).toBe('medium')
     expect(classifyDepth(10)).toBe('rebuild')
   })
+
+  it('keeps finalize_substituted_font_conformance available for legacy-encoding font profiles', () => {
+    const config = buildPipelineConfig({
+      structuralClass: 'untagged_digital',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'adobe_acrobat',
+      fontProfile: 'legacy_encoding',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+
+    expect(config.excludedTools).toContain('substitute_legacy_fonts_in_place')
+    expect(config.excludedTools).not.toContain('finalize_substituted_font_conformance')
+  })
 })

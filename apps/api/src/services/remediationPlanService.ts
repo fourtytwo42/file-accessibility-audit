@@ -364,7 +364,8 @@ function isOpportunitySelectable(input: {
   const repairFontUnicodeOutcome = actionAttemptOutcome('repair_font_unicode_maps', actions)
   const repairCidSetOutcome = actionAttemptOutcome('repair_cidset_consistency', actions)
   const persistentLegacyFontFailures = opportunity.derivedFromFailureModeKeys.some(key =>
-    key === 'pdfua.font_unicode'
+    key === 'pdfua.font_embedding'
+    || key === 'pdfua.font_unicode'
     || key === 'pdfua.type1_unicode'
     || key === 'pdfua.cid_symbol_fonts'
     || key === 'pdfua.cidset_consistency'
@@ -423,7 +424,16 @@ function isOpportunitySelectable(input: {
         )
     case 'finalize_substituted_font_conformance':
       return persistentLegacyFontFailures
-        && attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
+        && (
+          attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
+          || (
+            attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
+            && (
+              attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+              || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
+            )
+          )
+        )
     case 'adobe_auto_tag':
       return !attemptedOrPlanned('adobe_auto_tag', actions, selectedActions)
     case 'set_document_title':

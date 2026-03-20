@@ -250,7 +250,6 @@ export function buildPipelineConfig(classification: PdfClassification): Pipeline
       break
     case 'legacy_encoding':
       excludedTools.add('substitute_legacy_fonts_in_place')
-      excludedTools.add('finalize_substituted_font_conformance')
       break
     case 'needs_substitution':
       break

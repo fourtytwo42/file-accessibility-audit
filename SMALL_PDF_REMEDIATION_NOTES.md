@@ -2,16 +2,16 @@
 
 ## Current Active File
 
-- `victim2.pdf`
-- Current fresh queue item: `f147229b-c8b0-4f06-ad7d-ed1db15cf132`
-- Latest completed file: `GDRAAG.pdf` -> `97/A`
+- `CMVoga.pdf`
+- Current fresh queue item: `8ab42dd1-424a-4513-a3c1-2009e2dd510e`
+- Latest completed file: `Cook County DMR_Part II.pdf` -> `100/A`
 
 ## Recent Loop Summary
 
-- `victim2.pdf`
-- Baseline: `16/F`
-- First fresh rerun: `74/C`
-- Direct post-fix probe on rebuilt artifact: `74/C -> 85/B -> 96/A`
+- `CMVoga.pdf`
+- Baseline: `18/F`
+- First fresh rerun: `80/B`
+- Direct probe on rebuilt artifact: `80/B -> 100/A` via `finalize_substituted_font_conformance`
 
 ## New System Fixes This Round
 
@@ -21,13 +21,13 @@
 
 ## Current Blocker Hypothesis
 
-- `victim2.pdf` exposed a real Acrobat small-report font family:
-  - embedded TrueType fonts with WinAnsi-based dictionary encodings plus AGL-compliant `/Differences` arrays but no `/ToUnicode`
-  - one remaining unembedded `/Tekton-Bold` font after the first remediation pass
-- Direct probing of the rebuilt artifact shows the shared fix sequence is sufficient:
-  - `repair_font_unicode_maps` clears the remaining six missing `/ToUnicode` maps
-  - `embed_missing_fonts_in_place` then embeds the final Tekton font
-  - combined result reaches `96/A`
+- `Cook County DMR_Part II.pdf` is resolved at `100/A`.
+- `CMVoga.pdf` exposed a planner/classification routing gap rather than a backend gap:
+  - the first fresh run finished at `80/B` with only residual font-embedding debt and reading-order warning
+  - direct probing of the rebuilt artifact proved `finalize_substituted_font_conformance` alone clears the remaining font debt and reaches `100/A`
+- Shared fix in progress:
+  - `legacy_encoding` classification now keeps `finalize_substituted_font_conformance` available
+  - planner now treats residual `pdfua.font_embedding` debt as a persistent legacy-font failure and can schedule finalization after `embed_missing_fonts_in_place` plus Unicode repair, even if no explicit substitution step ran
 
 ## GDRAAG Result
 

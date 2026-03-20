@@ -488,4 +488,107 @@ describe('remediationPlanService', () => {
     expect(plan.actions).toHaveLength(32)
     expect(plan.actions.some(action => action.tool_name === 'embed_missing_fonts_in_place')).toBe(true)
   })
+  it('plans finalize_substituted_font_conformance after embed and unicode repair for persistent legacy font failures', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 80,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'pdfua.font_embedding',
+            label: 'Font embedding',
+            source: 'local_standards',
+            count: 5,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'finalize-fonts',
+            toolName: 'finalize_substituted_font_conformance',
+            reason: 'Finalize residual legacy font conformance after embedding.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.85,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.font_embedding'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 1,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'cmvoga.pdf',
+      analysis: {
+        overallScore: 80,
+        grade: 'B',
+        isScanned: false,
+        pageCount: 4,
+        verapdf: { failures: [] },
+        categories: [
+          { id: 'text_extractability', label: 'Text', score: 40, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 70, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: {
+          lang: '',
+          hasStructTree: true,
+          structTreeDepth: 2,
+          formFields: [],
+          unembeddedFontCount: 5,
+          fontsMissingToUnicode: 0,
+          type1FontsMissingToUnicode: 0,
+          legacyWidthRiskFontCount: 0,
+        },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 2,
+      actions: [
+        { tool: 'embed_missing_fonts_in_place', outcome: 'no_effect' },
+        { tool: 'repair_font_unicode_maps', outcome: 'no_effect' },
+      ] as any,
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'finalize_substituted_font_conformance')).toBe(true)
+  })
 })
