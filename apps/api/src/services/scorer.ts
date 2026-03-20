@@ -878,7 +878,13 @@ function scoreAltTextWithAcrobatRisk(
     }
   }
 
-  const scoreCap = acrobatAltRiskNodes.some(node => node.ownershipMode === 'mixed_text_graphics_same_mcid') ? 40 : 60
+  // If any mixed text/graphics node contains content-bearing (non-decorative) graphics, apply the strict cap.
+  // Purely decorative nodes (borders, lines — path/stroke ops only) are less severe since text is still
+  // accessible via MCIDs; cap at 60 to reflect the remaining Acrobat conformance risk without over-penalizing.
+  const hasNonDecorativeMixedContent = acrobatAltRiskNodes.some(
+    n => n.ownershipMode === 'mixed_text_graphics_same_mcid' && !n.graphicsLikelyDecorative
+  )
+  const scoreCap = hasNonDecorativeMixedContent ? 40 : 60
   const baseScore = category.score === null ? 100 : category.score
   const score = Math.min(baseScore, scoreCap)
 

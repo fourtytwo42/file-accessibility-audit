@@ -66,7 +66,12 @@ function missingLogicalStructureFinding(
   const sparseStructureSnapshot = qpdf.hasStructTree && structureNodeCount > 0 && structureNodeCount <= 1 && pdfjs.textLength > 0
   const figureCount = structure?.figures?.length ?? 0
   const imageStructNodeCount = structure?.imageStructNodes?.length ?? 0
-  const acrobatAltRiskCount = structure?.acrobatAltRiskNodes?.length ?? 0
+  const acrobatAltRiskNodes = structure?.acrobatAltRiskNodes ?? []
+  const acrobatAltRiskCount = acrobatAltRiskNodes.length
+  // Exclude purely decorative graphics (path/stroke only ops — borders, lines, underlines) from
+  // the proxy count. These elements mix text and decorative shapes in the same MCID, but the
+  // text is still fully accessible. They do not indicate a true tagged-content ownership conflict.
+  const substantiveAltRiskCount = acrobatAltRiskNodes.filter(n => !n.graphicsLikelyDecorative).length
   const readingOrderNodeCount = structure?.readingOrderNodes?.length ?? 0
   const semanticNodeCoverageAbsent = qpdf.hasStructTree
     && pdfjs.textLength > 1000
@@ -79,9 +84,9 @@ function missingLogicalStructureFinding(
     && figureCount > 0
     && imageStructNodeCount === 0
   const artifactMixingProxy = qpdf.hasStructTree
-    && acrobatAltRiskCount >= 5
+    && substantiveAltRiskCount >= 5
     && (qpdf.images.length > 0 || figureCount > 0)
-    && (readingOrderNodeCount === 0 || acrobatAltRiskCount >= Math.max(6, imageStructNodeCount + 3))
+    && (readingOrderNodeCount === 0 || substantiveAltRiskCount >= Math.max(6, imageStructNodeCount + 3))
 
   if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent || semanticFigureCoverageAbsent || artifactMixingProxy)) {
     inferred = true
@@ -106,8 +111,8 @@ function missingLogicalStructureFinding(
       evidence.push(`Detected ${figureCount} figure candidate(s) and ${qpdf.images.length} PDF image(s), but no image structure nodes were recovered from the structure snapshot.`)
     }
     if (artifactMixingProxy) {
-      count += Math.max(1, Math.min(acrobatAltRiskCount, 10))
-      evidence.push(`Recovered ${acrobatAltRiskCount} artifact-mixing risk node(s) from the structure snapshot, which is a strong local proxy that tagged content and artifact ownership still conflict.`)
+      count += Math.max(1, Math.min(substantiveAltRiskCount, 10))
+      evidence.push(`Recovered ${substantiveAltRiskCount} artifact-mixing risk node(s) from the structure snapshot, which is a strong local proxy that tagged content and artifact ownership still conflict.`)
     }
   }
 
