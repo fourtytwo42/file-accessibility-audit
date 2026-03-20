@@ -223,4 +223,40 @@ describe('analyzeWithQpdf', () => {
     expect(result.cidSetRiskFontCount).toBe(1)
     expect(result.cidSetExplicitFontCount).toBe(1)
   })
+
+  it('detects metadata type/subtype from QPDF v2 stream objects (no value wrapper)', () => {
+    // QPDF v2 JSON format: stream objects use { stream: { dict: {...} } } without a "value" key
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/StructTreeRoot': 'obj:2 0 R',
+            '/MarkInfo': { '/Marked': true },
+            '/Metadata': 'obj:9 0 R',
+          },
+        },
+        'obj:2 0 R': { value: { '/Type': '/StructTreeRoot' } },
+        // Metadata as a stream object — v2 format has no "value" key
+        'obj:9 0 R': { stream: { dict: { '/Type': '/Metadata', '/Subtype': '/XML' } } },
+      },
+    })
+
+    expect(result.metadataRef).toBe('obj:9 0 R')
+    expect(result.metadataTypeValid).toBe(true)
+    expect(result.metadataSubtypeXml).toBe(true)
+  })
+
+  it('detects Image XObjects from QPDF v2 stream objects (no value wrapper)', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        // Image XObject as a stream object — v2 format has no "value" key
+        'obj:5 0 R': { stream: { dict: { '/Subtype': '/Image', '/Width': 100, '/Height': 100 } } },
+      },
+    })
+
+    expect(result.images).toHaveLength(1)
+    expect(result.images[0].ref).toBe('obj:5 0 R')
+  })
 })

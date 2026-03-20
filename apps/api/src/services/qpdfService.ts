@@ -201,12 +201,22 @@ export function parseQpdfJson(json: any): QpdfResult {
   try {
     const rawObjects = json.objects || json.qpdf?.[1] || {}
 
-    // QPDF v2 JSON wraps objects as { value: {...}, stream?: {...} }
-    // Normalize so we always work with the inner value.
+    // QPDF v2 JSON wraps objects as { value: {...} } for plain dicts or
+    // { stream: { dict: {...} } } for stream objects (no "value" key).
+    // Normalize so we always work with the inner dict.
     const objects: Record<string, any> = {}
     for (const [ref, raw] of Object.entries(rawObjects)) {
       if (!raw || typeof raw !== 'object') continue
-      objects[ref] = (raw as any).value ?? raw
+      const r = raw as any
+      if (r.value !== undefined) {
+        objects[ref] = r.value
+      } else if (r.stream?.dict !== undefined) {
+        // Stream object: expose the stream dict so /Type, /Subtype etc. are accessible,
+        // and also attach a sentinel so callers can tell this is a stream object.
+        objects[ref] = { ...r.stream.dict, __isStream: true }
+      } else {
+        objects[ref] = r
+      }
     }
 
     const roleMapNoteAliases = new Set<string>(['/Note'])
