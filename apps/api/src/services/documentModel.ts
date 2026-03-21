@@ -226,6 +226,7 @@ export type ToolOpportunityStatusReasonCode =
   | 'already_attempted'
   | 'rejected_before'
   | 'no_effect_before'
+  | 'no_active_failure_mode'
   | 'safe_to_run'
   | 'retry_exception'
   | 'deferred_document_scope'

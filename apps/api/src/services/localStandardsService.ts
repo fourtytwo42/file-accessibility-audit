@@ -410,6 +410,36 @@ function fontEmbeddingFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
 
 function fontUnicodeFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
   if ((qpdf.fontsMissingToUnicode ?? 0) <= 0) return null
+  const blockingCount = qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0
+  const proxyCount = qpdf.fontsMissingToUnicodeProxy ?? 0
+  const advisoryCount = qpdf.fontsMissingToUnicodeAdvisory ?? 0
+  const evidence: string[] = []
+
+  if (blockingCount > 0) {
+    evidence.push(`Detected ${blockingCount} font object(s) without a ToUnicode map that still appear to carry readable text content.`)
+  }
+  if (proxyCount > 0) {
+    evidence.push(`Detected ${proxyCount} subsetted or legacy-encoded font object(s) without a ToUnicode map; these look more like conservative proxy drift than active text-loss debt.`)
+  }
+  if (advisoryCount > 0) {
+    evidence.push(`Detected ${advisoryCount} residual symbol, Dingbat, or Type3 font object(s) without a ToUnicode map; keep visible for diagnostics, but treat them as advisory.`)
+  }
+
+  if (blockingCount <= 0) {
+    return {
+      key: 'pdfua.font_unicode',
+      label: 'Font Unicode mapping',
+      severity: 'warning',
+      blocking: false,
+      categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+      confidence: proxyCount > 0 ? 0.72 : 0.6,
+      evidence,
+      source: 'qpdf',
+      inferred: true,
+      count: (qpdf.fontsMissingToUnicode ?? 0),
+    }
+  }
+
   return {
     key: 'pdfua.font_unicode',
     label: 'Font Unicode mapping',
@@ -417,10 +447,10 @@ function fontUnicodeFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
     blocking: true,
     categoryIds: ['text_extractability', 'pdf_ua_compliance'],
     confidence: 0.9,
-    evidence: [`Detected ${qpdf.fontsMissingToUnicode ?? 0} font object(s) without a ToUnicode map.`],
+    evidence,
     source: 'qpdf',
-    inferred: false,
-    count: qpdf.fontsMissingToUnicode ?? 0,
+    inferred: blockingCount !== (qpdf.fontsMissingToUnicode ?? 0),
+    count: blockingCount,
   }
 }
 

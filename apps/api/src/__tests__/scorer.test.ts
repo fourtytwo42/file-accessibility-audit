@@ -1844,6 +1844,7 @@ describe('scoreDocument — veraPDF integration', () => {
   it('caps text_extractability for a few fonts missing ToUnicode maps', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     qpdf.fontsMissingToUnicode = 2
+    qpdf.fontsMissingToUnicodeBlocking = 2
 
     const result = scoreDocument(qpdf, pdfjs)
 
@@ -1854,10 +1855,24 @@ describe('scoreDocument — veraPDF integration', () => {
   it('caps text_extractability more aggressively for many fonts missing ToUnicode maps', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     qpdf.fontsMissingToUnicode = 4
+    qpdf.fontsMissingToUnicodeBlocking = 4
 
     const result = scoreDocument(qpdf, pdfjs)
 
     expect(findCategory(result, 'text_extractability').score).toBe(70)
+  })
+
+  it('keeps advisory-only legacy font drift from blocking a clean text extractability score', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    qpdf.fontsMissingToUnicode = 3
+    qpdf.fontsMissingToUnicodeBlocking = 0
+    qpdf.fontsMissingToUnicodeProxy = 2
+    qpdf.fontsMissingToUnicodeAdvisory = 1
+
+    const result = scoreDocument(qpdf, pdfjs)
+
+    expect(findCategory(result, 'text_extractability').score).toBe(100)
+    expect(findCategory(result, 'text_extractability').findings.some(finding => finding.includes('advisory'))).toBe(true)
   })
 
   it('caps reading_order when visible annotations are missing StructParent ownership', () => {

@@ -252,6 +252,40 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.inferred).toBe(true)
   })
 
+  it('downgrades proxy-only missing ToUnicode debt to an advisory finding', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        fontsMissingToUnicode: 2,
+        fontsMissingToUnicodeBlocking: 0,
+        fontsMissingToUnicodeProxy: 1,
+        fontsMissingToUnicodeAdvisory: 1,
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.font_unicode')
+    expect(finding?.blocking).toBe(false)
+    expect(finding?.severity).toBe('warning')
+    expect(finding?.count).toBe(2)
+  })
+
+  it('keeps true text-font missing ToUnicode debt blocking', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        fontsMissingToUnicode: 2,
+        fontsMissingToUnicodeBlocking: 2,
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.font_unicode')
+    expect(finding?.blocking).toBe(true)
+    expect(finding?.severity).toBe('error')
+    expect(finding?.count).toBe(2)
+  })
+
   it('emits note-tag ID findings when note structure elements are missing /ID', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({ noteTagCount: 3, noteTagsMissingId: 2 }),

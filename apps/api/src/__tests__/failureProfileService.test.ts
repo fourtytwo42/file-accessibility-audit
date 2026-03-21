@@ -1298,21 +1298,25 @@ describe('failureProfileService', () => {
         "plannerEvidence": {
           "reasonCodeCounts": [
             {
-              "count": 15,
+              "count": 12,
               "reasonCode": "safe_to_run",
             },
             {
               "count": 7,
               "reasonCode": "manual_only_failure_mode",
             },
+            {
+              "count": 3,
+              "reasonCode": "no_active_failure_mode",
+            },
           ],
           "statusCounts": [
             {
-              "count": 15,
+              "count": 12,
               "status": "auto_runnable",
             },
             {
-              "count": 4,
+              "count": 7,
               "status": "deferred",
             },
             {
@@ -1353,5 +1357,39 @@ describe('failureProfileService', () => {
         ],
       }
     `)
+  })
+
+  it('does not keep proactive document cleanup tools auto-runnable without active failure derivation', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult({
+        overallScore: 100,
+        grade: 'A',
+        categories: [
+          { id: 'text_extractability', label: 'Text Extractability', weight: 0.225, score: 100, grade: 'A', severity: 'None', findings: [], explanation: '', helpLinks: [] },
+          { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 100, grade: 'A', severity: 'None', findings: [], explanation: '', helpLinks: [] },
+          { id: 'alt_text', label: 'Alt Text on Images', weight: 0.135, score: 100, grade: 'A', severity: 'None', findings: [], explanation: '', helpLinks: [] },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.10, score: 100, grade: 'A', severity: 'None', findings: [], explanation: '', helpLinks: [] },
+        ] as any,
+        verapdf: { ...makeAnalysisResult().verapdf, status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null, failedChecks: 0, failures: [] },
+        localStandards: { status: 'clear', findings: [], knownGapKeys: [] },
+      }),
+      context: makeContext({
+        qpdf: {
+          ...makeContext().qpdf,
+          annotationCount: 1,
+          hasStructTree: true,
+          isTagged: true,
+        },
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    for (const toolName of ['repair_annotation_alt_text', 'repair_malformed_bdc_operators', 'set_tabs_all_annotated_pages'] as const) {
+      const opportunity = result.failureProfile.toolOpportunities.find(entry => entry.toolName === toolName)
+      expect(opportunity?.derivedFromFailureModeKeys).toEqual([])
+      expect(opportunity?.status).toBe('deferred')
+      expect(opportunity?.statusReasonCode).toBe('no_active_failure_mode')
+    }
   })
 })

@@ -779,13 +779,18 @@ function scoreTextExtractability(qpdf: QpdfResult, pdfjs: PdfjsResult): Category
     findings.push('How to fix: (1) Run OCR in Adobe Acrobat: Scan & OCR → Recognize Text. (2) Then add tags: Accessibility → Add Tags to Document.')
   }
 
-  const missingToUnicode = qpdf.fontsMissingToUnicode ?? 0
-  if (score === 100 && missingToUnicode > 0) {
-    score = missingToUnicode <= 2
+  const blockingMissingToUnicode = qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0
+  const proxyMissingToUnicode = qpdf.fontsMissingToUnicodeProxy ?? 0
+  const advisoryMissingToUnicode = qpdf.fontsMissingToUnicodeAdvisory ?? 0
+  if (score === 100 && blockingMissingToUnicode > 0) {
+    score = blockingMissingToUnicode <= 2
       ? ANALYSIS.CHARACTER_ENCODING_SCORE_CAP_FEW
       : ANALYSIS.CHARACTER_ENCODING_SCORE_CAP_MANY
-    findings.push(`${missingToUnicode} font object(s) are missing /ToUnicode maps, so character extraction is not fully reliable.`)
+    findings.push(`${blockingMissingToUnicode} font object(s) are missing /ToUnicode maps on readable text fonts, so character extraction is not fully reliable.`)
     findings.push('How to fix: repair or regenerate the affected fonts so each embedded font maps used character codes to Unicode.')
+  } else if (score === 100 && (proxyMissingToUnicode > 0 || advisoryMissingToUnicode > 0)) {
+    const proxyTotal = proxyMissingToUnicode + advisoryMissingToUnicode
+    findings.push(`${proxyTotal} legacy or symbol-font object(s) are still missing /ToUnicode maps, but the remaining signal looks advisory rather than active text-loss debt.`)
   }
 
   return {

@@ -780,6 +780,19 @@ function deriveOpportunityStatus(
       statusReasonDetail: `A prior ${opportunity.toolName} attempt already targeted this scope.`,
     }
   }
+  const isProactiveCleanupWithoutActiveFailure = opportunity.derivedFromFailureModeKeys.length === 0
+    && [
+      'repair_malformed_bdc_operators',
+      'repair_annotation_alt_text',
+      'set_tabs_all_annotated_pages',
+    ].includes(opportunity.toolName)
+  if (isProactiveCleanupWithoutActiveFailure) {
+    return {
+      status: 'deferred',
+      statusReasonCode: 'no_active_failure_mode',
+      statusReasonDetail: 'This cleanup remains available, but no active blocking failure currently derives it.',
+    }
+  }
   if (opportunity.blockedReason) {
     const blockedByManualOnlyFailureMode = opportunity.derivedFromFailureModeKeys.some(key =>
       key.startsWith('context.') || key === 'pdfua.unmatched',

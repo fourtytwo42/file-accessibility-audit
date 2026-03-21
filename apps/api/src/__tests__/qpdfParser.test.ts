@@ -158,7 +158,47 @@ describe('analyzeWithQpdf', () => {
     expect(result.fontCount).toBeGreaterThan(0)
     expect(result.unembeddedFontCount).toBeGreaterThan(0)
     expect(result.fontsMissingToUnicode).toBeGreaterThan(0)
+    expect(result.fontsMissingToUnicodeBlocking).toBeGreaterThan(0)
     expect(result.cidFontsMissingCidToGidMap).toBeGreaterThan(0)
+  })
+
+  it('classifies symbol and subsetted CID fonts without ToUnicode as proxy or advisory debt', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:10 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type1',
+            '/BaseFont': '/ZapfDingbats',
+            '/FontDescriptor': 'obj:11 0 R',
+          },
+        },
+        'obj:11 0 R': { value: { '/Type': '/FontDescriptor', '/FontFile': 'obj:12 0 R' } },
+        'obj:20 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/Type0',
+            '/BaseFont': '/ABCDEF+SubsetSans',
+            '/DescendantFonts': ['obj:21 0 R'],
+            '/FontDescriptor': 'obj:22 0 R',
+          },
+        },
+        'obj:21 0 R': {
+          value: {
+            '/Type': '/Font',
+            '/Subtype': '/CIDFontType2',
+            '/FontDescriptor': 'obj:22 0 R',
+          },
+        },
+        'obj:22 0 R': { value: { '/Type': '/FontDescriptor', '/FontFile2': 'obj:23 0 R' } },
+      },
+    })
+
+    expect(result.fontsMissingToUnicode).toBe(2)
+    expect(result.fontsMissingToUnicodeBlocking).toBe(0)
+    expect(result.fontsMissingToUnicodeProxy).toBe(1)
+    expect(result.fontsMissingToUnicodeAdvisory).toBe(1)
   })
 
   it('parses legacy /heading N tags into heading levels for scoring', () => {

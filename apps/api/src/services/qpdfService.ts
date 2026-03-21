@@ -46,6 +46,9 @@ export interface QpdfResult {
   unembeddedFontCount?: number
   unembeddedType3FontCount?: number
   fontsMissingToUnicode?: number
+  fontsMissingToUnicodeBlocking?: number
+  fontsMissingToUnicodeProxy?: number
+  fontsMissingToUnicodeAdvisory?: number
   type1FontsMissingToUnicode?: number
   cidFontsMissingCidToGidMap?: number
   cidSetRiskFontCount?: number
@@ -125,6 +128,9 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         unembeddedFontCount: 0,
         unembeddedType3FontCount: 0,
         fontsMissingToUnicode: 0,
+        fontsMissingToUnicodeBlocking: 0,
+        fontsMissingToUnicodeProxy: 0,
+        fontsMissingToUnicodeAdvisory: 0,
         type1FontsMissingToUnicode: 0,
         cidFontsMissingCidToGidMap: 0,
         cidSetRiskFontCount: 0,
@@ -221,6 +227,9 @@ function emptyQpdfResult(error: string): QpdfResult {
     unembeddedFontCount: 0,
     unembeddedType3FontCount: 0,
     fontsMissingToUnicode: 0,
+    fontsMissingToUnicodeBlocking: 0,
+    fontsMissingToUnicodeProxy: 0,
+    fontsMissingToUnicodeAdvisory: 0,
     type1FontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
     cidSetRiskFontCount: 0,
@@ -264,6 +273,9 @@ export function parseQpdfJson(json: any): QpdfResult {
     unembeddedFontCount: 0,
     unembeddedType3FontCount: 0,
     fontsMissingToUnicode: 0,
+    fontsMissingToUnicodeBlocking: 0,
+    fontsMissingToUnicodeProxy: 0,
+    fontsMissingToUnicodeAdvisory: 0,
     type1FontsMissingToUnicode: 0,
     cidFontsMissingCidToGidMap: 0,
     cidSetRiskFontCount: 0,
@@ -530,6 +542,14 @@ export function parseQpdfJson(json: any): QpdfResult {
         const missingToUnicode = !fontHasToUnicode(o, objects)
         if (missingToUnicode) {
           result.fontsMissingToUnicode = (result.fontsMissingToUnicode ?? 0) + 1
+          const unicodeRisk = classifyMissingToUnicodeRisk(o, objects)
+          if (unicodeRisk === 'blocking_text_font') {
+            result.fontsMissingToUnicodeBlocking = (result.fontsMissingToUnicodeBlocking ?? 0) + 1
+          } else if (unicodeRisk === 'legacy_symbol_or_subset_proxy') {
+            result.fontsMissingToUnicodeProxy = (result.fontsMissingToUnicodeProxy ?? 0) + 1
+          } else {
+            result.fontsMissingToUnicodeAdvisory = (result.fontsMissingToUnicodeAdvisory ?? 0) + 1
+          }
           const subtype = String(o['/Subtype'] || '')
           if (subtype === '/Type1' || subtype === '/Type3') {
             result.type1FontsMissingToUnicode = (result.type1FontsMissingToUnicode ?? 0) + 1
@@ -1027,6 +1047,36 @@ function fontHasToUnicode(fontObj: any, objects: any): boolean {
     const resolved = typeof descendant === 'string' ? resolveRef(descendant, objects) : descendant
     return !!resolved?.['/ToUnicode']
   })
+}
+
+function classifyMissingToUnicodeRisk(
+  fontObj: any,
+  objects: any,
+): 'blocking_text_font' | 'legacy_symbol_or_subset_proxy' | 'advisory_post_repair_proxy' {
+  const descendantList = resolveDescendantFonts(fontObj, objects)
+  const descendant = descendantList.length > 0
+    ? (typeof descendantList[0] === 'string' ? resolveRef(descendantList[0], objects) : descendantList[0])
+    : null
+  const target = descendant && typeof descendant === 'object' ? descendant : fontObj
+  const subtype = String(target?.['/Subtype'] || fontObj?.['/Subtype'] || '')
+  const baseFont = String(fontObj?.['/BaseFont'] || target?.['/BaseFont'] || '')
+  const normalizedBaseFont = baseFont.replace(/^\//, '')
+  const looksSubsetted = /^\//.test(baseFont) && baseFont.includes('+')
+  const looksLegacySymbol = /symbol|wingdings|webdings|zapfdingbats|dingbat/i.test(normalizedBaseFont)
+  const cidFont = resolveCidFontTarget(fontObj, objects)
+  const missingCidToGidMap = fontMissingCidToGidMap(fontObj, objects)
+  const legacyWidthRisk = fontHasLegacyWidthRisk(fontObj, objects)
+  const hasEmbeddedProgram = fontHasEmbeddedProgram(fontObj, objects)
+
+  if (looksLegacySymbol || subtype === '/Type3') {
+    return 'advisory_post_repair_proxy'
+  }
+
+  if (hasEmbeddedProgram && (legacyWidthRisk || missingCidToGidMap || (cidFont && looksSubsetted))) {
+    return 'legacy_symbol_or_subset_proxy'
+  }
+
+  return 'blocking_text_font'
 }
 
 function fontMissingCidToGidMap(fontObj: any, objects: any): boolean {
