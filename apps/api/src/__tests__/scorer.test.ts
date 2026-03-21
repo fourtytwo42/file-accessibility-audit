@@ -952,6 +952,42 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('one image description is still unresolved'))).toBe(true)
   })
 
+  it('keeps raw untagged image ownership as a real alt-text failure even when figures already have alt text', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true },
+        { ref: '11 0 R', hasAlt: true },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          {
+            ref: 'page:1:raw:/Im1',
+            tag: '(untagged)',
+            pageRef: 'obj:5 0 R',
+            mcids: [],
+            hasText: false,
+            hasGraphics: true,
+            hasAlt: false,
+            splitSafe: false,
+            graphicsLikelyDecorative: true,
+            parentTagPath: [],
+            ownershipMode: 'untagged_image_direct',
+            duplicateOwnerRefs: [],
+          },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(60)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('Acrobat-style alternate-text risk remains'))).toBe(true)
+  })
+
   it('excludes decorative non-figure graphics from alt-text scoring when informative figures are already described', () => {
     const qpdf = makeQpdf({
       images: [

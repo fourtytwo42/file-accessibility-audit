@@ -68,10 +68,14 @@ function missingLogicalStructureFinding(
   const imageStructNodeCount = structure?.imageStructNodes?.length ?? 0
   const acrobatAltRiskNodes = structure?.acrobatAltRiskNodes ?? []
   const acrobatAltRiskCount = acrobatAltRiskNodes.length
+  const countsAsSubstantiveAltRisk = (node: NonNullable<typeof acrobatAltRiskNodes>[number]): boolean =>
+    !node.graphicsLikelyDecorative
+    || node.ownershipMode === 'untagged_image_direct'
+    || node.ownershipMode === 'untagged_image_mcid'
   // Exclude purely decorative graphics (path/stroke only ops — borders, lines, underlines) from
   // the proxy count. These elements mix text and decorative shapes in the same MCID, but the
   // text is still fully accessible. They do not indicate a true tagged-content ownership conflict.
-  const substantiveAltRiskCount = acrobatAltRiskNodes.filter(n => !n.graphicsLikelyDecorative).length
+  const substantiveAltRiskCount = acrobatAltRiskNodes.filter(countsAsSubstantiveAltRisk).length
   const readingOrderNodeCount = structure?.readingOrderNodes?.length ?? 0
   const semanticNodeCoverageAbsent = qpdf.hasStructTree
     && pdfjs.textLength > 1000

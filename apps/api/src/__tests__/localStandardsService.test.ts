@@ -342,4 +342,44 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.inferred).toBe(true)
     expect(finding?.blocking).toBe(true)
   })
+
+  it('treats raw untagged image ownership as substantive logical-structure debt even when the image looks decorative', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        images: [{ ref: 'obj:2 0 R', hasAlt: true }],
+        contentOrder: [0, 1, 2],
+      }),
+      makePdfjs({ textLength: 4000, hasText: true }),
+      {
+        structure: makeStructure({
+          structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 }] as any,
+          figures: [{ ref: 'obj:3 0 R', pageNumber: 1, hasAlt: true, altText: 'Seal' }] as any,
+          imageStructNodes: [{ ref: 'obj:4 0 R', tag: '/Figure', hasAlt: true }] as any,
+          acrobatAltRiskNodes: [
+            {
+              ref: 'page:1:raw:/Im1',
+              tag: '(untagged)',
+              pageRef: 'obj:5 0 R',
+              mcids: [],
+              hasText: false,
+              hasGraphics: true,
+              hasAlt: false,
+              splitSafe: false,
+              graphicsLikelyDecorative: true,
+              ownershipMode: 'untagged_image_direct',
+            },
+          ] as any,
+          readingOrderNodes: [],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeDefined()
+    expect(finding?.inferred).toBe(true)
+    expect(finding?.blocking).toBe(true)
+  })
 })

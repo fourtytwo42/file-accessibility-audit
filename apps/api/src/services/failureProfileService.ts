@@ -457,6 +457,10 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   }
 
   const acrobatAltRiskNodes = input.context.structure.acrobatAltRiskNodes || []
+  const countsAsSubstantiveAltRisk = (node: typeof acrobatAltRiskNodes[number]): boolean =>
+    !node.graphicsLikelyDecorative
+    || node.ownershipMode === 'untagged_image_direct'
+    || node.ownershipMode === 'untagged_image_mcid'
   // Determine unresolved alt risk nodes. The resolution semantics differ by mode:
   // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved when /Alt IS present (needs removal)
   // - all other modes: unresolved when /Alt is NOT present (needs addition)
@@ -464,7 +468,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   // they share MCIDs with text but carry no semantic information, so they do not require alt text
   // and are not real accessibility failures.
   const unresolvedAltRiskNodes = acrobatAltRiskNodes.filter(node =>
-    !node.graphicsLikelyDecorative
+    countsAsSubstantiveAltRisk(node)
     && (ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt)
   )
   if (unresolvedAltRiskNodes.length) {

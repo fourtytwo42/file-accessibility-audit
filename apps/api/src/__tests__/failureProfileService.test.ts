@@ -697,6 +697,54 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
   })
 
+  it('keeps raw untagged image ownership in Acrobat-risk failure modes even when the image is marked decorative', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 88,
+      grade: 'B',
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? {
+              ...category,
+              score: 60,
+              grade: 'D',
+              severity: 'Moderate',
+              findings: ['Acrobat-risk untagged image ownership remains.'],
+            }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [
+            {
+              ref: 'page:1:raw:/Im1',
+              tag: '(untagged)',
+              pageRef: 'obj:1 0 R',
+              mcids: [],
+              hasText: false,
+              hasGraphics: true,
+              hasAlt: false,
+              parentTagPath: [],
+              ownershipMode: 'untagged_image_direct',
+              splitSafe: false,
+              graphicsLikelyDecorative: true,
+              duplicateOwnerRefs: [],
+            },
+          ],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'acrobat.other_elements_alt_text' && mode.classification === 'deterministic')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
   it('keeps unsplittable mixed Acrobat-risk nodes manual-only', () => {
     const analysis = makeAnalysisResult({
       overallScore: 88,

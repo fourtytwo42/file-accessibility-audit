@@ -953,6 +953,10 @@ function scoreAltTextWithAcrobatRisk(
   structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures'> | null,
 ): CategoryResult {
   const acrobatAltRiskNodes = structure?.acrobatAltRiskNodes || []
+  const countsAsSubstantiveAltRisk = (node: AcrobatAltRiskNode): boolean =>
+    !node.graphicsLikelyDecorative
+    || node.ownershipMode === 'untagged_image_direct'
+    || node.ownershipMode === 'untagged_image_mcid'
   const category = scoreAltText(qpdf, pdfjs, structure)
   if (!acrobatAltRiskNodes.length) return category
 
@@ -970,7 +974,7 @@ function scoreAltTextWithAcrobatRisk(
     const unresolvedRiskNodes = acrobatAltRiskNodes.filter(n =>
       ALT_REMOVAL_MODES.has(n.ownershipMode ?? '') ? n.hasAlt : !n.hasAlt
     )
-    const substantiveUnresolvedRiskNodes = unresolvedRiskNodes.filter(node => !node.graphicsLikelyDecorative)
+    const substantiveUnresolvedRiskNodes = unresolvedRiskNodes.filter(countsAsSubstantiveAltRisk)
     if (!substantiveUnresolvedRiskNodes.length) {
       return {
         ...category,
@@ -1001,7 +1005,7 @@ function scoreAltTextWithAcrobatRisk(
   // Nodes that are purely decorative (path/stroke-only — borders, underlines, lines) do not
   // represent real accessibility failures: the text in the MCID is still accessible and the
   // graphics carry no semantic information. Do not cap the score for these.
-  const substantiveRiskNodes = acrobatAltRiskNodes.filter(n => !n.graphicsLikelyDecorative)
+  const substantiveRiskNodes = acrobatAltRiskNodes.filter(countsAsSubstantiveAltRisk)
   if (!substantiveRiskNodes.length) {
     const { figures, withAlt } = effectiveAltFigureStats(qpdf, structure)
     const missingWithoutAlt = Math.max(0, figures.length - withAlt)
@@ -1041,12 +1045,17 @@ function scoreAltTextWithAcrobatRisk(
   const { figures, withAlt: figuresWithAlt } = effectiveAltFigureStats(qpdf, structure)
   const missingFigureCount = Math.max(0, figures.length - figuresWithAlt)
   const allDetectedFiguresHaveAlt = figures.length > 0 && figures.every(fig => fig.hasAlt)
+  const guidanceOnlyResidualRisk = substantiveRiskNodes.every(node =>
+    node.ownershipMode === 'mixed_text_graphics_same_mcid'
+    || node.ownershipMode === 'duplicate_mcid_ownership'
+    || node.ownershipMode === 'container_with_graphics_descendants'
+  )
   // If any mixed text/graphics node contains content-bearing (non-decorative) graphics, apply the strict cap.
   const hasNonDecorativeMixedContent = substantiveRiskNodes.some(
     n => n.ownershipMode === 'mixed_text_graphics_same_mcid'
   )
   const baseScore = category.score === null ? 100 : category.score
-  if (baseScore === 100 && allDetectedFiguresHaveAlt) {
+  if (baseScore === 100 && allDetectedFiguresHaveAlt && guidanceOnlyResidualRisk) {
     return {
       ...category,
       findings: [
