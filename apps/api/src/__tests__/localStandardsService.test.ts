@@ -509,6 +509,22 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.count).toBe(1)
   })
 
+  it('emits figure alt-quality findings for unreadable glyph-soup alternate text', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        images: [
+          { ref: '10 0 R', hasAlt: true, altText: 'Ŗ œ œ h Ǝ Ǥ ™ † Ä Ü T â Ù e' },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.figure_alt_quality')
+    expect(finding).toBeDefined()
+    expect(finding?.count).toBe(1)
+  })
+
   it('emits heading-content findings for missing H1 and generic heading text', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

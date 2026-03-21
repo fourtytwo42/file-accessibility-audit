@@ -395,13 +395,24 @@ type AcrobatAltRiskNode = NonNullable<StructureBackendMutationResult['acrobatAlt
 type StructureFigureNode = NonNullable<StructureBackendMutationResult['figures']>[number]
 type StructureHeadingNode = NonNullable<StructureBackendMutationResult['headings']>[number]
 
-type AltQuality = 'missing' | 'empty' | 'generic' | 'boilerplate' | 'overlong' | 'descriptive'
+type AltQuality = 'missing' | 'empty' | 'generic' | 'boilerplate' | 'garbled' | 'overlong' | 'descriptive'
 
 const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo'])
 const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
 
 function normalizeSemanticText(text: string | null | undefined): string {
   return String(text || '').replace(/^u:/, '').trim().toLowerCase()
+}
+
+function isUnreadableAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const tokens = raw.split(/\s+/).filter(Boolean)
+  const isolatedGlyphTokens = tokens.filter(token => {
+    const normalized = token.replace(/[.,;:!?'"()\-_/\\]/g, '')
+    return normalized.length <= 1
+  })
+  return tokens.length >= 6 && (isolatedGlyphTokens.length / tokens.length) >= 0.65
 }
 
 function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQuality {
@@ -411,6 +422,7 @@ function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQualit
   const normalized = normalizeSemanticText(altText)
   if (GENERIC_ALT_TEXT_PATTERNS.has(normalized) || /^image\s+\d+$/i.test(normalized)) return 'generic'
   if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return 'boilerplate'
+  if (isUnreadableAltText(altText)) return 'garbled'
   if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return 'overlong'
   return 'descriptive'
 }

@@ -216,11 +216,23 @@ function normalizeFigureAltQualityText(text: string | null | undefined): string 
   return String(text || '').replace(/^u:/, '').trim().toLowerCase()
 }
 
+function isUnreadableFigureAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const tokens = raw.split(/\s+/).filter(Boolean)
+  const isolatedGlyphTokens = tokens.filter(token => {
+    const normalized = token.replace(/[.,;:!?'"()\-_/\\]/g, '')
+    return normalized.length <= 1
+  })
+  return tokens.length >= 6 && (isolatedGlyphTokens.length / tokens.length) >= 0.65
+}
+
 function hasLowQualityFigureAltText(text: string | null | undefined): boolean {
   const normalized = normalizeFigureAltQualityText(text)
   if (!normalized) return false
   if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return true
   if (/^image related to\b/i.test(normalized)) return true
+  if (isUnreadableFigureAltText(text)) return true
   if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return true
   return new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo', 'figure 1', 'figure 2']).has(normalized)
 }

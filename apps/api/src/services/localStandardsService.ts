@@ -47,6 +47,17 @@ function isBoilerplateAltText(text: string | null | undefined): boolean {
   return /^(image|picture|photo|graphic)\s+of\b/i.test(normalizeSemanticText(text))
 }
 
+function isUnreadableAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const tokens = raw.split(/\s+/).filter(Boolean)
+  const isolatedGlyphTokens = tokens.filter(token => {
+    const normalized = token.replace(/[.,;:!?'"()\-_/\\]/g, '')
+    return normalized.length <= 1
+  })
+  return tokens.length >= 6 && (isolatedGlyphTokens.length / tokens.length) >= 0.65
+}
+
 function isOverlongAltText(text: string | null | undefined): boolean {
   const normalized = normalizeSemanticText(text)
   return normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32
@@ -586,13 +597,13 @@ function altTextQualityFinding(
 ): LocalStandardsFinding | null {
   const lowQualityRefs = new Set<string>()
   for (const image of qpdf.images) {
-    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isOverlongAltText(image.altText))) {
+    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isUnreadableAltText(image.altText) || isOverlongAltText(image.altText))) {
       lowQualityRefs.add(image.canonicalRef || image.ref)
     }
   }
   for (const figure of structure?.figures || []) {
     if (figure.graphicsLikelyDecorative && !figure.hasText) continue
-    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isOverlongAltText(figure.altText))) {
+    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isUnreadableAltText(figure.altText) || isOverlongAltText(figure.altText))) {
       lowQualityRefs.add(figure.splitSourceRef || figure.ref)
     }
   }
