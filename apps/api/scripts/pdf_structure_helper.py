@@ -3527,6 +3527,34 @@ def artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=
     return True, applied
 
 
+def untagged_top_level_content_groups(pdf, include_text_groups=False):
+    groups = []
+    for page_num, page in enumerate(pdf.pages, 1):
+        page_obj = page.obj if hasattr(page, "obj") else page
+        parsed_groups = parse_top_level_content_groups(page_obj)
+        if not parsed_groups:
+            continue
+        page_ref = ref_string(page_obj)
+        for index, (is_marked, group) in enumerate(parsed_groups):
+            if is_marked is not False:
+                continue
+            has_text = group_has_text_showing(group)
+            has_graphics = group_has_visible_graphics(group)
+            if not has_graphics and not (include_text_groups and has_text):
+                continue
+            kind = "text+graphics" if has_text and has_graphics else "text" if has_text else "graphics"
+            groups.append({
+                "ref": f"{page_ref}:group:{index}",
+                "pageRef": page_ref,
+                "pageNumber": page_num,
+                "groupIndex": index,
+                "hasText": has_text,
+                "hasGraphics": has_graphics,
+                "kind": kind,
+            })
+    return groups
+
+
 def ensure_link_annotation_tags(pdf, parent_elem, page_obj, parent_tree_nums, next_key):
     annots = page_obj.get("/Annots")
     if not isinstance(annots, pikepdf.Array):
@@ -7270,6 +7298,7 @@ def snapshot(pdf, inspect_mode="light"):
         "figures": figure_candidates(pdf),
         "imageStructNodes": image_struct_candidates(pdf) if include_image_struct_nodes else [],
         "acrobatAltRiskNodes": acrobat_alt_risk_nodes(pdf) if include_image_struct_nodes else [],
+        "untaggedTopLevelContentGroups": untagged_top_level_content_groups(pdf, include_text_groups=True),
         "readingOrderNodes": reading_order_nodes(pdf),
         "readingOrderParents": reading_order_parents(pdf),
     }
@@ -7283,6 +7312,7 @@ def empty_snapshot():
         "figures": [],
         "imageStructNodes": [],
         "acrobatAltRiskNodes": [],
+        "untaggedTopLevelContentGroups": [],
         "readingOrderNodes": [],
         "readingOrderParents": [],
     }

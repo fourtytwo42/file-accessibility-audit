@@ -101,6 +101,7 @@ function makeStructure(overrides: Partial<StructureBackendMutationResult> = {}):
     figures: [],
     imageStructNodes: [],
     acrobatAltRiskNodes: [],
+    untaggedTopLevelContentGroups: [],
     readingOrderNodes: [],
     readingOrderParents: [],
     ...overrides,
@@ -265,6 +266,38 @@ describe('buildLocalStandardsReport', () => {
     expect(finding).toBeDefined()
     expect(finding?.blocking).toBe(true)
     expect(finding?.inferred).toBe(true)
+  })
+
+  it('emits inferred logical-structure findings for untagged top-level page content groups', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        structTreeDepth: 2,
+        contentOrder: [0, 1, 2],
+      }),
+      makePdfjs({ textLength: 1200, hasText: true }),
+      {
+        structure: makeStructure({
+          structuralNodes: [
+            { ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 },
+            { ref: 'obj:2 0 R', tag: '/Sect', orderIndex: 1 },
+          ] as any,
+          untaggedTopLevelContentGroups: [
+            { ref: 'obj:7 0 R:group:0', pageRef: 'obj:7 0 R', pageNumber: 1, groupIndex: 0, hasText: true, hasGraphics: true, kind: 'text+graphics' },
+            { ref: 'obj:8 0 R:group:0', pageRef: 'obj:8 0 R', pageNumber: 2, groupIndex: 0, hasText: true, hasGraphics: true, kind: 'text+graphics' },
+          ] as any,
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeDefined()
+    expect(finding?.blocking).toBe(true)
+    expect(finding?.inferred).toBe(true)
+    expect(finding?.count).toBeGreaterThanOrEqual(2)
+    expect(finding?.evidence.some(entry => entry.includes('untagged top-level page content group'))).toBe(true)
   })
 
   it('emits document-language findings when qpdf and pdfjs language signals are inconsistent', () => {

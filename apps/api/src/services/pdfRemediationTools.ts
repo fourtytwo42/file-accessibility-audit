@@ -2596,7 +2596,7 @@ export async function executeRemediationTool(input: {
       const translated = structureResultToAction({
         baseAction,
         result,
-        categoryTargets: ['alt_text'],
+        categoryTargets: ['alt_text', 'reading_order', 'pdf_ua_compliance'],
       })
       return {
         buffer: translated.buffer || buffer,

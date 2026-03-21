@@ -128,6 +128,15 @@ export interface StructureBackendMutationResult {
     splitSourceTag?: string | null
   }>
   imageStructNodes?: Array<{ ref: string; tag: string; hasAlt: boolean; altText?: string | null; parentTagPath?: string[]; mcids?: number[]; hasText?: boolean; graphicsDominant?: boolean }>
+  untaggedTopLevelContentGroups?: Array<{
+    ref: string
+    pageRef?: string | null
+    pageNumber?: number
+    groupIndex?: number
+    hasText?: boolean
+    hasGraphics?: boolean
+    kind?: 'text' | 'graphics' | 'text+graphics'
+  }>
   acrobatAltRiskNodes?: Array<{
     ref: string
     tag: string

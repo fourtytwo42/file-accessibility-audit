@@ -42,7 +42,7 @@ function looksLikeBrokenBookmarkTitle(title: string): boolean {
 function missingLogicalStructureFinding(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
-  structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes' | 'acrobatAltRiskNodes' | 'readingOrderNodes'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes' | 'acrobatAltRiskNodes' | 'untaggedTopLevelContentGroups' | 'readingOrderNodes'> | null,
 ): LocalStandardsFinding | null {
   const evidence: string[] = []
   let count = 0
@@ -77,6 +77,8 @@ function missingLogicalStructureFinding(
   // text is still fully accessible. They do not indicate a true tagged-content ownership conflict.
   const substantiveAltRiskCount = acrobatAltRiskNodes.filter(countsAsSubstantiveAltRisk).length
   const readingOrderNodeCount = structure?.readingOrderNodes?.length ?? 0
+  const untaggedTopLevelContentGroups = structure?.untaggedTopLevelContentGroups ?? []
+  const untaggedTopLevelContentCount = untaggedTopLevelContentGroups.length
   const semanticNodeCoverageAbsent = qpdf.hasStructTree
     && pdfjs.textLength > 1000
     && qpdf.outlineCount === 0
@@ -91,8 +93,10 @@ function missingLogicalStructureFinding(
     && substantiveAltRiskCount >= 5
     && (qpdf.images.length > 0 || figureCount > 0)
     && (readingOrderNodeCount === 0 || substantiveAltRiskCount >= Math.max(6, imageStructNodeCount + 3))
+  const untaggedTopLevelContentProxy = qpdf.hasStructTree
+    && untaggedTopLevelContentCount > 0
 
-  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent || semanticFigureCoverageAbsent || artifactMixingProxy)) {
+  if (!count && (weakContentEvidence || shallowStructureTree || sparseStructureSnapshot || semanticNodeCoverageAbsent || semanticFigureCoverageAbsent || artifactMixingProxy || untaggedTopLevelContentProxy)) {
     inferred = true
     if (weakContentEvidence) {
       count += 1
@@ -117,6 +121,10 @@ function missingLogicalStructureFinding(
     if (artifactMixingProxy) {
       count += Math.max(1, Math.min(substantiveAltRiskCount, 10))
       evidence.push(`Recovered ${substantiveAltRiskCount} artifact-mixing risk node(s) from the structure snapshot, which is a strong local proxy that tagged content and artifact ownership still conflict.`)
+    }
+    if (untaggedTopLevelContentProxy) {
+      count += Math.max(1, Math.min(untaggedTopLevelContentCount, 10))
+      evidence.push(`Recovered ${untaggedTopLevelContentCount} untagged top-level page content group(s) from the structure snapshot, which strongly suggests some visible page content is still outside the tag tree.`)
     }
   }
 
