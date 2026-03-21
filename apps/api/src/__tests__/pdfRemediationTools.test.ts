@@ -871,6 +871,46 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(reInspect.headings.map(heading => heading.tag)).toEqual(['/H1', '/H1'])
   }, 60_000)
 
+  it('bootstrap_struct_tree reattaches an existing structure tree to the catalog when augmenting', async () => {
+    const buffer = await makePdf()
+    const initial = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section one', level: 'H1', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(initial.outputBuffer).toBeDefined()
+    const doc = await PDFDocument.load(initial.outputBuffer!, { ignoreEncryption: true })
+    doc.catalog.delete(PDFName.of('StructTreeRoot'))
+    doc.catalog.delete(PDFName.of('MarkInfo'))
+    const detachedBuffer = Buffer.from(await doc.save())
+
+    const augmented = await runPdfStructureBackend({
+      buffer: detachedBuffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Section two', level: 'H2', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(augmented.status).toBe('applied')
+    expect(augmented.outputBuffer).toBeDefined()
+    const repairedDoc = await PDFDocument.load(augmented.outputBuffer!, { ignoreEncryption: true })
+    const structTreeRoot = repairedDoc.catalog.lookupMaybe(PDFName.of('StructTreeRoot'), PDFDict)
+    const markInfo = repairedDoc.catalog.lookupMaybe(PDFName.of('MarkInfo'), PDFDict)
+
+    expect(structTreeRoot).toBeTruthy()
+    expect(markInfo?.get(PDFName.of('Marked'))).toBeTruthy()
+  }, 60_000)
+
   it('splits mixed heading/logo MCIDs on the one-page chart fixture so Acrobat-risk nodes clear', async () => {
     const buffer = await loadDownloadFixture('1total offenses_1999-2008.pdf')
     const analysis = await analyzePDF(buffer, '1total offenses_1999-2008.pdf')

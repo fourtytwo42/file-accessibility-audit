@@ -1770,20 +1770,15 @@ def mutate_create_heading_tag(pdf, mutation):
 
 def mutate_bootstrap_struct_tree(pdf, mutation):
     root = get_struct_tree_root(pdf)
+    catalog = get_catalog(pdf)
+    if catalog is None:
+        return False, [], ["Could not locate the PDF catalog to attach a structure tree."]
     headings = mutation.get("headings") or []
     figures = mutation.get("figures") or []
     if not headings and not figures:
         return False, [], ["bootstrap_struct_tree requires heading or figure candidates."]
     applied = []
     if root is None:
-        catalog = None
-        for obj in pdf.objects:
-            if isinstance(obj, pikepdf.Dictionary) and str(obj.get("/Type")) == "/Catalog":
-                catalog = obj
-                break
-        if catalog is None:
-            return False, [], ["Could not locate the PDF catalog to attach a structure tree."]
-
         struct_root = pdf.make_indirect(pikepdf.Dictionary({
             "/Type": pikepdf.Name("/StructTreeRoot"),
             "/K": pikepdf.Array(),
@@ -1814,6 +1809,16 @@ def mutate_bootstrap_struct_tree(pdf, mutation):
             "after": "/Document",
             "details": f"Augmented existing structure tree under {ref_string(document)}.",
         })
+
+    if catalog.get("/StructTreeRoot") != struct_root:
+        catalog["/StructTreeRoot"] = struct_root
+        applied.append({
+            "ref": ref_string(struct_root),
+            "before": None,
+            "after": "/StructTreeRoot",
+            "details": f"Attached structure tree {ref_string(struct_root)} to the PDF catalog.",
+        })
+    ensure_mark_info(catalog)
 
     next_mcid = next_available_struct_mcid(pdf)
 
