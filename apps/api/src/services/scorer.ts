@@ -585,7 +585,7 @@ export function scoreDocument(
   categories.push(scoreTitleLanguage(qpdf, pdfjs))
 
   // 3. Heading Structure (15%)
-  categories.push(scoreHeadingStructureWithContent(qpdf, structure))
+  categories.push(scoreHeadingStructureWithContent(qpdf, pdfjs, structure))
 
   // 4. Alt Text on Images (15%)
   categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, verapdf, structure))
@@ -803,7 +803,7 @@ function scoreTitleLanguage(qpdf: QpdfResult, pdfjs: PdfjsResult): CategoryResul
   }
 }
 
-function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
+function scoreHeadingStructure(qpdf: QpdfResult, pdfjs?: PdfjsResult): CategoryResult {
   const findings: string[] = []
   const headingExplanation = 'Headings (H1–H6) create a navigable outline of the document. Screen reader users rely on headings to skim and jump between sections — similar to how sighted users scan bold section titles. Headings must follow a logical hierarchy: H1 for the main title, H2 for major sections, H3 for subsections, and so on. Skipping levels (e.g., H1 → H3) confuses assistive technology.'
   const headingLinks: CategoryResult['helpLinks'] = [
@@ -862,17 +862,46 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
     .map(h => parseInt(h.level.replace('H', '')))
 
   let hierarchyBroken = hasLegacyOutOfRangeHeading
+  let hierarchySkipCount = 0
+  let hierarchyResetCount = 0
   for (let i = 1; i < levels.length; i++) {
     if (levels[i] > levels[i - 1] + 1) {
       hierarchyBroken = true
+      hierarchySkipCount += 1
       findings.push(`Heading hierarchy skip: H${levels[i - 1]} → H${levels[i]} (skipped H${levels[i - 1] + 1})`)
     } else if (levels[i] < levels[i - 1]) {
       hierarchyBroken = true
+      hierarchyResetCount += 1
       findings.push(`Heading hierarchy reset: H${levels[i - 1]} → H${levels[i]} (descending levels should not restart)`)
     }
   }
 
   if (hierarchyBroken) {
+    const advisoryResetOnlyHierarchy =
+      !hasLegacyOutOfRangeHeading
+      && hierarchySkipCount === 0
+      && hierarchyResetCount > 0
+      && hierarchyResetCount <= 2
+      && levels.length <= 10
+      && (pdfjs?.pageCount ?? 0) > 0
+      && (pdfjs?.pageCount ?? 0) <= 4
+      && qpdf.formFields.length === 0
+      && (qpdf.linkAnnotationCount ?? 0) === 0
+    if (advisoryResetOnlyHierarchy) {
+      findings.unshift(`Found ${levels.length} heading tags with limited section-level resets`)
+      findings.push('The remaining heading resets were treated as an advisory warning because this short document otherwise maintains a stable heading structure without skipped levels or interactive-content debt.')
+      return {
+        id: 'heading_structure',
+        label: 'Heading Structure',
+        weight: SCORING_WEIGHTS.heading_structure,
+        score: 95,
+        grade: getGrade(95),
+        severity: getSeverity(95),
+        findings,
+        explanation: headingExplanation,
+        helpLinks: headingLinks,
+      }
+    }
     findings.unshift(`Found ${levels.length} heading tags, but hierarchy has gaps`)
     findings.push('Heading levels should not skip or restart — e.g., don\'t jump from H1 to H3 or fall back from H2 to H1 in the same outline.')
     return {
@@ -904,9 +933,10 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
 
 function scoreHeadingStructureWithContent(
   qpdf: QpdfResult,
+  pdfjs: PdfjsResult,
   structure?: Pick<StructureBackendMutationResult, 'headings'> | null,
 ): CategoryResult {
-  const category = scoreHeadingStructure(qpdf)
+  const category = scoreHeadingStructure(qpdf, pdfjs)
   const findings = [...category.findings]
   let score = category.score ?? 100
 

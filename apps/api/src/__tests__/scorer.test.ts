@@ -707,11 +707,49 @@ describe('scoreHeadingStructure edge cases', () => {
         { level: 'H1', tag: '/H1' },
       ],
     })
-    const pdfjs = makePdfjs()
+    const pdfjs = makePdfjs({ pageCount: 5 })
     const result = scoreDocument(qpdf, pdfjs)
     const cat = findCategory(result, 'heading_structure')
     expect(cat.score).toBe(60)
     expect(cat.findings.some(f => f.includes('reset'))).toBe(true)
+  })
+
+  it('treats limited heading resets as advisory on short non-interactive bulletins', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      {
+        ...qpdf,
+        headings: [
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+          { level: 'H2', tag: '/H2' },
+          { level: 'H3', tag: '/H3' },
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+        ],
+        formFields: [],
+        linkAnnotationCount: 0,
+      },
+      {
+        ...pdfjs,
+        pageCount: 4,
+        links: [],
+        outlineCount: 0,
+        hasOutlines: false,
+        metadata: {
+          ...pdfjs.metadata,
+          pageCount: 4,
+        },
+      },
+    )
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(95)
+    expect(cat.grade).toBe('A')
+    expect(cat.findings.some(f => f.includes('advisory warning'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
   })
 
   it('legacy heading tags outside H1-H6 degrade heading structure', () => {
