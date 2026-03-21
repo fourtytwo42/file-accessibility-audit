@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:scoring": "vitest run --testPathPattern=scoring",
-    "validate:adobe": "tsx src/scripts/validateAdobe99anreport.ts"
+    "validate:adobe": "tsx src/scripts/validateAdobe99anreport.ts",
+    "baseline:phase0": "tsx src/scripts/generatePhase0Baseline.ts",
+    "baseline:phase0:canary": "tsx src/scripts/generatePhase0Baseline.ts --corpus phase0-canary"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
