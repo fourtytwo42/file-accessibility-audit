@@ -1350,6 +1350,14 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
   const ignorablePunctuationFailures = contrast.failures.filter(failure =>
     /^[^a-z0-9]{1,3}$/i.test(failure.textPreview.trim()) && failure.contrastRatio >= 3.0
   )
+  const isSpacedDisplayText = (text: string): boolean => {
+    const normalized = text.trim()
+    if (normalized.length < 5) return false
+    const tokens = normalized.split(/\s+/).filter(Boolean)
+    if (tokens.length < 4) return false
+    const singleCharTokens = tokens.filter(token => /^[A-Za-z]$/.test(token))
+    return singleCharTokens.length / tokens.length >= 0.7
+  }
   const effectiveFailures = contrast.failures.filter(failure =>
     !(failure.contrastRatio <= 1.05 && failure.fgColor.toLowerCase() === failure.bgColor.toLowerCase())
     && !(/^[^a-z0-9]{1,3}$/i.test(failure.textPreview.trim()) && failure.contrastRatio >= 3.0)
@@ -1361,7 +1369,8 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     const nearThreshold = ratioDelta <= 0.3
     const displaySized = failure.fontSizePt >= 14 && failure.contrastRatio >= 3.0
     const shortFragment = failure.textPreview.trim().length <= 5 && failure.contrastRatio >= 3.0
-    return nearThreshold || displaySized || shortFragment
+    const spacedDisplayText = isSpacedDisplayText(failure.textPreview) && failure.contrastRatio >= 3.0
+    return nearThreshold || displaySized || shortFragment || spacedDisplayText
   })
   const materialFailures = effectiveFailures.filter(failure => !advisoryDisplayFailures.includes(failure))
   const residualMediumFailures = materialFailures.filter(failure => failure.contrastRatio >= 3.0)
@@ -1410,6 +1419,14 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
     findings.push('The failing samples were concentrated on one or two pages of a long document and were treated as an advisory contrast warning rather than a material document-wide contrast problem.')
+  } else if (
+    effectiveFailRatio <= 0.05
+    && materialFailures.length === 0
+    && contrast.pagesAnalyzed >= 8
+  ) {
+    score = 95
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
+    findings.push('The remaining failures were limited to advisory display-text styling on an otherwise readable long document and were treated as an advisory contrast warning.')
   } else if (effectiveFailRatio < 0.05) {
     score = effectiveFailingCount <= 10 ? 95 : 80
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)

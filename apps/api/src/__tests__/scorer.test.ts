@@ -2194,6 +2194,53 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })
+
+  it('treats spaced display-text contrast misses as advisory on long documents', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 10,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 10,
+          totalSamples: 416,
+          failingContrastCount: 19,
+          failRatio: 19 / 416,
+          failures: Array.from({ length: 19 }, (_, index) => ({
+            page: 1 + (index % 3),
+            textPreview: index % 2 === 0 ? 'J O D A V I E S S' : 'C O O K C O U N T Y',
+            contrastRatio: 3.59,
+            threshold: 4.5,
+            fgColor: '#878787',
+            bgColor: '#ffffff',
+            fontSizePt: 12,
+          })),
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('advisory display-text styling'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
 })
 
 describe('summarizeLinkTextQuality', () => {
