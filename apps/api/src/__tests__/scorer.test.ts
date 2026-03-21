@@ -2436,6 +2436,110 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.grade).toBe('A')
   })
 
+  it('treats sparse mostly-advisory long-report contrast misses as advisory', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const failures = [
+      {
+        page: 2,
+        textPreview: 'Juveniles placed on probation in Illinois',
+        contrastRatio: 3.69,
+        threshold: 4.5,
+        fgColor: '#858585',
+        bgColor: '#ffffff',
+        fontSizePt: 12,
+      },
+      ...[
+        'INTRODUCTION ...........................',
+        'II.  METHODOLOGY .......................',
+        'PROBATION IN 2000 ......................',
+        'History of Psychiatric Treatment .......',
+        'Conclusions.............................',
+        'New Arrest .............................',
+        'VI.  CONCLUSIONS........................',
+      ].map(textPreview => ({
+        page: 4,
+        textPreview,
+        contrastRatio: 2.27,
+        threshold: 4.5,
+        fgColor: '#acacac',
+        bgColor: '#ffffff',
+        fontSizePt: 12,
+      })),
+      {
+        page: 5,
+        textPreview: 'Figure 6: Juvenile Probationers Identifi',
+        contrastRatio: 3.69,
+        threshold: 4.5,
+        fgColor: '#858585',
+        bgColor: '#ffffff',
+        fontSizePt: 12,
+      },
+      {
+        page: 7,
+        textPreview: '8,000',
+        contrastRatio: 3.03,
+        threshold: 4.5,
+        fgColor: '#949494',
+        bgColor: '#ffffff',
+        fontSizePt: 10.6,
+      },
+      {
+        page: 7,
+        textPreview: '6,000',
+        contrastRatio: 3.03,
+        threshold: 4.5,
+        fgColor: '#949494',
+        bgColor: '#ffffff',
+        fontSizePt: 10.6,
+      },
+      {
+        page: 9,
+        textPreview: 'field-testing, some minor changes were m',
+        contrastRatio: 2.88,
+        threshold: 4.5,
+        fgColor: '#989898',
+        bgColor: '#ffffff',
+        fontSizePt: 12,
+      },
+    ]
+
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 52,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 10,
+          totalSamples: 260,
+          failingContrastCount: failures.length,
+          failRatio: failures.length / 260,
+          failures,
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('near-threshold caption or chart-label misses'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
+
   it('treats spaced display-text contrast misses as advisory on long documents', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(
