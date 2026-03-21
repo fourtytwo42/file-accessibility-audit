@@ -4792,6 +4792,49 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(decision.reason).toBeNull()
   })
 
+  it('accepts structure conformance when it only surfaces follow-up Acrobat ownership debt', async () => {
+    const { __test_evaluateStageAcceptance } = await import('../services/agentRemediationService.js')
+    const previous = {
+      overallScore: 68,
+      verapdf: { status: 'unavailable', failures: [] },
+      categories: [
+        { id: 'alt_text', score: 60, grade: 'D', severity: 'Moderate', findings: ['All 8 image(s) have alternative text'] },
+        { id: 'reading_order', score: 40, grade: 'F', severity: 'Moderate', findings: ['Structure tree depth: 1 level(s)'] },
+      ],
+    } as any
+    const next = {
+      overallScore: 68,
+      verapdf: { status: 'unavailable', failures: [] },
+      categories: [
+        {
+          id: 'alt_text',
+          score: 40,
+          grade: 'F',
+          severity: 'Moderate',
+          findings: [
+            'Detected 8 Acrobat-risk non-figure elements with graphics content.',
+            'Acrobat-style alternate-text risk remains because graphics content is still owned by non-/Figure structure elements.',
+          ],
+        },
+        { id: 'reading_order', score: 40, grade: 'F', severity: 'Moderate', findings: ['Structure tree depth: 2 level(s)'] },
+      ],
+    } as any
+    const decision = __test_evaluateStageAcceptance(previous, next, [{
+      tool: 'repair_structure_conformance',
+      target: 'document',
+      details: 'Wrapped untagged page content in marked content.',
+      confidence: 0.9,
+      autoApplied: true,
+      changedVisibleContent: false,
+      changedDocumentBytes: true,
+      categoryTargets: ['text_extractability', 'heading_structure', 'alt_text', 'link_quality', 'reading_order'],
+      outcome: 'applied',
+    }] as any)
+
+    expect(decision.accept).toBe(true)
+    expect(decision.reason).toBeNull()
+  })
+
   it('retries unresolved set_alt figure candidates during the late heuristic pass', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

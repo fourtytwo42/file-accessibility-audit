@@ -796,7 +796,28 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
   const standardsImproved = standardsValidationImproved(previous, next)
   const worstRegression = worstTargetedRegression(stageActions, previous, next)
   const targetedCategoryImproved = hasTargetedCategoryImprovement(previous, next, stageActions)
+  const structureConformanceActions = stageActions.filter(action =>
+    action.tool === 'repair_structure_conformance' && action.outcome === 'applied',
+  )
+  const nonAltTargetedImprovement = hasTargetedCategoryImprovement(previous, next, stageActions.filter(action =>
+    !(action.categoryTargets || []).includes('alt_text'),
+  ))
+  const structureConformanceSurfacedAcrobatOwnershipDebt =
+    structureConformanceActions.length > 0
+    && worstRegression < 0
+    && (next.categories.find(category => category.id === 'alt_text')?.findings || []).some(finding =>
+      /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(String(finding || '')),
+    )
+    && !nonAltTargetedImprovement
   if (worstRegression <= -REMEDIATION.NET_BENEFIT_MAX_CATEGORY_REGRESSION) {
+    if (structureConformanceSurfacedAcrobatOwnershipDebt) {
+      return {
+        accept: true,
+        reason: null,
+        standardsImproved,
+        worstTargetedRegression: worstRegression,
+      }
+    }
     return {
       accept: false,
       reason: `targeted category regressed by ${Math.abs(worstRegression)} points`,
