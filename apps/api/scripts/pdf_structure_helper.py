@@ -7294,12 +7294,15 @@ def mutate_mark_figure_decorative(pdf, mutation):
     before_tag = str(obj.get("/S"))
     if before_tag != "/Figure":
         return False, [], [f"Target {target_ref} has tag {before_tag} and is not an existing /Figure."]
-    obj["/Alt"] = pikepdf.String("Decorative image")
+    before_alt = obj.get("/Alt")
+    before_alt_text = str(before_alt).replace("u:", "") if isinstance(before_alt, str) else None
+    obj["/Alt"] = pikepdf.String("")
+    remove_alt_from_descendants(obj, skip_ref=ref_string(obj), preserve_leaf_figure_alt=True)
     return True, [{
         "ref": ref_string(obj),
-        "before": before_tag,
-        "after": "Decorative image",
-        "details": f"Marked {ref_string(obj)} as decorative by setting fallback alt text.",
+        "before": before_alt_text or before_tag,
+        "after": "",
+        "details": f"Marked {ref_string(obj)} as decorative by setting empty alternate text.",
     }], []
 
 

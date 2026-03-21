@@ -62,6 +62,7 @@ async function runAgentPatchPipeline(
   emitQueueItemUpsert(item.id)
 
   const remediation = await remediatePdfWithAgent(buffer, item.filename, originalResult, {
+    artifactsDir: reviewAssetsDir,
     signal: controller.signal,
     onProgress(progress) {
       updateQueueItem(item.id, {

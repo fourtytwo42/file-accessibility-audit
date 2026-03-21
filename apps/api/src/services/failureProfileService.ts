@@ -339,6 +339,16 @@ function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamily
     }
   }
 
+  if (finding.key === 'pdfua.link_text_quality') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['rewrite_link_visible_text', 'set_link_annotation_contents'],
+      categoryIds: ['link_quality', 'pdf_ua_compliance'],
+      classification: 'semantic',
+    }
+  }
+
   return {
     key: finding.key,
     label: finding.label,

@@ -478,6 +478,22 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.categoryIds).toContain('alt_text')
   })
 
+  it('emits figure alt-quality findings for boilerplate alternate text', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        images: [
+          { ref: '10 0 R', hasAlt: true, altText: 'Image of a county seal' },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.figure_alt_quality')
+    expect(finding).toBeDefined()
+    expect(finding?.count).toBe(1)
+  })
+
   it('emits heading-content findings for missing H1 and generic heading text', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({
@@ -514,5 +530,21 @@ describe('buildLocalStandardsReport', () => {
     const finding = report.findings.find(entry => entry.key === 'pdfua.table_complexity')
     expect(finding).toBeDefined()
     expect(finding?.categoryIds).toContain('table_markup')
+  })
+
+  it('emits link-text quality findings for ambiguous link labels', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf(),
+      makePdfjs({
+        links: [
+          { url: 'https://example.com', text: 'click here' },
+        ],
+      }),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.link_text_quality')
+    expect(finding).toBeDefined()
+    expect(finding?.categoryIds).toContain('link_quality')
   })
 })

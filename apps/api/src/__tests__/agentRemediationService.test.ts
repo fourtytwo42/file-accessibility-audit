@@ -35,6 +35,7 @@ const finalizePlaybookRun = vi.fn((input: any) => ({
 }))
 const learnFromSuccessfulRemediation = vi.fn()
 const deriveDeterministicCall = vi.fn()
+const ensureDisplayDocTitle = vi.fn(async (buffer: Buffer) => buffer)
 
 function makeVeraPdfResult(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
   return {
@@ -142,6 +143,10 @@ vi.mock('../services/playbookService.js', () => ({
 vi.mock('../services/remediationCallDerivationService.js', () => ({
   heuristicFigureAltText: (_candidateId: string, _context: unknown) => 'Image related to County outcomes chart',
   deriveDeterministicCall,
+}))
+
+vi.mock('../services/pdfOutputFinalizer.js', () => ({
+  ensureDisplayDocTitle,
 }))
 
 describe('agentRemediationService', { timeout: 15_000 }, () => {

@@ -188,6 +188,11 @@ export interface FigureCandidate {
   pageNumber: number
   targetRef?: string | null
   bbox?: BoundingBox | null
+  imageKey?: string | null
+  imageCanonicalRef?: string | null
+  imageContentFingerprint?: string | null
+  placementPageNumbers?: number[]
+  placementCount?: number
   hasAlt: boolean
   altText?: string | null
   informativeHint: 'informative' | 'decorative' | 'unknown'
@@ -708,6 +713,12 @@ function buildFigureCandidates(
   structure: StructureBackendMutationResult,
   qpdf: QpdfResult,
 ): FigureCandidate[] {
+  const qpdfImageByRef = new Map<string, QpdfResult['images'][number]>()
+  for (const image of qpdf.images) {
+    for (const key of [image.ref, image.canonicalRef, image.contentFingerprint].filter(Boolean) as string[]) {
+      if (!qpdfImageByRef.has(key)) qpdfImageByRef.set(key, image)
+    }
+  }
   const structuralByRef = new Map(structure.structuralNodes.map(node => [node.ref, node]))
   const figureByRef = new Map(structure.figures.map(figure => [figure.ref, figure]))
   const nestedFigureContainerRefs = new Set(
@@ -832,6 +843,8 @@ function buildFigureCandidates(
   const explicitFigures = structure.figures
     .filter(figure => !((figure.childFigureCount || 0) > 0))
     .map((figure, index) => {
+    const qpdfImage = qpdfImageByRef.get(figure.ref)
+      || (figure.splitSourceRef ? qpdfImageByRef.get(figure.splitSourceRef) : undefined)
     const page = imagePages[index] || pages[index] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const informativeHint = figure.splitGenerated ? 'decorative' as const : (surroundingText.length > 0 ? 'informative' as const : 'unknown' as const)
@@ -851,6 +864,11 @@ function buildFigureCandidates(
       pageNumber: page?.pageNumber || 1,
       targetRef: figure.ref,
       bbox: page ? { x: 0, y: 0, width: 1, height: 1 } : null,
+      imageKey: qpdfImage?.contentFingerprint || qpdfImage?.canonicalRef || figure.splitSourceRef || figure.ref,
+      imageCanonicalRef: qpdfImage?.canonicalRef || figure.splitSourceRef || figure.ref,
+      imageContentFingerprint: qpdfImage?.contentFingerprint || null,
+      placementPageNumbers: qpdfImage?.placementPageNumbers || (page?.pageNumber ? [page.pageNumber] : []),
+      placementCount: qpdfImage?.placementCount || 1,
       hasAlt: figure.hasAlt,
       altText: figure.altText || null,
       informativeHint,
@@ -869,6 +887,7 @@ function buildFigureCandidates(
     }
     })
   const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
+    const qpdfImage = qpdfImageByRef.get(node.ref)
     const page = imagePages[index] || pages[index] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
@@ -879,6 +898,11 @@ function buildFigureCandidates(
       pageNumber: page?.pageNumber || 1,
       targetRef: node.ref,
       bbox: page ? { x: 0, y: 0, width: 1, height: 1 } : null,
+      imageKey: qpdfImage?.contentFingerprint || qpdfImage?.canonicalRef || node.ref,
+      imageCanonicalRef: qpdfImage?.canonicalRef || node.ref,
+      imageContentFingerprint: qpdfImage?.contentFingerprint || null,
+      placementPageNumbers: qpdfImage?.placementPageNumbers || (page?.pageNumber ? [page.pageNumber] : []),
+      placementCount: qpdfImage?.placementCount || 1,
       hasAlt: node.hasAlt,
       altText: node.altText || null,
       informativeHint: surroundingText.length > 0 ? 'informative' as const : 'unknown' as const,
@@ -923,6 +947,11 @@ function buildFigureCandidates(
         pageNumber: page?.pageNumber || 1,
         targetRef,
         bbox: page ? { x: 0, y: 0, width: 1, height: 1 } : null,
+        imageKey: image.contentFingerprint || image.canonicalRef || image.ref,
+        imageCanonicalRef: image.canonicalRef || image.ref,
+        imageContentFingerprint: image.contentFingerprint || null,
+        placementPageNumbers: image.placementPageNumbers || (page?.pageNumber ? [page.pageNumber] : []),
+        placementCount: image.placementCount || 1,
         hasAlt: image.hasAlt,
         altText: image.altText || null,
         informativeHint: surroundingText.length ? 'informative' as const : 'unknown' as const,
@@ -962,6 +991,14 @@ function buildFigureCandidates(
       pageNumber: page.pageNumber,
       targetRef,
       bbox: { x: 0, y: 0, width: 1, height: 1 },
+      imageKey: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.contentFingerprint
+        || qpdf.images.find(image => image.pageNumber === page.pageNumber)?.canonicalRef
+        || imageFallback
+        || targetRef,
+      imageCanonicalRef: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.canonicalRef || imageFallback || targetRef,
+      imageContentFingerprint: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.contentFingerprint || null,
+      placementPageNumbers: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.placementPageNumbers || [page.pageNumber],
+      placementCount: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.placementCount || 1,
       hasAlt: !!figureByRef.get(targetRef || '')?.hasAlt,
       altText: null,
       informativeHint: page.textLines.length ? 'informative' as const : 'unknown' as const,

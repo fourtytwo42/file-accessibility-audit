@@ -51,6 +51,7 @@ import {
 } from './playbookService.js'
 import { deriveDeterministicCall, heuristicFigureAltText } from './remediationCallDerivationService.js'
 import { ensureDisplayDocTitle } from './pdfOutputFinalizer.js'
+import { loadAltTextSidecar, planAltTextSidecarDirectives, syncAltTextSidecar } from './altTextSidecarService.js'
 
 function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   const summary = result.verapdf
@@ -1693,6 +1694,7 @@ export async function remediatePdfWithAgent(
   filename: string,
   originalResult: AnalysisResult,
   options?: {
+    artifactsDir?: string
     signal?: AbortSignal
     onProgress?: (progress: { stage: string; percent: number }) => void
     onCheckpoint?: (model: DocumentModel) => Promise<void> | void
@@ -1724,6 +1726,7 @@ export async function remediatePdfWithAgent(
   let playbookInitialContext: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null = null
   let playbookInitialSignature: ReturnType<typeof buildFailureSignature> | null = null
   let latestContext: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null = null
+  let altTextSidecar = await loadAltTextSidecar(options?.artifactsDir)
   let currentClassification: PdfClassification | undefined
   let currentPipelineConfig: PipelineConfig | undefined
   const stagesRun = new Set<number>()
@@ -1926,6 +1929,78 @@ export async function remediatePdfWithAgent(
       signal: options?.signal,
       forceStructureForScoring: analysisOptions?.forceStructureForScoring,
     })
+  }
+
+  const syncAltTextReviewSidecar = async (
+    context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null,
+  ): Promise<void> => {
+    if (!options?.artifactsDir || !context) return
+    altTextSidecar = await syncAltTextSidecar({
+      artifactsDir: options.artifactsDir,
+      filename,
+      context,
+    })
+  }
+
+  const applyReviewedAltTextSidecar = async (): Promise<void> => {
+    if (!options?.artifactsDir) return
+    const context = latestContext || await inspectRemediationContext(workingBuffer, currentResult, 'light')
+    await syncAltTextReviewSidecar(context)
+    const directives = planAltTextSidecarDirectives({
+      context,
+      sidecar: altTextSidecar,
+    })
+    if (!directives.length) return
+
+    const reviewedAltStartResult = currentResult
+    const reviewedAltActions: RemediationActionRecord[] = []
+    let reviewedContext = context
+
+    stagesRun.add(95)
+    for (const directive of directives) {
+      const candidate = reviewedContext.figureCandidates.find(entry => entry.id === directive.candidateId)
+      if (!candidate) continue
+      const outcome = await executeRemediationTool({
+        buffer: workingBuffer,
+        context: reviewedContext,
+        call: {
+          tool_name: directive.toolName,
+          arguments: directive.toolName === 'mark_figure_decorative'
+            ? { candidateId: directive.candidateId, decorative: true, generationSource: 'manual_deferred' }
+            : { candidateId: directive.candidateId, altText: directive.altText, generationSource: 'manual_deferred' },
+          rationale: directive.status === 'decorative'
+            ? `Apply reviewed decorative figure decision for canonical image ${directive.imageId}.`
+            : `Apply reviewed alternate text for canonical image ${directive.imageId}.`,
+          confidence: 0.99,
+        },
+      })
+      reviewedAltActions.push(outcome.action)
+      actions.push(outcome.action)
+      allExecutedActions.push(outcome.action)
+      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...actionHistoryKeys(outcome.action),
+      ]))
+      if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
+      workingBuffer = outcome.buffer
+      markInspectionDirtyFromAction(inspectionState, outcome.action)
+      currentResult = await analyzeIntermediate(workingBuffer, currentResult)
+      currentResultHasFreshVeraPdf = false
+      reviewedContext = await inspectRemediationContext(workingBuffer, currentResult, 'light')
+      await syncAltTextReviewSidecar(reviewedContext)
+    }
+
+    if (reviewedAltActions.length) {
+      latestContext = reviewedContext
+      persistStageToolOutcomes(reviewedAltActions, {
+        previous: reviewedAltStartResult,
+        next: currentResult,
+        roundNumber: round,
+        stageNumber: 95,
+        standardsImproved: standardsValidationImproved(reviewedAltStartResult, currentResult),
+      })
+    }
   }
 
   const runAcrobatOwnershipConvergence = async (): Promise<void> => {
@@ -2143,6 +2218,7 @@ export async function remediatePdfWithAgent(
   // Single inspection pass
   options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 20 })
   let stageContext = await inspectRemediationContext(workingBuffer, currentResult)
+  await syncAltTextReviewSidecar(stageContext)
 
   nativeTaggedSafeMode = isNativeTaggedSafeContext(stageContext, currentResult)
   currentTitle = stageContext.pdfjs.title || currentTitle
@@ -3574,6 +3650,8 @@ export async function remediatePdfWithAgent(
       postAnalysisSweepCount += 1
     }
   }
+
+  await applyReviewedAltTextSidecar()
 
   previousActionNames = Array.from(new Set([
     ...previousActionNames,

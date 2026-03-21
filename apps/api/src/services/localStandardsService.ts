@@ -26,8 +26,9 @@ export interface LocalStandardsReport {
   knownGapKeys: string[]
 }
 
-const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon'])
+const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo'])
 const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
+const AMBIGUOUS_LINK_TEXT_PATTERNS = new Set(['click here', 'read more', 'more', 'learn more', 'here'])
 
 function normalizeSemanticText(text: string | null | undefined): string {
   return String(text || '').replace(/^u:/, '').trim().toLowerCase()
@@ -39,9 +40,23 @@ function isGenericAltText(text: string | null | undefined): boolean {
   return GENERIC_ALT_TEXT_PATTERNS.has(normalized) || /^image\s+\d+$/i.test(normalized)
 }
 
+function isBoilerplateAltText(text: string | null | undefined): boolean {
+  return /^(image|picture|photo|graphic)\s+of\b/i.test(normalizeSemanticText(text))
+}
+
+function isOverlongAltText(text: string | null | undefined): boolean {
+  const normalized = normalizeSemanticText(text)
+  return normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32
+}
+
 function isGenericHeadingText(text: string | null | undefined): boolean {
   const normalized = normalizeSemanticText(text)
   return !!normalized && GENERIC_HEADING_TEXT_PATTERNS.has(normalized)
+}
+
+function isAmbiguousLinkText(text: string | null | undefined): boolean {
+  const normalized = normalizeSemanticText(text).replace(/^[^a-z0-9]+|[^a-z0-9]+$/g, '')
+  return !!normalized && AMBIGUOUS_LINK_TEXT_PATTERNS.has(normalized)
 }
 
 function pushFinding(target: LocalStandardsFinding[], finding: LocalStandardsFinding | null): void {
@@ -565,15 +580,19 @@ function altTextQualityFinding(
   qpdf: QpdfResult,
   structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
 ): LocalStandardsFinding | null {
-  const genericRefs = new Set<string>()
+  const lowQualityRefs = new Set<string>()
   for (const image of qpdf.images) {
-    if (image.hasAlt && isGenericAltText(image.altText)) genericRefs.add(image.canonicalRef || image.ref)
+    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isOverlongAltText(image.altText))) {
+      lowQualityRefs.add(image.canonicalRef || image.ref)
+    }
   }
   for (const figure of structure?.figures || []) {
     if (figure.graphicsLikelyDecorative && !figure.hasText) continue
-    if (figure.hasAlt && isGenericAltText(figure.altText)) genericRefs.add(figure.splitSourceRef || figure.ref)
+    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isOverlongAltText(figure.altText))) {
+      lowQualityRefs.add(figure.splitSourceRef || figure.ref)
+    }
   }
-  if (!genericRefs.size) return null
+  if (!lowQualityRefs.size) return null
   return {
     key: 'pdfua.figure_alt_quality',
     label: 'Figure alternate text quality',
@@ -581,10 +600,27 @@ function altTextQualityFinding(
     blocking: true,
     categoryIds: ['alt_text', 'pdf_ua_compliance'],
     confidence: 0.82,
-    evidence: [...genericRefs].slice(0, 5).map(ref => `Figure ${ref} uses generic alternate text that does not describe the image meaningfully.`),
+    evidence: [...lowQualityRefs].slice(0, 5).map(ref => `Figure ${ref} uses low-quality alternate text that is generic, boilerplate, or overly long.`),
     source: 'composite',
     inferred: true,
-    count: genericRefs.size,
+    count: lowQualityRefs.size,
+  }
+}
+
+function linkTextQualityFinding(pdfjs: PdfjsResult): LocalStandardsFinding | null {
+  const ambiguousLinks = pdfjs.links.filter(link => isAmbiguousLinkText(link.text))
+  if (!ambiguousLinks.length) return null
+  return {
+    key: 'pdfua.link_text_quality',
+    label: 'Link text quality',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['link_quality', 'pdf_ua_compliance'],
+    confidence: 0.84,
+    evidence: ambiguousLinks.slice(0, 5).map(link => `Link text "${link.text.trim()}" is ambiguous when read out of context.`),
+    source: 'pdfjs',
+    inferred: false,
+    count: ambiguousLinks.length,
   }
 }
 
@@ -676,6 +712,7 @@ export function buildLocalStandardsReport(
   pushFinding(findings, tableRegularityFinding(qpdf))
   pushFinding(findings, complexTableStructureFinding(qpdf))
   pushFinding(findings, altTextQualityFinding(qpdf, options?.structure))
+  pushFinding(findings, linkTextQualityFinding(pdfjs))
   pushFinding(findings, headingContentFinding(qpdf, options?.structure))
   pushFinding(findings, partialArtifactFinding(qpdf, pdfjs))
 

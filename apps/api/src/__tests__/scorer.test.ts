@@ -821,7 +821,20 @@ describe('scoreAltText edge cases', () => {
     const result = scoreDocument(qpdf, makePdfjs())
     const category = findCategory(result, 'alt_text')
     expect(category.score).toBe(50)
-    expect(category.findings.some(finding => finding.includes('generic alternate text'))).toBe(true)
+    expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
+  })
+
+  it('boilerplate or overlong alt text lowers alt_text quality scoring', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true, altText: 'Image of the county seal on the cover page' },
+        { ref: '11 0 R', hasAlt: true, altText: 'This chart shows quarterly outcomes, yearly totals, monthly breakdowns, regional comparisons, staffing trends, historical baselines, forecast assumptions, source notes, and explanatory prose that is much too long for alternate text.' },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    const category = findCategory(result, 'alt_text')
+    expect(category.score).toBe(0)
+    expect(category.findings.some(finding => finding.includes('boilerplate'))).toBe(true)
   })
 
   it('images with no ref are excluded', () => {
@@ -1437,6 +1450,20 @@ describe('scoreLinkQuality edge cases', () => {
     })
     const result = scoreDocument(qpdf, pdfjs)
     expect(findCategory(result, 'link_quality').score).toBe(50)
+  })
+
+  it('ambiguous link text lowers link quality like raw URLs do', () => {
+    const qpdf = makeQpdf()
+    const pdfjs = makePdfjs({
+      links: [
+        { url: 'https://a.com', text: 'click here' },
+        { url: 'https://b.com', text: 'Annual Report 2024' },
+      ],
+    })
+    const result = scoreDocument(qpdf, pdfjs)
+    const category = findCategory(result, 'link_quality')
+    expect(category.score).toBe(50)
+    expect(category.findings.some(finding => finding.includes('ambiguous/generic text'))).toBe(true)
   })
 })
 

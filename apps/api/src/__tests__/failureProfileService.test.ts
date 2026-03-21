@@ -423,7 +423,7 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_table_headers')).toBe(true)
   })
 
-  it('maps alt-quality, heading-content, and complex-table findings into existing repair opportunities', () => {
+  it('maps alt-quality, heading-content, complex-table, and link-text findings into existing repair opportunities', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({
       verapdf: {
@@ -472,6 +472,18 @@ describe('failureProfileService', () => {
             inferred: false,
             count: 1,
           },
+          {
+            key: 'pdfua.link_text_quality',
+            label: 'Link text quality',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['link_quality', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['1 link uses ambiguous text like "click here".'],
+            source: 'pdfjs',
+            inferred: false,
+            count: 1,
+          },
         ],
         knownGapKeys: [],
       },
@@ -487,6 +499,7 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_figure_alt_text', 'retag_as_figure_and_set_alt'].includes(opportunity.toolName))).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['normalize_heading_hierarchy', 'create_heading_from_candidate'].includes(opportunity.toolName))).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['repair_native_table_headers', 'set_table_header_cells'].includes(opportunity.toolName))).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['rewrite_link_visible_text', 'set_link_annotation_contents'].includes(opportunity.toolName))).toBe(true)
   })
 
   it('maps local page-tabs, link-tagging, and annotation-contents findings into planner opportunities', () => {

@@ -391,9 +391,9 @@ type AcrobatAltRiskNode = NonNullable<StructureBackendMutationResult['acrobatAlt
 type StructureFigureNode = NonNullable<StructureBackendMutationResult['figures']>[number]
 type StructureHeadingNode = NonNullable<StructureBackendMutationResult['headings']>[number]
 
-type AltQuality = 'missing' | 'empty' | 'generic' | 'descriptive'
+type AltQuality = 'missing' | 'empty' | 'generic' | 'boilerplate' | 'overlong' | 'descriptive'
 
-const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon'])
+const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo'])
 const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
 
 function normalizeSemanticText(text: string | null | undefined): string {
@@ -406,6 +406,8 @@ function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQualit
   if (String(altText).trim().length === 0) return 'empty'
   const normalized = normalizeSemanticText(altText)
   if (GENERIC_ALT_TEXT_PATTERNS.has(normalized) || /^image\s+\d+$/i.test(normalized)) return 'generic'
+  if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return 'boilerplate'
+  if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return 'overlong'
   return 'descriptive'
 }
 
@@ -421,7 +423,7 @@ function effectiveAltFigureStats(
   figures: Array<{ ref: string; hasAlt: boolean; altText?: string; altQuality: AltQuality }>
   withAlt: number
   withDescriptiveAlt: number
-  genericAltCount: number
+  lowQualityAltCount: number
   wrapperExclusionCount: number
   structureCreditApplied: boolean
 } {
@@ -510,9 +512,7 @@ function effectiveAltFigureStats(
         ? (
             qpdfFigure?.altQuality === 'descriptive' || structureFigure?.altQuality === 'descriptive'
               ? 'descriptive'
-              : qpdfFigure?.altQuality === 'generic' || structureFigure?.altQuality === 'generic'
-                ? 'generic'
-                : 'empty'
+              : (qpdfFigure?.altQuality || structureFigure?.altQuality || 'empty')
           )
         : 'missing',
     }
@@ -522,7 +522,7 @@ function effectiveAltFigureStats(
     figures,
     withAlt: effectiveWithAlt,
     withDescriptiveAlt: effectiveWithDescriptiveAlt,
-    genericAltCount: figures.filter(figure => figure.altQuality === 'generic').length,
+    lowQualityAltCount: figures.filter(figure => !['descriptive', 'missing'].includes(figure.altQuality)).length,
     wrapperExclusionCount: excludedWrapperRefs.size,
     structureCreditApplied: structureWithAlt > qpdfWithAlt || structureTotal > filteredQpdfFigures.length,
   }
@@ -951,7 +951,7 @@ function scoreAltText(
     figures,
     withAlt,
     withDescriptiveAlt,
-    genericAltCount,
+    lowQualityAltCount,
     wrapperExclusionCount,
     structureCreditApplied,
   } = effectiveAltFigureStats(qpdf, structure)
@@ -1007,14 +1007,14 @@ function scoreAltText(
   } else {
     findings.push(`${withAlt} of ${figures.length} image(s) have alternative text`)
     const missing = figures.filter(f => !f.hasAlt).length
-    const lowQuality = figures.filter(f => f.altQuality === 'generic' || f.altQuality === 'empty').length
+    const lowQuality = figures.filter(f => f.altQuality !== 'descriptive' && f.altQuality !== 'missing').length
     if (missing > 0) findings.push(`${missing} image(s) are missing alt text`)
-    if (lowQuality > 0) findings.push(`${lowQuality} image(s) have empty or generic alt text that should be rewritten more descriptively.`)
+    if (lowQuality > 0) findings.push(`${lowQuality} image(s) have empty, generic, boilerplate, or overlong alt text that should be rewritten more descriptively.`)
     findings.push('How to fix: In Adobe Acrobat, open the Tags panel → find the <Figure> tag for each image → right-click → Properties → enter a description in the "Alternate Text" field.')
     findings.push('Tip: Good alt text is concise and describes the purpose of the image, not just its appearance. For example, "Bar chart showing 2024 crime rates by county" rather than "chart".')
   }
-  if (genericAltCount > 0) {
-    findings.push(`${genericAltCount} image(s) use generic alternate text such as "image" or "graphic".`)
+  if (lowQualityAltCount > 0) {
+    findings.push(`${lowQualityAltCount} image(s) use low-quality alternate text such as generic placeholders, boilerplate openings, or overlong descriptions.`)
   }
   if (wrapperExclusionCount > 0) {
     findings.push(`${wrapperExclusionCount} split-generated decorative wrapper figure(s) were excluded from alt-text scoring.`)
@@ -1569,7 +1569,7 @@ function scoreLinkQuality(pdfjs: PdfjsResult): CategoryResult {
       findings.push('How to fix: In the original document (Word, InDesign, etc.), change the visible link text to something descriptive before re-exporting to PDF. In Adobe Acrobat, you can edit link properties via the Edit PDF tool.')
     }
     if (genericLinkCount > 0) {
-      findings.push(`${genericLinkCount} link(s) use generic/meaningless text (e.g. 'click here', 'read more'). Screen readers present these out of context.`)
+      findings.push(`${genericLinkCount} link(s) use ambiguous/generic text (e.g. 'click here', 'read more'). Screen readers present these out of context.`)
       for (const link of genericLinks) {
         findings.push(`Generic link: "${link.text.trim()}"`)
       }
