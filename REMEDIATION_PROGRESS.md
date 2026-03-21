@@ -12,13 +12,13 @@
 ## Current Session Snapshot
 
 
-- Active PDF: `3rdPass/Fail/Evaluation of the Lake County Adult Probation.pdf`
-- Latest attempt path: `MitigationAttempts/Evaluation of the Lake County Adult Probation/attempt-001.pdf`
-- Latest result summary: direct path remediation left the PDF byte-identical and locally `100/A`, but a fresh `full_final` analysis with live `veraPDF` still failed (`105` checks), dominated by unmapped non-standard structure types such as `/Lbody`. `CMVoga.pdf` was rechecked first and moved from `3rdPass/Fail/` to `3rdPass/Pass/` because remediation output was byte-identical and already clean under the current app result.
-- Latest validation source: direct path remediation via `src/scripts/remediatePdfFromPath.ts`, followed by fresh direct `analyzePDF(... analysisProfile:'full_final', skipVeraPdf:false)` inspection on the active file
-- Next action: finish the generic unmapped-role logical-structure detection fix, commit/push it, then rerun `Evaluation of the Lake County Adult Probation.pdf` against the updated code before continuing alphabetically through `3rdPass/Fail/`
-- Next hypothesis: once unmapped non-standard structure tags are surfaced as blocking `pdfua.logical_structure` debt, the current false-clean `100/A` files in `3rdPass/Fail/` will stop being promoted prematurely and the next remediation loops will target the real blocker family instead of treating them as already solved.
-- API restart status: pending for the unmapped-role logical-structure fix
+- Active PDF: `3rdPass/Fail/FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
+- Latest attempt path: `MitigationAttempts/FINAL GUN HOMICIDE PDF-230610T15405729/attempt-001.pdf`
+- Latest result summary: after the qpdf structure-element parser fix, the saved `attempt-001` artifact now re-analyzes at `100/A` under the app with only advisory `pdfua.cidset_consistency` left in local standards. The same parser cleanup reduced `Evaluation of the Lake County Adult Probation.pdf` from four apparent non-standard tags down to the one real `/Lbody` issue, lifting that file to an honest `88/B` instead of the earlier false-clean `100/A`.
+- Latest validation source: fresh direct `analyzePDF(... analysisProfile:'full_final', skipVeraPdf:false)` comparison on the original and remediated gun-homicide artifact, plus direct `analyzeWithQpdf(...)` checks for unmapped role tags on both gun-homicide and Lake County
+- Next action: commit/push the qpdf structure-element parser fix, place the passing gun-homicide artifact into `3rdPass/Pass/`, and continue alphabetically through the remaining `3rdPass/Fail/` files.
+- Next hypothesis: the biggest remaining shared false-failure family was parser noise from non-structure dictionaries that also use `/S`; with that removed, the next files should either pass outright after existing remediation or expose much narrower real repair gaps.
+- API restart status: not required for direct script-based validation of the current parser fix
 - Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
@@ -30,13 +30,13 @@
 ## Current Focus
 
 
-- Active PDF: `3rdPass/Fail/Evaluation of the Lake County Adult Probation.pdf`
+- Active PDF: `3rdPass/Fail/FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
 - Current phase: `3rdPass/Fail` one-by-one remediation and promotion into `3rdPass/Pass/`
-- Immediate next step: commit/push the unmapped-role logical-structure detector fix, restart the API/runtime if needed, and rerun the active file fresh before deciding whether it belongs in `Pass`.
-- API restart/rerun confirmed for active file: no, restart is still pending for the current logical-structure detector fix.
+- Immediate next step: commit/push the parser fix that stops action/transparency dictionaries from masquerading as structure tags, then place the now-passing gun-homicide artifact into `Pass` and continue to the next failing file.
+- API restart/rerun confirmed for active file: yes for direct source-path validation; the saved attempt was re-analyzed against the latest code.
 - Rebuild required for active file: no
-- Active remediation loop count: `Evaluation of the Lake County Adult Probation.pdf (3rdPass)=1`
-- Next hypothesis: the active false-clean file family is being hidden by missing local detection for unmapped RoleMap structure tags; once exposed, remediation/scoring should stop treating these PDFs as solved and we can work the next real blocker generically.
+- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf (3rdPass)=1`
+- Next hypothesis: with parser noise removed, remaining `3rdPass/Fail` files will fall into two clearer buckets: genuine remediation misses we can keep improving, and artifacts that already pass once the scoring stack stops inventing non-existent logical-structure debt.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
@@ -76,6 +76,8 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-21T21:46:00Z Follow-up 3rd-pass parser fix: qpdf structure parsing now treats `/S` values as structure tags only when the object actually looks like a structure element, instead of blindly counting every dictionary with an `/S` key. This removed false non-standard-tag debt coming from action dictionaries (`/GoTo`, `/URI`, `/D`) and transparency dictionaries (`/Transparency`) while preserving real structure tags like `/Lbody`. Added a focused regression in `src/__tests__/qpdfParser.test.ts` to ignore action/transparency dictionaries and updated the existing unmapped-role test to mark its sample objects as real `/StructElem`s. Verification: `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/localStandardsService.test.ts` and `pnpm --filter api exec tsc --noEmit` both passed. Direct reanalysis showed `Evaluation of the Lake County Adult Probation.pdf` now has only one real unmapped structure tag (`/Lbody`) and scores `88/B`, while `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` no longer has any unmapped role tags at all. Its saved `MitigationAttempts/.../attempt-001.pdf` artifact now re-analyzes at `100/A` under the app with only advisory `pdfua.cidset_consistency` remaining, making it the next candidate to place into `3rdPass/Pass/`.
 
 - 2026-03-21T21:17:01Z Started the `3rdPass/Fail` cleanup wave in alphabetical order. `CMVoga.pdf` was checked first with `pnpm --filter api exec tsx src/scripts/remediatePdfFromPath.ts`, and the output matched the source byte-for-byte while still scoring `100/A`, so it was moved from `3rdPass/Fail/CMVoga.pdf` to `3rdPass/Pass/CMVoga.pdf`. The next file, `Evaluation of the Lake County Adult Probation.pdf`, exposed a shared false-clean system gap: direct remediation again produced a byte-identical `100/A`, but a fresh direct `full_final` analysis with `skipVeraPdf:false` still failed `veraPDF` with `105` checks, dominated by unmapped non-standard structure tags such as `/Lbody`. Implemented the first half of the generic fix by extending `qpdfService` to surface `unmappedRoleMapTagCount` / `unmappedRoleMapTags`, then finished the standards side so `buildLocalStandardsReport()` now emits a blocking `pdfua.logical_structure` finding when non-standard structure tags are not resolvable through RoleMap. Added targeted regressions in `src/__tests__/qpdfParser.test.ts`, `src/__tests__/localStandardsService.test.ts`, and `src/__tests__/scorer.test.ts`. Verification: `pnpm --filter api exec tsc --noEmit` passed, and targeted test coverage passed for the new parser/standards assertions; the broader scorer file still has the same pre-existing unrelated failure at `scoreDocument — veraPDF integration > treats tiny microtext display-label contrast misses as advisory on long documents`. Next action: commit/push this logical-structure detector fix, rerun Lake County fresh, and continue down `3rdPass/Fail/` one file at a time.
 

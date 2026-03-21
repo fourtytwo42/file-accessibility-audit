@@ -223,13 +223,40 @@ describe('analyzeWithQpdf', () => {
             '/K': ['obj:10 0 R', 'obj:11 0 R'],
           },
         },
-        'obj:10 0 R': { value: { '/S': '/CustomHeading' } },
-        'obj:11 0 R': { value: { '/S': '/Lbody' } },
+        'obj:10 0 R': { value: { '/Type': '/StructElem', '/S': '/CustomHeading' } },
+        'obj:11 0 R': { value: { '/Type': '/StructElem', '/S': '/Lbody' } },
       },
     })
 
     expect(result.unmappedRoleMapTagCount).toBe(1)
     expect(result.unmappedRoleMapTags).toEqual(['/Lbody'])
+  })
+
+  it('ignores action and transparency dictionaries when counting unmapped role tags', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/StructTreeRoot': 'obj:2 0 R',
+            '/MarkInfo': { '/Marked': true },
+          },
+        },
+        'obj:2 0 R': {
+          value: {
+            '/Type': '/StructTreeRoot',
+            '/K': ['obj:10 0 R'],
+          },
+        },
+        'obj:10 0 R': { value: { '/Type': '/StructElem', '/S': '/P' } },
+        'obj:20 0 R': { value: { '/S': '/URI', '/URI': 'u:https://example.com' } },
+        'obj:21 0 R': { value: { '/S': '/GoTo', '/D': 'obj:99 0 R' } },
+        'obj:22 0 R': { value: { '/S': '/Transparency' } },
+      },
+    })
+
+    expect(result.unmappedRoleMapTagCount).toBe(0)
+    expect(result.unmappedRoleMapTags).toEqual([])
   })
 
   it('counts table row spans from structure attributes when checking regularity', () => {

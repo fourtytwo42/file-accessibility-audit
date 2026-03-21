@@ -188,6 +188,18 @@ function isQpdfBufferOverflow(err: any): boolean {
     || /stdout maxBuffer length exceeded/i.test(message)
   }
 
+function isLikelyStructureElement(obj: Record<string, any>, tag: string, roleMap: Map<string, string>, roleMapNoteAliases: Set<string>): boolean {
+  const legacyHeading = LEGACY_HEADING_TAG_RE.test(tag)
+  const standardOrMappedTag = isStandardStructureTag(tag, roleMap) || roleMapNoteAliases.has(tag) || legacyHeading
+  if (standardOrMappedTag) return true
+  return obj['/Type'] === '/StructElem'
+    || obj['/P'] !== undefined
+    || obj['/K'] !== undefined
+    || obj['/Pg'] !== undefined
+    || obj['/Alt'] !== undefined
+    || obj['/ID'] !== undefined
+}
+
 function emptyQpdfResult(error: string): QpdfResult {
   return {
     hasStructTree: false,
@@ -435,6 +447,9 @@ export function parseQpdfJson(json: any): QpdfResult {
       // Structure elements (headings, tables, figures with alt)
       if (o['/S']) {
         const tag = o['/S']
+        if (typeof tag !== 'string' || !isLikelyStructureElement(o, tag, structRoleMap, roleMapNoteAliases)) {
+          continue
+        }
         if (typeof tag === 'string' && roleMapNoteAliases.has(tag)) {
           result.noteTagCount = (result.noteTagCount ?? 0) + 1
           const rawId = o['/ID']
