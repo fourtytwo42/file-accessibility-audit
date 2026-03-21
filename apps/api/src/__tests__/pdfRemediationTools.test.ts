@@ -1013,6 +1013,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(backendSpy).toHaveBeenCalledWith(expect.objectContaining({
       mutation: expect.objectContaining({
         operation: 'repair_other_elements_alt_text',
+        maxElapsedMs: 12_000,
       }),
     }))
     expect(result.action.outcome).toBe('applied')

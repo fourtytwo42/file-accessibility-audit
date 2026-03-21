@@ -92,6 +92,7 @@ export interface StructureBackendMutationRequest {
   figures?: Array<{ altText: string }>
   includeSnapshot?: boolean
   maxRepairsPerRun?: number
+  maxElapsedMs?: number
 }
 
 export interface StructureBackendMutationResult {

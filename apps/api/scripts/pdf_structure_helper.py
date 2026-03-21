@@ -2647,11 +2647,21 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
     applied = []
     unresolved = []
     max_repairs = mutation.get("maxRepairsPerRun")
+    max_elapsed_ms = mutation.get("maxElapsedMs")
     try:
         max_repairs = max(1, int(max_repairs)) if max_repairs is not None else None
     except Exception:
         max_repairs = None
+    try:
+        max_elapsed_ms = max(1000, int(max_elapsed_ms)) if max_elapsed_ms is not None else None
+    except Exception:
+        max_elapsed_ms = None
     repairs_applied = 0
+    started_at = time.monotonic()
+
+    def time_budget_exhausted():
+        return max_elapsed_ms is not None and ((time.monotonic() - started_at) * 1000.0) >= max_elapsed_ms
+
     risks = acrobat_alt_risk_nodes(pdf)
     if not risks:
         return False, [], ["No Acrobat-style alternate-text ownership risks were detected."]
@@ -2660,6 +2670,9 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
 
     normalization_changed = False
     for risk in risks:
+        if time_budget_exhausted():
+            unresolved.append("Deferred remaining Acrobat alternate-text ownership risks after reaching the wall-clock budget for this pass.")
+            break
         mode = risk.get("ownershipMode")
         if mode not in {"duplicate_mcid_ownership", "container_with_graphics_descendants"}:
             continue
@@ -2687,6 +2700,9 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
     for risk in risks:
         if repairs_applied >= max_repairs:
             unresolved.append(f"Deferred {len(risks)} remaining Acrobat alternate-text ownership risks for a follow-up pass.")
+            break
+        if time_budget_exhausted():
+            unresolved.append("Deferred remaining Acrobat alternate-text ownership risks after reaching the wall-clock budget for this pass.")
             break
         mode = risk.get("ownershipMode")
 

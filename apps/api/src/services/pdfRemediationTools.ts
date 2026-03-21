@@ -2467,6 +2467,7 @@ export async function executeRemediationTool(input: {
         mutation: {
           operation: 'repair_other_elements_alt_text',
           maxRepairsPerRun: 64,
+          maxElapsedMs: 12_000,
         },
       })
       const translated = structureResultToAction({
