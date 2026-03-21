@@ -717,6 +717,21 @@ describe('scoreHeadingStructure edge cases', () => {
     expect(cat.score).toBe(60)
     expect(cat.findings.some(f => f.includes('reset'))).toBe(true)
   })
+
+  it('legacy heading tags outside H1-H6 degrade heading structure', () => {
+    const qpdf = makeQpdf({
+      headings: [
+        { level: 'H1', tag: '/H1' },
+        { level: 'H4', tag: '/heading 4' },
+        { level: 'H9', tag: '/heading 9' },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(qpdf, pdfjs)
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(60)
+    expect(cat.findings.some(f => f.includes('outside H1-H6'))).toBe(true)
+  })
 })
 
 describe('scoreAltText pdfjs fallback', () => {

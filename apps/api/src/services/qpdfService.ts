@@ -7,6 +7,7 @@ import { promisify } from 'node:util'
 import { ANALYSIS } from '#config'
 
 const execFileAsync = promisify(execFile)
+const LEGACY_HEADING_TAG_RE = /^\/heading\s+(\d+)$/i
 const QPDF_BIN = process.env.QPDF_PATH || (() => {
   const candidates = [
     'C:/Program Files/qpdf 12.3.2/bin/qpdf.exe',
@@ -378,9 +379,11 @@ export function parseQpdfJson(json: any): QpdfResult {
           result.linkStructCount = (result.linkStructCount ?? 0) + 1
         }
         // Headings
+        const legacyHeading = typeof tag === 'string' ? tag.match(LEGACY_HEADING_TAG_RE) : null
         if (tag === '/H' || tag === '/H1' || tag === '/H2' || tag === '/H3' ||
-            tag === '/H4' || tag === '/H5' || tag === '/H6') {
-          result.headings.push({ level: tag.replace('/', ''), tag })
+            tag === '/H4' || tag === '/H5' || tag === '/H6' || legacyHeading) {
+          const level = legacyHeading ? `H${Number(legacyHeading[1]) || 1}` : tag.replace('/', '')
+          result.headings.push({ level, tag })
         }
         // Tables
         if (tag === '/Table') {

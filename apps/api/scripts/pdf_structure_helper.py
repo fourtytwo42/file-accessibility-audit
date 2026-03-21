@@ -742,9 +742,12 @@ def top_level_heading_candidates(pdf):
 
 def heading_level_number(tag):
     value = str(tag or "").upper().replace("/", "")
-    if not re.fullmatch(r"H[1-6]", value):
-        return None
-    return int(value[1:])
+    if re.fullmatch(r"H[1-6]", value):
+        return int(value[1:])
+    legacy = LEGACY_HEADING_TAG_RE.fullmatch(str(tag or ""))
+    if legacy is not None:
+        return min(6, max(1, int(legacy.group(1))))
+    return None
 
 
 def normalize_heading_sequence(levels):

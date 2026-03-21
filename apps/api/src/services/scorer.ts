@@ -770,6 +770,11 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
   const headingSummary = qpdf.headings.map(h => h.level).join(', ')
   findings.push(`Heading outline: ${headingSummary}`)
 
+  const hasLegacyOutOfRangeHeading = qpdf.headings.some(h => /^H\d+$/i.test(h.level) && !/^H[1-6]$/i.test(h.level))
+  if (hasLegacyOutOfRangeHeading) {
+    findings.push('Found legacy heading tags outside H1-H6, which Acrobat treats as invalid heading nesting.')
+  }
+
   const hasNumberedHeadings = qpdf.headings.some(h => /^H[1-6]$/.test(h.level))
 
   if (!hasNumberedHeadings) {
@@ -793,7 +798,7 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
     .filter(h => /^H[1-6]$/.test(h.level))
     .map(h => parseInt(h.level.replace('H', '')))
 
-  let hierarchyBroken = false
+  let hierarchyBroken = hasLegacyOutOfRangeHeading
   for (let i = 1; i < levels.length; i++) {
     if (levels[i] > levels[i - 1] + 1) {
       hierarchyBroken = true

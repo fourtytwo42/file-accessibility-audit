@@ -109,6 +109,22 @@ describe('analyzeWithQpdf', () => {
     expect(result.cidFontsMissingCidToGidMap).toBeGreaterThan(0)
   })
 
+  it('parses legacy /heading N tags into heading levels for scoring', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog', '/StructTreeRoot': 'obj:2 0 R', '/MarkInfo': { '/Marked': true } } },
+        'obj:2 0 R': { value: { '/Type': '/StructTreeRoot', '/K': ['obj:10 0 R', 'obj:11 0 R'] } },
+        'obj:10 0 R': { value: { '/S': '/heading 4' } },
+        'obj:11 0 R': { value: { '/S': '/heading 9' } },
+      },
+    })
+
+    expect(result.headings).toEqual([
+      { level: 'H4', tag: '/heading 4' },
+      { level: 'H9', tag: '/heading 9' },
+    ])
+  })
+
   it('tracks link annotations missing contents and legacy width-risk fonts', () => {
     const result = parseQpdfJson({
       objects: {

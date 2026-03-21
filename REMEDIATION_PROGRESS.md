@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
-- Latest attempt path: queue item `a2851f86-48c1-4fab-a42d-a46e3f492f5b`
-- Latest result summary: the fresh post-restart rerun `d91549c8-e289-4a01-beb3-3a934fb07446` still finished at `90/A`. The stable-target retry patch worked as intended, but the latest action list showed a different remaining inefficiency: late heuristic passes were still spending work on already-tagged `/Figure` candidates like `obj:336 0 R` and `obj:618 0 R` before the unresolved `/TD` wrappers. The rebuilt artifact still contains four unresolved strong `/TD` figure candidates (`obj:74 0 R`, `obj:75 0 R`, `obj:76 0 R`, `obj:78 0 R`) with `repairMode: retag_then_set_alt`.
-- Latest validation source: targeted `agentRemediationService` regressions for stable-target figure retries and unresolved-retag prioritization plus `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T01:23Z
-- Next action: restart the API on the heuristic-candidate prioritization patch and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
-- Next hypothesis: prioritizing unresolved `retag_then_set_alt` candidates ahead of already-alt-tagged leaf `/Figure` elements should let the late heuristic passes land the remaining `/TD` wraps and move the file above `95`
-- API restart status: pending PM2 restart after the latest heuristic prioritization fix
-- Build status: current source is ready; PM2 restart pending before the next fresh upload
+- Active PDF: `2ndPass/95+/2010 MV Annual Report.pdf`
+- Latest attempt path: rebuilt artifact `apps/api/data/queue-storage/rebuilt/f6b3f139-ad93-4049-9b84-a54ccdf9354f.pdf`
+- Latest result summary: Adobe’s companion report for `2010 MV Annual Report.pdf` shows a real local detection gap: the only failed Acrobat check is `Headings -> Appropriate nesting`, while our local scoring still passed the rebuilt artifact at `100/A`. Inspection showed the structure tree contains legacy heading tags like `/heading 4`, `/heading 5`, and `/heading 9`; qpdf heading extraction and the Python heading normalizer were both ignoring this legacy heading family.
+- Latest validation source: targeted `qpdfParser` and `scorer` regressions plus `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py` and `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T02:00Z
+- Next action: restart the API on the legacy-heading detection/normalization fix and run a fresh API remediation cycle for `2ndPass/95+/2010 MV Annual Report.pdf`
+- Next hypothesis: once legacy `/heading N` tags are detected locally and normalized by `normalize_heading_hierarchy`, this file should retain `100/A` while also clearing Acrobat’s heading-nesting failure on the next pass
+- API restart status: pending PM2 restart after the latest legacy-heading fix
+- Build status: current source is ready; PM2 restart pending before the next fresh rerun
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
-- Current phase: sixth remediation loop after isolating late-pass prioritization waste on already-tagged figures
-- Immediate next step: restart on the heuristic prioritization patch, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect whether the remaining `/TD` figure wraps land
+- Active PDF: `2ndPass/95+/2010 MV Annual Report.pdf`
+- Current phase: first Adobe-guided second-pass remediation loop
+- Immediate next step: restart on the legacy-heading fix, rerun `2010 MV Annual Report.pdf`, and validate that Acrobat-style heading nesting is now both detected locally and repaired generically
 - API restart/rerun confirmed for active file: pending restart after the latest code change
 - Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
-- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=6`
-- Next hypothesis: the remaining blocker is no longer table-cell figure classification, snapshot credit, or unstable retry ids; it is late-pass prioritization that still lets already-tagged figure candidates consume heuristic figure work ahead of unresolved `/TD` wrappers
+- Active remediation loop count: `2010 MV Annual Report.pdf (2ndPass)=1`
+- Next hypothesis: the remaining Acrobat-only miss is legacy heading nesting, not alt text, tables, or reading order
 
 ## Pending Files
 
@@ -76,6 +76,8 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-21T02:00:00Z 2nd-pass Adobe parity fix: qpdf heading extraction now recognizes legacy `/heading N` tags, heading scoring now degrades when those tags exceed the valid `H1-H6` range, and the Python heading normalizer now includes legacy heading tags so `normalize_heading_hierarchy` can rewrite them into valid heading levels. This directly targets the first 2nd-pass Adobe miss on `2ndPass/95+/2010 MV Annual Report.pdf`, whose Acrobat report failed only `Headings -> Appropriate nesting` while the local app still returned `100/A`. Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/scorer.test.ts`, `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart/rerun were pending at this checkpoint.
 
 - 2026-03-20T23:25:00Z Small-PDF loop fix: alt-text scoring now collapses split-generated informative figure variants onto a single canonical source ref before computing effective image coverage. This prevents wrapper/child figure variants from inflating the denominator or losing structure-backed alt-text credit when one underlying image was split into multiple figure refs during remediation. Verified with `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts -t 'credits structure-backed informative figures and excludes split-generated decorative wrappers|collapses split-generated informative figure variants onto one canonical image for alt-text credit|excludes decorative Acrobat-cleanup figures from alt-text scoring'` and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart/rerun were pending at this checkpoint.
 - 2026-03-20T23:18:00Z Fresh first-pass rerun: `methethnography.pdf` completed on queue item `e5464496-90fa-4149-a31f-742e6eb0d0cb` at `100/A`, from `27/F`, with no new code changes required. This is another signal that the current small-PDF stack is generalizing well after the heavy-link semantic fix. veraPDF remained intentionally disabled (`unavailable`) by user request.
