@@ -525,6 +525,22 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.count).toBe(1)
   })
 
+  it('emits figure alt-quality findings for body-prose fragment alternate text', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        images: [
+          { ref: '10 0 R', hasAlt: true, altText: 'emotional than men. 17 In addition, police culture may lead to skepticism, cynicism, and' },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.figure_alt_quality')
+    expect(finding).toBeDefined()
+    expect(finding?.count).toBe(1)
+  })
+
   it('emits heading-content findings for missing H1 and generic heading text', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

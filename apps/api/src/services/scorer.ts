@@ -415,6 +415,17 @@ function isUnreadableAltText(text: string | null | undefined): boolean {
   return tokens.length >= 6 && (isolatedGlyphTokens.length / tokens.length) >= 0.65
 }
 
+function isFragmentaryAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const words = raw.split(/\s+/).filter(Boolean)
+  if (words.length < 6) return false
+  const startsLowercase = /^[a-z]/.test(raw)
+  const endsWithContinuation = /\b(and|or|but|with|than|to|of|for|in|on|at|by)$/i.test(raw)
+  const hasCitationLikeNumber = /\b\d{1,3}\b/.test(raw)
+  return startsLowercase || endsWithContinuation || hasCitationLikeNumber
+}
+
 function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQuality {
   if (!hasAlt) return 'missing'
   if (altText === null || typeof altText === 'undefined') return 'descriptive'
@@ -423,6 +434,7 @@ function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQualit
   if (GENERIC_ALT_TEXT_PATTERNS.has(normalized) || /^image\s+\d+$/i.test(normalized)) return 'generic'
   if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return 'boilerplate'
   if (isUnreadableAltText(altText)) return 'garbled'
+  if (isFragmentaryAltText(altText)) return 'boilerplate'
   if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return 'overlong'
   return 'descriptive'
 }

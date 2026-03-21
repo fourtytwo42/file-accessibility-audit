@@ -33,6 +33,9 @@ function cleanContextLine(text: string | null | undefined): string | null {
   if (words.length >= 5 && singleCharacterWords.length / words.length > 0.45) return null
   const isolatedGlyphWords = words.filter(word => word.replace(/[.,;:!?'"()\-_/\\]/g, '').length <= 1)
   if (words.length >= 6 && isolatedGlyphWords.length / words.length >= 0.65) return null
+  if (/^[a-z]/.test(normalized) && words.length >= 6) return null
+  if (/\b\d{1,3}\b/.test(normalized) && words.length >= 6) return null
+  if (/\b(and|or|but|with|than|to|of|for|in|on|at|by)$/i.test(normalized)) return null
 
   return trimToWholeWords(normalized, 14, 100)
 }

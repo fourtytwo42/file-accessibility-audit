@@ -992,6 +992,19 @@ describe('scoreAltText edge cases', () => {
     expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
   })
 
+  it('body-prose fragment alt text lowers alt_text quality scoring', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true, altText: 'emotional than men. 17 In addition, police culture may lead to skepticism, cynicism, and' },
+        { ref: '11 0 R', hasAlt: true, altText: 'Support from administrative staff' },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    const category = findCategory(result, 'alt_text')
+    expect(category.score).toBe(50)
+    expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
+  })
+
   it('images with no ref are excluded', () => {
     const qpdf = makeQpdf({
       images: [

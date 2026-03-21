@@ -58,6 +58,17 @@ function isUnreadableAltText(text: string | null | undefined): boolean {
   return tokens.length >= 6 && (isolatedGlyphTokens.length / tokens.length) >= 0.65
 }
 
+function isFragmentaryAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const words = raw.split(/\s+/).filter(Boolean)
+  if (words.length < 6) return false
+  const startsLowercase = /^[a-z]/.test(raw)
+  const endsWithContinuation = /\b(and|or|but|with|than|to|of|for|in|on|at|by)$/i.test(raw)
+  const hasCitationLikeNumber = /\b\d{1,3}\b/.test(raw)
+  return startsLowercase || endsWithContinuation || hasCitationLikeNumber
+}
+
 function isOverlongAltText(text: string | null | undefined): boolean {
   const normalized = normalizeSemanticText(text)
   return normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32
@@ -597,13 +608,13 @@ function altTextQualityFinding(
 ): LocalStandardsFinding | null {
   const lowQualityRefs = new Set<string>()
   for (const image of qpdf.images) {
-    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isUnreadableAltText(image.altText) || isOverlongAltText(image.altText))) {
+    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isUnreadableAltText(image.altText) || isFragmentaryAltText(image.altText) || isOverlongAltText(image.altText))) {
       lowQualityRefs.add(image.canonicalRef || image.ref)
     }
   }
   for (const figure of structure?.figures || []) {
     if (figure.graphicsLikelyDecorative && !figure.hasText) continue
-    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isUnreadableAltText(figure.altText) || isOverlongAltText(figure.altText))) {
+    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isUnreadableAltText(figure.altText) || isFragmentaryAltText(figure.altText) || isOverlongAltText(figure.altText))) {
       lowQualityRefs.add(figure.splitSourceRef || figure.ref)
     }
   }

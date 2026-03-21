@@ -227,12 +227,24 @@ function isUnreadableFigureAltText(text: string | null | undefined): boolean {
   return tokens.length >= 6 && (isolatedGlyphTokens.length / tokens.length) >= 0.65
 }
 
+function isFragmentaryFigureAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const words = raw.split(/\s+/).filter(Boolean)
+  if (words.length < 6) return false
+  const startsLowercase = /^[a-z]/.test(raw)
+  const endsWithContinuation = /\b(and|or|but|with|than|to|of|for|in|on|at|by)$/i.test(raw)
+  const hasCitationLikeNumber = /\b\d{1,3}\b/.test(raw)
+  return startsLowercase || endsWithContinuation || hasCitationLikeNumber
+}
+
 function hasLowQualityFigureAltText(text: string | null | undefined): boolean {
   const normalized = normalizeFigureAltQualityText(text)
   if (!normalized) return false
   if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return true
   if (/^image related to\b/i.test(normalized)) return true
   if (isUnreadableFigureAltText(text)) return true
+  if (isFragmentaryFigureAltText(text)) return true
   if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return true
   return new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo', 'figure 1', 'figure 2']).has(normalized)
 }

@@ -27,4 +27,16 @@ describe('draftFigureAltText', () => {
 
     expect(result).toBe('Illustration on page 4')
   })
+
+  it('skips body-prose fragments when drafting fallback alt text', () => {
+    const result = draftFigureAltText({
+      pageNumber: 7,
+      surroundingText: [
+        'emotional than men. 17 In addition, police culture may lead to skepticism, cynicism, and',
+        'Support from administrative staff',
+      ],
+    })
+
+    expect(result).toBe('Support from administrative staff')
+  })
 })
