@@ -215,13 +215,28 @@ export interface RemediationIteration {
 
 export type FailureClassification = 'deterministic' | 'semantic' | 'manual_only'
 export type FailureModeSource = 'verapdf' | 'local_standards' | 'category' | 'context' | 'composite'
+export type FailureReportingCategory = 'metadata' | 'language' | 'logical_structure' | 'annotations' | 'alt_text' | 'tables' | 'fonts' | 'bookmarks' | 'reading_order' | 'general'
+export type FailureSourceDetail = 'verapdf_family' | 'local_standards_key' | 'acrobat_group' | 'category_score' | 'context_blocker' | 'composite_summary'
 export type ToolOpportunityScope = 'document' | 'page' | 'candidate' | 'candidate_group'
 export type ToolOpportunityStatus = 'auto_runnable' | 'blocked' | 'deferred' | 'already_attempted' | 'rejected' | 'no_effect'
+export type ToolOpportunityStatusReasonCode =
+  | 'pipeline_excluded'
+  | 'candidate_blocked'
+  | 'manual_only_failure_mode'
+  | 'already_attempted'
+  | 'rejected_before'
+  | 'no_effect_before'
+  | 'safe_to_run'
+  | 'retry_exception'
+  | 'deferred_document_scope'
 
 export interface FailureMode {
   key: string
   label: string
   source: FailureModeSource
+  reportingCategory?: FailureReportingCategory
+  sourceDetail?: FailureSourceDetail
+  derivedFrom?: string[]
   count: number
   categoryIds: string[]
   blocking: boolean
@@ -242,6 +257,8 @@ export interface ToolOpportunity {
   categoryTargets: string[]
   confidence: number
   status: ToolOpportunityStatus
+  statusReasonCode?: ToolOpportunityStatusReasonCode
+  statusReasonDetail?: string
   blockedReason?: string
   derivedFromFailureModeKeys: string[]
 }
@@ -366,10 +383,17 @@ export interface PlannerEvidenceSummary {
   attemptedKeys: string[]
   rejectedKeys: string[]
   noEffectKeys: string[]
+  attemptedOpportunityKeys?: string[]
+  rejectedOpportunityKeys?: string[]
+  noEffectOpportunityKeys?: string[]
+  statusCounts?: Array<{ status: ToolOpportunityStatus; count: number }>
+  reasonCodeCounts?: Array<{ reasonCode: ToolOpportunityStatusReasonCode; count: number }>
+  topBlockingFailureModeKeys?: string[]
+  topManualOnlyFailureModeKeys?: string[]
 }
 
 export interface FailureProfile {
-  version: '1'
+  version: '1' | '2'
   generatedAt: string
   analysisGrade: string
   analysisScore: number

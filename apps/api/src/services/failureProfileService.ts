@@ -2,6 +2,8 @@ import type { AnalysisResult } from './pdfAnalyzer.js'
 import type {
   FailureClassification,
   FailureMode,
+  FailureReportingCategory,
+  FailureSourceDetail,
   FailureProfile,
   PlannerEvidenceSummary,
   RemediationActionRecord,
@@ -10,6 +12,7 @@ import type {
   ToolOpportunity,
   ToolOpportunityScope,
   ToolOpportunityStatus,
+  ToolOpportunityStatusReasonCode,
 } from './documentModel.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { ALT_REMOVAL_MODES } from './altTextScoring.js'
@@ -181,6 +184,68 @@ function nowIso(): string {
 
 function unique<T>(values: T[]): T[] {
   return [...new Set(values)]
+}
+
+function classificationRank(classification: FailureClassification): number {
+  switch (classification) {
+    case 'deterministic':
+      return 0
+    case 'semantic':
+      return 1
+    case 'manual_only':
+      return 2
+  }
+}
+
+function reportingCategoryForMode(input: Pick<FailureMode, 'key' | 'categoryIds'>): FailureReportingCategory {
+  if (input.key.includes('bookmark') || input.categoryIds.includes('bookmarks')) return 'bookmarks'
+  if (input.key.includes('font') || input.key.includes('cid') || input.categoryIds.includes('text_extractability')) return 'fonts'
+  if (input.key.includes('table') || input.categoryIds.includes('table_markup')) return 'tables'
+  if (input.key.includes('annotation') || input.key.includes('link') || input.key.includes('note_tag') || input.categoryIds.includes('link_quality')) return 'annotations'
+  if (input.key.includes('reading_order') || input.key.includes('page_tabs') || input.categoryIds.includes('reading_order')) return 'reading_order'
+  if (input.key.includes('alt') || input.key.includes('figure') || input.categoryIds.includes('alt_text')) return 'alt_text'
+  if (input.key.includes('language') || input.categoryIds.includes('title_language')) return 'language'
+  if (input.key.includes('metadata') || input.key.includes('display_doc_title')) return 'metadata'
+  if (input.key.includes('logical_structure') || input.key.includes('struct') || input.key.includes('marked_content') || input.categoryIds.includes('pdf_ua_compliance')) return 'logical_structure'
+  return 'general'
+}
+
+function sourceDetailForMode(source: FailureMode['source'], key: string): FailureSourceDetail {
+  if (source === 'verapdf') return 'verapdf_family'
+  if (source === 'local_standards') return 'local_standards_key'
+  if (source === 'category') return 'category_score'
+  if (source === 'context') return 'context_blocker'
+  if (source === 'composite' && key.startsWith('adobe.')) return 'acrobat_group'
+  return 'composite_summary'
+}
+
+function sortFailureModes(modes: FailureMode[]): FailureMode[] {
+  return [...modes].sort((a, b) => {
+    const blockingDiff = Number(b.blocking) - Number(a.blocking)
+    if (blockingDiff !== 0) return blockingDiff
+    const countDiff = b.count - a.count
+    if (countDiff !== 0) return countDiff
+    const classificationDiff = classificationRank(a.classification) - classificationRank(b.classification)
+    if (classificationDiff !== 0) return classificationDiff
+    return a.key.localeCompare(b.key)
+  })
+}
+
+function withModeReportingFields(mode: FailureMode): FailureMode {
+  return {
+    ...mode,
+    reportingCategory: reportingCategoryForMode(mode),
+    sourceDetail: sourceDetailForMode(mode.source, mode.key),
+    derivedFrom: mode.derivedFrom || [mode.source === 'local_standards'
+      ? `local_standards:${mode.key}`
+      : mode.source === 'verapdf'
+        ? `verapdf:${mode.key}`
+        : mode.source === 'category'
+          ? `category:${mode.key.replace(/^category\./, '')}`
+          : mode.source === 'context'
+            ? `context:${mode.key}`
+            : `composite:${mode.key}`],
+  }
 }
 
 function sortedNumeric(values: number[]): number[] {
@@ -391,6 +456,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       key: `category.${category.id}`,
       label: category.label,
       source: 'category',
+      derivedFrom: [`category:${category.id}`],
       count: 1,
       categoryIds: [category.id],
       blocking: category.severity === 'Critical',
@@ -415,6 +481,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
         key: family.key,
         label: family.label,
         source: 'verapdf',
+        derivedFrom: unique([`verapdf:${family.key}`, failure.ruleId ? `verapdf_rule:${failure.ruleId}` : '']),
         count: 1,
         categoryIds: unique([...family.categoryIds, ...failure.categoryIds]),
         blocking: true,
@@ -429,6 +496,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
         key: 'pdfua.unmatched',
         label: 'Unmatched PDF/UA failures',
         source: 'verapdf',
+        derivedFrom: unique(['verapdf:unmatched', ...input.analysis.verapdf.failures.map(failure => failure.ruleId ? `verapdf_rule:${failure.ruleId}` : '')]),
         count: unmatchedCount,
         categoryIds: ['pdf_ua_compliance'],
         blocking: true,
@@ -447,6 +515,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
         key: family.key,
         label: family.label,
         source: 'local_standards',
+        derivedFrom: [`local_standards:${finding.key}`],
         count: Math.max(1, finding.count || 1),
         categoryIds: unique([...family.categoryIds, ...finding.categoryIds]),
         blocking: finding.blocking,
@@ -479,6 +548,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
         key,
         label: value.label,
         source: 'composite',
+        derivedFrom: [`adobe:${key.replace(/^adobe\./, '')}`],
         count: value.count,
         categoryIds: value.categoryIds,
         blocking: true,
@@ -501,6 +571,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       key: 'context.heading_candidates_blocked',
       label: 'Heading candidates need semantic or manual review',
       source: 'context',
+      derivedFrom: blockedHeadings.map(candidate => `heading_candidate:${candidate.id}`),
       count: blockedHeadings.length,
       categoryIds: ['heading_structure'],
       blocking: false,
@@ -520,6 +591,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       key: 'context.figure_candidates_blocked',
       label: 'Figure candidates need semantic or manual review',
       source: 'context',
+      derivedFrom: blockedFigures.map(candidate => `figure_candidate:${candidate.id}`),
       count: blockedFigures.length,
       categoryIds: ['alt_text'],
       blocking: false,
@@ -563,6 +635,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       key: 'acrobat.other_elements_alt_text',
       label: 'Acrobat-style other-elements alternate text',
       source: 'context',
+      derivedFrom: unresolvedAltRiskNodes.map(node => `acrobat_alt_risk:${node.ref || node.pageRef || node.tag}`),
       count: unresolvedAltRiskNodes.length,
       categoryIds: ['alt_text'],
       blocking: true,
@@ -593,6 +666,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       key: 'context.table_candidates_blocked',
       label: 'Table candidates need semantic or manual review',
       source: 'context',
+      derivedFrom: blockedTables.map(candidate => `table_candidate:${candidate.id}`),
       count: blockedTables.length,
       categoryIds: ['table_markup'],
       blocking: false,
@@ -609,6 +683,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       key: 'context.reading_order_groups_blocked',
       label: 'Reading-order groups require manual review',
       source: 'context',
+      derivedFrom: blockedReadingOrder.map(candidate => `reading_order_group:${candidate.id}`),
       count: blockedReadingOrder.length,
       categoryIds: ['reading_order'],
       blocking: false,
@@ -619,7 +694,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     })
   }
 
-  return [...modes.values()].sort((a, b) => b.count - a.count || a.key.localeCompare(b.key))
+  return sortFailureModes([...modes.values()].map(withModeReportingFields))
 }
 
 function addOpportunity(
@@ -639,7 +714,12 @@ function deriveOpportunityStatus(
   opportunity: Omit<ToolOpportunity, 'status'>,
   actions: RemediationActionRecord[],
   rejectedActions: RemediationActionRecord[],
-): ToolOpportunityStatus {
+): {
+  status: ToolOpportunityStatus
+  statusReasonCode: ToolOpportunityStatusReasonCode
+  statusReasonDetail: string
+  blockedReason?: string
+} {
   const target = actionTargetForOpportunity(opportunity)
   const candidateId = opportunity.candidateIds[0]
   const candidateGroupId = opportunity.candidateGroupIds[0]
@@ -650,7 +730,13 @@ function deriveOpportunityStatus(
       : candidateGroupId ? action.candidateGroupId === candidateGroupId
       : action.target === target),
   )
-  if (rejected) return 'rejected'
+  if (rejected) {
+    return {
+      status: 'rejected',
+      statusReasonCode: 'rejected_before',
+      statusReasonDetail: `A prior ${opportunity.toolName} attempt for this target was rejected.`,
+    }
+  }
 
   const prior = actions.find(action =>
     action.tool === opportunity.toolName &&
@@ -663,19 +749,59 @@ function deriveOpportunityStatus(
     && opportunity.toolName === 'repair_other_elements_alt_text'
     && opportunity.derivedFromFailureModeKeys.includes('acrobat.other_elements_alt_text')
   ) {
-    return 'auto_runnable'
+    return {
+      status: 'auto_runnable',
+      statusReasonCode: 'retry_exception',
+      statusReasonDetail: 'Acrobat-risk ownership repairs stay runnable while Acrobat debt remains.',
+    }
   }
   if (
     prior?.outcome === 'no_effect'
     && opportunity.toolName === 'finalize_substituted_font_conformance'
     && opportunity.derivedFromFailureModeKeys.some(key => key === 'pdfua.font_widths' || key === 'pdfua.font_embedding')
   ) {
-    return 'auto_runnable'
+    return {
+      status: 'auto_runnable',
+      statusReasonCode: 'retry_exception',
+      statusReasonDetail: 'Font finalization stays runnable after no-effect retries when width or embedding debt remains.',
+    }
   }
-  if (prior?.outcome === 'no_effect') return 'no_effect'
-  if (prior) return 'already_attempted'
-  if (opportunity.blockedReason) return opportunity.scope === 'candidate' || opportunity.scope === 'candidate_group' ? 'blocked' : 'deferred'
-  return 'auto_runnable'
+  if (prior?.outcome === 'no_effect') {
+    return {
+      status: 'no_effect',
+      statusReasonCode: 'no_effect_before',
+      statusReasonDetail: `A prior ${opportunity.toolName} attempt completed with no measurable effect.`,
+    }
+  }
+  if (prior) {
+    return {
+      status: 'already_attempted',
+      statusReasonCode: 'already_attempted',
+      statusReasonDetail: `A prior ${opportunity.toolName} attempt already targeted this scope.`,
+    }
+  }
+  if (opportunity.blockedReason) {
+    const blockedByManualOnlyFailureMode = opportunity.derivedFromFailureModeKeys.some(key =>
+      key.startsWith('context.') || key === 'pdfua.unmatched',
+    )
+    const status = opportunity.scope === 'candidate' || opportunity.scope === 'candidate_group' ? 'blocked' : 'deferred'
+    const statusReasonCode: ToolOpportunityStatusReasonCode = blockedByManualOnlyFailureMode
+      ? 'manual_only_failure_mode'
+      : status === 'blocked'
+        ? 'candidate_blocked'
+        : 'deferred_document_scope'
+    return {
+      status,
+      statusReasonCode,
+      statusReasonDetail: opportunity.blockedReason,
+      blockedReason: opportunity.blockedReason,
+    }
+  }
+  return {
+    status: 'auto_runnable',
+    statusReasonCode: 'safe_to_run',
+    statusReasonDetail: 'The current snapshot supports a safe deterministic run.',
+  }
 }
 
 function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: FailureMode[]): ToolOpportunity[] {
@@ -1114,10 +1240,16 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   return [...opportunities.values()]
-    .map(opportunity => ({
-      ...opportunity,
-      status: deriveOpportunityStatus(opportunity, input.actions, input.rejectedActions),
-    }))
+    .map(opportunity => {
+      const status = deriveOpportunityStatus(opportunity, input.actions, input.rejectedActions)
+      return {
+        ...opportunity,
+        status: status.status,
+        statusReasonCode: status.statusReasonCode,
+        statusReasonDetail: status.statusReasonDetail,
+        blockedReason: status.blockedReason,
+      }
+    })
     .sort((a, b) => a.key.localeCompare(b.key))
 }
 
@@ -1129,9 +1261,15 @@ export function buildPlannerEvidenceSummary(input: {
   iterations?: RemediationIteration[]
 }): PlannerEvidenceSummary {
   const skippedReasonCounts = new Map<string, number>()
+  const statusCounts = new Map<ToolOpportunityStatus, number>()
+  const reasonCodeCounts = new Map<ToolOpportunityStatusReasonCode, number>()
   for (const opportunity of input.toolOpportunities) {
+    statusCounts.set(opportunity.status, (statusCounts.get(opportunity.status) || 0) + 1)
+    if (opportunity.statusReasonCode) {
+      reasonCodeCounts.set(opportunity.statusReasonCode, (reasonCodeCounts.get(opportunity.statusReasonCode) || 0) + 1)
+    }
     if (opportunity.status === 'auto_runnable') continue
-    const reason = opportunity.blockedReason || opportunity.status
+    const reason = opportunity.statusReasonDetail || opportunity.blockedReason || opportunity.status
     skippedReasonCounts.set(reason, (skippedReasonCounts.get(reason) || 0) + 1)
   }
 
@@ -1140,9 +1278,20 @@ export function buildPlannerEvidenceSummary(input: {
   const noEffectKeys = unique(input.actions
     .filter(action => action.outcome === 'no_effect')
     .map(action => actionKey(action.tool, action.candidateGroupId || action.candidateId || action.target)))
+  const attemptedOpportunityKeys = input.toolOpportunities
+    .filter(opportunity => opportunity.status === 'already_attempted')
+    .map(opportunity => opportunity.key)
+  const rejectedOpportunityKeys = input.toolOpportunities
+    .filter(opportunity => opportunity.status === 'rejected')
+    .map(opportunity => opportunity.key)
+  const noEffectOpportunityKeys = input.toolOpportunities
+    .filter(opportunity => opportunity.status === 'no_effect')
+    .map(opportunity => opportunity.key)
 
   return {
     topFailureModeKeys: input.failureModes.slice(0, 5).map(mode => mode.key),
+    topBlockingFailureModeKeys: input.failureModes.filter(mode => mode.blocking).slice(0, 5).map(mode => mode.key),
+    topManualOnlyFailureModeKeys: input.failureModes.filter(mode => mode.classification === 'manual_only').slice(0, 5).map(mode => mode.key),
     topAutoRunnableOpportunityKeys: input.toolOpportunities
       .filter(opportunity => opportunity.status === 'auto_runnable')
       .slice(0, 5)
@@ -1153,6 +1302,15 @@ export function buildPlannerEvidenceSummary(input: {
     attemptedKeys,
     rejectedKeys,
     noEffectKeys,
+    attemptedOpportunityKeys,
+    rejectedOpportunityKeys,
+    noEffectOpportunityKeys,
+    statusCounts: [...statusCounts.entries()]
+      .map(([status, count]) => ({ status, count }))
+      .sort((a, b) => b.count - a.count || a.status.localeCompare(b.status)),
+    reasonCodeCounts: [...reasonCodeCounts.entries()]
+      .map(([reasonCode, count]) => ({ reasonCode, count }))
+      .sort((a, b) => b.count - a.count || a.reasonCode.localeCompare(b.reasonCode)),
   }
 }
 
@@ -1161,12 +1319,14 @@ export function buildFailureProfile(input: BuildFailureProfileInput): FailurePro
   const toolOpportunities = buildToolOpportunities(input, failureModes)
 
   return {
-    version: '1',
+    version: '2',
     generatedAt: nowIso(),
     analysisGrade: input.analysis.grade,
     analysisScore: input.analysis.overallScore,
     veraPdfStatus: input.analysis.verapdf.status,
     veraPdfFailedChecks: input.analysis.verapdf.failedChecks,
+    adobeStatus: input.analysis.adobe?.status,
+    adobeIssueCount: input.analysis.adobe?.issueCount,
     failureModes,
     toolOpportunities,
     summary: {

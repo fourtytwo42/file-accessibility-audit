@@ -1156,4 +1156,89 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.figure_candidates_blocked')).toBe(false)
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.table_candidates_blocked')).toBe(false)
   })
+
+  it('fills adobe summary fields and emits normalized reporting metadata', () => {
+    const analysis = makeAnalysisResult({
+      adobe: {
+        status: 'failed',
+        summary: 'Adobe reported 2 issues.',
+        passed: false,
+        issueCount: 2,
+        findings: [
+          { id: 'a1', rule: 'Figures alternate text', categoryId: 'alt_text', severity: 'error', message: 'Figure missing alt text' },
+          { id: 'a2', rule: 'Tagged annotations', categoryId: 'reading_order', severity: 'warning', message: 'Annotation not tagged' },
+        ],
+        warnings: [],
+      } as any,
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.version).toBe('2')
+    expect(result.failureProfile.adobeStatus).toBe('failed')
+    expect(result.failureProfile.adobeIssueCount).toBe(2)
+    expect(result.failureProfile.failureModes.every(mode => !!mode.reportingCategory && !!mode.sourceDetail && (mode.derivedFrom?.length || 0) > 0)).toBe(true)
+  })
+
+  it('emits stable status reason fields and richer planner evidence counts', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext(),
+      actions: [
+        makeAction({ tool: 'create_heading_from_candidate', target: 'page 1', candidateId: 'heading:1' }),
+        makeAction({ tool: 'set_link_annotation_contents', target: 'page 1', candidateId: 'link:1', outcome: 'no_effect' }),
+      ],
+      rejectedActions: [
+        makeAction({ tool: 'reorder_structure_children', target: 'document', candidateGroupId: 'group:1', outcome: 'rejected', autoApplied: false }),
+      ],
+    })
+
+    const headingOpportunity = result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'create_heading_from_candidate' && opportunity.candidateIds[0] === 'heading:1',
+    )
+    const noEffectOpportunity = result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'set_link_annotation_contents' && opportunity.candidateIds[0] === 'link:1',
+    )
+    const rejectedOpportunity = result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'reorder_structure_children' && opportunity.candidateGroupIds[0] === 'group:1',
+    )
+
+    expect(headingOpportunity?.statusReasonCode).toBe('already_attempted')
+    expect(noEffectOpportunity?.statusReasonCode).toBe('no_effect_before')
+    expect(rejectedOpportunity?.statusReasonCode).toBe('rejected_before')
+    expect(result.plannerEvidence.attemptedOpportunityKeys?.length).toBeGreaterThan(0)
+    expect(result.plannerEvidence.rejectedOpportunityKeys?.length).toBeGreaterThan(0)
+    expect(result.plannerEvidence.noEffectOpportunityKeys?.length).toBeGreaterThan(0)
+    expect(result.plannerEvidence.statusCounts?.some(entry => entry.status === 'auto_runnable')).toBe(true)
+    expect(result.plannerEvidence.reasonCodeCounts?.some(entry => entry.reasonCode === 'safe_to_run')).toBe(true)
+  })
+
+  it('keeps failure modes in reporting order and ensures derived opportunity keys resolve to real modes', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext(),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const modes = result.failureProfile.failureModes
+    for (let index = 1; index < modes.length; index += 1) {
+      const previous = modes[index - 1]!
+      const current = modes[index]!
+      expect(Number(previous.blocking)).toBeGreaterThanOrEqual(Number(current.blocking))
+    }
+
+    const modeKeys = new Set(modes.map(mode => mode.key))
+    expect(result.failureProfile.toolOpportunities.every(opportunity =>
+      opportunity.derivedFromFailureModeKeys.every(key => modeKeys.has(key)),
+    )).toBe(true)
+    expect(result.failureProfile.summary.deterministicIssueCount).toBe(modes.filter(mode => mode.classification === 'deterministic').length)
+    expect(result.failureProfile.summary.semanticIssueCount).toBe(modes.filter(mode => mode.classification === 'semantic').length)
+    expect(result.failureProfile.summary.manualOnlyIssueCount).toBe(modes.filter(mode => mode.classification === 'manual_only').length)
+  })
 })

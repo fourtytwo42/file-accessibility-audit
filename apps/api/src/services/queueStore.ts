@@ -456,13 +456,6 @@ function extractAdobeSummary(candidate: any): AdobeSummary | null {
 function compactFailureModes(failureModes: FailureMode[] | null | undefined, limit: number): QueueFailureModeSummary[] {
   if (!failureModes?.length) return []
   return [...failureModes]
-    .sort((a, b) => {
-      const blockingDiff = Number(b.blocking) - Number(a.blocking)
-      if (blockingDiff !== 0) return blockingDiff
-      const countDiff = b.count - a.count
-      if (countDiff !== 0) return countDiff
-      return a.label.localeCompare(b.label)
-    })
     .slice(0, limit)
     .map(mode => ({
       key: mode.key,
@@ -487,9 +480,14 @@ function scoreCappedByStandards(score: number | null, verapdfStatus: VeraPdfSumm
 
 function plannerOverviewFromModel(documentModel: DocumentModel | null | undefined): QueuePlannerOverview {
   const summary = documentModel?.failureProfile?.summary
+  const statusCounts = new Map(
+    (documentModel?.plannerEvidence?.statusCounts || []).map(entry => [entry.status, entry.count]),
+  )
+  const blockedFromStatusCounts = (statusCounts.get('blocked') ?? 0) + (statusCounts.get('deferred') ?? 0)
+  const autoRunnableFromStatusCounts = statusCounts.get('auto_runnable')
   return {
-    autoRunnableOpportunityCount: summary?.autoRunnableOpportunityCount ?? 0,
-    blockedOpportunityCount: summary?.blockedOpportunityCount ?? 0,
+    autoRunnableOpportunityCount: autoRunnableFromStatusCounts ?? (summary?.autoRunnableOpportunityCount ?? 0),
+    blockedOpportunityCount: blockedFromStatusCounts > 0 ? blockedFromStatusCounts : (summary?.blockedOpportunityCount ?? 0),
     deterministicIssueCount: summary?.deterministicIssueCount ?? 0,
     semanticIssueCount: summary?.semanticIssueCount ?? 0,
     manualOnlyIssueCount: summary?.manualOnlyIssueCount ?? 0,

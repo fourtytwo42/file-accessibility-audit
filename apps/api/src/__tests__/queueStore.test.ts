@@ -120,16 +120,21 @@ describe('queueStore serialization', () => {
       sourceType: 'native-text',
       pathFallbacks: ['fallback'],
       failureProfile: {
-        version: '1',
+        version: '2',
         generatedAt: '2026-03-13T00:00:00.000Z',
         analysisGrade: 'A',
         analysisScore: 97,
         veraPdfStatus: 'passed',
         veraPdfFailedChecks: 0,
+        adobeStatus: 'failed',
+        adobeIssueCount: 4,
         failureModes: [{
           key: 'pdfua.page_tabs',
           label: 'Page tab order metadata',
           source: 'verapdf',
+          reportingCategory: 'reading_order',
+          sourceDetail: 'verapdf_family',
+          derivedFrom: ['verapdf:pdfua.page_tabs'],
           count: 2,
           categoryIds: ['reading_order'],
           blocking: true,
@@ -149,11 +154,18 @@ describe('queueStore serialization', () => {
       },
       plannerEvidence: {
         topFailureModeKeys: ['pdfua.page_tabs'],
+        topBlockingFailureModeKeys: ['pdfua.page_tabs'],
+        topManualOnlyFailureModeKeys: [],
         topAutoRunnableOpportunityKeys: ['set_page_tabs:document'],
         skippedReasonCounts: [{ reason: 'blocked', count: 1 }],
         attemptedKeys: ['normalize_document_metadata:document'],
         rejectedKeys: [],
         noEffectKeys: [],
+        attemptedOpportunityKeys: ['set_page_tabs:document:document'],
+        rejectedOpportunityKeys: [],
+        noEffectOpportunityKeys: [],
+        statusCounts: [{ status: 'auto_runnable', count: 2 }, { status: 'blocked', count: 1 }],
+        reasonCodeCounts: [{ reasonCode: 'safe_to_run', count: 2 }, { reasonCode: 'candidate_blocked', count: 1 }],
       },
       finalAudit: {
         overallScore: 97,
@@ -193,10 +205,11 @@ describe('queueStore serialization', () => {
     const item = serializeQueueItemDetail(makeRow())
 
     expect(item.documentModel?.sourceType).toBe('native-text')
-    expect(item.documentModel?.failureProfile?.version).toBe('1')
+    expect(item.documentModel?.failureProfile?.version).toBe('2')
     expect(item.standardsDetail?.failureModes[0]?.key).toBe('pdfua.page_tabs')
     expect(item.standardsDetail?.plannerEvidence?.topFailureModeKeys).toEqual(['pdfua.page_tabs'])
     expect(item.standardsDetail?.remediationSummary.autoRunnableOpportunityCount).toBe(2)
+    expect(item.standardsDetail?.remediationSummary.blockedOpportunityCount).toBe(1)
     expect(item.standardsDetail?.veraPdf.original.status).toBe('failed')
     expect(item.standardsDetail?.gradeBasis.summaryText).toContain('veraPDF passed')
     expect(item.pathFallbacks).toEqual(['fallback'])
