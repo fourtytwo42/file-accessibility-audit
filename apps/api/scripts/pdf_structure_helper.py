@@ -3576,7 +3576,8 @@ def artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=
         if is_marked is False:
             has_text = group_has_text_showing(group)
             has_graphics = group_has_visible_graphics(group)
-            if has_graphics or (include_text_groups and has_text):
+            should_artifact = has_graphics and (include_text_groups or not has_text)
+            if should_artifact or (include_text_groups and has_text):
                 rewritten.append(pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")))
                 rewritten.extend(group)
                 rewritten.append(pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")))

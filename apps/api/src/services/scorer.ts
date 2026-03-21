@@ -915,7 +915,10 @@ function scoreHeadingStructureWithContent(
   }
 
   const snapshotHeadings = (structure?.headings || []) as StructureHeadingNode[]
-  const emptyHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+  const readableHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length > 0)
+  const emptyHeadings = readableHeadings.length > 0
+    ? snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+    : []
   const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))
   if (emptyHeadings.length > 0) {
     findings.push(`${emptyHeadings.length} heading tag(s) have no readable heading text.`)
