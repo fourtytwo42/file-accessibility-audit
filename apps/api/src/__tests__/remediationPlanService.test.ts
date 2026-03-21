@@ -624,6 +624,129 @@ describe('remediationPlanService', () => {
     expect(plan.actions).toHaveLength(32)
     expect(plan.actions.filter(action => action.tool_name === 'create_heading_from_candidate').length).toBeGreaterThan(0)
   })
+
+  it('selects document-level heading normalization before per-candidate heading creation when an existing heading tree needs repair', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'A',
+        analysisScore: 94,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'category.heading_structure',
+            label: 'Heading Structure',
+            source: 'category',
+            count: 1,
+            categoryIds: ['heading_structure'],
+            blocking: false,
+            unmatched: false,
+            classification: 'semantic',
+            nativeToolFamilies: [],
+            evidence: ['Found 5 heading tags, but hierarchy has gaps'],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'normalize-heading-hierarchy',
+            toolName: 'normalize_heading_hierarchy',
+            reason: 'Normalize existing heading levels.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure'],
+            confidence: 0.92,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.heading_structure'],
+          },
+          {
+            key: 'heading-1',
+            toolName: 'create_heading_from_candidate',
+            reason: 'Create heading 1',
+            scope: 'candidate',
+            candidateIds: ['heading:1:1'],
+            candidateGroupIds: [],
+            pageNumbers: [1],
+            categoryTargets: ['heading_structure'],
+            confidence: 0.7,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.heading_structure'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 0,
+          semanticIssueCount: 1,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'legacy-headings.pdf',
+      analysis: {
+        overallScore: 94,
+        grade: 'A',
+        isScanned: false,
+        pageCount: 25,
+        categories: [
+          { id: 'heading_structure', label: 'Heading', score: 60, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: {
+          lang: 'en',
+          hasStructTree: true,
+          structTreeDepth: 6,
+          formFields: [],
+          headings: [
+            { level: 'H1', tag: '/H1' },
+            { level: 'H4', tag: '/heading 4' },
+            { level: 'H9', tag: '/heading 9' },
+          ],
+        },
+        headingCandidates: [
+          {
+            id: 'heading:1:1',
+            pageNumber: 1,
+            text: 'Heading 1',
+            nearbyContext: [],
+            targetRef: 'obj:500 0 R',
+            existingTag: '/P',
+            repairMode: 'safe',
+          },
+        ],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions[0]?.tool_name).toBe('normalize_heading_hierarchy')
+  })
   it('plans finalize_substituted_font_conformance after embed and unicode repair for persistent legacy font failures', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {

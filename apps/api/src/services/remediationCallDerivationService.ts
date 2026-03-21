@@ -151,6 +151,13 @@ export function deriveDeterministicCall(input: {
       return context.headingCandidates.some(candidate => candidate.text.trim())
         ? { tool_name: 'replace_bookmarks_from_headings', arguments: {}, rationale: opportunity.reason, confidence: opportunity.confidence }
         : null
+    case 'normalize_heading_hierarchy':
+      return {
+        tool_name: 'normalize_heading_hierarchy',
+        arguments: { target: 'document' },
+        rationale: opportunity.reason,
+        confidence: opportunity.confidence,
+      }
     case 'create_heading_from_candidate': {
       const candidateId = opportunity.candidateIds[0]
       if (!candidateId) return null

@@ -109,6 +109,7 @@ export const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['repair_native_reading_order', 5],
   ['artifact_nonsemantic_page_elements', 5],
   ['replace_bookmarks_from_headings', 6],
+  ['normalize_heading_hierarchy', 6],
   ['create_heading_from_candidate', 6],
   ['create_heading_tag', 6],
   ['set_table_header_cells', 6],
@@ -150,6 +151,7 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['repair_native_reading_order', 2],
   ['artifact_nonsemantic_page_elements', 3],
   ['replace_bookmarks_from_headings', 0],
+  ['normalize_heading_hierarchy', 0],
   ['create_heading_from_candidate', 1],
   ['create_heading_tag', 2],
   ['set_table_header_cells', 3],
@@ -520,6 +522,13 @@ async function deterministicActions(input: {
     includeOpportunity: (opportunity: ToolOpportunity) => boolean
     maxSelections?: number
   }> = [
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        headingStructureUnresolved
+        && opportunity.toolName === 'normalize_heading_hierarchy'
+        && opportunity.scope === 'document',
+      maxSelections: 1,
+    },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         headingStructureUnresolved
