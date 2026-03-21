@@ -26,10 +26,13 @@ function cleanContextLine(text: string | null | undefined): string | null {
   if (normalized.length < 3) return null
   if (/^(figure|chart|table|image|photo|graphic|illustration)(\s+\d+)?$/i.test(normalized)) return null
   if (!/[A-Za-z]/.test(normalized)) return null
+  if (/^(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{4}$/i.test(normalized)) return null
 
   const words = normalized.split(/\s+/).filter(Boolean)
   const singleCharacterWords = words.filter(word => /^[A-Za-z]$/.test(word))
   if (words.length >= 5 && singleCharacterWords.length / words.length > 0.45) return null
+  const isolatedGlyphWords = words.filter(word => word.replace(/[.,;:!?'"()\-_/\\]/g, '').length <= 1)
+  if (words.length >= 6 && isolatedGlyphWords.length / words.length >= 0.65) return null
 
   return trimToWholeWords(normalized, 14, 100)
 }
