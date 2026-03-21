@@ -604,7 +604,10 @@ export function scoreDocument(
     computedScore = Math.min(computedScore, 52)
   }
 
-  const hasIncompleteScoredCategory = applicable.some(category => (category.score ?? 100) < 100)
+  const hasIncompleteScoredCategory = applicable.some(category => (
+    (category.score ?? 100) < 100
+      && category.grade !== 'A'
+  ))
   const scoreGateApplied = (!standardsClean && computedScore === 100)
     || (computedScore === 100 && hasIncompleteScoredCategory)
   const overallScore = scoreGateApplied ? 99 : computedScore
@@ -1669,7 +1672,8 @@ function generateSummary(
   const passing = categories.filter(c => c.severity === 'Pass')
   const applicable = categories.filter(c => c.score !== null)
 
-  if (localStandards.status === 'issues_detected') {
+  const hasBlockingLocalFindings = localStandards.findings.some(finding => finding.blocking)
+  if (localStandards.status === 'issues_detected' && (hasBlockingLocalFindings || context.gradeGateApplied || context.scoreGateApplied)) {
     const gateText = context.gradeGateApplied || context.scoreGateApplied
       ? ' Local standards findings keep the document below a fully confirmed pass.'
       : ''

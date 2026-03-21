@@ -1661,6 +1661,61 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.grade).toBe('A')
     expect(result.warnings.some(w => w.includes('veraPDF'))).toBe(true)
   })
+
+  it('does not cap a clean pass when only A-grade categories remain below 100', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      {
+        ...pdfjs,
+        links: [
+          { url: 'https://example.com/1', text: 'Section 1' },
+          { url: 'https://example.com/2', text: 'Section 2' },
+          { url: 'https://example.com/3', text: 'Section 3' },
+          { url: 'https://example.com/4', text: 'Section 4' },
+          { url: 'https://example.com/5', text: 'Section 5' },
+          { url: 'https://example.com/6', text: 'Section 6' },
+          { url: 'https://example.com/7', text: 'Section 7' },
+          { url: 'https://example.com/8', text: 'Section 8' },
+          { url: 'https://example.com/9', text: 'Section 9' },
+          { url: 'https://example.com/raw', text: 'https://example.com/raw' },
+        ],
+      },
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.cidset_consistency',
+            label: 'CIDSet consistency',
+            severity: 'error',
+            blocking: false,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Embedded CID font descriptors expose explicit CIDSet entries.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 5,
+          },
+        ],
+        knownGapKeys: ['pdfua.metadata_identification_content_unconfirmed'],
+      }),
+    )
+
+    expect(findCategory(result, 'link_quality').score).toBe(90)
+    expect(findCategory(result, 'link_quality').grade).toBe('A')
+    expect(findCategory(result, 'pdf_ua_compliance').score).toBe(100)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+    expect(result.executiveSummary).toContain('ready for publication')
+    expect(result.executiveSummary).not.toContain('fully confirmed pass')
+  })
 })
 
 describe('summarizeLinkTextQuality', () => {
