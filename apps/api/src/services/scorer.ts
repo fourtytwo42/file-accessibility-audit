@@ -1372,7 +1372,8 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     const displaySized = failure.fontSizePt >= 14 && failure.contrastRatio >= 3.0
     const shortFragment = failure.textPreview.trim().length <= 5 && failure.contrastRatio >= 3.0
     const spacedDisplayText = isAdvisoryDisplayText(failure.textPreview) && failure.contrastRatio >= 3.0
-    return nearThreshold || displaySized || shortFragment || spacedDisplayText
+    const microDisplayLabel = failure.fontSizePt > 0 && failure.fontSizePt <= 2.5
+    return nearThreshold || displaySized || shortFragment || spacedDisplayText || microDisplayLabel
   })
   const materialFailures = effectiveFailures.filter(failure => !advisoryDisplayFailures.includes(failure))
   const residualMediumFailures = materialFailures.filter(failure => failure.contrastRatio >= 3.0)
