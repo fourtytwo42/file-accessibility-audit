@@ -1848,6 +1848,15 @@ describe('scoreDocument — veraPDF integration', () => {
               bgColor: '#ffffff',
               fontSizePt: 12,
             },
+            {
+              page: 1,
+              textPreview: '-',
+              contrastRatio: 3.21,
+              threshold: 4.5,
+              fgColor: '#918f90',
+              bgColor: '#ffffff',
+              fontSizePt: 16,
+            },
           ],
           warnings: [],
         },
@@ -1857,6 +1866,7 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(findCategory(result, 'color_contrast').score).toBe(95)
     expect(findCategory(result, 'color_contrast').grade).toBe('A')
     expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('residual medium-contrast miss'))).toBe(true)
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('punctuation-only sample'))).toBe(true)
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })

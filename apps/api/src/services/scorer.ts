@@ -1238,16 +1238,21 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
   const ignorableInvisibleFailures = contrast.failures.filter(failure =>
     failure.contrastRatio <= 1.05 && failure.fgColor.toLowerCase() === failure.bgColor.toLowerCase()
   )
+  const ignorablePunctuationFailures = contrast.failures.filter(failure =>
+    /^[^a-z0-9]{1,3}$/i.test(failure.textPreview.trim()) && failure.contrastRatio >= 3.0
+  )
   const effectiveFailures = contrast.failures.filter(failure =>
     !(failure.contrastRatio <= 1.05 && failure.fgColor.toLowerCase() === failure.bgColor.toLowerCase())
+    && !(/^[^a-z0-9]{1,3}$/i.test(failure.textPreview.trim()) && failure.contrastRatio >= 3.0)
   )
   const effectiveFailingCount = effectiveFailures.length
   const effectiveFailRatio = contrast.totalSamples > 0 ? effectiveFailingCount / contrast.totalSamples : 0
   const advisoryDisplayFailures = effectiveFailures.filter(failure => {
     const ratioDelta = failure.threshold - failure.contrastRatio
-    const nearThreshold = ratioDelta <= 0.1
+    const nearThreshold = ratioDelta <= 0.3
     const displaySized = failure.fontSizePt >= 14 && failure.contrastRatio >= 3.0
-    return nearThreshold || displaySized
+    const shortFragment = failure.textPreview.trim().length <= 5 && failure.contrastRatio >= 3.0
+    return nearThreshold || displaySized || shortFragment
   })
   const materialFailures = effectiveFailures.filter(failure => !advisoryDisplayFailures.includes(failure))
   const residualMediumFailures = materialFailures.filter(failure => failure.contrastRatio >= 3.0)
@@ -1295,6 +1300,9 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
 
   if (ignorableInvisibleFailures.length > 0) {
     findings.push(`Ignored ${ignorableInvisibleFailures.length} white-on-white sample(s) that appear to be invisible or hidden text rather than visible page content.`)
+  }
+  if (ignorablePunctuationFailures.length > 0) {
+    findings.push(`Ignored ${ignorablePunctuationFailures.length} punctuation-only sample(s) that appear to be decorative glyphs or separator marks rather than readable text.`)
   }
 
   if (effectiveFailingCount > 0) {
