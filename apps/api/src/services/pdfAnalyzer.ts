@@ -122,8 +122,9 @@ function logAnalysisTimings(input: {
 function structureInspectModeForAnalysis(input: {
   analysisProfile: AnalysisProfile
   forceStructureForScoring?: boolean
+  preferDeepStructureInspect?: boolean
 }): 'light' | 'alt_text_deep' {
-  if (input.analysisProfile === 'remediation_fast') return 'light'
+  if (input.analysisProfile === 'remediation_fast') return input.preferDeepStructureInspect ? 'alt_text_deep' : 'light'
   if (input.forceStructureForScoring) return 'light'
   return 'alt_text_deep'
 }
@@ -140,6 +141,7 @@ export async function analyzePDF(
     inheritedVeraPdf?: VeraPdfResult
     analysisProfile?: AnalysisProfile
     forceStructureForScoring?: boolean
+    preferDeepStructureInspect?: boolean
   },
 ): Promise<AnalysisResult> {
   await acquireSemaphore()
@@ -190,6 +192,7 @@ export async function analyzePDF(
           const inspectMode = structureInspectModeForAnalysis({
             analysisProfile,
             forceStructureForScoring: options?.forceStructureForScoring,
+            preferDeepStructureInspect: options?.preferDeepStructureInspect,
           })
           const initial = await runPdfStructureBackend({
             buffer,

@@ -4559,6 +4559,111 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     )).toBe(true)
   })
 
+  it('uses deep structure inspection for repair_structure_conformance follow-up scoring', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: 'Adobe InDesign',
+      producer: 'Adobe PDF Library',
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 2,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'native-structure.pdf',
+      pageCount: 2,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 3, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 72,
+      grade: 'C',
+      isScanned: false,
+      executiveSummary: 'Logical structure issues remain.',
+      verapdf: {
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        profile: null,
+        flavour: 'ua1',
+        isCompliant: null,
+        passedChecks: 0,
+        failedChecks: 0,
+        failures: [],
+        message: 'veraPDF unavailable',
+      },
+      localStandards: { status: 'issues_detected', findings: [], knownGapKeys: [] },
+      categories: [
+        { id: 'text_extractability', label: 'Text Extractability', weight: 0.2, score: 40, grade: 'F', severity: 'Moderate', findings: [] },
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [] },
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.15, score: 100, grade: 'A', severity: 'Pass', findings: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.1, score: 40, grade: 'F', severity: 'Moderate', findings: [] },
+        { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.1, score: 20, grade: 'F', severity: 'Moderate', findings: [] },
+      ] as any,
+      standardsSummary: { gradeBasis: { currentGrade: 'C', currentScore: 72, gradeReducedByStandards: false, scoreCappedByStandards: false }, veraPdf: { status: 'unavailable', failedChecks: 0 }, failureOverview: { topFailureModes: [] }, plannerOverview: { autoRunnableOpportunityCount: 1, blockedOpportunityCount: 0, deterministicIssueCount: 1, semanticIssueCount: 0, manualOnlyIssueCount: 0 } },
+      confidenceSummary: { overall: 0.8, textRecovery: 0.8, structureRecovery: 0.8, tableRecovery: 1, visualFidelity: 1 },
+    } as any
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Native structure', lang: 'en', links: [], textLength: 1000, imageCount: 2 },
+      qpdf: { lang: 'en', images: [], headings: [], tables: [], hasStructTree: true, hasBookmarks: false, bookmarkTitles: [] },
+      pages: [],
+      headingCandidates: [],
+      figureCandidates: [],
+      tableCandidates: [],
+      linkCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { acrobatAltRiskNodes: [] },
+    } as any)
+
+    planRemediationActions.mockResolvedValueOnce({
+      actions: [
+        { tool_name: 'repair_structure_conformance', arguments: { target: 'document' }, rationale: 'repair structure', confidence: 0.95 },
+      ],
+    } as any).mockResolvedValueOnce({ actions: [] } as any)
+
+    executeRemediationTool.mockResolvedValueOnce({
+      buffer: Buffer.from('repaired-structure'),
+      action: {
+        tool: 'repair_structure_conformance',
+        target: 'document',
+        details: 'repaired structure',
+        confidence: 0.95,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['text_extractability', 'heading_structure', 'alt_text', 'link_quality', 'reading_order'],
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    analyzePDF.mockImplementation(async (_buffer: Buffer, _filename: string, options?: any) => {
+      if (options?.analysisProfile === 'remediation_fast') {
+        return {
+          ...originalResult,
+          overallScore: options?.preferDeepStructureInspect ? 87 : 72,
+          grade: options?.preferDeepStructureInspect ? 'B' : 'C',
+          categories: originalResult.categories.map((category: any) => {
+            if (category.id === 'text_extractability') return { ...category, score: options?.preferDeepStructureInspect ? 100 : 40, grade: options?.preferDeepStructureInspect ? 'A' : 'F', severity: 'Pass' }
+            if (category.id === 'pdf_ua_compliance') return { ...category, score: options?.preferDeepStructureInspect ? 85 : 20, grade: options?.preferDeepStructureInspect ? 'B' : 'F', severity: 'Moderate' }
+            return category
+          }),
+        }
+      }
+      return { ...originalResult, overallScore: 87, grade: 'B' }
+    })
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'native-structure.pdf', originalResult)
+
+    expect(analyzePDF.mock.calls.some(([, , options]) =>
+      options?.analysisProfile === 'remediation_fast'
+      && options?.preferDeepStructureInspect === true,
+    )).toBe(true)
+  })
+
   it('uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

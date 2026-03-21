@@ -73,6 +73,7 @@ async function analyzeIntermediatePdf(
   options?: {
     signal?: AbortSignal
     forceStructureForScoring?: boolean
+    preferDeepStructureInspect?: boolean
   },
 ): Promise<AnalysisResult> {
   return analyzePDF(buffer, filename, {
@@ -81,6 +82,7 @@ async function analyzeIntermediatePdf(
     skipAdobe: true,
     inheritedVeraPdf: baselineResult.verapdf,
     forceStructureForScoring: options?.forceStructureForScoring,
+    preferDeepStructureInspect: options?.preferDeepStructureInspect,
   })
 }
 
@@ -123,6 +125,7 @@ const DEEP_DIRTY_TOOLS = new Set<string>([
 ])
 
 const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
+  'repair_structure_conformance',
   'bootstrap_struct_tree',
   'set_figure_alt_text',
   'retag_as_figure_and_set_alt',
@@ -324,6 +327,12 @@ function batchActionDetails(
 function requiresDeepStructureScoring(actions: Array<Pick<RemediationActionRecord, 'tool' | 'categoryTargets'>>): boolean {
   return actions.some(action =>
     DEEP_STRUCTURE_SCORING_TOOLS.has(action.tool),
+  )
+}
+
+function requiresDeepStructureInspect(actions: Array<Pick<RemediationActionRecord, 'tool'>>): boolean {
+  return actions.some(action =>
+    action.tool === 'repair_structure_conformance',
   )
 }
 
@@ -1922,12 +1931,14 @@ export async function remediatePdfWithAgent(
     baselineResult: AnalysisResult,
     analysisOptions?: {
       forceStructureForScoring?: boolean
+      preferDeepStructureInspect?: boolean
     },
   ): Promise<AnalysisResult> => {
     remediationTimings.intermediateAnalyses += 1
     return analyzeIntermediatePdf(buffer, filename, baselineResult, {
       signal: options?.signal,
       forceStructureForScoring: analysisOptions?.forceStructureForScoring,
+      preferDeepStructureInspect: analysisOptions?.preferDeepStructureInspect,
     })
   }
 
@@ -2515,6 +2526,7 @@ export async function remediatePdfWithAgent(
 
       const analyzedAttempt = await analyzeIntermediate(attemptBuffer, checkpointResult, {
         forceStructureForScoring: requiresDeepStructureScoring(attemptEntries.map(entry => entry.action)),
+        preferDeepStructureInspect: requiresDeepStructureInspect(attemptEntries.map(entry => entry.action)),
       })
       const attemptRegressionReason = nativeStageRegressionReason(
         checkpointResult,
@@ -2561,6 +2573,7 @@ export async function remediatePdfWithAgent(
           ? analyzedAttempt
           : await analyzeIntermediate(entry.afterBuffer, checkpointResult, {
               forceStructureForScoring: requiresDeepStructureScoring([entry.action]),
+              preferDeepStructureInspect: requiresDeepStructureInspect([entry.action]),
             })
         const entryRegressionReason = nativeStageRegressionReason(
           priorResultForEntry,
@@ -2731,6 +2744,7 @@ export async function remediatePdfWithAgent(
       if (!nativeTaggedSafeMode && stageChangedDocument) {
         const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
           forceStructureForScoring: requiresDeepStructureScoring(stageActions),
+          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions),
         })
         const isAcrobatAltRepair = stageActions.some(
           action => action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
@@ -2970,6 +2984,7 @@ export async function remediatePdfWithAgent(
     if (!nativeTaggedSafeMode && stageChangedDocument) {
       const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
         forceStructureForScoring: requiresDeepStructureScoring(stageActions),
+        preferDeepStructureInspect: requiresDeepStructureInspect(stageActions),
       })
       // repair_other_elements_alt_text fixes Adobe Acrobat issues not reflected in our score model
       const isAcrobatAltRepair = stageActions.some(
@@ -3175,6 +3190,7 @@ export async function remediatePdfWithAgent(
       if (!nativeTaggedSafeMode && stageChangedDocument) {
         const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
           forceStructureForScoring: requiresDeepStructureScoring(stageActions),
+          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions),
         })
         const isAcrobatAltRepair = stageActions.some(a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied')
         const acceptanceDecision = evaluateStageAcceptance(stageStartResult, analyzedStage, stageActions)
