@@ -299,6 +299,16 @@ function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamily
     }
   }
 
+  if (finding.key === 'pdfua.table_regularity') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['repair_native_table_headers', 'set_table_header_cells'],
+      categoryIds: ['table_markup', 'pdf_ua_compliance'],
+      classification: 'deterministic',
+    }
+  }
+
   return {
     key: finding.key,
     label: finding.label,

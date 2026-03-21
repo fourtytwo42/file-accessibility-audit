@@ -152,6 +152,44 @@ describe('analyzeWithQpdf', () => {
     expect(result.legacyWidthRiskFontCount).toBe(1)
   })
 
+  it('counts table row spans from structure attributes when checking regularity', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/StructTreeRoot': 'obj:2 0 R',
+            '/MarkInfo': { '/Marked': true },
+          },
+        },
+        'obj:2 0 R': { value: { '/Type': '/StructTreeRoot', '/K': ['obj:10 0 R'] } },
+        'obj:10 0 R': { value: { '/S': '/Table', '/K': ['obj:11 0 R', 'obj:12 0 R'] } },
+        'obj:11 0 R': { value: { '/S': '/TR', '/K': ['obj:20 0 R', 'obj:21 0 R', 'obj:22 0 R', 'obj:23 0 R', 'obj:24 0 R', 'obj:25 0 R'] } },
+        'obj:12 0 R': { value: { '/S': '/TR', '/K': ['obj:30 0 R', 'obj:31 0 R', 'obj:32 0 R', 'obj:33 0 R', 'obj:34 0 R', 'obj:35 0 R', 'obj:36 0 R', 'obj:37 0 R', 'obj:38 0 R', 'obj:39 0 R'] } },
+        'obj:20 0 R': { value: { '/S': '/TH', '/A': { '/RowSpan': 2 } } },
+        'obj:21 0 R': { value: { '/S': '/TH', '/A': { '/ColSpan': 2 } } },
+        'obj:22 0 R': { value: { '/S': '/TH', '/A': { '/ColSpan': 2 } } },
+        'obj:23 0 R': { value: { '/S': '/TH', '/A': { '/ColSpan': 2 } } },
+        'obj:24 0 R': { value: { '/S': '/TH', '/A': { '/ColSpan': 2 } } },
+        'obj:25 0 R': { value: { '/S': '/TH', '/A': { '/ColSpan': 2 } } },
+        'obj:30 0 R': { value: { '/S': '/TD' } },
+        'obj:31 0 R': { value: { '/S': '/TD' } },
+        'obj:32 0 R': { value: { '/S': '/TD' } },
+        'obj:33 0 R': { value: { '/S': '/TD' } },
+        'obj:34 0 R': { value: { '/S': '/TD' } },
+        'obj:35 0 R': { value: { '/S': '/TD' } },
+        'obj:36 0 R': { value: { '/S': '/TD' } },
+        'obj:37 0 R': { value: { '/S': '/TD' } },
+        'obj:38 0 R': { value: { '/S': '/TD' } },
+        'obj:39 0 R': { value: { '/S': '/TD' } },
+      },
+    })
+
+    expect(result.tables).toEqual([
+      { hasHeaders: true, rowCellCounts: [11, 11], dominantColumnCount: 11, isRegular: true },
+    ])
+  })
+
   it('tracks unembedded Type3 fonts separately so display-font debt can escalate', () => {
     const result = parseQpdfJson({
       objects: {

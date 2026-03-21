@@ -6831,15 +6831,25 @@ def mutate_set_table_header_cells(pdf, mutation):
             if row_nodes:
                 def cell_span(cell):
                     try:
+                        attrs = cell.get("/A")
+                        if isinstance(attrs, pikepdf.Dictionary):
+                            return max(1, int(attrs.get("/ColSpan", cell.get("/ColSpan", 1)) or 1))
                         return max(1, int(cell.get("/ColSpan", 1) or 1))
                     except Exception:
                         return 1
+                def ensure_attrs(cell):
+                    attrs = cell.get("/A")
+                    if isinstance(attrs, pikepdf.Dictionary):
+                        return attrs
+                    attrs = pikepdf.Dictionary()
+                    cell["/A"] = attrs
+                    return attrs
                 row_column_counts = []
                 row_cells = []
                 for row in row_nodes:
                     cells = [cell for cell in get_child_dicts(row) if str(cell.get("/S")) in {"/TD", "/TH"}]
                     row_cells.append(cells)
-                row_column_counts.append(sum(cell_span(cell) for cell in cells))
+                    row_column_counts.append(sum(cell_span(cell) for cell in cells))
                 max_columns = max(row_column_counts) if row_column_counts else 0
                 if max_columns > 1:
                     for row_index, cells in enumerate(row_cells):
@@ -6847,7 +6857,8 @@ def mutate_set_table_header_cells(pdf, mutation):
                         if (
                             current_width < max_columns
                             and len(cells) >= 2
-                            and all(str(cell.get("/S")) == "/TH" for cell in cells)
+                            and str(cells[0].get("/S")) == "/TH"
+                            and all(str(cell.get("/S")) in {"/TH", "/TD"} for cell in cells[1:])
                             and all(cell_span(cell) == 1 for cell in cells)
                         ):
                             inferred_spans = None
@@ -6873,9 +6884,10 @@ def mutate_set_table_header_cells(pdf, mutation):
                                     if current_span == inferred_span:
                                         if inferred_row_span <= 1:
                                             continue
-                                    cell["/ColSpan"] = pikepdf.Integer(inferred_span)
+                                    attrs = ensure_attrs(cell)
+                                    attrs["/ColSpan"] = pikepdf.Integer(inferred_span)
                                     if inferred_row_span > 1:
-                                        cell["/RowSpan"] = pikepdf.Integer(inferred_row_span)
+                                        attrs["/RowSpan"] = pikepdf.Integer(inferred_row_span)
                                     applied.append({
                                         "ref": ref_string(cell),
                                         "before": str(current_span),
@@ -6896,7 +6908,7 @@ def mutate_set_table_header_cells(pdf, mutation):
                         current_span = cell_span(title_cell)
                         if current_span == max_columns:
                             continue
-                        title_cell["/ColSpan"] = pikepdf.Integer(max_columns)
+                        ensure_attrs(title_cell)["/ColSpan"] = pikepdf.Integer(max_columns)
                         applied.append({
                             "ref": ref_string(title_cell),
                             "before": str(current_span),

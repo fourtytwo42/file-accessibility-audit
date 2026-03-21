@@ -846,9 +846,11 @@ function analyzeTableRegularity(
     try {
       const attrs = cell?.['/A']
       if (attrs && typeof attrs === 'object') {
-        const span = Number(attrs['/ColSpan'] ?? 1)
+        const span = Number(attrs['/ColSpan'] ?? cell?.['/ColSpan'] ?? 1)
         return Number.isFinite(span) && span > 0 ? Math.max(1, Math.trunc(span)) : 1
       }
+      const span = Number(cell?.['/ColSpan'] ?? 1)
+      return Number.isFinite(span) && span > 0 ? Math.max(1, Math.trunc(span)) : 1
     } catch {}
     return 1
   }
@@ -857,9 +859,11 @@ function analyzeTableRegularity(
     try {
       const attrs = cell?.['/A']
       if (attrs && typeof attrs === 'object') {
-        const span = Number(attrs['/RowSpan'] ?? 1)
+        const span = Number(attrs['/RowSpan'] ?? cell?.['/RowSpan'] ?? 1)
         return Number.isFinite(span) && span > 0 ? Math.max(1, Math.trunc(span)) : 1
       }
+      const span = Number(cell?.['/RowSpan'] ?? 1)
+      return Number.isFinite(span) && span > 0 ? Math.max(1, Math.trunc(span)) : 1
     } catch {}
     return 1
   }
@@ -895,6 +899,7 @@ function analyzeTableRegularity(
   const activeRowSpans: number[] = []
   for (const row of rows) {
     while (activeRowSpans.length && activeRowSpans[activeRowSpans.length - 1] <= 0) activeRowSpans.pop()
+    const priorSpanCount = activeRowSpans.length
     let occupiedColumns = activeRowSpans.reduce((sum, span) => sum + (span > 0 ? 1 : 0), 0)
     const cells = listRowCells(row)
     for (const cell of cells) {
@@ -908,7 +913,7 @@ function analyzeTableRegularity(
       }
     }
     rowCellCounts.push(occupiedColumns)
-    for (let index = 0; index < activeRowSpans.length; index += 1) {
+    for (let index = 0; index < priorSpanCount; index += 1) {
       if (activeRowSpans[index] > 0) activeRowSpans[index] -= 1
     }
   }

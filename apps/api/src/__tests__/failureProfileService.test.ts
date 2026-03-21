@@ -371,6 +371,58 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'replace_bookmarks_from_headings')).toBe(true)
   })
 
+  it('maps table regularity findings into native table repair opportunities', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.table_regularity',
+            label: 'Table regularity',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['table_markup', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Table 1 exposes irregular row column counts (6, 11, 11).'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+      categories: [
+        ...baseAnalysis.categories.filter(category => category.id !== 'table_markup'),
+        { id: 'table_markup', label: 'Table Markup', weight: 0.09, score: 40, grade: 'F', severity: 'Moderate', findings: ['Tagged tables still have irregular row/column structure'], explanation: '', helpLinks: [] },
+      ] as any,
+    })
+
+    const context = makeContext({ analysis })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode =>
+      mode.key === 'pdfua.table_regularity'
+      && mode.source === 'local_standards'
+      && mode.nativeToolFamilies.includes('repair_native_table_headers')
+      && mode.nativeToolFamilies.includes('set_table_header_cells'),
+    )).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_table_headers')).toBe(true)
+  })
+
   it('maps local page-tabs, link-tagging, and annotation-contents findings into planner opportunities', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({
