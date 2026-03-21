@@ -173,6 +173,7 @@ function missingLogicalStructureFinding(
     && qpdf.images.length > 0
     && figureCount === 0
     && imageStructNodeCount === 0
+    && substantiveAltRiskCount > 0
   const artifactMixingProxy = qpdf.hasStructTree
     && substantiveAltRiskCount >= 5
     && (qpdf.images.length > 0 || figureCount > 0)
@@ -722,8 +723,8 @@ function altTextQualityFinding(
   return {
     key: 'pdfua.figure_alt_quality',
     label: 'Figure alternate text quality',
-    severity: 'error',
-    blocking: true,
+    severity: 'warning',
+    blocking: false,
     categoryIds: ['alt_text', 'pdf_ua_compliance'],
     confidence: 0.82,
     evidence: [...lowQualityRefs].slice(0, 5).map(ref => `Figure ${ref} uses low-quality alternate text that is generic, fragmentary, citation-like, unreadable, boilerplate, or overly long.`),

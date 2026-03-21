@@ -954,7 +954,7 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').score).toBe(67)
   })
 
-  it('generic alt text lowers alt_text even when alt is present', () => {
+  it('generic alt text stays advisory when all detected images already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
         { ref: '10 0 R', hasAlt: true, altText: 'image' },
@@ -963,11 +963,11 @@ describe('scoreAltText edge cases', () => {
     })
     const result = scoreDocument(qpdf, makePdfjs())
     const category = findCategory(result, 'alt_text')
-    expect(category.score).toBe(50)
+    expect(category.score).toBe(100)
     expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
   })
 
-  it('boilerplate or overlong alt text lowers alt_text quality scoring', () => {
+  it('boilerplate or overlong alt text stays advisory when all detected images already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
         { ref: '10 0 R', hasAlt: true, altText: 'Image of the county seal on the cover page' },
@@ -976,11 +976,11 @@ describe('scoreAltText edge cases', () => {
     })
     const result = scoreDocument(qpdf, makePdfjs())
     const category = findCategory(result, 'alt_text')
-    expect(category.score).toBe(0)
+    expect(category.score).toBe(100)
     expect(category.findings.some(finding => finding.includes('boilerplate'))).toBe(true)
   })
 
-  it('unreadable glyph-soup alt text lowers alt_text quality scoring', () => {
+  it('unreadable glyph-soup alt text stays advisory when all detected images already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
         { ref: '10 0 R', hasAlt: true, altText: 'Ŗ œ œ h Ǝ Ǥ ™ † Ä Ü T â Ù e' },
@@ -989,11 +989,11 @@ describe('scoreAltText edge cases', () => {
     })
     const result = scoreDocument(qpdf, makePdfjs())
     const category = findCategory(result, 'alt_text')
-    expect(category.score).toBe(50)
+    expect(category.score).toBe(100)
     expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
   })
 
-  it('body-prose fragment alt text lowers alt_text quality scoring', () => {
+  it('body-prose fragment alt text stays advisory when all detected images already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
         { ref: '10 0 R', hasAlt: true, altText: 'emotional than men. 17 In addition, police culture may lead to skepticism, cynicism, and' },
@@ -1002,11 +1002,11 @@ describe('scoreAltText edge cases', () => {
     })
     const result = scoreDocument(qpdf, makePdfjs())
     const category = findCategory(result, 'alt_text')
-    expect(category.score).toBe(50)
+    expect(category.score).toBe(100)
     expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
   })
 
-  it('bibliography-like alt text lowers alt_text quality scoring', () => {
+  it('bibliography-like alt text stays advisory when all detected images already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
         { ref: '10 0 R', hasAlt: true, altText: 'Management , 36 (1), 91-118' },
@@ -1015,7 +1015,7 @@ describe('scoreAltText edge cases', () => {
     })
     const result = scoreDocument(qpdf, makePdfjs())
     const category = findCategory(result, 'alt_text')
-    expect(category.score).toBe(50)
+    expect(category.score).toBe(100)
     expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
   })
 

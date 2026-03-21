@@ -413,6 +413,35 @@ describe('buildLocalStandardsReport', () => {
     expect(finding).toBeUndefined()
   })
 
+  it('does not emit inferred logical-structure findings solely because tagged files contain images without recovered image nodes', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        images: [{ ref: 'obj:2 0 R', hasAlt: true }, { ref: 'obj:3 0 R', hasAlt: true }],
+        contentOrder: [0, 1, 2],
+        structTreeDepth: 3,
+      }),
+      makePdfjs({ textLength: 3000, hasText: true }),
+      {
+        structure: makeStructure({
+          structuralNodes: [
+            { ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 },
+            { ref: 'obj:4 0 R', tag: '/Sect', orderIndex: 1 },
+            { ref: 'obj:5 0 R', tag: '/P', orderIndex: 2 },
+          ] as any,
+          figures: [],
+          imageStructNodes: [],
+          acrobatAltRiskNodes: [],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeUndefined()
+  })
+
   it('emits inferred logical-structure findings for artifact-mixing risk in tagged image-heavy files', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({
@@ -595,6 +624,7 @@ describe('buildLocalStandardsReport', () => {
     const finding = report.findings.find(entry => entry.key === 'pdfua.figure_alt_quality')
     expect(finding).toBeDefined()
     expect(finding?.categoryIds).toContain('alt_text')
+    expect(finding?.blocking).toBe(false)
   })
 
   it('emits figure alt-quality findings for boilerplate alternate text', () => {

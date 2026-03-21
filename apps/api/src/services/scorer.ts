@@ -1098,7 +1098,11 @@ function scoreAltText(
     }
   }
 
-  const score = withDescriptiveAlt === 0 ? 0 : Math.round((withDescriptiveAlt / figures.length) * 100)
+  const score = withAlt === figures.length
+    ? 100
+    : withDescriptiveAlt === 0
+      ? 0
+      : Math.round((withDescriptiveAlt / figures.length) * 100)
   const findings: string[] = []
 
   if (withDescriptiveAlt === figures.length) {
@@ -1106,6 +1110,9 @@ function scoreAltText(
     for (const fig of figures) {
       if (fig.altText) findings.push(`Image alt text: "${fig.altText}"`)
     }
+  } else if (withAlt === figures.length) {
+    findings.push(`All ${figures.length} image(s) have alternative text`)
+    findings.push(`${lowQualityAltCount} image(s) use low-quality alternate text that should be improved, but no detected image is missing alternate text.`)
   } else {
     findings.push(`${withAlt} of ${figures.length} image(s) have alternative text`)
     const missing = figures.filter(f => !f.hasAlt).length
