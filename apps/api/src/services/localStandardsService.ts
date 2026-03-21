@@ -630,7 +630,7 @@ function linkTextQualityFinding(pdfjs: PdfjsResult): LocalStandardsFinding | nul
 
 function headingContentFinding(
   qpdf: QpdfResult,
-  structure?: Pick<StructureBackendMutationResult, 'headings'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'headings' | 'structuralNodes'> | null,
 ): LocalStandardsFinding | null {
   const evidence: string[] = []
   let count = 0
@@ -647,6 +647,11 @@ function headingContentFinding(
     EXPLICIT_HEADING_TAG_RE.test(String(heading.tag || ''))
     || LEGACY_HEADING_TAG_RE.test(String(heading.tag || '')),
   )
+  const headingContainerRefs = new Set(
+    (structure?.structuralNodes || [])
+      .map(node => node.parentRef || null)
+      .filter((ref): ref is string => !!ref),
+  )
   const readableHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length > 0)
   const hasReliableHeadingTextCoverage = readableHeadings.length >= 2
     || (snapshotHeadings.length > 0 && (readableHeadings.length / snapshotHeadings.length) >= 0.5)
@@ -655,7 +660,10 @@ function headingContentFinding(
   // from a text-recovery blind spot. Only trust empty-heading detection once the same
   // document produced a reliable baseline of readable heading text.
   const emptyHeadings = hasReliableHeadingTextCoverage
-    ? snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+    ? snapshotHeadings.filter(heading =>
+      normalizeSemanticText(heading.text).length === 0
+      && !headingContainerRefs.has(heading.ref)
+    )
     : []
   const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))
   if (emptyHeadings.length > 0) {
