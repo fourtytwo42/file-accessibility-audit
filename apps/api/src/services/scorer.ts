@@ -1253,8 +1253,11 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
   } else if (effectiveFailRatio < 0.05) {
-    score = 80
+    score = effectiveFailingCount <= 10 ? 95 : 80
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
+    if (effectiveFailingCount <= 10) {
+      findings.push('The failing samples are low-density and were treated as an advisory contrast warning rather than a major document-wide contrast problem.')
+    }
   } else if (effectiveFailRatio < 0.20) {
     score = 60
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)

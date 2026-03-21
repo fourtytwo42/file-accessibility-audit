@@ -1716,6 +1716,64 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.executiveSummary).toContain('ready for publication')
     expect(result.executiveSummary).not.toContain('fully confirmed pass')
   })
+
+  it('treats low-density contrast failures as advisory when the sample count is small', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.cidset_consistency',
+            label: 'CIDSet consistency',
+            severity: 'warning',
+            blocking: false,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Detected embedded CID font descriptors with /CIDSet entries.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 2,
+          },
+        ],
+        knownGapKeys: ['pdfua.metadata_identification_content_unconfirmed'],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 10,
+          totalSamples: 358,
+          failingContrastCount: 9,
+          failRatio: 9 / 358,
+          failures: Array.from({ length: 9 }, (_, index) => ({
+            page: 4,
+            textPreview: `Low contrast sample ${index + 1}`,
+            contrastRatio: 2,
+            threshold: 4.5,
+            fgColor: '#cfcfcf',
+            bgColor: '#ffffff',
+            fontSizePt: 12,
+          })),
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('advisory contrast warning'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
 })
 
 describe('summarizeLinkTextQuality', () => {
