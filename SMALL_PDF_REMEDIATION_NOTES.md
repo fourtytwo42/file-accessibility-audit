@@ -3,7 +3,7 @@
 ## Current Active File
 
 - `juvenile2000study.pdf`
-- Current fresh queue item: `434adcbe-ca61-491b-8de7-36594d1997da`
+- Current fresh queue item: `2b2bddd4-182e-4ee4-b6be-e51ca7a27419`
 - Latest completed file: `State criminal justice survey Sept 2007.pdf` -> `100/A`
 
 ## Recent Loop Summary
@@ -68,6 +68,8 @@
 
 - Queue history:
   - `434adcbe-ca61-491b-8de7-36594d1997da` -> `89/B`
+  - `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3` -> `89/B`
+  - `2b2bddd4-182e-4ee4-b6be-e51ca7a27419` -> `89/B`
 - Outcome so far:
   - original result was `23/F`
   - first fresh rerun cleared structure, headings, bookmarks, metadata, reading order, and alt text
@@ -92,8 +94,12 @@
   - direct `tsx` probe on rebuilt artifact `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3.pdf` now returns:
     - `Embedded a full substitute font program for legacy symbol font /MapInfoArrows using arial.ttf`
     - `Added an explicit ToUnicode CMap for legacy symbol font /MapInfoArrows using 4 deterministic character mappings`
+- Live-pipeline follow-up:
+  - fresh rerun `2b2bddd4-182e-4ee4-b6be-e51ca7a27419` still stayed at `89/B`
+  - direct planner inspection on `juvenile2000study.pdf` now shows both `repair_cid_symbol_font_maps` and `repair_font_unicode_maps` are present in the live plan
+  - new shared fix: prioritize `repair_cid_symbol_font_maps` ahead of generic Unicode repair in the font stage
 - Next expected outcome:
-  - next fresh post-restart rerun should clear the last `MapInfoArrows` Unicode miss and push the file above `95`
+  - next fresh post-restart rerun should keep the successful `/MapInfoArrows` repair in the live pipeline and push the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

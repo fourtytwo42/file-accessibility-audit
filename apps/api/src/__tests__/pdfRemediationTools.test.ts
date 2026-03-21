@@ -4135,6 +4135,30 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(plan.actions.some(action => action.tool_name === 'repair_cid_symbol_font_maps')).toBe(true)
   }, 120_000)
 
+  it('prioritizes CID symbol-font repair before generic Unicode repair when both are present', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Downloads/juvenile2000study.pdf'))
+    const analysis = await analyzePDF(buffer, 'juvenile2000study.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const plan = await planRemediationActions({
+      filename: 'juvenile2000study.pdf',
+      analysis,
+      context,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const order = plan.actions.map(action => action.tool_name)
+    expect(order).toContain('repair_cid_symbol_font_maps')
+    expect(order).toContain('repair_font_unicode_maps')
+    expect(order.indexOf('repair_cid_symbol_font_maps')).toBeLessThan(order.indexOf('repair_font_unicode_maps'))
+  }, 120_000)
+
   it('plans CID symbol-font recovery on OCR-searchable reports after generic Unicode repair stalls', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')
