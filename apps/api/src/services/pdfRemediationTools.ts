@@ -238,6 +238,18 @@ function isFragmentaryFigureAltText(text: string | null | undefined): boolean {
   return startsLowercase || endsWithContinuation || hasCitationLikeNumber
 }
 
+function isCitationLikeFigureAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const words = raw.split(/\s+/).filter(Boolean)
+  if (words.length < 4) return false
+  if (/\b[A-Z][a-z]+,\s*\d{1,3}\s*\(\d+\)/.test(raw)) return true
+  if (/\b\d{1,3}\s*\(\d+\),\s*\d+[\u2013\u2014-]\d+\b/.test(raw)) return true
+  if (/\b\d{4}\)\s*$/.test(raw) && /[;,]/.test(raw)) return true
+  if (/\b\d{1,3}\s*\([1-9]\)\b/.test(raw)) return true
+  return /\b(vol\.?|no\.?|issue|journal|pp\.?|doi)\b/i.test(raw)
+}
+
 function hasLowQualityFigureAltText(text: string | null | undefined): boolean {
   const normalized = normalizeFigureAltQualityText(text)
   if (!normalized) return false
@@ -245,6 +257,7 @@ function hasLowQualityFigureAltText(text: string | null | undefined): boolean {
   if (/^image related to\b/i.test(normalized)) return true
   if (isUnreadableFigureAltText(text)) return true
   if (isFragmentaryFigureAltText(text)) return true
+  if (isCitationLikeFigureAltText(text)) return true
   if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return true
   return new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo', 'figure 1', 'figure 2']).has(normalized)
 }

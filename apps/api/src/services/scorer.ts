@@ -395,7 +395,7 @@ type AcrobatAltRiskNode = NonNullable<StructureBackendMutationResult['acrobatAlt
 type StructureFigureNode = NonNullable<StructureBackendMutationResult['figures']>[number]
 type StructureHeadingNode = NonNullable<StructureBackendMutationResult['headings']>[number]
 
-type AltQuality = 'missing' | 'empty' | 'generic' | 'boilerplate' | 'garbled' | 'overlong' | 'descriptive'
+type AltQuality = 'missing' | 'empty' | 'generic' | 'boilerplate' | 'garbled' | 'citation' | 'overlong' | 'descriptive'
 
 const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo'])
 const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
@@ -426,6 +426,18 @@ function isFragmentaryAltText(text: string | null | undefined): boolean {
   return startsLowercase || endsWithContinuation || hasCitationLikeNumber
 }
 
+function isCitationLikeAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const words = raw.split(/\s+/).filter(Boolean)
+  if (words.length < 4) return false
+  if (/\b[A-Z][a-z]+,\s*\d{1,3}\s*\(\d+\)/.test(raw)) return true
+  if (/\b\d{1,3}\s*\(\d+\),\s*\d+[\u2013\u2014-]\d+\b/.test(raw)) return true
+  if (/\b\d{4}\)\s*$/.test(raw) && /[;,]/.test(raw)) return true
+  if (/\b\d{1,3}\s*\([1-9]\)\b/.test(raw)) return true
+  return /\b(vol\.?|no\.?|issue|journal|pp\.?|doi)\b/i.test(raw)
+}
+
 function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQuality {
   if (!hasAlt) return 'missing'
   if (altText === null || typeof altText === 'undefined') return 'descriptive'
@@ -435,6 +447,7 @@ function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQualit
   if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return 'boilerplate'
   if (isUnreadableAltText(altText)) return 'garbled'
   if (isFragmentaryAltText(altText)) return 'boilerplate'
+  if (isCitationLikeAltText(altText)) return 'citation'
   if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return 'overlong'
   return 'descriptive'
 }

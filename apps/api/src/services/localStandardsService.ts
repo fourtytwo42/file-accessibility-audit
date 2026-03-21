@@ -69,6 +69,18 @@ function isFragmentaryAltText(text: string | null | undefined): boolean {
   return startsLowercase || endsWithContinuation || hasCitationLikeNumber
 }
 
+function isCitationLikeAltText(text: string | null | undefined): boolean {
+  const raw = String(text || '').replace(/^u:/, '').trim()
+  if (!raw) return false
+  const words = raw.split(/\s+/).filter(Boolean)
+  if (words.length < 4) return false
+  if (/\b[A-Z][a-z]+,\s*\d{1,3}\s*\(\d+\)/.test(raw)) return true
+  if (/\b\d{1,3}\s*\(\d+\),\s*\d+[\u2013\u2014-]\d+\b/.test(raw)) return true
+  if (/\b\d{4}\)\s*$/.test(raw) && /[;,]/.test(raw)) return true
+  if (/\b\d{1,3}\s*\([1-9]\)\b/.test(raw)) return true
+  return /\b(vol\.?|no\.?|issue|journal|pp\.?|doi)\b/i.test(raw)
+}
+
 function isOverlongAltText(text: string | null | undefined): boolean {
   const normalized = normalizeSemanticText(text)
   return normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32
@@ -608,13 +620,13 @@ function altTextQualityFinding(
 ): LocalStandardsFinding | null {
   const lowQualityRefs = new Set<string>()
   for (const image of qpdf.images) {
-    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isUnreadableAltText(image.altText) || isFragmentaryAltText(image.altText) || isOverlongAltText(image.altText))) {
+    if (image.hasAlt && (isGenericAltText(image.altText) || isBoilerplateAltText(image.altText) || isUnreadableAltText(image.altText) || isFragmentaryAltText(image.altText) || isCitationLikeAltText(image.altText) || isOverlongAltText(image.altText))) {
       lowQualityRefs.add(image.canonicalRef || image.ref)
     }
   }
   for (const figure of structure?.figures || []) {
     if (figure.graphicsLikelyDecorative && !figure.hasText) continue
-    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isUnreadableAltText(figure.altText) || isFragmentaryAltText(figure.altText) || isOverlongAltText(figure.altText))) {
+    if (figure.hasAlt && (isGenericAltText(figure.altText) || isBoilerplateAltText(figure.altText) || isUnreadableAltText(figure.altText) || isFragmentaryAltText(figure.altText) || isCitationLikeAltText(figure.altText) || isOverlongAltText(figure.altText))) {
       lowQualityRefs.add(figure.splitSourceRef || figure.ref)
     }
   }
@@ -626,7 +638,7 @@ function altTextQualityFinding(
     blocking: true,
     categoryIds: ['alt_text', 'pdf_ua_compliance'],
     confidence: 0.82,
-    evidence: [...lowQualityRefs].slice(0, 5).map(ref => `Figure ${ref} uses low-quality alternate text that is generic, boilerplate, or overly long.`),
+    evidence: [...lowQualityRefs].slice(0, 5).map(ref => `Figure ${ref} uses low-quality alternate text that is generic, fragmentary, citation-like, unreadable, boilerplate, or overly long.`),
     source: 'composite',
     inferred: true,
     count: lowQualityRefs.size,

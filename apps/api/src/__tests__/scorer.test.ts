@@ -1005,6 +1005,19 @@ describe('scoreAltText edge cases', () => {
     expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
   })
 
+  it('bibliography-like alt text lowers alt_text quality scoring', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true, altText: 'Management , 36 (1), 91-118' },
+        { ref: '11 0 R', hasAlt: true, altText: 'Illinois Policing Training Act' },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    const category = findCategory(result, 'alt_text')
+    expect(category.score).toBe(50)
+    expect(category.findings.some(finding => finding.includes('low-quality alternate text'))).toBe(true)
+  })
+
   it('images with no ref are excluded', () => {
     const qpdf = makeQpdf({
       images: [

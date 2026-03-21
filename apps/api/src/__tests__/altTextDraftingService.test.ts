@@ -39,4 +39,16 @@ describe('draftFigureAltText', () => {
 
     expect(result).toBe('Support from administrative staff')
   })
+
+  it('skips bibliography-like context lines when drafting fallback alt text', () => {
+    const result = draftFigureAltText({
+      pageNumber: 14,
+      surroundingText: [
+        'Management , 36 (1), 91-118',
+        'Illinois Policing Training Act',
+      ],
+    })
+
+    expect(result).toBe('Illinois Policing Training Act')
+  })
 })
