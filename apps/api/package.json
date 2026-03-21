@@ -12,9 +12,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:scoring": "vitest run --testPathPattern=scoring",
+    "test:regressions": "vitest run src/__tests__/failureProfileService.test.ts src/__tests__/queueStore.test.ts src/__tests__/comparePhase0Artifacts.test.ts",
     "validate:adobe": "tsx src/scripts/validateAdobe99anreport.ts",
     "baseline:phase0": "tsx src/scripts/generatePhase0Baseline.ts",
-    "baseline:phase0:canary": "tsx src/scripts/generatePhase0Baseline.ts --corpus phase0-canary"
+    "baseline:phase0:canary": "tsx src/scripts/generatePhase0Baseline.ts --corpus phase0-canary",
+    "baseline:phase0:compare": "tsx src/scripts/comparePhase0Artifacts.ts --mode all",
+    "verify:regressions": "pnpm test:regressions && pnpm baseline:phase0:compare"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",

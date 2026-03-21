@@ -1241,4 +1241,117 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.summary.semanticIssueCount).toBe(modes.filter(mode => mode.classification === 'semantic').length)
     expect(result.failureProfile.summary.manualOnlyIssueCount).toBe(modes.filter(mode => mode.classification === 'manual_only').length)
   })
+
+  it('keeps stable normalized contract slices for reporting consumers', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult(),
+      context: makeContext(),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect({
+      failureModes: result.failureProfile.failureModes.slice(0, 3).map(mode => ({
+        key: mode.key,
+        reportingCategory: mode.reportingCategory,
+        sourceDetail: mode.sourceDetail,
+        classification: mode.classification,
+        blocking: mode.blocking,
+      })),
+      toolOpportunities: result.failureProfile.toolOpportunities.slice(0, 3).map(opportunity => ({
+        key: opportunity.key,
+        status: opportunity.status,
+        statusReasonCode: opportunity.statusReasonCode,
+        scope: opportunity.scope,
+      })),
+      plannerEvidence: {
+        topFailureModeKeys: result.plannerEvidence.topFailureModeKeys.slice(0, 3),
+        topBlockingFailureModeKeys: result.plannerEvidence.topBlockingFailureModeKeys?.slice(0, 3),
+        statusCounts: result.plannerEvidence.statusCounts,
+        reasonCodeCounts: result.plannerEvidence.reasonCodeCounts,
+      },
+    }).toMatchInlineSnapshot(`
+      {
+        "failureModes": [
+          {
+            "blocking": true,
+            "classification": "deterministic",
+            "key": "category.reading_order",
+            "reportingCategory": "reading_order",
+            "sourceDetail": "category_score",
+          },
+          {
+            "blocking": true,
+            "classification": "deterministic",
+            "key": "pdfua.annotation_alt_contents",
+            "reportingCategory": "annotations",
+            "sourceDetail": "verapdf_family",
+          },
+          {
+            "blocking": true,
+            "classification": "deterministic",
+            "key": "pdfua.page_tabs",
+            "reportingCategory": "reading_order",
+            "sourceDetail": "verapdf_family",
+          },
+        ],
+        "plannerEvidence": {
+          "reasonCodeCounts": [
+            {
+              "count": 15,
+              "reasonCode": "safe_to_run",
+            },
+            {
+              "count": 7,
+              "reasonCode": "manual_only_failure_mode",
+            },
+          ],
+          "statusCounts": [
+            {
+              "count": 15,
+              "status": "auto_runnable",
+            },
+            {
+              "count": 4,
+              "status": "deferred",
+            },
+            {
+              "count": 3,
+              "status": "blocked",
+            },
+          ],
+          "topBlockingFailureModeKeys": [
+            "category.reading_order",
+            "pdfua.annotation_alt_contents",
+            "pdfua.page_tabs",
+          ],
+          "topFailureModeKeys": [
+            "category.reading_order",
+            "pdfua.annotation_alt_contents",
+            "pdfua.page_tabs",
+          ],
+        },
+        "toolOpportunities": [
+          {
+            "key": "bootstrap_struct_tree:document:document",
+            "scope": "document",
+            "status": "auto_runnable",
+            "statusReasonCode": "safe_to_run",
+          },
+          {
+            "key": "create_heading_from_candidate:candidate:heading:1",
+            "scope": "candidate",
+            "status": "auto_runnable",
+            "statusReasonCode": "safe_to_run",
+          },
+          {
+            "key": "create_heading_from_candidate:candidate:heading:2",
+            "scope": "candidate",
+            "status": "blocked",
+            "statusReasonCode": "manual_only_failure_mode",
+          },
+        ],
+      }
+    `)
+  })
 })

@@ -6,6 +6,12 @@ export interface Phase0CanaryPinnedEntry {
   sourceSet: '3rdpass_pass' | '3rdpass_fail' | 'downloads'
   why: string
   expectedSignals: string[]
+  verificationLocks?: {
+    disallowedAutoRunnableKeys?: string[]
+    requiredFailureProfileKeys?: string[]
+    requiredPlannerOpportunityKeys?: string[]
+    requiredAutoRunnableKeys?: string[]
+  }
 }
 
 export const PHASE0_CANARY_PINNED: Phase0CanaryPinnedEntry[] = [
@@ -15,27 +21,39 @@ export const PHASE0_CANARY_PINNED: Phase0CanaryPinnedEntry[] = [
     sourceSet: '3rdpass_pass',
     why: 'Only passing file in the 21-file Acrobat sample; guards against scoring drift on a near-clean well-tagged document.',
     expectedSignals: ['structural_class.well_tagged', 'adobe.figures_alt_text', 'adobe.tagged_annotations'],
+    verificationLocks: {
+      disallowedAutoRunnableKeys: ['bootstrap_struct_tree:document:document'],
+    },
   },
   {
     filename: 'Evaluation of the Lake County Adult Probation.pdf',
     pdfPath: '3rdPass/Fail/Evaluation of the Lake County Adult Probation.pdf',
     sourceSet: '3rdpass_fail',
     why: 'Known regression-sensitive native-tagged file with heading/planner history in REMEDIATION_PROGRESS.md.',
-    expectedSignals: ['structural_class.well_tagged', 'regression.heading_mutation', 'adobe.other'],
+    expectedSignals: ['structural_class.well_tagged', 'regression.heading_mutation', 'adobe.tagged_annotations'],
+    verificationLocks: {
+      disallowedAutoRunnableKeys: ['bootstrap_struct_tree:document:document'],
+    },
   },
   {
     filename: 'Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf',
     pdfPath: '3rdPass/Fail/Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf',
     sourceSet: '3rdpass_fail',
     why: 'Modern native-tagged report with Acrobat alt-text and annotation-content history.',
-    expectedSignals: ['structural_class.native_tagged', 'adobe.other_elements_alt_text', 'regression.alt_text_vs_heading_cleanup'],
+    expectedSignals: ['structural_class.native_tagged', 'adobe.nested_alt_text', 'regression.alt_text_vs_heading_cleanup'],
+    verificationLocks: {
+      disallowedAutoRunnableKeys: ['bootstrap_struct_tree:document:document'],
+    },
   },
   {
     filename: 'Prescription drug November 2008.pdf',
     pdfPath: '3rdPass/Fail/Prescription drug November 2008.pdf',
     sourceSet: '3rdpass_fail',
     why: 'Known font/encoding and figure-repair canary from the small-PDF campaign.',
-    expectedSignals: ['structural_class.well_tagged', 'adobe.character_encoding', 'regression.font_unicode'],
+    expectedSignals: ['structural_class.well_tagged', 'adobe.figures_alt_text', 'regression.font_unicode'],
+    verificationLocks: {
+      disallowedAutoRunnableKeys: ['bootstrap_struct_tree:document:document'],
+    },
   },
   {
     filename: 'GTF-juvenilesentencing.pdf',
@@ -43,6 +61,9 @@ export const PHASE0_CANARY_PINNED: Phase0CanaryPinnedEntry[] = [
     sourceSet: '3rdpass_fail',
     why: 'Known planner/orchestration regression canary for native-tagged logical-structure fixes.',
     expectedSignals: ['structural_class.native_tagged', 'adobe.other_elements_alt_text', 'regression.native_structure_orchestration'],
+    verificationLocks: {
+      disallowedAutoRunnableKeys: ['bootstrap_struct_tree:document:document'],
+    },
   },
   {
     filename: 'CMVoga.pdf',
@@ -50,6 +71,9 @@ export const PHASE0_CANARY_PINNED: Phase0CanaryPinnedEntry[] = [
     sourceSet: '3rdpass_fail',
     why: 'Native-tagged document with historical font-finalization fixes that should remain stable.',
     expectedSignals: ['structural_class.native_tagged', 'regression.font_finalization'],
+    verificationLocks: {
+      disallowedAutoRunnableKeys: ['bootstrap_struct_tree:document:document'],
+    },
   },
   {
     filename: '2014_CVPP_Reentry_Report-191011T20093121.pdf',

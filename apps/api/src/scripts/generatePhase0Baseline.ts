@@ -83,6 +83,12 @@ interface Phase0CanaryEntry {
   filename: string
   why: string
   expectedSignals: string[]
+  verificationLocks?: {
+    disallowedAutoRunnableKeys?: string[]
+    requiredFailureProfileKeys?: string[]
+    requiredPlannerOpportunityKeys?: string[]
+    requiredAutoRunnableKeys?: string[]
+  }
   source: 'pinned' | 'dynamic_class_fill'
   structuralClass: PdfStructuralClass | 'unknown'
   pdfPath: string
@@ -299,6 +305,7 @@ async function resolveDynamicClassFill(input: {
       filename: name,
       why: target.why,
       expectedSignals: [`structural_class.${classification.structuralClass}`],
+      verificationLocks: undefined,
       source: 'dynamic_class_fill',
       structuralClass: classification.structuralClass,
       pdfPath: path.relative(root, filePath),
@@ -506,6 +513,7 @@ async function main() {
       filename: pinned.filename,
       why: pinned.why,
       expectedSignals: pinned.expectedSignals,
+      verificationLocks: pinned.verificationLocks,
       source: 'pinned',
       structuralClass: report?.classification.structuralClass || 'unknown',
       pdfPath: report?.source.pdfPath || pinned.pdfPath,

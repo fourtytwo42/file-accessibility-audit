@@ -202,7 +202,9 @@ describe('queueStore serialization', () => {
       confidenceSummary: null,
     }) as any)
 
-    const item = serializeQueueItemDetail(makeRow())
+    const row = makeRow()
+    const item = serializeQueueItemDetail(row)
+    const summary = serializeQueueItemSummary(row)
 
     expect(item.documentModel?.sourceType).toBe('native-text')
     expect(item.documentModel?.failureProfile?.version).toBe('2')
@@ -213,6 +215,90 @@ describe('queueStore serialization', () => {
     expect(item.standardsDetail?.veraPdf.original.status).toBe('failed')
     expect(item.standardsDetail?.gradeBasis.summaryText).toContain('veraPDF passed')
     expect(item.pathFallbacks).toEqual(['fallback'])
+    expect({
+      standardsSummary: summary.standardsSummary,
+      standardsDetail: {
+        failureModes: item.standardsDetail?.failureModes.map(mode => ({
+          key: mode.key,
+          classification: mode.classification,
+          reportingCategory: mode.reportingCategory,
+        })),
+        plannerEvidence: item.standardsDetail?.plannerEvidence && {
+          topFailureModeKeys: item.standardsDetail.plannerEvidence.topFailureModeKeys,
+          statusCounts: item.standardsDetail.plannerEvidence.statusCounts,
+          reasonCodeCounts: item.standardsDetail.plannerEvidence.reasonCodeCounts,
+        },
+        remediationSummary: item.standardsDetail?.remediationSummary,
+      },
+    }).toMatchInlineSnapshot(`
+      {
+        "standardsDetail": {
+          "failureModes": [
+            {
+              "classification": "deterministic",
+              "key": "pdfua.page_tabs",
+              "reportingCategory": "reading_order",
+            },
+          ],
+          "plannerEvidence": {
+            "reasonCodeCounts": [
+              {
+                "count": 2,
+                "reasonCode": "safe_to_run",
+              },
+              {
+                "count": 1,
+                "reasonCode": "candidate_blocked",
+              },
+            ],
+            "statusCounts": [
+              {
+                "count": 2,
+                "status": "auto_runnable",
+              },
+              {
+                "count": 1,
+                "status": "blocked",
+              },
+            ],
+            "topFailureModeKeys": [
+              "pdfua.page_tabs",
+            ],
+          },
+          "remediationSummary": {
+            "autoRunnableOpportunityCount": 2,
+            "blockedOpportunityCount": 1,
+            "deterministicIssueCount": 1,
+            "manualOnlyIssueCount": 0,
+            "manualReviewRequired": false,
+            "semanticIssueCount": 0,
+          },
+        },
+        "standardsSummary": {
+          "adobe": undefined,
+          "failureOverview": {
+            "topFailureModes": [],
+          },
+          "gradeBasis": {
+            "currentGrade": "A",
+            "currentScore": 97,
+            "gradeReducedByStandards": false,
+            "scoreCappedByStandards": false,
+          },
+          "plannerOverview": {
+            "autoRunnableOpportunityCount": 0,
+            "blockedOpportunityCount": 0,
+            "deterministicIssueCount": 0,
+            "manualOnlyIssueCount": 0,
+            "semanticIssueCount": 0,
+          },
+          "veraPdf": {
+            "failedChecks": 0,
+            "status": "passed",
+          },
+        },
+      }
+    `)
   })
 
   it('falls back gracefully when the document model is missing', () => {
