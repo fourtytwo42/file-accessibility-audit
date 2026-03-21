@@ -873,7 +873,17 @@ def figure_candidates(pdf):
                 isinstance(k, pikepdf.Dictionary) and str(k.get("/Type", "")) == "/OBJR"
                 for k in kid_list
             )
-            if not has_objr:
+            has_struct_children = any(
+                isinstance(k, pikepdf.Dictionary)
+                and str(k.get("/Type", "")) != "/OBJR"
+                and str(k.get("/S", "")).startswith("/")
+                for k in kid_list
+            )
+            has_page_backed_child = any(
+                isinstance(k, pikepdf.Dictionary) and page_ref_for_struct_elem(k) is not None
+                for k in kid_list
+            )
+            if not has_objr and not (has_struct_children and has_page_backed_child):
                 continue
         page_obj = page_ref_for_struct_elem(obj)
         page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
