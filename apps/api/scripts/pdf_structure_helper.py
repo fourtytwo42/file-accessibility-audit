@@ -6851,8 +6851,14 @@ def mutate_set_table_header_cells(pdf, mutation):
                             and all(cell_span(cell) == 1 for cell in cells)
                         ):
                             inferred_spans = None
+                            inferred_row_spans = [1] * len(cells)
                             remaining_cells = len(cells) - 1
                             remaining_columns = max_columns - 1
+                            next_width = row_column_counts[row_index + 1] if row_index + 1 < len(row_column_counts) else 0
+                            next_cells = row_cells[row_index + 1] if row_index + 1 < len(row_cells) else []
+                            next_is_data_only = bool(next_cells) and all(str(cell.get("/S")) == "/TD" for cell in next_cells)
+                            if next_is_data_only and next_width == max_columns - 1 and len(cells) >= 2:
+                                inferred_row_spans[0] = 2
                             if remaining_cells > 0 and remaining_columns > 0 and remaining_columns % remaining_cells == 0:
                                 repeated_span = max(1, remaining_columns // remaining_cells)
                                 if repeated_span > 1:
@@ -6862,17 +6868,24 @@ def mutate_set_table_header_cells(pdf, mutation):
                                 if repeated_span > 1:
                                     inferred_spans = [repeated_span] * len(cells)
                             if inferred_spans:
-                                for cell, inferred_span in zip(cells, inferred_spans):
+                                for cell, inferred_span, inferred_row_span in zip(cells, inferred_spans, inferred_row_spans):
                                     current_span = cell_span(cell)
                                     if current_span == inferred_span:
-                                        continue
+                                        if inferred_row_span <= 1:
+                                            continue
                                     cell["/ColSpan"] = pikepdf.Integer(inferred_span)
+                                    if inferred_row_span > 1:
+                                        cell["/RowSpan"] = pikepdf.Integer(inferred_row_span)
                                     applied.append({
                                         "ref": ref_string(cell),
                                         "before": str(current_span),
-                                        "after": str(inferred_span),
+                                        "after": (
+                                            f"/ColSpan {inferred_span}, /RowSpan {inferred_row_span}"
+                                            if inferred_row_span > 1
+                                            else str(inferred_span)
+                                        ),
                                         "details": (
-                                            f"Inferred grouped-header /ColSpan {inferred_span} for {ref_string(cell)} "
+                                            f"Inferred grouped-header span metadata for {ref_string(cell)} "
                                             f"so row {row_index + 1} aligns with the table's {max_columns}-column body."
                                         ),
                                     })

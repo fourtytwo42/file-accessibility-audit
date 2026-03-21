@@ -842,7 +842,7 @@ function analyzeTableRegularity(
     collectRows(node['/K'], depth + 1)
   }
 
-  const cellSpan = (cell: any): number => {
+  const cellColSpan = (cell: any): number => {
     try {
       const attrs = cell?.['/A']
       if (attrs && typeof attrs === 'object') {
@@ -853,10 +853,21 @@ function analyzeTableRegularity(
     return 1
   }
 
-  const countRowCells = (row: any): number => {
+  const cellRowSpan = (cell: any): number => {
+    try {
+      const attrs = cell?.['/A']
+      if (attrs && typeof attrs === 'object') {
+        const span = Number(attrs['/RowSpan'] ?? 1)
+        return Number.isFinite(span) && span > 0 ? Math.max(1, Math.trunc(span)) : 1
+      }
+    } catch {}
+    return 1
+  }
+
+  const listRowCells = (row: any): any[] => {
     const kids = row?.['/K']
     const stack = Array.isArray(kids) ? [...kids] : kids !== undefined ? [kids] : []
-    let count = 0
+    const cells: any[] = []
     let guard = 0
     while (stack.length && guard < 400) {
       guard += 1
@@ -869,30 +880,49 @@ function analyzeTableRegularity(
       if (typeof kid !== 'object') continue
       const tag = kid['/S']
       if (tag === '/TH' || tag === '/TD') {
-        count += cellSpan(kid)
+        cells.push(kid)
         continue
       }
       const nested = kid['/K']
       if (Array.isArray(nested)) stack.unshift(...nested)
       else if (nested !== undefined) stack.unshift(nested)
     }
-    return count
+    return cells
   }
 
   collectRows(tableObj?.['/K'], 0)
-  const rowCellCounts = rows
-    .map(countRowCells)
-    .filter(count => Number.isFinite(count) && count > 0)
+  const rowCellCounts: number[] = []
+  const activeRowSpans: number[] = []
+  for (const row of rows) {
+    while (activeRowSpans.length && activeRowSpans[activeRowSpans.length - 1] <= 0) activeRowSpans.pop()
+    let occupiedColumns = activeRowSpans.reduce((sum, span) => sum + (span > 0 ? 1 : 0), 0)
+    const cells = listRowCells(row)
+    for (const cell of cells) {
+      const colSpan = cellColSpan(cell)
+      const rowSpan = cellRowSpan(cell)
+      occupiedColumns += colSpan
+      if (rowSpan > 1) {
+        for (let index = 0; index < colSpan; index += 1) {
+          activeRowSpans.push(rowSpan - 1)
+        }
+      }
+    }
+    rowCellCounts.push(occupiedColumns)
+    for (let index = 0; index < activeRowSpans.length; index += 1) {
+      if (activeRowSpans[index] > 0) activeRowSpans[index] -= 1
+    }
+  }
+  const filteredRowCounts = rowCellCounts.filter(count => Number.isFinite(count) && count > 0)
   const frequency = new Map<number, number>()
-  for (const count of rowCellCounts) frequency.set(count, (frequency.get(count) ?? 0) + 1)
+  for (const count of filteredRowCounts) frequency.set(count, (frequency.get(count) ?? 0) + 1)
   const dominantColumnCount = [...frequency.entries()]
     .sort((a, b) => (b[1] - a[1]) || (b[0] - a[0]))[0]?.[0] ?? 0
-  const isRegular = rowCellCounts.length <= 1
+  const isRegular = filteredRowCounts.length <= 1
     ? true
-    : rowCellCounts.every(count => count === dominantColumnCount)
+    : filteredRowCounts.every(count => count === dominantColumnCount)
 
   return {
-    rowCellCounts,
+    rowCellCounts: filteredRowCounts,
     dominantColumnCount,
     isRegular,
   }
