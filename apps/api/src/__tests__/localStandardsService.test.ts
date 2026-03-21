@@ -382,4 +382,23 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.inferred).toBe(true)
     expect(finding?.blocking).toBe(true)
   })
+
+  it('emits table-regularity findings for irregular tagged tables', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        tables: [
+          { hasHeaders: true, rowCellCounts: [6, 11, 11], dominantColumnCount: 11, isRegular: false },
+          { hasHeaders: true, rowCellCounts: [4, 4, 4], dominantColumnCount: 4, isRegular: true },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.table_regularity')
+    expect(finding).toBeDefined()
+    expect(finding?.count).toBe(1)
+    expect(finding?.categoryIds).toContain('table_markup')
+    expect(finding?.blocking).toBe(true)
+  })
 })

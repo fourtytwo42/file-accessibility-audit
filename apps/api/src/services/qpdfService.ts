@@ -49,7 +49,12 @@ export interface QpdfResult {
   linkAnnotationsMissingContents?: number
   images: Array<{ ref: string; hasAlt: boolean; altText?: string }>
   headings: Array<{ level: string; tag: string }>
-  tables: Array<{ hasHeaders: boolean }>
+  tables: Array<{
+    hasHeaders: boolean
+    rowCellCounts?: number[]
+    dominantColumnCount?: number
+    isRegular?: boolean
+  }>
   structTreeDepth: number
   // MCIDs in struct-tree depth-first order, as (pageIndex, mcid) pairs.
   // Each pair is encoded as pageIndex * 100000 + mcid so that the scorer can
@@ -388,7 +393,13 @@ export function parseQpdfJson(json: any): QpdfResult {
         // Tables
         if (tag === '/Table') {
           const hasHeaders = hasTableHeaders(o, objects)
-          result.tables.push({ hasHeaders })
+          const regularity = analyzeTableRegularity(o, objects)
+          result.tables.push({
+            hasHeaders,
+            rowCellCounts: regularity.rowCellCounts,
+            dominantColumnCount: regularity.dominantColumnCount,
+            isRegular: regularity.isRegular,
+          })
         }
         // Figures with alt text
         if (tag === '/Figure') {
@@ -805,6 +816,86 @@ function hasTableHeaders(tableObj: any, objects: any): boolean {
   }
 
   return checkForTH(kids, 0)
+}
+
+function analyzeTableRegularity(
+  tableObj: any,
+  objects: any,
+): { rowCellCounts: number[]; dominantColumnCount: number; isRegular: boolean } {
+  const rows: any[] = []
+
+  const collectRows = (node: any, depth: number): void => {
+    if (!node || depth > 12) return
+    if (Array.isArray(node)) {
+      for (const kid of node) collectRows(kid, depth + 1)
+      return
+    }
+    if (typeof node === 'string') {
+      collectRows(resolveRef(node, objects), depth + 1)
+      return
+    }
+    if (typeof node !== 'object') return
+    if (node['/S'] === '/TR') {
+      rows.push(node)
+      return
+    }
+    collectRows(node['/K'], depth + 1)
+  }
+
+  const cellSpan = (cell: any): number => {
+    try {
+      const attrs = cell?.['/A']
+      if (attrs && typeof attrs === 'object') {
+        const span = Number(attrs['/ColSpan'] ?? 1)
+        return Number.isFinite(span) && span > 0 ? Math.max(1, Math.trunc(span)) : 1
+      }
+    } catch {}
+    return 1
+  }
+
+  const countRowCells = (row: any): number => {
+    const kids = row?.['/K']
+    const stack = Array.isArray(kids) ? [...kids] : kids !== undefined ? [kids] : []
+    let count = 0
+    let guard = 0
+    while (stack.length && guard < 400) {
+      guard += 1
+      const kid = stack.shift()
+      if (!kid) continue
+      if (typeof kid === 'string') {
+        stack.unshift(resolveRef(kid, objects))
+        continue
+      }
+      if (typeof kid !== 'object') continue
+      const tag = kid['/S']
+      if (tag === '/TH' || tag === '/TD') {
+        count += cellSpan(kid)
+        continue
+      }
+      const nested = kid['/K']
+      if (Array.isArray(nested)) stack.unshift(...nested)
+      else if (nested !== undefined) stack.unshift(nested)
+    }
+    return count
+  }
+
+  collectRows(tableObj?.['/K'], 0)
+  const rowCellCounts = rows
+    .map(countRowCells)
+    .filter(count => Number.isFinite(count) && count > 0)
+  const frequency = new Map<number, number>()
+  for (const count of rowCellCounts) frequency.set(count, (frequency.get(count) ?? 0) + 1)
+  const dominantColumnCount = [...frequency.entries()]
+    .sort((a, b) => (b[1] - a[1]) || (b[0] - a[0]))[0]?.[0] ?? 0
+  const isRegular = rowCellCounts.length <= 1
+    ? true
+    : rowCellCounts.every(count => count === dominantColumnCount)
+
+  return {
+    rowCellCounts,
+    dominantColumnCount,
+    isRegular,
+  }
 }
 
 function collectMCIDs(obj: any, mcids: number[]): void {

@@ -604,10 +604,12 @@ export function scoreDocument(
     computedScore = Math.min(computedScore, 52)
   }
 
-  const scoreGateApplied = !standardsClean && computedScore === 100
+  const hasIncompleteScoredCategory = applicable.some(category => (category.score ?? 100) < 100)
+  const scoreGateApplied = (!standardsClean && computedScore === 100)
+    || (computedScore === 100 && hasIncompleteScoredCategory)
   const overallScore = scoreGateApplied ? 99 : computedScore
   let grade = getGrade(overallScore)
-  const gradeGateApplied = !standardsClean && grade === 'A'
+  const gradeGateApplied = ((!standardsClean && grade === 'A') || (hasIncompleteScoredCategory && grade === 'A'))
   if (gradeGateApplied) {
     grade = 'B'
   }
@@ -1321,6 +1323,11 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
     findings.push(`All ${qpdf.tables.length} table(s) have proper header tags (TH)`)
 
     let score = 100
+    const irregularTables = qpdf.tables.filter(table => table.isRegular === false)
+    if (irregularTables.length > 0) {
+      findings.push(`${irregularTables.length} tagged table(s) still have irregular row/column structure and may fail Acrobat's table regularity check.`)
+      score = irregularTables.length <= 1 ? 85 : 70
+    }
     const highConfidenceUntagged = tableStructure?.highConfidenceUntaggedTables ?? tableStructure?.untaggedTables ?? 0
     const advisoryUntagged = tableStructure?.advisoryUntaggedTables ?? 0
     if (tableStructure?.status === 'ok' && highConfidenceUntagged > 0) {

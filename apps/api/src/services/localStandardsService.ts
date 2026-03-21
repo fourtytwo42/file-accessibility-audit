@@ -480,6 +480,33 @@ function fontWidthsFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
   }
 }
 
+function tableRegularityFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
+  const irregularTables = qpdf.tables.filter(table =>
+    table.isRegular === false
+    && (table.rowCellCounts?.length ?? 0) > 1,
+  )
+  if (!irregularTables.length) return null
+
+  const evidence = irregularTables.slice(0, 3).map((table, index) => {
+    const counts = table.rowCellCounts?.join(', ') || 'unknown'
+    const dominant = table.dominantColumnCount ?? 'unknown'
+    return `Table ${index + 1} exposes irregular row column counts (${counts}); dominant column count is ${dominant}.`
+  })
+
+  return {
+    key: 'pdfua.table_regularity',
+    label: 'Table regularity',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['table_markup', 'pdf_ua_compliance'],
+    confidence: 0.92,
+    evidence,
+    source: 'qpdf',
+    inferred: false,
+    count: irregularTables.length,
+  }
+}
+
 function partialArtifactFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalStandardsFinding | null {
   if (!qpdf.hasStructTree || pdfjs.textLength === 0 || qpdf.contentOrder.length > 0) return null
   return {
@@ -519,6 +546,7 @@ export function buildLocalStandardsReport(
   pushFinding(findings, linkTaggingFinding(qpdf, pdfjs, options?.structure))
   pushFinding(findings, noteTagIdFinding(qpdf))
   pushFinding(findings, fontWidthsFinding(qpdf))
+  pushFinding(findings, tableRegularityFinding(qpdf))
   pushFinding(findings, partialArtifactFinding(qpdf, pdfjs))
 
   const knownGapKeys: string[] = []

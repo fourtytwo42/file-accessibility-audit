@@ -490,19 +490,15 @@ describe('grade thresholds', () => {
     expect(result.grade).toBe('A')
   })
 
-  it('score 90 → grade A (boundary)', () => {
-    // Create a scenario that produces exactly 90
+  it('downgrades the grade when an incomplete scored category prevents a clean pass', () => {
     const { qpdf, pdfjs } = fullyAccessible()
-    // Reduce one category slightly — 1 of 2 images missing alt → alt_text = 50
     qpdf.images = [
       { ref: '10 0 R', hasAlt: true },
       { ref: '11 0 R', hasAlt: false },
     ]
     const result = scoreDocument(qpdf, pdfjs)
-    // Verify grade based on the score produced
-    if (result.overallScore >= 90) expect(result.grade).toBe('A')
-    else if (result.overallScore >= 80) expect(result.grade).toBe('B')
-    else expect.fail(`Unexpected score: ${result.overallScore}`)
+    expect(result.overallScore).toBeGreaterThanOrEqual(90)
+    expect(result.grade).toBe('B')
   })
 
   it('score in 80-89 → grade B', () => {
@@ -1250,6 +1246,42 @@ describe('scoreTableMarkup edge cases', () => {
       },
     })
     expect(findCategory(result, 'table_markup').score).toBe(85)
+  })
+
+  it('lowers table score for irregular tagged tables even when headers are present', () => {
+    const qpdf = makeQpdf({
+      tables: [
+        { hasHeaders: true, rowCellCounts: [6, 11, 11], dominantColumnCount: 11, isRegular: false },
+        { hasHeaders: true, rowCellCounts: [4, 4, 4], dominantColumnCount: 4, isRegular: true },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    expect(findCategory(result, 'table_markup').score).toBe(85)
+    expect(findCategory(result, 'table_markup').findings.some(finding => finding.includes('regularity'))).toBe(true)
+  })
+})
+
+describe('scoreDocument gating edge cases', () => {
+  it('does not return 100/A when any scored category remains incomplete', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      {
+        ...qpdf,
+        images: [
+          { ref: '10 0 R', hasAlt: true },
+          { ref: '11 0 R', hasAlt: false },
+        ],
+      },
+      pdfjs,
+      makeVeraPdf(),
+      undefined,
+      null,
+      makeLocalStandards(),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBeLessThan(100)
+    expect(result.overallScore).toBeLessThan(100)
+    expect(result.grade).toBe('B')
   })
 })
 
