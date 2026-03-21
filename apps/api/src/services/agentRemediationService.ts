@@ -198,10 +198,16 @@ function markInspectionDirtyFromAction(state: InspectionDirtinessState, action: 
   }
 }
 
-function actionHistoryKeys(action: Pick<RemediationActionRecord, 'tool' | 'candidateGroupId' | 'candidateId' | 'target' | 'targetRef'>): string[] {
+function actionHistoryKeys(action: Pick<RemediationActionRecord, 'tool' | 'candidateGroupId' | 'candidateId' | 'target' | 'targetRef' | 'generationSource'>): string[] {
   const keys = [`${action.tool}:${action.candidateGroupId || action.candidateId || action.target}`]
   if (action.targetRef) {
     keys.push(`${action.tool}_target:${action.targetRef}`)
+  }
+  if (action.generationSource === 'heuristic_fallback') {
+    keys.push(`heuristic_fallback:${action.candidateGroupId || action.candidateId || action.target}`)
+    if (action.targetRef) {
+      keys.push(`heuristic_fallback_target:${action.targetRef}`)
+    }
   }
   return keys
 }
@@ -1012,9 +1018,12 @@ function shouldRetryLateHeuristicFigureCandidate(
   const attemptedSetAlt = candidate.targetRef
     ? previousActionNames.includes(`set_figure_alt_text_target:${candidate.targetRef}`)
     : previousActionNames.includes(`set_figure_alt_text:${candidate.id}`)
+  const attemptedHeuristicFallback = candidate.targetRef
+    ? previousActionNames.includes(`heuristic_fallback_target:${candidate.targetRef}`)
+    : previousActionNames.includes(`heuristic_fallback:${candidate.id}`)
   if (!attemptedSetAlt) return true
   return candidate.repairMode === 'retag_then_set_alt'
-    || !!candidate.hasLowQualityAlt
+    || (!!candidate.hasLowQualityAlt && !attemptedHeuristicFallback)
     || (candidate.repairMode === 'set_alt' && candidate.targetTag === '/Figure' && !candidate.hasAlt)
 }
 
