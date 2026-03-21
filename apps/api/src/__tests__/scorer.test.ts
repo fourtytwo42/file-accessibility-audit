@@ -1080,6 +1080,30 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('one image description is still unresolved'))).toBe(true)
   })
 
+  it('treats mostly decorative split-safe Acrobat ownership debt as guidance when figures already have alt text', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: 'obj:10 0 R', hasAlt: true, altText: 'Cover image' },
+      ],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [
+          { ref: 'obj:501 0 R', ownershipMode: 'mixed_text_graphics_same_mcid', graphicsLikelyDecorative: true, splitSafe: true },
+          { ref: 'obj:502 0 R', ownershipMode: 'mixed_text_graphics_same_mcid', graphicsLikelyDecorative: true, splitSafe: true },
+          { ref: 'obj:503 0 R', ownershipMode: 'untagged_image_mcid', graphicsLikelyDecorative: true, splitSafe: true },
+        ] as any,
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('structural cleanup guidance'))).toBe(true)
+  })
+
   it('keeps raw untagged image ownership as a real alt-text failure even when figures already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
@@ -2285,6 +2309,52 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(findCategory(result, 'color_contrast').score).toBe(95)
     expect(findCategory(result, 'color_contrast').grade).toBe('A')
     expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('advisory display-text styling'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
+
+  it('treats duplicated display-label contrast misses as advisory on long documents', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 10,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 10,
+          totalSamples: 361,
+          failingContrastCount: 19,
+          failRatio: 19 / 361,
+          failures: Array.from({ length: 19 }, (_, index) => ({
+            page: 1,
+            textPreview: index === 0 ? 'CChhiiccaaggoo' : 'J O D A V I E S S',
+            contrastRatio: 3.63,
+            threshold: 4.5,
+            fgColor: '#004da8',
+            bgColor: '#73b2ff',
+            fontSizePt: index === 0 ? 8.2 : 1.8,
+          })),
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })

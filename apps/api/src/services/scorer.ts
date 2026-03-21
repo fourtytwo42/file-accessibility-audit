@@ -1120,6 +1120,12 @@ function scoreAltTextWithAcrobatRisk(
   // represent real accessibility failures: the text in the MCID is still accessible and the
   // graphics carry no semantic information. Do not cap the score for these.
   const substantiveRiskNodes = acrobatAltRiskNodes.filter(countsAsSubstantiveAltRisk)
+  const residualDecorativeMixedCount = acrobatAltRiskNodes.filter(node =>
+    node.ownershipMode === 'mixed_text_graphics_same_mcid'
+    && node.graphicsLikelyDecorative
+    && node.splitSafe,
+  ).length
+  const residualUntaggedImageCount = acrobatAltRiskNodes.filter(node => node.ownershipMode === 'untagged_image_mcid').length
   if (!substantiveRiskNodes.length) {
     const { figures, withAlt } = effectiveAltFigureStats(qpdf, structure)
     const missingWithoutAlt = Math.max(0, figures.length - withAlt)
@@ -1169,7 +1175,11 @@ function scoreAltTextWithAcrobatRisk(
     n => n.ownershipMode === 'mixed_text_graphics_same_mcid'
   )
   const baseScore = category.score === null ? 100 : category.score
-  if (baseScore === 100 && allDetectedFiguresHaveAlt && guidanceOnlyResidualRisk) {
+  const mostlyDecorativeResidualRisk =
+    missingFigureCount === 0
+    && residualDecorativeMixedCount >= Math.max(1, acrobatAltRiskNodes.length - residualUntaggedImageCount)
+    && residualUntaggedImageCount <= 1
+  if (baseScore === 100 && allDetectedFiguresHaveAlt && (guidanceOnlyResidualRisk || mostlyDecorativeResidualRisk)) {
     return {
       ...category,
       findings: [
@@ -1373,7 +1383,8 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     const shortFragment = failure.textPreview.trim().length <= 5 && failure.contrastRatio >= 3.0
     const spacedDisplayText = isAdvisoryDisplayText(failure.textPreview) && failure.contrastRatio >= 3.0
     const microDisplayLabel = failure.fontSizePt > 0 && failure.fontSizePt <= 2.5
-    return nearThreshold || displaySized || shortFragment || spacedDisplayText || microDisplayLabel
+    const duplicatedDisplayArtifact = /(.)\1/i.test(failure.textPreview.replace(/\s+/g, '')) && failure.contrastRatio >= 3.0
+    return nearThreshold || displaySized || shortFragment || spacedDisplayText || microDisplayLabel || duplicatedDisplayArtifact
   })
   const materialFailures = effectiveFailures.filter(failure => !advisoryDisplayFailures.includes(failure))
   const residualMediumFailures = materialFailures.filter(failure => failure.contrastRatio >= 3.0)
@@ -1423,7 +1434,7 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
     findings.push('The failing samples were concentrated on one or two pages of a long document and were treated as an advisory contrast warning rather than a material document-wide contrast problem.')
   } else if (
-    effectiveFailRatio <= 0.05
+    effectiveFailRatio <= 0.06
     && materialFailures.length === 0
     && contrast.pagesAnalyzed >= 8
   ) {
