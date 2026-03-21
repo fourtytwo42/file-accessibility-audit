@@ -3,6 +3,7 @@ import type { RemediationActionRecord, RemediationToolCall, ToolOpportunity } fr
 import { normalizeLanguageTag } from './languageTags.js'
 import { hasSemanticRepairConfig } from './semanticEnrichmentService.js'
 import { normalizedExistingHeadingLevel, type PdfRemediationContext } from './pdfRemediationTools.js'
+import { draftFigureAltText } from './altTextDraftingService.js'
 
 function humanizeFilenameTitle(filename: string): string {
   const base = filename.replace(/\.pdf$/i, '')
@@ -68,13 +69,11 @@ function headingLevelForCandidate(candidateId: string, context: PdfRemediationCo
 export function heuristicFigureAltText(candidateId: string, context: PdfRemediationContext): string {
   const candidate = context.figureCandidates.find(entry => entry.id === candidateId)
   if (!candidate) return 'Image'
-  if (candidate.splitGenerated || candidate.informativeHint === 'decorative') {
-    return `Decorative image on page ${candidate.pageNumber}`
-  }
-  if (candidate.surroundingText[0]) {
-    return `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
-  }
-  return `Image on page ${candidate.pageNumber}`
+  return draftFigureAltText({
+    pageNumber: candidate.pageNumber,
+    surroundingText: candidate.surroundingText,
+    decorative: candidate.splitGenerated || candidate.informativeHint === 'decorative',
+  })
 }
 
 function shouldPreferSemanticFigureAltText(candidateId: string, context: PdfRemediationContext): boolean {

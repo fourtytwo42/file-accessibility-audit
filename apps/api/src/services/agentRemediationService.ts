@@ -52,6 +52,7 @@ import {
 import { deriveDeterministicCall, heuristicFigureAltText } from './remediationCallDerivationService.js'
 import { ensureDisplayDocTitle } from './pdfOutputFinalizer.js'
 import { loadAltTextSidecar, planAltTextSidecarDirectives, syncAltTextSidecar } from './altTextSidecarService.js'
+import { draftFigureAltText } from './altTextDraftingService.js'
 
 function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   const summary = result.verapdf
@@ -259,13 +260,11 @@ function looksLikeStageBatchProseHeadingText(text: string): boolean {
 }
 
 function stageBatchBootstrapFigureAltText(candidate: PdfRemediationContext['figureCandidates'][number]): string {
-  if (candidate.splitGenerated || candidate.informativeHint === 'decorative') {
-    return `Decorative image on page ${candidate.pageNumber}`
-  }
-  if (candidate.surroundingText[0]) {
-    return `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
-  }
-  return `Image on page ${candidate.pageNumber}`
+  return draftFigureAltText({
+    pageNumber: candidate.pageNumber,
+    surroundingText: candidate.surroundingText,
+    decorative: candidate.splitGenerated || candidate.informativeHint === 'decorative',
+  })
 }
 
 function batchActionCategoryTargets(tool: RemediationToolCall['tool_name']): string[] {

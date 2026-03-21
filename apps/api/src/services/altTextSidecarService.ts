@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
+import { draftFigureAltText } from './altTextDraftingService.js'
 
 export type AltTextSidecarStatus = 'needs_review' | 'approved' | 'decorative'
 
@@ -53,9 +54,11 @@ function buildFigureAIDraft(
   candidate: PdfRemediationContext['figureCandidates'][number],
 ): string | null {
   if (candidate.informativeHint === 'decorative' || candidate.splitGenerated) return null
-  const firstLine = normalizeText(candidate.surroundingText?.[0])
-  if (firstLine) return `Image related to ${firstLine.replace(/[.]+$/, '').slice(0, 120)}`
-  return `Image on page ${candidate.pageNumber}`
+  return draftFigureAltText({
+    pageNumber: candidate.pageNumber,
+    surroundingText: candidate.surroundingText,
+    decorative: false,
+  })
 }
 
 function candidatePriority(candidate: PdfRemediationContext['figureCandidates'][number]): number {

@@ -76,7 +76,7 @@ describe('altTextSidecarService', () => {
     })
 
     const persisted = await loadAltTextSidecar(artifactsDir)
-    expect(persisted?.entries['sha:abc']?.aiDraft).toContain('County outcomes chart')
+    expect(persisted?.entries['sha:abc']?.aiDraft).toBe('County outcomes chart')
   })
 
   it('preserves approved entries across reruns of the same canonical image', async () => {

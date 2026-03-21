@@ -22,6 +22,7 @@ import { runAdobeAutoTag } from './adobePdfServices.js'
 import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
 import { normalizeLanguageTag } from './languageTags.js'
 import { ANALYSIS, REMEDIATION } from '#config'
+import { draftFigureAltText } from './altTextDraftingService.js'
 import type {
   AppliedChange,
   BoundingBox,
@@ -268,13 +269,11 @@ export interface TableCandidate {
 }
 
 function bootstrapFigureAltText(candidate: FigureCandidate): string {
-  if (candidate.splitGenerated || candidate.informativeHint === 'decorative') {
-    return `Decorative image on page ${candidate.pageNumber}`
-  }
-  if (candidate.surroundingText[0]) {
-    return `Image related to ${candidate.surroundingText[0].replace(/[.]+$/, '').slice(0, 80)}`
-  }
-  return `Image on page ${candidate.pageNumber}`
+  return draftFigureAltText({
+    pageNumber: candidate.pageNumber,
+    surroundingText: candidate.surroundingText,
+    decorative: candidate.splitGenerated || candidate.informativeHint === 'decorative',
+  })
 }
 
 function isSemanticAiEligibleDeferredFigureCandidate(candidate: FigureCandidate | null | undefined): boolean {
