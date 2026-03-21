@@ -4931,6 +4931,147 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     )).toBe(true)
   })
 
+  it('retries low-quality existing figure alt text during the late heuristic pass', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'late-low-quality-alt.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 88,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'unavailable', executionStatus: 'missing_binary', failedChecks: 0, failures: [] }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text', weight: 0.15, score: 80, grade: 'B', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation
+      .mockResolvedValueOnce({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:49 0 R', hasAlt: true, altText: 'Image related to chart' }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [{
+          id: 'figure:1',
+          pageNumber: 1,
+          targetRef: 'obj:49 0 R',
+          hasAlt: true,
+          hasLowQualityAlt: true,
+          altText: 'Image related to chart',
+          informativeHint: 'informative',
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          pageImageCount: 1,
+          textDensityHint: 'high',
+          imageEvidence: 'strong',
+          surroundingText: ['Organizational culture chart'],
+          parentTagPath: ['/Figure'],
+        }],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      })
+      .mockResolvedValue({
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [{ ref: 'obj:49 0 R', hasAlt: true, altText: 'Image related to chart' }], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [{
+          id: 'figure:1',
+          pageNumber: 1,
+          targetRef: 'obj:49 0 R',
+          hasAlt: true,
+          hasLowQualityAlt: true,
+          altText: 'Image related to chart',
+          informativeHint: 'informative',
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          pageImageCount: 1,
+          textDensityHint: 'high',
+          imageEvidence: 'strong',
+          surroundingText: ['Organizational culture chart'],
+          parentTagPath: ['/Figure'],
+        }],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      })
+
+    planRemediationActions.mockResolvedValue({
+      done: false,
+      unresolvedIssues: ['alt_text'],
+      actions: [
+        { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:1', altText: 'Organizational culture chart' }, rationale: 'Improve generic alt', confidence: 0.8 },
+      ],
+    })
+    generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 1',
+          candidateId: 'figure:1',
+          details: 'first pass no effect',
+          confidence: 0.8,
+          autoApplied: false,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          outcome: 'no_effect',
+        },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdf'),
+        action: {
+          tool: 'set_figure_alt_text',
+          target: 'page 1',
+          candidateId: 'figure:1',
+          details: 'late heuristic retry for low-quality existing alt',
+          confidence: 0.55,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          categoryTargets: ['alt_text'],
+          generationSource: 'heuristic_fallback',
+          outcome: 'applied',
+        },
+        manualReviewFlags: [],
+      })
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'late-low-quality-alt.pdf', originalResult)
+
+    expect(executeRemediationTool.mock.calls.some(call =>
+      call[0].call.arguments?.candidateId === 'figure:1'
+      && call[0].call.arguments?.generationSource === 'heuristic_fallback'
+    )).toBe(true)
+    expect(result.model.actions?.some(action =>
+      action.candidateId === 'figure:1' && action.generationSource === 'heuristic_fallback'
+    )).toBe(true)
+  })
+
   it('tracks late heuristic figure retries by stable targetRef instead of recycled candidate ids', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

@@ -195,6 +195,7 @@ export interface FigureCandidate {
   placementCount?: number
   hasAlt: boolean
   altText?: string | null
+  hasLowQualityAlt?: boolean
   informativeHint: 'informative' | 'decorative' | 'unknown'
   surroundingText: string[]
   repairMode: 'set_alt' | 'retag_then_set_alt' | 'defer'
@@ -208,6 +209,19 @@ export interface FigureCandidate {
   splitGenerated?: boolean
   splitSourceRef?: string | null
   splitSourceTag?: string | null
+}
+
+function normalizeFigureAltQualityText(text: string | null | undefined): string {
+  return String(text || '').replace(/^u:/, '').trim().toLowerCase()
+}
+
+function hasLowQualityFigureAltText(text: string | null | undefined): boolean {
+  const normalized = normalizeFigureAltQualityText(text)
+  if (!normalized) return false
+  if (/^(image|picture|photo|graphic)\s+of\b/i.test(normalized)) return true
+  if (/^image related to\b/i.test(normalized)) return true
+  if (normalized.length > 220 || normalized.split(/\s+/).filter(Boolean).length > 32) return true
+  return new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo', 'figure 1', 'figure 2']).has(normalized)
 }
 
 export interface ReadingOrderCandidate {
@@ -871,6 +885,7 @@ function buildFigureCandidates(
       placementCount: qpdfImage?.placementCount || 1,
       hasAlt: figure.hasAlt,
       altText: figure.altText || null,
+      hasLowQualityAlt: figure.hasAlt && hasLowQualityFigureAltText(figure.altText || null),
       informativeHint,
       surroundingText,
       repairMode: classification.repairMode,
@@ -905,6 +920,7 @@ function buildFigureCandidates(
       placementCount: qpdfImage?.placementCount || 1,
       hasAlt: node.hasAlt,
       altText: node.altText || null,
+      hasLowQualityAlt: node.hasAlt && hasLowQualityFigureAltText(node.altText || null),
       informativeHint: surroundingText.length > 0 ? 'informative' as const : 'unknown' as const,
       surroundingText,
       repairMode: classification.repairMode,
@@ -1000,7 +1016,8 @@ function buildFigureCandidates(
       placementPageNumbers: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.placementPageNumbers || [page.pageNumber],
       placementCount: qpdf.images.find(image => image.pageNumber === page.pageNumber)?.placementCount || 1,
       hasAlt: !!figureByRef.get(targetRef || '')?.hasAlt,
-      altText: null,
+      altText: figureByRef.get(targetRef || '')?.altText || null,
+      hasLowQualityAlt: !!figureByRef.get(targetRef || '')?.hasAlt && hasLowQualityFigureAltText(figureByRef.get(targetRef || '')?.altText || null),
       informativeHint: page.textLines.length ? 'informative' as const : 'unknown' as const,
       surroundingText,
       repairMode: classification.repairMode,

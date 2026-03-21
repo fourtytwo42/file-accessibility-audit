@@ -991,14 +991,15 @@ function heuristicEligibleFigureCandidates(context: Awaited<ReturnType<typeof in
     .filter(candidate =>
       candidate.repairMode !== 'defer'
       && candidate.informativeHint !== 'decorative'
-      && (!candidate.hasAlt || candidate.repairMode === 'retag_then_set_alt')
+      && (!candidate.hasAlt || !!candidate.hasLowQualityAlt || candidate.repairMode === 'retag_then_set_alt')
     )
     .sort((left, right) => {
       const priority = (candidate: PdfRemediationContext['figureCandidates'][number]): number => {
         if (candidate.repairMode === 'retag_then_set_alt' && !candidate.hasAlt) return 0
         if (candidate.repairMode === 'set_alt' && !candidate.hasAlt) return 1
-        if (candidate.repairMode === 'retag_then_set_alt') return 2
-        return 3
+        if (candidate.repairMode === 'set_alt' && candidate.hasLowQualityAlt) return 2
+        if (candidate.repairMode === 'retag_then_set_alt') return 3
+        return 4
       }
       return priority(left) - priority(right)
     })
@@ -1013,6 +1014,7 @@ function shouldRetryLateHeuristicFigureCandidate(
     : previousActionNames.includes(`set_figure_alt_text:${candidate.id}`)
   if (!attemptedSetAlt) return true
   return candidate.repairMode === 'retag_then_set_alt'
+    || !!candidate.hasLowQualityAlt
     || (candidate.repairMode === 'set_alt' && candidate.targetTag === '/Figure' && !candidate.hasAlt)
 }
 
