@@ -268,6 +268,33 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.inferred).toBe(true)
   })
 
+  it('suppresses content-order-only logical-structure debt when other semantic structure is already present', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        structTreeDepth: 2,
+        contentOrder: [],
+        headings: [{ tag: '/H1', text: 'Heading' }] as any,
+      }),
+      makePdfjs({ textLength: 400, hasText: true }),
+      {
+        structure: makeStructure({
+          structuralNodes: [
+            { ref: 'obj:1 0 R', tag: '/Document', orderIndex: 0 },
+            { ref: 'obj:2 0 R', tag: '/H1', orderIndex: 1 },
+          ] as any,
+        }),
+      },
+    )
+
+    expect(report.findings.some(entry =>
+      entry.key === 'pdfua.logical_structure'
+      && entry.evidence.some(evidence => evidence.includes('no content-order MCID trace'))
+    )).toBe(false)
+  })
+
   it('emits inferred logical-structure findings for untagged top-level page content groups', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

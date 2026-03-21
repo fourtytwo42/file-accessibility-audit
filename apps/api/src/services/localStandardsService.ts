@@ -61,7 +61,12 @@ function missingLogicalStructureFinding(
   }
 
   const structureNodeCount = structure?.structuralNodes?.length ?? 0
-  const weakContentEvidence = pdfjs.textLength > 0 && qpdf.contentOrder.length === 0
+  const semanticCoveragePresent = qpdf.headings.length > 0
+    || qpdf.tables.length > 0
+    || qpdf.images.length > 0
+    || (qpdf.linkStructCount ?? 0) > 0
+    || structureNodeCount > 1
+  const weakContentEvidence = pdfjs.textLength > 0 && qpdf.contentOrder.length === 0 && !semanticCoveragePresent
   const shallowStructureTree = qpdf.hasStructTree && qpdf.structTreeDepth > 0 && qpdf.structTreeDepth <= 1
   const sparseStructureSnapshot = qpdf.hasStructTree && structureNodeCount > 0 && structureNodeCount <= 1 && pdfjs.textLength > 0
   const figureCount = structure?.figures?.length ?? 0
@@ -516,7 +521,11 @@ function tableRegularityFinding(qpdf: QpdfResult): LocalStandardsFinding | null 
 }
 
 function partialArtifactFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalStandardsFinding | null {
-  if (!qpdf.hasStructTree || pdfjs.textLength === 0 || qpdf.contentOrder.length > 0) return null
+  const semanticCoveragePresent = qpdf.headings.length > 0
+    || qpdf.tables.length > 0
+    || qpdf.images.length > 0
+    || (qpdf.linkStructCount ?? 0) > 0
+  if (!qpdf.hasStructTree || pdfjs.textLength === 0 || qpdf.contentOrder.length > 0 || semanticCoveragePresent) return null
   return {
     key: 'pdfua.logical_structure',
     label: 'Logical structure and marked content',
