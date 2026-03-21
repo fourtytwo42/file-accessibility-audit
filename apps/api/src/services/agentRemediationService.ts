@@ -891,6 +891,32 @@ function rejectAction(input: {
   }
 }
 
+function rejectActionForRegression(
+  action: RemediationActionRecord,
+  reason: string,
+  isolated: boolean,
+): RemediationActionRecord {
+  return {
+    ...action,
+    details: isolated
+      ? `${action.details} Rejected because it was isolated as the regressing action: ${reason}.`
+      : `${action.details} Rejected because ${reason}.`,
+    outcome: 'rejected',
+    autoApplied: false,
+    changedDocumentBytes: false,
+  }
+}
+
+function isolationCandidateIndexes(stageActions: RemediationActionRecord[]): number[] {
+  return stageActions
+    .map((action, index) => ({
+      action,
+      index,
+    }))
+    .filter(({ action }) => !!action.changedDocumentBytes || action.outcome === 'no_effect')
+    .map(({ index }) => index)
+}
+
 function semanticThreshold(batchType: SemanticBatchResult['batchType']): number {
   return batchType === 'figures' ? 0.75 : 0.8
 }
@@ -1312,6 +1338,10 @@ async function runSemanticEnrichmentStage(input: {
       call: Parameters<typeof executeRemediationTool>[0]['call']
     }>,
     batchContext: Awaited<ReturnType<typeof inspectPdfForRemediation>>,
+    executionOptions?: {
+      startBuffer?: Buffer
+      baselineResult?: AnalysisResult
+    },
   ): Promise<{
     buffer: Buffer
     actions: RemediationActionRecord[]
@@ -1319,7 +1349,8 @@ async function runSemanticEnrichmentStage(input: {
     changedDocument: boolean
     context: Awaited<ReturnType<typeof inspectPdfForRemediation>>
   }> => {
-    let working = workingBuffer
+    const baselineResult = executionOptions?.baselineResult || currentResult
+    let working = executionOptions?.startBuffer || workingBuffer
     let context = batchContext
     let changedDocument = false
     const actions: RemediationActionRecord[] = []
@@ -1342,7 +1373,7 @@ async function runSemanticEnrichmentStage(input: {
         flags = mergeManualReviewFlags(flags, outcome.manualReviewFlags)
         changedDocument = changedDocument || !!outcome.action.changedDocumentBytes
         if (outcome.action.changedDocumentBytes) {
-          context = await inspectPdfForRemediation(working, currentResult, {
+          context = await inspectPdfForRemediation(working, baselineResult, {
             cache: input.inspectionCache,
           })
         }
@@ -1371,7 +1402,7 @@ async function runSemanticEnrichmentStage(input: {
         flags = mergeManualReviewFlags(flags, outcome.manualReviewFlags)
         changedDocument = changedDocument || !!outcome.action.changedDocumentBytes
         if (outcome.action.changedDocumentBytes) {
-          context = await inspectPdfForRemediation(working, currentResult, {
+          context = await inspectPdfForRemediation(working, baselineResult, {
             cache: input.inspectionCache,
           })
         }
@@ -1384,7 +1415,7 @@ async function runSemanticEnrichmentStage(input: {
         buffer: working,
         mutations,
         includeSnapshot: false,
-        inspectMode: inspectModeForResult(currentResult),
+        inspectMode: inspectModeForResult(baselineResult),
       })
       const operationResults = batchResult.operationResults || []
       const validBatch = batchResult.status !== 'failed'
@@ -1403,7 +1434,7 @@ async function runSemanticEnrichmentStage(input: {
           flags = mergeManualReviewFlags(flags, outcome.manualReviewFlags)
           changedDocument = changedDocument || !!outcome.action.changedDocumentBytes
           if (outcome.action.changedDocumentBytes) {
-            context = await inspectPdfForRemediation(working, currentResult, {
+            context = await inspectPdfForRemediation(working, baselineResult, {
               cache: input.inspectionCache,
             })
           }
@@ -1426,7 +1457,7 @@ async function runSemanticEnrichmentStage(input: {
       }
       if (operationResults.some(result => result.changedDocumentBytes)) {
         changedDocument = true
-        context = await inspectPdfForRemediation(working, currentResult, {
+        context = await inspectPdfForRemediation(working, baselineResult, {
           cache: input.inspectionCache,
         })
       }
@@ -1632,6 +1663,7 @@ async function runSemanticEnrichmentStage(input: {
     input.onProgress?.({ stage: `Applying semantic fixes: ${batch.batchType}`, percent: 89 })
     const batchStartBuffer = workingBuffer
     const batchStartResult = currentResult
+    const batchStartContext = context
     const batchActions: RemediationActionRecord[] = []
     const executedBatch = await executeSemanticCalls(plannedCalls, context)
     const batchBuffer = executedBatch.buffer
@@ -1663,14 +1695,105 @@ async function runSemanticEnrichmentStage(input: {
     )
 
     if (hasCategoryRegression || hasVisibleRegression || hasStandardsRegression) {
-      for (const action of batchActions) {
-        const rejected = {
-          ...action,
-          details: `${action.details} Rejected because the semantic batch regressed validation or category scores.`,
-          outcome: 'rejected' as const,
-          autoApplied: false,
-          changedDocumentBytes: false,
+      const candidateIndexes = isolationCandidateIndexes(batchActions)
+      let isolated = false
+
+      if (candidateIndexes.length >= 2) {
+        for (let removeCount = 1; removeCount <= candidateIndexes.length; removeCount += 1) {
+          const removedIndexes = new Set(candidateIndexes.slice(-removeCount))
+          const retainedCalls = plannedCalls.filter((_, index) => !removedIndexes.has(index))
+          if (!retainedCalls.length) continue
+
+          const replayedBatch = await executeSemanticCalls(retainedCalls, context, {
+            startBuffer: batchStartBuffer,
+            baselineResult: batchStartResult,
+          })
+
+          if (!replayedBatch.changedDocument) {
+            const rejectedActions = batchActions
+              .filter((_, index) => removedIndexes.has(index))
+              .map(action => rejectActionForRegression(
+                action,
+                'the semantic batch regressed validation or targeted scores',
+                true,
+              ))
+            acceptedActions.push(...replayedBatch.actions, ...rejectedActions)
+            input.rejectedActions.push(...rejectedActions)
+            manualReviewFlags.push(...mergeManualReviewFlags(replayedBatch.manualReviewFlags, [{
+              code: `semantic_${batch.batchType}_isolated_regression`,
+              label: 'AI semantic repair isolated',
+              severity: 'warning',
+              details: `Rejected isolated ${batch.batchType} semantic repairs after replay showed the remaining calls were safe.`,
+            }]))
+            workingBuffer = batchStartBuffer
+            currentResult = batchStartResult
+            context = batchStartContext
+            isolated = true
+            break
+          }
+
+          const analyzedReplay = await analyzePDF(replayedBatch.buffer, input.filename, {
+            analysisProfile: 'remediation_fast',
+            signal: input.signal,
+            skipAdobe: true,
+            inheritedVeraPdf: batchStartResult.verapdf,
+          })
+          usedInheritedVeraPdf = true
+          const replayTargetedCategories = [...new Set(replayedBatch.actions.flatMap(action => action.categoryTargets || []))]
+          const replayHasCategoryRegression = replayTargetedCategories.some(categoryId => categoryRegression(batchStartResult, analyzedReplay, categoryId))
+          const replayHasVisibleRegression = replayedBatch.actions.some(action =>
+            !!shouldRejectNativeVisibleRewrite(batchStartResult, analyzedReplay, action)
+          )
+          const replayHasStandardsRegression = replayedBatch.actions.some(action =>
+            !!hasNativeStandardsRegression(batchStartResult, analyzedReplay, action.tool)
+          )
+          if (replayHasCategoryRegression || replayHasVisibleRegression || replayHasStandardsRegression) {
+            continue
+          }
+
+          for (const action of replayedBatch.actions) {
+            const targets = action.categoryTargets || []
+            action.scoreDelta = targets.map(categoryId => ({
+              categoryId,
+              before: scoreForCategory(batchStartResult, categoryId),
+              after: scoreForCategory(analyzedReplay, categoryId),
+            }))
+            if (action.outcome === 'applied' && action.scoreDelta.length && !action.scoreDelta.some(delta => (delta.after ?? -1) > (delta.before ?? -1))) {
+              action.outcome = 'no_effect'
+            }
+          }
+
+          const rejectedActions = batchActions
+            .filter((_, index) => removedIndexes.has(index))
+            .map(action => rejectActionForRegression(
+              action,
+              'the semantic batch regressed validation or targeted scores',
+              true,
+            ))
+          acceptedActions.push(...replayedBatch.actions, ...rejectedActions)
+          input.rejectedActions.push(...rejectedActions)
+          manualReviewFlags.push(...mergeManualReviewFlags(replayedBatch.manualReviewFlags, [{
+            code: `semantic_${batch.batchType}_isolated_regression`,
+            label: 'AI semantic repair isolated',
+            severity: 'warning',
+            details: `Rejected isolated ${batch.batchType} semantic repairs after replay showed the remaining calls were safe.`,
+          }]))
+          workingBuffer = replayedBatch.buffer
+          currentResult = analyzedReplay
+          context = replayedBatch.context
+          isolated = true
+          break
         }
+      }
+
+      if (isolated) continue
+
+      for (const action of batchActions) {
+        const rejected = rejectActionForRegression(
+          action,
+          'the semantic batch regressed validation or category scores',
+          false,
+        )
         acceptedActions.push(rejected)
         input.rejectedActions.push(rejected)
       }
@@ -2754,6 +2877,185 @@ export async function remediatePdfWithAgent(
     }
   }
 
+  const replaceStageActionsInHistory = (
+    history: RemediationActionRecord[],
+    originalActions: RemediationActionRecord[],
+    replacementActions: RemediationActionRecord[],
+  ): void => {
+    if (!originalActions.length) {
+      history.push(...replacementActions)
+      return
+    }
+    const startIndex = history.indexOf(originalActions[0]!)
+    if (startIndex < 0) return
+    history.splice(startIndex, originalActions.length, ...replacementActions)
+  }
+
+  const executeNonNativeStageCalls = async (
+    stageCalls: RemediationToolCall[],
+    stageExecutionContext: Awaited<ReturnType<typeof inspectPdfForRemediation>>,
+    startBuffer: Buffer,
+  ): Promise<{
+    buffer: Buffer
+    actions: RemediationActionRecord[]
+    manualReviewFlags: ModelReviewFlag[]
+    changedDocument: boolean
+  }> => {
+    let attemptBuffer = startBuffer
+    let changedDocument = false
+    const attemptActions: RemediationActionRecord[] = []
+    let attemptFlags: ModelReviewFlag[] = []
+
+    for (const cluster of clusterStageCalls(stageCalls, stageExecutionContext)) {
+      if (options?.signal?.aborted) {
+        const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
+        error.aborted = true
+        throw error
+      }
+
+      const execution = await executeBatchedCluster(cluster, attemptBuffer, stageExecutionContext)
+      attemptBuffer = execution.buffer
+      if (execution.changedDocument) changedDocument = true
+      attemptActions.push(...execution.actions)
+      attemptFlags = mergeManualReviewFlags(attemptFlags, execution.manualReviewFlags)
+    }
+
+    return {
+      buffer: attemptBuffer,
+      actions: attemptActions,
+      manualReviewFlags: attemptFlags,
+      changedDocument,
+    }
+  }
+
+  const persistResolvedStageToolOutcomes = (
+    acceptedActions: RemediationActionRecord[],
+    rejectedStageActions: RemediationActionRecord[],
+    input: {
+      previous: AnalysisResult
+      next: AnalysisResult
+      roundNumber: number
+      stageNumber: number
+      standardsImproved: boolean
+      playbookId?: string | null
+      playbookRunId?: string | null
+    },
+  ): void => {
+    if (acceptedActions.length) {
+      persistStageToolOutcomes(acceptedActions, input)
+    }
+    if (rejectedStageActions.length) {
+      persistStageToolOutcomes(rejectedStageActions, {
+        ...input,
+        next: input.previous,
+        standardsImproved: false,
+      })
+    }
+  }
+
+  const tryIsolateNonNativeStageRegression = async (input: {
+    stageCalls: RemediationToolCall[]
+    stageActions: RemediationActionRecord[]
+    stageStartBuffer: Buffer
+    stageStartResult: AnalysisResult
+    stageStartContext: Awaited<ReturnType<typeof inspectPdfForRemediation>>
+    stageStartTitle: string
+    stageStartLanguage: string
+    rejectionReason: string
+  }): Promise<null | {
+    stageActions: RemediationActionRecord[]
+    acceptedActions: RemediationActionRecord[]
+    rejectedActions: RemediationActionRecord[]
+    buffer: Buffer
+    result: AnalysisResult
+    context: Awaited<ReturnType<typeof inspectPdfForRemediation>>
+    title: string
+    language: string
+    manualReviewFlags: ModelReviewFlag[]
+    changedDocument: boolean
+    improvedStandards: boolean
+    improvedTargets: boolean
+    appliedAcrobatAltRepair: boolean
+  }> => {
+    const candidateIndexes = isolationCandidateIndexes(input.stageActions)
+    if (candidateIndexes.length < 2) return null
+
+    for (let removeCount = 1; removeCount <= candidateIndexes.length; removeCount += 1) {
+      const removedIndexes = new Set(candidateIndexes.slice(-removeCount))
+      const retainedCalls = input.stageCalls.filter((_, index) => !removedIndexes.has(index))
+      if (!retainedCalls.length) continue
+
+      const replay = await executeNonNativeStageCalls(
+        retainedCalls,
+        input.stageStartContext,
+        input.stageStartBuffer,
+      )
+
+      if (!replay.changedDocument) {
+        const rejectedActions = input.stageActions
+          .filter((_, index) => removedIndexes.has(index))
+          .map(action => rejectActionForRegression(action, input.rejectionReason, true))
+        return {
+          stageActions: [...replay.actions, ...rejectedActions],
+          acceptedActions: replay.actions,
+          rejectedActions,
+          buffer: input.stageStartBuffer,
+          result: input.stageStartResult,
+          context: input.stageStartContext,
+          title: input.stageStartTitle,
+          language: input.stageStartLanguage,
+          manualReviewFlags: replay.manualReviewFlags,
+          changedDocument: false,
+          improvedStandards: false,
+          improvedTargets: false,
+          appliedAcrobatAltRepair: false,
+        }
+      }
+
+      const analyzedReplay = await analyzeIntermediate(replay.buffer, input.stageStartResult, {
+        forceStructureForScoring: requiresDeepStructureScoring(replay.actions),
+        preferDeepStructureInspect: requiresDeepStructureInspect(replay.actions),
+      })
+      const appliedAcrobatAltRepair = replay.actions.some(action =>
+        action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
+      )
+      const acceptanceDecision = evaluateStageAcceptance(input.stageStartResult, analyzedReplay, replay.actions)
+      const improvedStandards = acceptanceDecision.standardsImproved
+      let improvedTargets = false
+      for (const action of replay.actions) {
+        improvedTargets = applyScoreDelta(action, input.stageStartResult, analyzedReplay) || improvedTargets
+        if (!improvedTargets && action.outcome === 'applied') action.outcome = 'no_effect'
+      }
+
+      if (!appliedAcrobatAltRepair && !acceptanceDecision.accept) {
+        continue
+      }
+
+      const replayContext = await inspectRemediationContext(replay.buffer, analyzedReplay)
+      const rejectedActions = input.stageActions
+        .filter((_, index) => removedIndexes.has(index))
+        .map(action => rejectActionForRegression(action, input.rejectionReason, true))
+
+      return {
+        stageActions: [...replay.actions, ...rejectedActions],
+        acceptedActions: replay.actions,
+        rejectedActions,
+        buffer: replay.buffer,
+        result: analyzedReplay,
+        context: replayContext,
+        title: replayContext.pdfjs.title || input.stageStartTitle,
+        language: replayContext.qpdf.lang || replayContext.pdfjs.lang || input.stageStartLanguage,
+        manualReviewFlags: replay.manualReviewFlags,
+        changedDocument: true,
+        improvedStandards,
+        improvedTargets,
+        appliedAcrobatAltRepair,
+      }
+    }
+
+    return null
+  }
+
   const buildOrderedStages = (calls: RemediationToolCall[]): [number, RemediationToolCall[]][] => {
     const stageMap = new Map<number, RemediationToolCall[]>()
     for (const call of filterCallsForPipeline(calls)) {
@@ -3063,21 +3365,13 @@ export async function remediatePdfWithAgent(
         stageImprovedTargets = stageActions.some(action => actionHasMeaningfulProgress(action))
       }
     } else {
-    for (const cluster of clusterStageCalls(stageCalls, stageContext)) {
-      if (options?.signal?.aborted) {
-        const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
-        error.aborted = true
-        throw error
-      }
-
-      const execution = await executeBatchedCluster(cluster, workingBuffer, stageContext)
+      const execution = await executeNonNativeStageCalls(stageCalls, stageContext, workingBuffer)
       workingBuffer = execution.buffer
       if (execution.changedDocument) stageChangedDocument = true
       stageActions.push(...execution.actions)
       actions.push(...execution.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, execution.manualReviewFlags)
       for (const action of execution.actions) markInspectionDirtyFromAction(inspectionState, action)
-    }
     }
 
     // Non-native mode: single analysis per stage (instead of per action)
@@ -3099,38 +3393,75 @@ export async function remediatePdfWithAgent(
       }
 
       if (!isAcrobatAltRepair && !acceptanceDecision.accept) {
-        // Rollback entire stage
-        for (const action of stageActions) {
-          if (action.changedDocumentBytes || action.outcome === 'no_effect') {
-            const rejected = {
-              ...action,
-              details: `${action.details} Rejected because ${acceptanceDecision.reason || 'the stage failed the net-benefit acceptance policy'}.`,
-              outcome: 'rejected' as const,
-              autoApplied: false,
-              changedDocumentBytes: false,
-            }
-            const idx = actions.indexOf(action)
-            if (idx >= 0) actions[idx] = rejected
-            const stageIdx = stageActions.indexOf(action)
-            if (stageIdx >= 0) stageActions[stageIdx] = rejected
-            rejectedActions.push(rejected)
+        const isolationReason = acceptanceDecision.reason || 'the stage failed the net-benefit acceptance policy'
+        const isolatedStage = await tryIsolateNonNativeStageRegression({
+          stageCalls,
+          stageActions,
+          stageStartBuffer,
+          stageStartResult,
+          stageStartContext: stageContext,
+          stageStartTitle: currentTitle,
+          stageStartLanguage: currentLanguage,
+          rejectionReason: isolationReason,
+        })
+
+        if (isolatedStage) {
+          replaceStageActionsInHistory(actions, stageActions, isolatedStage.stageActions)
+          stageActions.splice(0, stageActions.length, ...isolatedStage.stageActions)
+          rejectedActions.push(...isolatedStage.rejectedActions)
+          workingBuffer = isolatedStage.buffer
+          currentResult = isolatedStage.result
+          stageContext = isolatedStage.context
+          currentTitle = isolatedStage.title
+          currentLanguage = isolatedStage.language
+          manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, isolatedStage.manualReviewFlags)
+          manualReviewFlags = addFlag(manualReviewFlags, {
+            code: `stage_${stageNum}_isolated_regression`,
+            label: 'Regressive tool isolated',
+            severity: 'warning',
+            details: `Rejected isolated tool changes from stage ${stageNum} because ${isolationReason}.`,
+          })
+          stageChangedDocument = isolatedStage.changedDocument
+          stageImprovedStandards = isolatedStage.improvedStandards
+          stageImprovedTargets = isolatedStage.improvedTargets
+          stageAppliedAcrobatAltRepair = isolatedStage.appliedAcrobatAltRepair
+          currentResultHasFreshVeraPdf = false
+          persistResolvedStageToolOutcomes(isolatedStage.acceptedActions, isolatedStage.rejectedActions, {
+            previous: stageStartResult,
+            next: isolatedStage.result,
+            roundNumber: round,
+            stageNumber: stageNum,
+            standardsImproved: isolatedStage.improvedStandards,
+          })
+          await maybeRefreshClassificationFromStage(stageActions)
+        } else {
+          // Rollback entire stage
+          const rejectedStageActions = stageActions.map(action =>
+            (action.changedDocumentBytes || action.outcome === 'no_effect')
+              ? rejectActionForRegression(action, isolationReason, false)
+              : action,
+          )
+          replaceStageActionsInHistory(actions, stageActions, rejectedStageActions)
+          stageActions.splice(0, stageActions.length, ...rejectedStageActions)
+          for (const action of rejectedStageActions) {
+            if (action.outcome === 'rejected') rejectedActions.push(action)
           }
+          manualReviewFlags = addFlag(manualReviewFlags, {
+            code: `stage_${stageNum}_regressed`,
+            label: 'Regressive stage rejected',
+            severity: 'warning',
+            details: `Rejected remediation stage ${stageNum} because ${acceptanceDecision.reason || 'it failed the net-benefit acceptance policy'}.`,
+          })
+          workingBuffer = stageStartBuffer
+          currentResult = stageStartResult
+          persistStageToolOutcomes(stageActions, {
+            previous: stageStartResult,
+            next: stageStartResult,
+            roundNumber: round,
+            stageNumber: stageNum,
+            standardsImproved: false,
+          })
         }
-        manualReviewFlags = addFlag(manualReviewFlags, {
-          code: `stage_${stageNum}_regressed`,
-          label: 'Regressive stage rejected',
-          severity: 'warning',
-          details: `Rejected remediation stage ${stageNum} because ${acceptanceDecision.reason || 'it failed the net-benefit acceptance policy'}.`,
-        })
-        workingBuffer = stageStartBuffer
-        currentResult = stageStartResult
-        persistStageToolOutcomes(stageActions, {
-          previous: stageStartResult,
-          next: stageStartResult,
-          roundNumber: round,
-          stageNumber: stageNum,
-          standardsImproved: false,
-        })
       } else {
         currentResult = analyzedStage
         currentResultHasFreshVeraPdf = false
@@ -3275,8 +3606,7 @@ export async function remediatePdfWithAgent(
         allExecutedActions.push(...nativeStage.stageActions)
         stageChangedDocument = nativeStage.stageChangedDocument
       } else {
-      for (const cluster of clusterStageCalls(stageCalls, stageContext)) {
-        const execution = await executeBatchedCluster(cluster, workingBuffer, stageContext)
+        const execution = await executeNonNativeStageCalls(stageCalls, stageContext, workingBuffer)
         workingBuffer = execution.buffer
         if (execution.changedDocument) stageChangedDocument = true
         stageActions.push(...execution.actions)
@@ -3284,7 +3614,6 @@ export async function remediatePdfWithAgent(
         allExecutedActions.push(...execution.actions)
         manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, execution.manualReviewFlags)
         for (const action of execution.actions) markInspectionDirtyFromAction(inspectionState, action)
-      }
       }
 
       if (!nativeTaggedSafeMode && stageChangedDocument) {
@@ -3301,31 +3630,64 @@ export async function remediatePdfWithAgent(
           if (!stageImprovedTargets && action.outcome === 'applied') action.outcome = 'no_effect'
         }
         if (!isAcrobatAltRepair && !acceptanceDecision.accept) {
-          for (const action of stageActions) {
-            if (action.changedDocumentBytes || action.outcome === 'no_effect') {
-              const rejected = {
-                ...action,
-                details: `${action.details} Rejected because ${acceptanceDecision.reason || `post-bootstrap stage ${stageNum} failed the net-benefit acceptance policy`}.`,
-                outcome: 'rejected' as const,
-                autoApplied: false,
-                changedDocumentBytes: false,
-              }
-              const idx = actions.indexOf(action)
-              if (idx >= 0) actions[idx] = rejected
-              const stageIdx = stageActions.indexOf(action)
-              if (stageIdx >= 0) stageActions[stageIdx] = rejected
-              rejectedActions.push(rejected)
-            }
-          }
-          workingBuffer = stageStartBuffer
-          currentResult = stageStartResult
-          persistStageToolOutcomes(stageActions, {
-            previous: stageStartResult,
-            next: stageStartResult,
-            roundNumber: round,
-            stageNumber: stageNum,
-            standardsImproved: false,
+          const isolationReason = acceptanceDecision.reason || `post-bootstrap stage ${stageNum} failed the net-benefit acceptance policy`
+          const isolatedStage = await tryIsolateNonNativeStageRegression({
+            stageCalls,
+            stageActions,
+            stageStartBuffer,
+            stageStartResult,
+            stageStartContext: stageContext,
+            stageStartTitle: currentTitle,
+            stageStartLanguage: currentLanguage,
+            rejectionReason: isolationReason,
           })
+
+          if (isolatedStage) {
+            replaceStageActionsInHistory(actions, stageActions, isolatedStage.stageActions)
+            replaceStageActionsInHistory(allExecutedActions, stageActions, isolatedStage.stageActions)
+            stageActions.splice(0, stageActions.length, ...isolatedStage.stageActions)
+            rejectedActions.push(...isolatedStage.rejectedActions)
+            workingBuffer = isolatedStage.buffer
+            currentResult = isolatedStage.result
+            currentTitle = isolatedStage.title
+            currentLanguage = isolatedStage.language
+            manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, isolatedStage.manualReviewFlags)
+            manualReviewFlags = addFlag(manualReviewFlags, {
+              code: `stage_${stageNum}_isolated_regression`,
+              label: 'Regressive tool isolated',
+              severity: 'warning',
+              details: `Rejected isolated post-bootstrap tool changes from stage ${stageNum} because ${isolationReason}.`,
+            })
+            currentResultHasFreshVeraPdf = false
+            persistResolvedStageToolOutcomes(isolatedStage.acceptedActions, isolatedStage.rejectedActions, {
+              previous: stageStartResult,
+              next: isolatedStage.result,
+              roundNumber: round,
+              stageNumber: stageNum,
+              standardsImproved: isolatedStage.improvedStandards,
+            })
+          } else {
+            const rejectedStageActions = stageActions.map(action =>
+              (action.changedDocumentBytes || action.outcome === 'no_effect')
+                ? rejectActionForRegression(action, isolationReason, false)
+                : action,
+            )
+            replaceStageActionsInHistory(actions, stageActions, rejectedStageActions)
+            replaceStageActionsInHistory(allExecutedActions, stageActions, rejectedStageActions)
+            stageActions.splice(0, stageActions.length, ...rejectedStageActions)
+            for (const action of rejectedStageActions) {
+              if (action.outcome === 'rejected') rejectedActions.push(action)
+            }
+            workingBuffer = stageStartBuffer
+            currentResult = stageStartResult
+            persistStageToolOutcomes(stageActions, {
+              previous: stageStartResult,
+              next: stageStartResult,
+              roundNumber: round,
+              stageNumber: stageNum,
+              standardsImproved: false,
+            })
+          }
         } else {
           currentResult = analyzedStage
           currentResultHasFreshVeraPdf = false
@@ -3422,13 +3784,17 @@ export async function remediatePdfWithAgent(
       ...previousActionNames,
       ...semanticStage.actions.flatMap(actionHistoryKeys),
     ]))
-    persistStageToolOutcomes(semanticStage.actions, {
+    persistResolvedStageToolOutcomes(
+      semanticStage.actions.filter(action => action.outcome !== 'rejected'),
+      semanticStage.actions.filter(action => action.outcome === 'rejected'),
+      {
       previous: semanticStageStartResult,
       next: currentResult,
       roundNumber: round,
       stageNumber: 90,
       standardsImproved: standardsValidationImproved(semanticStageStartResult, currentResult),
-    })
+      },
+    )
   }
 
   if (!skipDirectToFinalCleanup && (currentPipelineConfig?.semanticStrategy || 'full_ai') === 'full_ai' && shouldRunBookmarkCleanup(currentResult, originalResult, latestContext)) {
@@ -3468,13 +3834,17 @@ export async function remediatePdfWithAgent(
       ]))
       latestContext = await inspectRemediationContext(workingBuffer, currentResult)
     }
-    persistStageToolOutcomes(bookmarkStage.actions, {
+    persistResolvedStageToolOutcomes(
+      bookmarkStage.actions.filter(action => action.outcome !== 'rejected'),
+      bookmarkStage.actions.filter(action => action.outcome === 'rejected'),
+      {
       previous: bookmarkStageStartResult,
       next: currentResult,
       roundNumber: round,
       stageNumber: 91,
       standardsImproved: standardsValidationImproved(bookmarkStageStartResult, currentResult),
-    })
+      },
+    )
   }
 
   const lateAltPassNeeded = !skipDirectToFinalCleanup
