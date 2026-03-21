@@ -13,11 +13,11 @@
 
 - Active PDF: `juvenile2000study.pdf`
 - Latest attempt path: queue item `434adcbe-ca61-491b-8de7-36594d1997da`
-- Latest result summary: the first fresh rerun improved `juvenile2000study.pdf` from `23/F` to `89/B`, clearing structure, headings, bookmarks, alt text, and metadata. The remaining gap is a single `/Type0 /Identity-H` `MapInfoArrows` font still missing `ToUnicode`, plus residual CIDSet drift. The next deployed fix makes generic `ToUnicode` merging emit a CID CMap for `/Type0 /Identity-H` fonts instead of incorrectly using the simple-font builder.
-- Latest validation source: targeted `pdfRemediationTools` CID-symbol test, `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, and `pnpm --filter api exec tsc --noEmit` completed on 2026-03-21T00:11Z
-- Next action: commit/push the CID `ToUnicode` merge fix, restart the API, and rerun `juvenile2000study.pdf` fresh through the API
-- Next hypothesis: once `/Type0 /Identity-H` symbol fonts receive a proper CID `ToUnicode` stream, this file should move above `95` and likely to `100/A`
-- API restart status: restart required after the new CID `ToUnicode` fix before trusting the next queue result
+- Latest result summary: the first fresh rerun improved `juvenile2000study.pdf` from `23/F` to `89/B`, clearing structure, headings, bookmarks, alt text, and metadata. The first CID `ToUnicode` fix was not sufficient because `MapInfoArrows` reported only used code `0`, which filtered the deterministic fallback map down to nothing. The follow-up helper change now preserves the known fallback map for that collapsed-CID pattern, and a direct rebuilt-artifact probe confirms `repair_font_unicode_maps` applies cleanly to `/MapInfoArrows`.
+- Latest validation source: targeted `pdfRemediationTools` CID-symbol test, `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, `pnpm --filter api exec tsc --noEmit`, and a direct `tsx` probe against rebuilt artifact `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3.pdf` completed on 2026-03-21T00:14Z
+- Next action: commit/push the collapsed-CID fallback fix, restart the API again, and rerun `juvenile2000study.pdf` fresh through the API
+- Next hypothesis: now that `/MapInfoArrows` no longer filters down to an empty Unicode map, the remaining single-font blocker should clear and the file should move above `95`
+- API restart status: another restart is required because rerun `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3` finished on code that was stale relative to the latest helper change
 - Build status: latest source change is verified but not yet redeployed
 
 ## Current Concurrency
@@ -31,8 +31,8 @@
 
 - Active PDF: `juvenile2000study.pdf`
 - Current phase: close the last font-conformance gap exposed by the first fresh rerun
-- Immediate next step: deploy the CID `ToUnicode` merge fix, rerun `juvenile2000study.pdf`, and confirm that the remaining `MapInfoArrows` Unicode miss clears
-- API restart/rerun confirmed for active file: pending restart and fresh rerun after the code change
+- Immediate next step: deploy the collapsed-CID fallback fix, rerun `juvenile2000study.pdf`, and confirm that the remaining `MapInfoArrows` Unicode miss clears
+- API restart/rerun confirmed for active file: pending restart and a second fresh rerun after the latest code change
 - Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
 - Active remediation loop count: `juvenile2000study.pdf=2`
 - Next hypothesis: the remaining blocker is no longer planning or structure recovery; it is a generic CID `ToUnicode` emission bug for `/Type0 /Identity-H` fonts

@@ -83,8 +83,17 @@
 - Shared fix applied:
   - `merge_tounicode_map()` now emits `build_cid_tounicode_cmap(...)` for `/Type0 /Identity-H` fonts and the regular simple-font builder otherwise
   - targeted verification passed with the existing CID-symbol repair test, Python compile, and `tsc`
+- Follow-up finding:
+  - live rerun `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3` still finished at `89/B`
+  - direct rebuilt-artifact inspection showed `/MapInfoArrows` only reports used code `[0]`
+  - that meant the deterministic fallback map was still being filtered down to nothing before `ToUnicode` emission
+- Follow-up fix applied:
+  - for `/Type0 /Identity-H` legacy symbol fonts whose used-code set collapses to `[0]`, keep the full deterministic fallback map instead of dropping it
+  - direct `tsx` probe on rebuilt artifact `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3.pdf` now returns:
+    - `Embedded a full substitute font program for legacy symbol font /MapInfoArrows using arial.ttf`
+    - `Added an explicit ToUnicode CMap for legacy symbol font /MapInfoArrows using 4 deterministic character mappings`
 - Next expected outcome:
-  - fresh post-restart rerun should clear the last `MapInfoArrows` Unicode miss and push the file above `95`
+  - next fresh post-restart rerun should clear the last `MapInfoArrows` Unicode miss and push the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

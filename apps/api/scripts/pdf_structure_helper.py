@@ -5126,8 +5126,19 @@ def mutate_repair_font_unicode_maps(pdf, mutation):
                 explicit_map = SIMPLE_TRUETYPE_UNICODE_MAPS.get(base_font, {})
                 used_codes = sorted(used_codes_by_font.get(font_ref, set()))
                 if explicit_map:
+                    full_explicit_map = explicit_map
                     if used_codes:
                         explicit_map = {code: text for code, text in explicit_map.items() if code in used_codes}
+                    if (
+                        not explicit_map
+                        and subtype == "/Type0"
+                        and encoding == "/Identity-H"
+                        and used_codes == [0]
+                    ):
+                        # Some legacy Type0 symbol subsets collapse all live glyph references to CID 0
+                        # even when the deterministic fallback map is known. Preserve the fallback map
+                        # so the font still receives a standards-valid ToUnicode stream.
+                        explicit_map = full_explicit_map
                     if explicit_map:
                         substitute_name = SIMPLE_TRUETYPE_SUBSTITUTE_FONTS.get(base_font)
                         substitute_path = font_file_path(substitute_name) if substitute_name else None
