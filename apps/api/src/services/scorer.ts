@@ -1271,7 +1271,8 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     effectiveFailRatio < 0.20
     && materialFailures.length <= 1
     && residualMediumFailures.length === materialFailures.length
-    && uniqueAdvisoryDisplayElements.size <= 10
+    && contrast.pagesAnalyzed <= 2
+    && uniqueAdvisoryDisplayElements.size <= 20
   ) {
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
