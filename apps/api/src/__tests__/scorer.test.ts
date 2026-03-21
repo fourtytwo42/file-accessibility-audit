@@ -2372,6 +2372,70 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.grade).toBe('A')
   })
 
+  it('treats toc dot-leader contrast misses as advisory display text on long documents', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const failures = [
+      {
+        page: 2,
+        textPreview: 'Juveniles placed on probation in Illinois',
+        contrastRatio: 3.69,
+        threshold: 4.5,
+        fgColor: '#858585',
+        bgColor: '#ffffff',
+        fontSizePt: 12,
+      },
+      ...[
+        'INTRODUCTION ...........................',
+        'II.  METHODOLOGY .......................',
+        'PROBATION IN 2000 ......................',
+        'History of Psychiatric Treatment .......',
+      ].map(textPreview => ({
+        page: 4,
+        textPreview,
+        contrastRatio: 1.9,
+        threshold: 4.5,
+        fgColor: '#c2c2c2',
+        bgColor: '#ffffff',
+        fontSizePt: 12,
+      })),
+    ]
+
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 52,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 10,
+          totalSamples: 260,
+          failingContrastCount: failures.length,
+          failRatio: failures.length / 260,
+          failures,
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
+
   it('treats spaced display-text contrast misses as advisory on long documents', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(
