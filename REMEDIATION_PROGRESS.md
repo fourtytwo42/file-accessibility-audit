@@ -13,11 +13,11 @@
 
 - Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
 - Latest attempt path: queue item `a2851f86-48c1-4fab-a42d-a46e3f492f5b`
-- Latest result summary: the helper-side snapshot fix improved the file from `88/B` to `90/A`, but the rebuilt artifact still contains four unresolved strong `/TD` figure candidates (`obj:74 0 R`, `obj:75 0 R`, `obj:76 0 R`, `obj:78 0 R`) with `repairMode: retag_then_set_alt`. The remaining blocker is now a live retry-history bug: late heuristic figure passes still treated recycled `figure:n` ids as stable across inspections, so prior work on `obj:78 0 R` could incorrectly suppress later retries on different targets that inherited the same candidate slot number.
-- Latest validation source: targeted `agentRemediationService` regressions for late figure retries plus `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T01:18Z
-- Next action: restart the API on the stable-target retry patch and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
-- Next hypothesis: tracking late figure attempts by stable `targetRef` instead of recycled candidate ids should let the live pipeline clear the remaining strong `/TD` figure wraps and move the file above `95`
-- API restart status: pending PM2 restart after the latest late-figure retry fix
+- Latest result summary: the fresh post-restart rerun `d91549c8-e289-4a01-beb3-3a934fb07446` still finished at `90/A`. The stable-target retry patch worked as intended, but the latest action list showed a different remaining inefficiency: late heuristic passes were still spending work on already-tagged `/Figure` candidates like `obj:336 0 R` and `obj:618 0 R` before the unresolved `/TD` wrappers. The rebuilt artifact still contains four unresolved strong `/TD` figure candidates (`obj:74 0 R`, `obj:75 0 R`, `obj:76 0 R`, `obj:78 0 R`) with `repairMode: retag_then_set_alt`.
+- Latest validation source: targeted `agentRemediationService` regressions for stable-target figure retries and unresolved-retag prioritization plus `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T01:23Z
+- Next action: restart the API on the heuristic-candidate prioritization patch and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
+- Next hypothesis: prioritizing unresolved `retag_then_set_alt` candidates ahead of already-alt-tagged leaf `/Figure` elements should let the late heuristic passes land the remaining `/TD` wraps and move the file above `95`
+- API restart status: pending PM2 restart after the latest heuristic prioritization fix
 - Build status: current source is ready; PM2 restart pending before the next fresh upload
 
 ## Current Concurrency
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
-- Current phase: fifth remediation loop after isolating unstable figure retry history in the late heuristic passes
-- Immediate next step: restart on the stable-target retry patch, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect whether the remaining `/TD` figure wraps land
+- Current phase: sixth remediation loop after isolating late-pass prioritization waste on already-tagged figures
+- Immediate next step: restart on the heuristic prioritization patch, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect whether the remaining `/TD` figure wraps land
 - API restart/rerun confirmed for active file: pending restart after the latest code change
 - Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
-- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=5`
-- Next hypothesis: the remaining blocker is no longer table-cell figure classification or snapshot credit; it is figure retry history that still keys off recycled candidate ids instead of stable object refs
+- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=6`
+- Next hypothesis: the remaining blocker is no longer table-cell figure classification, snapshot credit, or unstable retry ids; it is late-pass prioritization that still lets already-tagged figure candidates consume heuristic figure work ahead of unresolved `/TD` wrappers
 
 ## Pending Files
 

@@ -127,6 +127,7 @@
 - Queue history:
   - `e4cc930c-8265-43d2-aad7-8a69058e8ceb` -> `88/B`
   - `a2851f86-48c1-4fab-a42d-a46e3f492f5b` -> `90/A`
+  - `d91549c8-e289-4a01-beb3-3a934fb07446` -> `90/A`
 - Outcome so far:
   - original result was `32/F`
   - first fresh rerun cleared title/language, heading structure, link quality, reading order, text extractability, and PDF/UA compliance
@@ -149,11 +150,12 @@
   - late heuristic figure fallback now reselects candidates from refreshed post-write context instead of iterating stale candidate ids from the original context
   - wrapped child `/Figure` nodes created under `/TD` containers are now preserved in structure snapshots when they have page-backed child content
   - late heuristic figure retry history now keys off stable `targetRef` object refs instead of recycled `figure:n` ids
+  - late heuristic figure fallback now prioritizes unresolved `retag_then_set_alt` candidates before already-alt-tagged leaf `/Figure` elements
 - Latest validation:
-  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'retries unresolved set_alt figure candidates during the late heuristic pass|tracks late heuristic figure retries by stable targetRef instead of recycled candidate ids'`
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'retries unresolved set_alt figure candidates during the late heuristic pass|tracks late heuristic figure retries by stable targetRef instead of recycled candidate ids|prioritizes unresolved retag candidates before already-tagged figures in late heuristic passes'`
   - `pnpm --filter api exec tsc --noEmit`
 - Next expected outcome:
-  - fresh post-restart rerun should stop confusing earlier work on `obj:78 0 R` with later unresolved `/TD` targets that inherit the same candidate slot number, letting the remaining table-cell figure wraps land and pushing the file above `95`
+  - fresh post-restart rerun should stop burning late heuristic work on already-satisfied leaf `/Figure` nodes and instead spend that effort on the unresolved `/TD` wrappers, letting the remaining table-cell figure wraps land and pushing the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

@@ -966,9 +966,21 @@ function finalCleanupDetails(tool: string, appliedMutations: Array<{ details: st
 
 function heuristicEligibleFigureCandidates(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): PdfRemediationContext['figureCandidates'] {
   if (!context) return []
-  return context.figureCandidates.filter(candidate =>
-    candidate.repairMode !== 'defer' && candidate.informativeHint !== 'decorative'
-  )
+  return context.figureCandidates
+    .filter(candidate =>
+      candidate.repairMode !== 'defer'
+      && candidate.informativeHint !== 'decorative'
+      && (!candidate.hasAlt || candidate.repairMode === 'retag_then_set_alt')
+    )
+    .sort((left, right) => {
+      const priority = (candidate: PdfRemediationContext['figureCandidates'][number]): number => {
+        if (candidate.repairMode === 'retag_then_set_alt' && !candidate.hasAlt) return 0
+        if (candidate.repairMode === 'set_alt' && !candidate.hasAlt) return 1
+        if (candidate.repairMode === 'retag_then_set_alt') return 2
+        return 3
+      }
+      return priority(left) - priority(right)
+    })
 }
 
 function shouldRetryLateHeuristicFigureCandidate(

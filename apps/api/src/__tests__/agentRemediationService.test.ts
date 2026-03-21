@@ -4961,4 +4961,112 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     )).toBe(true)
   })
 
+  it('prioritizes unresolved retag candidates before already-tagged figures in late heuristic passes', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'prioritized-retag.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 80,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'unavailable', executionStatus: 'missing_binary', failedChecks: 0, failures: [] }),
+      categories: [
+        { id: 'alt_text', label: 'Alt Text', weight: 0.15, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: null, lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+      figureCandidates: [
+        {
+          id: 'figure:1',
+          pageNumber: 1,
+          targetRef: 'obj:336 0 R',
+          hasAlt: true,
+          altText: 'existing alt',
+          informativeHint: 'informative',
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          pageImageCount: 1,
+          textDensityHint: 'medium',
+          imageEvidence: 'strong',
+          surroundingText: ['Already tagged figure'],
+          parentTagPath: ['/Figure'],
+        },
+        {
+          id: 'figure:4',
+          pageNumber: 4,
+          targetRef: 'obj:74 0 R',
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          repairMode: 'retag_then_set_alt',
+          targetTag: '/TD',
+          pageImageCount: 1,
+          textDensityHint: 'medium',
+          imageEvidence: 'strong',
+          surroundingText: ['Needs wrapper figure'],
+          parentTagPath: ['/Table', '/TR', '/TD'],
+        },
+      ],
+      tableCandidates: [],
+      headingCandidates: [],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+
+    planRemediationActions.mockResolvedValue({
+      done: false,
+      unresolvedIssues: ['alt_text'],
+      actions: [],
+    })
+    generateSemanticRepairBatches.mockResolvedValue({ batches: [], reviewFlags: [] })
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('pdf'),
+      action: {
+        tool: 'set_figure_alt_text',
+        target: 'page 4',
+        targetRef: 'obj:74 0 R',
+        candidateId: 'figure:4',
+        details: 'late heuristic retry prioritized unresolved wrapper',
+        confidence: 0.55,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: false,
+        categoryTargets: ['alt_text'],
+        generationSource: 'heuristic_fallback',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'prioritized-retag.pdf', originalResult)
+
+    const heuristicCall = executeRemediationTool.mock.calls.find(call =>
+      call[0].call.arguments?.generationSource === 'heuristic_fallback',
+    )
+    expect(heuristicCall?.[0].call.arguments?.candidateId).toBe('figure:4')
+  })
+
 })
