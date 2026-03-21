@@ -751,6 +751,12 @@ function nativeStageRegressionReason(
   stageActions: RemediationActionRecord[],
   options?: { includeOverallScoreRegression?: boolean },
 ): string | null {
+  const structureConformanceSurfacedAcrobatOwnershipDebt =
+    stageActions.some(action => action.tool === 'repair_structure_conformance' && action.outcome === 'applied')
+    && (next.categories.find(category => category.id === 'alt_text')?.findings || []).some(finding =>
+      /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(String(finding || '')),
+    )
+
   if (options?.includeOverallScoreRegression && next.overallScore < previous.overallScore) {
     return `overall score regressed from ${previous.overallScore} to ${next.overallScore}`
   }
@@ -758,6 +764,9 @@ function nativeStageRegressionReason(
   const targetedCategories = [...new Set(stageActions.flatMap(action => action.categoryTargets || []))]
   const regressedCategory = targetedCategories.find(categoryId => categoryRegression(previous, next, categoryId))
   if (regressedCategory) {
+    if (structureConformanceSurfacedAcrobatOwnershipDebt && regressedCategory === 'alt_text') {
+      return null
+    }
     const before = scoreForCategory(previous, regressedCategory)
     const after = scoreForCategory(next, regressedCategory)
     return `${regressedCategory} score regressed from ${before} to ${after}`
@@ -779,6 +788,8 @@ function nativeStageRegressionReason(
 
   return null
 }
+
+export const __test_nativeStageRegressionReason = nativeStageRegressionReason
 
 function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult, stageActions: RemediationActionRecord[]): StageAcceptanceDecision {
   const visibleRegression = stageActions.find(action =>
