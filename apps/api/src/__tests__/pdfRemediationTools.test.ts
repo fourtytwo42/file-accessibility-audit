@@ -31,6 +31,7 @@ import type { StructureBackendMutationResult } from '../services/pdfStructureBac
 
 const FIXTURES_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
 const DOWNLOADS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Processed/Before')
+const PROCESSED_AFTER_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Processed/After')
 
 async function makePdf(): Promise<Buffer> {
   const doc = await PDFDocument.create()
@@ -132,6 +133,10 @@ async function loadFixture(name: string): Promise<Buffer> {
 
 async function loadDownloadFixture(name: string): Promise<Buffer> {
   return fs.promises.readFile(path.join(DOWNLOADS_DIR, name))
+}
+
+async function loadProcessedAfterFixture(name: string): Promise<Buffer> {
+  return fs.promises.readFile(path.join(PROCESSED_AFTER_DIR, name))
 }
 
 async function loadRepoDownload(name: string): Promise<Buffer> {
@@ -980,6 +985,33 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       !/image related to/i.test(figure.altText || '')
       && !/^sect$/i.test((figure.altText || '').trim())
     )).toBe(true)
+  }, 600_000)
+
+  it('brings the processed-after font-unicode cluster to 100/A through the full agent loop', async () => {
+    const filenames = [
+      '11drug_seizures_1997-2007.pdf',
+      '12drug_submissions_1997-2007.pdf',
+      '15adult_probation_1999-2008.pdf',
+    ] as const
+
+    for (const filename of filenames) {
+      const buffer = await loadProcessedAfterFixture(filename)
+      const analysis = await analyzePDF(buffer, filename, {
+        skipAdobe: true,
+        skipVeraPdf: true,
+        analysisProfile: 'remediation_fast',
+      })
+      const remediated = await remediatePdfWithAgent(buffer, filename, analysis)
+      const appliedTools = (remediated.model.actions || [])
+        .filter(action => action.outcome === 'applied')
+        .map(action => action.tool)
+
+      expect(analysis.overallScore).toBeLessThan(100)
+      expect(remediated.finalResult.overallScore).toBe(100)
+      expect(remediated.finalResult.grade).toBe('A')
+      expect(appliedTools).toContain('repair_font_unicode_maps')
+      expect(remediated.model.rejectedActions || []).toEqual([])
+    }
   }, 600_000)
 
   it('routes Acrobat-risk alternate-text repairs through the structure backend', async () => {
