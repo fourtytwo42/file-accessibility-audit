@@ -528,6 +528,15 @@ export const REMEDIATION = {
   TOOL_RELIABILITY_MIN_ATTEMPTS: 3,
 
   /**
+   * Reliability floor below which a tool may be skipped during planning when
+   * historical outcomes for the active PDF class suggest it is too risky.
+   *
+   * SAFE TO CHANGE: Yes — raise to be more conservative, lower to allow more
+   * speculative tool selection.
+   */
+  TOOL_CLASS_RELIABILITY_SKIP_THRESHOLD: 0.3,
+
+  /**
    * Minimum overall score at which deterministic replanning may stop early
    * and hand off directly to the existing final cleanup batch.
    *

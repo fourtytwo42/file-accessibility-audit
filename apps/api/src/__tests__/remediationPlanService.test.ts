@@ -2,9 +2,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const buildFailureProfileArtifacts = vi.fn()
 const getToolReliabilityMap = vi.fn()
+const classifyPdfFull = vi.fn()
+const buildPipelineConfig = vi.fn()
 
 vi.mock('../services/failureProfileService.js', () => ({
   buildFailureProfileArtifacts,
+}))
+
+vi.mock('../services/pdfClassificationService.js', () => ({
+  classifyPdfFull,
+  buildPipelineConfig,
 }))
 
 vi.mock('../services/toolReliabilityService.js', () => ({
@@ -28,6 +35,36 @@ describe('remediationPlanService', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     getToolReliabilityMap.mockReturnValue(new Map())
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'untagged_digital',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: true,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildPipelineConfig.mockReturnValue({
+      stages: {
+        metadata: true,
+        structureBootstrap: true,
+        linkStructure: true,
+        fonts: true,
+        nativeStructure: true,
+        safeCandidates: true,
+      },
+      excludedTools: [],
+      maxRounds: 3,
+      earlyExitScore: 98,
+      semanticStrategy: 'full_ai',
+    })
   })
 
   it('reorders deterministic opportunities using historical reliability', async () => {
@@ -133,6 +170,22 @@ describe('remediationPlanService', () => {
   })
 
   it('skips solved categories in round 2+ but preserves standards-only tools for unresolved compliance', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'partially_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'polish',
+    })
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {
         version: '1',
@@ -357,6 +410,391 @@ describe('remediationPlanService', () => {
     })
 
     expect(plan.actions.map(action => action.tool_name)).toEqual(['set_document_title'])
+  })
+
+  it('suppresses broad structure tools on well-tagged documents', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'well_tagged',
+      contentProfile: {
+        textDensity: 'dense',
+        hasImages: true,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'adobe_indesign',
+      fontProfile: 'clean',
+      scale: 'medium',
+      remediationDepth: 'polish',
+    })
+    buildPipelineConfig.mockReturnValue({
+      stages: {
+        metadata: true,
+        structureBootstrap: false,
+        linkStructure: true,
+        fonts: false,
+        nativeStructure: true,
+        safeCandidates: true,
+      },
+      excludedTools: ['bootstrap_struct_tree', 'repair_structure_conformance'],
+      maxRounds: 2,
+      earlyExitScore: 95,
+      semanticStrategy: 'heuristic_only',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 88,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 1,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'pdfua.structure',
+          label: 'PDF/UA structure',
+          source: 'verapdf',
+          count: 1,
+          categoryIds: ['pdf_ua_compliance'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: [],
+          evidence: [],
+        }],
+        toolOpportunities: [
+          {
+            key: 'bootstrap',
+            toolName: 'bootstrap_struct_tree',
+            reason: 'Rebuild structure',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'alt_text'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.structure'],
+          },
+          {
+            key: 'conformance',
+            toolName: 'repair_structure_conformance',
+            reason: 'Fix broad structure',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['pdf_ua_compliance'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.structure'],
+          },
+          {
+            key: 'native-reading',
+            toolName: 'repair_native_reading_order',
+            reason: 'Fix reading order in place',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order'],
+            confidence: 0.75,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.reading_order'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 3,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'well-tagged.pdf',
+      analysis: {
+        overallScore: 88,
+        grade: 'B',
+        isScanned: false,
+        categories: [
+          { id: 'reading_order', label: 'Reading Order', score: 70, severity: 'Moderate' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 70, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual(['repair_native_reading_order'])
+    expect(plan.plannerEvidence.skippedReasonCounts.some(entry => entry.reason.includes('pipeline_excluded:repair_structure_conformance'))).toBe(true)
+  })
+
+  it('prefers narrow native repairs over broad conformance repair on native-tagged documents', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'dense',
+        hasImages: true,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: true,
+        hasFootnotes: false,
+      },
+      authoringTool: 'adobe_indesign',
+      fontProfile: 'clean',
+      scale: 'medium',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'C',
+        analysisScore: 72,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 2,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'pdfua.logical_structure',
+          label: 'Logical structure and marked content',
+          source: 'verapdf',
+          count: 1,
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: [],
+          evidence: [],
+        }],
+        toolOpportunities: [
+          {
+            key: 'conformance',
+            toolName: 'repair_structure_conformance',
+            reason: 'Fix broad structure',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['pdf_ua_compliance'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+          {
+            key: 'native-marked',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair native marked content',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.82,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'native-tagged.pdf',
+      analysis: {
+        overallScore: 72,
+        grade: 'C',
+        isScanned: false,
+        categories: [
+          { id: 'reading_order', label: 'Reading Order', score: 60, severity: 'Moderate' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 60, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual(['repair_native_marked_content_refs'])
+    expect(plan.actions.some(action => action.tool_name === 'repair_structure_conformance')).toBe(false)
+  })
+
+  it('skips low-reliability tools when a blocking alternative exists for the same failure family', async () => {
+    getToolReliabilityMap.mockReturnValue(new Map([
+      ['repair_native_marked_content_refs', { reliability: 0.2, source: 'tool_and_class' }],
+      ['repair_structure_conformance', { reliability: 0.9, source: 'tool_and_class' }],
+    ]))
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'partially_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'C',
+        analysisScore: 70,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 1,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'pdfua.logical_structure',
+          label: 'Logical structure and marked content',
+          source: 'verapdf',
+          count: 1,
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: [],
+          evidence: [],
+        }],
+        toolOpportunities: [
+          {
+            key: 'native-marked',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair native marked content',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+          {
+            key: 'conformance',
+            toolName: 'repair_structure_conformance',
+            reason: 'Repair broad structure',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['pdf_ua_compliance'],
+            confidence: 0.85,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'reliability.pdf',
+      analysis: {
+        overallScore: 70,
+        grade: 'C',
+        isScanned: false,
+        categories: [
+          { id: 'reading_order', label: 'Reading Order', score: 60, severity: 'Moderate' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 60, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 2, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual(['repair_structure_conformance'])
+    expect(plan.plannerEvidence.skippedReasonCounts.some(entry => entry.reason === 'low_class_reliability:repair_native_marked_content_refs')).toBe(true)
   })
 
   it('reserves room for document-scoped fixes before candidate floods consume the action budget', async () => {

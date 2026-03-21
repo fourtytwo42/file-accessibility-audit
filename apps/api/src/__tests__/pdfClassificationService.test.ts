@@ -229,6 +229,7 @@ describe('pdfClassificationService', () => {
     expect(config.maxRounds).toBe(2)
     expect(config.earlyExitScore).toBe(95)
     expect(config.excludedTools).toContain('bootstrap_struct_tree')
+    expect(config.excludedTools).toContain('repair_structure_conformance')
     expect(config.excludedTools).toContain('repair_native_link_structure')
 
     expect(toReliabilityPdfClass(classification)).toBe('native_tagged')

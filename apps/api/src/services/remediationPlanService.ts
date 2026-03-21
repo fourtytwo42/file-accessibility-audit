@@ -2,7 +2,10 @@ import { REMEDIATION } from '#config'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import type {
   FailureMode,
+  PlannerEvidenceSummary,
   PipelineConfig,
+  PdfClassification,
+  PdfStructuralClass,
   RemediationActionRecord,
   RemediationToolCall,
   RemediationToolName,
@@ -11,6 +14,7 @@ import type {
 } from './documentModel.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
+import { buildPipelineConfig, classifyPdfFull } from './pdfClassificationService.js'
 import { classifyPdf, getToolReliabilityMap } from './toolReliabilityService.js'
 import { deriveDeterministicCall, hasMeaningfulMetadataTitle, heuristicFigureAltText } from './remediationCallDerivationService.js'
 
@@ -232,6 +236,81 @@ function isNativeTaggedSafeContext(context: PdfRemediationContext): boolean {
     && (context.structure.structuralNodes?.length || 0) > 0
 }
 
+const NATIVE_SAFE_REPAIR_TOOLS = new Set<RemediationToolName>([
+  'repair_native_marked_content_refs',
+  'repair_native_link_structure',
+  'tag_unowned_annotations',
+  'repair_native_figure_semantics',
+  'repair_native_table_headers',
+  'repair_native_reading_order',
+])
+
+const BROAD_STRUCTURE_FAILURE_KEYS = new Set([
+  'pdfua.logical_structure',
+  'pdfua.structure',
+])
+
+function classAllowsNativeSafeRepair(structuralClass: PdfStructuralClass): boolean {
+  return structuralClass === 'partially_tagged'
+    || structuralClass === 'native_tagged'
+    || structuralClass === 'well_tagged'
+}
+
+function hasDirectStructureFailure(opportunity: ToolOpportunity): boolean {
+  return opportunity.derivedFromFailureModeKeys.some(key => BROAD_STRUCTURE_FAILURE_KEYS.has(key))
+}
+
+function hasNarrowerStructureAlternative(input: {
+  opportunity: ToolOpportunity
+  autoRunnableOpportunities: ToolOpportunity[]
+  pipelineConfig: PipelineConfig | null
+  reliabilityByTool: Map<RemediationToolName, { reliability: number, source?: string }>
+  failureModeByKey: Map<string, FailureMode>
+}): boolean {
+  const { opportunity, autoRunnableOpportunities, pipelineConfig, reliabilityByTool, failureModeByKey } = input
+  const excluded = new Set(pipelineConfig?.excludedTools || [])
+  return autoRunnableOpportunities.some(candidate =>
+    candidate.toolName !== opportunity.toolName
+    && !excluded.has(candidate.toolName)
+    && NATIVE_SAFE_REPAIR_TOOLS.has(candidate.toolName)
+    && candidate.derivedFromFailureModeKeys.some(key => opportunity.derivedFromFailureModeKeys.includes(key))
+    && !shouldSkipForLowReliability({
+      opportunity: candidate,
+      reliability: reliabilityByTool.get(candidate.toolName)?.reliability ?? REMEDIATION.TOOL_RELIABILITY_DEFAULT,
+      reliabilitySource: reliabilityByTool.get(candidate.toolName)?.source,
+      autoRunnableOpportunities,
+      failureModeByKey,
+      pipelineConfig,
+    })
+  )
+}
+
+function shouldSkipForLowReliability(input: {
+  opportunity: ToolOpportunity
+  reliability: number
+  reliabilitySource: string | undefined
+  autoRunnableOpportunities: ToolOpportunity[]
+  failureModeByKey: Map<string, FailureMode>
+  pipelineConfig: PipelineConfig | null
+}): boolean {
+  const { opportunity, reliability, reliabilitySource, autoRunnableOpportunities, failureModeByKey, pipelineConfig } = input
+  if (reliabilitySource === 'default') return false
+  if (reliability >= REMEDIATION.TOOL_CLASS_RELIABILITY_SKIP_THRESHOLD) return false
+
+  const blockingDerivedKeys = opportunity.derivedFromFailureModeKeys.filter(key => failureModeByKey.get(key)?.blocking)
+  if (!blockingDerivedKeys.length) return true
+
+  const excluded = new Set(pipelineConfig?.excludedTools || [])
+  const hasAlternative = autoRunnableOpportunities.some(candidate =>
+    candidate.toolName !== opportunity.toolName
+    && !excluded.has(candidate.toolName)
+    && candidate.status === 'auto_runnable'
+    && candidate.derivedFromFailureModeKeys.some(key => blockingDerivedKeys.includes(key))
+  )
+
+  return hasAlternative
+}
+
 function scopeRank(scope: ToolOpportunityScope): number {
   switch (scope) {
     case 'document': return 0
@@ -347,20 +426,37 @@ function buildDeterministicCall(input: {
   return deriveDeterministicCall(input)
 }
 
-function isOpportunitySelectable(input: {
+function opportunitySelectionDecision(input: {
   opportunity: ToolOpportunity
   analysis: AnalysisResult
   context: PdfRemediationContext
+  classification: PdfClassification
+  pipelineConfig: PipelineConfig | null
   actions: RemediationActionRecord[]
   selectedActions: RemediationToolCall[]
   autoRunnableOpportunities: ToolOpportunity[]
-}): boolean {
-  const { opportunity, analysis, context, actions, selectedActions, autoRunnableOpportunities } = input
-  if (opportunity.status !== 'auto_runnable') return false
-  if (!TOOL_STAGE_ORDER.has(opportunity.toolName)) return false
-  if (CANDIDATE_ONLY_TOOLS.has(opportunity.toolName) && opportunity.scope === 'document') return false
+  reliabilityByTool: Map<RemediationToolName, { reliability: number, source?: string }>
+  failureModeByKey: Map<string, FailureMode>
+}): { selectable: boolean, reason?: string } {
+  const {
+    opportunity,
+    analysis,
+    context,
+    classification,
+    pipelineConfig,
+    actions,
+    selectedActions,
+    autoRunnableOpportunities,
+    reliabilityByTool,
+    failureModeByKey,
+  } = input
+  if (opportunity.status !== 'auto_runnable') return { selectable: false, reason: `opportunity_status:${opportunity.status}` }
+  if (!TOOL_STAGE_ORDER.has(opportunity.toolName)) return { selectable: false, reason: 'tool_not_ranked' }
+  if ((pipelineConfig?.excludedTools || []).includes(opportunity.toolName)) return { selectable: false, reason: `pipeline_excluded:${opportunity.toolName}` }
+  if (CANDIDATE_ONLY_TOOLS.has(opportunity.toolName) && opportunity.scope === 'document') return { selectable: false, reason: `candidate_only_scope:${opportunity.toolName}` }
 
-  const alreadyTaggedNative = !analysis.isScanned
+  const structuralClass = classification.structuralClass
+  const nativeSafeContext = !analysis.isScanned
     && isNativeTaggedSafeContext(context)
     && !hasActionTool(actions, 'bootstrap_struct_tree')
     && !hasPlannedTool(selectedActions, 'bootstrap_struct_tree')
@@ -378,26 +474,69 @@ function isOpportunitySelectable(input: {
     || key === 'pdfua.font_widths',
   )
 
+  const reliabilitySummary = reliabilityByTool.get(opportunity.toolName)
+  if (shouldSkipForLowReliability({
+    opportunity,
+    reliability: reliabilitySummary?.reliability ?? REMEDIATION.TOOL_RELIABILITY_DEFAULT,
+    reliabilitySource: reliabilitySummary?.source,
+    autoRunnableOpportunities,
+    failureModeByKey,
+    pipelineConfig,
+  })) {
+    return { selectable: false, reason: `low_class_reliability:${opportunity.toolName}` }
+  }
+
   switch (opportunity.toolName) {
     case 'repair_bootstrapped_chart_content_refs':
-      return useBootstrappedChartConformance
+      return {
+        selectable: useBootstrappedChartConformance,
+        reason: useBootstrappedChartConformance ? undefined : 'bootstrapped_chart_not_applicable',
+      }
     case 'repair_native_marked_content_refs':
     case 'repair_native_link_structure':
+    case 'tag_unowned_annotations':
     case 'repair_native_figure_semantics':
     case 'repair_native_table_headers':
     case 'repair_native_reading_order':
-      return alreadyTaggedNative
+      return {
+        selectable: nativeSafeContext && classAllowsNativeSafeRepair(structuralClass),
+        reason: nativeSafeContext && classAllowsNativeSafeRepair(structuralClass)
+          ? undefined
+          : `structural_class_blocks_native_safe:${structuralClass}`,
+      }
     case 'repair_structure_conformance':
-      if (!context.qpdf.hasStructTree) return false
-      if (useBootstrappedChartConformance && !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_bootstrapped_chart_content_refs')) return false
-      if (alreadyTaggedNative && (hasAutoNativeMarkedContent || hasAutoNativeLinkRepair)) return false
-      return true
+      if (!context.qpdf.hasStructTree) return { selectable: false, reason: 'no_struct_tree' }
+      if (structuralClass === 'well_tagged') return { selectable: false, reason: `structural_class_blocks_broad_structure:${structuralClass}` }
+      if (!hasDirectStructureFailure(opportunity)) return { selectable: false, reason: 'no_direct_structure_failure_family' }
+      if (useBootstrappedChartConformance && !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_bootstrapped_chart_content_refs')) {
+        return { selectable: false, reason: 'superseded_by_bootstrapped_chart_conformance' }
+      }
+      if (hasNarrowerStructureAlternative({
+        opportunity,
+        autoRunnableOpportunities,
+        pipelineConfig,
+        reliabilityByTool,
+        failureModeByKey,
+      })) {
+        return { selectable: false, reason: 'superseded_by_narrow_native_structure_repair' }
+      }
+      if (structuralClass === 'untagged_digital' || structuralClass === 'scanned') {
+        return { selectable: false, reason: `structural_class_blocks_broad_structure:${structuralClass}` }
+      }
+      if (structuralClass === 'native_tagged' && (hasAutoNativeMarkedContent || hasAutoNativeLinkRepair)) {
+        return { selectable: false, reason: 'native_tagged_prefers_narrow_repairs' }
+      }
+      return { selectable: true }
     case 'repair_type1_font_unicode_maps':
-      return attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+      return {
+        selectable: attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
         || (context.qpdf.type1FontsMissingToUnicode ?? 0) > 0
-        || opportunity.derivedFromFailureModeKeys.includes('pdfua.type1_unicode')
+        || opportunity.derivedFromFailureModeKeys.includes('pdfua.type1_unicode'),
+        reason: 'font_unicode_prereq_missing',
+      }
     case 'repair_cidset_consistency':
-      return attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
+      return {
+        selectable: attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
         && (
           !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_font_unicode_maps')
           || attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
@@ -405,9 +544,12 @@ function isOpportunitySelectable(input: {
         && (
           !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_cid_symbol_font_maps')
           || attemptedOrPlanned('repair_cid_symbol_font_maps', actions, selectedActions)
-        )
+        ),
+        reason: 'cidset_prereqs_missing',
+      }
     case 'substitute_legacy_fonts_in_place':
-      return persistentLegacyFontFailures
+      return {
+        selectable: persistentLegacyFontFailures
         && (
         (
           analysis.pageCount >= 10
@@ -427,9 +569,12 @@ function isOpportunitySelectable(input: {
         && (
           attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
           || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
-        )
+        ),
+        reason: 'legacy_font_substitution_prereqs_missing',
+      }
     case 'finalize_substituted_font_conformance':
-      return persistentLegacyFontFailures
+      return {
+        selectable: persistentLegacyFontFailures
         && (
           attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
           || (
@@ -439,18 +584,44 @@ function isOpportunitySelectable(input: {
               || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
             )
           )
-        )
+        ),
+        reason: 'finalize_substituted_fonts_prereqs_missing',
+      }
     case 'adobe_auto_tag':
-      return !attemptedOrPlanned('adobe_auto_tag', actions, selectedActions)
+      return {
+        selectable: !attemptedOrPlanned('adobe_auto_tag', actions, selectedActions),
+        reason: 'already_attempted:adobe_auto_tag',
+      }
     case 'set_document_title':
-      return !hasMeaningfulMetadataTitle(context.pdfjs.title)
+      return {
+        selectable: !hasMeaningfulMetadataTitle(context.pdfjs.title),
+        reason: 'metadata_title_already_present',
+      }
     case 'set_document_language':
-      return !(context.qpdf.lang || context.pdfjs.lang)
+      return {
+        selectable: !(context.qpdf.lang || context.pdfjs.lang),
+        reason: 'document_language_already_present',
+      }
     case 'set_pdfua_identification':
     case 'normalize_document_metadata':
-      return true
+      return { selectable: true }
     default:
-      return true
+      return { selectable: true }
+  }
+}
+
+function mergePlannerEvidenceSummary(base: PlannerEvidenceSummary, selectionSkipCounts: Map<string, number>): PlannerEvidenceSummary {
+  if (!selectionSkipCounts.size) return base
+  const merged = new Map<string, number>()
+  for (const entry of base.skippedReasonCounts) merged.set(entry.reason, entry.count)
+  for (const [reason, count] of selectionSkipCounts.entries()) {
+    merged.set(reason, (merged.get(reason) || 0) + count)
+  }
+  return {
+    ...base,
+    skippedReasonCounts: [...merged.entries()]
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count || a.reason.localeCompare(b.reason)),
   }
 }
 
@@ -463,21 +634,30 @@ async function deterministicActions(input: {
   rejectedActions: RemediationActionRecord[]
   pipelineConfig?: PipelineConfig | null
 }): Promise<{ actions: RemediationToolCall[]; artifacts: ReturnType<typeof buildFailureProfileArtifacts> }> {
-  const artifacts = buildFailureProfileArtifacts({
+  const classification = classifyPdfFull({
+    analysis: input.analysis,
+    context: {
+      qpdf: input.context.qpdf,
+      pdfjs: input.context.pdfjs,
+    },
+  })
+  const effectivePipelineConfig = input.pipelineConfig ?? buildPipelineConfig(classification)
+  const baseArtifacts = buildFailureProfileArtifacts({
     analysis: input.analysis,
     context: input.context,
     actions: input.actions,
     rejectedActions: input.rejectedActions,
   })
-  const { failureProfile } = artifacts
+  const { failureProfile } = baseArtifacts
   const failureModeByKey = new Map(failureProfile.failureModes.map(mode => [mode.key, mode]))
   const activeIssues = activeIssueCategoryIds({
     analysis: input.analysis,
     failureModeByKey,
   })
+  const selectionSkipCounts = new Map<string, number>()
   const autoRunnableOpportunities = failureProfile.toolOpportunities.filter(opportunity =>
     opportunity.status === 'auto_runnable'
-    && !(input.pipelineConfig?.excludedTools || []).includes(opportunity.toolName)
+    && !((effectivePipelineConfig?.excludedTools || []).includes(opportunity.toolName))
     && (
       input.iteration <= 1
       || opportunityTargetsActiveIssue({
@@ -487,6 +667,14 @@ async function deterministicActions(input: {
       })
     ),
   )
+  for (const opportunity of failureProfile.toolOpportunities) {
+    if (opportunity.status !== 'auto_runnable') continue
+    if ((effectivePipelineConfig?.excludedTools || []).includes(opportunity.toolName)) {
+      const reason = `pipeline_excluded:${opportunity.toolName}`
+      selectionSkipCounts.set(reason, (selectionSkipCounts.get(reason) || 0) + 1)
+    }
+  }
+
   const pdfClass = classifyPdf({
     analysis: input.analysis,
     context: input.context,
@@ -556,14 +744,22 @@ async function deterministicActions(input: {
         if (selectionPass.maxSelections !== undefined && passSelections >= selectionPass.maxSelections) break
         if (!selectionPass.includeOpportunity(opportunity)) continue
         if (selectedOpportunityKeys.has(opportunity.key)) continue
-        if (!isOpportunitySelectable({
+        const decision = opportunitySelectionDecision({
           opportunity,
           analysis: input.analysis,
           context: input.context,
+          classification,
+          pipelineConfig: effectivePipelineConfig,
           actions: input.actions,
           selectedActions: selected,
           autoRunnableOpportunities,
-        })) {
+          reliabilityByTool: reliabilityByTool as any,
+          failureModeByKey,
+        })
+        if (!decision.selectable) {
+          if (decision.reason) {
+            selectionSkipCounts.set(decision.reason, (selectionSkipCounts.get(decision.reason) || 0) + 1)
+          }
           continue
         }
         const call = buildDeterministicCall({
@@ -582,7 +778,13 @@ async function deterministicActions(input: {
     }
   }
 
-  return { actions: dedupeActions(selected), artifacts }
+  return {
+    actions: dedupeActions(selected),
+    artifacts: {
+      ...baseArtifacts,
+      plannerEvidence: mergePlannerEvidenceSummary(baseArtifacts.plannerEvidence, selectionSkipCounts),
+    },
+  }
 }
 
 function buildPrompt(input: {

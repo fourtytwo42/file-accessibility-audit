@@ -209,6 +209,7 @@ export function buildPipelineConfig(classification: PdfClassification): Pipeline
       config.stages.structureBootstrap = false
       excludedTools.add('bootstrap_struct_tree')
       excludedTools.add('ocr_scanned_pdf')
+      excludedTools.add('repair_structure_conformance')
       config.maxRounds = Math.min(config.maxRounds, 2)
       config.earlyExitScore = 95
       config.semanticStrategy = 'heuristic_only'
