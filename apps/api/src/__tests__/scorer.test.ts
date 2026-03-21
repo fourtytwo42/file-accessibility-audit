@@ -864,7 +864,7 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').score).toBe(60)
   })
 
-  it('uses a residual Acrobat-risk cap when all detected figures already have alt text', () => {
+  it('reports residual Acrobat-risk ownership debt as guidance when all detected figures already have alt text', () => {
     const qpdf = makeQpdf({
       images: [
         { ref: '10 0 R', hasAlt: true },
@@ -896,8 +896,8 @@ describe('scoreAltText edge cases', () => {
       }),
     )
 
-    expect(findCategory(result, 'alt_text').score).toBe(75)
-    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('residual structure debt'))).toBe(true)
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+    expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('structural cleanup guidance'))).toBe(true)
   })
 
   it('uses a softer residual Acrobat-risk cap when only one figure is still missing alt text', () => {
