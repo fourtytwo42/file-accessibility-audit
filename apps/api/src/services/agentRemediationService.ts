@@ -336,6 +336,16 @@ function requiresDeepStructureInspect(actions: Array<Pick<RemediationActionRecor
   )
 }
 
+function hasDeterministicAcrobatOwnershipRisk(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): boolean {
+  return (context?.structure?.acrobatAltRiskNodes || []).some(node => {
+    const unresolved = ['duplicate_mcid_ownership', 'container_with_graphics_descendants', 'graphics_only_nonfigure', 'untagged_image_mcid', 'untagged_image_direct'].includes(node.ownershipMode || '')
+      || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && !!node.splitSafe)
+      || (node.ownershipMode === 'orphaned_alt_empty_element' && !!node.hasAlt)
+      || (node.ownershipMode === 'nonfigure_with_alt' && !!node.hasAlt)
+    return unresolved
+  })
+}
+
 function buildBatchMutationForCall(
   call: RemediationToolCall,
   context: Awaited<ReturnType<typeof inspectPdfForRemediation>>,
@@ -2480,12 +2490,19 @@ export async function remediatePdfWithAgent(
         const clusterStartTitle = attemptTitle
         const clusterStartLanguage = attemptLanguage
         const execution = await executeBatchedCluster(cluster, attemptBuffer, attemptContext)
+        const clusterAppliedStructureConformance = execution.actions.some(action =>
+          action.tool === 'repair_structure_conformance' && action.outcome === 'applied' && action.changedDocumentBytes,
+        )
         let afterContext = attemptContext
         let afterTitle = attemptTitle
         let afterLanguage = attemptLanguage
 
         if (execution.changedDocument) {
-          afterContext = await inspectRemediationContext(execution.buffer, checkpointResult)
+          afterContext = await inspectRemediationContext(
+            execution.buffer,
+            checkpointResult,
+            clusterAppliedStructureConformance ? 'alt_text_deep' : undefined,
+          )
           afterTitle = afterContext.pdfjs.title || attemptTitle
           afterLanguage = afterContext.qpdf.lang || afterContext.pdfjs.lang || attemptLanguage
           attemptChangedDocument = true
@@ -2511,7 +2528,48 @@ export async function remediatePdfWithAgent(
           })
         }
 
-        attemptBuffer = execution.buffer
+        let latestClusterBuffer = execution.buffer
+        if (
+          clusterAppliedStructureConformance
+          && !cluster.some(call => call.tool_name === 'repair_other_elements_alt_text')
+          && hasDeterministicAcrobatOwnershipRisk(afterContext)
+        ) {
+          const followUp = await executeRemediationTool({
+            buffer: latestClusterBuffer,
+            context: afterContext,
+            call: {
+              tool_name: 'repair_other_elements_alt_text',
+              arguments: { target: 'document' },
+              rationale: 'Resolve Acrobat-style ownership risks surfaced by structure conformance before stage validation.',
+              confidence: 0.92,
+            },
+          })
+          attemptEntries.push({
+            call: {
+              tool_name: 'repair_other_elements_alt_text',
+              arguments: { target: 'document' },
+              rationale: 'Resolve Acrobat-style ownership risks surfaced by structure conformance before stage validation.',
+              confidence: 0.92,
+            },
+            action: followUp.action,
+            beforeBuffer: latestClusterBuffer,
+            afterBuffer: followUp.buffer,
+            afterContext,
+            afterTitle,
+            afterLanguage,
+            manualReviewFlags: followUp.manualReviewFlags,
+            batchCluster: undefined,
+          })
+          if (followUp.action.changedDocumentBytes && followUp.action.outcome !== 'rejected') {
+            latestClusterBuffer = followUp.buffer
+            afterContext = await inspectRemediationContext(followUp.buffer, checkpointResult, 'alt_text_deep')
+            afterTitle = afterContext.pdfjs.title || afterTitle
+            afterLanguage = afterContext.qpdf.lang || afterContext.pdfjs.lang || afterLanguage
+            attemptChangedDocument = true
+          }
+        }
+
+        attemptBuffer = latestClusterBuffer
         attemptContext = afterContext
         attemptTitle = afterTitle
         attemptLanguage = afterLanguage

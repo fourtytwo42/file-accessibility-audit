@@ -4664,6 +4664,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     )).toBe(true)
   })
 
+
   it('uses heuristic-only semantic routing for well-tagged figure cleanup without calling AI enrichment', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
