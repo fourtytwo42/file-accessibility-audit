@@ -1774,6 +1774,92 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })
+
+  it('treats near-threshold and display-sized contrast misses as advisory on short documents', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 2,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+        knownGapKeys: ['pdfua.metadata_identification_content_unconfirmed'],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 2,
+          totalSamples: 164,
+          failingContrastCount: 19,
+          failRatio: 19 / 164,
+          failures: [
+            {
+              page: 1,
+              textPreview: 'State of Illinois',
+              contrastRatio: 4.49,
+              threshold: 4.5,
+              fgColor: '#008394',
+              bgColor: '#ffffff',
+              fontSizePt: 12,
+            },
+            {
+              page: 1,
+              textPreview: 'Rod R. Blagojevich, Governor',
+              contrastRatio: 4.49,
+              threshold: 4.5,
+              fgColor: '#008394',
+              bgColor: '#ffffff',
+              fontSizePt: 12,
+            },
+            {
+              page: 1,
+              textPreview: 'Illinois Criminal Justice Information Authority',
+              contrastRatio: 4.49,
+              threshold: 4.5,
+              fgColor: '#008394',
+              bgColor: '#ffffff',
+              fontSizePt: 12,
+            },
+            {
+              page: 1,
+              textPreview: 'Lori G. Levin, Director',
+              contrastRatio: 4.49,
+              threshold: 4.5,
+              fgColor: '#008394',
+              bgColor: '#ffffff',
+              fontSizePt: 12,
+            },
+            {
+              page: 1,
+              textPreview: 'data.',
+              contrastRatio: 3.13,
+              threshold: 4.5,
+              fgColor: '#939192',
+              bgColor: '#ffffff',
+              fontSizePt: 18,
+            },
+          ],
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('display-sized text'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
 })
 
 describe('summarizeLinkTextQuality', () => {
