@@ -539,6 +539,31 @@ describe('buildLocalStandardsReport', () => {
     expect(finding).toBeUndefined()
   })
 
+  it('does not treat mostly-unreadable heading snapshots as empty-heading failures without reliable text coverage', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        headings: [
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+        ],
+      }),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          headings: [
+            { ref: 'obj:50 0 R', tag: '/H1', text: 'Juvenile Sentencing' },
+            { ref: 'obj:51 0 R', tag: '/H1', text: '' },
+            { ref: 'obj:81 0 R', tag: '/H1', text: null },
+          ],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.heading_content_quality')
+    expect(finding).toBeUndefined()
+  })
+
   it('emits complex-table findings for irregular grouped-header tables', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

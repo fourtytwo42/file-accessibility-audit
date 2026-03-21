@@ -785,6 +785,31 @@ describe('scoreHeadingStructure edge cases', () => {
     expect(cat.score).toBe(100)
     expect(cat.findings.some(f => f.includes('no readable heading text'))).toBe(false)
   })
+
+  it('does not lower heading structure when most recovered heading text is unreadable', () => {
+    const qpdf = makeQpdf({
+      headings: [
+        { level: 'H1', tag: '/H1' },
+        { level: 'H1', tag: '/H1' },
+        { level: 'H1', tag: '/H1' },
+      ],
+    })
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs(),
+      makeVeraPdf(),
+      makeStructure({
+        headings: [
+          { ref: 'obj:50 0 R', tag: '/H1', text: 'Juvenile Sentencing' },
+          { ref: 'obj:51 0 R', tag: '/H1', text: '' },
+          { ref: 'obj:81 0 R', tag: '/H1', text: null },
+        ],
+      }),
+    )
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(100)
+    expect(cat.findings.some(f => f.includes('no readable heading text'))).toBe(false)
+  })
 })
 
 describe('scoreAltText pdfjs fallback', () => {
