@@ -564,6 +564,30 @@ describe('buildLocalStandardsReport', () => {
     expect(finding).toBeUndefined()
   })
 
+  it('ignores non-heading wrapper tags like /Story when evaluating heading-content quality', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        headings: [
+          { level: 'H1', tag: '/H1' },
+          { level: 'H1', tag: '/H1' },
+        ],
+      }),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          headings: [
+            { ref: 'obj:45 0 R', tag: '/Story', text: null },
+            { ref: 'obj:46 0 R', tag: '/Story', text: '' },
+            { ref: 'obj:47 0 R', tag: '/H1', text: 'Juvenile records' },
+          ],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.heading_content_quality')
+    expect(finding).toBeUndefined()
+  })
+
   it('emits complex-table findings for irregular grouped-header tables', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

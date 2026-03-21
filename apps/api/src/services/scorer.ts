@@ -45,6 +45,9 @@ export interface ScoringResult {
   warnings: string[]
 }
 
+const EXPLICIT_HEADING_TAG_RE = /^\/H(?:[1-6])?$/i
+const LEGACY_HEADING_TAG_RE = /^\/heading\s+\d+$/i
+
 type ProvisionalCategoryId = 'reading_order' | 'color_contrast'
 
 export function isRawUrlLinkText(text: string): boolean {
@@ -914,7 +917,10 @@ function scoreHeadingStructureWithContent(
     score = Math.min(score, 60)
   }
 
-  const snapshotHeadings = (structure?.headings || []) as StructureHeadingNode[]
+  const snapshotHeadings = ((structure?.headings || []) as StructureHeadingNode[]).filter(heading =>
+    EXPLICIT_HEADING_TAG_RE.test(String(heading.tag || ''))
+    || LEGACY_HEADING_TAG_RE.test(String(heading.tag || '')),
+  )
   const readableHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length > 0)
   const hasReliableHeadingTextCoverage = readableHeadings.length >= 2
     || (snapshotHeadings.length > 0 && (readableHeadings.length / snapshotHeadings.length) >= 0.5)

@@ -29,6 +29,8 @@ export interface LocalStandardsReport {
 const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo'])
 const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
 const AMBIGUOUS_LINK_TEXT_PATTERNS = new Set(['click here', 'read more', 'more', 'learn more', 'here'])
+const EXPLICIT_HEADING_TAG_RE = /^\/H(?:[1-6])?$/i
+const LEGACY_HEADING_TAG_RE = /^\/heading\s+\d+$/i
 
 function normalizeSemanticText(text: string | null | undefined): string {
   return String(text || '').replace(/^u:/, '').trim().toLowerCase()
@@ -639,7 +641,10 @@ function headingContentFinding(
     evidence.push('The document contains headings but no main H1 heading was detected.')
   }
 
-  const snapshotHeadings = structure?.headings || []
+  const snapshotHeadings = (structure?.headings || []).filter(heading =>
+    EXPLICIT_HEADING_TAG_RE.test(String(heading.tag || ''))
+    || LEGACY_HEADING_TAG_RE.test(String(heading.tag || '')),
+  )
   const readableHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length > 0)
   const hasReliableHeadingTextCoverage = readableHeadings.length >= 2
     || (snapshotHeadings.length > 0 && (readableHeadings.length / snapshotHeadings.length) >= 0.5)
