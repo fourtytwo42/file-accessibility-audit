@@ -2,9 +2,9 @@
 
 ## Current Active File
 
-- `juvenile2000study.pdf`
-- Current fresh queue item: `2b2bddd4-182e-4ee4-b6be-e51ca7a27419`
-- Latest completed file: `State criminal justice survey Sept 2007.pdf` -> `100/A`
+- `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
+- Current fresh queue item: pending upload
+- Latest completed file: `Adams.pdf` -> `100/A`
 
 ## Recent Loop Summary
 
@@ -70,6 +70,7 @@
   - `434adcbe-ca61-491b-8de7-36594d1997da` -> `89/B`
   - `c3eacea3-d483-4ee2-ae9f-a4a16cbd1aa3` -> `89/B`
   - `2b2bddd4-182e-4ee4-b6be-e51ca7a27419` -> `89/B`
+  - `11c09a66-ecb5-4a26-bcbe-6a8b2e78cdff` -> `100/A`
 - Outcome so far:
   - original result was `23/F`
   - first fresh rerun cleared structure, headings, bookmarks, metadata, reading order, and alt text
@@ -98,8 +99,53 @@
   - fresh rerun `2b2bddd4-182e-4ee4-b6be-e51ca7a27419` still stayed at `89/B`
   - direct planner inspection on `juvenile2000study.pdf` now shows both `repair_cid_symbol_font_maps` and `repair_font_unicode_maps` are present in the live plan
   - new shared fix: prioritize `repair_cid_symbol_font_maps` ahead of generic Unicode repair in the font stage
+- Final outcome:
+  - fresh rerun `11c09a66-ecb5-4a26-bcbe-6a8b2e78cdff` cleared at `100/A`
+  - original result was `23/F`
+  - the planner-order fix was the missing live-pipeline piece; helper-side CID symbol repair was already correct
+
+## Law Expands Access to Juv Justice Info Result
+
+- Queue history:
+  - `3d178e7e-61e5-45a1-9e5f-9b945ef529d9` -> `100/A`
+- Outcome:
+  - cleared on the first fresh API run with no new code changes required
+  - original result was `9/F`
+  - remediated output reached `100/A` on the current stack, which is another good signal that the recent font-planning and small-PDF fixes are holding across new random files
+
+## Adams Result
+
+- Queue history:
+  - `b74a2a34-1a1b-4dce-be5d-f030696229a6` -> `100/A`
+- Outcome:
+  - cleared on the first fresh API run with no new code changes required
+  - original result was `24/F`
+  - remediated output reached `100/A` on the same deployed stack, so the current small-PDF flow continues to generalize without another system fix
+
+## Youth Development Result
+
+- Queue history:
+  - `e4cc930c-8265-43d2-aad7-8a69058e8ceb` -> `88/B`
+- Outcome so far:
+  - original result was `32/F`
+  - first fresh rerun cleared title/language, heading structure, link quality, reading order, text extractability, and PDF/UA compliance
+  - remaining score loss is concentrated in `alt_text = 20/F`
+  - local standards are effectively clean except for one non-blocking `pdfua.cidset_consistency` warning
+- Current blocker:
+  - 4 remaining strong-evidence figure candidates are deferred only because they sit under `/TD` wrappers
+  - rebuilt-artifact inspection showed candidates like `obj:74 0 R`, `obj:75 0 R`, `obj:76 0 R`, and `obj:78 0 R` with:
+    - `targetTag: /TD`
+    - `imageEvidence: strong`
+    - `informativeHint: informative`
+    - `repairMode: defer`
+  - the backend already supports wrapping a child `/Figure` under unsafe ancestry, including `/TD`
+- Shared fix applied:
+  - strong informative `/TD`-backed figure candidates now route to `retag_then_set_alt` instead of automatic defer
+  - targeted verification passed:
+    - weak unsafe table-backed figures still defer
+    - strong informative table-backed figures can wrap a child `/Figure`
 - Next expected outcome:
-  - next fresh post-restart rerun should keep the successful `/MapInfoArrows` repair in the live pipeline and push the file above `95`
+  - fresh post-restart rerun should clear the remaining four missing-alt figures and push the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

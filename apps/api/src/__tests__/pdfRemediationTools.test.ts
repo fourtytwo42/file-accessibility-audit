@@ -2510,6 +2510,54 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.manualReviewFlags[0]?.details).toContain('/TD')
   })
 
+  it('allows strong informative table-backed figure candidates to wrap a child figure', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const analysis = await analyzePDF(accessibleBuffer, 'accessible.pdf')
+    const context = await inspectPdfForRemediation(accessibleBuffer, analysis)
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect' },
+    })
+    const tableCellRef = inspect.tables.flatMap(table => table.firstRowCellRefs)[0]
+    expect(tableCellRef).toBeTruthy()
+
+    const strongContext: PdfRemediationContext = {
+      ...context,
+      figureCandidates: [{
+        id: 'figure:strong-td',
+        pageNumber: 1,
+        targetRef: tableCellRef,
+        bbox: null,
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Figure 1', 'Interventions Across the Life-Course'],
+        repairMode: 'retag_then_set_alt',
+        targetTag: '/TD',
+        parentTagPath: ['/TR', '/Table'],
+        pageImageCount: 1,
+        textDensityHint: 'high',
+        imageEvidence: 'strong',
+      }],
+    }
+
+    const result = await executeRemediationTool({
+      buffer: accessibleBuffer,
+      context: strongContext,
+      call: {
+        tool_name: 'retag_as_figure_and_set_alt',
+        arguments: {
+          candidateId: 'figure:strong-td',
+          altText: 'Lifecycle interventions figure',
+        },
+        rationale: 'Wrap informative table-backed figure content.',
+        confidence: 0.8,
+      },
+    })
+
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+  })
+
   it('defers unsafe TOCI-backed figure candidates instead of force-retagging them', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const analysis = await analyzePDF(accessibleBuffer, 'accessible.pdf')

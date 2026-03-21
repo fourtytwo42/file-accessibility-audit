@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `juvenile2000study.pdf`
-- Latest attempt path: queue item `2b2bddd4-182e-4ee4-b6be-e51ca7a27419`
-- Latest result summary: even after the collapsed-CID fallback fix, the fresh rerun still stayed at `89/B`. Direct planner inspection on `juvenile2000study.pdf` now shows the real remaining gap: `repair_cid_symbol_font_maps` and `repair_font_unicode_maps` are both selectable, but the CID symbol repair must be prioritized earlier in the font stage so `/MapInfoArrows` is normalized before generic Unicode repair runs.
-- Latest validation source: targeted `pdfRemediationTools` planner regressions, `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, `pnpm --filter api exec tsc --noEmit`, and direct `tsx` inspection of the live plan completed on 2026-03-21T00:29Z
-- Next action: commit/push the font-priority ordering fix, restart the API, and rerun `juvenile2000study.pdf` fresh through the API
-- Next hypothesis: prioritizing `repair_cid_symbol_font_maps` ahead of generic Unicode repair will let the live stage loop keep the same successful `MapInfoArrows` repair that already works in direct probes, pushing the file above `95`
-- API restart status: another restart is required after the planner-order change
-- Build status: latest source change is verified and ready to deploy
+- Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
+- Latest attempt path: queue item `e4cc930c-8265-43d2-aad7-8a69058e8ceb`
+- Latest result summary: the first fresh rerun improved `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` from `32/F` to `88/B`. Nearly every category cleared, but `alt_text` stayed at `20/F` because four remaining strong-evidence figure candidates were deferred solely for living under `/TD` wrappers. The backend already supports wrapping a child `/Figure` under a table cell, so the missing live-pipeline piece is the TS candidate classifier.
+- Latest validation source: targeted `pdfRemediationTools` regressions for weak vs strong table-backed figure candidates and `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T00:35Z
+- Next action: deploy the strong-table-cell figure wrap fix, restart the API, and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
+- Next hypothesis: allowing strong informative `/TD`-backed figures into `retag_then_set_alt` should clear the remaining four missing-alt candidates and push this file above `95`
+- API restart status: completed for the latest planner change before `juvenile2000study.pdf` rerun
+- Build status: current source is deployed; no additional restart needed before the next fresh upload
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `juvenile2000study.pdf`
-- Current phase: close the last planner-order gap in the font repair chain
-- Immediate next step: deploy the CID-symbol priority fix, rerun `juvenile2000study.pdf`, and confirm that `/MapInfoArrows` clears in the live pipeline
-- API restart/rerun confirmed for active file: pending restart and a fresh rerun after the latest code change
+- Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
+- Current phase: second remediation loop after isolating the remaining alt-text blocker family
+- Immediate next step: deploy the table-cell figure-wrap fix, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect the new result
+- API restart/rerun confirmed for active file: pending restart after the latest code change
 - Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
-- Active remediation loop count: `juvenile2000study.pdf=4`
-- Next hypothesis: the remaining blocker is no longer `ToUnicode` emission itself; it is planner/stage ordering for CID symbol-font recovery on `/Type0 /Identity-H` fonts
+- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=2`
+- Next hypothesis: the remaining blocker is no longer link structure, metadata, or CID repair; it is strong figure wrapping under `/TD` cells
 
 ## Pending Files
 

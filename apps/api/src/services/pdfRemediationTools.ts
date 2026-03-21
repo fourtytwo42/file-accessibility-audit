@@ -770,12 +770,22 @@ function buildFigureCandidates(
         parentTagPath,
       }
     }
-    if (unsafeTag || unsafeParent) {
+    const isTableCellWrapCandidate = targetTag === '/TD'
+      && imageEvidence === 'strong'
+      && informativeHint !== 'decorative'
+    if ((unsafeTag || unsafeParent) && !isTableCellWrapCandidate) {
       return {
         repairMode: 'defer' as const,
         targetTag,
         parentTagPath,
         unsafeReason: `unsafe_ancestry: Target ${targetRef} is associated with ${unsafeTag ? targetTag : unsafeParent} and is not safe to retag as /Figure.`,
+      }
+    }
+    if (isTableCellWrapCandidate) {
+      return {
+        repairMode: 'retag_then_set_alt' as const,
+        targetTag,
+        parentTagPath,
       }
     }
     if (allowContainerAlt && targetTag) {
