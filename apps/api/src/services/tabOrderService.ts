@@ -12,6 +12,7 @@ export interface TabOrderResult {
   annotatedPageCount: number
   missingTabsCount: number
   outOfOrderPageCount: number
+  unownedAnnotationCount: number
   issues: TabOrderIssue[]
   warnings: string[]
 }
@@ -59,6 +60,7 @@ export async function analyzeTabOrder(
     let annotatedPageCount = 0
     let missingTabsCount = 0
     let outOfOrderPageCount = 0
+    let unownedAnnotationCount = 0
 
     for (const [index, page] of pages.entries()) {
       const pageNumber = index + 1
@@ -71,6 +73,7 @@ export async function analyzeTabOrder(
           if (!(annotation instanceof PDFDict)) continue
           if (String(annotation.get(PDFName.of('Subtype')) || '') === '/Popup') continue
           if (annotationIsInvisible(annotation)) continue
+          if (!annotation.has(PDFName.of('StructParent'))) unownedAnnotationCount += 1
           visibleAnnotations.push(annotation)
         }
       }
@@ -108,6 +111,7 @@ export async function analyzeTabOrder(
       annotatedPageCount,
       missingTabsCount,
       outOfOrderPageCount,
+      unownedAnnotationCount,
       issues,
       warnings: [],
     }
@@ -118,6 +122,7 @@ export async function analyzeTabOrder(
       annotatedPageCount: 0,
       missingTabsCount: 0,
       outOfOrderPageCount: 0,
+      unownedAnnotationCount: 0,
       issues: [],
       warnings: [error?.message || 'Tab order analysis failed.'],
     }

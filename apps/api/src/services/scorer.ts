@@ -779,6 +779,15 @@ function scoreTextExtractability(qpdf: QpdfResult, pdfjs: PdfjsResult): Category
     findings.push('How to fix: (1) Run OCR in Adobe Acrobat: Scan & OCR → Recognize Text. (2) Then add tags: Accessibility → Add Tags to Document.')
   }
 
+  const missingToUnicode = qpdf.fontsMissingToUnicode ?? 0
+  if (score === 100 && missingToUnicode > 0) {
+    score = missingToUnicode <= 2
+      ? ANALYSIS.CHARACTER_ENCODING_SCORE_CAP_FEW
+      : ANALYSIS.CHARACTER_ENCODING_SCORE_CAP_MANY
+    findings.push(`${missingToUnicode} font object(s) are missing /ToUnicode maps, so character extraction is not fully reliable.`)
+    findings.push('How to fix: repair or regenerate the affected fonts so each embedded font maps used character codes to Unicode.')
+  }
+
   return {
     id: 'text_extractability',
     label: 'Text Extractability',
@@ -1153,6 +1162,7 @@ function scoreAltTextWithAcrobatRisk(
     !node.graphicsLikelyDecorative
     || node.ownershipMode === 'untagged_image_direct'
     || node.ownershipMode === 'untagged_image_mcid'
+    || node.ownershipMode === 'nested_alt_text_hides_content'
   const category = scoreAltText(qpdf, pdfjs, structure)
   if (!acrobatAltRiskNodes.length) return category
 
@@ -1163,14 +1173,16 @@ function scoreAltTextWithAcrobatRisk(
     ...acrobatAltRiskNodes.slice(0, 3).map(describeAcrobatAltRisk),
   ]
 
+  // Determine which nodes are still unresolved:
+  // - orphaned_alt_empty_element / nonfigure_with_alt / nested_alt_text_hides_content:
+  //   unresolved if /Alt IS present (needs removal)
+  // - all other modes: unresolved if /Alt is NOT present (needs addition)
+  const unresolvedRiskNodes = acrobatAltRiskNodes.filter(n =>
+    ALT_REMOVAL_MODES.has(n.ownershipMode ?? '') ? n.hasAlt : !n.hasAlt
+  )
+  const substantiveUnresolvedRiskNodes = unresolvedRiskNodes.filter(countsAsSubstantiveAltRisk)
+
   if (verapdf.status === 'passed' && category.score === 100) {
-    // Determine which nodes are still unresolved:
-    // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved if /Alt IS present (needs removal)
-    // - all other modes: unresolved if /Alt is NOT present (needs addition)
-    const unresolvedRiskNodes = acrobatAltRiskNodes.filter(n =>
-      ALT_REMOVAL_MODES.has(n.ownershipMode ?? '') ? n.hasAlt : !n.hasAlt
-    )
-    const substantiveUnresolvedRiskNodes = unresolvedRiskNodes.filter(countsAsSubstantiveAltRisk)
     if (!substantiveUnresolvedRiskNodes.length) {
       return {
         ...category,
@@ -1186,9 +1198,21 @@ function scoreAltTextWithAcrobatRisk(
         findings,
       }
     }
-    // Some nodes still need repair — veraPDF passes but Adobe will flag them.
-    // Cap the score to reflect that these are real accessibility failures.
-    const scoreCap = substantiveUnresolvedRiskNodes.some(n => n.ownershipMode === 'mixed_text_graphics_same_mcid') ? 75 : 85
+    const hasMixedContentRisk = substantiveUnresolvedRiskNodes.some(n => n.ownershipMode === 'mixed_text_graphics_same_mcid')
+    const hasNestedAltRisk = substantiveUnresolvedRiskNodes.some(n => n.ownershipMode === 'nested_alt_text_hides_content')
+    const hasUntaggedImageRisk = substantiveUnresolvedRiskNodes.some(n =>
+      n.ownershipMode === 'untagged_image_direct' || n.ownershipMode === 'untagged_image_mcid',
+    )
+    const hasNonFigureAltRisk = substantiveUnresolvedRiskNodes.some(n => n.ownershipMode === 'nonfigure_with_alt')
+    const scoreCap = hasUntaggedImageRisk
+      ? ANALYSIS.UNTAGGED_IMAGE_ALT_SCORE_CAP
+      : hasNestedAltRisk
+        ? ANALYSIS.NESTED_ALT_TEXT_SCORE_CAP
+        : hasNonFigureAltRisk
+          ? ANALYSIS.NONFIGURE_ALT_SCORE_CAP
+          : hasMixedContentRisk
+            ? 75
+            : 85
     return {
       ...category,
       score: scoreCap,
@@ -1256,7 +1280,14 @@ function scoreAltTextWithAcrobatRisk(
   const hasNonDecorativeMixedContent = substantiveRiskNodes.some(
     n => n.ownershipMode === 'mixed_text_graphics_same_mcid'
   )
-  const baseScore = category.score === null ? 100 : category.score
+  const hasNestedAltRisk = substantiveUnresolvedRiskNodes.some(node => node.ownershipMode === 'nested_alt_text_hides_content')
+  const hasUntaggedImageRisk = substantiveUnresolvedRiskNodes.some(node =>
+    node.ownershipMode === 'untagged_image_mcid' || node.ownershipMode === 'untagged_image_direct',
+  )
+  const hasNonFigureAltRisk = substantiveUnresolvedRiskNodes.some(node => node.ownershipMode === 'nonfigure_with_alt')
+  const baseScore = category.score === null
+    ? (hasUntaggedImageRisk ? ANALYSIS.UNTAGGED_IMAGE_ALT_SCORE_CAP : 100)
+    : category.score
   const mostlyDecorativeResidualRisk =
     missingFigureCount === 0
     && residualDecorativeMixedCount >= Math.max(1, acrobatAltRiskNodes.length - residualUntaggedImageCount)
@@ -1288,7 +1319,13 @@ function scoreAltTextWithAcrobatRisk(
       ],
     }
   }
-  const scoreCap = hasNonDecorativeMixedContent
+  const scoreCap = hasUntaggedImageRisk
+    ? ANALYSIS.UNTAGGED_IMAGE_ALT_SCORE_CAP
+    : hasNestedAltRisk
+      ? ANALYSIS.NESTED_ALT_TEXT_SCORE_CAP
+      : hasNonFigureAltRisk
+        ? ANALYSIS.NONFIGURE_ALT_SCORE_CAP
+        : hasNonDecorativeMixedContent
     ? (
         substantiveRiskNodes.length === 1
         && substantiveRiskNodes[0]?.splitSafe
@@ -1953,6 +1990,10 @@ function scoreReadingOrder(qpdf: QpdfResult, pdfjs: PdfjsResult, pdfminer?: Read
     if (tabOrder.missingTabsCount > 0) {
       finalScore = Math.min(finalScore, 60)
       findings.push(`${tabOrder.missingTabsCount} page(s) are missing /Tabs /S.`)
+    }
+    if ((tabOrder.unownedAnnotationCount ?? 0) > 0) {
+      finalScore = Math.min(finalScore, ANALYSIS.UNOWNED_ANNOTATION_SCORE_CAP)
+      findings.push(`${tabOrder.unownedAnnotationCount} visible annotation(s) are missing /StructParent ownership and are not fully tagged.`)
     }
     if (tabOrder.outOfOrderPageCount > 0) {
       finalScore = Math.min(finalScore, 75)

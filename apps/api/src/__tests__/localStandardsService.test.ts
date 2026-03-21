@@ -83,6 +83,7 @@ function makeTabOrder(overrides: Partial<TabOrderResult> = {}): TabOrderResult {
     annotatedPageCount: 0,
     missingTabsCount: 0,
     outOfOrderPageCount: 0,
+    unownedAnnotationCount: 0,
     issues: [],
     warnings: [],
     ...overrides,
@@ -140,6 +141,21 @@ describe('buildLocalStandardsReport', () => {
     const finding = report.findings.find(entry => entry.key === 'pdfua.page_tabs')
     expect(finding?.count).toBe(2)
     expect(finding?.categoryIds).toContain('reading_order')
+  })
+
+  it('emits tagged-annotations findings when visible annotations are missing StructParent ownership', () => {
+    const report = buildLocalStandardsReport(makeQpdf(), makePdfjs(), {
+      tabOrder: makeTabOrder({
+        annotatedPageCount: 1,
+        unownedAnnotationCount: 3,
+      }),
+      structure: makeStructure(),
+    })
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.tagged_annotations')
+    expect(finding?.count).toBe(3)
+    expect(finding?.blocking).toBe(true)
+    expect(finding?.categoryIds).toContain('pdf_ua_compliance')
   })
 
   it('emits annotation-contents findings for links with missing /Contents', () => {
@@ -440,6 +456,73 @@ describe('buildLocalStandardsReport', () => {
     const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
     expect(finding).toBeDefined()
     expect(finding?.inferred).toBe(true)
+    expect(finding?.blocking).toBe(true)
+  })
+
+  it('emits untagged-rendered-images findings for Acrobat untagged image ownership nodes', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({ images: [{ ref: 'obj:2 0 R', hasAlt: false }] }),
+      makePdfjs({ imageCount: 1 }),
+      {
+        structure: makeStructure({
+          acrobatAltRiskNodes: [{
+            ref: 'page:1:raw:/Im1',
+            tag: '(untagged)',
+            pageRef: 'obj:5 0 R',
+            mcids: [],
+            hasText: false,
+            hasGraphics: true,
+            hasAlt: false,
+            ownershipMode: 'untagged_image_direct',
+          }] as any,
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.untagged_rendered_images')
+    expect(finding?.count).toBe(1)
+    expect(finding?.blocking).toBe(true)
+  })
+
+  it('emits nonfigure-with-alt findings for invalid Alt ownership', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf(),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          acrobatAltRiskNodes: [{
+            ref: 'obj:11 0 R',
+            tag: '/P',
+            hasAlt: true,
+            ownershipMode: 'nonfigure_with_alt',
+          }] as any,
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.nonfigure_with_alt')
+    expect(finding?.count).toBe(1)
+    expect(finding?.blocking).toBe(true)
+  })
+
+  it('emits nested-alt findings when parent figure alt hides child semantic content', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf(),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          acrobatAltRiskNodes: [{
+            ref: 'obj:12 0 R',
+            tag: '/Figure',
+            hasAlt: true,
+            ownershipMode: 'nested_alt_text_hides_content',
+          }] as any,
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.nested_alt_text')
+    expect(finding?.count).toBe(1)
     expect(finding?.blocking).toBe(true)
   })
 

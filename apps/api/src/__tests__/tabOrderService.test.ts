@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PDFArray, PDFDocument, PDFName, PDFString, StandardFonts } from 'pdf-lib'
+import { PDFArray, PDFDocument, PDFName, PDFNumber, PDFString, StandardFonts } from 'pdf-lib'
 import { analyzeTabOrder } from '../services/tabOrderService.js'
 
 async function makePdfWithOutOfOrderLinks(): Promise<Buffer> {
@@ -31,6 +31,39 @@ async function makePdfWithOutOfOrderLinks(): Promise<Buffer> {
     A: bottomAction,
   })
   page.node.set(PDFName.of('Annots'), doc.context.obj([bottomAnnot, topAnnot]))
+  return Buffer.from(await doc.save())
+}
+
+async function makePdfWithOwnedAndUnownedAnnotations(): Promise<Buffer> {
+  const doc = await PDFDocument.create()
+  const page = doc.addPage([612, 792])
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  page.drawText('Owned link', { x: 72, y: 720, size: 12, font })
+  page.drawText('Unowned link', { x: 72, y: 660, size: 12, font })
+  const ownedAction = doc.context.obj({
+    S: PDFName.of('URI'),
+    URI: PDFString.of('https://example.com/owned'),
+  })
+  const unownedAction = doc.context.obj({
+    S: PDFName.of('URI'),
+    URI: PDFString.of('https://example.com/unowned'),
+  })
+  const ownedAnnot = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [72, 716, 150, 732],
+    Border: [0, 0, 0],
+    A: ownedAction,
+    StructParent: PDFNumber.of(0),
+  })
+  const unownedAnnot = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [72, 656, 160, 672],
+    Border: [0, 0, 0],
+    A: unownedAction,
+  })
+  page.node.set(PDFName.of('Annots'), doc.context.obj([ownedAnnot, unownedAnnot]))
   return Buffer.from(await doc.save())
 }
 
@@ -66,5 +99,13 @@ describe('analyzeTabOrder', () => {
     expect(result.status).toBe('ok')
     expect(result.missingTabsCount).toBe(0)
     expect(result.outOfOrderPageCount).toBe(0)
+  })
+
+  it('counts visible annotations missing StructParent ownership', async () => {
+    const buffer = await makePdfWithOwnedAndUnownedAnnotations()
+    const result = await analyzeTabOrder(buffer)
+
+    expect(result.status).toBe('ok')
+    expect(result.unownedAnnotationCount).toBe(1)
   })
 })

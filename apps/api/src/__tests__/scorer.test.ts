@@ -122,6 +122,7 @@ function makeTabOrder(overrides: Partial<TabOrderResult> = {}): TabOrderResult {
     annotatedPageCount: 0,
     missingTabsCount: 0,
     outOfOrderPageCount: 0,
+    unownedAnnotationCount: 0,
     issues: [],
     warnings: [],
     ...overrides,
@@ -1245,8 +1246,67 @@ describe('scoreAltText edge cases', () => {
       }),
     )
 
-    expect(findCategory(result, 'alt_text').score).toBe(60)
+    expect(findCategory(result, 'alt_text').score).toBe(0)
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('Acrobat-style alternate-text risk remains'))).toBe(true)
+  })
+
+  it('treats untagged image Acrobat risk as scored alt-text debt when base category would otherwise be N/A', () => {
+    const qpdf = makeQpdf({ images: [] })
+    const pdfjs = makePdfjs({ imageCount: 1 })
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [{
+          ref: 'page:1:raw:/Im1',
+          tag: '(untagged)',
+          pageRef: 'obj:5 0 R',
+          mcids: [],
+          hasText: false,
+          hasGraphics: true,
+          hasAlt: false,
+          splitSafe: false,
+          graphicsLikelyDecorative: true,
+          parentTagPath: [],
+          ownershipMode: 'untagged_image_direct',
+          duplicateOwnerRefs: [],
+        }] as any,
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(0)
+    expect(findCategory(result, 'alt_text').grade).toBe('F')
+  })
+
+  it('caps alt_text when nested alternate text hides child semantic content', () => {
+    const qpdf = makeQpdf({
+      images: [{ ref: '10 0 R', hasAlt: true }],
+    })
+    const pdfjs = makePdfjs()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        acrobatAltRiskNodes: [{
+          ref: 'obj:50 0 R',
+          tag: '/Figure',
+          pageRef: 'obj:5 0 R',
+          mcids: [1],
+          hasText: true,
+          hasGraphics: true,
+          hasAlt: true,
+          splitSafe: false,
+          graphicsLikelyDecorative: false,
+          parentTagPath: ['/Document'],
+          ownershipMode: 'nested_alt_text_hides_content',
+          duplicateOwnerRefs: [],
+        }] as any,
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(60)
   })
 
   it('excludes decorative non-figure graphics from alt-text scoring when informative figures are already described', () => {
@@ -1779,6 +1839,38 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(findCategory(result, 'text_extractability').score).toBeLessThan(100)
     expect(findCategory(result, 'pdf_ua_compliance').score).toBe(85)
     expect(result.warnings.some(warning => warning.includes('Local standards checks'))).toBe(true)
+  })
+
+  it('caps text_extractability for a few fonts missing ToUnicode maps', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    qpdf.fontsMissingToUnicode = 2
+
+    const result = scoreDocument(qpdf, pdfjs)
+
+    expect(findCategory(result, 'text_extractability').score).toBe(85)
+    expect(findCategory(result, 'text_extractability').findings.some(finding => finding.includes('/ToUnicode'))).toBe(true)
+  })
+
+  it('caps text_extractability more aggressively for many fonts missing ToUnicode maps', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    qpdf.fontsMissingToUnicode = 4
+
+    const result = scoreDocument(qpdf, pdfjs)
+
+    expect(findCategory(result, 'text_extractability').score).toBe(70)
+  })
+
+  it('caps reading_order when visible annotations are missing StructParent ownership', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), undefined, null, undefined, {
+      tabOrder: makeTabOrder({
+        annotatedPageCount: 1,
+        unownedAnnotationCount: 2,
+      }),
+    })
+
+    expect(findCategory(result, 'reading_order').score).toBe(60)
+    expect(findCategory(result, 'reading_order').findings.some(finding => finding.includes('/StructParent'))).toBe(true)
   })
 
   it('does not claim a clean local PDF/UA pass when known gaps remain', () => {

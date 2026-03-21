@@ -385,6 +385,32 @@ export const ANALYSIS = {
   PDFMINER_READING_ORDER_THRESHOLD: 0.25,
 
   /**
+   * Alt-text cap when substantive rendered images are present but still untagged.
+   */
+  UNTAGGED_IMAGE_ALT_SCORE_CAP: 0,
+
+  /**
+   * Alt-text cap when non-/Figure or non-/Formula elements still carry /Alt.
+   */
+  NONFIGURE_ALT_SCORE_CAP: 60,
+
+  /**
+   * Reading-order cap when visible annotations are missing /StructParent ownership.
+   */
+  UNOWNED_ANNOTATION_SCORE_CAP: 60,
+
+  /**
+   * Alt-text cap when parent /Figure alt hides child semantic content.
+   */
+  NESTED_ALT_TEXT_SCORE_CAP: 60,
+
+  /**
+   * Text-extractability caps for fonts missing /ToUnicode maps.
+   */
+  CHARACTER_ENCODING_SCORE_CAP_FEW: 85,
+  CHARACTER_ENCODING_SCORE_CAP_MANY: 70,
+
+  /**
    * Maximum number of pages analyzed by the PDFMiner reading order checker.
    */
   PDFMINER_MAX_PAGES: 20,

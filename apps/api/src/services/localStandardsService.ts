@@ -492,6 +492,85 @@ function pageTabsFinding(tabOrder: TabOrderResult | null | undefined): LocalStan
   }
 }
 
+function taggedAnnotationsFinding(tabOrder: TabOrderResult | null | undefined): LocalStandardsFinding | null {
+  if (!tabOrder || tabOrder.status !== 'ok' || (tabOrder.unownedAnnotationCount ?? 0) <= 0) return null
+  return {
+    key: 'pdfua.tagged_annotations',
+    label: 'Tagged annotations',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['reading_order', 'pdf_ua_compliance'],
+    confidence: 0.94,
+    evidence: [`Detected ${tabOrder.unownedAnnotationCount} visible annotation(s) without a /StructParent entry.`],
+    source: 'composite',
+    inferred: false,
+    count: tabOrder.unownedAnnotationCount,
+  }
+}
+
+function untaggedRenderedImagesFinding(
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
+): LocalStandardsFinding | null {
+  const nodes = (structure?.acrobatAltRiskNodes || []).filter(node =>
+    node.ownershipMode === 'untagged_image_direct' || node.ownershipMode === 'untagged_image_mcid',
+  )
+  if (!nodes.length) return null
+  return {
+    key: 'pdfua.untagged_rendered_images',
+    label: 'Untagged rendered images',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['alt_text', 'pdf_ua_compliance'],
+    confidence: 0.94,
+    evidence: nodes.slice(0, 5).map(node => `Rendered image ${node.ref} is not owned by a /Figure or /Formula structure element.`),
+    source: 'structure_backend',
+    inferred: false,
+    count: nodes.length,
+  }
+}
+
+function nonfigureWithAltFinding(
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
+): LocalStandardsFinding | null {
+  const nodes = (structure?.acrobatAltRiskNodes || []).filter(node =>
+    node.ownershipMode === 'nonfigure_with_alt' && node.hasAlt,
+  )
+  if (!nodes.length) return null
+  return {
+    key: 'pdfua.nonfigure_with_alt',
+    label: 'Other elements alternate text',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['alt_text', 'pdf_ua_compliance'],
+    confidence: 0.95,
+    evidence: nodes.slice(0, 5).map(node => `${node.tag || 'Non-figure element'} ${node.ref} carries /Alt but is not a /Figure or /Formula.`),
+    source: 'structure_backend',
+    inferred: false,
+    count: nodes.length,
+  }
+}
+
+function nestedAltTextFinding(
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes'> | null,
+): LocalStandardsFinding | null {
+  const nodes = (structure?.acrobatAltRiskNodes || []).filter(node =>
+    node.ownershipMode === 'nested_alt_text_hides_content' && node.hasAlt,
+  )
+  if (!nodes.length) return null
+  return {
+    key: 'pdfua.nested_alt_text',
+    label: 'Nested alternate text',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['alt_text', 'pdf_ua_compliance'],
+    confidence: 0.9,
+    evidence: nodes.slice(0, 5).map(node => `${node.tag || '/Figure'} ${node.ref} carries /Alt while also containing child semantic structure content.`),
+    source: 'structure_backend',
+    inferred: false,
+    count: nodes.length,
+  }
+}
+
 function annotationAltContentsFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalStandardsFinding | null {
   const missingFromLinks = pdfjs.links.filter(link => !(link.contents || '').trim()).length
   const missingCount = (qpdf.linkAnnotationCount ?? 0) > 0
@@ -765,12 +844,16 @@ export function buildLocalStandardsReport(
   pushFinding(findings, cidSymbolFontFinding(qpdf))
   pushFinding(findings, cidSetConsistencyFinding(qpdf))
   pushFinding(findings, pageTabsFinding(options?.tabOrder))
+  pushFinding(findings, taggedAnnotationsFinding(options?.tabOrder))
   pushFinding(findings, annotationAltContentsFinding(qpdf, pdfjs))
   pushFinding(findings, linkTaggingFinding(qpdf, pdfjs, options?.structure))
   pushFinding(findings, noteTagIdFinding(qpdf))
   pushFinding(findings, fontWidthsFinding(qpdf))
   pushFinding(findings, tableRegularityFinding(qpdf))
   pushFinding(findings, complexTableStructureFinding(qpdf))
+  pushFinding(findings, untaggedRenderedImagesFinding(options?.structure))
+  pushFinding(findings, nonfigureWithAltFinding(options?.structure))
+  pushFinding(findings, nestedAltTextFinding(options?.structure))
   pushFinding(findings, altTextQualityFinding(qpdf, options?.structure))
   pushFinding(findings, linkTextQualityFinding(pdfjs))
   pushFinding(findings, headingContentFinding(qpdf, options?.structure))

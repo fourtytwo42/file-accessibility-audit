@@ -1548,6 +1548,55 @@ def acrobat_alt_risk_nodes(pdf):
             except Exception:
                 pass
 
+        visited_nested_alt = set()
+        def scan_nested_alt_text(node):
+            try:
+                obj = node if isinstance(node, pikepdf.Dictionary) else None
+                if obj is None:
+                    return
+                node_ref = ref_string(obj)
+                if not node_ref or node_ref in visited_nested_alt:
+                    return
+                visited_nested_alt.add(node_ref)
+                tag = str(obj.get("/S", ""))
+                kids = obj.get("/K")
+                kid_list = list(kids) if isinstance(kids, pikepdf.Array) else ([kids] if kids is not None else [])
+                child_structs = []
+                has_child_struct = False
+                for kid in kid_list:
+                    if isinstance(kid, pikepdf.Dictionary):
+                        ktype = str(kid.get("/Type", ""))
+                        if ktype not in ("/MCR", "/OBJR"):
+                            has_child_struct = True
+                            child_structs.append(kid)
+                if tag == "/Figure" and obj.get("/Alt") is not None and has_child_struct and node_ref not in seen_refs:
+                    pg = obj.get("/Pg")
+                    page_ref = ref_string(pg) if isinstance(pg, pikepdf.Dictionary) else None
+                    seen_refs.add(node_ref)
+                    risks.append({
+                        "ref": node_ref,
+                        "tag": tag,
+                        "pageRef": page_ref,
+                        "mcids": normalized_struct_elem_mcids(obj),
+                        "hasText": True,
+                        "hasGraphics": True,
+                        "hasAlt": True,
+                        "splitSafe": False,
+                        "graphicsLikelyDecorative": False,
+                        "operatorPattern": None,
+                        "parentTagPath": [],
+                        "ownershipMode": "nested_alt_text_hides_content",
+                        "duplicateOwnerRefs": [],
+                    })
+                for child in child_structs:
+                    scan_nested_alt_text(child)
+            except Exception:
+                pass
+
+        for top in top_list:
+            if isinstance(top, pikepdf.Dictionary):
+                scan_nested_alt_text(top)
+
     # Phase 4: Find image XObjects invoked in content streams where the MCID is not
     # claimed by any struct element. Adobe's "Other elements alternate text" check
     # fails for any rendered image that has no struct-tree owner, even if it is inside
