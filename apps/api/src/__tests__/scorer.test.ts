@@ -2086,6 +2086,67 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })
+
+  it('treats very low-density contrast misses as advisory on large documents', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 10,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.cidset_consistency',
+            label: 'CIDSet consistency',
+            severity: 'warning',
+            blocking: false,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Detected embedded CID font descriptors with /CIDSet entries.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: ['pdfua.metadata_identification_content_unconfirmed'],
+      }),
+      {
+        colorContrast: {
+          status: 'ok',
+          pagesAnalyzed: 10,
+          totalSamples: 1215,
+          failingContrastCount: 13,
+          failRatio: 13 / 1215,
+          failures: Array.from({ length: 13 }, (_, index) => ({
+            page: 2 + (index % 7),
+            textPreview: `Sparse contrast sample ${index + 1}`,
+            contrastRatio: 2.9,
+            threshold: 4.5,
+            fgColor: '#6f6f6f',
+            bgColor: '#ffffff',
+            fontSizePt: 12,
+          })),
+          warnings: [],
+        },
+      },
+    )
+
+    expect(findCategory(result, 'color_contrast').score).toBe(95)
+    expect(findCategory(result, 'color_contrast').grade).toBe('A')
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('sparse across a large document'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
 })
 
 describe('summarizeLinkTextQuality', () => {

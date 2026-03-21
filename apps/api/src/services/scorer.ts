@@ -1370,6 +1370,11 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
       `${failure.page}|${failure.textPreview.trim().toLowerCase()}|${failure.fgColor.toLowerCase()}|${failure.bgColor.toLowerCase()}|${failure.threshold}`,
     ),
   )
+  const largeDocumentLowDensityContrastRisk =
+    contrast.totalSamples >= 750
+    && contrast.pagesAnalyzed >= 8
+    && effectiveFailRatio < 0.02
+    && effectiveFailingCount <= 20
   findings.push(`Analyzed ${contrast.totalSamples} text samples across ${contrast.pagesAnalyzed} page(s).`)
 
   let score: number
@@ -1389,6 +1394,10 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
   } else if (effectiveFailRatio < 0.01) {
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
+  } else if (largeDocumentLowDensityContrastRisk) {
+    score = 95
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
+    findings.push('The failing samples were sparse across a large document and were treated as an advisory contrast warning rather than a material document-wide contrast problem.')
   } else if (effectiveFailRatio < 0.05) {
     score = effectiveFailingCount <= 10 ? 95 : 80
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
