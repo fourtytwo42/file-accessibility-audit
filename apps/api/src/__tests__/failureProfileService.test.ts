@@ -584,6 +584,37 @@ describe('failureProfileService', () => {
     expect(result.plannerEvidence.rejectedKeys.some(key => key.includes('reorder_structure_children:group:1'))).toBe(true)
   })
 
+  it('emits document-level heading normalization when existing heading tags already need repair', () => {
+    const analysis = makeAnalysisResult({
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'heading_structure'
+          ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Heading hierarchy skip'] }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          headings: [
+            { level: 'H1', tag: '/H1' },
+            { level: 'H4', tag: '/heading 4' },
+            { level: 'H9', tag: '/heading 9' },
+          ],
+        },
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'normalize_heading_hierarchy'
+      && opportunity.scope === 'document'
+      && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
   it('does not emit heading or figure candidate opportunities once those categories are already complete', () => {
     const analysis = makeAnalysisResult({
       overallScore: 100,

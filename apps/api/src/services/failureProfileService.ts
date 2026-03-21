@@ -873,6 +873,24 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     })
   }
 
+  if (
+    issueIds.has('heading_structure')
+    && input.context.qpdf.headings.some(heading => /^H\d+$/i.test(heading.level))
+  ) {
+    addOpportunity(opportunities, {
+      toolName: 'normalize_heading_hierarchy',
+      reason: 'Existing heading tags already form a detectable hierarchy, but their levels need normalization to remove Acrobat-style nesting failures.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['heading_structure'],
+      confidence: 0.92,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.heading_structure']),
+    })
+  }
+
   for (const candidate of input.context.headingCandidates) {
     if (!issueIds.has('heading_structure')) continue
     addOpportunity(opportunities, {
