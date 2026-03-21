@@ -461,4 +461,58 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.categoryIds).toContain('table_markup')
     expect(finding?.blocking).toBe(true)
   })
+
+  it('emits figure alt-quality findings for generic alternate text', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        images: [
+          { ref: '10 0 R', hasAlt: true, altText: 'image' },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.figure_alt_quality')
+    expect(finding).toBeDefined()
+    expect(finding?.categoryIds).toContain('alt_text')
+  })
+
+  it('emits heading-content findings for missing H1 and generic heading text', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        headings: [
+          { level: 'H2', tag: '/H2' },
+        ],
+      }),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          headings: [
+            { ref: 'obj:12 0 R', tag: '/H2', text: 'Heading' },
+          ],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.heading_content_quality')
+    expect(finding).toBeDefined()
+    expect(finding?.categoryIds).toContain('heading_structure')
+  })
+
+  it('emits complex-table findings for irregular grouped-header tables', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        tables: [
+          { hasHeaders: true, isRegular: false, rowCellCounts: [4, 6, 6], headerRowCount: 2, maxRowSpan: 2, maxColSpan: 3 },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.table_complexity')
+    expect(finding).toBeDefined()
+    expect(finding?.categoryIds).toContain('table_markup')
+  })
 })

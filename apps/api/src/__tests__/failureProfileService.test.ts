@@ -423,6 +423,72 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_table_headers')).toBe(true)
   })
 
+  it('maps alt-quality, heading-content, and complex-table findings into existing repair opportunities', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.figure_alt_quality',
+            label: 'Figure alternate-text quality',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['1 figure uses low-value alternate text.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.heading_content_quality',
+            label: 'Heading content quality',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['heading_structure', 'pdf_ua_compliance'],
+            confidence: 0.88,
+            evidence: ['The document contains headings but no main H1 heading was detected.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.table_complexity',
+            label: 'Complex table header relationships',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['table_markup', 'pdf_ua_compliance'],
+            confidence: 0.86,
+            evidence: ['1 table uses grouped or span-heavy headers but still has ambiguous header relationships.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['set_figure_alt_text', 'retag_as_figure_and_set_alt'].includes(opportunity.toolName))).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['normalize_heading_hierarchy', 'create_heading_from_candidate'].includes(opportunity.toolName))).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => ['repair_native_table_headers', 'set_table_header_cells'].includes(opportunity.toolName))).toBe(true)
+  })
+
   it('maps local page-tabs, link-tagging, and annotation-contents findings into planner opportunities', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({

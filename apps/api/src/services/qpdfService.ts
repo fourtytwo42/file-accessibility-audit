@@ -57,12 +57,15 @@ export interface QpdfResult {
     placementPageNumbers?: number[]
     placementCount?: number
   }>
-  headings: Array<{ level: string; tag: string }>
+  headings: Array<{ level: string; tag: string; text?: string | null }>
   tables: Array<{
     hasHeaders: boolean
     rowCellCounts?: number[]
     dominantColumnCount?: number
     isRegular?: boolean
+    headerRowCount?: number
+    maxRowSpan?: number
+    maxColSpan?: number
   }>
   structTreeDepth: number
   // MCIDs in struct-tree depth-first order, as (pageIndex, mcid) pairs.
@@ -1112,7 +1115,14 @@ function hasTableHeaders(tableObj: any, objects: any): boolean {
 function analyzeTableRegularity(
   tableObj: any,
   objects: any,
-): { rowCellCounts: number[]; dominantColumnCount: number; isRegular: boolean } {
+): {
+  rowCellCounts: number[]
+  dominantColumnCount: number
+  isRegular: boolean
+  headerRowCount: number
+  maxRowSpan: number
+  maxColSpan: number
+} {
   const rows: any[] = []
 
   const collectRows = (node: any, depth: number): void => {
@@ -1187,15 +1197,21 @@ function analyzeTableRegularity(
 
   collectRows(tableObj?.['/K'], 0)
   const rowCellCounts: number[] = []
+  let headerRowCount = 0
+  let maxRowSpan = 1
+  let maxColSpan = 1
   const activeRowSpans: number[] = []
   for (const row of rows) {
     while (activeRowSpans.length && activeRowSpans[activeRowSpans.length - 1] <= 0) activeRowSpans.pop()
     const priorSpanCount = activeRowSpans.length
     let occupiedColumns = activeRowSpans.reduce((sum, span) => sum + (span > 0 ? 1 : 0), 0)
     const cells = listRowCells(row)
+    if (cells.some(cell => cell?.['/S'] === '/TH')) headerRowCount += 1
     for (const cell of cells) {
       const colSpan = cellColSpan(cell)
       const rowSpan = cellRowSpan(cell)
+      maxColSpan = Math.max(maxColSpan, colSpan)
+      maxRowSpan = Math.max(maxRowSpan, rowSpan)
       occupiedColumns += colSpan
       if (rowSpan > 1) {
         for (let index = 0; index < colSpan; index += 1) {
@@ -1221,6 +1237,9 @@ function analyzeTableRegularity(
     rowCellCounts: filteredRowCounts,
     dominantColumnCount,
     isRegular,
+    headerRowCount,
+    maxRowSpan,
+    maxColSpan,
   }
 }
 

@@ -26,6 +26,24 @@ export interface LocalStandardsReport {
   knownGapKeys: string[]
 }
 
+const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon'])
+const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
+
+function normalizeSemanticText(text: string | null | undefined): string {
+  return String(text || '').replace(/^u:/, '').trim().toLowerCase()
+}
+
+function isGenericAltText(text: string | null | undefined): boolean {
+  const normalized = normalizeSemanticText(text)
+  if (!normalized) return false
+  return GENERIC_ALT_TEXT_PATTERNS.has(normalized) || /^image\s+\d+$/i.test(normalized)
+}
+
+function isGenericHeadingText(text: string | null | undefined): boolean {
+  const normalized = normalizeSemanticText(text)
+  return !!normalized && GENERIC_HEADING_TEXT_PATTERNS.has(normalized)
+}
+
 function pushFinding(target: LocalStandardsFinding[], finding: LocalStandardsFinding | null): void {
   if (!finding) return
   target.push(finding)
@@ -520,6 +538,98 @@ function tableRegularityFinding(qpdf: QpdfResult): LocalStandardsFinding | null 
   }
 }
 
+function complexTableStructureFinding(qpdf: QpdfResult): LocalStandardsFinding | null {
+  const complexTables = qpdf.tables.filter(table => {
+    const spanHeavy = (table.maxRowSpan ?? 1) > 1 || (table.maxColSpan ?? 1) > 1
+    const multiHeaderRows = (table.headerRowCount ?? 0) > 1
+    const irregular = table.isRegular === false && (table.rowCellCounts?.length ?? 0) > 1
+    return table.hasHeaders && irregular && (spanHeavy || multiHeaderRows)
+  })
+  if (!complexTables.length) return null
+
+  return {
+    key: 'pdfua.table_complexity',
+    label: 'Complex table header relationships',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['table_markup', 'pdf_ua_compliance'],
+    confidence: 0.82,
+    evidence: complexTables.slice(0, 3).map((table, index) => `Table ${index + 1} has grouped or span-heavy headers (header rows ${table.headerRowCount ?? 0}, max RowSpan ${table.maxRowSpan ?? 1}, max ColSpan ${table.maxColSpan ?? 1}) while row structure remains irregular.`),
+    source: 'qpdf',
+    inferred: true,
+    count: complexTables.length,
+  }
+}
+
+function altTextQualityFinding(
+  qpdf: QpdfResult,
+  structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
+): LocalStandardsFinding | null {
+  const genericRefs = new Set<string>()
+  for (const image of qpdf.images) {
+    if (image.hasAlt && isGenericAltText(image.altText)) genericRefs.add(image.canonicalRef || image.ref)
+  }
+  for (const figure of structure?.figures || []) {
+    if (figure.graphicsLikelyDecorative && !figure.hasText) continue
+    if (figure.hasAlt && isGenericAltText(figure.altText)) genericRefs.add(figure.splitSourceRef || figure.ref)
+  }
+  if (!genericRefs.size) return null
+  return {
+    key: 'pdfua.figure_alt_quality',
+    label: 'Figure alternate text quality',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['alt_text', 'pdf_ua_compliance'],
+    confidence: 0.82,
+    evidence: [...genericRefs].slice(0, 5).map(ref => `Figure ${ref} uses generic alternate text that does not describe the image meaningfully.`),
+    source: 'composite',
+    inferred: true,
+    count: genericRefs.size,
+  }
+}
+
+function headingContentFinding(
+  qpdf: QpdfResult,
+  structure?: Pick<StructureBackendMutationResult, 'headings'> | null,
+): LocalStandardsFinding | null {
+  const evidence: string[] = []
+  let count = 0
+
+  const numberedLevels = qpdf.headings
+    .map(heading => heading.level)
+    .filter(level => /^H[1-6]$/i.test(level))
+  if (numberedLevels.length > 0 && !numberedLevels.some(level => /^H1$/i.test(level))) {
+    count += 1
+    evidence.push('The document contains headings but no main H1 heading was detected.')
+  }
+
+  const snapshotHeadings = structure?.headings || []
+  const emptyHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+  const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))
+  if (emptyHeadings.length > 0) {
+    count += emptyHeadings.length
+    evidence.push(...emptyHeadings.slice(0, 3).map(heading => `Heading ${heading.ref} is tagged as ${heading.tag} but has no readable heading text.`))
+  }
+  if (genericHeadings.length > 0) {
+    count += genericHeadings.length
+    evidence.push(...genericHeadings.slice(0, 3).map(heading => `Heading ${heading.ref} uses generic text "${String(heading.text || '').trim()}".`))
+  }
+  if (!count) return null
+
+  return {
+    key: 'pdfua.heading_content_quality',
+    label: 'Heading content quality',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['heading_structure', 'pdf_ua_compliance'],
+    confidence: snapshotHeadings.length > 0 ? 0.86 : 0.74,
+    evidence,
+    source: snapshotHeadings.length > 0 ? 'structure_backend' : 'composite',
+    inferred: snapshotHeadings.length === 0,
+    count,
+  }
+}
+
 function partialArtifactFinding(qpdf: QpdfResult, pdfjs: PdfjsResult): LocalStandardsFinding | null {
   const semanticCoveragePresent = qpdf.headings.length > 0
     || qpdf.tables.length > 0
@@ -545,7 +655,7 @@ export function buildLocalStandardsReport(
   pdfjs: PdfjsResult,
   options?: {
     tabOrder?: TabOrderResult | null
-    structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'imageStructNodes' | 'acrobatAltRiskNodes' | 'readingOrderNodes'> | null
+    structure?: Pick<StructureBackendMutationResult, 'structuralNodes' | 'figures' | 'headings' | 'imageStructNodes' | 'acrobatAltRiskNodes' | 'readingOrderNodes'> | null
   },
 ): LocalStandardsReport {
   const findings: LocalStandardsFinding[] = []
@@ -564,6 +674,9 @@ export function buildLocalStandardsReport(
   pushFinding(findings, noteTagIdFinding(qpdf))
   pushFinding(findings, fontWidthsFinding(qpdf))
   pushFinding(findings, tableRegularityFinding(qpdf))
+  pushFinding(findings, complexTableStructureFinding(qpdf))
+  pushFinding(findings, altTextQualityFinding(qpdf, options?.structure))
+  pushFinding(findings, headingContentFinding(qpdf, options?.structure))
   pushFinding(findings, partialArtifactFinding(qpdf, pdfjs))
 
   const knownGapKeys: string[] = []

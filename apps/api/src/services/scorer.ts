@@ -389,13 +389,39 @@ interface SummaryContext {
 
 type AcrobatAltRiskNode = NonNullable<StructureBackendMutationResult['acrobatAltRiskNodes']>[number]
 type StructureFigureNode = NonNullable<StructureBackendMutationResult['figures']>[number]
+type StructureHeadingNode = NonNullable<StructureBackendMutationResult['headings']>[number]
+
+type AltQuality = 'missing' | 'empty' | 'generic' | 'descriptive'
+
+const GENERIC_ALT_TEXT_PATTERNS = new Set(['image', 'photo', 'picture', 'graphic', 'icon'])
+const GENERIC_HEADING_TEXT_PATTERNS = new Set(['heading', 'title', 'header', 'subtitle'])
+
+function normalizeSemanticText(text: string | null | undefined): string {
+  return String(text || '').replace(/^u:/, '').trim().toLowerCase()
+}
+
+function classifyAltQuality(hasAlt: boolean, altText?: string | null): AltQuality {
+  if (!hasAlt) return 'missing'
+  if (altText === null || typeof altText === 'undefined') return 'descriptive'
+  if (String(altText).trim().length === 0) return 'empty'
+  const normalized = normalizeSemanticText(altText)
+  if (GENERIC_ALT_TEXT_PATTERNS.has(normalized) || /^image\s+\d+$/i.test(normalized)) return 'generic'
+  return 'descriptive'
+}
+
+function isGenericHeadingText(text: string | null | undefined): boolean {
+  const normalized = normalizeSemanticText(text)
+  return !!normalized && GENERIC_HEADING_TEXT_PATTERNS.has(normalized)
+}
 
 function effectiveAltFigureStats(
   qpdf: QpdfResult,
   structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
 ): {
-  figures: Array<{ ref: string; hasAlt: boolean; altText?: string }>
+  figures: Array<{ ref: string; hasAlt: boolean; altText?: string; altQuality: AltQuality }>
   withAlt: number
+  withDescriptiveAlt: number
+  genericAltCount: number
   wrapperExclusionCount: number
   structureCreditApplied: boolean
 } {
@@ -409,22 +435,28 @@ function effectiveAltFigureStats(
   }
   const collapseFigureVariants = <T extends { ref: string; hasAlt: boolean; altText?: string | null; splitSourceRef?: string | null }>(
     figures: T[],
-  ): Array<{ ref: string; hasAlt: boolean; altText?: string }> => {
-    const byCanonicalRef = new Map<string, { ref: string; hasAlt: boolean; altText?: string }>()
+  ): Array<{ ref: string; hasAlt: boolean; altText?: string; altQuality: AltQuality }> => {
+    const byCanonicalRef = new Map<string, { ref: string; hasAlt: boolean; altText?: string; altQuality: AltQuality }>()
     for (const figure of figures) {
       const rawCanonicalRef = figure.splitSourceRef || figure.ref
       const canonicalRef = qpdfCanonicalByRef.get(rawCanonicalRef) || rawCanonicalRef
       const existing = byCanonicalRef.get(canonicalRef)
+      const nextQuality = classifyAltQuality(!!figure.hasAlt, figure.altText)
       if (!existing) {
         byCanonicalRef.set(canonicalRef, {
           ref: canonicalRef,
           hasAlt: !!figure.hasAlt,
           altText: figure.altText || undefined,
+          altQuality: nextQuality,
         })
         continue
       }
       existing.hasAlt = existing.hasAlt || !!figure.hasAlt
       if (!existing.altText && figure.altText) existing.altText = figure.altText
+      if (existing.altQuality !== 'descriptive') {
+        if (nextQuality === 'descriptive') existing.altQuality = 'descriptive'
+        else if (existing.altQuality === 'missing') existing.altQuality = nextQuality
+      }
     }
     return [...byCanonicalRef.values()]
   }
@@ -459,11 +491,14 @@ function effectiveAltFigureStats(
   )
   const structureTotal = informativeStructureFigures.length
   const structureWithAlt = informativeStructureFigures.filter(figure => figure.hasAlt).length
+  const structureWithDescriptiveAlt = informativeStructureFigures.filter(figure => figure.altQuality === 'descriptive').length
   const qpdfWithAlt = filteredQpdfFigures.filter(figure => figure.hasAlt).length
+  const qpdfWithDescriptiveAlt = filteredQpdfFigures.filter(figure => figure.altQuality === 'descriptive').length
   const effectiveTotal = Math.max(filteredQpdfFigures.length, structureTotal)
   const effectiveWithAlt = Math.min(effectiveTotal, Math.max(qpdfWithAlt, structureWithAlt))
+  const effectiveWithDescriptiveAlt = Math.min(effectiveTotal, Math.max(qpdfWithDescriptiveAlt, structureWithDescriptiveAlt))
 
-  const figures = Array.from({ length: effectiveTotal }, (_, index) => {
+  const figures: Array<{ ref: string; hasAlt: boolean; altText?: string; altQuality: AltQuality }> = Array.from({ length: effectiveTotal }, (_, index) => {
     const qpdfFigure = filteredQpdfFigures[index]
     const structureFigure = informativeStructureFigures[index]
     const hasAlt = index < effectiveWithAlt
@@ -471,12 +506,23 @@ function effectiveAltFigureStats(
       ref: qpdfFigure?.ref || structureFigure?.ref || `structure:${index}`,
       hasAlt,
       altText: qpdfFigure?.altText || structureFigure?.altText || undefined,
+      altQuality: hasAlt
+        ? (
+            qpdfFigure?.altQuality === 'descriptive' || structureFigure?.altQuality === 'descriptive'
+              ? 'descriptive'
+              : qpdfFigure?.altQuality === 'generic' || structureFigure?.altQuality === 'generic'
+                ? 'generic'
+                : 'empty'
+          )
+        : 'missing',
     }
   })
 
   return {
     figures,
     withAlt: effectiveWithAlt,
+    withDescriptiveAlt: effectiveWithDescriptiveAlt,
+    genericAltCount: figures.filter(figure => figure.altQuality === 'generic').length,
     wrapperExclusionCount: excludedWrapperRefs.size,
     structureCreditApplied: structureWithAlt > qpdfWithAlt || structureTotal > filteredQpdfFigures.length,
   }
@@ -491,7 +537,7 @@ export function scoreDocument(
     isCompliant: true,
     message: 'veraPDF passed PDF/UA validation.',
   }),
-  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures' | 'headings'> | null,
   adobe?: AdobeSummary | null,
   localStandards: LocalStandardsReport = { status: 'clear', findings: [], knownGapKeys: ['pdfua.local_coverage_unconfirmed'] },
   extras?: {
@@ -535,7 +581,7 @@ export function scoreDocument(
   categories.push(scoreTitleLanguage(qpdf, pdfjs))
 
   // 3. Heading Structure (15%)
-  categories.push(scoreHeadingStructure(qpdf))
+  categories.push(scoreHeadingStructureWithContent(qpdf, structure))
 
   // 4. Alt Text on Images (15%)
   categories.push(scoreAltTextWithAcrobatRisk(qpdf, pdfjs, verapdf, structure))
@@ -852,6 +898,43 @@ function scoreHeadingStructure(qpdf: QpdfResult): CategoryResult {
   }
 }
 
+function scoreHeadingStructureWithContent(
+  qpdf: QpdfResult,
+  structure?: Pick<StructureBackendMutationResult, 'headings'> | null,
+): CategoryResult {
+  const category = scoreHeadingStructure(qpdf)
+  const findings = [...category.findings]
+  let score = category.score ?? 100
+
+  const numberedLevels = qpdf.headings
+    .map(heading => heading.level)
+    .filter(level => /^H[1-6]$/i.test(level))
+  if (numberedLevels.length > 0 && !numberedLevels.some(level => /^H1$/i.test(level))) {
+    findings.push('The document contains headings but no main H1 heading was detected.')
+    score = Math.min(score, 60)
+  }
+
+  const snapshotHeadings = (structure?.headings || []) as StructureHeadingNode[]
+  const emptyHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+  const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))
+  if (emptyHeadings.length > 0) {
+    findings.push(`${emptyHeadings.length} heading tag(s) have no readable heading text.`)
+    score = Math.min(score, 60)
+  }
+  if (genericHeadings.length > 0) {
+    findings.push(`${genericHeadings.length} heading tag(s) use generic heading text such as "${String(genericHeadings[0]?.text || '').trim()}".`)
+    score = Math.min(score, 60)
+  }
+
+  return {
+    ...category,
+    score,
+    grade: getGrade(score),
+    severity: getSeverity(score),
+    findings,
+  }
+}
+
 function scoreAltText(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
@@ -867,6 +950,8 @@ function scoreAltText(
   const {
     figures,
     withAlt,
+    withDescriptiveAlt,
+    genericAltCount,
     wrapperExclusionCount,
     structureCreditApplied,
   } = effectiveAltFigureStats(qpdf, structure)
@@ -911,10 +996,10 @@ function scoreAltText(
     }
   }
 
-  const score = withAlt === 0 ? 0 : Math.round((withAlt / figures.length) * 100)
+  const score = withDescriptiveAlt === 0 ? 0 : Math.round((withDescriptiveAlt / figures.length) * 100)
   const findings: string[] = []
 
-  if (withAlt === figures.length) {
+  if (withDescriptiveAlt === figures.length) {
     findings.push(`All ${figures.length} image(s) have alternative text`)
     for (const fig of figures) {
       if (fig.altText) findings.push(`Image alt text: "${fig.altText}"`)
@@ -922,9 +1007,14 @@ function scoreAltText(
   } else {
     findings.push(`${withAlt} of ${figures.length} image(s) have alternative text`)
     const missing = figures.filter(f => !f.hasAlt).length
-    findings.push(`${missing} image(s) are missing alt text`)
+    const lowQuality = figures.filter(f => f.altQuality === 'generic' || f.altQuality === 'empty').length
+    if (missing > 0) findings.push(`${missing} image(s) are missing alt text`)
+    if (lowQuality > 0) findings.push(`${lowQuality} image(s) have empty or generic alt text that should be rewritten more descriptively.`)
     findings.push('How to fix: In Adobe Acrobat, open the Tags panel → find the <Figure> tag for each image → right-click → Properties → enter a description in the "Alternate Text" field.')
     findings.push('Tip: Good alt text is concise and describes the purpose of the image, not just its appearance. For example, "Bar chart showing 2024 crime rates by county" rather than "chart".')
+  }
+  if (genericAltCount > 0) {
+    findings.push(`${genericAltCount} image(s) use generic alternate text such as "image" or "graphic".`)
   }
   if (wrapperExclusionCount > 0) {
     findings.push(`${wrapperExclusionCount} split-generated decorative wrapper figure(s) were excluded from alt-text scoring.`)
@@ -1369,9 +1459,18 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
 
     let score = 100
     const irregularTables = qpdf.tables.filter(table => table.isRegular === false)
+    const complexTables = qpdf.tables.filter(table =>
+      table.hasHeaders
+      && (((table.headerRowCount ?? 0) > 1) || ((table.maxRowSpan ?? 1) > 1) || ((table.maxColSpan ?? 1) > 1))
+      && table.isRegular === false,
+    )
     if (irregularTables.length > 0) {
       findings.push(`${irregularTables.length} tagged table(s) still have irregular row/column structure and may fail Acrobat's table regularity check.`)
       score = irregularTables.length <= 1 ? 85 : 70
+    }
+    if (complexTables.length > 0) {
+      findings.push(`${complexTables.length} table(s) use grouped or span-heavy headers but still have ambiguous header relationships.`)
+      score = Math.min(score, complexTables.length <= 1 ? 75 : 60)
     }
     const highConfidenceUntagged = tableStructure?.highConfidenceUntaggedTables ?? tableStructure?.untaggedTables ?? 0
     const advisoryUntagged = tableStructure?.advisoryUntaggedTables ?? 0

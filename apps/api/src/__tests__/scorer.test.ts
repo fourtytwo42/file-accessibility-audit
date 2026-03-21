@@ -728,6 +728,40 @@ describe('scoreHeadingStructure edge cases', () => {
     expect(cat.score).toBe(60)
     expect(cat.findings.some(f => f.includes('outside H1-H6'))).toBe(true)
   })
+
+  it('headings without an H1 lower heading structure', () => {
+    const qpdf = makeQpdf({
+      headings: [
+        { level: 'H2', tag: '/H2' },
+        { level: 'H3', tag: '/H3' },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(60)
+    expect(cat.findings.some(f => f.includes('no main H1'))).toBe(true)
+  })
+
+  it('generic heading text from structure snapshots lowers heading structure', () => {
+    const qpdf = makeQpdf({
+      headings: [
+        { level: 'H1', tag: '/H1' },
+      ],
+    })
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs(),
+      makeVeraPdf(),
+      makeStructure({
+        headings: [
+          { ref: 'obj:50 0 R', tag: '/H1', text: 'Heading' },
+        ],
+      }),
+    )
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(60)
+    expect(cat.findings.some(f => f.includes('generic heading text'))).toBe(true)
+  })
 })
 
 describe('scoreAltText pdfjs fallback', () => {
@@ -775,6 +809,19 @@ describe('scoreAltText edge cases', () => {
     const pdfjs = makePdfjs()
     const result = scoreDocument(qpdf, pdfjs)
     expect(findCategory(result, 'alt_text').score).toBe(67)
+  })
+
+  it('generic alt text lowers alt_text even when alt is present', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: '10 0 R', hasAlt: true, altText: 'image' },
+        { ref: '11 0 R', hasAlt: true, altText: 'Revenue chart by quarter' },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    const category = findCategory(result, 'alt_text')
+    expect(category.score).toBe(50)
+    expect(category.findings.some(finding => finding.includes('generic alternate text'))).toBe(true)
   })
 
   it('images with no ref are excluded', () => {
@@ -1030,6 +1077,30 @@ describe('scoreAltText edge cases', () => {
 
     expect(findCategory(result, 'alt_text').score).toBe(100)
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('excluded from alt-text scoring'))).toBe(true)
+  })
+
+  it('keeps decorative empty structure figures compliant when they are intentionally decorative', () => {
+    const result = scoreDocument(
+      makeQpdf({ images: [] }),
+      makePdfjs(),
+      makeVeraPdf(),
+      makeStructure({
+        figures: [
+          {
+            ref: 'obj:77 0 R',
+            tag: '/Figure',
+            pageRef: 'obj:5 0 R',
+            mcids: [3],
+            hasAlt: false,
+            altText: '',
+            hasText: false,
+            splitGenerated: true,
+            graphicsLikelyDecorative: true,
+          },
+        ] as any,
+      }),
+    )
+    expect(findCategory(result, 'alt_text').score).toBeNull()
   })
 
   it('credits structure-backed informative figures and excludes split-generated decorative wrappers', () => {
@@ -1293,6 +1364,17 @@ describe('scoreTableMarkup edge cases', () => {
     const result = scoreDocument(qpdf, makePdfjs())
     expect(findCategory(result, 'table_markup').score).toBe(85)
     expect(findCategory(result, 'table_markup').findings.some(finding => finding.includes('regularity'))).toBe(true)
+  })
+
+  it('lowers table score more aggressively for complex irregular grouped-header tables', () => {
+    const qpdf = makeQpdf({
+      tables: [
+        { hasHeaders: true, rowCellCounts: [6, 11, 11], dominantColumnCount: 11, isRegular: false, headerRowCount: 2, maxRowSpan: 2, maxColSpan: 3 },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    expect(findCategory(result, 'table_markup').score).toBe(75)
+    expect(findCategory(result, 'table_markup').findings.some(finding => finding.includes('span-heavy headers'))).toBe(true)
   })
 })
 

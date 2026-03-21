@@ -727,15 +727,28 @@ def structural_nodes(pdf):
 
 def top_level_heading_candidates(pdf):
     candidates = []
+    page_text_cache = {}
     for obj in iter_struct_elems(pdf):
         tag = str(obj.get("/S"))
         parent = obj.get("/P")
         parent_ref = ref_string(parent) if isinstance(parent, pikepdf.Dictionary) else None
         if is_heading_compat_tag(tag) and parent_ref:
+            page_obj = obj.get("/Pg")
+            page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
+            text_map = page_text_cache.get(page_ref)
+            if text_map is None:
+                text_map = page_mcid_text_map(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else {}
+                page_text_cache[page_ref] = text_map
+            heading_text = " ".join(
+                text_map.get(mcid, "").strip()
+                for mcid in normalized_struct_elem_mcids(obj)
+                if text_map.get(mcid, "").strip()
+            ).strip() or None
             candidates.append({
                 "ref": ref_string(obj),
                 "tag": tag,
                 "parentRef": parent_ref,
+                "text": heading_text,
             })
     return [candidate for candidate in candidates if candidate["ref"]]
 
@@ -3418,6 +3431,65 @@ def text_strings_for_instruction(instruction):
     if operator == "TJ" and operands and isinstance(operands[0], pikepdf.Array):
         return [item for item in operands[0] if not isinstance(item, (int, float))]
     return []
+
+
+def _normalized_text_fragment(value):
+    try:
+        text = str(value).replace("u:", "").strip()
+    except Exception:
+        return ""
+    if not text or text in ("None", "null"):
+        return ""
+    return text
+
+
+def page_mcid_text_map(page_obj):
+    if not isinstance(page_obj, pikepdf.Dictionary):
+        return {}
+    try:
+        instructions = list(pikepdf.parse_content_stream(page_obj))
+    except Exception:
+        return {}
+
+    text_by_mcid = {}
+    mcid_stack = []
+
+    for instruction in instructions:
+        operator = str(instruction.operator)
+        operands = list(instruction.operands)
+
+        if operator == "BDC":
+            mcid = None
+            if len(operands) >= 2 and isinstance(operands[1], pikepdf.Dictionary):
+                raw_mcid = operands[1].get("/MCID")
+                try:
+                    mcid = int(raw_mcid)
+                except Exception:
+                    mcid = None
+            mcid_stack.append(mcid)
+            continue
+        if operator == "BMC":
+            mcid_stack.append(None)
+            continue
+        if operator == "EMC":
+            if mcid_stack:
+                mcid_stack.pop()
+            continue
+        if operator not in TEXT_SHOWING_OPERATORS:
+            continue
+
+        active_mcid = next((value for value in reversed(mcid_stack) if value is not None), None)
+        if active_mcid is None:
+            continue
+
+        fragments = [_normalized_text_fragment(value) for value in text_strings_for_instruction(instruction)]
+        normalized = " ".join(fragment for fragment in fragments if fragment).strip()
+        if not normalized:
+            continue
+        existing = text_by_mcid.get(active_mcid, "")
+        text_by_mcid[active_mcid] = f"{existing} {normalized}".strip() if existing else normalized
+
+    return text_by_mcid
 
 
 def cid_codes_from_pdf_string(value):

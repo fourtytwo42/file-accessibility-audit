@@ -104,7 +104,7 @@ export interface StructureBackendMutationResult {
     details: string
   }>
   warnings: string[]
-  headings: Array<{ ref: string; tag: string; parentRef?: string | null }>
+  headings: Array<{ ref: string; tag: string; parentRef?: string | null; text?: string | null }>
   structuralNodes: Array<{ ref: string; tag: string; parentRef?: string | null; orderIndex: number; parentTagPath?: string[] }>
   tables: Array<{
     ref: string

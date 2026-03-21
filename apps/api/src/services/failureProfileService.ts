@@ -309,6 +309,36 @@ function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamily
     }
   }
 
+  if (finding.key === 'pdfua.table_complexity') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['repair_native_table_headers', 'set_table_header_cells'],
+      categoryIds: ['table_markup', 'pdf_ua_compliance'],
+      classification: 'deterministic',
+    }
+  }
+
+  if (finding.key === 'pdfua.figure_alt_quality') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['set_figure_alt_text', 'retag_as_figure_and_set_alt'],
+      categoryIds: ['alt_text', 'pdf_ua_compliance'],
+      classification: 'semantic',
+    }
+  }
+
+  if (finding.key === 'pdfua.heading_content_quality') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['normalize_heading_hierarchy', 'create_heading_from_candidate'],
+      categoryIds: ['heading_structure', 'pdf_ua_compliance'],
+      classification: 'semantic',
+    }
+  }
+
   return {
     key: finding.key,
     label: finding.label,
