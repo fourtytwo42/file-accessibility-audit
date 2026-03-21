@@ -12,13 +12,13 @@
 ## Current Session Snapshot
 
 - Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
-- Latest attempt path: queue item `e4cc930c-8265-43d2-aad7-8a69058e8ceb`
-- Latest result summary: even after the first table-cell figure-wrap deployment, the fresh rerun still stayed at `88/B`. Inspection of the rebuilt artifact shows the `/TD` candidates are now correctly classified as `retag_then_set_alt`, and one of them (`obj:78 0 R`) did get wrapped with alt text in the live run. The remaining issue is in the late heuristic figure loop: after the first buffer-changing write, candidate ids can be regenerated, and the loop was still iterating stale candidate ids from the original context.
-- Latest validation source: targeted `pdfRemediationTools` regressions for weak vs strong table-backed figure candidates and `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T00:43Z
-- Next action: deploy the refreshed-candidate late-figure loop fix, restart the API, and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
-- Next hypothesis: reselecting heuristic figure candidates from the current post-write context should let the late pass continue past the first wrapped `/TD` figure and clear the remaining strong-evidence table-cell figures, pushing the file above `95`
-- API restart status: completed for the latest planner change before `juvenile2000study.pdf` rerun
-- Build status: current source is deployed; no additional restart needed before the next fresh upload
+- Latest attempt path: queue item `a2851f86-48c1-4fab-a42d-a46e3f492f5b`
+- Latest result summary: the helper-side snapshot fix improved the file from `88/B` to `90/A`, but the rebuilt artifact still contains four unresolved strong `/TD` figure candidates (`obj:74 0 R`, `obj:75 0 R`, `obj:76 0 R`, `obj:78 0 R`) with `repairMode: retag_then_set_alt`. The remaining blocker is now a live retry-history bug: late heuristic figure passes still treated recycled `figure:n` ids as stable across inspections, so prior work on `obj:78 0 R` could incorrectly suppress later retries on different targets that inherited the same candidate slot number.
+- Latest validation source: targeted `agentRemediationService` regressions for late figure retries plus `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T01:18Z
+- Next action: restart the API on the stable-target retry patch and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
+- Next hypothesis: tracking late figure attempts by stable `targetRef` instead of recycled candidate ids should let the live pipeline clear the remaining strong `/TD` figure wraps and move the file above `95`
+- API restart status: pending PM2 restart after the latest late-figure retry fix
+- Build status: current source is ready; PM2 restart pending before the next fresh upload
 
 ## Current Concurrency
 
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
-- Current phase: third remediation loop after isolating a stale-candidate bug in the late figure pass
-- Immediate next step: deploy the refreshed-candidate late-figure loop fix, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect the new result
+- Current phase: fifth remediation loop after isolating unstable figure retry history in the late heuristic passes
+- Immediate next step: restart on the stable-target retry patch, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect whether the remaining `/TD` figure wraps land
 - API restart/rerun confirmed for active file: pending restart after the latest code change
 - Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
-- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=3`
-- Next hypothesis: the remaining blocker is no longer figure classification; it is stale candidate iteration after a buffer-changing late figure repair
+- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=5`
+- Next hypothesis: the remaining blocker is no longer table-cell figure classification or snapshot credit; it is figure retry history that still keys off recycled candidate ids instead of stable object refs
 
 ## Pending Files
 

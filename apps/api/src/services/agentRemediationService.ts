@@ -193,6 +193,14 @@ function markInspectionDirtyFromAction(state: InspectionDirtinessState, action: 
   }
 }
 
+function actionHistoryKeys(action: Pick<RemediationActionRecord, 'tool' | 'candidateGroupId' | 'candidateId' | 'target' | 'targetRef'>): string[] {
+  const keys = [`${action.tool}:${action.candidateGroupId || action.candidateId || action.target}`]
+  if (action.targetRef) {
+    keys.push(`${action.tool}_target:${action.targetRef}`)
+  }
+  return keys
+}
+
 function applyMetadataCallHints(
   calls: RemediationToolCall[],
   actions: RemediationActionRecord[],
@@ -967,7 +975,9 @@ function shouldRetryLateHeuristicFigureCandidate(
   candidate: PdfRemediationContext['figureCandidates'][number],
   previousActionNames: string[],
 ): boolean {
-  const attemptedSetAlt = previousActionNames.includes(`set_figure_alt_text:${candidate.id}`)
+  const attemptedSetAlt = candidate.targetRef
+    ? previousActionNames.includes(`set_figure_alt_text_target:${candidate.targetRef}`)
+    : previousActionNames.includes(`set_figure_alt_text:${candidate.id}`)
   if (!attemptedSetAlt) return true
   return candidate.repairMode === 'retag_then_set_alt'
     || (candidate.repairMode === 'set_alt' && candidate.targetTag === '/Figure' && !candidate.hasAlt)
@@ -1936,7 +1946,7 @@ export async function remediatePdfWithAgent(
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        `${outcome.action.tool}:${outcome.action.candidateGroupId || outcome.action.candidateId || outcome.action.target}`,
+        ...actionHistoryKeys(outcome.action),
       ]))
 
       if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') break
@@ -2058,7 +2068,7 @@ export async function remediatePdfWithAgent(
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        `${outcome.action.tool}:${outcome.action.candidateGroupId || outcome.action.candidateId || outcome.action.target}`,
+        ...actionHistoryKeys(outcome.action),
       ]))
       if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
       changed = true
@@ -2703,7 +2713,7 @@ export async function remediatePdfWithAgent(
 
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        ...stageActions.map(action => `${action.tool}:${action.candidateGroupId || action.candidateId || action.target}`),
+        ...stageActions.flatMap(actionHistoryKeys),
       ]))
 
       if (currentResult.grade === 'A') return true
@@ -2952,7 +2962,7 @@ export async function remediatePdfWithAgent(
     allExecutedActions.push(...stageActions)
     previousActionNames = Array.from(new Set([
       ...previousActionNames,
-      ...stageActions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ...stageActions.flatMap(actionHistoryKeys),
     ]))
     if (stageChangedDocument) roundChangedDocument = true
     if (stageChangedDocument && !stageImprovedStandards && !stageImprovedTargets && !stageAppliedAcrobatAltRepair) {
@@ -3205,7 +3215,7 @@ export async function remediatePdfWithAgent(
     for (const action of semanticStage.actions) markInspectionDirtyFromAction(inspectionState, action)
     previousActionNames = Array.from(new Set([
       ...previousActionNames,
-      ...semanticStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+      ...semanticStage.actions.flatMap(actionHistoryKeys),
     ]))
     persistStageToolOutcomes(semanticStage.actions, {
       previous: semanticStageStartResult,
@@ -3249,7 +3259,7 @@ export async function remediatePdfWithAgent(
       for (const action of bookmarkStage.actions) markInspectionDirtyFromAction(inspectionState, action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        ...bookmarkStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+        ...bookmarkStage.actions.flatMap(actionHistoryKeys),
       ]))
       latestContext = await inspectRemediationContext(workingBuffer, currentResult)
     }
@@ -3289,7 +3299,7 @@ export async function remediatePdfWithAgent(
       for (const action of lateAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        ...lateAltStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+        ...lateAltStage.actions.flatMap(actionHistoryKeys),
       ]))
       latestContext = await inspectRemediationContext(workingBuffer, currentResult)
       persistStageToolOutcomes(lateAltStage.actions, {
@@ -3473,7 +3483,7 @@ export async function remediatePdfWithAgent(
       for (const action of postCleanupAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        ...postCleanupAltStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+        ...postCleanupAltStage.actions.flatMap(actionHistoryKeys),
       ]))
       latestContext = await inspectRemediationContext(workingBuffer, currentResult)
       persistStageToolOutcomes(postCleanupAltStage.actions, {
@@ -3528,7 +3538,7 @@ export async function remediatePdfWithAgent(
       for (const action of postAnalysisAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
-        ...postAnalysisAltStage.actions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+        ...postAnalysisAltStage.actions.flatMap(actionHistoryKeys),
       ]))
       persistStageToolOutcomes(postAnalysisAltStage.actions, {
         previous: postAnalysisAltStageStartResult,
@@ -3552,7 +3562,7 @@ export async function remediatePdfWithAgent(
 
   previousActionNames = Array.from(new Set([
     ...previousActionNames,
-    ...finalCleanupActions.map(a => `${a.tool}:${a.candidateGroupId || a.candidateId || a.target}`),
+    ...finalCleanupActions.flatMap(actionHistoryKeys),
   ]))
 
   const finalContext = (!nativeTaggedSafeMode && cleanupContext)

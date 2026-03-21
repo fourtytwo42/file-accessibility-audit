@@ -126,32 +126,34 @@
 
 - Queue history:
   - `e4cc930c-8265-43d2-aad7-8a69058e8ceb` -> `88/B`
+  - `a2851f86-48c1-4fab-a42d-a46e3f492f5b` -> `90/A`
 - Outcome so far:
   - original result was `32/F`
   - first fresh rerun cleared title/language, heading structure, link quality, reading order, text extractability, and PDF/UA compliance
-  - remaining score loss is concentrated in `alt_text = 20/F`
+  - current rerun now reaches `90/A`, but remaining score loss is still concentrated in `alt_text = 40/F`
   - local standards are effectively clean except for one non-blocking `pdfua.cidset_consistency` warning
 - Current blocker:
-  - 4 remaining strong-evidence figure candidates are deferred only because they sit under `/TD` wrappers
-  - rebuilt-artifact inspection showed candidates like `obj:74 0 R`, `obj:75 0 R`, `obj:76 0 R`, and `obj:78 0 R` with:
+  - rebuilt-artifact inspection on `a2851f86-48c1-4fab-a42d-a46e3f492f5b.pdf` still shows 4 unresolved strong-evidence `/TD` candidates:
+    - `obj:74 0 R`
+    - `obj:75 0 R`
+    - `obj:76 0 R`
+    - `obj:78 0 R`
+  - all four are now correctly classified as:
     - `targetTag: /TD`
     - `imageEvidence: strong`
     - `informativeHint: informative`
-    - `repairMode: defer`
-  - the backend already supports wrapping a child `/Figure` under unsafe ancestry, including `/TD`
-- Shared fix applied:
+    - `repairMode: retag_then_set_alt`
+  - so the remaining blocker is no longer classification or snapshot credit; it is the live retry history in late figure passes
+- Shared fixes applied:
   - strong informative `/TD`-backed figure candidates now route to `retag_then_set_alt` instead of automatic defer
-  - targeted verification passed:
-    - weak unsafe table-backed figures still defer
-    - strong informative table-backed figures can wrap a child `/Figure`
-- Live rerun result after first deployment:
-  - fresh rerun `b6109a8b-be8a-4c6f-afed-f7ba9f1c045d` still stayed at `88/B`
-  - rebuilt-artifact inspection now shows the remaining `/TD` candidates are correctly classified as `retag_then_set_alt`
-  - the live run wrapped only one of them (`obj:78 0 R`) and left the others behind
-- Next shared fix:
-  - late heuristic figure fallback now reselects candidates from the refreshed post-write context instead of iterating stale candidate ids from the original context
+  - late heuristic figure fallback now reselects candidates from refreshed post-write context instead of iterating stale candidate ids from the original context
+  - wrapped child `/Figure` nodes created under `/TD` containers are now preserved in structure snapshots when they have page-backed child content
+  - late heuristic figure retry history now keys off stable `targetRef` object refs instead of recycled `figure:n` ids
+- Latest validation:
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t 'retries unresolved set_alt figure candidates during the late heuristic pass|tracks late heuristic figure retries by stable targetRef instead of recycled candidate ids'`
+  - `pnpm --filter api exec tsc --noEmit`
 - Next expected outcome:
-  - fresh post-restart rerun should continue past the first wrapped `/TD` figure and clear the remaining strong-evidence table-cell figures, pushing the file above `95`
+  - fresh post-restart rerun should stop confusing earlier work on `obj:78 0 R` with later unresolved `/TD` targets that inherit the same candidate slot number, letting the remaining table-cell figure wraps land and pushing the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

@@ -190,6 +190,7 @@ export interface RemediationActionRecord {
   target: string
   candidateId?: string
   candidateGroupId?: string
+  targetRef?: string
   before?: string | null
   after?: string | null
   details: string

@@ -2150,7 +2150,10 @@ export async function executeRemediationTool(input: {
       const translated = structureResultToAction({ baseAction, result, categoryTargets: ['alt_text'] })
       return {
         buffer: translated.buffer || buffer,
-        action: translated.action,
+        action: {
+          ...translated.action,
+          targetRef: candidate.targetRef,
+        },
         manualReviewFlags: translated.manualReviewFlags,
       }
     }
