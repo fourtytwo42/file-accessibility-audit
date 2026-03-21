@@ -2306,10 +2306,13 @@ describe('scoreReadingOrder edge cases', () => {
         ...qpdf,
         structTreeDepth: 3,
         contentOrder: [0, 1, 2, 3, 4, 5, 6],
+        tables: [],
+        formFields: [],
       }),
       makePdfjs({
         ...pdfjs,
         pageCount: 2,
+        links: [],
       }),
       makeVeraPdf({
         status: 'unavailable',
@@ -2344,6 +2347,56 @@ describe('scoreReadingOrder edge cases', () => {
     expect(findCategory(result, 'reading_order').score).toBe(95)
     expect(findCategory(result, 'reading_order').grade).toBe('A')
     expect(findCategory(result, 'reading_order').findings.some(finding => finding.includes('advisory warning'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
+
+  it('treats pdfminer reading-order mismatch as advisory on short four-page brochures without interactive content', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      makeQpdf({
+        ...qpdf,
+        structTreeDepth: 3,
+        contentOrder: Array.from({ length: 20 }, (_, index) => index),
+        tables: [],
+        formFields: [],
+      }),
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 4,
+        links: [],
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+      }),
+      {
+        readingOrder: {
+          status: 'ok',
+          pagesAnalyzed: 4,
+          totalBlocks: 20,
+          disorderRatio: 0.34,
+          disorderedBlockCount: 7,
+          disorderedBlocks: [],
+          warnings: [],
+        },
+        tabOrder: makeTabOrder({
+          annotatedPageCount: 0,
+          missingTabsCount: 0,
+          outOfOrderPageCount: 0,
+        }),
+      },
+    )
+
+    expect(findCategory(result, 'reading_order').score).toBe(95)
+    expect(findCategory(result, 'reading_order').grade).toBe('A')
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })

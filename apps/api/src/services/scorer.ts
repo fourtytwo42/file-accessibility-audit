@@ -604,7 +604,7 @@ export function scoreDocument(
   // 9. Reading Order (5%)
   categories.push(provisionalCategoryIds.has('reading_order')
     ? provisionalCategoryResult('reading_order', 'Reading Order', SCORING_WEIGHTS.reading_order, 'Reading-order scoring is provisional during fast remediation analysis.')
-    : scoreReadingOrder(qpdf, extras?.readingOrder, extras?.tabOrder, verapdf))
+    : scoreReadingOrder(qpdf, pdfjs, extras?.readingOrder, extras?.tabOrder, verapdf))
 
   // 10. Color Contrast (4.5%)
   categories.push(provisionalCategoryIds.has('color_contrast')
@@ -1662,7 +1662,7 @@ function scoreFormAccessibility(qpdf: QpdfResult): CategoryResult {
   }
 }
 
-function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | null, tabOrder?: TabOrderResult | null, verapdf?: VeraPdfResult | null): CategoryResult {
+function scoreReadingOrder(qpdf: QpdfResult, pdfjs: PdfjsResult, pdfminer?: ReadingOrderResult | null, tabOrder?: TabOrderResult | null, verapdf?: VeraPdfResult | null): CategoryResult {
   const readingLinks: CategoryResult['helpLinks'] = [
     { label: 'Adobe: Fix Reading Order', url: 'https://helpx.adobe.com/acrobat/using/create-verify-pdf-accessibility.html' },
     { label: 'WCAG 1.3.2: Meaningful Sequence', url: 'https://www.w3.org/WAI/WCAG21/Understanding/meaningful-sequence.html' },
@@ -1776,8 +1776,12 @@ function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | nul
     const shortTaggedBrochureMismatch =
       qpdf.structTreeDepth >= 2
       && qpdf.contentOrder.length > 0
-      && qpdf.contentOrder.length <= 10
-      && pdfminer.pagesAnalyzed <= 2
+      && qpdf.contentOrder.length <= 24
+      && pdfminer.pagesAnalyzed <= 4
+      && pdfjs.pageCount <= 4
+      && qpdf.tables.length === 0
+      && pdfjs.links.length === 0
+      && qpdf.formFields.length === 0
       && (tabOrder?.status !== 'ok' || (tabOrder.missingTabsCount === 0 && tabOrder.outOfOrderPageCount === 0))
     if (shouldIgnorePdfMinerMismatch) {
       findings.push(`PDFMiner detected a ${pct}% content-stream mismatch, but this was ignored because the document passes PDF/UA and no MCID content-order trace was available for a stronger comparison.`)
