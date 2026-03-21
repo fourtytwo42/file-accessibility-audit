@@ -2623,6 +2623,56 @@ describe('scoreReadingOrder edge cases', () => {
     expect(result.grade).toBe('A')
   })
 
+  it('treats denser short four-page brochures as advisory when interactive debt is absent', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      makeQpdf({
+        ...qpdf,
+        structTreeDepth: 2,
+        contentOrder: Array.from({ length: 39 }, (_, index) => index),
+        tables: [],
+        formFields: [],
+      }),
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 4,
+        links: [],
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+      }),
+      {
+        readingOrder: {
+          status: 'ok',
+          pagesAnalyzed: 4,
+          totalBlocks: 39,
+          disorderRatio: 0.41,
+          disorderedBlockCount: 16,
+          disorderedBlocks: [],
+          warnings: [],
+        },
+        tabOrder: makeTabOrder({
+          annotatedPageCount: 0,
+          missingTabsCount: 0,
+          outOfOrderPageCount: 0,
+        }),
+      },
+    )
+
+    expect(findCategory(result, 'reading_order').score).toBe(95)
+    expect(findCategory(result, 'reading_order').grade).toBe('A')
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
+
   it('empty contentOrder with deep tree → score 100', () => {
     const qpdf = makeQpdf({
       hasStructTree: true,

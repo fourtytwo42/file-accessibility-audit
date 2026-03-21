@@ -1823,7 +1823,7 @@ function scoreReadingOrder(qpdf: QpdfResult, pdfjs: PdfjsResult, pdfminer?: Read
     const shortTaggedBrochureMismatch =
       qpdf.structTreeDepth >= 2
       && qpdf.contentOrder.length > 0
-      && qpdf.contentOrder.length <= 24
+      && qpdf.contentOrder.length <= 48
       && pdfminer.pagesAnalyzed <= 4
       && pdfjs.pageCount <= 4
       && qpdf.tables.length === 0
