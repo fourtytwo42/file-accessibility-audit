@@ -872,6 +872,38 @@ describe('scoreHeadingStructure edge cases', () => {
     expect(cat.score).toBe(100)
     expect(cat.findings.some(f => f.includes('no readable heading text'))).toBe(false)
   })
+
+  it('does not lower heading structure for empty nested heading wrappers', () => {
+    const qpdf = makeQpdf({
+      headings: [
+        { level: 'H1', tag: '/H1' },
+        { level: 'H1', tag: '/H1' },
+        { level: 'H2', tag: '/H2' },
+      ],
+    })
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs({ pageCount: 4 }),
+      makeVeraPdf(),
+      makeStructure({
+        headings: [
+          { ref: 'obj:22 0 R', tag: '/H1', parentRef: 'obj:48 0 R', text: 'Figure 2 Law enforcement professionals survey response analysis*' },
+          { ref: 'obj:23 0 R', tag: '/H2', parentRef: 'obj:22 0 R', text: null },
+          { ref: 'obj:25 0 R', tag: '/H3', parentRef: 'obj:26 0 R', text: '*Judges excluded due to small sample size.' },
+          { ref: 'obj:27 0 R', tag: '/H1', parentRef: 'obj:28 0 R', text: null },
+          { ref: 'obj:29 0 R', tag: '/H1', parentRef: 'obj:28 0 R', text: null },
+        ],
+        structuralNodes: [
+          { ref: 'obj:28 0 R', tag: '/Story', parentRef: 'obj:47 0 R', orderIndex: 0 },
+          { ref: 'obj:23 0 R', tag: '/H2', parentRef: 'obj:22 0 R', orderIndex: 0 },
+          { ref: 'obj:30 0 R', tag: '/Story', parentRef: 'obj:28 0 R', orderIndex: 1 },
+        ],
+      }),
+    )
+    const cat = findCategory(result, 'heading_structure')
+    expect(cat.score).toBe(100)
+    expect(cat.findings.some(f => f.includes('no readable heading text'))).toBe(false)
+  })
 })
 
 describe('scoreAltText pdfjs fallback', () => {

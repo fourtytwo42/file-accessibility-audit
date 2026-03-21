@@ -541,7 +541,7 @@ export function scoreDocument(
     isCompliant: true,
     message: 'veraPDF passed PDF/UA validation.',
   }),
-  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures' | 'headings'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures' | 'headings' | 'structuralNodes'> | null,
   adobe?: AdobeSummary | null,
   localStandards: LocalStandardsReport = { status: 'clear', findings: [], knownGapKeys: ['pdfua.local_coverage_unconfirmed'] },
   extras?: {
@@ -934,7 +934,7 @@ function scoreHeadingStructure(qpdf: QpdfResult, pdfjs?: PdfjsResult): CategoryR
 function scoreHeadingStructureWithContent(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
-  structure?: Pick<StructureBackendMutationResult, 'headings'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'headings' | 'structuralNodes'> | null,
 ): CategoryResult {
   const category = scoreHeadingStructure(qpdf, pdfjs)
   const findings = [...category.findings]
@@ -952,11 +952,25 @@ function scoreHeadingStructureWithContent(
     EXPLICIT_HEADING_TAG_RE.test(String(heading.tag || ''))
     || LEGACY_HEADING_TAG_RE.test(String(heading.tag || '')),
   )
+  const snapshotHeadingRefs = new Set(snapshotHeadings.map(heading => heading.ref))
+  const structuralNodeTagByRef = new Map(
+    (structure?.structuralNodes || []).map(node => [node.ref, String(node.tag || '')]),
+  )
+  const headingContainerRefs = new Set(
+    (structure?.structuralNodes || [])
+      .map(node => node.parentRef || null)
+      .filter((ref): ref is string => !!ref),
+  )
   const readableHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length > 0)
   const hasReliableHeadingTextCoverage = readableHeadings.length >= 2
     || (snapshotHeadings.length > 0 && (readableHeadings.length / snapshotHeadings.length) >= 0.5)
   const emptyHeadings = hasReliableHeadingTextCoverage
-    ? snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+    ? snapshotHeadings.filter(heading =>
+      normalizeSemanticText(heading.text).length === 0
+      && !headingContainerRefs.has(heading.ref)
+      && !snapshotHeadingRefs.has(String(heading.parentRef || ''))
+      && !['/Story', '/Sect', '/Div'].includes(structuralNodeTagByRef.get(String(heading.parentRef || '')) || '')
+    )
     : []
   const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))
   if (emptyHeadings.length > 0) {
