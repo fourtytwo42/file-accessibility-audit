@@ -462,6 +462,21 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.blocking).toBe(true)
   })
 
+  it('treats mostly regular short-row tables as advisory', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        tables: [
+          { hasHeaders: true, rowCellCounts: [4, 5, 5, 5, 5, 5, 5, 2, 5, 5], dominantColumnCount: 5, isRegular: false, headerRowCount: 1, maxRowSpan: 1, maxColSpan: 1 },
+        ],
+      }),
+      makePdfjs(),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.table_regularity')
+    expect(finding).toBeUndefined()
+  })
+
   it('emits figure alt-quality findings for generic alternate text', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

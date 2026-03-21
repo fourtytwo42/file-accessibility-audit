@@ -1485,6 +1485,17 @@ describe('scoreTableMarkup edge cases', () => {
     expect(findCategory(result, 'table_markup').score).toBe(75)
     expect(findCategory(result, 'table_markup').findings.some(finding => finding.includes('span-heavy headers'))).toBe(true)
   })
+
+  it('keeps advisory mostly-regular short-row tables at full score', () => {
+    const qpdf = makeQpdf({
+      tables: [
+        { hasHeaders: true, rowCellCounts: [4, 5, 5, 5, 5, 5, 5, 2, 5, 5], dominantColumnCount: 5, isRegular: false, headerRowCount: 1, maxRowSpan: 1, maxColSpan: 1 },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    expect(findCategory(result, 'table_markup').score).toBe(100)
+    expect(findCategory(result, 'table_markup').findings.some(finding => finding.includes('regularity'))).toBe(false)
+  })
 })
 
 describe('scoreDocument gating edge cases', () => {

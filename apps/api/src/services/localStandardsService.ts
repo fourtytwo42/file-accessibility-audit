@@ -3,6 +3,7 @@ import type { PdfjsResult } from './pdfjsService.js'
 import type { TabOrderResult } from './tabOrderService.js'
 import type { StructureBackendMutationResult } from './pdfStructureBackend.js'
 import { hasCanonicalLanguageTag } from './languageTags.js'
+import { isAdvisoryTableRegularity } from './tableRegularityHeuristics.js'
 
 export type LocalStandardsSource = 'qpdf' | 'pdfjs' | 'structure_backend' | 'composite'
 export type LocalStandardsSeverity = 'warning' | 'error'
@@ -533,9 +534,10 @@ function tableRegularityFinding(qpdf: QpdfResult): LocalStandardsFinding | null 
     table.isRegular === false
     && (table.rowCellCounts?.length ?? 0) > 1,
   )
-  if (!irregularTables.length) return null
+  const blockingIrregularTables = irregularTables.filter(table => !isAdvisoryTableRegularity(table))
+  if (!blockingIrregularTables.length) return null
 
-  const evidence = irregularTables.slice(0, 3).map((table, index) => {
+  const evidence = blockingIrregularTables.slice(0, 3).map((table, index) => {
     const counts = table.rowCellCounts?.join(', ') || 'unknown'
     const dominant = table.dominantColumnCount ?? 'unknown'
     return `Table ${index + 1} exposes irregular row column counts (${counts}); dominant column count is ${dominant}.`
@@ -551,7 +553,7 @@ function tableRegularityFinding(qpdf: QpdfResult): LocalStandardsFinding | null 
     evidence,
     source: 'qpdf',
     inferred: false,
-    count: irregularTables.length,
+    count: blockingIrregularTables.length,
   }
 }
 
@@ -560,7 +562,7 @@ function complexTableStructureFinding(qpdf: QpdfResult): LocalStandardsFinding |
     const spanHeavy = (table.maxRowSpan ?? 1) > 1 || (table.maxColSpan ?? 1) > 1
     const multiHeaderRows = (table.headerRowCount ?? 0) > 1
     const irregular = table.isRegular === false && (table.rowCellCounts?.length ?? 0) > 1
-    return table.hasHeaders && irregular && (spanHeavy || multiHeaderRows)
+    return table.hasHeaders && irregular && !isAdvisoryTableRegularity(table) && (spanHeavy || multiHeaderRows)
   })
   if (!complexTables.length) return null
 

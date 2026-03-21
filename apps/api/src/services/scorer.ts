@@ -15,6 +15,7 @@ import type { ColorContrastResult } from './colorContrastService.js'
 import type { TableStructureResult } from './tableStructureService.js'
 import type { TabOrderResult } from './tabOrderService.js'
 import type { LocalStandardsFinding, LocalStandardsReport } from './localStandardsService.js'
+import { isAdvisoryTableRegularity } from './tableRegularityHeuristics.js'
 
 export interface HelpLink {
   label: string
@@ -1521,11 +1522,14 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
     findings.push(`All ${qpdf.tables.length} table(s) have proper header tags (TH)`)
 
     let score = 100
-    const irregularTables = qpdf.tables.filter(table => table.isRegular === false)
+    const irregularTables = qpdf.tables.filter(table =>
+      table.isRegular === false && !isAdvisoryTableRegularity(table),
+    )
     const complexTables = qpdf.tables.filter(table =>
       table.hasHeaders
       && (((table.headerRowCount ?? 0) > 1) || ((table.maxRowSpan ?? 1) > 1) || ((table.maxColSpan ?? 1) > 1))
-      && table.isRegular === false,
+      && table.isRegular === false
+      && !isAdvisoryTableRegularity(table),
     )
     if (irregularTables.length > 0) {
       findings.push(`${irregularTables.length} tagged table(s) still have irregular row/column structure and may fail Acrobat's table regularity check.`)
