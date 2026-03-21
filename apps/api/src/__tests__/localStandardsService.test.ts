@@ -516,6 +516,29 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.categoryIds).toContain('heading_structure')
   })
 
+  it('does not treat all-unreadable heading snapshots as empty-heading failures by themselves', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        headings: [
+          { level: 'H1', tag: '/H1' },
+          { level: 'H2', tag: '/H2' },
+        ],
+      }),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          headings: [
+            { ref: 'obj:50 0 R', tag: '/H1', text: null },
+            { ref: 'obj:51 0 R', tag: '/H2', text: '' },
+          ],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.heading_content_quality')
+    expect(finding).toBeUndefined()
+  })
+
   it('emits complex-table findings for irregular grouped-header tables', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

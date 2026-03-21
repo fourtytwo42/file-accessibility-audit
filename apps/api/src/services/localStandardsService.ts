@@ -640,7 +640,13 @@ function headingContentFinding(
   }
 
   const snapshotHeadings = structure?.headings || []
-  const emptyHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+  const readableHeadings = snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length > 0)
+  // Older tagged PDFs can expose valid heading structure while our MCID-to-text snapshot
+  // still fails to recover any readable heading text. Only trust empty-heading detection
+  // when at least one heading on the same document produced readable text.
+  const emptyHeadings = readableHeadings.length > 0
+    ? snapshotHeadings.filter(heading => normalizeSemanticText(heading.text).length === 0)
+    : []
   const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))
   if (emptyHeadings.length > 0) {
     count += emptyHeadings.length

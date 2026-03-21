@@ -6057,7 +6057,10 @@ def mutate_artifact_nonsemantic_page_elements(pdf, mutation):
         text = raw.decode("latin-1", "ignore")
         if not has_struct and "BMC" not in text and "BDC" not in text:
             continue
-        page_changed, page_applied = artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=True)
+        # Restrict this generic cleanup pass to graphics-only orphan groups. Mixed or
+        # text-bearing groups often represent real content that needs structural repair,
+        # not artifacting.
+        page_changed, page_applied = artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=False)
         if page_changed:
             applied.extend(page_applied)
             changed = True

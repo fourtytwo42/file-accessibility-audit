@@ -12,14 +12,14 @@
 ## Current Session Snapshot
 
 
-- Active PDF: `2ndPass/95+/Adams.pdf`
-- Latest attempt path: rebuilt artifact `apps/api/data/queue-storage/rebuilt/9875898c-7a82-480a-b72d-b5232878d992.pdf` copied to `2ndPass/100/2025FirearmProhibitorsReport-250626T19175938.pdf`
-- Latest result summary: `2025FirearmProhibitorsReport-250626T19175938.pdf` reached `100/A` on a fresh post-restart API rerun after softening the residual Acrobat alt-text cap when all detected figures already have compliant alternate text. This aligns local scoring with the companion Adobe report, which shows no hard failures for that file. The next active file is `Adams.pdf`, whose Adobe report still fails `Tagged content` and `Other elements alternate text`.
-- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts -t 'reports residual Acrobat-risk ownership debt as guidance when all detected figures already have alternate text|uses a softer residual Acrobat-risk cap when only one figure is still missing alt text|excludes decorative Acrobat-cleanup figures from alt-text scoring'`, `pnpm --filter api exec tsc --noEmit`, PM2 restart, and fresh API rerun `9875898c-7a82-480a-b72d-b5232878d992`, completed on 2026-03-21T02:20Z
-- Next action: inspect the first fresh API result for `2ndPass/95+/Adams.pdf` and compare it directly to Adobe’s `Tagged content` and `Other elements alternate text` failures.
-- Next hypothesis: Adams will expose a remaining generic non-figure graphics ownership or untagged-content detection gap that we can close for Acrobat parity across this report family.
-- API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before the fresh firearm rerun and the new Adams upload.
-- Build status: no rebuild required; live source restart confirmed before the latest rerun.
+- Active PDF: `2ndPass/95+/GTF-juvenilesentencing.pdf`
+- Latest attempt path: queue item `acb2ae08-65f5-4270-ae0c-b774ae6729a4`
+- Latest result summary: fresh 2nd-pass rerun of `GTF-juvenilesentencing.pdf` still finished at `62/D` with no net remediation effect. The authoritative blockers on the latest code are `pdfua.logical_structure` from `8` recovered untagged top-level page content groups and a likely false-positive `pdfua.heading_content_quality` finding from `3` unreadable `/H1` snapshots, while the companion Adobe report only fails `Tagged content` and `Other elements alternate text`.
+- Latest validation source: direct queue inspection for `acb2ae08-65f5-4270-ae0c-b774ae6729a4`, plus direct structure snapshot inspection via `runPdfStructureBackend(... inspectMode:'alt_text_deep')`
+- Next action: restart on the new conservative parity fix, then run a fresh API remediation cycle for `2ndPass/95+/GTF-juvenilesentencing.pdf`
+- Next hypothesis: restricting `artifact_nonsemantic_page_elements` to graphics-only orphan groups and suppressing all-empty unreadable heading false positives will let the active file improve on Acrobat-tagged-content parity without erasing real content.
+- API restart status: pending for the new 2nd-pass parity fix
+- Build status: no rebuild required unless fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
 
@@ -30,13 +30,13 @@
 ## Current Focus
 
 
-- Active PDF: `2ndPass/95+/Adams.pdf`
+- Active PDF: `2ndPass/95+/GTF-juvenilesentencing.pdf`
 - Current phase: Adobe-guided second-pass remediation loop
-- Immediate next step: let fresh queue item `8f11699c-42a4-4bd3-8579-584379ed6596` complete, inspect the rebuilt score, and map any remaining local misses to Adobe’s `Tagged content` and `Other elements alternate text` failures.
-- API restart/rerun confirmed for active file: yes, the current Adams upload was started after the latest PM2 restart.
+- Immediate next step: commit/push the graphics-only artifact + conservative heading-quality fix, restart PM2, and rerun `GTF-juvenilesentencing.pdf` fresh through the API.
+- API restart/rerun confirmed for active file: no, restart is still pending for the current fix.
 - Rebuild required for active file: no
-- Active remediation loop count: `Adams.pdf (2ndPass)=1`
-- Next hypothesis: Adams will need a shared fix in native tagged-content coverage or Acrobat non-figure alt-risk normalization, not a scoring-only adjustment.
+- Active remediation loop count: `GTF-juvenilesentencing.pdf (2ndPass)=2`
+- Next hypothesis: this Acrobat-report family needs conservative graphics-only artifact cleanup, not text-bearing artifacting, and heading-text unreadability on legacy tagged PDFs should not be treated as a hard empty-heading failure by itself.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
@@ -77,6 +77,7 @@
 
 ## Recent Events
 
+- 2026-03-21T05:22:57Z 2nd-pass Adobe parity fix: empty-heading quality findings are now suppressed when every recovered heading snapshot is unreadable (a conservative guard against legacy tagged-PDF MCID text blind spots), and `artifact_nonsemantic_page_elements` now artifacts only graphics-only orphan top-level content groups instead of mixed text-bearing groups. This targets the stalled `2ndPass/95+/GTF-juvenilesentencing.pdf` loop, where Acrobat only fails `Tagged content` and `Other elements alternate text` but the local stack was also false-failing headings and rejecting artifact cleanup after an `alt_text` regression. Verified with `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, `pnpm --filter api exec vitest run src/__tests__/localStandardsService.test.ts`, and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart/fresh rerun are next.
 - 2026-03-21T05:00:00Z Deployed system improvement: committed `4457bc7` (`Add semantic accessibility quality checks`), pushed to `feature/pdf-fixing`, restarted PM2 with `pm2 restart ecosystem.config.cjs --update-env`, and confirmed health at `http://localhost:6103/api/health` => `{"status":"ok","validators":{"veraPdf":"deprecated"}}`. The quality-oriented detector wave is now live for the next remediation and 2nd-pass Adobe-parity loops.
 - 2026-03-21T04:56:00Z System improvement: implemented a quality-oriented accessibility detection wave inspired by the `Research/` review. QPDF table analysis now carries grouped-header complexity signals (`headerRowCount`, `maxRowSpan`, `maxColSpan`); the Python structure snapshot now extracts heading text by MCID from page content streams; local standards now emit explicit findings for generic figure alt text, empty/generic heading content or missing `H1`, and irregular span-heavy complex tables; scorer logic now degrades `alt_text` for generic/empty alternate text when the text is actually known, degrades `heading_structure` for empty/generic heading content and missing `H1`, and degrades `table_markup` more aggressively for complex irregular grouped-header tables; failure-profile mapping now routes those findings into existing figure, heading, and native-table repair families. Verified with `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, `pnpm --filter api exec vitest run src/__tests__/localStandardsService.test.ts src/__tests__/failureProfileService.test.ts src/__tests__/scorer.test.ts`, and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart were pending at this checkpoint.
 - 2026-03-21T04:37:00Z System improvement: qpdf image discovery now recursively traverses nested `/Form` XObjects, deduplicates repeated image placements by stable content fingerprint, and carries canonical image identity through `qpdf.images`. Alt-text scoring now reconciles structure-backed figures against those canonical image refs so repeated placements and split-generated variants stop inflating image debt. Final output hardening now guarantees `/ViewerPreferences /DisplayDocTitle true` on rebuilt PDFs. Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/scorer.test.ts src/__tests__/pdfOutputFinalizer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart were pending at this checkpoint.
