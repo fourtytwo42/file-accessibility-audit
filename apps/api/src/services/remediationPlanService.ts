@@ -530,8 +530,7 @@ function opportunitySelectionDecision(input: {
     case 'repair_type1_font_unicode_maps':
       return {
         selectable: attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
-        || (context.qpdf.type1FontsMissingToUnicode ?? 0) > 0
-        || opportunity.derivedFromFailureModeKeys.includes('pdfua.type1_unicode'),
+          || !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_font_unicode_maps'),
         reason: 'font_unicode_prereq_missing',
       }
     case 'repair_cidset_consistency':
@@ -551,20 +550,22 @@ function opportunitySelectionDecision(input: {
       return {
         selectable: persistentLegacyFontFailures
         && (
-        (
-          analysis.pageCount >= 10
-          && attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
-        )
-        || (
-          opportunity.derivedFromFailureModeKeys.includes('pdfua.cidset_consistency')
+          (
+            !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_type1_font_unicode_maps')
+            || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
+          )
           && (
-            attemptedOrPlanned('repair_cidset_consistency', actions, selectedActions)
+            !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_cidset_consistency')
+            || attemptedOrPlanned('repair_cidset_consistency', actions, selectedActions)
             || repairCidSetOutcome === 'no_effect'
             || repairCidSetOutcome === 'applied'
           )
+          && (
+            repairFontUnicodeOutcome === 'no_effect'
+            || repairFontUnicodeOutcome === 'applied'
+            || attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+          )
         )
-        || repairFontUnicodeOutcome === 'no_effect'
-      )
         && attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
         && (
           attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
@@ -575,16 +576,7 @@ function opportunitySelectionDecision(input: {
     case 'finalize_substituted_font_conformance':
       return {
         selectable: persistentLegacyFontFailures
-        && (
-          attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions)
-          || (
-            attemptedOrPlanned('embed_missing_fonts_in_place', actions, selectedActions)
-            && (
-              attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
-              || attemptedOrPlanned('repair_type1_font_unicode_maps', actions, selectedActions)
-            )
-          )
-        ),
+        && attemptedOrPlanned('substitute_legacy_fonts_in_place', actions, selectedActions),
         reason: 'finalize_substituted_fonts_prereqs_missing',
       }
     case 'adobe_auto_tag':

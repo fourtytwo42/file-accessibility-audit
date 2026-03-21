@@ -7628,6 +7628,50 @@ def empty_snapshot():
     }
 
 
+def summarize_font_operation(operation, applied, warnings):
+    if operation not in {
+        "embed_missing_fonts_in_place",
+        "repair_font_unicode_maps",
+        "repair_type1_font_unicode_maps",
+        "repair_cid_symbol_font_maps",
+        "repair_cidset_consistency",
+        "substitute_legacy_fonts_in_place",
+        "finalize_substituted_font_conformance",
+    }:
+        return None
+
+    def _details(entry):
+        return str((entry or {}).get("details") or "")
+
+    def _after(entry):
+        return str((entry or {}).get("after") or "")
+
+    return {
+        "operation": operation,
+        "embeddedFontProgramsAdded": sum(
+            1 for entry in (applied or [])
+            if "Embedded font program" in _details(entry)
+            or "Embedded exact font program" in _details(entry)
+            or "Embedded fallback substitute" in _details(entry)
+            or "Embedded a full substitute font program" in _details(entry)
+        ),
+        "toUnicodeMapsAdded": sum(1 for entry in (applied or []) if "ToUnicode" in _details(entry)),
+        "cidSetStreamsRebuilt": sum(
+            1 for entry in (applied or [])
+            if "CIDSet" in _details(entry) and ("rewrote" in _details(entry).lower() or "repaired" in _details(entry).lower() or "rebuilt" in _details(entry).lower())
+        ),
+        "substituteFontsApplied": sum(
+            1 for entry in (applied or [])
+            if "Substituted legacy font" in _details(entry) or "substitute font" in _details(entry).lower()
+        ),
+        "widthFixesApplied": sum(
+            1 for entry in (applied or [])
+            if "/Widths" in _after(entry) or "width" in _details(entry).lower()
+        ),
+        "unresolvedWarningCount": len(warnings or []),
+    }
+
+
 def analyze_reading_order_pdfminer(pdf_path, request):
     try:
         from pdfminer.high_level import extract_pages
@@ -7855,6 +7899,7 @@ def main():
                 "operation": sub_op,
                 "status": "applied" if op_changed else ("unsupported" if op_warnings and op_warnings[0].startswith("unsupported:") else "no_effect"),
                 "changedDocumentBytes": op_changed,
+                "fontOperationSummary": summarize_font_operation(sub_op, op_applied, op_warnings),
                 "appliedMutations": op_applied,
                 "warnings": op_warnings,
             })
@@ -7862,6 +7907,7 @@ def main():
         print(json.dumps({
             "status": "applied" if changed else "no_effect",
             "changedDocumentBytes": changed,
+            "fontOperationSummary": None,
             "appliedMutations": applied,
             "warnings": warnings,
             "operationResults": per_op_results,
@@ -7877,6 +7923,7 @@ def main():
             print(json.dumps({
                 "status": "unsupported",
                 "changedDocumentBytes": False,
+                "fontOperationSummary": None,
                 "appliedMutations": [],
                 "warnings": [f"Unsupported operation: {operation}"],
                 **snap,
@@ -7890,6 +7937,7 @@ def main():
     print(json.dumps({
         "status": "applied" if changed else "no_effect",
         "changedDocumentBytes": changed,
+        "fontOperationSummary": summarize_font_operation(operation, applied, warnings),
         "appliedMutations": applied,
         "warnings": warnings,
         **snap,

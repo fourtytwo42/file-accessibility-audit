@@ -1185,7 +1185,7 @@ describe('remediationPlanService', () => {
 
     expect(plan.actions[0]?.tool_name).toBe('normalize_heading_hierarchy')
   })
-  it('plans finalize_substituted_font_conformance after embed and unicode repair for persistent legacy font failures', async () => {
+  it('does not plan finalize_substituted_font_conformance before legacy substitution has run', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {
         version: '1',
@@ -1286,6 +1286,6 @@ describe('remediationPlanService', () => {
       rejectedActions: [],
     })
 
-    expect(plan.actions.some(action => action.tool_name === 'finalize_substituted_font_conformance')).toBe(true)
+    expect(plan.actions.some(action => action.tool_name === 'finalize_substituted_font_conformance')).toBe(false)
   })
 })

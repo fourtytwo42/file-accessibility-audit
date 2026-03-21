@@ -2276,7 +2276,7 @@ export async function remediatePdfWithAgent(
       })
     }
 
-    if ((context.qpdf.fontsMissingToUnicode ?? 0) > 0) {
+    if ((context.qpdf.fontsMissingToUnicodeBlocking ?? context.qpdf.fontsMissingToUnicode ?? 0) > 0) {
       residualCalls.push({
         tool_name: 'repair_font_unicode_maps',
         arguments: { target: 'document' },

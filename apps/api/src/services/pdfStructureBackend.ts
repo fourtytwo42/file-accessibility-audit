@@ -100,6 +100,15 @@ export interface StructureBackendMutationRequest {
 export interface StructureBackendMutationResult {
   status: 'applied' | 'no_effect' | 'unsupported' | 'failed'
   changedDocumentBytes: boolean
+  fontOperationSummary?: {
+    operation: string
+    embeddedFontProgramsAdded: number
+    toUnicodeMapsAdded: number
+    cidSetStreamsRebuilt: number
+    substituteFontsApplied: number
+    widthFixesApplied: number
+    unresolvedWarningCount: number
+  }
   appliedMutations: Array<{
     ref: string
     before?: string | null
@@ -175,6 +184,7 @@ export interface StructureBackendOperationResult {
   operation: string
   status: 'applied' | 'no_effect' | 'unsupported'
   changedDocumentBytes: boolean
+  fontOperationSummary?: StructureBackendMutationResult['fontOperationSummary']
   appliedMutations: StructureBackendMutationResult['appliedMutations']
   warnings: string[]
 }
@@ -236,6 +246,7 @@ export async function runPdfStructureBackend(input: {
     return {
       status: 'failed',
       changedDocumentBytes: false,
+      fontOperationSummary: undefined,
       appliedMutations: [],
       warnings: [error?.message || 'Structure backend failed.'],
       headings: [],
@@ -316,6 +327,7 @@ export async function runPdfStructureBackendBatch(input: {
     return {
       status: 'failed',
       changedDocumentBytes: false,
+      fontOperationSummary: undefined,
       appliedMutations: [],
       warnings: [error?.message || 'Structure backend batch failed.'],
       headings: [],

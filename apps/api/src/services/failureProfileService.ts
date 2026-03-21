@@ -40,6 +40,24 @@ type FailureFamilyDefinition = Omit<VeraPdfFailureFamily, 'pattern'>
 
 const SEMANTIC_CATEGORY_IDS = new Set(['heading_structure', 'alt_text', 'table_markup', 'link_quality'])
 const MANUAL_ONLY_CATEGORY_IDS = new Set(['text_extractability'])
+const FONT_REMEDIATION_TOOLS = new Set<RemediationToolName>([
+  'embed_missing_fonts_in_place',
+  'repair_font_unicode_maps',
+  'repair_type1_font_unicode_maps',
+  'repair_cid_symbol_font_maps',
+  'repair_cidset_consistency',
+  'substitute_legacy_fonts_in_place',
+  'finalize_substituted_font_conformance',
+])
+const FONT_FAILURE_MODE_KEYS = new Set([
+  'pdfua.font_embedding',
+  'pdfua.font_unicode',
+  'pdfua.type1_unicode',
+  'pdfua.truetype_encoding_differences',
+  'pdfua.font_widths',
+  'pdfua.cid_symbol_fonts',
+  'pdfua.cidset_consistency',
+])
 
 const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
   {
@@ -710,6 +728,109 @@ function addOpportunity(
   })
 }
 
+function hasAttemptedFontStep(actions: RemediationActionRecord[], tool: RemediationToolName): boolean {
+  return actions.some(action =>
+    action.tool === tool
+      && (action.outcome === 'applied' || action.outcome === 'no_effect' || action.outcome === 'unsupported'),
+  )
+}
+
+function opportunitiesHasTool(
+  opportunities: Map<string, Omit<ToolOpportunity, 'status'>>,
+  toolName: RemediationToolName,
+): boolean {
+  for (const opportunity of opportunities.values()) {
+    if (opportunity.toolName === toolName) return true
+  }
+  return false
+}
+
+function applyFontOpportunityPolicy(
+  opportunities: Map<string, Omit<ToolOpportunity, 'status'>>,
+  input: BuildFailureProfileInput,
+  failureModeByKey: Map<string, FailureMode>,
+): void {
+  const blockingFontFailures = new Set(
+    [...failureModeByKey.values()]
+      .filter(mode => mode.blocking && FONT_FAILURE_MODE_KEYS.has(mode.key))
+      .map(mode => mode.key),
+  )
+  const hasBlockingFontFailures = blockingFontFailures.size > 0
+  const qpdf = input.context.qpdf
+  const attemptedEmbed = hasAttemptedFontStep(input.actions, 'embed_missing_fonts_in_place')
+  const attemptedUnicode = hasAttemptedFontStep(input.actions, 'repair_font_unicode_maps')
+  const attemptedType1 = hasAttemptedFontStep(input.actions, 'repair_type1_font_unicode_maps')
+  const attemptedCidSymbol = hasAttemptedFontStep(input.actions, 'repair_cid_symbol_font_maps')
+  const attemptedCidSet = hasAttemptedFontStep(input.actions, 'repair_cidset_consistency')
+  const attemptedSubstitute = hasAttemptedFontStep(input.actions, 'substitute_legacy_fonts_in_place')
+
+  for (const opportunity of opportunities.values()) {
+    if (!FONT_REMEDIATION_TOOLS.has(opportunity.toolName)) continue
+    const derivedFailureModes = opportunity.derivedFromFailureModeKeys
+      .map(key => failureModeByKey.get(key))
+      .filter((mode): mode is FailureMode => !!mode)
+    const onlyAdvisoryFontResidue = derivedFailureModes.length > 0
+      && derivedFailureModes.every(mode => FONT_FAILURE_MODE_KEYS.has(mode.key) && !mode.blocking)
+
+    if (!hasBlockingFontFailures && onlyAdvisoryFontResidue) {
+      opportunity.blockedReason = 'Only advisory font or CIDSet residue remains; do not keep font remediation auto-runnable.'
+      continue
+    }
+
+    switch (opportunity.toolName) {
+      case 'repair_font_unicode_maps':
+        if ((qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) <= 0) {
+          opportunity.blockedReason = 'No blocking text-font Unicode debt remains.'
+        } else if ((qpdf.unembeddedFontCount ?? 0) > 0 && !attemptedEmbed) {
+          opportunity.blockedReason = 'Run embedding before Unicode repair when fonts still lack embedded programs.'
+        }
+        break
+      case 'repair_type1_font_unicode_maps':
+        if (
+          !attemptedUnicode
+          && opportunitiesHasTool(opportunities, 'repair_font_unicode_maps')
+          && (qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) > 0
+        ) {
+          opportunity.blockedReason = 'Run generic Unicode repair before the Type1/Type3-specific recovery pass.'
+        }
+        break
+      case 'repair_cidset_consistency':
+        if (!hasBlockingFontFailures && onlyAdvisoryFontResidue) {
+          opportunity.blockedReason = 'CIDSet residue is advisory-only in the current snapshot.'
+        } else if ((qpdf.unembeddedFontCount ?? 0) > 0 && !attemptedEmbed) {
+          opportunity.blockedReason = 'Run embedding before CIDSet consistency repair.'
+        } else if ((qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) > 0 && !attemptedUnicode) {
+          opportunity.blockedReason = 'Run Unicode repair before CIDSet consistency repair.'
+        } else if (opportunitiesHasTool(opportunities, 'repair_cid_symbol_font_maps') && !attemptedCidSymbol) {
+          opportunity.blockedReason = 'Run CID symbol-font recovery before CIDSet consistency repair.'
+        }
+        break
+      case 'substitute_legacy_fonts_in_place':
+        if ((qpdf.unembeddedFontCount ?? 0) > 0 && !attemptedEmbed) {
+          opportunity.blockedReason = 'Run embedding before legacy font substitution.'
+        } else if ((qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) > 0 && !attemptedUnicode) {
+          opportunity.blockedReason = 'Run Unicode repair before legacy font substitution.'
+        } else if ((qpdf.type1FontsMissingToUnicode ?? 0) > 0 && !attemptedType1) {
+          opportunity.blockedReason = 'Run Type1/Type3 Unicode repair before legacy font substitution.'
+        } else if (
+          opportunity.derivedFromFailureModeKeys.includes('pdfua.cidset_consistency')
+          && opportunitiesHasTool(opportunities, 'repair_cidset_consistency')
+          && !attemptedCidSet
+        ) {
+          opportunity.blockedReason = 'Run CIDSet consistency repair before escalating to font substitution.'
+        }
+        break
+      case 'finalize_substituted_font_conformance':
+        if (!attemptedSubstitute) {
+          opportunity.blockedReason = 'Finalize substituted fonts only after substitution has run.'
+        }
+        break
+      default:
+        break
+    }
+  }
+}
+
 function deriveOpportunityStatus(
   opportunity: Omit<ToolOpportunity, 'status'>,
   actions: RemediationActionRecord[],
@@ -1251,6 +1372,8 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       derivedFromFailureModeKeys: derivedFailureKeys(['category.bookmarks']),
     })
   }
+
+  applyFontOpportunityPolicy(opportunities, input, failureModeByKey)
 
   return [...opportunities.values()]
     .map(opportunity => {

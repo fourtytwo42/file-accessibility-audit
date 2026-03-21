@@ -1624,6 +1624,17 @@ function structureResultToAction(input: {
   const details = input.result.appliedMutations.length
     ? input.result.appliedMutations.map(mutationEntry => mutationEntry.details).join(' ')
     : condensedWarnings[0] || input.baseAction.details
+  const fontSummary = input.result.fontOperationSummary
+  const fontSummaryText = fontSummary
+    ? [
+        fontSummary.embeddedFontProgramsAdded ? `embedded ${fontSummary.embeddedFontProgramsAdded} font program(s)` : null,
+        fontSummary.toUnicodeMapsAdded ? `added ${fontSummary.toUnicodeMapsAdded} ToUnicode map(s)` : null,
+        fontSummary.cidSetStreamsRebuilt ? `rebuilt ${fontSummary.cidSetStreamsRebuilt} CIDSet stream(s)` : null,
+        fontSummary.substituteFontsApplied ? `applied ${fontSummary.substituteFontsApplied} substitute font(s)` : null,
+        fontSummary.widthFixesApplied ? `normalized ${fontSummary.widthFixesApplied} width fix(es)` : null,
+      ].filter(Boolean).join(', ')
+    : ''
+  const detailedSummary = fontSummaryText ? `${details} Font operation summary: ${fontSummaryText}.` : details
 
   if (input.result.status === 'applied' && input.result.outputBuffer) {
     return {
@@ -1632,7 +1643,7 @@ function structureResultToAction(input: {
         ...input.baseAction,
         before: input.result.appliedMutations.map(entry => `${entry.ref}:${entry.before || ''}`).join(', ') || null,
         after: input.result.appliedMutations.map(entry => `${entry.ref}:${entry.after || ''}`).join(', ') || null,
-        details,
+        details: detailedSummary,
         categoryTargets: input.categoryTargets,
         changedDocumentBytes: true,
         validationWarnings: condensedWarnings,
@@ -1646,7 +1657,7 @@ function structureResultToAction(input: {
   return {
     action: {
       ...input.baseAction,
-      details,
+      details: detailedSummary,
       autoApplied: false,
       categoryTargets: input.categoryTargets,
       changedDocumentBytes: false,
