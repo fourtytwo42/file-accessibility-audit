@@ -117,6 +117,8 @@ function missingLogicalStructureFinding(
   const evidence: string[] = []
   let count = 0
   let inferred = false
+  const unmappedRoleMapTagCount = qpdf.unmappedRoleMapTagCount ?? 0
+  const unmappedRoleMapTags = qpdf.unmappedRoleMapTags ?? []
 
   if (!qpdf.hasStructTree) {
     count += 1
@@ -128,6 +130,13 @@ function missingLogicalStructureFinding(
   } else if (qpdf.marked !== true) {
     count += 1
     evidence.push('MarkInfo dictionary is present but /Marked is not true.')
+  }
+  if (unmappedRoleMapTagCount > 0) {
+    count += unmappedRoleMapTagCount
+    const tagPreview = unmappedRoleMapTags.slice(0, 5).join(', ')
+    evidence.push(
+      `Detected ${unmappedRoleMapTagCount} non-standard structure type${unmappedRoleMapTagCount === 1 ? '' : 's'} without a resolvable RoleMap mapping: ${tagPreview || 'unknown tag(s)'}.`,
+    )
   }
 
   const structureNodeCount = structure?.structuralNodes?.length ?? 0

@@ -8,6 +8,14 @@ import { ANALYSIS } from '#config'
 
 const execFileAsync = promisify(execFile)
 const LEGACY_HEADING_TAG_RE = /^\/heading\s+(\d+)$/i
+const STANDARD_STRUCTURE_TAGS = new Set<string>([
+  '/Document', '/Part', '/Art', '/Sect', '/Div', '/BlockQuote', '/Caption', '/TOC', '/TOCI', '/Index',
+  '/NonStruct', '/Private', '/P', '/H', '/H1', '/H2', '/H3', '/H4', '/H5', '/H6',
+  '/L', '/LI', '/Lbl', '/LBody', '/Table', '/TR', '/TH', '/TD', '/THead', '/TBody', '/TFoot',
+  '/Span', '/Quote', '/Note', '/Reference', '/BibEntry', '/Code', '/Link', '/Annot',
+  '/Ruby', '/RB', '/RT', '/RP', '/Warichu', '/WT', '/WP', '/Figure', '/Formula', '/Form',
+  '/Artifact',
+])
 const QPDF_RETRY_MAX_BUFFER = 150 * 1024 * 1024
 const QPDF_BIN = process.env.QPDF_PATH || (() => {
   const candidates = [
@@ -45,6 +53,8 @@ export interface QpdfResult {
   legacyWidthRiskFontCount?: number
   noteTagCount?: number
   noteTagsMissingId?: number
+  unmappedRoleMapTagCount?: number
+  unmappedRoleMapTags?: string[]
   linkAnnotationCount?: number
   linkStructCount?: number
   linkAnnotationsMissingContents?: number
@@ -122,6 +132,8 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
         legacyWidthRiskFontCount: 0,
         noteTagCount: 0,
         noteTagsMissingId: 0,
+        unmappedRoleMapTagCount: 0,
+        unmappedRoleMapTags: [],
         linkAnnotationCount: 0,
         linkStructCount: 0,
         linkAnnotationsMissingContents: 0,
@@ -204,6 +216,8 @@ function emptyQpdfResult(error: string): QpdfResult {
     legacyWidthRiskFontCount: 0,
     noteTagCount: 0,
     noteTagsMissingId: 0,
+    unmappedRoleMapTagCount: 0,
+    unmappedRoleMapTags: [],
     linkAnnotationCount: 0,
     linkStructCount: 0,
     linkAnnotationsMissingContents: 0,
@@ -245,6 +259,8 @@ export function parseQpdfJson(json: any): QpdfResult {
     legacyWidthRiskFontCount: 0,
     noteTagCount: 0,
     noteTagsMissingId: 0,
+    unmappedRoleMapTagCount: 0,
+    unmappedRoleMapTags: [],
     linkAnnotationCount: 0,
     linkStructCount: 0,
     linkAnnotationsMissingContents: 0,
@@ -278,6 +294,8 @@ export function parseQpdfJson(json: any): QpdfResult {
     }
 
     const roleMapNoteAliases = new Set<string>(['/Note'])
+    const structRoleMap = new Map<string, string>()
+    const unmappedRoleTags = new Set<string>()
     const descendantFontRefs = new Set<string>()
     const softMaskImageRefs = new Set<string>()
     const ignoredFormDefaultFontRefs = new Set<string>()
@@ -305,6 +323,9 @@ export function parseQpdfJson(json: any): QpdfResult {
       const resolvedRoleMap = resolveObject(obj['/RoleMap'], objects)
       if (!resolvedRoleMap || typeof resolvedRoleMap !== 'object') continue
       for (const [tag, mapped] of Object.entries(resolvedRoleMap)) {
+        if (typeof tag === 'string' && typeof mapped === 'string') {
+          structRoleMap.set(tag, mapped)
+        }
         if (mapped === '/Note' && typeof tag === 'string') {
           roleMapNoteAliases.add(tag)
         }
@@ -426,6 +447,9 @@ export function parseQpdfJson(json: any): QpdfResult {
         }
         if (tag === '/Link') {
           result.linkStructCount = (result.linkStructCount ?? 0) + 1
+        }
+        if (typeof tag === 'string' && !isStandardStructureTag(tag, structRoleMap)) {
+          unmappedRoleTags.add(tag)
         }
         // Headings
         const legacyHeading = typeof tag === 'string' ? tag.match(LEGACY_HEADING_TAG_RE) : null
@@ -660,6 +684,8 @@ export function parseQpdfJson(json: any): QpdfResult {
     const cidSetSignals = collectCidSetSignals(objects)
     result.cidSetRiskFontCount = cidSetSignals.riskCount
     result.cidSetExplicitFontCount = cidSetSignals.explicitCount
+    result.unmappedRoleMapTags = [...unmappedRoleTags].sort()
+    result.unmappedRoleMapTagCount = unmappedRoleTags.size
 
   } catch (err) {
     console.error('QPDF JSON parse error:', err)
@@ -667,6 +693,20 @@ export function parseQpdfJson(json: any): QpdfResult {
   }
 
   return result
+}
+
+function isStandardStructureTag(tag: string, roleMap: Map<string, string>): boolean {
+  if (STANDARD_STRUCTURE_TAGS.has(tag)) return true
+  const visited = new Set<string>()
+  let current: string | undefined = tag
+  while (current && !visited.has(current)) {
+    visited.add(current)
+    const mapped = roleMap.get(current)
+    if (!mapped) return false
+    if (STANDARD_STRUCTURE_TAGS.has(mapped)) return true
+    current = mapped
+  }
+  return false
 }
 
 function canonicalizeQpdfRef(ref: string | null | undefined): string {

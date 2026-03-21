@@ -1956,6 +1956,42 @@ describe('scoreDocument — veraPDF integration', () => {
     expect(result.overallScore).toBeLessThan(100)
   })
 
+  it('does not return 100/A when local standards report unmapped role-map logical-structure debt', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      qpdf,
+      pdfjs,
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure and marked content',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'reading_order', 'pdf_ua_compliance'],
+            confidence: 0.98,
+            evidence: ['Detected 1 non-standard structure type without a resolvable RoleMap mapping: /Lbody.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      }),
+    )
+
+    expect(result.overallScore).toBeLessThan(100)
+    expect(result.grade).not.toBe('A')
+  })
+
   it('heavily caps local PDF/UA scoring when structure and CIDSet blockers coexist', () => {
     const { qpdf, pdfjs } = fullyAccessible()
     const result = scoreDocument(

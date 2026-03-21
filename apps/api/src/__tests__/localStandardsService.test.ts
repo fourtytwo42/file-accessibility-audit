@@ -284,6 +284,27 @@ describe('buildLocalStandardsReport', () => {
     expect(finding?.inferred).toBe(true)
   })
 
+  it('emits blocking logical-structure findings for unmapped non-standard role tags', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        hasStructTree: true,
+        hasMarkInfo: true,
+        marked: true,
+        unmappedRoleMapTagCount: 2,
+        unmappedRoleMapTags: ['/Lbody', '/CustomThing'],
+      }),
+      makePdfjs({ textLength: 400, hasText: true }),
+      { structure: makeStructure() },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.logical_structure')
+    expect(finding).toBeDefined()
+    expect(finding?.blocking).toBe(true)
+    expect(finding?.inferred).toBe(false)
+    expect(finding?.count).toBe(2)
+    expect(finding?.evidence.some(entry => entry.includes('/Lbody'))).toBe(true)
+  })
+
   it('suppresses content-order-only logical-structure debt when other semantic structure is already present', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({

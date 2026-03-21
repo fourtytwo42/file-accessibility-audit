@@ -204,6 +204,34 @@ describe('analyzeWithQpdf', () => {
     expect(result.legacyWidthRiskFontCount).toBe(1)
   })
 
+  it('tracks unmapped non-standard structure tags that are not resolved through RoleMap', () => {
+    const result = parseQpdfJson({
+      objects: {
+        'obj:1 0 R': {
+          value: {
+            '/Type': '/Catalog',
+            '/StructTreeRoot': 'obj:2 0 R',
+            '/MarkInfo': { '/Marked': true },
+          },
+        },
+        'obj:2 0 R': {
+          value: {
+            '/Type': '/StructTreeRoot',
+            '/RoleMap': {
+              '/CustomHeading': '/H1',
+            },
+            '/K': ['obj:10 0 R', 'obj:11 0 R'],
+          },
+        },
+        'obj:10 0 R': { value: { '/S': '/CustomHeading' } },
+        'obj:11 0 R': { value: { '/S': '/Lbody' } },
+      },
+    })
+
+    expect(result.unmappedRoleMapTagCount).toBe(1)
+    expect(result.unmappedRoleMapTags).toEqual(['/Lbody'])
+  })
+
   it('counts table row spans from structure attributes when checking regularity', () => {
     const result = parseQpdfJson({
       objects: {

@@ -12,14 +12,14 @@
 ## Current Session Snapshot
 
 
-- Active PDF: `2ndPass/95+/GTF-juvenilesentencing.pdf`
-- Latest attempt path: queue item `b862349e-505b-4ade-8c3b-28d34a5d992f`
-- Latest result summary: fresh rerun `b862349e-505b-4ade-8c3b-28d34a5d992f` held at `72/C`, but it proved the native-tagged stage-2 gating fix is live because the queue finally ran stage `2` and attempted `repair_structure_conformance` plus `repair_native_marked_content_refs`. Direct helper probes then showed the remaining blocker is narrower: `repair_structure_conformance` does remove the untagged top-level content groups, while `repair_native_marked_content_refs` was still carrying an unintended artifact-cleanup side effect that could hide the real follow-up state.
-- Latest validation source: direct queue inspection for `b862349e-505b-4ade-8c3b-28d34a5d992f`, plus direct structure mutation probes via `runPdfStructureBackend(... inspectMode:'alt_text_deep')`
-- Next action: commit/push the helper fix that removes artifact cleanup from `repair_native_marked_content_refs`, restart PM2, and run another fresh API remediation cycle for `2ndPass/95+/GTF-juvenilesentencing.pdf`
-- Next hypothesis: once native marked-content repair stops artifacting content as a side effect, the stage-2 logical-structure path will expose and preserve the real repaired state from `repair_structure_conformance`, allowing follow-up Acrobat ownership cleanup instead of another flat `72/C` no-effect loop.
-- API restart status: pending for the marked-content repair side-effect fix
-- Build status: no rebuild required unless fresh rerun still reflects stale behavior after restart
+- Active PDF: `3rdPass/Fail/Evaluation of the Lake County Adult Probation.pdf`
+- Latest attempt path: `MitigationAttempts/Evaluation of the Lake County Adult Probation/attempt-001.pdf`
+- Latest result summary: direct path remediation left the PDF byte-identical and locally `100/A`, but a fresh `full_final` analysis with live `veraPDF` still failed (`105` checks), dominated by unmapped non-standard structure types such as `/Lbody`. `CMVoga.pdf` was rechecked first and moved from `3rdPass/Fail/` to `3rdPass/Pass/` because remediation output was byte-identical and already clean under the current app result.
+- Latest validation source: direct path remediation via `src/scripts/remediatePdfFromPath.ts`, followed by fresh direct `analyzePDF(... analysisProfile:'full_final', skipVeraPdf:false)` inspection on the active file
+- Next action: finish the generic unmapped-role logical-structure detection fix, commit/push it, then rerun `Evaluation of the Lake County Adult Probation.pdf` against the updated code before continuing alphabetically through `3rdPass/Fail/`
+- Next hypothesis: once unmapped non-standard structure tags are surfaced as blocking `pdfua.logical_structure` debt, the current false-clean `100/A` files in `3rdPass/Fail/` will stop being promoted prematurely and the next remediation loops will target the real blocker family instead of treating them as already solved.
+- API restart status: pending for the unmapped-role logical-structure fix
+- Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
 
@@ -30,13 +30,13 @@
 ## Current Focus
 
 
-- Active PDF: `2ndPass/95+/GTF-juvenilesentencing.pdf`
-- Current phase: Adobe-guided second-pass remediation loop
-- Immediate next step: commit/push the helper fix that removes artifact cleanup from `repair_native_marked_content_refs`, restart PM2, and rerun `GTF-juvenilesentencing.pdf` fresh through the API.
-- API restart/rerun confirmed for active file: no, restart is still pending for the current helper fix.
+- Active PDF: `3rdPass/Fail/Evaluation of the Lake County Adult Probation.pdf`
+- Current phase: `3rdPass/Fail` one-by-one remediation and promotion into `3rdPass/Pass/`
+- Immediate next step: commit/push the unmapped-role logical-structure detector fix, restart the API/runtime if needed, and rerun the active file fresh before deciding whether it belongs in `Pass`.
+- API restart/rerun confirmed for active file: no, restart is still pending for the current logical-structure detector fix.
 - Rebuild required for active file: no
-- Active remediation loop count: `GTF-juvenilesentencing.pdf (2ndPass)=2`
-- Next hypothesis: this Acrobat-report family now needs stage-2 logical-structure repairs to remain structural rather than silently artifacting content; once that side effect is gone, the next blocker should collapse to the residual Acrobat ownership nodes created after `repair_structure_conformance`.
+- Active remediation loop count: `Evaluation of the Lake County Adult Probation.pdf (3rdPass)=1`
+- Next hypothesis: the active false-clean file family is being hidden by missing local detection for unmapped RoleMap structure tags; once exposed, remediation/scoring should stop treating these PDFs as solved and we can work the next real blocker generically.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
@@ -76,6 +76,8 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-21T21:17:01Z Started the `3rdPass/Fail` cleanup wave in alphabetical order. `CMVoga.pdf` was checked first with `pnpm --filter api exec tsx src/scripts/remediatePdfFromPath.ts`, and the output matched the source byte-for-byte while still scoring `100/A`, so it was moved from `3rdPass/Fail/CMVoga.pdf` to `3rdPass/Pass/CMVoga.pdf`. The next file, `Evaluation of the Lake County Adult Probation.pdf`, exposed a shared false-clean system gap: direct remediation again produced a byte-identical `100/A`, but a fresh direct `full_final` analysis with `skipVeraPdf:false` still failed `veraPDF` with `105` checks, dominated by unmapped non-standard structure tags such as `/Lbody`. Implemented the first half of the generic fix by extending `qpdfService` to surface `unmappedRoleMapTagCount` / `unmappedRoleMapTags`, then finished the standards side so `buildLocalStandardsReport()` now emits a blocking `pdfua.logical_structure` finding when non-standard structure tags are not resolvable through RoleMap. Added targeted regressions in `src/__tests__/qpdfParser.test.ts`, `src/__tests__/localStandardsService.test.ts`, and `src/__tests__/scorer.test.ts`. Verification: `pnpm --filter api exec tsc --noEmit` passed, and targeted test coverage passed for the new parser/standards assertions; the broader scorer file still has the same pre-existing unrelated failure at `scoreDocument — veraPDF integration > treats tiny microtext display-label contrast misses as advisory on long documents`. Next action: commit/push this logical-structure detector fix, rerun Lake County fresh, and continue down `3rdPass/Fail/` one file at a time.
 
 - 2026-03-21T21:03:15Z Phase 6 verification/regression-lock pass implemented. Added a manifest-backed Phase 0 artifact comparator at `apps/api/src/scripts/comparePhase0Artifacts.ts`, blessed-artifact references in `apps/api/src/scripts/phase0VerificationManifest.ts`, machine-checkable canary planner locks in the canary corpus, new package commands (`baseline:phase0:compare`, `test:regressions`, and `verify:regressions`), and focused contract snapshots for `FailureProfile v2` and queue reporting. Fresh blessed artifacts were generated at `MitigationAttempts/phase0-baselines/2026-03-21T21-03-15Z.phase0-baseline.json` and `MitigationAttempts/phase0-baselines/2026-03-21T21-03-15Z.phase0-canary.json`. Verified with `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api exec vitest run src/__tests__/failureProfileService.test.ts src/__tests__/queueStore.test.ts src/__tests__/comparePhase0Artifacts.test.ts`, `pnpm --filter api exec tsx src/scripts/comparePhase0Artifacts.ts --mode phase0-baseline --before MitigationAttempts/phase0-baselines/2026-03-21T20-29-06Z.phase0-baseline.json --after MitigationAttempts/phase0-baselines/2026-03-21T21-03-15Z.phase0-baseline.json`, and `pnpm --filter api verify:regressions`. The fresh full baseline remained at `3` false `100/100` files and the fresh canary preserved full structural-class coverage with `1` false `100/100`, which is the expected no-regression result for a verification-only phase. Comparison passed with no allowlisted gaps. Next hypothesis: future scorer/planner/reporting fixes should use `verify:regressions` as the default gate so source baseline honesty, contract stability, and canary planner locks are all checked before we trust the run.
 - 2026-03-21T20:29:06Z Phase 5 failure-profile/reporting contract pass implemented. `FailureProfile` now emits contract version `2`, always carries Adobe status/count when Adobe data exists, and normalizes failure modes with explicit `reportingCategory`, `sourceDetail`, and `derivedFrom` provenance. Tool opportunities now expose stable `statusReasonCode` / `statusReasonDetail` fields in addition to legacy `blockedReason`, planner evidence now includes normalized opportunity-key/status/reason summaries, and queue reporting now consumes the normalized contract rather than re-sorting failure modes independently. Verified with `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api exec vitest run src/__tests__/failureProfileService.test.ts src/__tests__/queueStore.test.ts`, and a fresh Phase 0 rerun at `MitigationAttempts/phase0-baselines/2026-03-21T20-29-06Z.phase0-baseline.json`. The source-corpus baseline stayed stable at `3` false `100/100` files with full canary structural-class coverage, which is expected because Phase 5 strengthens the reporting contract rather than the scorer or remediation behavior. Next hypothesis: Phase 6 should use the richer contract to add stronger before/after verification and regression locks, especially around failure-mode ordering, opportunity status explanations, and queue-visible planner summaries.
