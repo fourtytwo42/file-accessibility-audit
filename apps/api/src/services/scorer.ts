@@ -1250,6 +1250,7 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     return nearThreshold || displaySized
   })
   const materialFailures = effectiveFailures.filter(failure => !advisoryDisplayFailures.includes(failure))
+  const residualMediumFailures = materialFailures.filter(failure => failure.contrastRatio >= 3.0)
   const uniqueAdvisoryDisplayElements = new Set(
     advisoryDisplayFailures.map(failure =>
       `${failure.page}|${failure.textPreview.trim().toLowerCase()}|${failure.fgColor.toLowerCase()}|${failure.bgColor.toLowerCase()}|${failure.threshold}`,
@@ -1263,12 +1264,13 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     findings.push('All sampled text meets WCAG contrast requirements.')
   } else if (
     effectiveFailRatio < 0.20
-    && materialFailures.length === 0
+    && materialFailures.length <= 1
+    && residualMediumFailures.length === materialFailures.length
     && uniqueAdvisoryDisplayElements.size <= 10
   ) {
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
-    findings.push('The failing samples were limited to near-threshold or display-sized text and were treated as an advisory contrast warning rather than a major document-wide contrast problem.')
+    findings.push('The failing samples were limited to near-threshold or display-sized text, with at most one residual medium-contrast miss, and were treated as an advisory contrast warning rather than a major document-wide contrast problem.')
   } else if (effectiveFailRatio < 0.01) {
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)

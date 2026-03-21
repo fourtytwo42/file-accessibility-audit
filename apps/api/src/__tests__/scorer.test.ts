@@ -1846,7 +1846,7 @@ describe('scoreDocument — veraPDF integration', () => {
               threshold: 4.5,
               fgColor: '#939192',
               bgColor: '#ffffff',
-              fontSizePt: 18,
+              fontSizePt: 12,
             },
           ],
           warnings: [],
@@ -1856,7 +1856,7 @@ describe('scoreDocument — veraPDF integration', () => {
 
     expect(findCategory(result, 'color_contrast').score).toBe(95)
     expect(findCategory(result, 'color_contrast').grade).toBe('A')
-    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('display-sized text'))).toBe(true)
+    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('residual medium-contrast miss'))).toBe(true)
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })
