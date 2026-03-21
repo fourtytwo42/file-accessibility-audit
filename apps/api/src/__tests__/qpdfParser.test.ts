@@ -40,7 +40,7 @@ describe('analyzeWithQpdf', () => {
       },
     })
 
-    expect(result.images).toEqual([{ ref: 'obj:3 0 R', hasAlt: false }])
+    expect(result.images).toEqual([expect.objectContaining({ ref: 'obj:3 0 R', hasAlt: false })])
   })
 
   it('reconciles associated figure alt text onto a raw image without double-counting when figure objects appear first', () => {
@@ -60,7 +60,7 @@ describe('analyzeWithQpdf', () => {
     })
 
     expect(result.images).toEqual([
-      { ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' },
+      expect.objectContaining({ ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' }),
     ])
   })
 
@@ -86,7 +86,7 @@ describe('analyzeWithQpdf', () => {
       },
     })
 
-    expect(result.images).toContainEqual({ ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' })
+    expect(result.images).toContainEqual(expect.objectContaining({ ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' }))
     expect(result.images.some(image => image.ref === 'obj:10 0 R')).toBe(false)
   })
 
@@ -112,7 +112,7 @@ describe('analyzeWithQpdf', () => {
       },
     })
 
-    expect(result.images).toContainEqual({ ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' })
+    expect(result.images).toContainEqual(expect.objectContaining({ ref: 'obj:3 0 R', hasAlt: true, altText: 'Program logo' }))
     expect(result.images.some(image => image.ref === 'obj:10 0 R')).toBe(false)
   })
 
@@ -627,5 +627,102 @@ describe('analyzeWithQpdf', () => {
 
     expect(result.images).toHaveLength(1)
     expect(result.images[0].ref).toBe('obj:5 0 R')
+  })
+
+  it('detects nested image XObjects inside /Form resources and assigns a stable fingerprint', () => {
+    const result = parseQpdfJson({
+      pages: [
+        { object: 'obj:2 0 R', pageposfrom1: 1 },
+      ],
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:2 0 R': {
+          value: {
+            '/Type': '/Page',
+            '/Resources': {
+              '/XObject': {
+                '/Fm1': 'obj:10 0 R',
+              },
+            },
+          },
+        },
+        'obj:10 0 R': {
+          stream: {
+            dict: {
+              '/Subtype': '/Form',
+              '/Resources': {
+                '/XObject': {
+                  '/ImNested': 'obj:11 0 R',
+                },
+              },
+            },
+          },
+        },
+        'obj:11 0 R': {
+          stream: {
+            dict: {
+              '/Subtype': '/Image',
+              '/Width': 32,
+              '/Height': 32,
+            },
+            data: 'nested-image-stream',
+          },
+        },
+      },
+    })
+
+    expect(result.images).toHaveLength(1)
+    expect(result.images[0]).toEqual(expect.objectContaining({
+      ref: 'obj:11 0 R',
+      canonicalRef: 'obj:11 0 R',
+      pageNumber: 1,
+      placementCount: 1,
+    }))
+    expect(result.images[0].contentFingerprint).toMatch(/^[a-f0-9]{40}$/)
+  })
+
+  it('deduplicates repeated placements of the same image stream by content fingerprint', () => {
+    const result = parseQpdfJson({
+      pages: [
+        { object: 'obj:2 0 R', pageposfrom1: 1 },
+        { object: 'obj:3 0 R', pageposfrom1: 2 },
+      ],
+      objects: {
+        'obj:1 0 R': { value: { '/Type': '/Catalog' } },
+        'obj:2 0 R': {
+          value: {
+            '/Type': '/Page',
+            '/Resources': { '/XObject': { '/Im1': 'obj:20 0 R' } },
+          },
+        },
+        'obj:3 0 R': {
+          value: {
+            '/Type': '/Page',
+            '/Resources': { '/XObject': { '/Im2': 'obj:21 0 R' } },
+          },
+        },
+        'obj:20 0 R': {
+          stream: {
+            dict: { '/Subtype': '/Image', '/Width': 16, '/Height': 16 },
+            data: 'same-image-stream',
+          },
+        },
+        'obj:21 0 R': {
+          stream: {
+            dict: { '/Subtype': '/Image', '/Width': 16, '/Height': 16 },
+            data: 'same-image-stream',
+          },
+        },
+      },
+    })
+
+    expect(result.images).toHaveLength(1)
+    expect(result.images[0]).toEqual(expect.objectContaining({
+      ref: 'obj:20 0 R',
+      canonicalRef: 'obj:20 0 R',
+      pageNumber: 1,
+      placementPageNumbers: [1, 2],
+      placementCount: 2,
+    }))
   })
 })

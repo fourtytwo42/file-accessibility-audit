@@ -1083,6 +1083,41 @@ describe('scoreAltText edge cases', () => {
     expect(findCategory(result, 'alt_text').findings.some(finding => finding.includes('structure snapshot'))).toBe(true)
   })
 
+  it('does not let canonicalized repeated qpdf image placements inflate alt-text debt', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: 'obj:700 0 R', canonicalRef: 'obj:700 0 R', hasAlt: true, altText: 'Agency logo', placementCount: 3, placementPageNumbers: [1, 2, 3] },
+      ],
+    })
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs(),
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+  })
+
+  it('maps structure figures onto qpdf canonical image refs before computing alt-text coverage', () => {
+    const qpdf = makeQpdf({
+      images: [
+        { ref: 'obj:810 0 R', canonicalRef: 'obj:800 0 R', hasAlt: false },
+      ],
+    })
+    const result = scoreDocument(
+      qpdf,
+      makePdfjs(),
+      makeVeraPdf({ status: 'unavailable', executionStatus: 'missing_binary', isCompliant: null }),
+      makeStructure({
+        figures: [
+          { ref: 'obj:901 0 R', tag: '/Figure', hasAlt: true, altText: 'Canonical figure alt', childFigureCount: 0, hasText: true, splitGenerated: true, splitSourceRef: 'obj:810 0 R', splitSourceTag: '/Story' },
+        ],
+      }),
+    )
+
+    expect(findCategory(result, 'alt_text').score).toBe(100)
+  })
+
   it('excludes decorative Acrobat-cleanup figures from alt-text scoring', () => {
     const qpdf = makeQpdf({
       images: [

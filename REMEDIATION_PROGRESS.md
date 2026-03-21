@@ -11,32 +11,32 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `2ndPass/95+/2010 MV Annual Report.pdf`
-- Latest attempt path: rebuilt artifact `apps/api/data/queue-storage/rebuilt/f6b3f139-ad93-4049-9b84-a54ccdf9354f.pdf`
-- Latest result summary: Adobe’s companion report for `2010 MV Annual Report.pdf` shows a real local detection gap: the only failed Acrobat check is `Headings -> Appropriate nesting`, while our local scoring still passed the rebuilt artifact at `100/A`. Inspection showed the structure tree contains legacy heading tags like `/heading 4`, `/heading 5`, and `/heading 9`; qpdf heading extraction and the Python heading normalizer were both ignoring this legacy heading family.
-- Latest validation source: targeted `qpdfParser` and `scorer` regressions plus `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py` and `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T02:00Z
-- Next action: restart the API on the legacy-heading detection/normalization fix and run a fresh API remediation cycle for `2ndPass/95+/2010 MV Annual Report.pdf`
-- Next hypothesis: once legacy `/heading N` tags are detected locally and normalized by `normalize_heading_hierarchy`, this file should retain `100/A` while also clearing Acrobat’s heading-nesting failure on the next pass
-- API restart status: pending PM2 restart after the latest legacy-heading fix
-- Build status: current source is ready; PM2 restart pending before the next fresh rerun
 
+- Active PDF: `2ndPass/95+/Adams.pdf`
+- Latest attempt path: rebuilt artifact `apps/api/data/queue-storage/rebuilt/9875898c-7a82-480a-b72d-b5232878d992.pdf` copied to `2ndPass/100/2025FirearmProhibitorsReport-250626T19175938.pdf`
+- Latest result summary: `2025FirearmProhibitorsReport-250626T19175938.pdf` reached `100/A` on a fresh post-restart API rerun after softening the residual Acrobat alt-text cap when all detected figures already have compliant alternate text. This aligns local scoring with the companion Adobe report, which shows no hard failures for that file. The next active file is `Adams.pdf`, whose Adobe report still fails `Tagged content` and `Other elements alternate text`.
+- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/scorer.test.ts -t 'reports residual Acrobat-risk ownership debt as guidance when all detected figures already have alternate text|uses a softer residual Acrobat-risk cap when only one figure is still missing alt text|excludes decorative Acrobat-cleanup figures from alt-text scoring'`, `pnpm --filter api exec tsc --noEmit`, PM2 restart, and fresh API rerun `9875898c-7a82-480a-b72d-b5232878d992`, completed on 2026-03-21T02:20Z
+- Next action: inspect the first fresh API result for `2ndPass/95+/Adams.pdf` and compare it directly to Adobe’s `Tagged content` and `Other elements alternate text` failures.
+- Next hypothesis: Adams will expose a remaining generic non-figure graphics ownership or untagged-content detection gap that we can close for Acrobat parity across this report family.
+- API restart status: completed via `pm2 restart ecosystem.config.cjs --update-env` before the fresh firearm rerun and the new Adams upload.
+- Build status: no rebuild required; live source restart confirmed before the latest rerun.
 ## Current Concurrency
 
-- Active parallel PDF jobs: 2 active
-- CPU/memory notes: load 24%, memory 70%
-- Last adjustment: current cap 2
-- In-flight PDFs before restart: `2019 Illinois Methamphetamine Study-191218T21562198.pdf`, `2025FirearmProhibitorsReport-250626T19175938.pdf`
 
+- Active parallel PDF jobs: 1 active
+- CPU/memory notes: single-file second-pass loop to keep restart boundaries clean while Adobe gaps are being investigated
+- Last adjustment: reduced effective concurrency to 1 for the second-pass campaign
+- In-flight PDFs before restart: none
 ## Current Focus
 
-- Active PDF: `2ndPass/95+/2010 MV Annual Report.pdf`
-- Current phase: first Adobe-guided second-pass remediation loop
-- Immediate next step: restart on the legacy-heading fix, rerun `2010 MV Annual Report.pdf`, and validate that Acrobat-style heading nesting is now both detected locally and repaired generically
-- API restart/rerun confirmed for active file: pending restart after the latest code change
-- Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
-- Active remediation loop count: `2010 MV Annual Report.pdf (2ndPass)=1`
-- Next hypothesis: the remaining Acrobat-only miss is legacy heading nesting, not alt text, tables, or reading order
 
+- Active PDF: `2ndPass/95+/Adams.pdf`
+- Current phase: Adobe-guided second-pass remediation loop
+- Immediate next step: let fresh queue item `8f11699c-42a4-4bd3-8579-584379ed6596` complete, inspect the rebuilt score, and map any remaining local misses to Adobe’s `Tagged content` and `Other elements alternate text` failures.
+- API restart/rerun confirmed for active file: yes, the current Adams upload was started after the latest PM2 restart.
+- Rebuild required for active file: no
+- Active remediation loop count: `Adams.pdf (2ndPass)=1`
+- Next hypothesis: Adams will need a shared fix in native tagged-content coverage or Acrobat non-figure alt-risk normalization, not a scoring-only adjustment.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
@@ -77,6 +77,8 @@
 
 ## Recent Events
 
+- 2026-03-21T04:37:00Z System improvement: qpdf image discovery now recursively traverses nested `/Form` XObjects, deduplicates repeated image placements by stable content fingerprint, and carries canonical image identity through `qpdf.images`. Alt-text scoring now reconciles structure-backed figures against those canonical image refs so repeated placements and split-generated variants stop inflating image debt. Final output hardening now guarantees `/ViewerPreferences /DisplayDocTitle true` on rebuilt PDFs. Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/scorer.test.ts src/__tests__/pdfOutputFinalizer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart were pending at this checkpoint.
+- 2026-03-21T02:20:00Z 2nd-pass Adobe parity fix: residual Acrobat alt-risk no longer caps `alt_text` when all detected `/Figure` elements already have compliant alternate text. This closed the local-only scoring gap on `2ndPass/95+/2025FirearmProhibitorsReport-250626T19175938.pdf`, whose Adobe report already showed zero hard failures. Verified with targeted `scorer` regressions, `pnpm --filter api exec tsc --noEmit`, PM2 restart, and fresh API rerun `9875898c-7a82-480a-b72d-b5232878d992` (`100/A`). Final rebuilt artifact copied to `2ndPass/100/2025FirearmProhibitorsReport-250626T19175938.pdf`.
 - 2026-03-21T02:00:00Z 2nd-pass Adobe parity fix: qpdf heading extraction now recognizes legacy `/heading N` tags, heading scoring now degrades when those tags exceed the valid `H1-H6` range, and the Python heading normalizer now includes legacy heading tags so `normalize_heading_hierarchy` can rewrite them into valid heading levels. This directly targets the first 2nd-pass Adobe miss on `2ndPass/95+/2010 MV Annual Report.pdf`, whose Acrobat report failed only `Headings -> Appropriate nesting` while the local app still returned `100/A`. Verified with `pnpm --filter api exec vitest run src/__tests__/qpdfParser.test.ts src/__tests__/scorer.test.ts`, `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart/rerun were pending at this checkpoint.
 - 2026-03-21T02:06:00Z 2nd-pass planner fix: when a document already has a heading tree but `heading_structure` is still failing, the failure profile now emits a document-scoped `normalize_heading_hierarchy` opportunity before relying on per-candidate heading promotion. This directly addresses the fresh 2010 annual-report rerun, where the new legacy-heading detector worked but the planner still spent effort on no-effect `create_heading_from_candidate` calls instead of normalizing the existing `/H1`, `/heading 4`, `/heading 5`, and `/heading 9` structure. Verified with `pnpm --filter api exec vitest run src/__tests__/failureProfileService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/scorer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart/rerun were pending at this checkpoint.
 - 2026-03-21T02:11:00Z 2nd-pass planner execution fix: document-scoped `normalize_heading_hierarchy` is now fully selectable and derivable in deterministic planning. The prior follow-up on `2010 MV Annual Report.pdf` exposed two connected gaps: the planner had no stage/priority entry for `normalize_heading_hierarchy`, and the deterministic call derivation layer had no case to emit the actual tool call even when the opportunity existed. Both are now fixed, and deterministic planning explicitly gives document-level heading normalization the first heading-repair slot ahead of per-candidate heading creation when the existing heading tree is already malformed. Verified with `pnpm --filter api exec vitest run src/__tests__/remediationPlanService.test.ts src/__tests__/failureProfileService.test.ts src/__tests__/qpdfParser.test.ts src/__tests__/scorer.test.ts` and `pnpm --filter api exec tsc --noEmit`. Commit/push/restart/rerun were pending at this checkpoint.

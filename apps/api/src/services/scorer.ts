@@ -400,12 +400,20 @@ function effectiveAltFigureStats(
   structureCreditApplied: boolean
 } {
   const structureFigures = structure?.figures || []
+  const qpdfCanonicalByRef = new Map<string, string>()
+  for (const image of qpdf.images) {
+    const canonicalRef = image.canonicalRef || image.ref
+    if (!canonicalRef) continue
+    if (image.ref) qpdfCanonicalByRef.set(image.ref, canonicalRef)
+    qpdfCanonicalByRef.set(canonicalRef, canonicalRef)
+  }
   const collapseFigureVariants = <T extends { ref: string; hasAlt: boolean; altText?: string | null; splitSourceRef?: string | null }>(
     figures: T[],
   ): Array<{ ref: string; hasAlt: boolean; altText?: string }> => {
     const byCanonicalRef = new Map<string, { ref: string; hasAlt: boolean; altText?: string }>()
     for (const figure of figures) {
-      const canonicalRef = figure.splitSourceRef || figure.ref
+      const rawCanonicalRef = figure.splitSourceRef || figure.ref
+      const canonicalRef = qpdfCanonicalByRef.get(rawCanonicalRef) || rawCanonicalRef
       const existing = byCanonicalRef.get(canonicalRef)
       if (!existing) {
         byCanonicalRef.set(canonicalRef, {
@@ -433,7 +441,7 @@ function effectiveAltFigureStats(
     qpdf.images
       .filter((img): img is typeof img & { ref: string } => !!img.ref && !excludedWrapperRefs.has(img.ref))
       .map(img => ({
-        ref: img.ref,
+        ref: img.canonicalRef || img.ref,
         hasAlt: img.hasAlt,
         altText: img.altText,
         splitSourceRef: null,

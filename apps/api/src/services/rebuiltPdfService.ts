@@ -3,6 +3,7 @@ import { chromium } from 'playwright'
 import { cropPngRegionBuffer } from './pdfRenderService.js'
 import type { DocumentModel, ReconstructionArtifacts } from './documentModel.js'
 import { scopeCssToSelector } from './htmlPageService.js'
+import { ensureDisplayDocTitle } from './pdfOutputFinalizer.js'
 
 function escapeHtml(value: string): string {
   return value
@@ -156,7 +157,7 @@ export async function buildRebuiltPdf(input: {
     const pdfDoc = await PDFDocument.load(Buffer.from(pdf.data, 'base64'), { ignoreEncryption: true })
     pdfDoc.setTitle(input.model.title || 'Accessible PDF', { showInWindowTitleBar: true })
     pdfDoc.setLanguage(input.model.language || 'en')
-    return Buffer.from(await pdfDoc.save())
+    return ensureDisplayDocTitle(Buffer.from(await pdfDoc.save()))
   } finally {
     await browser.close()
   }

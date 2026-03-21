@@ -900,7 +900,11 @@ function buildFigureCandidates(
     .map((image, index) => ({ image, index }))
     .filter(({ image }) => !!image.ref && !explicitRefs.has(image.ref) && !nestedFigureContainerRefs.has(image.ref))
     .map(({ image, index }) => {
-      const page = imagePages[index] || pages[index] || null
+      const page = pages.find(candidate => candidate.pageNumber === image.pageNumber)
+        || imagePages.find(candidate => candidate.pageNumber === image.pageNumber)
+        || imagePages[index]
+        || pages[index]
+        || null
       const imageFallback = image.ref || null
       const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
       const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
@@ -938,7 +942,9 @@ function buildFigureCandidates(
   }
 
   return imagePages.map((page, index) => {
-    const imageFallback = qpdf.images[index]?.ref || null
+    const imageFallback = qpdf.images.find(image => image.pageNumber === page.pageNumber)?.ref
+      || qpdf.images[index]?.ref
+      || null
     const structuralFallback = imageFallback && structuralByRef.has(imageFallback)
       ? structuralByRef.get(imageFallback)!
       : structure.structuralNodes

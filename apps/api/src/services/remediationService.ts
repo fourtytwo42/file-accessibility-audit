@@ -4,6 +4,7 @@ import { analyzeWithPdfjs } from './pdfjsService.js'
 import { analyzeWithQpdf } from './qpdfService.js'
 import type { ModelReviewFlag as ManualReviewFlag } from './documentModel.js'
 import type { ReconstructionStatus as RemediationStatus } from './queueStore.js'
+import { ensureDisplayDocTitle } from './pdfOutputFinalizer.js'
 
 export interface RemediationOutput {
   buffer: Buffer
@@ -147,7 +148,7 @@ export async function remediatePdf(
     skippedFixes.push('Semantic or OCR-dependent fixes were intentionally skipped and flagged for manual review.')
   }
 
-  const buffer = Buffer.from(await pdfDoc.save())
+  const buffer = await ensureDisplayDocTitle(Buffer.from(await pdfDoc.save()))
   const remediationStatus: RemediationStatus = manualReviewFlags.length > 0 ? 'manual_review_required' : 'completed'
 
   return {

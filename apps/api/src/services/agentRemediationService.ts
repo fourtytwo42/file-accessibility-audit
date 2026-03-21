@@ -50,6 +50,7 @@ import {
   learnFromSuccessfulRemediation,
 } from './playbookService.js'
 import { deriveDeterministicCall, heuristicFigureAltText } from './remediationCallDerivationService.js'
+import { ensureDisplayDocTitle } from './pdfOutputFinalizer.js'
 
 function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   const summary = result.verapdf
@@ -3509,6 +3510,7 @@ export async function remediatePdfWithAgent(
   }
 
   if (!workingBuffer.equals(originalBuffer)) {
+    workingBuffer = await ensureDisplayDocTitle(workingBuffer)
     currentResult = await analyzePDF(workingBuffer, filename, {
       analysisProfile: 'full_final',
       signal: options?.signal,
@@ -3560,6 +3562,7 @@ export async function remediatePdfWithAgent(
         standardsImproved: standardsValidationImproved(postAnalysisAltStageStartResult, currentResult),
       })
       if (!changedResidualFigures) break
+      workingBuffer = await ensureDisplayDocTitle(workingBuffer)
       currentResult = await analyzePDF(workingBuffer, filename, {
         analysisProfile: 'full_final',
         signal: options?.signal,
@@ -3637,6 +3640,9 @@ export async function remediatePdfWithAgent(
       outcome: currentResult.grade === 'A' ? 'succeeded' : 'failed',
       finalScore: currentResult.overallScore,
     })
+  }
+  if (!workingBuffer.equals(originalBuffer)) {
+    workingBuffer = await ensureDisplayDocTitle(workingBuffer)
   }
 
   if (currentResult.grade === 'A' && playbookInitialArtifacts && playbookInitialAnalysis && playbookInitialContext && playbookInitialSignature) {

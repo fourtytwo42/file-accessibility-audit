@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -47,7 +47,16 @@ export interface QpdfResult {
   linkAnnotationCount?: number
   linkStructCount?: number
   linkAnnotationsMissingContents?: number
-  images: Array<{ ref: string; hasAlt: boolean; altText?: string }>
+  images: Array<{
+    ref: string
+    hasAlt: boolean
+    altText?: string
+    canonicalRef?: string | null
+    contentFingerprint?: string | null
+    pageNumber?: number | null
+    placementPageNumbers?: number[]
+    placementCount?: number
+  }>
   headings: Array<{ level: string; tag: string }>
   tables: Array<{
     hasHeaders: boolean
@@ -71,7 +80,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
   try {
     fs.writeFileSync(tmpPath, buffer)
 
-    const { stdout } = await execFileAsync(QPDF_BIN, ['--json', tmpPath], {
+    const { stdout } = await execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=inline', tmpPath], {
       timeout: ANALYSIS.QPDF_TIMEOUT_MS,
       maxBuffer: ANALYSIS.QPDF_MAX_BUFFER,
       encoding: 'utf-8',
@@ -246,7 +255,19 @@ export function parseQpdfJson(json: any): QpdfResult {
       altText?: string
       hasAssociatedContent: boolean
       hasDirectAssociatedContent: boolean
+      directImageRefs: string[]
     }> = []
+    const canonicalImageEntries = new Map<string, {
+      ref: string
+      hasAlt: boolean
+      altText?: string
+      canonicalRef: string
+      contentFingerprint?: string
+      pageNumber?: number
+      placementPageNumbers: number[]
+      placementCount: number
+    }>()
+    const rawImageRefToCanonicalRef = new Map<string, string>()
     for (const obj of Object.values(objects)) {
       if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/StructTreeRoot') continue
       const resolvedRoleMap = resolveObject(obj['/RoleMap'], objects)
@@ -358,16 +379,6 @@ export function parseQpdfJson(json: any): QpdfResult {
         result.outlineTitles = titles
       }
 
-      // Image XObjects
-      if (o['/Subtype'] === '/Image' || o['/Subtype'] === '/Form') {
-        if (o['/Subtype'] === '/Image') {
-          const isSoftMaskOnly = softMaskImageRefs.has(ref)
-          const isStencilMask = o['/ImageMask'] === true || o['/ImageMask'] === 'true'
-          if (isSoftMaskOnly || isStencilMask) continue
-          result.images.push({ ref, hasAlt: false })
-        }
-      }
-
       // Structure elements (headings, tables, figures with alt)
       if (o['/S']) {
         const tag = o['/S']
@@ -409,7 +420,8 @@ export function parseQpdfJson(json: any): QpdfResult {
           const hasAlt = altText !== undefined && altText !== ''
           const hasAssociatedContent = structElemHasAssociatedContent(o, objects)
           const hasDirectAssociatedContent = structElemHasDirectAssociatedContent(o, objects)
-          pendingFigureEntries.push({ ref, hasAlt, altText, hasAssociatedContent, hasDirectAssociatedContent })
+          const directImageRefs = collectStructElemDirectImageRefs(o, objects)
+          pendingFigureEntries.push({ ref, hasAlt, altText, hasAssociatedContent, hasDirectAssociatedContent, directImageRefs })
         }
 
       }
@@ -456,6 +468,43 @@ export function parseQpdfJson(json: any): QpdfResult {
         if (fontHasLegacyWidthRisk(o, objects)) result.legacyWidthRiskFontCount = (result.legacyWidthRiskFontCount ?? 0) + 1
       }
     }
+
+    collectDiscoveredPageImages({
+      json,
+      objects,
+      rawObjects,
+      softMaskImageRefs,
+      canonicalImageEntries,
+      rawImageRefToCanonicalRef,
+    })
+
+    if (canonicalImageEntries.size === 0) {
+      for (const [ref, obj] of Object.entries(objects)) {
+        if (!obj || typeof obj !== 'object' || obj['/Subtype'] !== '/Image') continue
+        const isSoftMaskOnly = softMaskImageRefs.has(ref)
+        const isStencilMask = obj['/ImageMask'] === true || obj['/ImageMask'] === 'true'
+        if (isSoftMaskOnly || isStencilMask) continue
+        registerDiscoveredImage({
+          ref,
+          pageNumber: undefined,
+          objects,
+          rawObjects,
+          canonicalImageEntries,
+          rawImageRefToCanonicalRef,
+        })
+      }
+    }
+
+    result.images = [...canonicalImageEntries.values()].map(entry => ({
+      ref: entry.ref,
+      hasAlt: entry.hasAlt,
+      altText: entry.altText,
+      canonicalRef: entry.canonicalRef,
+      contentFingerprint: entry.contentFingerprint || null,
+      pageNumber: entry.pageNumber ?? null,
+      placementPageNumbers: entry.placementPageNumbers,
+      placementCount: entry.placementCount,
+    }))
 
     // Also check for form fields via AcroForm
     if (result.hasAcroForm) {
@@ -512,7 +561,10 @@ export function parseQpdfJson(json: any): QpdfResult {
       }
     }
 
-    const claimedRawImageRefs = new Set<string>()
+    const claimedCanonicalImageRefs = new Set<string>()
+    const imageEntryByCanonicalRef = new Map(
+      result.images.map(image => [image.canonicalRef || image.ref, image]),
+    )
     const claimFigureEntries = (
       figures: Array<typeof pendingFigureEntries[number]>,
       options?: { requireAlt?: boolean },
@@ -520,9 +572,17 @@ export function parseQpdfJson(json: any): QpdfResult {
       for (const figure of figures) {
         if (!figure.hasAssociatedContent) continue
         if (options?.requireAlt && !figure.hasAlt) continue
-        const matchingRawImage = result.images.find(img => !claimedRawImageRefs.has(img.ref))
+        const directCanonicalRefs = figure.directImageRefs
+          .map(ref => canonicalizeQpdfRef(rawImageRefToCanonicalRef.get(ref) || ref))
+          .filter(Boolean)
+        const directImage = directCanonicalRefs
+          .map(ref => imageEntryByCanonicalRef.get(ref))
+          .find((image, index) => image && !claimedCanonicalImageRefs.has(directCanonicalRefs[index])) || null
+        const matchingRawImage = directImage
+          ? directImage
+          : result.images.find(img => !claimedCanonicalImageRefs.has(img.canonicalRef || img.ref))
         if (!matchingRawImage) continue
-        claimedRawImageRefs.add(matchingRawImage.ref)
+        claimedCanonicalImageRefs.add(matchingRawImage.canonicalRef || matchingRawImage.ref)
         if (figure.hasAlt) {
           matchingRawImage.hasAlt = true
           matchingRawImage.altText = figure.altText
@@ -538,12 +598,30 @@ export function parseQpdfJson(json: any): QpdfResult {
     )
     for (const figure of pendingFigureEntries) {
       if (!figure.hasAssociatedContent) continue
-      const matchingRawImage = result.images.find(img => !claimedRawImageRefs.has(img.ref))
+      const canonicalFigureRef = canonicalizeQpdfRef(
+        rawImageRefToCanonicalRef.get(figure.directImageRefs[0] || '')
+        || rawImageRefToCanonicalRef.get(figure.ref)
+        || figure.directImageRefs[0]
+        || figure.ref,
+      )
+      const matchingRawImage = result.images.find(img => !claimedCanonicalImageRefs.has(img.canonicalRef || img.ref))
       if (matchingRawImage) continue
       // Only count figures with real associated content. Empty /Figure elements with /Alt
       // are Adobe "Associated with content" failures and must not satisfy alt-text scoring.
-      if (!result.images.some(img => img.ref === figure.ref) && (figure.hasDirectAssociatedContent || result.images.length === 0)) {
-        result.images.push({ ref: figure.ref, hasAlt: figure.hasAlt, altText: figure.altText })
+      if (
+        !result.images.some(img => (img.canonicalRef || img.ref) === canonicalFigureRef)
+        && (figure.hasDirectAssociatedContent || result.images.length === 0)
+      ) {
+        result.images.push({
+          ref: canonicalFigureRef,
+          hasAlt: figure.hasAlt,
+          altText: figure.altText,
+          canonicalRef: canonicalFigureRef,
+          contentFingerprint: null,
+          pageNumber: null,
+          placementPageNumbers: [],
+          placementCount: 0,
+        })
       }
     }
 
@@ -557,6 +635,163 @@ export function parseQpdfJson(json: any): QpdfResult {
   }
 
   return result
+}
+
+function canonicalizeQpdfRef(ref: string | null | undefined): string {
+  if (!ref) return ''
+  return ref.startsWith('obj:') ? ref : `obj:${ref}`
+}
+
+function imageStreamFingerprint(raw: any, obj: any): string | null {
+  const streamData = raw?.stream?.data
+  if (typeof streamData === 'string' && streamData.length > 0) {
+    return createHash('sha1').update(streamData).digest('hex')
+  }
+  if (!obj || typeof obj !== 'object') return null
+  const normalizedDict = JSON.stringify({
+    subtype: obj['/Subtype'] || null,
+    width: obj['/Width'] || null,
+    height: obj['/Height'] || null,
+    bitsPerComponent: obj['/BitsPerComponent'] || null,
+    colorSpace: obj['/ColorSpace'] || null,
+    filter: obj['/Filter'] || null,
+    decodeParms: obj['/DecodeParms'] || null,
+    length: obj['/Length'] || null,
+  })
+  if (!normalizedDict) return null
+  return createHash('sha1').update(normalizedDict).digest('hex')
+}
+
+function registerDiscoveredImage(input: {
+  ref: string
+  pageNumber?: number
+  objects: Record<string, any>
+  rawObjects: Record<string, any>
+  canonicalImageEntries: Map<string, {
+    ref: string
+    hasAlt: boolean
+    altText?: string
+    canonicalRef: string
+    contentFingerprint?: string
+    pageNumber?: number
+    placementPageNumbers: number[]
+    placementCount: number
+  }>
+  rawImageRefToCanonicalRef: Map<string, string>
+}): void {
+  const canonicalRef = canonicalizeQpdfRef(input.ref)
+  const obj = resolveRef(canonicalRef, input.objects)
+  const raw = input.rawObjects[canonicalRef] || input.rawObjects[canonicalRef.replace(/^obj:/, '')]
+  const fingerprint = imageStreamFingerprint(raw, obj)
+  const canonicalKey = fingerprint || canonicalRef
+  const existing = input.canonicalImageEntries.get(canonicalKey)
+  if (existing) {
+    existing.placementCount += 1
+    if (input.pageNumber && !existing.placementPageNumbers.includes(input.pageNumber)) {
+      existing.placementPageNumbers.push(input.pageNumber)
+    }
+    input.rawImageRefToCanonicalRef.set(canonicalRef, existing.canonicalRef)
+    return
+  }
+  input.canonicalImageEntries.set(canonicalKey, {
+    ref: canonicalRef,
+    hasAlt: false,
+    canonicalRef,
+    contentFingerprint: fingerprint || undefined,
+    pageNumber: input.pageNumber,
+    placementPageNumbers: input.pageNumber ? [input.pageNumber] : [],
+    placementCount: 1,
+  })
+  input.rawImageRefToCanonicalRef.set(canonicalRef, canonicalRef)
+}
+
+function collectDiscoveredPageImages(input: {
+  json: any
+  objects: Record<string, any>
+  rawObjects: Record<string, any>
+  softMaskImageRefs: Set<string>
+  canonicalImageEntries: Map<string, {
+    ref: string
+    hasAlt: boolean
+    altText?: string
+    canonicalRef: string
+    contentFingerprint?: string
+    pageNumber?: number
+    placementPageNumbers: number[]
+    placementCount: number
+  }>
+  rawImageRefToCanonicalRef: Map<string, string>
+}): void {
+  const pages = Array.isArray(input.json?.pages) ? input.json.pages : []
+  for (const page of pages) {
+    const pageRef = typeof page?.object === 'string' ? canonicalizeQpdfRef(page.object) : ''
+    if (!pageRef) continue
+    const pageObj = resolveRef(pageRef, input.objects)
+    if (!pageObj || typeof pageObj !== 'object') continue
+    const resources = resolveObject(pageObj['/Resources'], input.objects)
+    walkXObjectResources(resources, {
+      pageNumber: Number(page.pageposfrom1) || undefined,
+      objects: input.objects,
+      rawObjects: input.rawObjects,
+      softMaskImageRefs: input.softMaskImageRefs,
+      canonicalImageEntries: input.canonicalImageEntries,
+      rawImageRefToCanonicalRef: input.rawImageRefToCanonicalRef,
+      visitedForms: new Set<string>(),
+    })
+  }
+}
+
+function walkXObjectResources(
+  resources: any,
+  input: {
+    pageNumber?: number
+    objects: Record<string, any>
+    rawObjects: Record<string, any>
+    softMaskImageRefs: Set<string>
+    canonicalImageEntries: Map<string, {
+      ref: string
+      hasAlt: boolean
+      altText?: string
+      canonicalRef: string
+      contentFingerprint?: string
+      pageNumber?: number
+      placementPageNumbers: number[]
+      placementCount: number
+    }>
+    rawImageRefToCanonicalRef: Map<string, string>
+    visitedForms: Set<string>
+  },
+): void {
+  if (!resources || typeof resources !== 'object') return
+  const xobjects = resolveObject(resources['/XObject'], input.objects)
+  if (!xobjects || typeof xobjects !== 'object') return
+  for (const value of Object.values(xobjects as Record<string, unknown>)) {
+    const rawRef = typeof value === 'string' ? canonicalizeQpdfRef(value) : null
+    const xobj = resolveObject(value, input.objects)
+    if (!xobj || typeof xobj !== 'object') continue
+    const subtype = String(xobj['/Subtype'] || '')
+    if (subtype === '/Image') {
+      const imageRef = rawRef || Object.entries(input.objects).find(([, candidate]) => candidate === xobj)?.[0]
+      if (!imageRef) continue
+      const isSoftMaskOnly = input.softMaskImageRefs.has(imageRef)
+      const isStencilMask = xobj['/ImageMask'] === true || xobj['/ImageMask'] === 'true'
+      if (isSoftMaskOnly || isStencilMask) continue
+      registerDiscoveredImage({
+        ref: imageRef,
+        pageNumber: input.pageNumber,
+        objects: input.objects,
+        rawObjects: input.rawObjects,
+        canonicalImageEntries: input.canonicalImageEntries,
+        rawImageRefToCanonicalRef: input.rawImageRefToCanonicalRef,
+      })
+      continue
+    }
+    if (subtype !== '/Form') continue
+    if (rawRef && input.visitedForms.has(rawRef)) continue
+    if (rawRef) input.visitedForms.add(rawRef)
+    const childResources = resolveObject(xobj['/Resources'], input.objects)
+    walkXObjectResources(childResources, input)
+  }
 }
 
 // Resolve a ref like "9 0 R" to its object, trying both "obj:9 0 R" and "9 0 R" key formats
@@ -629,6 +864,21 @@ function structElemHasDirectAssociatedContent(node: any, objects: any): boolean 
   }
 
   return false
+}
+
+function collectStructElemDirectImageRefs(node: any, objects: any): string[] {
+  if (!node || typeof node !== 'object') return []
+  const refs = new Set<string>()
+  const kids = node['/K']
+  const kidList = Array.isArray(kids) ? kids : kids !== undefined && kids !== null ? [kids] : []
+  for (const kid of kidList) {
+    if (!kid || typeof kid !== 'object') continue
+    if (kid['/Type'] === '/OBJR' && typeof kid['/Obj'] === 'string') {
+      refs.add(canonicalizeQpdfRef(kid['/Obj']))
+      continue
+    }
+  }
+  return [...refs]
 }
 
 function isFontObject(obj: any): boolean {
