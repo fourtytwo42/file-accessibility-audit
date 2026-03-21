@@ -6733,6 +6733,55 @@ def mutate_set_link_annotation_contents(pdf, mutation):
 
 
 def mutate_normalize_nested_figure_containers(pdf, mutation):
+    def count_descendant_figures(node):
+        count = 0
+        visited = set()
+
+        def visit(value, is_root=False):
+            nonlocal count
+            if not isinstance(value, pikepdf.Dictionary):
+                return
+            node_ref = ref_string(value)
+            if node_ref and node_ref in visited:
+                return
+            if node_ref:
+                visited.add(node_ref)
+            if not is_root and str(value.get("/S")) == "/Figure":
+                count += 1
+            kids = value.get("/K")
+            if isinstance(kids, pikepdf.Array):
+                for child in kids:
+                    visit(child)
+            elif isinstance(kids, pikepdf.Dictionary):
+                visit(kids)
+
+        visit(node, is_root=True)
+        return count
+
+    def descendant_leaf_figures_with_direct_content(node):
+        figures = []
+        visited = set()
+
+        def visit(value, is_root=False):
+            if not isinstance(value, pikepdf.Dictionary):
+                return
+            node_ref = ref_string(value)
+            if node_ref and node_ref in visited:
+                return
+            if node_ref:
+                visited.add(node_ref)
+            if not is_root and str(value.get("/S")) == "/Figure" and direct_struct_elem_mcids(value):
+                figures.append(value)
+            kids = value.get("/K")
+            if isinstance(kids, pikepdf.Array):
+                for child in kids:
+                    visit(child)
+            elif isinstance(kids, pikepdf.Dictionary):
+                visit(kids)
+
+        visit(node, is_root=True)
+        return figures
+
     applied = []
     for obj in iter_struct_elems(pdf):
         if str(obj.get("/S")) != "/Figure":
@@ -6746,16 +6795,14 @@ def mutate_normalize_nested_figure_containers(pdf, mutation):
         else:
             child_values = [kids]
 
-        child_figures = 0
+        child_figures = count_descendant_figures(obj)
         has_non_struct_kid = False
         for child in child_values:
             if not isinstance(child, pikepdf.Dictionary):
                 has_non_struct_kid = True
                 continue
             child_tag = str(child.get("/S"))
-            if child_tag == "/Figure":
-                child_figures += 1
-            elif not child_tag:
+            if not child_tag:
                 has_non_struct_kid = True
 
         mcids = normalized_struct_elem_mcids(obj)
@@ -6763,7 +6810,24 @@ def mutate_normalize_nested_figure_containers(pdf, mutation):
             continue
 
         before_alt = obj.get("/Alt")
-        before_alt_text = str(before_alt).replace("u:", "") if isinstance(before_alt, str) else None
+        before_alt_text = str(before_alt).replace("u:", "").strip() if before_alt is not None else None
+        if before_alt_text:
+          leaf_figures = [
+              figure for figure in descendant_leaf_figures_with_direct_content(obj)
+              if not str(figure.get("/Alt") or "").replace("u:", "").strip()
+          ]
+          if len(leaf_figures) == 1:
+              leaf = leaf_figures[0]
+              leaf["/Alt"] = before_alt
+              applied.append({
+                  "ref": ref_string(leaf),
+                  "before": None,
+                  "after": before_alt_text,
+                  "details": (
+                      f"Moved wrapper alt text from {ref_string(obj)} onto descendant figure {ref_string(leaf)} "
+                      "so the real marked-content figure carries the alternate description."
+                  ),
+              })
         if before_alt is not None:
             try:
                 del obj["/Alt"]

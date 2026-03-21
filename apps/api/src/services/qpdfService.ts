@@ -245,6 +245,7 @@ export function parseQpdfJson(json: any): QpdfResult {
       hasAlt: boolean
       altText?: string
       hasAssociatedContent: boolean
+      hasDirectAssociatedContent: boolean
     }> = []
     for (const obj of Object.values(objects)) {
       if (!obj || typeof obj !== 'object' || obj['/Type'] !== '/StructTreeRoot') continue
@@ -407,7 +408,8 @@ export function parseQpdfJson(json: any): QpdfResult {
           const altText = typeof rawAlt === 'string' ? rawAlt.replace(/^u:/, '') : undefined
           const hasAlt = altText !== undefined && altText !== ''
           const hasAssociatedContent = structElemHasAssociatedContent(o, objects)
-          pendingFigureEntries.push({ ref, hasAlt, altText, hasAssociatedContent })
+          const hasDirectAssociatedContent = structElemHasDirectAssociatedContent(o, objects)
+          pendingFigureEntries.push({ ref, hasAlt, altText, hasAssociatedContent, hasDirectAssociatedContent })
         }
 
       }
@@ -511,20 +513,36 @@ export function parseQpdfJson(json: any): QpdfResult {
     }
 
     const claimedRawImageRefs = new Set<string>()
-    for (const figure of pendingFigureEntries) {
-      if (!figure.hasAssociatedContent) continue
-      const matchingRawImage = result.images.find(img => !claimedRawImageRefs.has(img.ref))
-      if (matchingRawImage) {
+    const claimFigureEntries = (
+      figures: Array<typeof pendingFigureEntries[number]>,
+      options?: { requireAlt?: boolean },
+    ) => {
+      for (const figure of figures) {
+        if (!figure.hasAssociatedContent) continue
+        if (options?.requireAlt && !figure.hasAlt) continue
+        const matchingRawImage = result.images.find(img => !claimedRawImageRefs.has(img.ref))
+        if (!matchingRawImage) continue
         claimedRawImageRefs.add(matchingRawImage.ref)
         if (figure.hasAlt) {
           matchingRawImage.hasAlt = true
           matchingRawImage.altText = figure.altText
         }
-        continue
       }
+    }
+    claimFigureEntries(
+      pendingFigureEntries.filter(figure => figure.hasDirectAssociatedContent && figure.hasAlt),
+    )
+    claimFigureEntries(
+      pendingFigureEntries.filter(figure => !figure.hasDirectAssociatedContent),
+      { requireAlt: true },
+    )
+    for (const figure of pendingFigureEntries) {
+      if (!figure.hasAssociatedContent) continue
+      const matchingRawImage = result.images.find(img => !claimedRawImageRefs.has(img.ref))
+      if (matchingRawImage) continue
       // Only count figures with real associated content. Empty /Figure elements with /Alt
       // are Adobe "Associated with content" failures and must not satisfy alt-text scoring.
-      if (!result.images.some(img => img.ref === figure.ref)) {
+      if (!result.images.some(img => img.ref === figure.ref) && (figure.hasDirectAssociatedContent || result.images.length === 0)) {
         result.images.push({ ref: figure.ref, hasAlt: figure.hasAlt, altText: figure.altText })
       }
     }
@@ -584,6 +602,29 @@ function structElemHasAssociatedContent(node: any, objects: any, visited = new S
     if (kid && typeof kid === 'object') {
       if (kid['/Type'] === '/OBJR' || kid['/MCID'] !== undefined) return true
       if (structElemHasAssociatedContent(kid, objects, visited)) return true
+    }
+  }
+
+  return false
+}
+
+function structElemHasDirectAssociatedContent(node: any, objects: any): boolean {
+  if (!node || typeof node !== 'object') return false
+  const kids = node['/K']
+  if (kids === undefined || kids === null) return false
+  if (typeof kids === 'number') return true
+
+  const kidList = Array.isArray(kids) ? kids : [kids]
+  for (const kid of kidList) {
+    if (typeof kid === 'number') return true
+    if (typeof kid === 'object' && kid) {
+      if (kid['/Type'] === '/OBJR' || kid['/MCID'] !== undefined) return true
+    }
+    if (typeof kid === 'string') {
+      const child = resolveRef(kid, objects)
+      if (child && typeof child === 'object' && (child['/Type'] === '/OBJR' || child['/MCID'] !== undefined)) {
+        return true
+      }
     }
   }
 
