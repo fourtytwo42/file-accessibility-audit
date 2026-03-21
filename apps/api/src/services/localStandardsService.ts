@@ -647,6 +647,7 @@ function headingContentFinding(
     EXPLICIT_HEADING_TAG_RE.test(String(heading.tag || ''))
     || LEGACY_HEADING_TAG_RE.test(String(heading.tag || '')),
   )
+  const snapshotHeadingRefs = new Set(snapshotHeadings.map(heading => heading.ref))
   const headingContainerRefs = new Set(
     (structure?.structuralNodes || [])
       .map(node => node.parentRef || null)
@@ -663,6 +664,7 @@ function headingContentFinding(
     ? snapshotHeadings.filter(heading =>
       normalizeSemanticText(heading.text).length === 0
       && !headingContainerRefs.has(heading.ref)
+      && !snapshotHeadingRefs.has(String(heading.parentRef || ''))
     )
     : []
   const genericHeadings = snapshotHeadings.filter(heading => isGenericHeadingText(heading.text))

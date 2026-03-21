@@ -631,6 +631,33 @@ describe('buildLocalStandardsReport', () => {
     expect(finding).toBeUndefined()
   })
 
+  it('ignores empty nested heading wrappers whose parent is another heading', () => {
+    const report = buildLocalStandardsReport(
+      makeQpdf({
+        headings: [
+          { level: 'H1', tag: '/H1' },
+          { level: 'H2', tag: '/H2' },
+          { level: 'H2', tag: '/H2' },
+          { level: 'H3', tag: '/H3' },
+        ],
+      }),
+      makePdfjs(),
+      {
+        structure: makeStructure({
+          headings: [
+            { ref: 'obj:20 0 R', tag: '/H1', text: 'State criminal justice survey seeks input' },
+            { ref: 'obj:22 0 R', tag: '/H2', text: 'Figure 2 Survey response analysis' },
+            { ref: 'obj:23 0 R', tag: '/H2', parentRef: 'obj:22 0 R', text: null },
+            { ref: 'obj:25 0 R', tag: '/H3', text: '*Judges excluded due to small sample size.' },
+          ],
+        }),
+      },
+    )
+
+    const finding = report.findings.find(entry => entry.key === 'pdfua.heading_content_quality')
+    expect(finding).toBeUndefined()
+  })
+
   it('emits complex-table findings for irregular grouped-header tables', () => {
     const report = buildLocalStandardsReport(
       makeQpdf({
