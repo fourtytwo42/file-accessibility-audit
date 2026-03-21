@@ -2299,6 +2299,55 @@ describe('scoreReadingOrder edge cases', () => {
     expect(findCategory(result, 'reading_order').score).toBe(100)
   })
 
+  it('treats pdfminer reading-order mismatch as advisory on short tagged brochures', () => {
+    const { qpdf, pdfjs } = fullyAccessible()
+    const result = scoreDocument(
+      makeQpdf({
+        ...qpdf,
+        structTreeDepth: 3,
+        contentOrder: [0, 1, 2, 3, 4, 5, 6],
+      }),
+      makePdfjs({
+        ...pdfjs,
+        pageCount: 2,
+      }),
+      makeVeraPdf({
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        isCompliant: null,
+      }),
+      undefined,
+      null,
+      makeLocalStandards({
+        status: 'clear',
+        findings: [],
+        knownGapKeys: ['pdfua.metadata_identification_content_unconfirmed'],
+      }),
+      {
+        readingOrder: {
+          status: 'ok',
+          pagesAnalyzed: 2,
+          totalBlocks: 12,
+          disorderRatio: 0.37,
+          disorderedBlockCount: 4,
+          disorderedBlocks: [],
+          warnings: [],
+        },
+        tabOrder: makeTabOrder({
+          annotatedPageCount: 0,
+          missingTabsCount: 0,
+          outOfOrderPageCount: 0,
+        }),
+      },
+    )
+
+    expect(findCategory(result, 'reading_order').score).toBe(95)
+    expect(findCategory(result, 'reading_order').grade).toBe('A')
+    expect(findCategory(result, 'reading_order').findings.some(finding => finding.includes('advisory warning'))).toBe(true)
+    expect(result.overallScore).toBe(100)
+    expect(result.grade).toBe('A')
+  })
+
   it('empty contentOrder with deep tree → score 100', () => {
     const qpdf = makeQpdf({
       hasStructTree: true,

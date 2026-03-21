@@ -1773,8 +1773,17 @@ function scoreReadingOrder(qpdf: QpdfResult, pdfminer?: ReadingOrderResult | nul
   ) {
     const pct = Math.round(pdfminer.disorderRatio * 100)
     const shouldIgnorePdfMinerMismatch = qpdf.contentOrder.length === 0 && verapdf?.status === 'passed'
+    const shortTaggedBrochureMismatch =
+      qpdf.structTreeDepth >= 2
+      && qpdf.contentOrder.length > 0
+      && qpdf.contentOrder.length <= 10
+      && pdfminer.pagesAnalyzed <= 2
+      && (tabOrder?.status !== 'ok' || (tabOrder.missingTabsCount === 0 && tabOrder.outOfOrderPageCount === 0))
     if (shouldIgnorePdfMinerMismatch) {
       findings.push(`PDFMiner detected a ${pct}% content-stream mismatch, but this was ignored because the document passes PDF/UA and no MCID content-order trace was available for a stronger comparison.`)
+    } else if (shortTaggedBrochureMismatch) {
+      finalScore = 95
+      findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages), but this was treated as an advisory warning because the short tagged document already has a stable structure tree and no annotation/tab-order debt.`)
     } else if (finalScore < 100) {
       findings.push(`PDFMiner detected content-stream vs visual order mismatch (${pct}% of block pairs disordered across ${pdfminer.pagesAnalyzed} pages).`)
     } else {
