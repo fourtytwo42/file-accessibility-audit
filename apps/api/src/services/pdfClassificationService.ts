@@ -214,7 +214,6 @@ export function buildPipelineConfig(classification: PdfClassification): Pipeline
       config.semanticStrategy = 'heuristic_only'
       break
     case 'native_tagged':
-      config.stages.structureBootstrap = false
       excludedTools.add('bootstrap_struct_tree')
       excludedTools.add('ocr_scanned_pdf')
       config.maxRounds = Math.min(config.maxRounds, 3)

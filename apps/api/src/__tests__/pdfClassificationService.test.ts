@@ -259,4 +259,28 @@ describe('pdfClassificationService', () => {
     expect(config.excludedTools).toContain('substitute_legacy_fonts_in_place')
     expect(config.excludedTools).not.toContain('finalize_substituted_font_conformance')
   })
+
+  it('keeps stage-2 structural repair enabled for native-tagged PDFs', () => {
+    const config = buildPipelineConfig({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'dense',
+        hasImages: true,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'adobe_indesign',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+
+    expect(config.stages.structureBootstrap).toBe(true)
+    expect(config.excludedTools).toContain('bootstrap_struct_tree')
+    expect(config.excludedTools).not.toContain('repair_structure_conformance')
+    expect(config.excludedTools).not.toContain('repair_native_marked_content_refs')
+  })
 })
