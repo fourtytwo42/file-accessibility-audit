@@ -8,6 +8,7 @@ import { ANALYSIS } from '#config'
 
 const execFileAsync = promisify(execFile)
 const LEGACY_HEADING_TAG_RE = /^\/heading\s+(\d+)$/i
+const QPDF_RETRY_MAX_BUFFER = 150 * 1024 * 1024
 const QPDF_BIN = process.env.QPDF_PATH || (() => {
   const candidates = [
     'C:/Program Files/qpdf 12.3.2/bin/qpdf.exe',
@@ -83,13 +84,7 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
   try {
     fs.writeFileSync(tmpPath, buffer)
 
-    const { stdout } = await execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=inline', tmpPath], {
-      timeout: ANALYSIS.QPDF_TIMEOUT_MS,
-      maxBuffer: ANALYSIS.QPDF_MAX_BUFFER,
-      encoding: 'utf-8',
-      signal: options?.signal,
-      windowsHide: true,
-    })
+    const { stdout } = await runQpdfJson(tmpPath, ANALYSIS.QPDF_MAX_BUFFER, options?.signal)
 
     const json = JSON.parse(stdout)
     return parseQpdfJson(json)
@@ -145,46 +140,80 @@ export async function analyzeWithQpdf(buffer: Buffer, options?: { signal?: Abort
       throw error
     }
     // Return partial result with error
-    return {
-      hasStructTree: false,
-      isTagged: false,
-      hasMarkInfo: false,
-      marked: null,
-      hasLang: false,
-      lang: null,
-      hasOutlines: false,
-      outlineCount: 0,
-      outlineTitles: [],
-      displayDocTitle: null,
-      metadataRef: null,
-      metadataTypeValid: false,
-      metadataSubtypeXml: false,
-      hasAcroForm: false,
-      formFields: [],
-      fontCount: 0,
-      unembeddedFontCount: 0,
-      unembeddedType3FontCount: 0,
-      fontsMissingToUnicode: 0,
-      type1FontsMissingToUnicode: 0,
-      cidFontsMissingCidToGidMap: 0,
-      cidSetRiskFontCount: 0,
-      cidSetExplicitFontCount: 0,
-      legacyWidthRiskFontCount: 0,
-      noteTagCount: 0,
-      noteTagsMissingId: 0,
-      linkAnnotationCount: 0,
-      linkStructCount: 0,
-      linkAnnotationsMissingContents: 0,
-      images: [],
-      headings: [],
-      tables: [],
-      structTreeDepth: 0,
-      contentOrder: [],
-      annotationCount: 0,
-      error: 'QPDF parsing failed',
-    }
+    return emptyQpdfResult('QPDF parsing failed')
   } finally {
     try { fs.unlinkSync(tmpPath) } catch {}
+  }
+}
+
+async function runQpdfJson(tmpPath: string, maxBuffer: number, signal?: AbortSignal) {
+  try {
+    return await execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=inline', tmpPath], {
+      timeout: ANALYSIS.QPDF_TIMEOUT_MS,
+      maxBuffer,
+      encoding: 'utf-8',
+      signal,
+      windowsHide: true,
+    })
+  } catch (err: any) {
+    if (isQpdfBufferOverflow(err) && maxBuffer < QPDF_RETRY_MAX_BUFFER) {
+      return execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=inline', tmpPath], {
+        timeout: ANALYSIS.QPDF_TIMEOUT_MS,
+        maxBuffer: QPDF_RETRY_MAX_BUFFER,
+        encoding: 'utf-8',
+        signal,
+        windowsHide: true,
+      })
+    }
+    throw err
+  }
+}
+
+function isQpdfBufferOverflow(err: any): boolean {
+  const message = String(err?.message || '')
+  return err?.code === 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER'
+    || /maxBuffer/i.test(message)
+    || /stdout maxBuffer length exceeded/i.test(message)
+  }
+
+function emptyQpdfResult(error: string): QpdfResult {
+  return {
+    hasStructTree: false,
+    isTagged: false,
+    hasMarkInfo: false,
+    marked: null,
+    hasLang: false,
+    lang: null,
+    hasOutlines: false,
+    outlineCount: 0,
+    outlineTitles: [],
+    displayDocTitle: null,
+    metadataRef: null,
+    metadataTypeValid: false,
+    metadataSubtypeXml: false,
+    hasAcroForm: false,
+    formFields: [],
+    fontCount: 0,
+    unembeddedFontCount: 0,
+    unembeddedType3FontCount: 0,
+    fontsMissingToUnicode: 0,
+    type1FontsMissingToUnicode: 0,
+    cidFontsMissingCidToGidMap: 0,
+    cidSetRiskFontCount: 0,
+    cidSetExplicitFontCount: 0,
+    legacyWidthRiskFontCount: 0,
+    noteTagCount: 0,
+    noteTagsMissingId: 0,
+    linkAnnotationCount: 0,
+    linkStructCount: 0,
+    linkAnnotationsMissingContents: 0,
+    images: [],
+    headings: [],
+    tables: [],
+    structTreeDepth: 0,
+    contentOrder: [],
+    annotationCount: 0,
+    error,
   }
 }
 
