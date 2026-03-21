@@ -144,8 +144,14 @@
   - targeted verification passed:
     - weak unsafe table-backed figures still defer
     - strong informative table-backed figures can wrap a child `/Figure`
+- Live rerun result after first deployment:
+  - fresh rerun `b6109a8b-be8a-4c6f-afed-f7ba9f1c045d` still stayed at `88/B`
+  - rebuilt-artifact inspection now shows the remaining `/TD` candidates are correctly classified as `retag_then_set_alt`
+  - the live run wrapped only one of them (`obj:78 0 R`) and left the others behind
+- Next shared fix:
+  - late heuristic figure fallback now reselects candidates from the refreshed post-write context instead of iterating stale candidate ids from the original context
 - Next expected outcome:
-  - fresh post-restart rerun should clear the remaining four missing-alt figures and push the file above `95`
+  - fresh post-restart rerun should continue past the first wrapped `/TD` figure and clear the remaining strong-evidence table-cell figures, pushing the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

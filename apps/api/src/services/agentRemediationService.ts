@@ -1056,8 +1056,7 @@ async function runHeuristicFigureFallbackStage(input: {
   manualReviewFlags: ModelReviewFlag[]
   usedInheritedVeraPdf: boolean
 }> {
-  const candidates = heuristicEligibleFigureCandidates(input.context)
-  if (!candidates.length) {
+  if (!heuristicEligibleFigureCandidates(input.context).length) {
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
   }
 
@@ -1066,9 +1065,16 @@ async function runHeuristicFigureFallbackStage(input: {
   const actions: RemediationActionRecord[] = []
   let context = input.context
   let usedInheritedVeraPdf = false
+  const attemptedTargets = new Set<string>()
 
-  for (const candidate of candidates) {
-    if (!shouldRetryLateHeuristicFigureCandidate(candidate, input.previousActionNames)) continue
+  while (true) {
+    const candidate = heuristicEligibleFigureCandidates(context).find(entry => {
+      const stableKey = entry.targetRef || entry.id
+      return !attemptedTargets.has(stableKey)
+        && shouldRetryLateHeuristicFigureCandidate(entry, input.previousActionNames)
+    })
+    if (!candidate) break
+    attemptedTargets.add(candidate.targetRef || candidate.id)
     const call = {
       tool_name: 'set_figure_alt_text' as const,
       arguments: {

@@ -13,10 +13,10 @@
 
 - Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
 - Latest attempt path: queue item `e4cc930c-8265-43d2-aad7-8a69058e8ceb`
-- Latest result summary: the first fresh rerun improved `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` from `32/F` to `88/B`. Nearly every category cleared, but `alt_text` stayed at `20/F` because four remaining strong-evidence figure candidates were deferred solely for living under `/TD` wrappers. The backend already supports wrapping a child `/Figure` under a table cell, so the missing live-pipeline piece is the TS candidate classifier.
-- Latest validation source: targeted `pdfRemediationTools` regressions for weak vs strong table-backed figure candidates and `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T00:35Z
-- Next action: deploy the strong-table-cell figure wrap fix, restart the API, and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
-- Next hypothesis: allowing strong informative `/TD`-backed figures into `retag_then_set_alt` should clear the remaining four missing-alt candidates and push this file above `95`
+- Latest result summary: even after the first table-cell figure-wrap deployment, the fresh rerun still stayed at `88/B`. Inspection of the rebuilt artifact shows the `/TD` candidates are now correctly classified as `retag_then_set_alt`, and one of them (`obj:78 0 R`) did get wrapped with alt text in the live run. The remaining issue is in the late heuristic figure loop: after the first buffer-changing write, candidate ids can be regenerated, and the loop was still iterating stale candidate ids from the original context.
+- Latest validation source: targeted `pdfRemediationTools` regressions for weak vs strong table-backed figure candidates and `pnpm --filter api exec tsc --noEmit`, completed on 2026-03-21T00:43Z
+- Next action: deploy the refreshed-candidate late-figure loop fix, restart the API, and rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf` fresh
+- Next hypothesis: reselecting heuristic figure candidates from the current post-write context should let the late pass continue past the first wrapped `/TD` figure and clear the remaining strong-evidence table-cell figures, pushing the file above `95`
 - API restart status: completed for the latest planner change before `juvenile2000study.pdf` rerun
 - Build status: current source is deployed; no additional restart needed before the next fresh upload
 
@@ -30,12 +30,12 @@
 ## Current Focus
 
 - Active PDF: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`
-- Current phase: second remediation loop after isolating the remaining alt-text blocker family
-- Immediate next step: deploy the table-cell figure-wrap fix, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect the new result
+- Current phase: third remediation loop after isolating a stale-candidate bug in the late figure pass
+- Immediate next step: deploy the refreshed-candidate late-figure loop fix, rerun `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf`, and inspect the new result
 - API restart/rerun confirmed for active file: pending restart after the latest code change
 - Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
-- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=2`
-- Next hypothesis: the remaining blocker is no longer link structure, metadata, or CID repair; it is strong figure wrapping under `/TD` cells
+- Active remediation loop count: `Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf=3`
+- Next hypothesis: the remaining blocker is no longer figure classification; it is stale candidate iteration after a buffer-changing late figure repair
 
 ## Pending Files
 
