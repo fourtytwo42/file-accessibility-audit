@@ -2223,7 +2223,7 @@ describe('scoreDocument — veraPDF integration', () => {
           failRatio: 19 / 416,
           failures: Array.from({ length: 19 }, (_, index) => ({
             page: 1 + (index % 3),
-            textPreview: index % 2 === 0 ? 'J O D A V I E S S' : 'C O O K C O U N T Y',
+            textPreview: index % 3 === 0 ? 'J O D A V I E S S' : (index % 3 === 1 ? 'STEPHENSON' : 'C O O K C O U N T Y'),
             contrastRatio: 3.59,
             threshold: 4.5,
             fgColor: '#878787',
