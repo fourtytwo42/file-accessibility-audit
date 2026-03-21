@@ -1446,11 +1446,18 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     && effectiveFailingCount <= 20
   const concentratedLongDocumentContrastRisk =
     contrast.pagesAnalyzed >= 10
-    && contrast.totalSamples >= 350
+    && contrast.totalSamples >= 250
     && effectiveFailRatio <= 0.05
     && effectiveFailingCount <= 24
     && concentratedFailurePages.size <= 2
-    && residualMediumFailures.length === effectiveFailures.length
+  const mostlyAdvisoryLongDocumentContrastRisk =
+    contrast.pagesAnalyzed >= 10
+    && contrast.totalSamples >= 250
+    && effectiveFailRatio <= 0.05
+    && effectiveFailingCount <= 12
+    && concentratedFailurePages.size <= 2
+    && materialFailures.length > 0
+    && residualMediumFailures.length <= 1
   findings.push(`Analyzed ${contrast.totalSamples} text samples across ${contrast.pagesAnalyzed} page(s).`)
 
   let score: number
@@ -1478,6 +1485,10 @@ function scoreColorContrast(contrast?: ColorContrastResult | null): CategoryResu
     score = 95
     findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
     findings.push('The failing samples were concentrated on one or two pages of a long document and were treated as an advisory contrast warning rather than a material document-wide contrast problem.')
+  } else if (mostlyAdvisoryLongDocumentContrastRisk) {
+    score = 95
+    findings.push(`${effectiveFailingCount} text sample(s) fail contrast requirements (${Math.round(effectiveFailRatio * 100)}% of samples).`)
+    findings.push('The failing samples were concentrated on one or two pages of a long document, with at most one residual medium-contrast miss beyond advisory display text, and were treated as an advisory contrast warning.')
   } else if (
     effectiveFailRatio <= 0.06
     && materialFailures.length === 0
