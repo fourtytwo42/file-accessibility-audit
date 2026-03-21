@@ -3913,10 +3913,6 @@ def mutate_repair_native_marked_content_refs(pdf, mutation):
 
     for page in pdf.pages:
         page_obj = page.obj
-        artifact_changed, artifact_applied = artifact_orphan_top_level_content_groups(pdf, page_obj)
-        if artifact_changed:
-            applied.extend(artifact_applied)
-            changed = True
         page_mcids = extract_page_mcids(page_obj)
         if not page_mcids:
             continue

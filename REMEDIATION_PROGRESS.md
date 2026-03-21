@@ -13,12 +13,12 @@
 
 
 - Active PDF: `2ndPass/95+/GTF-juvenilesentencing.pdf`
-- Latest attempt path: queue item `acb2ae08-65f5-4270-ae0c-b774ae6729a4`
-- Latest result summary: fresh rerun `5f0a4a52-267a-466a-9dad-168e568f7cb8` improved `GTF-juvenilesentencing.pdf` further to `72/C` by clearing the heading false positives and limiting artifact cleanup to graphics-only groups, but the file is still blocked because native-tagged pipeline config was suppressing stage 2 entirely, so `repair_structure_conformance` and `repair_native_marked_content_refs` still never ran in the live queue path.
-- Latest validation source: direct queue inspection for `acb2ae08-65f5-4270-ae0c-b774ae6729a4`, plus direct structure snapshot inspection via `runPdfStructureBackend(... inspectMode:'alt_text_deep')`
-- Next action: restart on the native-tagged stage-2 gating fix, then run another fresh API remediation cycle for `2ndPass/95+/GTF-juvenilesentencing.pdf`
-- Next hypothesis: once stage 2 is actually enabled for native-tagged PDFs, `repair_structure_conformance` will run before artifact cleanup and convert the remaining untagged top-level content groups into real marked content instead of trying to artifact them away.
-- API restart status: pending for the new 2nd-pass parity fix
+- Latest attempt path: queue item `b862349e-505b-4ade-8c3b-28d34a5d992f`
+- Latest result summary: fresh rerun `b862349e-505b-4ade-8c3b-28d34a5d992f` held at `72/C`, but it proved the native-tagged stage-2 gating fix is live because the queue finally ran stage `2` and attempted `repair_structure_conformance` plus `repair_native_marked_content_refs`. Direct helper probes then showed the remaining blocker is narrower: `repair_structure_conformance` does remove the untagged top-level content groups, while `repair_native_marked_content_refs` was still carrying an unintended artifact-cleanup side effect that could hide the real follow-up state.
+- Latest validation source: direct queue inspection for `b862349e-505b-4ade-8c3b-28d34a5d992f`, plus direct structure mutation probes via `runPdfStructureBackend(... inspectMode:'alt_text_deep')`
+- Next action: commit/push the helper fix that removes artifact cleanup from `repair_native_marked_content_refs`, restart PM2, and run another fresh API remediation cycle for `2ndPass/95+/GTF-juvenilesentencing.pdf`
+- Next hypothesis: once native marked-content repair stops artifacting content as a side effect, the stage-2 logical-structure path will expose and preserve the real repaired state from `repair_structure_conformance`, allowing follow-up Acrobat ownership cleanup instead of another flat `72/C` no-effect loop.
+- API restart status: pending for the marked-content repair side-effect fix
 - Build status: no rebuild required unless fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
@@ -32,11 +32,11 @@
 
 - Active PDF: `2ndPass/95+/GTF-juvenilesentencing.pdf`
 - Current phase: Adobe-guided second-pass remediation loop
-- Immediate next step: commit/push the native-tagged stage-2 gating fix, restart PM2, and rerun `GTF-juvenilesentencing.pdf` fresh through the API.
-- API restart/rerun confirmed for active file: no, restart is still pending for the current pipeline-config fix.
+- Immediate next step: commit/push the helper fix that removes artifact cleanup from `repair_native_marked_content_refs`, restart PM2, and rerun `GTF-juvenilesentencing.pdf` fresh through the API.
+- API restart/rerun confirmed for active file: no, restart is still pending for the current helper fix.
 - Rebuild required for active file: no
 - Active remediation loop count: `GTF-juvenilesentencing.pdf (2ndPass)=2`
-- Next hypothesis: this Acrobat-report family needs conservative graphics-only artifact cleanup, not text-bearing artifacting, and heading-text unreadability on legacy tagged PDFs should not be treated as a hard empty-heading failure by itself.
+- Next hypothesis: this Acrobat-report family now needs stage-2 logical-structure repairs to remain structural rather than silently artifacting content; once that side effect is gone, the next blocker should collapse to the residual Acrobat ownership nodes created after `repair_structure_conformance`.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
