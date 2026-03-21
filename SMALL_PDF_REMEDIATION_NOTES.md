@@ -2,37 +2,89 @@
 
 ## Current Active File
 
-- `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current fresh queue item: `ae0190c8-aff7-41b9-8c22-75f08fc666e4`
-- Latest completed file: `McLean-2.pdf` -> `100/A`
+- `juvenile2000study.pdf`
+- Current fresh queue item: `434adcbe-ca61-491b-8de7-36594d1997da`
+- Latest completed file: `State criminal justice survey Sept 2007.pdf` -> `100/A`
 
 ## Recent Loop Summary
 
-- `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Baseline: stalled in original analysis
-- First fresh rerun: stalled in original analysis
-- Second fresh rerun after timeout fix: progressed into remediation but still re-triggered repeated `alt_text_deep` failures during semantic processing
-- Latest completed rerun after timeout + fallback: `31/F -> 63/D`
-- Previous resolved file: `McLean-2.pdf` moved `24/F -> 100/A`
+- `DNA testing.pdf`
+- Baseline: `22/F`
+- First fresh rerun: `93/A`
+- Second fresh rerun after split-figure scoring and semantic oversize fallback fixes: still `93/A`
+- Third fresh rerun after late `/Figure` retry widening: still `93/A`
+- Fourth fresh rerun after descendant `/Figure` alt preservation in wrappers: `97/A`
+- Fifth fresh rerun after suppressing no-op wrapper rewraps: `97/A`
 
 ## New System Fixes This Round
 
-- In progress:
-  - TrueType Unicode recovery now repairs embedded Acrobat-era TrueType fonts that use `/Encoding << /BaseEncoding /WinAnsiEncoding /Differences [...] >>` by deriving `/ToUnicode` from the parsed encoding map instead of only handling bare `/WinAnsiEncoding` names.
-  - Added Tekton family substitute fallbacks so `embed_missing_fonts_in_place` can embed the last unembedded legacy display font on `victim2.pdf`.
+- Completed:
+  - Split-generated informative figure variants now collapse onto one canonical source ref before alt-text scoring, preventing wrapper/child figure variants from inflating the denominator.
+  - Oversized singleton figure semantic requests now retry without page images instead of being dropped immediately by prompt-size limits.
+  - Late heuristic cleanup now retries unresolved live `/Figure` candidates with `repairMode: "set_alt"` and missing `/Alt`.
+  - Wrapper repairs now preserve descendant leaf `/Figure` alt text instead of stripping it during cleanup.
+  - Wrapper retagging now no-ops when a target already contains a descendant leaf `/Figure` with alt text, preventing repeated rewrap churn on already-fixed containers.
 
 ## Current Blocker Hypothesis
 
-- `Southern Illinois Drug Task Force.pdf`, `Wabash-2.pdf`, and `McLean-2.pdf` are all resolved at `100/A`.
-- `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` exposed a throughput blocker rather than a normal scoring blocker:
-  - two API attempts froze at `Original analysis: Extracting page 16 of 16`
-  - `updatedAt` never advanced after the start timestamp
-  - direct probes proved `qpdf`, `pdfjs`, `readingOrder`, `tableStructure`, and `colorContrast` are all fast
-  - both full `analyzePDF(...)` and direct `runPdfStructureBackend({ operation: 'inspect', inspectMode: 'alt_text_deep' })` drove `pdf_structure_helper.py` CPU-bound for minutes
-- Shared fix in progress:
-  - cut `inspect alt_text_deep` timeout from 5 minutes to 45 seconds so pathological structure snapshots fail fast instead of stalling the queue
-  - when `alt_text_deep` still fails, immediately fall back to `light` inspection instead of repeatedly re-requesting the same pathological deep snapshot
-  - now that deep structure scoring is no longer the dominant bottleneck, the next shared fix is batching heavy link `/Contents` mutations so the runtime stops thrashing through tiny one-by-one validation loops
+- `DNA testing.pdf` is now above target at `97/A`, so it is no longer the active blocker file.
+- The last remaining debt on `DNA testing.pdf` is residual Acrobat-style mixed ownership on non-`/Figure` containers, not missing alt text:
+  - all detected `/Figure` elements now have alternate text
+  - wrapper churn is suppressed correctly with explicit no-effect messages when a descendant `/Figure` already has alt text
+- Next hypothesis is no longer on `DNA testing.pdf`; it will come from the first fresh run of the next random small PDF, `State criminal justice survey Sept 2007.pdf`.
+
+## DNA testing Result
+
+- Queue history:
+  - `ea557252-c8a9-423a-8127-8dece6f2e887` -> `93/A`
+  - `ce40822b-3570-4521-a8c4-759d1ab82d49` -> `93/A`
+  - `bc25f8db-93dd-422b-b952-d351b0852c7d` -> `93/A`
+  - `866d94d1-c901-4478-9592-312a2104e019` -> `93/A`
+  - `6a8dfbe0-08b0-4c5e-8ab4-6d22262b074d` -> `97/A`
+  - `47f9ca04-25d3-4053-83fa-69ef009f2da8` -> `97/A`
+- Root causes resolved:
+  - split-generated informative figure variants were inflating the effective image denominator
+  - oversized singleton figure semantic batches could be skipped entirely
+  - unresolved live `/Figure` candidates were not retried late
+  - wrapper cleanup was stripping descendant leaf `/Figure` alt text
+  - already-fixed wrapper containers could be rewrapped repeatedly
+- Current outcome:
+  - file clears the user target at `97/A`
+  - `alt_text` is now `85/B`
+  - all detected `/Figure` elements have alternate text
+  - remaining score loss is residual Acrobat ownership debt rather than missing figure descriptions
+
+## State criminal justice survey Sept 2007 Result
+
+- Queue history:
+  - `4e351ecd-1ea2-48d7-aad7-46157672b2d0` -> `100/A`
+- Outcome:
+  - cleared on the first fresh API run with no new code changes required
+  - original result was `28/F`
+  - remediated output reached `100/A` with headings, table headers, metadata, tab order, Type1 Unicode recovery, and figure semantics all handled by the current stack
+  - this is another strong signal that the recent small-PDF fixes are generalizing cleanly
+
+## juvenile2000study Result
+
+- Queue history:
+  - `434adcbe-ca61-491b-8de7-36594d1997da` -> `89/B`
+- Outcome so far:
+  - original result was `23/F`
+  - first fresh rerun cleared structure, headings, bookmarks, metadata, reading order, and alt text
+  - remaining score loss is concentrated in one font family:
+    - `text_extractability = 60`
+    - `pdf_ua_compliance = 85`
+    - `Detected 1 font object(s) without a ToUnicode map.`
+    - rejected detail names `/MapInfoArrows (/Type0, /Identity-H)`
+- Root cause:
+  - the helper already has deterministic Unicode mappings for `/MapInfoArrows`
+  - but generic `merge_tounicode_map()` always emitted a simple-font `ToUnicode` CMap, even for `/Type0 /Identity-H` fonts
+  - that means CID symbol fonts could still fail Unicode recovery after `/CIDToGIDMap /Identity` was fixed
+- Shared fix applied:
+  - `merge_tounicode_map()` now emits `build_cid_tounicode_cmap(...)` for `/Type0 /Identity-H` fonts and the regular simple-font builder otherwise
+  - targeted verification passed with the existing CID-symbol repair test, Python compile, and `tsc`
+- Next expected outcome:
+  - fresh post-restart rerun should clear the last `MapInfoArrows` Unicode miss and push the file above `95`
 
 ## Southern Illinois Drug Task Force Result
 

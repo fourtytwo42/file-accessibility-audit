@@ -6156,7 +6156,13 @@ def merge_tounicode_map(font, pdf, encoding_map):
     merged = {**existing, **encoding_map}
     if merged == existing and has_tounicode(font):
         return False
-    font["/ToUnicode"] = pdf.make_stream(build_tounicode_cmap(merged).encode("utf-8"))
+    subtype = str(font.get("/Subtype"))
+    encoding = str(font.get("/Encoding")) if font.get("/Encoding") is not None else ""
+    if subtype == "/Type0" and encoding == "/Identity-H":
+        cmap = build_cid_tounicode_cmap(merged)
+    else:
+        cmap = build_tounicode_cmap(merged)
+    font["/ToUnicode"] = pdf.make_stream(cmap.encode("utf-8"))
     return True
 
 

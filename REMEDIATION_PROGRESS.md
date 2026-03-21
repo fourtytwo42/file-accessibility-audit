@@ -11,14 +11,14 @@
 
 ## Current Session Snapshot
 
-- Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Latest attempt path: queue item `ae0190c8-aff7-41b9-8c22-75f08fc666e4`
-- Latest result summary: the deterministic-stage link batching fix helped the file progress cleanly into stage 6, but the run still stalls at the semantic phase because semantic link annotation repairs were still being applied one-by-one. The next deployed fix batches semantic `set_link_annotation_contents` mutations through the same structure-backend path.
-- Latest validation source: targeted `agentRemediationService` tests, `tsc`, direct semantic profiling, and live PM2 log diagnosis completed on 2026-03-20T23:02Z
-- Next action: commit/push the semantic link batching fix, rebuild/restart, cancel the now-stale in-flight queue item, and rerun `FINAL GUN HOMICIDE PDF-230610T15405729.pdf` fresh through the API
-- Next hypothesis: once semantic link `/Contents` repairs are batched too, this heavy-link Acrobat report should stop stalling at `Generating semantic fixes` and either complete or expose the next real scoring blocker.
-- API restart status: restart required after the new batching fix before trusting the next queue result
-- Build status: `pnpm --filter api build` should be run before the next PM2 restart
+- Active PDF: `juvenile2000study.pdf`
+- Latest attempt path: queue item `434adcbe-ca61-491b-8de7-36594d1997da`
+- Latest result summary: the first fresh rerun improved `juvenile2000study.pdf` from `23/F` to `89/B`, clearing structure, headings, bookmarks, alt text, and metadata. The remaining gap is a single `/Type0 /Identity-H` `MapInfoArrows` font still missing `ToUnicode`, plus residual CIDSet drift. The next deployed fix makes generic `ToUnicode` merging emit a CID CMap for `/Type0 /Identity-H` fonts instead of incorrectly using the simple-font builder.
+- Latest validation source: targeted `pdfRemediationTools` CID-symbol test, `python3 -m py_compile apps/api/scripts/pdf_structure_helper.py`, and `pnpm --filter api exec tsc --noEmit` completed on 2026-03-21T00:11Z
+- Next action: commit/push the CID `ToUnicode` merge fix, restart the API, and rerun `juvenile2000study.pdf` fresh through the API
+- Next hypothesis: once `/Type0 /Identity-H` symbol fonts receive a proper CID `ToUnicode` stream, this file should move above `95` and likely to `100/A`
+- API restart status: restart required after the new CID `ToUnicode` fix before trusting the next queue result
+- Build status: latest source change is verified but not yet redeployed
 
 ## Current Concurrency
 
@@ -29,13 +29,13 @@
 
 ## Current Focus
 
-- Active PDF: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: the runtime bottleneck has moved from deep structure inspection to repeated one-by-one link annotation mutations on a heavy-link Acrobat report
-- Immediate next step: deploy the semantic-link batching fix, rerun the same PDF, and confirm the run gets through `Generating semantic fixes` without stalling
-- API restart/rerun confirmed for active file: pending restart; the current queue item `ae0190c8-aff7-41b9-8c22-75f08fc666e4` is stale relative to the newest semantic-stage batching change
-- Rebuild required for active file: yes, run `pnpm --filter api build` before the PM2 restart
-- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf=11`
-- Next hypothesis: once `set_link_annotation_contents` joins the shared backend batch path, heavy-link PDFs should stop thrashing the mutation/inspection loop and expose the next true scoring blocker instead of a runtime bottleneck
+- Active PDF: `juvenile2000study.pdf`
+- Current phase: close the last font-conformance gap exposed by the first fresh rerun
+- Immediate next step: deploy the CID `ToUnicode` merge fix, rerun `juvenile2000study.pdf`, and confirm that the remaining `MapInfoArrows` Unicode miss clears
+- API restart/rerun confirmed for active file: pending restart and fresh rerun after the code change
+- Rebuild required for active file: no rebuild expected; PM2 restart should be sufficient unless behavior looks stale
+- Active remediation loop count: `juvenile2000study.pdf=2`
+- Next hypothesis: the remaining blocker is no longer planning or structure recovery; it is a generic CID `ToUnicode` emission bug for `/Type0 /Identity-H` fonts
 
 ## Pending Files
 
