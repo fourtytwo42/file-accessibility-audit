@@ -720,7 +720,15 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const plan = await planRemediationActions({
       filename: 'table.pdf',
       analysis: analysis as any,
-      context,
+      context: {
+        ...context,
+        qpdf: {
+          ...context.qpdf,
+          annotationCount: 2,
+          isTagged: true,
+          hasStructTree: true,
+        },
+      },
       iteration: 1,
       actions: [],
       rejectedActions: [],
@@ -1018,6 +1026,113 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }))
     expect(result.action.outcome).toBe('applied')
     expect(result.action.categoryTargets).toEqual(['alt_text'])
+  })
+
+  it('routes unowned-annotation repairs through the structure backend', async () => {
+    const buffer = await makePdfWithMixedAnnotations()
+    const analysis = await analyzePDF(buffer, 'annot-ownership.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [{
+        ref: 'obj:20 0 R',
+        before: null,
+        after: '/Annot',
+        details: 'Created /Annot structure element for unowned annotation on page obj:1 0 R.',
+      }],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: buffer,
+    })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'tag_unowned_annotations',
+        arguments: { target: 'document' },
+        rationale: 'Tag visible annotations missing structure ownership.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalledWith(expect.objectContaining({
+      mutation: expect.objectContaining({
+        operation: 'tag_unowned_annotations',
+      }),
+    }))
+    expect(result.action.outcome).toBe('applied')
+    expect(result.action.categoryTargets).toEqual(['reading_order', 'pdf_ua_compliance'])
+  })
+
+  it('orders annotation ownership repair before annotation alt-text repair when both are planned', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new Error('offline')
+    }))
+
+    const buffer = await makePdfWithMixedAnnotations()
+    const analysis = await analyzePDF(buffer, 'annotation-order.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const plan = await planRemediationActions({
+      filename: 'annotation-order.pdf',
+      analysis: {
+        ...analysis,
+        overallScore: 82,
+        grade: 'B',
+        categories: analysis.categories.map(category =>
+          category.id === 'reading_order'
+            ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Visible annotations are missing structure ownership.'] }
+            : category.id === 'alt_text'
+              ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Annotation descriptions need normalization.'] }
+              : category),
+        localStandards: {
+          status: 'issues_detected',
+          knownGapKeys: [],
+          findings: [
+            {
+              key: 'pdfua.tagged_annotations',
+              label: 'Tagged annotations',
+              severity: 'error',
+              blocking: true,
+              categoryIds: ['reading_order', 'pdf_ua_compliance'],
+              confidence: 0.9,
+              evidence: ['Detected 2 visible annotation(s) without a /StructParent entry.'],
+              source: 'composite',
+              inferred: false,
+              count: 2,
+            },
+          ],
+        },
+      },
+      context: {
+        ...context,
+        qpdf: {
+          ...context.qpdf,
+          annotationCount: 2,
+          isTagged: true,
+          hasStructTree: true,
+        },
+      },
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const ownershipIndex = plan.actions.findIndex(action => action.tool_name === 'tag_unowned_annotations')
+    const altTextIndex = plan.actions.findIndex(action => action.tool_name === 'repair_annotation_alt_text')
+
+    expect(ownershipIndex).toBeGreaterThanOrEqual(0)
+    expect(altTextIndex).toBeGreaterThanOrEqual(0)
+    expect(ownershipIndex).toBeLessThan(altTextIndex)
   })
 
   it('passes figure bootstrap candidates into bootstrap_struct_tree for weak native image documents', async () => {

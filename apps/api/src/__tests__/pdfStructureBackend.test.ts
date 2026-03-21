@@ -17,5 +17,8 @@ describe('pdfStructureBackend', () => {
     expect(__test_structureBackendTimeoutMs({
       operation: 'repair_other_elements_alt_text',
     })).toBe(900_000)
+    expect(__test_structureBackendTimeoutMs({
+      operation: 'tag_unowned_annotations',
+    })).toBe(120_000)
   })
 })

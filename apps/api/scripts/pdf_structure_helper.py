@@ -3187,6 +3187,31 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                     unresolved.append(f"Could not remove /Alt from {risk['tag']} {risk['ref']}: {exc}")
             continue
 
+        if mode == "nested_alt_text_hides_content":
+            existing_alt = obj.get("/Alt")
+            if existing_alt is None:
+                unresolved.append(
+                    f"{risk['tag']} {risk['ref']} no longer carries /Alt, so nested alternate-text repair was not needed."
+                )
+                continue
+            try:
+                del obj["/Alt"]
+                changed = True
+                repairs_applied += 1
+                applied.append({
+                    "ref": risk["ref"],
+                    "before": str(existing_alt)[:60],
+                    "after": None,
+                    "details": (
+                        f"Removed parent /Alt from {risk['tag']} element {risk['ref']} because child structure "
+                        f"elements already carry semantic content. Fixes Adobe 'Nested alternate text' without "
+                        f"altering descendants."
+                    ),
+                })
+            except Exception as exc:
+                unresolved.append(f"Could not remove nested /Alt from {risk['tag']} {risk['ref']}: {exc}")
+            continue
+
         if mode == "orphaned_alt_empty_element":
             # Element has /Alt but no MCID/OBJR-backed content. Adobe flags this as
             # "Associated with content - Failed". Remove both the /Alt AND the element
@@ -4087,6 +4112,34 @@ def _annotation_has_link_struct_parent(annot, nums):
     return False
 
 
+def _annotation_struct_parent_entry(annot, nums):
+    struct_parent = annot.get("/StructParent")
+    try:
+        struct_parent_int = int(struct_parent) if struct_parent is not None else None
+    except Exception:
+        struct_parent_int = None
+    if struct_parent_int is None:
+        return None, None
+    index = 0
+    while index + 1 < len(nums):
+        try:
+            existing_key = int(nums[index])
+        except Exception:
+            index += 2
+            continue
+        if existing_key == struct_parent_int:
+            return struct_parent_int, nums[index + 1]
+        index += 2
+    return struct_parent_int, None
+
+
+def _annotation_has_struct_parent_tag(annot, nums, expected_tag):
+    _, entry = _annotation_struct_parent_entry(annot, nums)
+    if not isinstance(entry, pikepdf.Dictionary):
+        return False
+    return str(entry.get("/S", "")) == expected_tag
+
+
 def _struct_kids_list(obj):
     kids = obj.get("/K") if isinstance(obj, pikepdf.Dictionary) else None
     if isinstance(kids, pikepdf.Array):
@@ -4153,6 +4206,112 @@ def _remove_annotation_objr_from_nonlink_elems(pdf, annot):
     return removed
 
 
+def _remove_annotation_objr_from_nonmatching_elems(pdf, annot, expected_tag):
+    removed = []
+    annot_ref = ref_string(annot)
+    if not annot_ref:
+        return removed
+
+    for elem in iter_struct_elems(pdf):
+        tag = str(elem.get("/S", ""))
+        if tag == expected_tag:
+            continue
+        kids = _struct_kids_list(elem)
+        if not kids:
+            continue
+        kept = []
+        changed = False
+        for kid in kids:
+            if _objr_targets_annotation(kid, annot):
+                changed = True
+                removed.append({
+                    "ref": ref_string(elem),
+                    "before": tag or "null-tag",
+                    "after": "OBJR removed",
+                    "details": f"Removed stale OBJR for annotation {annot_ref} from non-{expected_tag} structure element {ref_string(elem)}.",
+                })
+                continue
+            kept.append(kid)
+
+        if not changed:
+            continue
+
+        if len(kept) == 0:
+            try:
+                del elem["/K"]
+            except Exception:
+                elem["/K"] = pikepdf.Array()
+        elif len(kept) == 1:
+            elem["/K"] = kept[0]
+        else:
+            elem["/K"] = pikepdf.Array(kept)
+
+    return removed
+
+
+def _repair_annotation_struct_ownership(pdf, root, document, nums, next_key, annot, page_obj, expected_tag):
+    applied = []
+    changed = False
+    page_ref = ref_string(page_obj)
+
+    if expected_tag == "/Link":
+        removed_objr = _remove_annotation_objr_from_nonlink_elems(pdf, annot)
+    else:
+        removed_objr = _remove_annotation_objr_from_nonmatching_elems(pdf, annot, expected_tag)
+    if removed_objr:
+        applied.extend(removed_objr)
+        changed = True
+
+    if _annotation_has_struct_parent_tag(annot, nums, expected_tag):
+        return changed, applied, next_key
+
+    struct_parent = annot.get("/StructParent")
+    try:
+        struct_parent_int = int(struct_parent) if struct_parent is not None else None
+    except Exception:
+        struct_parent_int = None
+    if struct_parent_int is None:
+        struct_parent_int = next_key
+        next_key += 1
+        annot["/StructParent"] = pikepdf.Integer(struct_parent_int)
+        changed = True
+        applied.append({
+            "ref": ref_string(annot),
+            "before": None,
+            "after": f"/StructParent {struct_parent_int}",
+            "details": f"Assigned /StructParent {struct_parent_int} to {expected_tag} annotation on page {page_ref}.",
+        })
+
+    objr = pdf.make_indirect(pikepdf.Dictionary({
+        "/Type": pikepdf.Name("/OBJR"),
+        "/Obj": annot,
+        "/Pg": page_obj,
+    }))
+    struct_elem = pdf.make_indirect(pikepdf.Dictionary({
+        "/Type": pikepdf.Name("/StructElem"),
+        "/S": pikepdf.Name(expected_tag.lstrip("/")),
+        "/P": document,
+        "/Pg": page_obj,
+        "/K": objr,
+    }))
+
+    kids = document.get("/K")
+    if not isinstance(kids, pikepdf.Array):
+        kids = pikepdf.Array([kids]) if kids is not None else pikepdf.Array()
+    kids.append(struct_elem)
+    document["/K"] = kids
+
+    upsert_parent_tree_entry(nums, struct_parent_int, struct_elem)
+    changed = True
+    applied.append({
+        "ref": ref_string(struct_elem),
+        "before": None,
+        "after": expected_tag,
+        "details": f"Created {expected_tag} structure element for unowned annotation on page {page_ref}.",
+    })
+    return changed, applied, next_key
+
+
 def mutate_repair_native_link_structure(pdf, mutation):
     """Create /Link structure elements for link annotations not properly enclosed in a /Link struct elem.
 
@@ -4206,64 +4365,69 @@ def mutate_repair_native_link_structure(pdf, mutation):
                     "details": f"Cleared hidden flag on link annotation on page {page_ref}.",
                 })
 
-            # Skip if already properly enclosed in a /Link struct element.
-            if _annotation_has_link_struct_parent(annot, nums):
-                continue
-
-            removed_objr = _remove_annotation_objr_from_nonlink_elems(pdf, annot)
-            if removed_objr:
-                applied.extend(removed_objr)
+            child_changed, child_applied, next_key = _repair_annotation_struct_ownership(
+                pdf, root, document, nums, next_key, annot, page_obj, "/Link"
+            )
+            if child_changed:
                 changed = True
-
-            # Assign a new StructParent key if the annotation doesn't already have one.
-            struct_parent = annot.get("/StructParent")
-            try:
-                struct_parent_int = int(struct_parent) if struct_parent is not None else None
-            except Exception:
-                struct_parent_int = None
-            if struct_parent_int is None:
-                struct_parent_int = next_key
-                next_key += 1
-                annot["/StructParent"] = struct_parent_int
-
-            # Create OBJR reference and /Link structure element.
-            objr = pdf.make_indirect(pikepdf.Dictionary({
-                "/Type": pikepdf.Name("/OBJR"),
-                "/Obj": annot,
-                "/Pg": page_obj,
-            }))
-            link_elem = pdf.make_indirect(pikepdf.Dictionary({
-                "/Type": pikepdf.Name("/StructElem"),
-                "/S": pikepdf.Name("/Link"),
-                "/P": document,
-                "/Pg": page_obj,
-                "/K": objr,
-            }))
-            # Do NOT copy /Contents to /Alt on the struct element. Struct elements
-            # that only have an OBJR (no MCID content) must not carry /Alt or Adobe
-            # fires "Associated with content - Failed" because /Alt requires MCID-based
-            # content association. The annotation's /Contents is the accessible
-            # description and is read directly by assistive technology.
-
-            kids = document.get("/K")
-            if not isinstance(kids, pikepdf.Array):
-                kids = pikepdf.Array([kids]) if kids is not None else pikepdf.Array()
-            kids.append(link_elem)
-            document["/K"] = kids
-
-            upsert_parent_tree_entry(nums, struct_parent_int, link_elem)
-            changed = True
-            applied.append({
-                "ref": ref_string(link_elem),
-                "before": None,
-                "after": "/Link",
-                "details": f"Created /Link structure element for untagged annotation on page {page_ref}.",
-            })
+                applied.extend(child_applied)
 
     root["/ParentTree"] = parent_tree
     root["/ParentTreeNextKey"] = next_key
     if not changed:
         return False, [], ["No untagged link annotations required native link structure repair."]
+    return changed, applied, []
+
+
+def mutate_tag_unowned_annotations(pdf, mutation):
+    catalog = get_catalog(pdf)
+    if catalog is None:
+        return False, [], ["Could not locate the PDF catalog to tag unowned annotations."]
+
+    root = get_struct_tree_root(pdf)
+    if not isinstance(root, pikepdf.Dictionary):
+        return False, [], ["tag_unowned_annotations requires an existing structure tree."]
+
+    ensure_mark_info(catalog)
+    document = ensure_document_struct_elem(pdf, root)
+    parent_tree, nums = ensure_parent_tree(root, pdf)
+    next_key = int(root.get("/ParentTreeNextKey", 0) or 0)
+    applied = []
+    changed = False
+
+    for page in pdf.pages:
+        page_obj = page.obj
+        annots_raw = page_obj.get("/Annots")
+        annots = annots_raw if isinstance(annots_raw, pikepdf.Array) else None
+        if annots is None:
+          continue
+
+        for annot_ref in annots:
+            try:
+                annot = pdf.get_object(annot_ref.objgen) if hasattr(annot_ref, 'objgen') else annot_ref
+            except Exception:
+                annot = annot_ref
+            if not isinstance(annot, pikepdf.Dictionary):
+                continue
+
+            subtype = str(annot.get("/Subtype") or "")
+            if subtype not in _VISIBLE_ANNOT_SUBTYPES or subtype == "/Popup":
+                continue
+            if _annotation_is_invisible(annot):
+                continue
+
+            expected_tag = "/Link" if subtype == "/Link" else "/Annot"
+            child_changed, child_applied, next_key = _repair_annotation_struct_ownership(
+                pdf, root, document, nums, next_key, annot, page_obj, expected_tag
+            )
+            if child_changed:
+                changed = True
+                applied.extend(child_applied)
+
+    root["/ParentTree"] = parent_tree
+    root["/ParentTreeNextKey"] = next_key
+    if not changed:
+        return False, [], ["No visible annotations were missing structure ownership."]
     return changed, applied, []
 
 
@@ -7589,6 +7753,8 @@ def dispatch_single_operation(pdf, operation, request):
         return mutate_repair_native_marked_content_refs(pdf, request)
     elif operation == "repair_native_link_structure":
         return mutate_repair_native_link_structure(pdf, request)
+    elif operation == "tag_unowned_annotations":
+        return mutate_tag_unowned_annotations(pdf, request)
     elif operation == "repair_bootstrapped_chart_content_refs":
         return mutate_repair_bootstrapped_chart_content_refs(pdf, request)
     elif operation == "repair_native_figure_semantics":

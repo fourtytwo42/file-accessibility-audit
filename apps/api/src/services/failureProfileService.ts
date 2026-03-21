@@ -349,6 +349,30 @@ function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamily
     }
   }
 
+  if (finding.key === 'pdfua.tagged_annotations') {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['tag_unowned_annotations'],
+      categoryIds: ['reading_order', 'pdf_ua_compliance'],
+      classification: 'deterministic',
+    }
+  }
+
+  if (
+    finding.key === 'pdfua.untagged_rendered_images'
+    || finding.key === 'pdfua.nonfigure_with_alt'
+    || finding.key === 'pdfua.nested_alt_text'
+  ) {
+    return {
+      key: finding.key,
+      label: finding.label,
+      nativeToolFamilies: ['repair_other_elements_alt_text'],
+      categoryIds: ['alt_text', 'pdf_ua_compliance'],
+      classification: 'deterministic',
+    }
+  }
+
   return {
     key: finding.key,
     label: finding.label,

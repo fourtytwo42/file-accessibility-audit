@@ -109,6 +109,7 @@ export function deriveDeterministicCall(input: {
     case 'repair_note_tag_ids':
     case 'repair_native_marked_content_refs':
     case 'repair_native_link_structure':
+    case 'tag_unowned_annotations':
     case 'repair_bootstrapped_chart_content_refs':
     case 'repair_structure_conformance':
     case 'embed_missing_fonts_in_place':

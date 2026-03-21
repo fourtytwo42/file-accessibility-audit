@@ -126,6 +126,7 @@ export type RemediationToolName =
   | 'repair_note_tag_ids'
   | 'repair_native_marked_content_refs'
   | 'repair_native_link_structure'
+  | 'tag_unowned_annotations'
   | 'repair_bootstrapped_chart_content_refs'
   | 'repair_native_figure_semantics'
   | 'repair_other_elements_alt_text'

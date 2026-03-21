@@ -828,6 +828,86 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
   })
 
+  it('maps Phase 1 local standards findings to deterministic remediation opportunities', () => {
+    const base = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      overallScore: 82,
+      grade: 'B',
+      localStandards: {
+        status: 'issues_detected',
+        knownGapKeys: [],
+        findings: [
+          {
+            key: 'pdfua.tagged_annotations',
+            label: 'Tagged annotations',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Detected 2 visible annotation(s) without a /StructParent entry.'],
+            source: 'composite',
+            inferred: false,
+            count: 2,
+          },
+          {
+            key: 'pdfua.untagged_rendered_images',
+            label: 'Untagged rendered images',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Detected 1 rendered image without /Figure ownership.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.nonfigure_with_alt',
+            label: 'Other elements alternate text',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Detected 1 non-Figure element with /Alt.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.nested_alt_text',
+            label: 'Nested alternate text',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Detected 1 /Figure parent with semantic child structure and /Alt.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+        ],
+      },
+      categories: base.categories.map(category =>
+        category.id === 'alt_text'
+          ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Alt-text repair needed'] }
+          : category.id === 'reading_order'
+            ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Annotation ownership missing'] }
+            : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({ analysis }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'tag_unowned_annotations' && opportunity.status === 'auto_runnable')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
   it('keeps raw untagged image ownership in Acrobat-risk failure modes even when the image is marked decorative', () => {
     const analysis = makeAnalysisResult({
       overallScore: 88,

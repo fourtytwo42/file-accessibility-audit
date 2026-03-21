@@ -20,6 +20,7 @@ const HELPER_PATH = path.resolve(
 
 function structureBackendTimeoutMs(mutation: StructureBackendMutationRequest): number {
   if (mutation.operation === 'repair_other_elements_alt_text') return 900_000
+  if (mutation.operation === 'tag_unowned_annotations') return 120_000
   if (mutation.operation === 'inspect' && mutation.inspectMode === 'alt_text_deep') return 45_000
   if (mutation.operation === 'inspect') return 120_000
   return 60_000
@@ -39,6 +40,7 @@ export interface StructureBackendMutationRequest {
     | 'repair_note_tag_ids'
     | 'repair_native_marked_content_refs'
     | 'repair_native_link_structure'
+    | 'tag_unowned_annotations'
     | 'set_link_annotation_contents'
     | 'repair_bootstrapped_chart_content_refs'
     | 'repair_native_figure_semantics'

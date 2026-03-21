@@ -2462,6 +2462,24 @@ export async function executeRemediationTool(input: {
         manualReviewFlags: translated.manualReviewFlags,
       }
     }
+    case 'tag_unowned_annotations': {
+      const result = await runPdfStructureBackend({
+        buffer,
+        mutation: {
+          operation: 'tag_unowned_annotations',
+        },
+      })
+      const translated = structureResultToAction({
+        baseAction,
+        result,
+        categoryTargets: ['reading_order', 'pdf_ua_compliance'],
+      })
+      return {
+        buffer: translated.buffer || buffer,
+        action: translated.action,
+        manualReviewFlags: translated.manualReviewFlags,
+      }
+    }
     case 'repair_bootstrapped_chart_content_refs': {
       const result = await runPdfStructureBackend({
         buffer,
@@ -2750,6 +2768,7 @@ export function toAppliedChange(action: RemediationActionRecord): AppliedChange 
     repair_note_tag_ids: 'structure',
     repair_native_marked_content_refs: 'structure',
     repair_native_link_structure: 'structure',
+    tag_unowned_annotations: 'structure',
     repair_bootstrapped_chart_content_refs: 'structure',
     repair_native_figure_semantics: 'alt_text',
     repair_other_elements_alt_text: 'alt_text',
@@ -2814,6 +2833,7 @@ export function toSuggestedChange(action: RemediationActionRecord): SuggestedCha
     repair_note_tag_ids: 'structure',
     repair_native_marked_content_refs: 'structure',
     repair_native_link_structure: 'structure',
+    tag_unowned_annotations: 'structure',
     repair_bootstrapped_chart_content_refs: 'structure',
     repair_native_figure_semantics: 'alt_text',
     repair_other_elements_alt_text: 'alt_text',
