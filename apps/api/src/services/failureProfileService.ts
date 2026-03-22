@@ -49,6 +49,12 @@ const FONT_REMEDIATION_TOOLS = new Set<RemediationToolName>([
   'substitute_legacy_fonts_in_place',
   'finalize_substituted_font_conformance',
 ])
+const FIGURE_REMEDIATION_TOOLS = new Set<RemediationToolName>([
+  'set_figure_alt_text',
+  'retag_as_figure_and_set_alt',
+  'mark_figure_decorative',
+  'repair_native_figure_semantics',
+])
 const FONT_FAILURE_MODE_KEYS = new Set([
   'pdfua.font_embedding',
   'pdfua.font_unicode',
@@ -57,6 +63,9 @@ const FONT_FAILURE_MODE_KEYS = new Set([
   'pdfua.font_widths',
   'pdfua.cid_symbol_fonts',
   'pdfua.cidset_consistency',
+])
+const FIGURE_ADVISORY_FAILURE_MODE_KEYS = new Set([
+  'pdfua.figure_alt_quality',
 ])
 
 const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
@@ -831,6 +840,38 @@ function applyFontOpportunityPolicy(
   }
 }
 
+function applyFigureOpportunityPolicy(
+  opportunities: Map<string, Omit<ToolOpportunity, 'status'>>,
+  input: BuildFailureProfileInput,
+  failureModeByKey: Map<string, FailureMode>,
+): void {
+  const blockingAltFailures = new Set(
+    [...failureModeByKey.values()]
+      .filter(mode => mode.blocking && mode.categoryIds.includes('alt_text'))
+      .map(mode => mode.key),
+  )
+  const acrobatAltRiskNodes = input.context.structure.acrobatAltRiskNodes || []
+  const substantiveUnresolvedAltRiskCount = acrobatAltRiskNodes.filter(node =>
+    (!node.graphicsLikelyDecorative
+      || node.ownershipMode === 'untagged_image_direct'
+      || node.ownershipMode === 'untagged_image_mcid')
+    && (ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt)
+  ).length
+
+  for (const opportunity of opportunities.values()) {
+    if (!FIGURE_REMEDIATION_TOOLS.has(opportunity.toolName)) continue
+    const derivedFailureModes = opportunity.derivedFromFailureModeKeys
+      .map(key => failureModeByKey.get(key))
+      .filter((mode): mode is FailureMode => !!mode)
+    const onlyAdvisoryFigureResidue = derivedFailureModes.length > 0
+      && derivedFailureModes.every(mode => FIGURE_ADVISORY_FAILURE_MODE_KEYS.has(mode.key) && !mode.blocking)
+
+    if (blockingAltFailures.size === 0 && substantiveUnresolvedAltRiskCount === 0 && onlyAdvisoryFigureResidue) {
+      opportunity.blockedReason = 'Only advisory figure alternate-text quality residue remains; do not keep figure remediation auto-runnable.'
+    }
+  }
+}
+
 function deriveOpportunityStatus(
   opportunity: Omit<ToolOpportunity, 'status'>,
   actions: RemediationActionRecord[],
@@ -1373,6 +1414,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     })
   }
 
+  applyFigureOpportunityPolicy(opportunities, input, failureModeByKey)
   applyFontOpportunityPolicy(opportunities, input, failureModeByKey)
 
   return [...opportunities.values()]

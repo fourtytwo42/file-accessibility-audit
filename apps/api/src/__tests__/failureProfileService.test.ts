@@ -502,6 +502,73 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['rewrite_link_visible_text', 'set_link_annotation_contents'].includes(opportunity.toolName))).toBe(true)
   })
 
+  it('does not keep figure remediation auto-runnable for advisory-only alt-quality residue', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      overallScore: 99,
+      grade: 'B',
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      categories: baseAnalysis.categories.map(category =>
+        category.id === 'alt_text'
+          ? { ...category, score: 90, grade: 'B', severity: 'Moderate', findings: ['Figure alt text quality is advisory only.'] }
+          : category.id === 'pdf_ua_compliance'
+            ? { ...category, score: 100, grade: 'A', severity: 'Pass', findings: [] }
+            : category.id === 'color_contrast'
+              ? category
+              : category.id === 'reading_order' || category.id === 'heading_structure' || category.id === 'title_language' || category.id === 'link_quality'
+                ? { ...category, score: 100, grade: 'A', severity: 'Pass', findings: [] }
+                : category,
+      ),
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.figure_alt_quality',
+            label: 'Figure alternate-text quality',
+            severity: 'warning',
+            blocking: false,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.82,
+            evidence: ['1 figure uses low-quality alternate text.'],
+            source: 'composite',
+            inferred: true,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          hasStructTree: false,
+          structTreeDepth: 0,
+        },
+        figureCandidates: [],
+        structure: { structuralNodes: [], acrobatAltRiskNodes: [] } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const figureOpportunities = result.failureProfile.toolOpportunities.filter(opportunity =>
+      ['set_figure_alt_text', 'retag_as_figure_and_set_alt'].includes(opportunity.toolName),
+    )
+    expect(figureOpportunities.length).toBeGreaterThan(0)
+    expect(figureOpportunities.every(opportunity => opportunity.status === 'deferred')).toBe(true)
+    expect(figureOpportunities.every(opportunity => opportunity.statusReasonCode === 'deferred_document_scope')).toBe(true)
+  })
+
   it('maps local page-tabs, link-tagging, and annotation-contents findings into planner opportunities', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({
