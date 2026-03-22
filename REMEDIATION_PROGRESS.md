@@ -5,19 +5,21 @@
 - Status: In progress
 - Branch: `pdf-fixing`
 - Input folder: `Downloads/`
-- Final output folder: `Mitigated/`
+- Final output folder: `Complete/`
 - Intermediate output folder: `MitigationAttempts/`
 - Mantra: ABI — Always Be Improving
+- Campaign target: every PDF in `Downloads/` should reach a validated score above `90/100` and be copied to `Complete/`
+- Secondary engineering target: generalize fixes in the API/tooling when a blocker family can be improved safely and commit/push those shared changes
 
 ## Current Session Snapshot
 
 
-- Active PDF: processed intake parity canary (`Processed/Before/15adult probation_1999-2008.pdf`)
+- Active PDF: `15adult probation_1999-2008.pdf` campaign canary for the new `Downloads -> Complete (>90)` goal
 - Latest attempt path: `MitigationAttempts/processed-intake-parity/2026-03-22T22-45-44Z.processed-intake-parity.json`
-- Latest result summary: the structural-tail cleanup chain is now wired into live residual cleanup. The fresh `15adult` parity rerun now lands at `runtime planning 100/A` / `runtime full audit 86/B` with `familyCompletionGapCount = 0` and `nextBlockingFamily = full_audit_tail`. `pdfua.logical_structure` is now cleared in the live path; the remaining blocker is narrowed to `pdfua.heading_content_quality`, surfaced only through `post_bootstrap_heading_convergence`. The supporting trace confirms the structural chain explicitly: after figure cleanup reaches `82/B`, `artifact_nonsemantic_page_elements` and `repair_native_marked_content_refs` both return `no_effect`, but the same residual pass continues to `repair_bootstrapped_chart_content_refs`, which lifts the runtime output to `86/B` and hands the blocker off from generic structure debt to a heading-only tail.
-- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts`, `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api diagnose:processed-intake-parity --pair "15adult probation_1999-2008.pdf"`, and `pnpm --filter api verify:regressions`
-- Next action: target the remaining heading-only tail on `15adult`, starting with `create_heading_from_candidate` / heading-content cleanup, then rerun parity to confirm the full-audit tail is no longer generic structure debt.
-- Next hypothesis: `15adult` is no longer a logical-structure problem. The next shared system fix should target heading-content convergence directly rather than structure routing, figure cleanup, or parity plumbing.
+- Latest result summary: the active canary is currently at `86/B`, below the new campaign threshold for `Complete/`. The queue-wide campaign target is now every file in `Downloads/` above `90/100`; `15adult` remains a strong active canary because it is close and still exposes a shared heading-content blocker family after the recent structural fixes.
+- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/residualFamilyService.test.ts`, `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api diagnose:processed-intake-parity --pair "15adult probation_1999-2008.pdf"`, and `pnpm --filter api verify:regressions`
+- Next action: continue the active remediation loop on `15adult probation_1999-2008.pdf` until it crosses `90/100`, then place the validated output in `Complete/` and proceed alphabetically through the remaining queue.
+- Next hypothesis: the next shared system improvement should target heading-content convergence so the current canary can clear the `>90` threshold and the same family can help additional PDFs in `Downloads/`.
 - API restart status: direct script-based reruns are using current source code for validation; API restart is still required before trusting queue-driven reruns
 - Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
@@ -30,17 +32,18 @@
 ## Current Focus
 
 
-- Active PDF: processed intake parity canary (`15adult probation_1999-2008.pdf`)
-- Current phase: raw-source vs stored-after parity hardening after automatic structural-tail closure
-- Immediate next step: trace and fix the remaining `post_bootstrap_heading_convergence` tail on the `15adult` runtime output now that live chart-content repair is automatic.
+- Active PDF: `15adult probation_1999-2008.pdf`
+- Current phase: corpus campaign kickoff under the new `Complete/` and `>90` target
+- Immediate next step: finish pushing the active canary above `90/100`, then continue alphabetically through `Downloads/`.
 - API restart/rerun confirmed for active file: fresh direct script reruns have been started with current code; API restart is still required before trusting any queue result
 - Rebuild required for active file: no
-- Active remediation loop count: `processed-intake parity canary=5`
-- Next hypothesis: the link, figure, and logical-structure families are now cleared in planning/full-audit handoff on `15adult`, so the remaining gap to the stronger stored-after path is a heading-only tail. The next shared system fix should target `create_heading_from_candidate` / heading-content cleanup directly.
+- Active remediation loop count: `15adult probation_1999-2008.pdf=6`
+- Next hypothesis: the first shared system fix under the new campaign should target `create_heading_from_candidate` / heading-content cleanup directly so the canary can cross the `>90` threshold and future queue files with the same residual family benefit.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
-- Remaining files: 986
+- Remaining files in `Downloads/`: 956
+- Completion target: move each PDF that reaches a validated score above `90/100` into `Complete/`
 
 ## In Progress
 
@@ -76,6 +79,8 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-22T22:55:00Z Campaign retargeted from `Mitigated/` / `100/A` to `Complete/` / `>90`. `AGENTS.md` now defines the primary campaign goal as getting every PDF in `Downloads/` above `90/100` and placing validated outputs in `Complete/`, with API generalization as the secondary goal. `.gitignore` now ignores `Complete/`, the folder has been created locally, and the tracker summary has been updated so the new target survives context compression. Active execution remains on `15adult probation_1999-2008.pdf` as the canary closest to the new threshold (`86/B`), with the next shared system fix still focused on heading-content convergence.
 
 - 2026-03-22T22:45:44Z Structural tail closure for `15adult` after figure-family automation: extended `apps/api/src/services/agentRemediationService.ts` so residual full-audit-tail cleanup can chain the structural families together instead of stopping at the first selected family. The residual cleanup builder now treats `post_bootstrap_heading_convergence` and `logical_structure_marked_content` as a shared structural chain with effective order `artifact_nonsemantic_page_elements -> repair_native_marked_content_refs -> repair_bootstrapped_chart_content_refs -> repair_structure_conformance`, and the pipeline-family override now honors all families in that chain so later structural calls are not filtered out just because they belong to the adjacent residual family. Added focused regressions in `src/__tests__/agentRemediationService.test.ts` proving the structural chain keeps `repair_bootstrapped_chart_content_refs` reachable after early `no_effect` steps, and a family-layer regression in `src/__tests__/residualFamilyService.test.ts` proving that once chart-content repair has landed, heading convergence remains the active blocker while generic logical-structure debt drops out as the blocking family. Tightened `apps/api/src/services/familyConvergenceService.ts` and `apps/api/src/scripts/traceFullAuditTailConvergence.ts` so the trace artifact records skipped steps explicitly and preserves the selected-family handoff across the structural chain. Verification passed with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/residualFamilyService.test.ts` and `pnpm --filter api exec tsc --noEmit`; fresh proof runs produced `MitigationAttempts/full-audit-tail-traces/2026-03-22T22-36-27Z.full-audit-tail-trace.json` and `MitigationAttempts/processed-intake-parity/2026-03-22T22-45-44Z.processed-intake-parity.json`. Those artifacts confirm the live path now consumes the structural chain automatically: `repair_other_elements_alt_text` still moves `71/C -> 82/B`, `artifact_nonsemantic_page_elements` and `repair_native_marked_content_refs` both stay `no_effect`, then `repair_bootstrapped_chart_content_refs` applies and lifts the runtime output to `86/B`, clearing `pdfua.logical_structure` and leaving `pdfua.heading_content_quality` as the only remaining blocker through `post_bootstrap_heading_convergence`. Next hypothesis: the next shared system fix should target heading-content cleanup directly, starting with `create_heading_from_candidate` rather than more structure-family routing work.
 

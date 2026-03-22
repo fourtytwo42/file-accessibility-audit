@@ -52,6 +52,7 @@ tmp/
 downloads/
 Downloads/
 Mitigated/
+Complete/
 MitigationAttempts/
 Processed/
 /*.pdf
@@ -60,3 +61,4 @@ apps/api/scripts/__pycache__/
 apps/api/tmp-*.pdf
 apps/api/check_post_remediation.mts
 apps/api/check_split.mts
+Research/
