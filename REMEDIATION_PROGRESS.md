@@ -13,12 +13,12 @@
 
 
 - Active PDF: annual-report runtime blocker family (`2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`)
-- Latest attempt path: annual-report trace at `MitigationAttempts/annual-report-traces/2026-03-22T17-24-25Z.annual-report-trace.json`
-- Latest result summary: the annual-report post-table closure trace now confirms the next two deterministic families are landing cleanly. On both `2007 Annual Report Final.pdf` and `2008 Annual Report.pdf`, `set_page_tabs` now clears `pdfua.page_tabs` entirely (`pageTabsFindingCount 24 -> 0`), `embed_missing_fonts_in_place` clears `pdfua.font_embedding`, and `repair_font_unicode_maps` clears `pdfua.font_unicode` (`fontsMissingToUnicodeBlocking 8 -> 0`) while lifting the pair from `56/F -> 63/D`. After those fixes the only remaining blocking family on both files is `pdfua.logical_structure`; metadata, table regularity, annotation contents, page tabs, and font blockers are no longer the live blockers.
-- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t "sets /Tabs /S on annotated pages|sets /Tabs /S on every page in tagged documents even when only one page has links|sets link annotation /Contents without rewriting visible text"`, `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api trace:annual-reports "2007 Annual Report Final.pdf" "2008 Annual Report.pdf"`, and `pnpm --filter api verify:regressions`
-- Next action: commit/push the annual-report page-tabs-and-font-closure wave, then pivot the next engineering pass to the remaining annual-report `pdfua.logical_structure` family on the same 2007/2008 pair.
-- Next hypothesis: annual-report page-tabs and font closure are now landing; the next live blocker is purely logical-structure repair/credit rather than metadata, tables, links, tabs, or fonts.
-- API restart status: not required for direct script-based validation of the qpdf fallback fix; restart still required before trusting any fresh API queue reruns
+- Latest attempt path: `MitigationAttempts/2008 Annual Report/attempt-005-runtime-integration.pdf` with the paired live rerun sequence driven by the annual-report logical-routing integration
+- Latest result summary: runtime planning now matches the traced annual-report logical sequence instead of spending the first structure slot on `repair_native_marked_content_refs`. Fresh direct remediations with current code start both annual reports at `42/F`. `2008 Annual Report.pdf` now completes the full live agent loop to `90/B` with zero Adobe non-figure `/Alt` risks and no remaining auto-runnable tools. Fresh analysis of that output shows the residual score is no longer generic logical-structure debt; it is concentrated in `heading_structure=40` and `pdf_ua_compliance=85`. `2007 Annual Report Final.pdf` hit one transient semantic-provider `502 Bad Gateway` failure on the first fresh rerun after the routing change; a clean retry was started immediately and progressed past the prior failure point, so the provider outage is being tracked separately from planner behavior.
+- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/remediationPlanService.test.ts -t "prioritizes post-bootstrap structural residue cleanup ahead of repeated bootstrap"`, `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api verify:regressions`, `pnpm --filter api exec tsx src/scripts/remediatePdfFromPath.ts "../../Downloads/2008 Annual Report.pdf" "../../MitigationAttempts/2008 Annual Report/attempt-005-runtime-integration.pdf"`, and a fresh analysis pass over that output
+- Next action: commit/push the annual-report runtime-routing wave, then finish the active `2007 Annual Report Final.pdf` retry and use the paired rerun results to isolate the next real annual-report residue after heading/list-tag convergence.
+- Next hypothesis: the annual-report runtime route is now correctly preferring `artifact_nonsemantic_page_elements -> normalize_heading_hierarchy`; the next live blocker is a narrower heading-structure/PDF-UA tail after that convergence, not native marked-content repair.
+- API restart status: direct script-based reruns are using current source code for validation; API restart is still required before trusting queue-driven reruns
 - Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
@@ -32,11 +32,11 @@
 
 - Active PDF: annual-report runtime blocker family (`2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`)
 - Current phase: annual-report post-font closure with only logical-structure residue left
-- Immediate next step: commit/push the annual-report page-tabs-and-font-closure wave, then start the follow-up logical-structure closure wave for the same family.
-- API restart/rerun confirmed for active file: not required for the current script/test/reporting wave; restart still required before trusting any fresh API queue rerun
+- Immediate next step: finish the live `2007 Annual Report Final.pdf` retry, then commit/push the annual-report runtime-routing wave and use the paired rerun outputs to choose the next annual-report residue family.
+- API restart/rerun confirmed for active file: fresh direct script reruns have been started with current code; API restart is still required before trusting any queue result
 - Rebuild required for active file: no
 - Active remediation loop count: `annual-report blocker family trace=3`
-- Next hypothesis: after the refreshed annual-report trace, page-tabs and font closure are no longer first blockers; the next engineering effort should target the remaining logical-structure closure family.
+- Next hypothesis: after runtime integration, the annual-report pair no longer needs `repair_native_marked_content_refs` first; the next engineering effort should target the remaining post-heading score/compliance tail once the live rerun pair is complete.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
@@ -50,8 +50,8 @@
 ## Blockers
 
 - 2006CHRIAuditReport.pdf: state=blocked, score=--, grade=--, veraPDF=failed, attempt=4, loop=4
-- 2007 Annual Report Final.pdf: state=needs_fix, score=63, grade=D, veraPDF=failed, attempt=4, loop=6
-- 2008 Annual Report.pdf: state=needs_fix, score=63, grade=D, veraPDF=failed, attempt=4, loop=6
+- 2007 Annual Report Final.pdf: state=needs_fix, score=--, grade=--, veraPDF=--, attempt=6, loop=8
+- 2008 Annual Report.pdf: state=needs_fix, score=90, grade=B, veraPDF=unavailable, attempt=5, loop=7
 - 2010 MV Annual Report.pdf: state=blocked, score=--, grade=--, veraPDF=--, attempt=3, loop=3
 - 2011 MV Annual Report.pdf: state=blocked, score=--, grade=--, veraPDF=--, attempt=1, loop=1
 - 2012_MV_Annual_Report.pdf: state=blocked, score=--, grade=--, veraPDF=--, attempt=1, loop=1
@@ -76,6 +76,8 @@
 - 2001-2020 SFS Full Year End Report-220520T19141184.pdf: state=done, score=100, grade=A, veraPDF=passed, attempt=2, loop=2
 
 ## Recent Events
+
+- 2026-03-22T18:05:00Z Annual-report runtime-routing wave: updated `apps/api/src/services/remediationPlanService.ts` so post-bootstrap structural residue now prefers `normalize_heading_hierarchy` immediately after `artifact_nonsemantic_page_elements` / chart-ref cleanup and before `repair_native_marked_content_refs` or broad `repair_structure_conformance` when heading debt is still unresolved. Locked that route in `apps/api/src/__tests__/remediationPlanService.test.ts` with a planner regression proving annual-report-style structure residue takes `artifact_nonsemantic_page_elements`, then `normalize_heading_hierarchy`, before any marked-content repair. Verification passed with `pnpm --filter api exec vitest run src/__tests__/remediationPlanService.test.ts -t "prioritizes post-bootstrap structural residue cleanup ahead of repeated bootstrap"`, `pnpm --filter api exec tsc --noEmit`, and `pnpm --filter api verify:regressions` (`0` Phase 0 baseline regressions / `0` canary regressions). Fresh direct runtime reruns then started on the annual-report pair with current code. `2008 Annual Report.pdf` completed to `90/B` on `MitigationAttempts/2008 Annual Report/attempt-005-runtime-integration.pdf`, with zero Adobe non-figure `/Alt` risks and no remaining auto-runnable tools; a fresh analysis of that output shows the residual score is now concentrated in `heading_structure=40` and `pdf_ua_compliance=85` rather than generic logical-structure debt. `2007 Annual Report Final.pdf` hit a transient semantic-provider `502 Bad Gateway` on the first rerun before output write; a clean retry `MitigationAttempts/2007 Annual Report Final/attempt-006-runtime-integration-retry.pdf` was started immediately and progressed well past the earlier failure point, so that outage is being treated as an external provider interruption rather than a planner/runtime regression.
 
 - 2026-03-22T17:25:00Z Annual-report page-tabs-and-font-closure wave: widened `set_page_tabs` in `apps/api/src/services/pdfRemediationTools.ts` so tagged documents now default to setting `/Tabs /S` on every page, not just pages with visible links, and extended `apps/api/src/scripts/traceAnnualReportOwnership.ts` through the remaining deterministic post-table chain: `set_page_tabs`, optional `normalize_annotation_tab_order`, `set_link_annotation_contents`, `embed_missing_fonts_in_place`, `repair_font_unicode_maps`, optional `repair_type1_font_unicode_maps`, and final `repair_structure_conformance`. Added a focused regression in `src/__tests__/pdfRemediationTools.test.ts` proving a tagged multi-page document with only one linked page still receives `/Tabs /S` on every page. Verification passed with `pnpm --filter api exec vitest run src/__tests__/pdfRemediationTools.test.ts -t "sets /Tabs /S on annotated pages|sets /Tabs /S on every page in tagged documents even when only one page has links|sets link annotation /Contents without rewriting visible text"`, `pnpm --filter api exec tsc --noEmit`, `pnpm --filter api trace:annual-reports "2007 Annual Report Final.pdf" "2008 Annual Report.pdf"`, and `pnpm --filter api verify:regressions` (`0` Phase 0 baseline regressions, `0` canary regressions). The key artifact `MitigationAttempts/annual-report-traces/2026-03-22T17-24-25Z.annual-report-trace.json` shows the annual-report pair now progressing `39/F -> 51/F` after metadata, `54/F` after native table repair, `56/F` after annotation contents cleanup, then `63/D` after page-tabs and font closure. On both files `pdfua.page_tabs` is fully cleared, `pdfua.font_embedding` is cleared after embedding, `fontsMissingToUnicodeBlocking` drops from `8 -> 0` after `repair_font_unicode_maps`, and the only remaining blocking family is `pdfua.logical_structure`.
 

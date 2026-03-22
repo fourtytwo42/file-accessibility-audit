@@ -1829,6 +1829,19 @@ describe('remediationPlanService', () => {
             derivedFromFailureModeKeys: ['context.post_bootstrap_structural_residue'],
           },
           {
+            key: 'heading-normalization',
+            toolName: 'normalize_heading_hierarchy',
+            reason: 'Normalize heading hierarchy after artifact cleanup',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'pdf_ua_compliance'],
+            confidence: 0.89,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_bootstrap_structural_residue', 'category.heading_structure'],
+          },
+          {
             key: 'conformance',
             toolName: 'repair_structure_conformance',
             reason: 'Repair structure conformance',
@@ -1910,6 +1923,10 @@ describe('remediationPlanService', () => {
       'artifact_nonsemantic_page_elements',
       'repair_bootstrapped_chart_content_refs',
     ]))
+    expect(plan.actions[2]?.tool_name).toBe('normalize_heading_hierarchy')
+    const nativeMarkedIndex = plan.actions.findIndex(action => action.tool_name === 'repair_native_marked_content_refs')
+    const headingNormalizationIndex = plan.actions.findIndex(action => action.tool_name === 'normalize_heading_hierarchy')
+    expect(nativeMarkedIndex === -1 || nativeMarkedIndex > headingNormalizationIndex).toBe(true)
     expect(plan.actions.some(action => action.tool_name === 'bootstrap_struct_tree')).toBe(false)
   })
 

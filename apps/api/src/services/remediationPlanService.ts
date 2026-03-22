@@ -784,6 +784,14 @@ async function deterministicActions(input: {
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         postBootstrapStructuralResidue
+        && headingStructureUnresolved
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'normalize_heading_hierarchy',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        postBootstrapStructuralResidue
         && opportunity.scope === 'document'
         && ['repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName),
       maxSelections: 2,
