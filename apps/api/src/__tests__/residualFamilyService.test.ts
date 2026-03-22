@@ -106,6 +106,12 @@ describe('residualFamilyService', () => {
       'metadata_normalization',
       'font_embedding_and_unicode',
     ]))
+    expect(decisions.find(entry => entry.id === 'font_embedding_and_unicode')?.evidenceSignals).toEqual(
+      expect.arrayContaining([
+        'blocking_failure_mode:pdfua.font_unicode',
+        'opportunity:repair_font_unicode_maps:auto_runnable',
+      ]),
+    )
   })
 
   it('annotates tool opportunities with family ids, steps, and postconditions', () => {
@@ -125,6 +131,85 @@ describe('residualFamilyService', () => {
     expect(annotated?.familyId).toBe('font_embedding_and_unicode')
     expect(annotated?.familyStep).toBe(2)
     expect(annotated?.expectedPostconditions).toContain('font_blocking_keys_shrink')
+  })
+
+  it('does not activate unrelated residual families from low category scores alone', () => {
+    const decisions = buildResidualFamilyDecisions({
+      analysis: makeAnalysis({
+        categories: [
+          { id: 'title_language', score: 100 },
+          { id: 'text_extractability', score: 60 },
+          { id: 'table_markup', score: 100 },
+          { id: 'heading_structure', score: 70 },
+          { id: 'alt_text', score: 65 },
+          { id: 'link_quality', score: 100 },
+          { id: 'reading_order', score: 55 },
+          { id: 'pdf_ua_compliance', score: 50 },
+          { id: 'bookmarks', score: 100 },
+        ],
+        localStandards: {
+          findings: [],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          fontsMissingToUnicodeBlocking: 0,
+          unembeddedFontCount: 0,
+        },
+        figureCandidates: [],
+      }),
+      failureModes: [],
+      toolOpportunities: [],
+      actions: [],
+    })
+
+    expect(decisions.map(entry => entry.id)).toEqual(['unresolved_manual_family'])
+    expect(decisions[0]?.evidenceSignals).toEqual(['no_direct_family_evidence'])
+  })
+
+  it('does not activate unrelated families from shared category-target opportunities alone', () => {
+    const decisions = buildResidualFamilyDecisions({
+      analysis: makeAnalysis({
+        categories: [
+          { id: 'title_language', score: 100 },
+          { id: 'text_extractability', score: 100 },
+          { id: 'table_markup', score: 100 },
+          { id: 'heading_structure', score: 80 },
+          { id: 'alt_text', score: 100 },
+          { id: 'link_quality', score: 100 },
+          { id: 'reading_order', score: 70 },
+          { id: 'pdf_ua_compliance', score: 85 },
+          { id: 'bookmarks', score: 100 },
+        ],
+        localStandards: {
+          findings: [],
+        },
+      }),
+      context: makeContext(),
+      failureModes: [],
+      toolOpportunities: [
+        makeOpportunity({
+          key: 'artifact_nonsemantic_page_elements:document:document',
+          toolName: 'artifact_nonsemantic_page_elements',
+          categoryTargets: ['reading_order', 'pdf_ua_compliance'],
+          derivedFromFailureModeKeys: [],
+          status: 'auto_runnable',
+        }),
+      ],
+      actions: [],
+    })
+
+    expect(decisions.map(entry => entry.id)).toEqual(expect.arrayContaining([
+      'post_bootstrap_heading_convergence',
+      'logical_structure_marked_content',
+    ]))
+    expect(decisions.map(entry => entry.id)).not.toEqual(expect.arrayContaining([
+      'metadata_normalization',
+      'bookmark_language_outline_cleanup',
+      'font_embedding_and_unicode',
+      'table_structure_recovery',
+      'link_tabs_and_annotation_cleanup',
+    ]))
   })
 
   it('marks postconditions satisfied when blocking keys or counters shrink', () => {

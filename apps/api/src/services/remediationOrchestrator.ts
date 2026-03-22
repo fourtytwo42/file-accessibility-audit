@@ -5,6 +5,7 @@ import { spawn } from 'node:child_process'
 import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { analyzeWithQpdf } from './qpdfService.js'
 import { renderPdfPageToDataUrl } from './pdfRenderService.js'
+import type { PlannerResidualFamilySummary, ResidualFamilyId } from './documentModel.js'
 
 type PdfjsLib = typeof import('pdfjs-dist/legacy/build/pdf.mjs')
 
@@ -99,8 +100,18 @@ export interface QueueItemDetail {
     details: string
     generationSource?: 'semantic_ai' | 'heuristic_fallback' | 'manual_deferred'
   }>
+  manualReviewFlags?: Array<{
+    code: string
+    label: string
+    severity: 'warning' | 'critical'
+    details: string
+  }>
   standardsDetail?: {
     failureModes?: QueueFailureModeSummary[]
+    plannerEvidence?: {
+      topBlockingResidualFamilyIds?: ResidualFamilyId[]
+      topResidualFamilySummaries?: PlannerResidualFamilySummary[]
+    }
     veraPdf?: {
       current?: {
         status: string | null
@@ -155,6 +166,9 @@ export interface FailurePacket {
     failedChecks: number | null
   }
   topFailureModes: QueueFailureModeSummary[]
+  topBlockingResidualFamilyIds?: ResidualFamilyId[]
+  topResidualFamilies?: PlannerResidualFamilySummary[]
+  semanticSidecarState?: 'unknown' | 'not_flagged' | 'semantic_sidecar_unavailable'
   visualComparison: VisualComparisonResult | null
   bookmarkValidation: BookmarkValidationResult | null
   freshPostRestartRemediation: boolean
@@ -979,6 +993,7 @@ export async function runValidationPipeline(
 
   let failurePacket: FailurePacket | null = null
   if (!validation.passed) {
+    const manualReviewFlags = detail.manualReviewFlags || []
     failurePacket = {
       filename: entry.filename,
       queueItemId: entry.queueItemId,
@@ -990,6 +1005,13 @@ export async function runValidationPipeline(
         failedChecks: veraPdf.failedChecks,
       },
       topFailureModes: (detail.standardsDetail?.failureModes || []).slice(0, 8),
+      topBlockingResidualFamilyIds: detail.standardsDetail?.plannerEvidence?.topBlockingResidualFamilyIds || [],
+      topResidualFamilies: detail.standardsDetail?.plannerEvidence?.topResidualFamilySummaries || [],
+      semanticSidecarState: manualReviewFlags.some(flag => flag.code === 'semantic_sidecar_unavailable')
+        ? 'semantic_sidecar_unavailable'
+        : manualReviewFlags.length
+          ? 'not_flagged'
+          : 'unknown',
       visualComparison,
       bookmarkValidation,
       freshPostRestartRemediation: entry.resultProvenance === 'current_session',
@@ -1018,6 +1040,11 @@ export async function copyPassingOutputToMitigated(downloadedPdfPath: string, mi
 }
 
 export function buildFailurePacketSummary(packet: FailurePacket): string {
+  const topFamily = (packet.topResidualFamilies || []).find(family => family.blocking) || packet.topResidualFamilies?.[0]
+  if (topFamily) {
+    const reason = topFamily.blockingReason || topFamily.evidenceSignals[0] || 'family_evidence'
+    return `${packet.filename}: ${topFamily.id} (${reason}) | score ${packet.latestQueueSummary.score ?? '--'} | grade ${packet.latestQueueSummary.grade ?? '--'}`
+  }
   const topFailure = packet.topFailureModes[0]?.label || 'validation failure'
   return `${packet.filename}: ${topFailure} | score ${packet.latestQueueSummary.score ?? '--'} | grade ${packet.latestQueueSummary.grade ?? '--'}`
 }
@@ -1071,6 +1098,14 @@ function entrySummaryLine(entry: TrackedPdfState): string {
 }
 
 function buildFailurePacketSummaryFromEntry(entry: TrackedPdfState): string {
+  if (entry.latestFailurePacketPath) {
+    try {
+      const packet = JSON.parse(fs.readFileSync(entry.latestFailurePacketPath, 'utf8')) as FailurePacket
+      return buildFailurePacketSummary(packet)
+    } catch {
+      // Fall through to the compact score summary when the packet is unavailable.
+    }
+  }
   return `${entry.filename}: score ${entry.latestScore ?? '--'}, grade ${entry.latestGrade ?? '--'}, veraPDF ${entry.latestVeraPdfStatus ?? '--'}`
 }
 

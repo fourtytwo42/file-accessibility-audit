@@ -241,6 +241,7 @@ export type FailureReportingCategory = 'metadata' | 'language' | 'logical_struct
 export type FailureSourceDetail = 'verapdf_family' | 'local_standards_key' | 'acrobat_group' | 'category_score' | 'context_blocker' | 'composite_summary'
 export type ToolOpportunityScope = 'document' | 'page' | 'candidate' | 'candidate_group'
 export type ToolOpportunityStatus = 'auto_runnable' | 'blocked' | 'deferred' | 'already_attempted' | 'rejected' | 'no_effect'
+export type ResidualFamilyEvidenceStrength = number
 export type ToolOpportunityStatusReasonCode =
   | 'pipeline_excluded'
   | 'candidate_blocked'
@@ -258,6 +259,7 @@ export interface ResidualFamilyDecision {
   label: string
   priority: number
   blocking: boolean
+  blockingReason?: string
   semanticPolicy: ResidualSemanticPolicy
   failureModeKeys: string[]
   categoryIds: string[]
@@ -266,7 +268,19 @@ export interface ResidualFamilyDecision {
   expectedPostconditions: string[]
   activeOpportunityKeys: string[]
   currentStep: number | null
+  evidenceSignals: string[]
+  evidenceStrength: ResidualFamilyEvidenceStrength
   regressionCanaries: string[]
+}
+
+export interface PlannerResidualFamilySummary {
+  id: ResidualFamilyId
+  label: string
+  blocking: boolean
+  blockingReason?: string
+  currentStep: number | null
+  evidenceSignals: string[]
+  evidenceStrength: ResidualFamilyEvidenceStrength
 }
 
 export interface FailureMode {
@@ -425,6 +439,8 @@ export interface PlaybookRun {
 export interface PlannerEvidenceSummary {
   topFailureModeKeys: string[]
   topResidualFamilyIds?: ResidualFamilyId[]
+  topBlockingResidualFamilyIds?: ResidualFamilyId[]
+  topResidualFamilySummaries?: PlannerResidualFamilySummary[]
   topAutoRunnableOpportunityKeys: string[]
   skippedReasonCounts: Array<{ reason: string; count: number }>
   attemptedKeys: string[]

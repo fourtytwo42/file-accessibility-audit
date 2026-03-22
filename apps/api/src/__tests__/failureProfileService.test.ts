@@ -2171,6 +2171,17 @@ describe('failureProfileService', () => {
 
     expect(result.failureProfile.residualFamilies.map(entry => entry.id)).toContain('font_embedding_and_unicode')
     expect(result.plannerEvidence.topResidualFamilyIds).toContain('font_embedding_and_unicode')
+    expect(result.plannerEvidence.topBlockingResidualFamilyIds).toContain('font_embedding_and_unicode')
+    expect(result.plannerEvidence.topResidualFamilySummaries).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'font_embedding_and_unicode',
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.font_unicode',
+          evidenceSignals: expect.arrayContaining(['blocking_failure_mode:pdfua.font_unicode']),
+        }),
+      ]),
+    )
     const opportunity = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_font_unicode_maps')
     expect(opportunity?.familyId).toBe('font_embedding_and_unicode')
     expect(opportunity?.familyStep).toBe(2)

@@ -258,26 +258,90 @@ function shrinkSignal(label: string, previousValue: number | null | undefined, n
   return nextValue < previousValue ? [`${label}:${previousValue}->${nextValue}`] : []
 }
 
-function familyMatches(definition: ResidualFamilyDefinition, input: BuildResidualFamilyInput): boolean {
-  const failureModeKeys = new Set(input.failureModes.map(mode => mode.key))
-  if (definition.failureModeKeys.some(key => failureModeKeys.has(key))) return true
-  if (definition.categoryIds.some(categoryId => categoryScore(input.analysis, categoryId) !== null && (categoryScore(input.analysis, categoryId) ?? 100) < 100)) {
-    return true
-  }
-  return input.toolOpportunities.some(opportunity =>
-    definition.preferredTools.includes(opportunity.toolName)
-    || definition.deprioritizedTools.includes(opportunity.toolName),
+function actionMatchesDefinition(action: Pick<RemediationActionRecord, 'tool' | 'familyId'>, definition: ResidualFamilyDefinition): boolean {
+  return action.familyId === definition.id
+    || definition.preferredTools.includes(action.tool)
+}
+
+function opportunityMatchesDefinition(opportunity: ToolOpportunity, definition: ResidualFamilyDefinition): boolean {
+  return definition.preferredTools.includes(opportunity.toolName)
+    || opportunity.derivedFromFailureModeKeys.some(key => definition.failureModeKeys.includes(key))
+}
+
+function collectFamilyEvidence(definition: ResidualFamilyDefinition, input: BuildResidualFamilyInput): {
+  signals: string[]
+  strength: number
+  matchedFailureModes: FailureMode[]
+  matchedOpportunities: ToolOpportunity[]
+  matchedActions: RemediationActionRecord[]
+} {
+  const matchedFailureModes = input.failureModes.filter(mode => definition.failureModeKeys.includes(mode.key))
+  const matchedOpportunities = input.toolOpportunities.filter(opportunity =>
+    opportunityMatchesDefinition(opportunity, definition),
   )
+  const matchedActions = input.actions.filter(action => actionMatchesDefinition(action, definition))
+
+  const signals: string[] = []
+  let strength = 0
+
+  for (const mode of matchedFailureModes) {
+    const signal = mode.blocking ? `blocking_failure_mode:${mode.key}` : `failure_mode:${mode.key}`
+    signals.push(signal)
+    strength += mode.blocking ? 10 : 6
+  }
+
+  const opportunitySignals = new Set<string>()
+  for (const opportunity of matchedOpportunities) {
+    const signal = `opportunity:${opportunity.toolName}:${opportunity.status}`
+    if (!opportunitySignals.has(signal)) {
+      opportunitySignals.add(signal)
+      signals.push(signal)
+      strength += opportunity.status === 'auto_runnable' ? 4 : 2
+    }
+  }
+
+  const actionSignals = new Set<string>()
+  for (const action of matchedActions) {
+    const signal = `prior_action:${action.tool}:${action.outcome}`
+    if (!actionSignals.has(signal)) {
+      actionSignals.add(signal)
+      signals.push(signal)
+      strength += action.outcome === 'applied' ? 3 : 1
+    }
+  }
+
+  return {
+    signals: sortedUnique(signals),
+    strength,
+    matchedFailureModes,
+    matchedOpportunities,
+    matchedActions,
+  }
+}
+
+function familyMatches(definition: ResidualFamilyDefinition, input: BuildResidualFamilyInput): boolean {
+  return collectFamilyEvidence(definition, input).strength > 0
+}
+
+function familyBlockingReason(input: {
+  matchedFailureModes: FailureMode[]
+  matchedOpportunities: ToolOpportunity[]
+  matchedActions: RemediationActionRecord[]
+}): string | undefined {
+  const blockingFailure = input.matchedFailureModes.find(mode => mode.blocking)
+  if (blockingFailure) return `blocking_failure_mode:${blockingFailure.key}`
+  const autoRunnableOpportunity = input.matchedOpportunities.find(opportunity => opportunity.status === 'auto_runnable')
+  if (autoRunnableOpportunity) return `auto_runnable:${autoRunnableOpportunity.toolName}`
+  const appliedAction = input.matchedActions.find(action => action.outcome === 'applied')
+  if (appliedAction) return `prior_action:${appliedAction.tool}:applied`
+  return undefined
 }
 
 function opportunityFamilyScore(opportunity: ToolOpportunity, definition: ResidualFamilyDefinition): number {
   let score = 0
   if (definition.preferredTools.includes(opportunity.toolName)) score += 4
-  if (definition.deprioritizedTools.includes(opportunity.toolName)) score += 1
   const matchedFailureKeys = opportunity.derivedFromFailureModeKeys.filter(key => definition.failureModeKeys.includes(key))
   score += matchedFailureKeys.length * 5
-  const matchedCategories = opportunity.categoryTargets.filter(categoryId => definition.categoryIds.includes(categoryId))
-  score += matchedCategories.length * 3
   return score
 }
 
@@ -302,28 +366,42 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
     .filter(definition => definition.id !== 'unresolved_manual_family')
     .filter(definition => familyMatches(definition, input))
     .map(definition => {
-      const familyFailureModes = input.failureModes.filter(mode =>
-        definition.failureModeKeys.includes(mode.key)
-        || mode.categoryIds.some(categoryId => definition.categoryIds.includes(categoryId)),
-      )
-      const familyOpportunities = input.toolOpportunities.filter(opportunity => opportunityFamilyScore(opportunity, definition) > 0)
+      const evidence = collectFamilyEvidence(definition, input)
+      const familyFailureModes = evidence.matchedFailureModes
+      const familyOpportunities = evidence.matchedOpportunities
+      const blocking = familyFailureModes.some(mode => mode.blocking) || familyOpportunities.some(opportunity => opportunity.status === 'auto_runnable')
       return {
         id: definition.id,
         label: definition.label,
         priority: definition.priority,
-        blocking: familyFailureModes.some(mode => mode.blocking),
+        blocking,
+        blockingReason: blocking ? familyBlockingReason({
+          matchedFailureModes: evidence.matchedFailureModes,
+          matchedOpportunities: evidence.matchedOpportunities,
+          matchedActions: evidence.matchedActions,
+        }) : undefined,
         semanticPolicy: definition.semanticPolicy,
         failureModeKeys: sortedUnique(familyFailureModes.map(mode => mode.key)),
-        categoryIds: sortedUnique(familyFailureModes.flatMap(mode => mode.categoryIds.filter(categoryId => definition.categoryIds.includes(categoryId)))),
+        categoryIds: sortedUnique([
+          ...familyFailureModes.flatMap(mode => mode.categoryIds.filter(categoryId => definition.categoryIds.includes(categoryId))),
+          ...familyOpportunities.flatMap(opportunity => opportunity.categoryTargets.filter(categoryId => definition.categoryIds.includes(categoryId))),
+        ]),
         preferredTools: [...definition.preferredTools],
         deprioritizedTools: [...definition.deprioritizedTools],
         expectedPostconditions: [...definition.expectedPostconditions],
         activeOpportunityKeys: sortedUnique(familyOpportunities.map(opportunity => opportunity.key)),
         currentStep: currentFamilyStep(definition, familyOpportunities),
+        evidenceSignals: evidence.signals,
+        evidenceStrength: evidence.strength,
         regressionCanaries: [...definition.regressionCanaries],
       } satisfies ResidualFamilyDecision
     })
-    .sort((left, right) => left.priority - right.priority || left.id.localeCompare(right.id))
+    .sort((left, right) =>
+      Number(right.blocking) - Number(left.blocking)
+      || left.priority - right.priority
+      || right.evidenceStrength - left.evidenceStrength
+      || left.id.localeCompare(right.id),
+    )
 
   const hasBlockingManualIssue = input.failureModes.some(mode => mode.blocking && mode.classification === 'manual_only')
   if (!decisions.length || hasBlockingManualIssue) {
@@ -333,6 +411,7 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
       label: unresolved.label,
       priority: unresolved.priority,
       blocking: hasBlockingManualIssue || !decisions.some(decision => decision.blocking),
+      blockingReason: hasBlockingManualIssue ? 'manual_only_failure_mode' : 'no_direct_family_evidence',
       semanticPolicy: unresolved.semanticPolicy,
       failureModeKeys: sortedUnique(input.failureModes.filter(mode => mode.classification === 'manual_only').map(mode => mode.key)),
       categoryIds: sortedUnique(input.failureModes.filter(mode => mode.classification === 'manual_only').flatMap(mode => mode.categoryIds)),
@@ -341,6 +420,12 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
       expectedPostconditions: [...unresolved.expectedPostconditions],
       activeOpportunityKeys: [],
       currentStep: null,
+      evidenceSignals: hasBlockingManualIssue
+        ? sortedUnique(input.failureModes.filter(mode => mode.classification === 'manual_only').map(mode => `manual_only_failure_mode:${mode.key}`))
+        : ['no_direct_family_evidence'],
+      evidenceStrength: hasBlockingManualIssue
+        ? input.failureModes.filter(mode => mode.classification === 'manual_only').length * 5
+        : 1,
       regressionCanaries: [...unresolved.regressionCanaries],
     })
   }

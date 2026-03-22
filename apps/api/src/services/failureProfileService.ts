@@ -1796,6 +1796,21 @@ export function buildPlannerEvidenceSummary(input: {
   return {
     topFailureModeKeys: input.failureModes.slice(0, 5).map(mode => mode.key),
     topResidualFamilyIds: (input.residualFamilies || []).slice(0, 5).map(family => family.id),
+    topBlockingResidualFamilyIds: (input.residualFamilies || [])
+      .filter(family => family.blocking)
+      .slice(0, 5)
+      .map(family => family.id),
+    topResidualFamilySummaries: (input.residualFamilies || [])
+      .slice(0, 5)
+      .map(family => ({
+        id: family.id,
+        label: family.label,
+        blocking: family.blocking,
+        blockingReason: family.blockingReason,
+        currentStep: family.currentStep,
+        evidenceSignals: family.evidenceSignals.slice(0, 5),
+        evidenceStrength: family.evidenceStrength,
+      })),
     topBlockingFailureModeKeys: input.failureModes.filter(mode => mode.blocking).slice(0, 5).map(mode => mode.key),
     topManualOnlyFailureModeKeys: input.failureModes.filter(mode => mode.classification === 'manual_only').slice(0, 5).map(mode => mode.key),
     topAutoRunnableOpportunityKeys: input.toolOpportunities

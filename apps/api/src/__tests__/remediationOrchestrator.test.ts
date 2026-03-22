@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   QueueApiClient,
   buildAttemptArtifactPaths,
+  buildFailurePacketSummary,
   compareRenderedPageImages,
   createEmptyCampaignState,
   defaultOrchestratorConfig,
@@ -281,6 +282,34 @@ describe('remediationOrchestrator', () => {
     const config = defaultOrchestratorConfig('/repo')
     state.lastApiRestartAt = '2026-03-18T00:00:00.000Z'
     state.recentEvents.push('2026-03-18T00:01:00.000Z Needs fix: report.pdf')
+    const packetPath = path.join(os.tmpdir(), `orchestrator-failure-packet-${Date.now()}.json`)
+    fs.writeFileSync(packetPath, JSON.stringify({
+      filename: 'report.pdf',
+      queueItemId: 'qid-report',
+      latestAttemptPath: '/repo/MitigationAttempts/report/attempt-003.pdf',
+      latestQueueSummary: {
+        score: 92,
+        grade: 'B',
+        verapdfStatus: 'failed',
+        failedChecks: 5,
+      },
+      topFailureModes: [],
+      topBlockingResidualFamilyIds: ['post_bootstrap_heading_convergence'],
+      topResidualFamilies: [{
+        id: 'post_bootstrap_heading_convergence',
+        label: 'Post-bootstrap heading convergence',
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:context.post_bootstrap_structural_residue',
+        currentStep: 2,
+        evidenceSignals: ['blocking_failure_mode:context.post_bootstrap_structural_residue'],
+        evidenceStrength: 14,
+      }],
+      semanticSidecarState: 'unknown',
+      visualComparison: null,
+      bookmarkValidation: null,
+      freshPostRestartRemediation: true,
+      generatedAt: '2026-03-18T00:01:00.000Z',
+    }), 'utf8')
     state.files['report.pdf'] = {
       filename: 'report.pdf',
       sourcePath: '/repo/Downloads/report.pdf',
@@ -290,7 +319,7 @@ describe('remediationOrchestrator', () => {
       lifecycleState: 'needs_fix',
       validationStage: 'idle',
       latestOutputPath: '/repo/MitigationAttempts/report/attempt-003.pdf',
-      latestFailurePacketPath: '/repo/MitigationAttempts/report/attempt-003-failure-packet.json',
+      latestFailurePacketPath: packetPath,
       latestScore: 92,
       latestGrade: 'B',
       latestVeraPdfStatus: 'failed',
@@ -318,7 +347,42 @@ describe('remediationOrchestrator', () => {
     expect(rendered).toContain('# Remediation Progress')
     expect(rendered).toContain('Autofix the current blocker batch')
     expect(rendered).toContain('report.pdf')
+    expect(rendered).toContain('post_bootstrap_heading_convergence')
     expect(rendered).toContain('API restart status')
+    try { fs.unlinkSync(packetPath) } catch {}
+  })
+
+  it('summarizes failure packets with residual family evidence when available', () => {
+    const summary = buildFailurePacketSummary({
+      filename: 'report.pdf',
+      queueItemId: 'qid-report',
+      latestAttemptPath: '/repo/MitigationAttempts/report/attempt-003.pdf',
+      latestQueueSummary: {
+        score: 92,
+        grade: 'B',
+        verapdfStatus: 'failed',
+        failedChecks: 5,
+      },
+      topFailureModes: [],
+      topBlockingResidualFamilyIds: ['unresolved_manual_family'],
+      topResidualFamilies: [{
+        id: 'unresolved_manual_family',
+        label: 'Unresolved manual family',
+        blocking: true,
+        blockingReason: 'manual_only_failure_mode',
+        currentStep: null,
+        evidenceSignals: ['manual_only_failure_mode:manual.semantic_follow_up'],
+        evidenceStrength: 5,
+      }],
+      semanticSidecarState: 'semantic_sidecar_unavailable',
+      visualComparison: null,
+      bookmarkValidation: null,
+      freshPostRestartRemediation: true,
+      generatedAt: '2026-03-18T00:01:00.000Z',
+    })
+
+    expect(summary).toContain('unresolved_manual_family')
+    expect(summary).toContain('manual_only_failure_mode')
   })
 
   it('calls the API queue endpoints with session auth', async () => {

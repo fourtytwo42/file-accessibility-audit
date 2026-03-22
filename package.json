@@ -21,6 +21,7 @@
     "baseline:processed:pairs": "pnpm --filter api baseline:processed:pairs",
     "baseline:processed:capability": "pnpm --filter api baseline:processed:capability",
     "baseline:processed:font-capability": "pnpm --filter api baseline:processed:font-capability",
+    "diagnose:live-families": "pnpm --filter api diagnose:live-families",
     "trace:97anreport": "pnpm --filter api trace:97anreport",
     "trace:annual-reports": "pnpm --filter api trace:annual-reports",
     "trace:long-reports": "pnpm --filter api trace:long-reports",
