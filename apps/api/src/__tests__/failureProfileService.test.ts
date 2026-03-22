@@ -871,6 +871,195 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_structure_conformance')).toBe(true)
   })
 
+  it('caps long-report heading opportunities to a small high-confidence subset and suppresses weak prose candidates', () => {
+    const analysis = makeAnalysisResult({
+      pageCount: 28,
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'heading_structure'
+          ? { ...category, score: 40, grade: 'F', severity: 'Critical', findings: ['Heading hierarchy missing'] }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        headingCandidates: [
+          {
+            id: 'heading:strong:1',
+            pageNumber: 1,
+            text: 'Criminal Justice',
+            bbox: { x: 0.1, y: 0.08, width: 0.4, height: 0.05 },
+            fontSize: 24,
+            fontWeight: 'bold',
+            nearbyContext: [],
+            targetRef: 'obj:10 0 R',
+            existingTag: '/P',
+            repairMode: 'safe',
+          },
+          {
+            id: 'heading:strong:2',
+            pageNumber: 2,
+            text: 'Executive Summary',
+            bbox: { x: 0.1, y: 0.18, width: 0.4, height: 0.05 },
+            fontSize: 20,
+            fontWeight: 'bold',
+            nearbyContext: [],
+            targetRef: 'obj:11 0 R',
+            existingTag: '/P',
+            repairMode: 'safe',
+          },
+          {
+            id: 'heading:strong:3',
+            pageNumber: 4,
+            text: 'Appendix A',
+            bbox: { x: 0.1, y: 0.14, width: 0.3, height: 0.04 },
+            fontSize: 18,
+            fontWeight: 'bold',
+            nearbyContext: [],
+            targetRef: 'obj:12 0 R',
+            existingTag: '/P',
+            repairMode: 'safe',
+          },
+          {
+            id: 'heading:weak:1',
+            pageNumber: 5,
+            text: 'The weeks that followed included additional review from agency staff and stakeholders',
+            bbox: { x: 0.1, y: 0.25, width: 0.8, height: 0.04 },
+            fontSize: 16,
+            fontWeight: 'bold',
+            nearbyContext: ['The weeks that followed included additional review from agency staff and stakeholders.'],
+            targetRef: 'obj:13 0 R',
+            existingTag: '/P',
+            repairMode: 'safe',
+          },
+          {
+            id: 'heading:weak:2',
+            pageNumber: 6,
+            text: 'office of information for the agency and community partners',
+            bbox: { x: 0.1, y: 0.25, width: 0.8, height: 0.04 },
+            fontSize: 15,
+            fontWeight: 'bold',
+            nearbyContext: ['This section provides statistical context for the agency and community partners.'],
+            targetRef: 'obj:14 0 R',
+            existingTag: '/P',
+            repairMode: 'safe',
+          },
+        ],
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const headingOpportunities = result.failureProfile.toolOpportunities.filter(opportunity =>
+      opportunity.toolName === 'create_heading_from_candidate' && opportunity.status === 'auto_runnable')
+    expect(headingOpportunities.map(opportunity => opportunity.candidateIds[0])).toEqual([
+      'heading:strong:1',
+      'heading:strong:2',
+      'heading:strong:3',
+    ])
+  })
+
+  it('emits post-heading-creation native structure debt after accepted heading creation', () => {
+    const analysis = makeAnalysisResult({
+      pageCount: 24,
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'heading_structure' || category.id === 'pdf_ua_compliance'
+          ? { ...category, score: 55, grade: 'D', severity: 'Moderate', findings: ['Native structure debt remains'] }
+          : category),
+      localStandards: {
+        status: 'issues_detected',
+        findings: [{
+          key: 'pdfua.logical_structure',
+          label: 'Logical structure',
+          severity: 'error',
+          blocking: true,
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          confidence: 0.9,
+          evidence: ['Marked-content refs remain incomplete.'],
+          source: 'qpdf',
+          inferred: false,
+          count: 1,
+        }],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          headings: [{ level: 'H1', tag: '/H1' }],
+          hasStructTree: true,
+          structTreeDepth: 4,
+        },
+      }),
+      actions: [
+        makeAction({
+          tool: 'create_heading_from_candidate',
+          target: 'page 1',
+          candidateId: 'heading:1',
+          details: 'Created heading tag.',
+          outcome: 'applied',
+        }),
+      ],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.post_heading_creation_native_structure_debt')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'repair_native_marked_content_refs'
+      && opportunity.derivedFromFailureModeKeys.includes('context.post_heading_creation_native_structure_debt'))).toBe(true)
+  })
+
+  it('defers long-report bookmark replacement until metadata and heading convergence stabilize', () => {
+    const analysis = makeAnalysisResult({
+      pageCount: 26,
+      categories: [
+        ...makeAnalysisResult().categories.map(category =>
+          category.id === 'heading_structure' || category.id === 'title_language'
+            ? { ...category, score: 40, grade: 'F', severity: 'Critical', findings: ['Long report convergence pending'] }
+            : category),
+        { id: 'bookmarks', label: 'Bookmarks', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: ['Missing bookmarks'], explanation: '', helpLinks: [] },
+      ] as any,
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.metadata_identification',
+            label: 'Metadata identification',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Missing metadata identification.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: { ...makeContext().qpdf, hasStructTree: true, structTreeDepth: 4, lang: '' },
+        pdfjs: { ...makeContext().pdfjs, title: '', lang: '' },
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'replace_bookmarks_from_headings')?.status).toBe('deferred')
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'normalize_document_metadata')?.status).toBe('auto_runnable')
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'set_pdfua_identification')?.status).toBe('auto_runnable')
+  })
+
   it('does not emit heading or figure candidate opportunities once those categories are already complete', () => {
     const analysis = makeAnalysisResult({
       overallScore: 100,

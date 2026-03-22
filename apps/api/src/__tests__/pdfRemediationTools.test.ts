@@ -23,6 +23,7 @@ import {
   inspectPdfForRemediation,
   needsAltTextDeepInspection,
   normalizedExistingHeadingLevel,
+  selectHighConfidenceLongReportHeadingCandidates,
 } from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
 import type { RemediationActionRecord, RemediationToolName } from '../services/documentModel.js'
@@ -1394,6 +1395,61 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       expect.objectContaining({ text: 'Criminal Justice', pageNumber: 1 }),
       expect.objectContaining({ text: 'Contents', pageNumber: 1 }),
     ])
+  })
+
+  it('keeps only high-confidence heading candidates for long-report convergence', () => {
+    const selected = selectHighConfidenceLongReportHeadingCandidates([
+      {
+        id: 'heading:1',
+        pageNumber: 1,
+        text: 'CRIMINAL JUSTICE',
+        bbox: { x: 0.1, y: 0.08, width: 0.4, height: 0.05 },
+        fontSize: 24,
+        fontWeight: 'bold',
+        nearbyContext: [],
+        targetRef: 'obj:1 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      },
+      {
+        id: 'heading:2',
+        pageNumber: 2,
+        text: 'Executive Summary',
+        bbox: { x: 0.1, y: 0.14, width: 0.4, height: 0.05 },
+        fontSize: 20,
+        fontWeight: 'bold',
+        nearbyContext: [],
+        targetRef: 'obj:2 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      },
+      {
+        id: 'heading:3',
+        pageNumber: 3,
+        text: 'Appendix A',
+        bbox: { x: 0.1, y: 0.18, width: 0.3, height: 0.04 },
+        fontSize: 18,
+        fontWeight: 'bold',
+        nearbyContext: [],
+        targetRef: 'obj:3 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      },
+      {
+        id: 'heading:4',
+        pageNumber: 4,
+        text: 'The weeks that followed included additional review from agency staff and stakeholders',
+        bbox: { x: 0.1, y: 0.24, width: 0.8, height: 0.04 },
+        fontSize: 16,
+        fontWeight: 'bold',
+        nearbyContext: ['The weeks that followed included additional review from agency staff and stakeholders.'],
+        targetRef: 'obj:4 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      },
+    ])
+
+    expect(selected.map(candidate => candidate.id)).toEqual(['heading:1', 'heading:2', 'heading:3'])
   })
 
   it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {

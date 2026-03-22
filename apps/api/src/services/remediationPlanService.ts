@@ -17,6 +17,7 @@ import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { buildPipelineConfig, classifyPdfFull } from './pdfClassificationService.js'
 import { classifyPdf, getToolReliabilityMap } from './toolReliabilityService.js'
 import { deriveDeterministicCall, hasMeaningfulMetadataTitle, heuristicFigureAltText } from './remediationCallDerivationService.js'
+import { needsLanguageTagNormalization } from './languageTags.js'
 
 const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
 const OPENAI_COMPAT_API_KEY = process.env.OPENAI_COMPAT_API_KEY || process.env.OPENROUTER_API_KEY || 'hs_a9a29d90a35c4b1c8a709e17c8c76dcf'
@@ -24,6 +25,7 @@ const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENR
 const PLAN_REMEDIATION_TOOL = 'plan_pdf_remediation'
 const MAX_ACTIONS = 32
 const RESERVED_HEADING_ACTIONS = 8
+const LONG_REPORT_RESERVED_HEADING_ACTIONS = 3
 
 const STRUCTURE_BOOTSTRAP_STAGE = new Set<RemediationToolName>([
   'bootstrap_struct_tree',
@@ -457,6 +459,7 @@ function opportunitySelectionDecision(input: {
 
   const structuralClass = classification.structuralClass
   const allowsPostBootstrapNativeConvergence = opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_native_structure_debt')
+    || opportunity.derivedFromFailureModeKeys.includes('context.post_heading_creation_native_structure_debt')
   const nativeSafeContext = !analysis.isScanned
     && isNativeTaggedSafeContext(context)
     && (
@@ -594,8 +597,9 @@ function opportunitySelectionDecision(input: {
         reason: 'metadata_title_already_present',
       }
     case 'set_document_language':
+      const currentLanguage = context.qpdf.lang || context.pdfjs.lang || ''
       return {
-        selectable: !(context.qpdf.lang || context.pdfjs.lang),
+        selectable: !currentLanguage || needsLanguageTagNormalization(currentLanguage),
         reason: 'document_language_already_present',
       }
     case 'set_pdfua_identification':
@@ -706,10 +710,33 @@ async function deterministicActions(input: {
 
   const headingStructureUnresolved = issueCategoryIds(input.analysis).includes('heading_structure')
   const postBootstrapStructureDebt = failureModeByKey.has('context.post_bootstrap_native_structure_debt')
+  const postHeadingCreationStructureDebt = failureModeByKey.has('context.post_heading_creation_native_structure_debt')
+  const longReportConvergence = input.analysis.pageCount >= 20 && !input.analysis.isScanned
+  const longReportMetadataDebt = longReportConvergence && (
+    failureModeByKey.has('category.title_language')
+    || failureModeByKey.has('pdfua.metadata_identification')
+    || failureModeByKey.has('pdfua.document_language')
+    || failureModeByKey.has('pdfua.display_doc_title')
+  )
+  const headingSelectionLimit = longReportConvergence ? LONG_REPORT_RESERVED_HEADING_ACTIONS : RESERVED_HEADING_ACTIONS
   const selectionPasses: Array<{
     includeOpportunity: (opportunity: ToolOpportunity) => boolean
     maxSelections?: number
   }> = [
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        longReportMetadataDebt
+        && opportunity.scope === 'document'
+        && ['set_pdfua_identification', 'normalize_document_metadata', 'set_document_language', 'set_document_title'].includes(opportunity.toolName),
+      maxSelections: 4,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        postHeadingCreationStructureDebt
+        && opportunity.scope === 'document'
+        && ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName),
+      maxSelections: 3,
+    },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         postBootstrapStructureDebt
@@ -729,7 +756,7 @@ async function deterministicActions(input: {
         headingStructureUnresolved
         && opportunity.toolName === 'create_heading_from_candidate'
         && opportunity.scope === 'candidate',
-      maxSelections: RESERVED_HEADING_ACTIONS,
+      maxSelections: headingSelectionLimit,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) => !isCandidateFloodOpportunity(opportunity),

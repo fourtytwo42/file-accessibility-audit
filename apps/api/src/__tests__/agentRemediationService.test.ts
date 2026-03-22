@@ -105,6 +105,7 @@ vi.mock('../services/pdfAnalyzer.js', () => ({
 vi.mock('../services/pdfRemediationTools.js', () => ({
   inspectPdfForRemediation,
   executeRemediationTool,
+  selectHighConfidenceLongReportHeadingCandidates: (candidates: any[]) => candidates.slice(0, 3),
   buildRemediationContextFromSnapshot: ({ analysis, qpdf, pdfjs, pages, structure }: any) => ({
     analysis,
     qpdf,
@@ -4807,6 +4808,111 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       options?.analysisProfile === 'remediation_fast'
       && options?.preferDeepStructureInspect === true,
     )).toBe(true)
+  })
+
+  it('replans from heading creation into native structure convergence on long reports', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: 'Adobe Acrobat',
+      producer: 'Adobe PDF Library',
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 28,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'biennial-followup.pdf',
+      pageCount: 28,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 33,
+      grade: 'F',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({ status: 'unavailable', isCompliant: null, failedChecks: 0 }),
+      categories: [
+        { id: 'title_language', label: 'Title', weight: 0.1, score: 40, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+        { id: 'heading_structure', label: 'Headings', weight: 0.15, score: 20, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading', weight: 0.15, score: 50, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+        { id: 'pdf_ua_compliance', label: 'PDF/UA', weight: 0.2, score: 20, grade: 'F', severity: 'Critical', findings: [], explanation: '', helpLinks: [] },
+      ],
+      localStandards: { status: 'issues_detected', findings: [], knownGapKeys: [] },
+      warnings: [],
+    } as any
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: '', lang: '', hasText: true, textLength: 45000, links: [], imageCount: 2, metadata: pdfMetadata },
+      qpdf: { lang: '', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, hasMarkInfo: true, outlineCount: 0, outlineTitles: [], structTreeDepth: 4 },
+      pages: [],
+      headingCandidates: [
+        { id: 'heading:1', pageNumber: 1, text: 'Criminal Justice', existingTag: '/P', repairMode: 'safe' },
+        { id: 'heading:2', pageNumber: 2, text: 'Executive Summary', existingTag: '/P', repairMode: 'safe' },
+        { id: 'heading:3', pageNumber: 4, text: 'Appendix A', existingTag: '/P', repairMode: 'safe' },
+      ],
+      figureCandidates: [],
+      tableCandidates: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: { structuralNodes: [{ ref: '1 0 R' }], acrobatAltRiskNodes: [] },
+    } as any)
+
+    planRemediationActions
+      .mockResolvedValueOnce({
+        actions: [
+          { tool_name: 'set_pdfua_identification', arguments: { target: 'document' }, rationale: 'set pdfua', confidence: 0.95 },
+          { tool_name: 'normalize_document_metadata', arguments: { target: 'document', title: 'Biennial', language: 'en' }, rationale: 'normalize metadata', confidence: 0.95 },
+          { tool_name: 'create_heading_from_candidate', arguments: { candidateId: 'heading:1', level: 'H1' }, rationale: 'create h1', confidence: 0.9 },
+        ],
+      } as any)
+      .mockResolvedValueOnce({
+        actions: [
+          { tool_name: 'repair_native_marked_content_refs', arguments: { target: 'document' }, rationale: 'repair marked content', confidence: 0.9 },
+        ],
+      } as any)
+      .mockResolvedValueOnce({ actions: [] } as any)
+
+    executeRemediationTool
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('pdfua'),
+        action: { tool: 'set_pdfua_identification', target: 'document', details: 'pdfua', confidence: 0.95, autoApplied: true, changedVisibleContent: false, changedDocumentBytes: true, categoryTargets: ['title_language', 'pdf_ua_compliance'], outcome: 'applied' },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('metadata'),
+        action: { tool: 'normalize_document_metadata', target: 'document', details: 'metadata', confidence: 0.95, autoApplied: true, changedVisibleContent: false, changedDocumentBytes: true, categoryTargets: ['title_language'], outcome: 'applied' },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('heading'),
+        action: { tool: 'create_heading_from_candidate', target: 'page 1', candidateId: 'heading:1', details: 'heading created', confidence: 0.9, autoApplied: true, changedVisibleContent: false, changedDocumentBytes: true, categoryTargets: ['heading_structure'], outcome: 'applied' },
+        manualReviewFlags: [],
+      })
+      .mockResolvedValueOnce({
+        buffer: Buffer.from('marked-content'),
+        action: { tool: 'repair_native_marked_content_refs', target: 'document', details: 'marked content repaired', confidence: 0.9, autoApplied: true, changedVisibleContent: false, changedDocumentBytes: true, categoryTargets: ['heading_structure', 'pdf_ua_compliance'], outcome: 'applied' },
+        manualReviewFlags: [],
+      })
+
+    analyzePDF
+      .mockResolvedValueOnce(originalResult)
+      .mockResolvedValueOnce({ ...originalResult, overallScore: 48, grade: 'D' } as any)
+      .mockResolvedValueOnce({ ...originalResult, overallScore: 60, grade: 'C' } as any)
+      .mockResolvedValueOnce({ ...originalResult, overallScore: 70, grade: 'B' } as any)
+      .mockResolvedValueOnce({ ...originalResult, overallScore: 82, grade: 'B' } as any)
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'biennial-followup.pdf', originalResult)
+
+    expect(planRemediationActions).toHaveBeenCalledTimes(3)
+    expect(planRemediationActions.mock.calls[1]?.[0]?.actions.some((action: any) =>
+      action.tool === 'create_heading_from_candidate' && action.outcome === 'applied',
+    )).toBe(true)
+    expect(executeRemediationTool.mock.calls.some(call => call[0].call.tool_name === 'repair_native_marked_content_refs')).toBe(true)
   })
 
 

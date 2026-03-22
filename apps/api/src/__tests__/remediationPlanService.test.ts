@@ -1186,6 +1186,278 @@ describe('remediationPlanService', () => {
     expect(plan.actions[0]?.tool_name).toBe('normalize_heading_hierarchy')
   })
 
+  it('prioritizes long-report metadata normalization ahead of heading candidate floods', async () => {
+    const headingOpportunities = Array.from({ length: 6 }, (_, index) => ({
+      key: `heading-${index}`,
+      toolName: 'create_heading_from_candidate',
+      reason: `Create heading ${index}`,
+      scope: 'candidate',
+      candidateIds: [`heading:${index}`],
+      candidateGroupIds: [],
+      pageNumbers: [index + 1],
+      categoryTargets: ['heading_structure'],
+      confidence: 0.72,
+      status: 'auto_runnable',
+      derivedFromFailureModeKeys: ['category.heading_structure'],
+    }))
+
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'F',
+        analysisScore: 33,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'category.heading_structure',
+            label: 'Heading Structure',
+            source: 'category',
+            count: 1,
+            categoryIds: ['heading_structure'],
+            blocking: true,
+            unmatched: false,
+            classification: 'semantic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+          {
+            key: 'category.title_language',
+            label: 'Title and Language',
+            source: 'category',
+            count: 1,
+            categoryIds: ['title_language'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+          {
+            key: 'pdfua.metadata_identification',
+            label: 'Metadata identification',
+            source: 'local_standards',
+            count: 1,
+            categoryIds: ['title_language', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['set_pdfua_identification', 'normalize_document_metadata'],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'set_pdfua_identification:document',
+            toolName: 'set_pdfua_identification',
+            reason: 'Set identification',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['title_language', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.metadata_identification'],
+          },
+          {
+            key: 'normalize_document_metadata:document',
+            toolName: 'normalize_document_metadata',
+            reason: 'Normalize metadata',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['title_language'],
+            confidence: 0.88,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.title_language', 'pdfua.metadata_identification'],
+          },
+          ...headingOpportunities,
+        ],
+        summary: {
+          deterministicIssueCount: 2,
+          semanticIssueCount: 1,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 8,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: '1988-1989_Biennial_Report.pdf',
+      analysis: {
+        overallScore: 33,
+        grade: 'F',
+        isScanned: false,
+        pageCount: 28,
+        categories: [
+          { id: 'title_language', label: 'Title', score: 35, severity: 'Critical' },
+          { id: 'heading_structure', label: 'Headings', score: 40, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 35, severity: 'Critical' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: headingOpportunities.map((_, index) => ({
+          id: `heading:${index}`,
+          pageNumber: index + 1,
+          text: `Heading ${index}`,
+          nearbyContext: [],
+          targetRef: `obj:${100 + index} 0 R`,
+          existingTag: '/P',
+          repairMode: 'safe',
+        })),
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions[0]?.tool_name).toBe('set_pdfua_identification')
+    expect(plan.actions[1]?.tool_name).toBe('normalize_document_metadata')
+  })
+
+  it('prioritizes native structure convergence ahead of bookmark replacement after heading creation', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'D',
+        analysisScore: 55,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'context.post_heading_creation_native_structure_debt',
+            label: 'Post heading creation debt',
+            source: 'context',
+            count: 1,
+            categoryIds: ['heading_structure', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_native_marked_content_refs', 'repair_structure_conformance'],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'normalize_heading_hierarchy:document',
+            toolName: 'normalize_heading_hierarchy',
+            reason: 'Normalize heading hierarchy',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_heading_creation_native_structure_debt'],
+          },
+          {
+            key: 'repair_native_marked_content_refs:document',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair marked content refs',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'pdf_ua_compliance'],
+            confidence: 0.85,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_heading_creation_native_structure_debt'],
+          },
+          {
+            key: 'replace_bookmarks_from_headings:document',
+            toolName: 'replace_bookmarks_from_headings',
+            reason: 'Replace bookmarks',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['bookmarks'],
+            confidence: 0.6,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.bookmarks'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: '1993-1994_Biennial_Report.pdf',
+      analysis: {
+        overallScore: 55,
+        grade: 'D',
+        isScanned: false,
+        pageCount: 30,
+        categories: [
+          { id: 'heading_structure', label: 'Headings', score: 50, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 55, severity: 'Critical' },
+          { id: 'bookmarks', label: 'Bookmarks', score: 0, severity: 'Critical' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: 'Biennial', lang: 'en', hasText: true, textLength: 40000, imageCount: 2, links: [] },
+        qpdf: { lang: 'en', hasStructTree: true, hasMarkInfo: true, structTreeDepth: 4, headings: [{ level: 'H1', tag: '/H1' }], images: [], formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 2,
+      actions: [{ tool: 'create_heading_from_candidate', target: 'page 1', outcome: 'applied' }] as any,
+      rejectedActions: [],
+    })
+
+    expect(['normalize_heading_hierarchy', 'repair_native_marked_content_refs']).toContain(plan.actions[0]?.tool_name)
+    expect(plan.actions.some(action => action.tool_name === 'replace_bookmarks_from_headings')).toBe(false)
+  })
+
   it('prioritizes post-bootstrap native structure convergence ahead of bookmark cleanup', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {

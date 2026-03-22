@@ -480,6 +480,72 @@ function looksLikeProseHeadingText(text: string): boolean {
   return false
 }
 
+function headingWordCount(text: string): number {
+  return (normalizeHeadingText(text).match(/\b[\p{L}\p{N}&/-]+\b/gu) || []).length
+}
+
+function longReportHeadingCandidateScore(
+  candidate: HeadingCandidate,
+  duplicateCounts: Map<string, number>,
+): number {
+  const normalized = normalizeHeadingText(candidate.text)
+  const normalizedKey = normalized.toLowerCase()
+  const words = headingWordCount(normalized)
+  let score = 0
+  if (candidate.pageNumber === 1) score += 3
+  if (candidate.fontWeight === 'bold') score += 2
+  if (candidate.fontSize >= 18) score += 2
+  else if (candidate.fontSize >= 15) score += 1
+  if (words >= 1 && words <= 4) score += 2
+  else if (words <= 6) score += 1
+  if ((candidate.existingTag || '').startsWith('/H')) score += 2
+  if ((duplicateCounts.get(normalizedKey) || 0) > 1) score -= 3
+  if (normalized === normalized.toUpperCase() && words <= 4) score += 1
+  if (candidate.bbox.y < 0.25) score += 1
+  return score
+}
+
+function shouldRejectLongReportHeadingCandidate(
+  candidate: HeadingCandidate,
+  duplicateCounts: Map<string, number>,
+): boolean {
+  const normalized = normalizeHeadingText(candidate.text)
+  if (!normalized) return true
+  if (candidate.repairMode !== 'safe') return true
+  if (normalized.length < 4 || normalized.length > 90) return true
+  if (isRawUrl(normalized)) return true
+  if (/(\.{2,}|_{2,}|-{3,})/.test(normalized)) return true
+  if (/^\d+$/.test(normalized)) return true
+  if (/^[a-z]/.test(normalized)) return true
+  if (looksLikeProseHeadingText(normalized)) return true
+  if (headingWordCount(normalized) > 8) return true
+  if ((duplicateCounts.get(normalized.toLowerCase()) || 0) > 1 && candidate.pageNumber > 1) return true
+  if (candidate.nearbyContext.some(line => looksLikeProseHeadingText(line) && line.length > 40)) return true
+  return false
+}
+
+export function selectHighConfidenceLongReportHeadingCandidates(
+  candidates: HeadingCandidate[],
+  options?: { maxCandidates?: number },
+): HeadingCandidate[] {
+  const safeCandidates = candidates.filter(candidate => candidate.repairMode === 'safe')
+  const duplicateCounts = new Map<string, number>()
+  for (const candidate of safeCandidates) {
+    const key = normalizeHeadingText(candidate.text).toLowerCase()
+    duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1)
+  }
+  const filtered = safeCandidates.filter(candidate => !shouldRejectLongReportHeadingCandidate(candidate, duplicateCounts))
+  return [...filtered]
+    .sort((a, b) => {
+      const scoreDiff = longReportHeadingCandidateScore(b, duplicateCounts) - longReportHeadingCandidateScore(a, duplicateCounts)
+      if (scoreDiff !== 0) return scoreDiff
+      const pageDiff = a.pageNumber - b.pageNumber
+      if (pageDiff !== 0) return pageDiff
+      return normalizeHeadingText(a.text).localeCompare(normalizeHeadingText(b.text))
+    })
+    .slice(0, options?.maxCandidates ?? 3)
+}
+
 function normalizeBookmarkText(text: string): string {
   const stopWords = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'via'])
   const normalized = text

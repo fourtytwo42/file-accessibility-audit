@@ -14,6 +14,7 @@ import type {
   ToolOpportunityStatus,
   ToolOpportunityStatusReasonCode,
 } from './documentModel.js'
+import { selectHighConfidenceLongReportHeadingCandidates } from './pdfRemediationTools.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { ALT_REMOVAL_MODES } from './altTextScoring.js'
 import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
@@ -67,6 +68,12 @@ const FONT_FAILURE_MODE_KEYS = new Set([
 const FIGURE_ADVISORY_FAILURE_MODE_KEYS = new Set([
   'pdfua.figure_alt_quality',
 ])
+const LONG_REPORT_HEADING_LIMIT = 3
+
+function isLongReportConvergenceContext(input: BuildFailureProfileInput): boolean {
+  return input.analysis.pageCount >= 20
+    && !input.analysis.isScanned
+}
 
 const VERA_PDF_FAILURE_FAMILIES: VeraPdfFailureFamily[] = [
   {
@@ -598,6 +605,10 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     && action.outcome === 'applied'
     && /Augmented existing structure tree/i.test(action.details || ''),
   )
+  const acceptedHeadingCreation = input.actions.some(action =>
+    action.tool === 'create_heading_from_candidate'
+    && action.outcome === 'applied',
+  )
   const blockedHeadings = headingNeedsReview
     ? input.context.headingCandidates.filter(candidate => candidate.repairMode !== 'safe')
     : []
@@ -645,6 +656,36 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
           : headingNeedsReview
             ? 'Bootstrap added headings to an existing structure tree, but heading hierarchy still needs native cleanup.'
             : 'Bootstrap added headings to an existing structure tree, but logical-structure debt still blocks native convergence.',
+      ],
+    })
+  }
+
+  if (
+    acceptedHeadingCreation
+    && postBootstrapStructureRefsAvailable
+    && (headingNeedsReview || logicalStructureBlocking)
+  ) {
+    mergeMode(modes, {
+      key: 'context.post_heading_creation_native_structure_debt',
+      label: 'Post-heading native structure debt remains',
+      source: 'context',
+      derivedFrom: [
+        'action:create_heading_from_candidate',
+        ...(headingNeedsReview ? ['category:heading_structure'] : []),
+        ...(logicalStructureBlocking ? ['local_standard:pdfua.logical_structure'] : []),
+      ],
+      count: 1,
+      categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+      blocking: logicalStructureBlocking || headingNeedsReview,
+      unmatched: false,
+      classification: 'deterministic',
+      nativeToolFamilies: ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+      evidence: [
+        headingNeedsReview && logicalStructureBlocking
+          ? 'New headings were created, but native marked-content and logical-structure debt still prevent convergence.'
+          : headingNeedsReview
+            ? 'New headings were created, but the heading hierarchy still needs native structure cleanup.'
+            : 'New headings were created, but logical-structure debt still blocks native convergence.',
       ],
     })
   }
@@ -1027,6 +1068,14 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       .filter(category => typeof category.score === 'number' && category.score < 100)
       .map(category => category.id),
   )
+  const isLongReportConvergence = isLongReportConvergenceContext(input)
+  const prioritizedLongReportHeadingIds = isLongReportConvergence && issueIds.has('heading_structure')
+    ? new Set(
+        selectHighConfidenceLongReportHeadingCandidates(input.context.headingCandidates, {
+          maxCandidates: LONG_REPORT_HEADING_LIMIT,
+        }).map(candidate => candidate.id),
+      )
+    : null
 
   const derivedFailureKeys = (keys: string[]) => keys.filter(key => failureModeByKey.has(key))
 
@@ -1074,6 +1123,24 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
         derivedFromFailureModeKeys: derivedFailureKeys(['category.title_language']),
       })
     }
+  }
+
+  if (
+    failureModeByKey.has('pdfua.metadata_identification')
+    && !opportunities.has('set_pdfua_identification:document:document')
+  ) {
+    addOpportunity(opportunities, {
+      toolName: 'set_pdfua_identification',
+      reason: 'The document metadata is missing or incomplete for PDF/UA identification, so the identification dictionary should be normalized early.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['title_language', 'pdf_ua_compliance'],
+      confidence: 0.9,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['pdfua.metadata_identification', 'category.title_language']),
+    })
   }
 
   const hasNativeStructure = input.context.qpdf.hasStructTree
@@ -1306,12 +1373,23 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       categoryTargets: ['heading_structure'],
       confidence: 0.92,
       blockedReason: undefined,
-      derivedFromFailureModeKeys: derivedFailureKeys(['category.heading_structure', 'context.post_bootstrap_native_structure_debt']),
+      derivedFromFailureModeKeys: derivedFailureKeys([
+        'category.heading_structure',
+        'context.post_bootstrap_native_structure_debt',
+        'context.post_heading_creation_native_structure_debt',
+      ]),
     })
   }
 
   for (const candidate of input.context.headingCandidates) {
     if (!issueIds.has('heading_structure')) continue
+    if (
+      prioritizedLongReportHeadingIds
+      && candidate.repairMode === 'safe'
+      && !prioritizedLongReportHeadingIds.has(candidate.id)
+    ) {
+      continue
+    }
     addOpportunity(opportunities, {
       toolName: 'create_heading_from_candidate',
       reason: candidate.repairMode === 'safe'
@@ -1322,7 +1400,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       candidateGroupIds: [],
       pageNumbers: [candidate.pageNumber],
       categoryTargets: ['heading_structure'],
-      confidence: 0.7,
+      confidence: candidate.pageNumber === 1 ? 0.82 : candidate.fontWeight === 'bold' ? 0.76 : 0.7,
       blockedReason: candidate.repairMode === 'safe' ? undefined : (candidate.unsafeReason || 'Heading candidate requires semantic review.'),
       derivedFromFailureModeKeys: derivedFailureKeys(['category.heading_structure', 'context.heading_candidates_blocked']),
     })
@@ -1440,18 +1518,44 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   if (issueIds.has('bookmarks')) {
-    addOpportunity(opportunities, {
-      toolName: 'replace_bookmarks_from_headings',
-      reason: 'The document lacks bookmarks and can try generating them from headings.',
-      scope: 'document',
-      candidateIds: [],
-      candidateGroupIds: [],
-      pageNumbers: [],
-      categoryTargets: ['bookmarks'],
-      confidence: 0.55,
-      blockedReason: input.context.headingCandidates.length ? undefined : 'Bookmark generation needs heading candidates or manual review.',
-      derivedFromFailureModeKeys: derivedFailureKeys(['category.bookmarks']),
-    })
+    const metadataDebtActive = failureModeByKey.has('category.title_language')
+      || failureModeByKey.has('pdfua.metadata_identification')
+      || failureModeByKey.has('pdfua.document_language')
+      || failureModeByKey.has('pdfua.display_doc_title')
+    const prioritizedHeadingWorkPending = !!prioritizedLongReportHeadingIds?.size
+    const headingConvergenceStarted = input.actions.some(action =>
+      (action.tool === 'create_heading_from_candidate' || action.tool === 'normalize_heading_hierarchy')
+      && action.outcome === 'applied',
+    )
+    const bookmarkBlockedReason = !input.context.headingCandidates.length
+      ? 'Bookmark generation needs heading candidates or manual review.'
+      : isLongReportConvergence && metadataDebtActive
+        ? 'Bookmark generation should wait until metadata and language normalization complete on long reports.'
+        : isLongReportConvergence && prioritizedHeadingWorkPending && !headingConvergenceStarted
+          ? 'Bookmark generation should wait until the highest-confidence heading candidates have been repaired.'
+          : undefined
+    const existingBookmarkOpportunity = [...opportunities.values()].find(opportunity => opportunity.toolName === 'replace_bookmarks_from_headings')
+    if (existingBookmarkOpportunity) {
+      existingBookmarkOpportunity.blockedReason = bookmarkBlockedReason
+      existingBookmarkOpportunity.categoryTargets = ['bookmarks']
+      existingBookmarkOpportunity.derivedFromFailureModeKeys = derivedFailureKeys([
+        ...existingBookmarkOpportunity.derivedFromFailureModeKeys,
+        'category.bookmarks',
+      ])
+    } else {
+      addOpportunity(opportunities, {
+        toolName: 'replace_bookmarks_from_headings',
+        reason: 'The document lacks bookmarks and can try generating them from headings.',
+        scope: 'document',
+        candidateIds: [],
+        candidateGroupIds: [],
+        pageNumbers: [],
+        categoryTargets: ['bookmarks'],
+        confidence: 0.55,
+        blockedReason: bookmarkBlockedReason,
+        derivedFromFailureModeKeys: derivedFailureKeys(['category.bookmarks']),
+      })
+    }
   }
 
   applyFigureOpportunityPolicy(opportunities, input, failureModeByKey)
