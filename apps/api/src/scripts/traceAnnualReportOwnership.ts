@@ -255,6 +255,37 @@ async function traceFile(filename: string): Promise<AnnualReportTraceFile> {
   }
 
   {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const tabOrderOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'normalize_annotation_tab_order',
+    )
+    if (tabOrderOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'normalize_annotation_tab_order',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report annotation tab-order cleanup trace.',
+          confidence: 0.9,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('normalize_annotation_tab_order', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
     let batchChanged = false
     let batchOutcome = 'no_effect'
     let context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
@@ -296,6 +327,37 @@ async function traceFile(filename: string): Promise<AnnualReportTraceFile> {
 
   {
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const embedOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'embed_missing_fonts_in_place',
+    )
+    if (embedOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'embed_missing_fonts_in_place',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report font embedding trace.',
+          confidence: 0.9,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('embed_missing_fonts_in_place', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const fontOpportunity = buildFailureProfileArtifacts({
       analysis,
       context,
@@ -319,6 +381,37 @@ async function traceFile(filename: string): Promise<AnnualReportTraceFile> {
       actions.push(outcome.action)
       analysis = await analyzeForTrace(buffer, filename)
       steps.push(await summarizeStep('repair_font_unicode_maps', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const type1Opportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'repair_type1_font_unicode_maps',
+    )
+    if (type1Opportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'repair_type1_font_unicode_maps',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report Type1 font Unicode trace.',
+          confidence: 0.9,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('repair_type1_font_unicode_maps', filename, buffer, analysis, actions, {
         outcome: outcome.action.outcome,
         changedDocumentBytes: outcome.action.changedDocumentBytes,
       }))

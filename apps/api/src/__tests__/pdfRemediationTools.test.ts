@@ -72,6 +72,42 @@ async function makePdfWithLink(): Promise<Buffer> {
   return Buffer.from(await doc.save())
 }
 
+async function makeTaggedPdfWithOneLinkedPage(): Promise<Buffer> {
+  const doc = await PDFDocument.create()
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const pageOne = doc.addPage([612, 792])
+  const pageTwo = doc.addPage([612, 792])
+  pageOne.drawText('https://example.com/report', { x: 72, y: 720, size: 12, font })
+  pageTwo.drawText('Second tagged page', { x: 72, y: 720, size: 12, font })
+
+  const action = doc.context.obj({
+    S: PDFName.of('URI'),
+    URI: PDFString.of('https://example.com/report'),
+  })
+  const annotation = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [72, 716, 220, 732],
+    Border: [0, 0, 0],
+    A: action,
+  })
+  pageOne.node.set(PDFName.of('Annots'), doc.context.obj([annotation]))
+
+  const markInfo = doc.context.obj({
+    Marked: true,
+  })
+  const structTreeRoot = doc.context.obj({
+    Type: PDFName.of('StructTreeRoot'),
+    K: doc.context.obj([]),
+    ParentTree: doc.context.obj({ Nums: [] }),
+    RoleMap: doc.context.obj({}),
+  })
+  doc.catalog.set(PDFName.of('MarkInfo'), markInfo)
+  doc.catalog.set(PDFName.of('StructTreeRoot'), structTreeRoot)
+
+  return Buffer.from(await doc.save())
+}
+
 async function makePdfWithMixedAnnotations(): Promise<Buffer> {
   const doc = await PDFDocument.create()
   const page = doc.addPage([612, 792])
@@ -1718,6 +1754,31 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
     expect(result.action.outcome).toBe('applied')
     expect(String(tabs)).toBe('/S')
+  })
+
+  it('sets /Tabs /S on every page in tagged documents even when only one page has links', async () => {
+    const buffer = await makeTaggedPdfWithOneLinkedPage()
+    const analysis = await analyzePDF(buffer, 'tagged-linked.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'set_page_tabs',
+        arguments: { target: 'document' },
+        rationale: 'Normalize tab order on all tagged pages.',
+        confidence: 0.9,
+      },
+    })
+
+    const nextDoc = await PDFDocument.load(result.buffer, { ignoreEncryption: true })
+    const firstTabs = nextDoc.getPage(0).node.get(PDFName.of('Tabs'))
+    const secondTabs = nextDoc.getPage(1).node.get(PDFName.of('Tabs'))
+
+    expect(result.action.outcome).toBe('applied')
+    expect(String(firstTabs)).toBe('/S')
+    expect(String(secondTabs)).toBe('/S')
   })
 
   it('sets link annotation /Contents without rewriting visible text', async () => {

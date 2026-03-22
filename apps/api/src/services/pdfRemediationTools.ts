@@ -2131,7 +2131,13 @@ export async function executeRemediationTool(input: {
     case 'set_page_tabs': {
       const pageNumbers = Array.isArray(args.pageNumbers)
         ? args.pageNumbers.map((value: unknown) => Number(value)).filter(Number.isFinite)
-        : (typeof args.pageNumber === 'number' ? [args.pageNumber] : context.pages.filter(page => page.links.length > 0).map(page => page.pageNumber))
+        : (typeof args.pageNumber === 'number'
+            ? [args.pageNumber]
+            : (
+                context.qpdf.hasStructTree || context.qpdf.isTagged
+                  ? context.pages.map(page => page.pageNumber)
+                  : context.pages.filter(page => page.links.length > 0).map(page => page.pageNumber)
+              ))
       if (!pageNumbers.length) {
         return {
           buffer,
