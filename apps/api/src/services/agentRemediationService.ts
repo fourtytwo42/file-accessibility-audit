@@ -1015,6 +1015,70 @@ export function __test_needsFamilyCompleteConvergence(
 
 export const __test_selectResidualCleanupFamilyTarget = selectResidualCleanupFamilyTarget
 
+function buildResidualCleanupFamilyCalls(input: {
+  filename: string
+  analysis: AnalysisResult
+  context: PdfRemediationContext
+  failureProfile: Pick<FailureProfile, 'toolOpportunities'>
+  family: ResidualFamilyDecision
+  plannedCalls: RemediationToolCall[]
+}): RemediationToolCall[] {
+  const plannedFamilyCalls = input.plannedCalls.filter(call =>
+    call.familyId === input.family.id
+    && input.family.preferredTools.includes(call.tool_name),
+  )
+
+  const candidateCalls: RemediationToolCall[] = []
+  const familyOpportunities = input.failureProfile.toolOpportunities
+    .filter(opportunity =>
+      opportunity.familyId === input.family.id
+      && input.family.preferredTools.includes(opportunity.toolName)
+      && opportunity.status === 'auto_runnable',
+    )
+    .sort((left, right) =>
+      (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
+      || (TOOL_STAGE_ORDER.get(left.toolName) ?? 99) - (TOOL_STAGE_ORDER.get(right.toolName) ?? 99)
+      || (left.scope === 'document' ? 0 : 1) - (right.scope === 'document' ? 0 : 1)
+      || right.confidence - left.confidence
+      || left.key.localeCompare(right.key),
+    )
+
+  for (const opportunity of familyOpportunities) {
+    const call = deriveDeterministicCall({
+      filename: input.filename,
+      analysis: input.analysis,
+      context: input.context,
+      opportunity,
+      selectedActions: [...plannedFamilyCalls, ...candidateCalls],
+    })
+    if (!call) continue
+    candidateCalls.push(call)
+  }
+
+  return dedupeToolCalls([
+    ...plannedFamilyCalls,
+    ...candidateCalls,
+  ])
+}
+
+export const __test_buildResidualCleanupFamilyCalls = buildResidualCleanupFamilyCalls
+
+type ResidualCleanupExecutionMode = 'current' | 'baseline' | 'seeded' | 'refresh'
+
+function residualCleanupExecutionMode(input: {
+  hasBaselineFamily: boolean
+  hasSeededPlanningState: boolean
+  familyPasses: number
+}): ResidualCleanupExecutionMode {
+  if (!input.hasBaselineFamily) return 'current'
+  if (input.familyPasses === 0) {
+    return input.hasSeededPlanningState ? 'seeded' : 'baseline'
+  }
+  return 'refresh'
+}
+
+export const __test_residualCleanupExecutionMode = residualCleanupExecutionMode
+
 function rejectAction(input: {
   action: RemediationActionRecord
   reason: string
@@ -2599,8 +2663,14 @@ export async function remediatePdfWithAgent(
     let familyPasses = 0
 
     while (familyPasses < 3) {
-      const useSeededPlanningState = !!baselineConvergenceFamily && familyPasses === 0 && !!seededPlanningState
-      const shouldRefreshPlanningState = !!baselineConvergenceFamily && !useSeededPlanningState
+      const executionMode = residualCleanupExecutionMode({
+        hasBaselineFamily: !!baselineConvergenceFamily,
+        hasSeededPlanningState: !!seededPlanningState,
+        familyPasses,
+      })
+      const useSeededPlanningState = executionMode === 'seeded'
+      const useBaselineState = executionMode === 'baseline'
+      const shouldRefreshPlanningState = executionMode === 'refresh'
       const planningResult = useSeededPlanningState
         ? seededPlanningState!.result
         : shouldRefreshPlanningState
@@ -2629,7 +2699,9 @@ export async function remediatePdfWithAgent(
             iterations,
           })
         : currentResidualArtifacts
-      const convergenceFamily = useSeededPlanningState || shouldRefreshPlanningState
+      const convergenceFamily = useBaselineState
+        ? baselineConvergenceFamily
+        : useSeededPlanningState || shouldRefreshPlanningState
         ? selectResidualCleanupFamilyTarget(residualArtifacts.failureProfile)
         : baselineConvergenceFamily
       const residualCalls: RemediationToolCall[] = []
@@ -2644,41 +2716,14 @@ export async function remediatePdfWithAgent(
           rejectedActions,
           pipelineConfig: currentPipelineConfig,
         })
-        const plannedFamilyActions = familyPlan?.actions || []
-        let familyCalls = plannedFamilyActions.filter(call =>
-          call.familyId === convergenceFamily.id
-          && convergenceFamily.preferredTools.includes(call.tool_name),
-        )
-
-        if (!familyCalls.length) {
-          const candidateCalls: RemediationToolCall[] = []
-          const familyOpportunities = residualArtifacts.failureProfile.toolOpportunities
-            .filter(opportunity =>
-              opportunity.familyId === convergenceFamily.id
-              && convergenceFamily.preferredTools.includes(opportunity.toolName)
-              && opportunity.status === 'auto_runnable',
-            )
-            .sort((left, right) =>
-              (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
-              || (TOOL_STAGE_ORDER.get(left.toolName) ?? 99) - (TOOL_STAGE_ORDER.get(right.toolName) ?? 99)
-              || (left.scope === 'document' ? 0 : 1) - (right.scope === 'document' ? 0 : 1)
-              || right.confidence - left.confidence
-              || left.key.localeCompare(right.key),
-            )
-
-          for (const opportunity of familyOpportunities) {
-            const call = deriveDeterministicCall({
-              filename,
-              analysis: planningResult,
-              context: planningContext,
-              opportunity,
-              selectedActions: candidateCalls,
-            })
-            if (!call) continue
-            candidateCalls.push(call)
-          }
-          familyCalls = candidateCalls
-        }
+        const familyCalls = buildResidualCleanupFamilyCalls({
+          filename,
+          analysis: planningResult,
+          context: planningContext,
+          failureProfile: residualArtifacts.failureProfile,
+          family: convergenceFamily,
+          plannedCalls: familyPlan?.actions || [],
+        })
 
         residualCalls.push(...familyCalls)
       }

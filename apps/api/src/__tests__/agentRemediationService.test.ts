@@ -431,6 +431,131 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })?.id).toBe('native_figure_convergence')
   })
 
+  it('continues through the next preferred figure-family step when the first residual step is a no-op', async () => {
+    const {
+      __test_buildResidualCleanupFamilyCalls,
+      __test_residualCleanupExecutionMode,
+    } = await import('../services/agentRemediationService.js')
+
+    expect(__test_residualCleanupExecutionMode({
+      hasBaselineFamily: true,
+      hasSeededPlanningState: false,
+      familyPasses: 0,
+    })).toBe('baseline')
+    expect(__test_residualCleanupExecutionMode({
+      hasBaselineFamily: true,
+      hasSeededPlanningState: true,
+      familyPasses: 0,
+    })).toBe('seeded')
+    expect(__test_residualCleanupExecutionMode({
+      hasBaselineFamily: true,
+      hasSeededPlanningState: false,
+      familyPasses: 1,
+    })).toBe('refresh')
+
+    const familyCalls = __test_buildResidualCleanupFamilyCalls({
+      filename: '15adult-probation-1999-2008.runtime.pdf',
+      analysis: makeAnalysisResult({
+        overallScore: 71,
+        grade: 'C',
+        categories: [
+          { id: 'alt_text', score: 40, grade: 'F' },
+          { id: 'pdf_ua_compliance', score: 70, grade: 'C' },
+        ],
+      }),
+      context: {
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [{ ref: 'obj:38 0 R', tag: '/P', ownershipMode: 'graphics_only_nonfigure' }] },
+      } as any,
+      failureProfile: {
+        toolOpportunities: [
+          {
+            key: 'repair_native_figure_semantics:document:document',
+            toolName: 'repair_native_figure_semantics',
+            reason: 'Retag safe figure ownership first.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['alt_text'],
+            confidence: 0.94,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.alt_text'],
+            familyId: 'native_figure_convergence',
+            familyStep: 1,
+            expectedPostconditions: ['figure_blocking_keys_shrink'],
+          },
+          {
+            key: 'repair_other_elements_alt_text:document:document',
+            toolName: 'repair_other_elements_alt_text',
+            reason: 'Clear residual non-figure graphics ownership after native figure repair is exhausted.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['alt_text'],
+            confidence: 0.93,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.alt_text'],
+            familyId: 'native_figure_convergence',
+            familyStep: 2,
+            expectedPostconditions: ['figure_blocking_keys_shrink'],
+          },
+        ],
+      },
+      family: {
+        id: 'native_figure_convergence',
+        label: 'Native figure convergence',
+        priority: 60,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:category.alt_text',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'optional_after_deterministic',
+        failureModeKeys: ['category.alt_text', 'pdfua.untagged_rendered_images'],
+        categoryIds: ['alt_text', 'pdf_ua_compliance'],
+        preferredTools: ['repair_native_figure_semantics', 'repair_other_elements_alt_text'],
+        deprioritizedTools: ['artifact_nonsemantic_page_elements'],
+        expectedPostconditions: ['figure_blocking_keys_shrink'],
+        activeOpportunityKeys: [
+          'repair_native_figure_semantics:document:document',
+          'repair_other_elements_alt_text:document:document',
+        ],
+        preferredAutoRunnableOpportunityKeys: [
+          'repair_native_figure_semantics:document:document',
+          'repair_other_elements_alt_text:document:document',
+        ],
+        currentStep: 1,
+        evidenceSignals: ['blocking_failure_mode:category.alt_text'],
+        evidenceStrength: 21,
+        regressionCanaries: ['long_report_figure_cleanup'],
+      },
+      plannedCalls: [
+        {
+          tool_name: 'repair_native_figure_semantics',
+          arguments: { target: 'document' },
+          rationale: 'Try native figure repair first.',
+          confidence: 0.94,
+          familyId: 'native_figure_convergence',
+          familyStep: 1,
+          expectedPostconditions: ['figure_blocking_keys_shrink'],
+        },
+      ],
+    })
+
+    expect(familyCalls.map(call => call.tool_name)).toEqual([
+      'repair_native_figure_semantics',
+      'repair_other_elements_alt_text',
+    ])
+  })
+
   it('keeps metadata-only updates on cached inspection context and uses fast intermediate analysis', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

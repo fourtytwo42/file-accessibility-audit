@@ -29,6 +29,9 @@ type FullAuditTailTraceStepRecord = {
   tool: RemediationToolName
   outcome: RemediationActionRecord['outcome']
   details: string
+  selectedFamilyId: ResidualFamilyDecision['id'] | null
+  selectedFamilyCurrentStep: number | null
+  selectedFamilyActiveOpportunityKeys: string[]
   blockingFindingKeys: string[]
   topBlockingResidualFamilyIds: string[]
   postconditionStatus?: RemediationActionRecord['postconditionStatus']
@@ -167,10 +170,14 @@ function familyForTool(state: FullAuditTailTraceState, tool: RemediationToolName
 }
 
 function summarizeAction(action: RemediationActionRecord, state: FullAuditTailTraceState): FullAuditTailTraceStepRecord {
+  const selectedFamily = familyForTool(state, action.tool)
   return {
     tool: action.tool,
     outcome: action.outcome,
     details: action.details,
+    selectedFamilyId: selectedFamily?.id || null,
+    selectedFamilyCurrentStep: selectedFamily?.currentStep ?? null,
+    selectedFamilyActiveOpportunityKeys: [...(selectedFamily?.activeOpportunityKeys || [])],
     blockingFindingKeys: state.blockingFindingKeys,
     topBlockingResidualFamilyIds: state.topBlockingResidualFamilyIds,
     postconditionStatus: action.postconditionStatus,
@@ -225,6 +232,13 @@ async function tracePdf(pdfPath: string): Promise<FullAuditTailTraceReport> {
     }),
     steps: FULL_AUDIT_TAIL_TOOLS.map(tool => ({
       key: tool,
+      shouldRun: state => {
+        const family = familyForTool(state, tool)
+        if (!family || !family.blocking) return false
+        const matchesTool = (key: string) => key.startsWith(`${tool}:`)
+        return family.activeOpportunityKeys.some(matchesTool)
+          || family.preferredAutoRunnableOpportunityKeys.some(matchesTool)
+      },
       execute: async ({ buffer, state }) => {
         const analysis = await analyzePDF(buffer, filename, {
           analysisProfile: 'full_final',
