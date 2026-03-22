@@ -1027,6 +1027,8 @@ const STRUCTURAL_RESIDUAL_CLEANUP_TOOL_ORDER: RemediationToolName[] = [
   'artifact_nonsemantic_page_elements',
   'repair_native_marked_content_refs',
   'repair_bootstrapped_chart_content_refs',
+  'normalize_heading_hierarchy',
+  'create_heading_from_candidate',
   'repair_structure_conformance',
 ]
 
@@ -1122,7 +1124,12 @@ function buildResidualCleanupFamilyCalls(input: {
   return dedupeToolCalls([
     ...plannedFamilyCalls,
     ...candidateCalls,
-  ])
+  ]).sort((left, right) =>
+    (toolOrderIndex.get(left.tool_name) ?? Number.MAX_SAFE_INTEGER) - (toolOrderIndex.get(right.tool_name) ?? Number.MAX_SAFE_INTEGER)
+    || (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
+    || (TOOL_STAGE_ORDER.get(left.tool_name) ?? 99) - (TOOL_STAGE_ORDER.get(right.tool_name) ?? 99)
+    || right.confidence - left.confidence,
+  )
 }
 
 export const __test_buildResidualCleanupFamilyCalls = buildResidualCleanupFamilyCalls
