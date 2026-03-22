@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  classifyProcessedStaticMisses,
   evaluateProcessedFontCapabilityArtifact,
   type ProcessedFontCapabilityFileReport,
+  type ProcessedStaticAfterAnalysis,
 } from '../scripts/verifyProcessedFontCapability.js'
 
 function makeFile(overrides?: Partial<ProcessedFontCapabilityFileReport>): ProcessedFontCapabilityFileReport {
@@ -42,12 +44,23 @@ function makeFile(overrides?: Partial<ProcessedFontCapabilityFileReport>): Proce
   }
 }
 
+function makeStaticAfter(overrides?: Partial<ProcessedStaticAfterAnalysis>): ProcessedStaticAfterAnalysis {
+  return {
+    filename: '11drug_seizures_1997-2007.pdf',
+    overallScore: 75,
+    grade: 'C',
+    plannerAutoRunnableKeys: ['repair_font_unicode_maps:document:document'],
+    ...overrides,
+  }
+}
+
 describe('evaluateProcessedFontCapabilityArtifact', () => {
   it('marks imperfect baseline files as directly repairable when post-repair state is clean', () => {
     const result = evaluateProcessedFontCapabilityArtifact([makeFile()])
     expect(result.summary.fileCount).toBe(1)
     expect(result.summary.baselineImperfectCount).toBe(1)
     expect(result.summary.directRepairableCount).toBe(1)
+    expect(result.summary.unresolvedAfterDirectRepairCount).toBe(0)
     expect(result.summary.regressionCount).toBe(0)
   })
 
@@ -74,5 +87,40 @@ describe('evaluateProcessedFontCapabilityArtifact', () => {
       }),
     ])
     expect(result.regressions.map(entry => entry.key)).toContain('post_repair_font_auto_runnable:11drug_seizures_1997-2007.pdf')
+  })
+
+  it('classifies font-only static misses separately from non-font misses', () => {
+    const result = classifyProcessedStaticMisses([
+      makeStaticAfter(),
+      makeStaticAfter({
+        filename: '97anreport.pdf',
+        overallScore: 81,
+        grade: 'B',
+        plannerAutoRunnableKeys: ['normalize_document_metadata:document:document'],
+      }),
+      makeStaticAfter({
+        filename: '98anreport.pdf',
+        overallScore: 100,
+        grade: 'A',
+        plannerAutoRunnableKeys: [],
+      }),
+    ])
+
+    expect(result.fontOnlyStaticMisses).toEqual(['11drug_seizures_1997-2007.pdf'])
+    expect(result.nonFontStaticMisses).toEqual(['97anreport.pdf'])
+  })
+
+  it('surfaces next true blockers after excluding directly repairable font files', () => {
+    const result = evaluateProcessedFontCapabilityArtifact(
+      [makeFile()],
+      {
+        fontOnlyStaticMisses: ['11drug_seizures_1997-2007.pdf'],
+        nonFontStaticMisses: ['97anreport.pdf'],
+      },
+    )
+
+    expect(result.buckets.baselineImperfectButDirectlyRepairable).toEqual(['11drug_seizures_1997-2007.pdf'])
+    expect(result.buckets.nonFontStaticMisses).toEqual(['97anreport.pdf'])
+    expect(result.nextTrueBlockers).toEqual(['97anreport.pdf'])
   })
 })
