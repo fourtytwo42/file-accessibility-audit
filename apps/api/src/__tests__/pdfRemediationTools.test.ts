@@ -4663,6 +4663,32 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(plan.actions.some(action => action.tool_name === 'repair_cid_symbol_font_maps')).toBe(true)
   }, 120_000)
 
+  it('preserves qpdf structure detection after bootstrapping a long processed report', async () => {
+    const buffer = await loadProcessedAfterFixture('1988-1989_Biennial_Report.pdf')
+    const analysis = await analyzePDF(buffer, '1988-1989_Biennial_Report.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+    })
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'bootstrap_struct_tree',
+        arguments: { target: 'document' },
+        rationale: 'Bootstrap long-report structure for qpdf regression coverage.',
+        confidence: 0.95,
+      },
+    })
+
+    const qpdf = await analyzeWithQpdf(result.buffer)
+    expect(result.action.outcome).toBe('applied')
+    expect(qpdf.error).toBeNull()
+    expect(qpdf.hasStructTree).toBe(true)
+    expect(qpdf.hasMarkInfo).toBe(true)
+  }, 180_000)
+
   it('plans legacy font substitution after embedding and Type1 Unicode recovery on annual-report PDFs', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')

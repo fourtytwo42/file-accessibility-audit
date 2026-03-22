@@ -175,13 +175,28 @@ async function runQpdfJson(tmpPath: string, maxBuffer: number, signal?: AbortSig
     })
   } catch (err: any) {
     if (isQpdfBufferOverflow(err) && maxBuffer < QPDF_RETRY_MAX_BUFFER) {
-      return execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=inline', tmpPath], {
-        timeout: ANALYSIS.QPDF_TIMEOUT_MS,
-        maxBuffer: QPDF_RETRY_MAX_BUFFER,
-        encoding: 'utf-8',
-        signal,
-        windowsHide: true,
-      })
+      try {
+        return await execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=inline', tmpPath], {
+          timeout: ANALYSIS.QPDF_TIMEOUT_MS,
+          maxBuffer: QPDF_RETRY_MAX_BUFFER,
+          encoding: 'utf-8',
+          signal,
+          windowsHide: true,
+        })
+      } catch (retryErr: any) {
+        if (!isQpdfBufferOverflow(retryErr)) throw retryErr
+        // For very large post-remediation PDFs, inline stream bodies can make qpdf JSON
+        // balloon into hundreds of MB. We only need stream dictionaries for structure,
+        // font, image, and metadata inspection, so fall back to omitting stream bodies
+        // rather than treating the whole qpdf pass as failed.
+        return execFileAsync(QPDF_BIN, ['--json', '--json-stream-data=none', tmpPath], {
+          timeout: ANALYSIS.QPDF_TIMEOUT_MS,
+          maxBuffer,
+          encoding: 'utf-8',
+          signal,
+          windowsHide: true,
+        })
+      }
     }
     throw err
   }

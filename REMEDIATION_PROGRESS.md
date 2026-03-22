@@ -12,13 +12,13 @@
 ## Current Session Snapshot
 
 
-- Active PDF: `3rdPass/Fail/FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Latest attempt path: `MitigationAttempts/FINAL GUN HOMICIDE PDF-230610T15405729/attempt-001.pdf`
-- Latest result summary: after the qpdf structure-element parser fix, the saved `attempt-001` artifact now re-analyzes at `100/A` under the app with only advisory `pdfua.cidset_consistency` left in local standards. The same parser cleanup reduced `Evaluation of the Lake County Adult Probation.pdf` from four apparent non-standard tags down to the one real `/Lbody` issue, lifting that file to an honest `88/B` instead of the earlier false-clean `100/A`.
-- Latest validation source: fresh direct `analyzePDF(... analysisProfile:'full_final', skipVeraPdf:false)` comparison on the original and remediated gun-homicide artifact, plus direct `analyzeWithQpdf(...)` checks for unmapped role tags on both gun-homicide and Lake County
-- Next action: commit/push the qpdf structure-element parser fix, place the passing gun-homicide artifact into `3rdPass/Pass/`, and continue alphabetically through the remaining `3rdPass/Fail/` files.
-- Next hypothesis: the biggest remaining shared false-failure family was parser noise from non-structure dictionaries that also use `/S`; with that removed, the next files should either pass outright after existing remediation or expose much narrower real repair gaps.
-- API restart status: not required for direct script-based validation of the current parser fix
+- Active PDF: `Processed/After/1988-1989_Biennial_Report.pdf`
+- Latest attempt path: direct bootstrap trace probe on `Processed/After/1988-1989_Biennial_Report.pdf`
+- Latest result summary: traced the long-report post-bootstrap family to a real shared analyzer bug. `bootstrap_struct_tree` was writing a real `/StructTreeRoot` and `/MarkInfo`, but `analyzeWithQpdf()` was failing on the resulting large post-bootstrap file because `qpdf --json --json-stream-data=inline` overflowed both configured `maxBuffer` limits. That caused qpdf analysis to fall back to `error: \"QPDF parsing failed\"`, `hasStructTree:false`, and `hasMarkInfo:false`, which made the long-report family look like bootstrap had no structural effect. Fixed `qpdfService` so inline-stream overflow now falls back to `--json-stream-data=none`, preserving structure/font/metadata inspection on large remediated files. Direct post-fix probe on the bootstrapped biennial file now shows `qpdf.error:null`, `hasStructTree:true`, `hasMarkInfo:true`, `structTreeDepth:2`, and `12` detected headings.
+- Latest validation source: direct `bootstrap_struct_tree` execution on `Processed/After/1988-1989_Biennial_Report.pdf`, raw `pikepdf` catalog inspection of the saved bootstrapped output, targeted qpdf regression test, and direct post-fix `analyzeWithQpdf(...)` probe on the bootstrapped buffer
+- Next action: commit/push the qpdf large-stream fallback fix, then continue the biennial step-by-step cleanup trace now that post-bootstrap structure is visible to scoring.
+- Next hypothesis: the long-report family was being under-credited primarily because qpdf analysis dropped structure on large bootstrapped outputs; with that fixed, the next real blocker should narrow to one specific post-bootstrap cleanup tool if scores still stay flat.
+- API restart status: not required for direct script-based validation of the qpdf fallback fix; restart still required before trusting any fresh API queue reruns
 - Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
@@ -30,13 +30,13 @@
 ## Current Focus
 
 
-- Active PDF: `3rdPass/Fail/FINAL GUN HOMICIDE PDF-230610T15405729.pdf`
-- Current phase: `3rdPass/Fail` one-by-one remediation and promotion into `3rdPass/Pass/`
-- Immediate next step: commit/push the parser fix that stops action/transparency dictionaries from masquerading as structure tags, then place the now-passing gun-homicide artifact into `Pass` and continue to the next failing file.
-- API restart/rerun confirmed for active file: yes for direct source-path validation; the saved attempt was re-analyzed against the latest code.
+- Active PDF: `Processed/After/1988-1989_Biennial_Report.pdf`
+- Current phase: long-report post-bootstrap convergence tracing
+- Immediate next step: commit/push the qpdf fallback fix for large bootstrapped files, then rerun the reduced post-bootstrap cleanup trace to identify the next concrete cleanup tool if score movement is still partial.
+- API restart/rerun confirmed for active file: yes for direct source-path validation of the qpdf fix; no fresh queue/API rerun has been trusted yet for the biennial family.
 - Rebuild required for active file: no
-- Active remediation loop count: `FINAL GUN HOMICIDE PDF-230610T15405729.pdf (3rdPass)=1`
-- Next hypothesis: with parser noise removed, remaining `3rdPass/Fail` files will fall into two clearer buckets: genuine remediation misses we can keep improving, and artifacts that already pass once the scoring stack stops inventing non-existent logical-structure debt.
+- Active remediation loop count: `1988-1989_Biennial_Report.pdf (processed long-report trace)=1`
+- Next hypothesis: with qpdf no longer dropping structure on large bootstrapped outputs, the biennial family should either finally show real logical-structure credit after bootstrap or reveal one specific ineffective cleanup tool immediately after bootstrap.
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
