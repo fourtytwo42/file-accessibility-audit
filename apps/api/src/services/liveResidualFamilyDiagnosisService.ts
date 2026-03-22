@@ -14,7 +14,9 @@ export interface LiveResidualFamilySummary {
   label: string
   blocking: boolean
   blockingReason?: string
+  convergenceStatus: ResidualFamilyDecision['convergenceStatus']
   currentStep: number | null
+  preferredAutoRunnableOpportunityKeys: string[]
   evidenceSignals: string[]
   evidenceStrength: number
   activeOpportunityKeys: string[]
@@ -73,7 +75,9 @@ function summarizeFamily(family: ResidualFamilyDecision): LiveResidualFamilySumm
     label: family.label,
     blocking: family.blocking,
     blockingReason: family.blockingReason,
+    convergenceStatus: family.convergenceStatus || (family.blocking ? 'preferred_tools_exhausted' : 'postconditions_satisfied'),
     currentStep: family.currentStep,
+    preferredAutoRunnableOpportunityKeys: (family.preferredAutoRunnableOpportunityKeys || []).slice(0, 10),
     evidenceSignals: family.evidenceSignals.slice(0, 5),
     evidenceStrength: family.evidenceStrength,
     activeOpportunityKeys: family.activeOpportunityKeys.slice(0, 10),

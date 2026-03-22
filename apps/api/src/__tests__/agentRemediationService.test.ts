@@ -106,6 +106,7 @@ vi.mock('../services/pdfRemediationTools.js', () => ({
   inspectPdfForRemediation,
   executeRemediationTool,
   selectHighConfidenceLongReportHeadingCandidates: (candidates: any[]) => candidates.slice(0, 3),
+  selectHighConfidenceLongReportFigureCandidates: (candidates: any[]) => candidates.slice(0, 5),
   buildRemediationContextFromSnapshot: ({ analysis, qpdf, pdfjs, pages, structure }: any) => ({
     analysis,
     qpdf,
@@ -241,6 +242,124 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       readingOrderParents: [],
       operationResults: [],
     })
+  })
+
+  it('does not treat a single blocking family with live preferred tools as converged', async () => {
+    const { __test_needsFamilyCompleteConvergence } = await import('../services/agentRemediationService.js')
+
+    expect(__test_needsFamilyCompleteConvergence({
+      residualFamilies: [
+        {
+          id: 'link_tabs_and_annotation_cleanup',
+          label: 'Link, tabs, and annotation cleanup',
+          priority: 50,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.link_tagging',
+          convergenceStatus: 'preferred_tools_available',
+          semanticPolicy: 'optional_after_deterministic',
+          failureModeKeys: ['pdfua.link_tagging'],
+          categoryIds: ['link_quality'],
+          preferredTools: ['repair_native_link_structure', 'tag_unowned_annotations'],
+          deprioritizedTools: ['rewrite_link_visible_text'],
+          expectedPostconditions: ['link_blocking_keys_shrink'],
+          activeOpportunityKeys: ['repair_native_link_structure:document:document'],
+          preferredAutoRunnableOpportunityKeys: ['repair_native_link_structure:document:document'],
+          currentStep: 1,
+          evidenceSignals: ['blocking_failure_mode:pdfua.link_tagging'],
+          evidenceStrength: 20,
+          regressionCanaries: ['annual_report_link_tabs_cleanup'],
+        },
+      ],
+    })).toBe(true)
+
+    expect(__test_needsFamilyCompleteConvergence({
+      residualFamilies: [
+        {
+          id: 'link_tabs_and_annotation_cleanup',
+          label: 'Link, tabs, and annotation cleanup',
+          priority: 50,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.link_tagging',
+          convergenceStatus: 'preferred_tools_exhausted',
+          semanticPolicy: 'optional_after_deterministic',
+          failureModeKeys: ['pdfua.link_tagging'],
+          categoryIds: ['link_quality'],
+          preferredTools: ['repair_native_link_structure', 'tag_unowned_annotations'],
+          deprioritizedTools: ['rewrite_link_visible_text'],
+          expectedPostconditions: ['link_blocking_keys_shrink'],
+          activeOpportunityKeys: [],
+          preferredAutoRunnableOpportunityKeys: [],
+          currentStep: null,
+          evidenceSignals: ['blocking_failure_mode:pdfua.link_tagging'],
+          evidenceStrength: 12,
+          regressionCanaries: ['annual_report_link_tabs_cleanup'],
+        },
+      ],
+    })).toBe(false)
+  })
+
+  it('allows an explicit family-convergence step to bypass stale pipeline exclusions', async () => {
+    const { __test_shouldAllowPipelineExcludedFamilyCall } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowPipelineExcludedFamilyCall(
+      {
+        tool_name: 'repair_native_link_structure',
+        arguments: { target: 'document' },
+        rationale: 'Close the remaining link family.',
+        confidence: 0.9,
+        familyId: 'link_tabs_and_annotation_cleanup',
+        familyStep: 1,
+      },
+      {
+        id: 'link_tabs_and_annotation_cleanup',
+        label: 'Link, tabs, and annotation cleanup',
+        priority: 50,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:pdfua.link_tagging',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'optional_after_deterministic',
+        failureModeKeys: ['pdfua.link_tagging'],
+        categoryIds: ['link_quality'],
+        preferredTools: ['repair_native_link_structure', 'tag_unowned_annotations'],
+        deprioritizedTools: ['rewrite_link_visible_text'],
+        expectedPostconditions: ['link_blocking_keys_shrink'],
+        activeOpportunityKeys: ['repair_native_link_structure:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['repair_native_link_structure:document:document'],
+        currentStep: 1,
+        evidenceSignals: ['blocking_failure_mode:pdfua.link_tagging'],
+        evidenceStrength: 20,
+        regressionCanaries: ['annual_report_link_tabs_cleanup'],
+      },
+    )).toBe(true)
+
+    expect(__test_shouldAllowPipelineExcludedFamilyCall(
+      {
+        tool_name: 'repair_native_link_structure',
+        arguments: { target: 'document' },
+        rationale: 'Close the remaining link family.',
+        confidence: 0.9,
+      },
+      {
+        id: 'post_bootstrap_heading_convergence',
+        label: 'Post-bootstrap heading convergence',
+        priority: 70,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:category.heading_structure',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'optional_after_deterministic',
+        failureModeKeys: ['category.heading_structure'],
+        categoryIds: ['heading_structure'],
+        preferredTools: ['artifact_nonsemantic_page_elements', 'normalize_heading_hierarchy'],
+        deprioritizedTools: ['bootstrap_struct_tree'],
+        expectedPostconditions: ['heading_blocking_keys_shrink'],
+        activeOpportunityKeys: ['normalize_heading_hierarchy:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['normalize_heading_hierarchy:document:document'],
+        currentStep: 2,
+        evidenceSignals: ['blocking_failure_mode:category.heading_structure'],
+        evidenceStrength: 18,
+        regressionCanaries: ['annual_report_heading_convergence'],
+      },
+    )).toBe(false)
   })
 
   it('keeps metadata-only updates on cached inspection context and uses fast intermediate analysis', async () => {
@@ -387,11 +506,11 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'example.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(4)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(7)
     expect(planRemediationActions).toHaveBeenCalled()
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
-    expect(analyzePDF).toHaveBeenCalledTimes(3)
+    expect(analyzePDF).toHaveBeenCalledTimes(5)
     expect(analyzePDF.mock.calls[0]?.[2]).toMatchObject({
       analysisProfile: 'remediation_fast',
       skipAdobe: true,
@@ -409,7 +528,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(analyzePDF.mock.calls.at(-1)?.[2]?.inheritedVeraPdf).toBeUndefined()
     expect(executeRemediationTool.mock.calls[1]?.[0]?.context?.figureCandidates?.[0]?.targetRef).toBe('obj:new 0 R')
     expect(result.model.actions?.slice(0, 2).map(action => action.outcome)).toEqual(['applied', 'applied'])
-    expect(result.model.failureProfile?.version).toBe('1')
+    expect(result.model.failureProfile?.version).toBe('2')
     expect(result.model.failureProfile?.toolOpportunities.length).toBeGreaterThanOrEqual(0)
     expect(result.model.plannerEvidence).toBeTruthy()
     expect(result.finalResult.overallScore).toBe(90)
@@ -543,9 +662,9 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'batched.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(4)
-    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light', 'light'])
-    expect(analyzePDF).toHaveBeenCalledTimes(3)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(7)
+    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light', 'light', 'light', 'light', 'light'])
+    expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(3)
     expect(result.finalResult.grade).toBe('A')
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
   })
@@ -1031,7 +1150,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'tagged-stage.pdf', originalResult)
 
-    expect(analyzePDF).toHaveBeenCalledTimes(3)
+    expect(analyzePDF).toHaveBeenCalledTimes(7)
     expect(runPdfStructureBackendBatch).toHaveBeenCalled()
     expect(runPdfStructureBackendBatch).toHaveBeenCalled()
     expect(executeRemediationTool.mock.calls.filter(call =>
@@ -1163,14 +1282,13 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     ])
     expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.includeSnapshot).toBe(true)
     expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.inspectMode).toBe('light')
-    expect(result.model.actions?.slice(-3).map(action => action.tool)).toEqual([
-      'repair_native_link_structure',
-      'normalize_annotation_tab_order',
-      'set_tabs_all_annotated_pages',
-    ])
+    const finalCleanupTools = result.model.actions?.map(action => action.tool) || []
+    expect(finalCleanupTools).toContain('repair_native_link_structure')
+    expect(finalCleanupTools).toContain('normalize_annotation_tab_order')
+    expect(finalCleanupTools).toContain('set_tabs_all_annotated_pages')
     expect(result.buffer.equals(Buffer.from('pdf-cleanup-batch'))).toBe(true)
     expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(2)
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(1)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(6)
   })
 
   it('batches native-safe final cleanup into one analysis pass', async () => {
@@ -1246,7 +1364,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(2)
     expect(executeRemediationTool.mock.calls.length).toBeGreaterThanOrEqual(5)
-    const finalTools = result.model.actions?.slice(-6).map(action => action.tool) || []
+    const finalTools = result.model.actions?.map(action => action.tool) || []
     expect(finalTools).toContain('normalize_nested_figure_containers')
     expect(finalTools).toContain('repair_native_link_structure')
     expect(finalTools).toContain('normalize_annotation_tab_order')

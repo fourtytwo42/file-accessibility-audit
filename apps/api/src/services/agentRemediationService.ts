@@ -3,6 +3,7 @@ import type { AnalysisResult } from './pdfAnalyzer.js'
 import type {
   AppliedChange,
   DocumentModel,
+  FailureProfile,
   ModelReviewFlag,
   PdfClassification,
   PipelineConfig,
@@ -12,6 +13,7 @@ import type {
   RemediationActionRecord,
   RemediationIteration,
   RemediationToolCall,
+  ResidualFamilyDecision,
   SemanticStrategy,
   SuggestedChange,
   VeraPdfSummary,
@@ -56,6 +58,7 @@ import { loadAltTextSidecar, planAltTextSidecarDirectives, syncAltTextSidecar } 
 import { draftFigureAltText } from './altTextDraftingService.js'
 import {
   evaluateActionPostconditions,
+  findSingleBlockingResidualFamilyConvergenceTarget,
   semanticSidecarEligibleFamilies,
 } from './residualFamilyService.js'
 
@@ -656,6 +659,7 @@ function unresolvedIssues(result: AnalysisResult): string[] {
 }
 
 function scoreForCategory(result: AnalysisResult, categoryId: string): number | null {
+  if (!Array.isArray(result?.categories)) return null
   const category = result.categories.find(entry => entry.id === categoryId)
   return typeof category?.score === 'number' ? category.score : null
 }
@@ -950,6 +954,41 @@ function canExitEarlyToFinalCleanup(result: AnalysisResult, threshold: number = 
   return remaining.every(categoryId => cleanupEligible.has(categoryId))
 }
 
+function dedupeToolCalls(calls: RemediationToolCall[]): RemediationToolCall[] {
+  const seen = new Set<string>()
+  const next: RemediationToolCall[] = []
+  for (const call of calls) {
+    const key = JSON.stringify([call.tool_name, call.arguments])
+    if (seen.has(key)) continue
+    seen.add(key)
+    next.push(call)
+  }
+  return next
+}
+
+function shouldAllowPipelineExcludedFamilyCall(
+  call: RemediationToolCall,
+  convergenceFamily: ResidualFamilyDecision | null | undefined,
+): boolean {
+  if (!convergenceFamily) return false
+  return call.familyId === convergenceFamily.id
+    && convergenceFamily.preferredTools.includes(call.tool_name)
+}
+
+export const __test_shouldAllowPipelineExcludedFamilyCall = shouldAllowPipelineExcludedFamilyCall
+
+function familyCompletionTarget(
+  failureProfile: Pick<FailureProfile, 'residualFamilies'> | null | undefined,
+) {
+  return findSingleBlockingResidualFamilyConvergenceTarget(failureProfile?.residualFamilies || [])
+}
+
+export function __test_needsFamilyCompleteConvergence(
+  failureProfile: Pick<FailureProfile, 'residualFamilies'> | null | undefined,
+): boolean {
+  return !!familyCompletionTarget(failureProfile)
+}
+
 function rejectAction(input: {
   action: RemediationActionRecord
   reason: string
@@ -1037,6 +1076,7 @@ function bookmarkCleanupTriggerAnalysis(result: AnalysisResult): AnalysisResult 
 }
 
 function hasAcrobatAltRiskFindings(result: AnalysisResult): boolean {
+  if (!Array.isArray(result?.categories)) return false
   const altTextCategory = result.categories.find(category => category.id === 'alt_text')
   return (altTextCategory?.findings || []).some(finding =>
     /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding),
@@ -1044,6 +1084,7 @@ function hasAcrobatAltRiskFindings(result: AnalysisResult): boolean {
 }
 
 function inspectModeForResult(result: AnalysisResult): RemediationInspectMode {
+  if (!Array.isArray(result?.categories)) return 'light'
   return needsAltTextDeepInspection(result) || hasAcrobatAltRiskFindings(result)
     ? 'alt_text_deep'
     : 'light'
@@ -1090,6 +1131,19 @@ function finalCleanupCategoryTargets(tool: string): string[] {
     default:
       return []
   }
+}
+
+function hasResultCategories(result: AnalysisResult | null | undefined): result is AnalysisResult {
+  return Array.isArray(result?.categories)
+}
+
+function hasInspectionPayload(
+  context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null | undefined,
+): context is Awaited<ReturnType<typeof inspectPdfForRemediation>> {
+  return !!context
+    && !!context.qpdf
+    && !!context.pdfjs
+    && Array.isArray(context.pages)
 }
 
 function finalCleanupDetails(tool: string, appliedMutations: Array<{ details: string }>, warnings: string[]): string {
@@ -2067,6 +2121,18 @@ export async function remediatePdfWithAgent(
     return calls.filter(call => !excluded.has(call.tool_name))
   }
 
+  const filterCallsForPipelineWithFamilyOverride = (
+    calls: RemediationToolCall[],
+    convergenceFamily?: ResidualFamilyDecision | null,
+  ): RemediationToolCall[] => {
+    if (!currentPipelineConfig) return calls
+    const excluded = new Set(currentPipelineConfig.excludedTools)
+    return calls.filter(call =>
+      !excluded.has(call.tool_name)
+      || shouldAllowPipelineExcludedFamilyCall(call, convergenceFamily),
+    )
+  }
+
   const maybeRefreshClassificationFromStage = async (stageActions: RemediationActionRecord[]): Promise<void> => {
     if (!stageActions.some(action =>
       action.changedDocumentBytes
@@ -2184,9 +2250,37 @@ export async function remediatePdfWithAgent(
   const syncInspectionCache = (
     context: Awaited<ReturnType<typeof inspectPdfForRemediation>>,
   ): void => {
+    if (!hasInspectionPayload(context)) return
     inspectionCache.qpdf = context.qpdf
     inspectionCache.pdfjs = context.pdfjs
     inspectionCache.pages = context.pages
+  }
+
+  const rebindContextFromCache = (
+    analysis: AnalysisResult,
+    inspectMode: RemediationInspectMode = inspectModeForResult(analysis),
+  ): Awaited<ReturnType<typeof inspectPdfForRemediation>> | null => {
+    const payload = inspectionCache.contextsByMode?.[inspectMode]
+      || inspectionCache.contextsByMode?.light
+      || inspectionCache.contextsByMode?.alt_text_deep
+
+    if (!payload) return null
+
+    const rebound = buildRemediationContextFromSnapshot({
+      analysis,
+      qpdf: payload.qpdf,
+      pdfjs: payload.pdfjs,
+      pages: payload.pages,
+      structure: payload.structure,
+      inspectMode,
+      cache: inspectionCache,
+    })
+    latestContext = rebound
+    syncInspectionCache(rebound)
+    refreshClassification(analysis, rebound)
+    inspectionState.bufferSha256 = getBufferSha256(workingBuffer)
+    inspectionState.lastInspectMode = inspectMode
+    return rebound
   }
 
   const inspectRemediationContext = async (
@@ -2227,6 +2321,11 @@ export async function remediatePdfWithAgent(
       inspectMode,
       cache: inspectionCache,
     })
+    if (!hasInspectionPayload(inspected)) {
+      const rebound = rebindContextFromCache(analysis, inspectMode)
+      if (rebound) return rebound
+      throw new Error(`inspectPdfForRemediation returned an invalid context for ${filename}`)
+    }
     latestContext = inspected
     syncInspectionCache(inspected)
     refreshClassification(analysis, inspected)
@@ -2249,11 +2348,38 @@ export async function remediatePdfWithAgent(
     },
   ): Promise<AnalysisResult> => {
     remediationTimings.intermediateAnalyses += 1
-    return analyzeIntermediatePdf(buffer, filename, baselineResult, {
+    const analyzed = await analyzeIntermediatePdf(buffer, filename, baselineResult, {
       signal: options?.signal,
       forceStructureForScoring: analysisOptions?.forceStructureForScoring,
       preferDeepStructureInspect: analysisOptions?.preferDeepStructureInspect,
     })
+    return hasResultCategories(analyzed) ? analyzed : baselineResult
+  }
+
+  const analyzeAuthoritative = async (
+    buffer: Buffer,
+    baselineResult: AnalysisResult,
+  ): Promise<AnalysisResult> => {
+    const analyzed = await analyzePDF(buffer, filename, {
+      analysisProfile: 'full_final',
+      signal: options?.signal,
+      skipAdobe: true,
+      skipVeraPdf: true,
+    })
+    return hasResultCategories(analyzed) ? analyzed : baselineResult
+  }
+
+  const inspectRemediationContextSafely = async (
+    buffer: Buffer,
+    analysis: AnalysisResult,
+    inspectMode: RemediationInspectMode = inspectModeForResult(analysis),
+  ): Promise<Awaited<ReturnType<typeof inspectPdfForRemediation>> | null> => {
+    if (!hasResultCategories(analysis)) return null
+    try {
+      return await inspectRemediationContext(buffer, analysis, inspectMode)
+    } catch {
+      return rebindContextFromCache(analysis, inspectMode)
+    }
   }
 
   const syncAltTextReviewSidecar = async (
@@ -2388,112 +2514,267 @@ export async function remediatePdfWithAgent(
     }
   }
 
+  const familyCompletionTargetForState = (analysis: AnalysisResult, context: PdfRemediationContext) => familyCompletionTarget(buildFailureProfileArtifacts({
+    analysis,
+    context,
+    actions,
+    rejectedActions,
+    iterations,
+  }).failureProfile)
+  const currentFamilyCompletionTarget = (context: PdfRemediationContext) => familyCompletionTargetForState(currentResult, context)
+
   const runFinalResidualRepairs = async (): Promise<void> => {
-    let context = latestContext || await inspectRemediationContext(workingBuffer, currentResult, inspectModeForResult(currentResult))
-    const residualCalls: RemediationToolCall[] = []
+    const baseInspectMode = inspectModeForResult(currentResult)
+    let context = latestContext
+      || rebindContextFromCache(currentResult, baseInspectMode)
+      || await inspectRemediationContextSafely(workingBuffer, currentResult, baseInspectMode)
+    if (!context) return
 
-    const titleLanguageScore = currentResult.categories.find(entry => entry.id === 'title_language')?.score ?? 100
-    const pdfUaScore = currentResult.categories.find(entry => entry.id === 'pdf_ua_compliance')?.score ?? 100
-    if (titleLanguageScore < 100 || pdfUaScore < 100) {
-      residualCalls.push({
-        tool_name: 'normalize_document_metadata',
-        arguments: {
-          title: currentTitle || context.pdfjs.title || filename.replace(/\.pdf$/i, ''),
-          language: currentLanguage || context.qpdf.lang || context.pdfjs.lang || 'en',
-        },
-        rationale: 'Final cleanup: normalize metadata and PDF/UA identification before authoritative analysis.',
-        confidence: 0.98,
-      })
+    const currentResidualArtifacts = buildFailureProfileArtifacts({
+      analysis: currentResult,
+      context,
+      actions,
+      rejectedActions,
+      iterations,
+    })
+    let baselineConvergenceFamily = familyCompletionTarget(currentResidualArtifacts.failureProfile)
+    let seededPlanningState: {
+      result: AnalysisResult
+      context: PdfRemediationContext
+      artifacts: ReturnType<typeof buildFailureProfileArtifacts>
+    } | null = null
+
+    if (!baselineConvergenceFamily) {
+      const seededPlanningResult = await analyzeIntermediate(workingBuffer, currentResult)
+      if (hasResultCategories(seededPlanningResult)) {
+        const seededPlanningContext = rebindContextFromCache(seededPlanningResult, inspectModeForResult(seededPlanningResult))
+          || await inspectRemediationContextSafely(workingBuffer, seededPlanningResult, inspectModeForResult(seededPlanningResult))
+        if (seededPlanningContext) {
+          const seededPlanningArtifacts = buildFailureProfileArtifacts({
+            analysis: seededPlanningResult,
+            context: seededPlanningContext,
+            actions,
+            rejectedActions,
+            iterations,
+          })
+          const seededFamily = familyCompletionTarget(seededPlanningArtifacts.failureProfile)
+          if (seededFamily) {
+            baselineConvergenceFamily = seededFamily
+            seededPlanningState = {
+              result: seededPlanningResult,
+              context: seededPlanningContext,
+              artifacts: seededPlanningArtifacts,
+            }
+          }
+        }
+      }
     }
 
-    if ((context.qpdf.unembeddedFontCount ?? 0) > 0) {
-      residualCalls.push({
-        tool_name: 'embed_missing_fonts_in_place',
-        arguments: { target: 'document' },
-        rationale: 'Final cleanup: retry embedding for any fonts still lacking embedded programs after later mutations.',
-        confidence: 0.9,
-      })
-    }
+    let familyPasses = 0
 
-    if ((context.qpdf.fontsMissingToUnicodeBlocking ?? context.qpdf.fontsMissingToUnicode ?? 0) > 0) {
-      residualCalls.push({
-        tool_name: 'repair_font_unicode_maps',
-        arguments: { target: 'document' },
-        rationale: 'Final cleanup: add ToUnicode maps for fonts still missing Unicode coverage after later mutations.',
-        confidence: 0.92,
-      })
-    }
+    while (familyPasses < 3) {
+      const useSeededPlanningState = !!baselineConvergenceFamily && familyPasses === 0 && !!seededPlanningState
+      const shouldRefreshPlanningState = !!baselineConvergenceFamily && !useSeededPlanningState
+      const planningResult = useSeededPlanningState
+        ? seededPlanningState!.result
+        : shouldRefreshPlanningState
+          ? await analyzeIntermediate(workingBuffer, currentResult)
+          : currentResult
+      if (!hasResultCategories(planningResult)) return
 
-    if ((context.qpdf.type1FontsMissingToUnicode ?? 0) > 0) {
-      residualCalls.push({
-        tool_name: 'repair_type1_font_unicode_maps',
-        arguments: { target: 'document' },
-        rationale: 'Final cleanup: retry Type1/Type3 Unicode recovery after later font cleanup changed the remaining font set.',
-        confidence: 0.9,
-      })
-    }
+      const planningContext = useSeededPlanningState
+        ? seededPlanningState!.context
+        : shouldRefreshPlanningState
+        ? (
+            rebindContextFromCache(planningResult, inspectModeForResult(planningResult))
+            || await inspectRemediationContextSafely(workingBuffer, planningResult, inspectModeForResult(planningResult))
+          )
+        : context
+      if (!planningContext) return
 
-    if (context.linkCandidates.some(candidate => !(candidate.annotationContents || '').trim())) {
-      for (const candidate of context.linkCandidates.filter(entry => !(entry.annotationContents || '').trim())) {
+      const residualArtifacts = useSeededPlanningState
+        ? seededPlanningState!.artifacts
+        : shouldRefreshPlanningState
+        ? buildFailureProfileArtifacts({
+            analysis: planningResult,
+            context: planningContext,
+            actions,
+            rejectedActions,
+            iterations,
+          })
+        : currentResidualArtifacts
+      const convergenceFamily = useSeededPlanningState || shouldRefreshPlanningState
+        ? familyCompletionTarget(residualArtifacts.failureProfile)
+        : null
+      const residualCalls: RemediationToolCall[] = []
+
+      if (convergenceFamily) {
+        const familyPlan = await planRemediationActions({
+          filename,
+          analysis: planningResult,
+          context: planningContext,
+          iteration: round,
+          actions,
+          rejectedActions,
+          pipelineConfig: currentPipelineConfig,
+        })
+        let familyCalls = familyPlan.actions.filter(call =>
+          call.familyId === convergenceFamily.id
+          && convergenceFamily.preferredTools.includes(call.tool_name),
+        )
+
+        if (!familyCalls.length) {
+          const candidateCalls: RemediationToolCall[] = []
+          const familyOpportunities = residualArtifacts.failureProfile.toolOpportunities
+            .filter(opportunity =>
+              opportunity.familyId === convergenceFamily.id
+              && convergenceFamily.preferredTools.includes(opportunity.toolName)
+              && opportunity.status === 'auto_runnable',
+            )
+            .sort((left, right) =>
+              (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
+              || (TOOL_STAGE_ORDER.get(left.toolName) ?? 99) - (TOOL_STAGE_ORDER.get(right.toolName) ?? 99)
+              || (left.scope === 'document' ? 0 : 1) - (right.scope === 'document' ? 0 : 1)
+              || right.confidence - left.confidence
+              || left.key.localeCompare(right.key),
+            )
+
+          for (const opportunity of familyOpportunities) {
+            const call = deriveDeterministicCall({
+              filename,
+              analysis: planningResult,
+              context: planningContext,
+              opportunity,
+              selectedActions: candidateCalls,
+            })
+            if (!call) continue
+            candidateCalls.push(call)
+          }
+          familyCalls = candidateCalls
+        }
+
+        residualCalls.push(...familyCalls)
+      }
+
+      const titleLanguageScore = currentResult.categories.find(entry => entry.id === 'title_language')?.score ?? 100
+      const pdfUaScore = currentResult.categories.find(entry => entry.id === 'pdf_ua_compliance')?.score ?? 100
+      if (titleLanguageScore < 100 || pdfUaScore < 100) {
         residualCalls.push({
-          tool_name: 'set_link_annotation_contents',
+          tool_name: 'normalize_document_metadata',
           arguments: {
-            candidateId: candidate.id,
-            pageNumber: candidate.pageNumber,
-            annotationIndex: candidate.annotationIndex,
-            contents: candidate.suggestedText || candidate.text || candidate.url,
+            title: currentTitle || context.pdfjs.title || filename.replace(/\.pdf$/i, ''),
+            language: currentLanguage || context.qpdf.lang || context.pdfjs.lang || 'en',
           },
-          rationale: `Final cleanup: ensure link annotation ${candidate.id} exposes /Contents.`,
+          rationale: 'Final cleanup: normalize metadata and PDF/UA identification before authoritative analysis.',
+          confidence: 0.98,
+        })
+      }
+
+      if ((context.qpdf.unembeddedFontCount ?? 0) > 0) {
+        residualCalls.push({
+          tool_name: 'embed_missing_fonts_in_place',
+          arguments: { target: 'document' },
+          rationale: 'Final cleanup: retry embedding for any fonts still lacking embedded programs after later mutations.',
+          confidence: 0.9,
+        })
+      }
+
+      if ((context.qpdf.fontsMissingToUnicodeBlocking ?? context.qpdf.fontsMissingToUnicode ?? 0) > 0) {
+        residualCalls.push({
+          tool_name: 'repair_font_unicode_maps',
+          arguments: { target: 'document' },
+          rationale: 'Final cleanup: add ToUnicode maps for fonts still missing Unicode coverage after later mutations.',
           confidence: 0.92,
         })
       }
-    }
 
-    if ((currentResult.categories.find(entry => entry.id === 'table_markup')?.score ?? 100) < 100) {
-      residualCalls.push({
-        tool_name: 'repair_native_table_headers',
-        arguments: { target: 'document' },
-        rationale: 'Final cleanup: repair native table headers before authoritative scoring.',
-        confidence: 0.88,
-      })
-      for (const candidate of context.tableCandidates.filter(entry => entry.repairMode === 'safe' && !entry.hasHeaders && !!entry.ref)) {
+      if ((context.qpdf.type1FontsMissingToUnicode ?? 0) > 0) {
         residualCalls.push({
-          tool_name: 'set_table_header_cells',
-          arguments: { targets: [candidate.ref] },
-          rationale: `Final cleanup: promote first row to headers for ${candidate.ref}.`,
-          confidence: 0.86,
+          tool_name: 'repair_type1_font_unicode_maps',
+          arguments: { target: 'document' },
+          rationale: 'Final cleanup: retry Type1/Type3 Unicode recovery after later font cleanup changed the remaining font set.',
+          confidence: 0.9,
         })
       }
-    }
 
-    const filteredResidualCalls = filterCallsForPipeline(residualCalls)
-    if (!filteredResidualCalls.length) return
+      if (context.linkCandidates.some(candidate => !(candidate.annotationContents || '').trim())) {
+        for (const candidate of context.linkCandidates.filter(entry => !(entry.annotationContents || '').trim())) {
+          residualCalls.push({
+            tool_name: 'set_link_annotation_contents',
+            arguments: {
+              candidateId: candidate.id,
+              pageNumber: candidate.pageNumber,
+              annotationIndex: candidate.annotationIndex,
+              contents: candidate.suggestedText || candidate.text || candidate.url,
+            },
+            rationale: `Final cleanup: ensure link annotation ${candidate.id} exposes /Contents.`,
+            confidence: 0.92,
+          })
+        }
+      }
 
-    let changed = false
-    for (const call of filteredResidualCalls) {
-      const outcome = await executeRemediationTool({
-        buffer: workingBuffer,
-        context,
-        call,
-      })
-      actions.push(outcome.action)
-      allExecutedActions.push(outcome.action)
-      manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
-      previousActionNames = Array.from(new Set([
-        ...previousActionNames,
-        ...actionHistoryKeys(outcome.action),
-      ]))
-      if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
-      changed = true
-      workingBuffer = outcome.buffer
-      markInspectionDirtyFromAction(inspectionState, outcome.action)
-      currentResult = await analyzeIntermediate(workingBuffer, currentResult)
-      currentResultHasFreshVeraPdf = false
-      context = await inspectRemediationContext(workingBuffer, currentResult)
-    }
+      if ((currentResult.categories.find(entry => entry.id === 'table_markup')?.score ?? 100) < 100) {
+        residualCalls.push({
+          tool_name: 'repair_native_table_headers',
+          arguments: { target: 'document' },
+          rationale: 'Final cleanup: repair native table headers before authoritative scoring.',
+          confidence: 0.88,
+        })
+        for (const candidate of context.tableCandidates.filter(entry => entry.repairMode === 'safe' && !entry.hasHeaders && !!entry.ref)) {
+          residualCalls.push({
+            tool_name: 'set_table_header_cells',
+            arguments: { targets: [candidate.ref] },
+            rationale: `Final cleanup: promote first row to headers for ${candidate.ref}.`,
+            confidence: 0.86,
+          })
+        }
+      }
 
-    if (changed) {
-      latestContext = context
+      const filteredResidualCalls = dedupeToolCalls(filterCallsForPipelineWithFamilyOverride(
+        residualCalls,
+        convergenceFamily,
+      ))
+      if (!filteredResidualCalls.length) return
+
+      let changed = false
+      for (const call of filteredResidualCalls) {
+        const previous = currentResult
+        const outcome = await executeRemediationTool({
+          buffer: workingBuffer,
+          context,
+          call,
+        })
+        actions.push(outcome.action)
+        allExecutedActions.push(outcome.action)
+        manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+        previousActionNames = Array.from(new Set([
+          ...previousActionNames,
+          ...actionHistoryKeys(outcome.action),
+        ]))
+        if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
+        changed = true
+        workingBuffer = outcome.buffer
+        markInspectionDirtyFromAction(inspectionState, outcome.action)
+        currentResult = await analyzeIntermediate(workingBuffer, currentResult)
+        currentResultHasFreshVeraPdf = false
+        const refreshedContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
+          || await inspectRemediationContextSafely(workingBuffer, currentResult)
+        if (!refreshedContext) return
+        context = refreshedContext
+        const improvedTargets = applyScoreDelta(outcome.action, previous, currentResult)
+        if (!improvedTargets && outcome.action.outcome === 'applied') {
+          outcome.action.outcome = 'no_effect'
+        }
+      }
+
+      if (changed) {
+        latestContext = context
+      }
+
+      if (!convergenceFamily || !changed) {
+        return
+      }
+      familyPasses += 1
     }
   }
 
@@ -3691,10 +3972,13 @@ export async function remediatePdfWithAgent(
     const bootstrapWasApplied = actions.some(a => a.tool === 'bootstrap_struct_tree' && a.outcome === 'applied')
     const altTextStillBroken = (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
     const altRepairAlreadyApplied = actions.some(a => a.tool === 'repair_other_elements_alt_text' && (a.outcome === 'applied' || a.outcome === 'no_effect'))
-	    if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
-	      skipDirectToFinalCleanup = true
-	      break
-	    }
+      if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
+        const blockingFamilyTarget = currentFamilyCompletionTarget(stageContext)
+        if (!blockingFamilyTarget) {
+          skipDirectToFinalCleanup = true
+          break
+        }
+      }
     if (round > 1 && !roundChangedDocument && (!needsStructuralPersistenceRound(currentResult, latestContext) || round >= REMEDIATION.MIN_STRUCTURAL_ROUNDS)) break
     if (stopAfterRound) break
     // Post-bootstrap second pass (round 1 only): when bootstrap created a struct tree, re-inspect for alt risks and run stages 5+.
@@ -3869,10 +4153,13 @@ export async function remediatePdfWithAgent(
       ]))
     }
     }
-	    if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
-	      skipDirectToFinalCleanup = true
-	      break
-	    }
+    if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
+      const blockingFamilyTarget = currentFamilyCompletionTarget(stageContext)
+      if (!blockingFamilyTarget) {
+        skipDirectToFinalCleanup = true
+        break
+      }
+    }
     if (needsStructuralPersistenceRound(currentResult, latestContext) && round < REMEDIATION.MIN_STRUCTURAL_ROUNDS) {
       round += 1
       continue
@@ -4218,14 +4505,17 @@ export async function remediatePdfWithAgent(
 
   if (!workingBuffer.equals(originalBuffer)) {
     workingBuffer = await ensureDisplayDocTitle(workingBuffer)
-    currentResult = await analyzePDF(workingBuffer, filename, {
-      analysisProfile: 'full_final',
-      signal: options?.signal,
-      skipAdobe: true,
-      skipVeraPdf: true,
-    })
+    currentResult = await analyzeAuthoritative(workingBuffer, currentResult)
     currentResultHasFreshVeraPdf = true
-    latestContext = null
+    latestContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
+
+    await runFinalResidualRepairs()
+    if (!workingBuffer.equals(originalBuffer)) {
+      workingBuffer = await ensureDisplayDocTitle(workingBuffer)
+      currentResult = await analyzeAuthoritative(workingBuffer, currentResult)
+      currentResultHasFreshVeraPdf = true
+      latestContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
+    }
   }
 
   const postAnalysisAltPassNeeded = !skipDirectToFinalCleanup
@@ -4270,19 +4560,15 @@ export async function remediatePdfWithAgent(
       })
       if (!changedResidualFigures) break
       workingBuffer = await ensureDisplayDocTitle(workingBuffer)
-      currentResult = await analyzePDF(workingBuffer, filename, {
-        analysisProfile: 'full_final',
-        signal: options?.signal,
-        skipAdobe: true,
-        skipVeraPdf: true,
-      })
+      currentResult = await analyzeAuthoritative(workingBuffer, currentResult)
       currentResultHasFreshVeraPdf = true
-      latestContext = null
+      latestContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
       postAnalysisSweepCount += 1
     }
   }
 
   await applyReviewedAltTextSidecar()
+  await runFinalResidualRepairs()
 
   previousActionNames = Array.from(new Set([
     ...previousActionNames,

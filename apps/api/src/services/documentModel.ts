@@ -192,6 +192,11 @@ export type ResidualFamilyId =
 
 export type ResidualSemanticPolicy = 'forbidden' | 'optional_after_deterministic' | 'manual_only'
 export type FamilyPostconditionStatus = 'satisfied' | 'not_satisfied' | 'unknown'
+export type ResidualFamilyConvergenceStatus =
+  | 'preferred_tools_available'
+  | 'preferred_tools_exhausted'
+  | 'postconditions_satisfied'
+  | 'manual_only'
 
 export interface RemediationToolCall {
   tool_name: RemediationToolName
@@ -260,6 +265,7 @@ export interface ResidualFamilyDecision {
   priority: number
   blocking: boolean
   blockingReason?: string
+  convergenceStatus: ResidualFamilyConvergenceStatus
   semanticPolicy: ResidualSemanticPolicy
   failureModeKeys: string[]
   categoryIds: string[]
@@ -267,6 +273,7 @@ export interface ResidualFamilyDecision {
   deprioritizedTools: RemediationToolName[]
   expectedPostconditions: string[]
   activeOpportunityKeys: string[]
+  preferredAutoRunnableOpportunityKeys: string[]
   currentStep: number | null
   evidenceSignals: string[]
   evidenceStrength: ResidualFamilyEvidenceStrength
@@ -278,7 +285,9 @@ export interface PlannerResidualFamilySummary {
   label: string
   blocking: boolean
   blockingReason?: string
+  convergenceStatus: ResidualFamilyConvergenceStatus
   currentStep: number | null
+  preferredAutoRunnableOpportunityKeys?: string[]
   evidenceSignals: string[]
   evidenceStrength: ResidualFamilyEvidenceStrength
 }

@@ -4,6 +4,7 @@ import {
   annotateToolOpportunitiesWithResidualFamilies,
   buildResidualFamilyDecisions,
   evaluateActionPostconditions,
+  findSingleBlockingResidualFamilyConvergenceTarget,
   semanticSidecarEligibleFamilies,
 } from '../services/residualFamilyService.js'
 
@@ -210,6 +211,151 @@ describe('residualFamilyService', () => {
       'table_structure_recovery',
       'link_tabs_and_annotation_cleanup',
     ]))
+  })
+
+  it('classifies tagged annotations inside the link/tabs family and exposes tag_unowned_annotations as a preferred step', () => {
+    const decisions = buildResidualFamilyDecisions({
+      analysis: makeAnalysis({
+        categories: [
+          { id: 'title_language', score: 100 },
+          { id: 'text_extractability', score: 100 },
+          { id: 'table_markup', score: 100 },
+          { id: 'heading_structure', score: 100 },
+          { id: 'alt_text', score: 100 },
+          { id: 'link_quality', score: 65 },
+          { id: 'reading_order', score: 80 },
+          { id: 'pdf_ua_compliance', score: 75 },
+          { id: 'bookmarks', score: 100 },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.tagged_annotations', blocking: true, count: 2 },
+          ],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          fontsMissingToUnicodeBlocking: 0,
+          unembeddedFontCount: 0,
+        },
+      }),
+      failureModes: [
+        makeFailureMode({
+          key: 'pdfua.tagged_annotations',
+          categoryIds: ['link_quality', 'reading_order', 'pdf_ua_compliance'],
+          nativeToolFamilies: ['tag_unowned_annotations'],
+        }),
+      ],
+      toolOpportunities: [
+        makeOpportunity({
+          key: 'tag_unowned_annotations:document:document',
+          toolName: 'tag_unowned_annotations',
+          categoryTargets: ['link_quality', 'reading_order'],
+          derivedFromFailureModeKeys: ['pdfua.tagged_annotations'],
+        }),
+      ],
+      actions: [],
+    })
+
+    const family = decisions.find(entry => entry.id === 'link_tabs_and_annotation_cleanup')
+    expect(family?.preferredTools.slice(0, 4)).toEqual([
+      'repair_native_link_structure',
+      'tag_unowned_annotations',
+      'set_page_tabs',
+      'set_link_annotation_contents',
+    ])
+    expect(family?.preferredAutoRunnableOpportunityKeys).toEqual(['tag_unowned_annotations:document:document'])
+    expect(family?.convergenceStatus).toBe('preferred_tools_available')
+  })
+
+  it('identifies a single blocking family that still has preferred deterministic work left', () => {
+    const target = findSingleBlockingResidualFamilyConvergenceTarget([
+      {
+        id: 'link_tabs_and_annotation_cleanup',
+        label: 'Link, tabs, and annotation cleanup',
+        priority: 50,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:pdfua.link_tagging',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'optional_after_deterministic',
+        failureModeKeys: ['pdfua.link_tagging'],
+        categoryIds: ['link_quality'],
+        preferredTools: ['repair_native_link_structure'],
+        deprioritizedTools: ['rewrite_link_visible_text'],
+        expectedPostconditions: ['link_blocking_keys_shrink'],
+        activeOpportunityKeys: ['repair_native_link_structure:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['repair_native_link_structure:document:document'],
+        currentStep: 1,
+        evidenceSignals: ['blocking_failure_mode:pdfua.link_tagging'],
+        evidenceStrength: 20,
+        regressionCanaries: ['annual_report_link_tabs_cleanup'],
+      },
+    ])
+
+    expect(target?.id).toBe('link_tabs_and_annotation_cleanup')
+  })
+
+  it('marks a blocking family as exhausted when its remaining preferred opportunity was already attempted', () => {
+    const decisions = buildResidualFamilyDecisions({
+      analysis: makeAnalysis({
+        categories: [
+          { id: 'title_language', score: 100 },
+          { id: 'text_extractability', score: 100 },
+          { id: 'table_markup', score: 100 },
+          { id: 'heading_structure', score: 100 },
+          { id: 'alt_text', score: 100 },
+          { id: 'link_quality', score: 65 },
+          { id: 'reading_order', score: 80 },
+          { id: 'pdf_ua_compliance', score: 75 },
+          { id: 'bookmarks', score: 100 },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.link_tagging', blocking: true, count: 1 },
+          ],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          fontsMissingToUnicodeBlocking: 0,
+          unembeddedFontCount: 0,
+        },
+      }),
+      failureModes: [
+        makeFailureMode({
+          key: 'pdfua.link_tagging',
+          categoryIds: ['link_quality', 'pdf_ua_compliance'],
+          nativeToolFamilies: ['repair_native_link_structure'],
+        }),
+      ],
+      toolOpportunities: [
+        makeOpportunity({
+          key: 'repair_native_link_structure:document:document',
+          toolName: 'repair_native_link_structure',
+          categoryTargets: ['link_quality', 'reading_order'],
+          derivedFromFailureModeKeys: ['pdfua.link_tagging'],
+        }),
+      ],
+      actions: [
+        {
+          tool: 'repair_native_link_structure',
+          target: 'document',
+          details: 'link structure normalized',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['link_quality', 'reading_order'],
+          outcome: 'applied',
+          familyId: 'link_tabs_and_annotation_cleanup',
+          postconditionStatus: 'not_satisfied',
+        },
+      ],
+    })
+
+    const family = decisions.find(entry => entry.id === 'link_tabs_and_annotation_cleanup')
+    expect(family?.convergenceStatus).toBe('preferred_tools_exhausted')
+    expect(findSingleBlockingResidualFamilyConvergenceTarget(decisions)).toBeNull()
   })
 
   it('marks postconditions satisfied when blocking keys or counters shrink', () => {

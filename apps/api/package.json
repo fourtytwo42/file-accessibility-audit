@@ -20,6 +20,7 @@
     "baseline:processed:pairs": "tsx src/scripts/verifyProcessedRegressionPairs.ts",
     "baseline:processed:capability": "tsx src/scripts/verifyProcessedFontCapability.ts",
     "baseline:processed:font-capability": "tsx src/scripts/verifyProcessedFontCapability.ts",
+    "diagnose:processed-intake-parity": "tsx src/scripts/diagnoseProcessedIntakeParity.ts",
     "diagnose:live-families": "tsx src/scripts/diagnoseLiveResidualFamilies.ts",
     "trace:97anreport": "tsx src/scripts/trace97anreportMetadataBookmarks.ts",
     "trace:annual-reports": "tsx src/scripts/traceAnnualReportOwnership.ts",

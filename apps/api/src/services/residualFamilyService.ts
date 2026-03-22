@@ -5,6 +5,7 @@ import type {
   FamilyPostconditionStatus,
   RemediationActionRecord,
   RemediationToolName,
+  ResidualFamilyConvergenceStatus,
   ResidualFamilyDecision,
   ResidualFamilyId,
   ResidualSemanticPolicy,
@@ -128,19 +129,18 @@ const RESIDUAL_FAMILY_DEFINITIONS: ResidualFamilyDefinition[] = [
       'pdfua.page_tabs',
       'pdfua.annotation_alt_contents',
       'pdfua.link_tagging',
+      'pdfua.tagged_annotations',
     ],
     categoryIds: ['link_quality', 'reading_order', 'pdf_ua_compliance'],
     preferredTools: [
       'repair_native_link_structure',
+      'tag_unowned_annotations',
       'set_page_tabs',
+      'set_link_annotation_contents',
       'normalize_annotation_tab_order',
       'set_tabs_all_annotated_pages',
-      'repair_annotation_alt_text',
-      'set_link_annotation_contents',
-      'rewrite_link_visible_text',
-      'update_link_visible_text',
     ],
-    deprioritizedTools: [],
+    deprioritizedTools: ['repair_annotation_alt_text', 'rewrite_link_visible_text', 'update_link_visible_text'],
     expectedPostconditions: ['link_blocking_keys_shrink', 'page_tabs_clear', 'annotation_alt_clear'],
     regressionCanaries: ['annual_report_link_tabs_cleanup'],
   },
@@ -337,6 +337,42 @@ function familyBlockingReason(input: {
   return undefined
 }
 
+function preferredAutoRunnableOpportunityKeys(
+  definition: ResidualFamilyDefinition,
+  opportunities: ToolOpportunity[],
+): string[] {
+  return sortedUnique(opportunities
+    .filter(opportunity =>
+      opportunity.status === 'auto_runnable'
+      && definition.preferredTools.includes(opportunity.toolName),
+    )
+    .map(opportunity => opportunity.key))
+}
+
+function convergenceStatus(input: {
+  definition: ResidualFamilyDefinition
+  blocking: boolean
+  matchedOpportunities: ToolOpportunity[]
+  matchedActions: RemediationActionRecord[]
+}): ResidualFamilyConvergenceStatus {
+  if (input.definition.semanticPolicy === 'manual_only') return 'manual_only'
+  const preferredAutoRunnableKeys = preferredAutoRunnableOpportunityKeys(input.definition, input.matchedOpportunities)
+  if (!input.blocking) return 'postconditions_satisfied'
+  if (preferredAutoRunnableKeys.length === 0) return 'preferred_tools_exhausted'
+
+  const attemptedPreferredTools = new Set(
+    input.matchedActions
+      .filter(action => input.definition.preferredTools.includes(action.tool))
+      .map(action => action.tool),
+  )
+  const hasUnattemptedPreferredOpportunity = input.matchedOpportunities.some(opportunity =>
+    opportunity.status === 'auto_runnable'
+    && input.definition.preferredTools.includes(opportunity.toolName)
+    && !attemptedPreferredTools.has(opportunity.toolName),
+  )
+  return hasUnattemptedPreferredOpportunity ? 'preferred_tools_available' : 'preferred_tools_exhausted'
+}
+
 function opportunityFamilyScore(opportunity: ToolOpportunity, definition: ResidualFamilyDefinition): number {
   let score = 0
   if (definition.preferredTools.includes(opportunity.toolName)) score += 4
@@ -370,6 +406,12 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
       const familyFailureModes = evidence.matchedFailureModes
       const familyOpportunities = evidence.matchedOpportunities
       const blocking = familyFailureModes.some(mode => mode.blocking) || familyOpportunities.some(opportunity => opportunity.status === 'auto_runnable')
+      const familyConvergenceStatus = convergenceStatus({
+        definition,
+        blocking,
+        matchedOpportunities: familyOpportunities,
+        matchedActions: evidence.matchedActions,
+      })
       return {
         id: definition.id,
         label: definition.label,
@@ -380,6 +422,7 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
           matchedOpportunities: evidence.matchedOpportunities,
           matchedActions: evidence.matchedActions,
         }) : undefined,
+        convergenceStatus: familyConvergenceStatus,
         semanticPolicy: definition.semanticPolicy,
         failureModeKeys: sortedUnique(familyFailureModes.map(mode => mode.key)),
         categoryIds: sortedUnique([
@@ -390,6 +433,7 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
         deprioritizedTools: [...definition.deprioritizedTools],
         expectedPostconditions: [...definition.expectedPostconditions],
         activeOpportunityKeys: sortedUnique(familyOpportunities.map(opportunity => opportunity.key)),
+        preferredAutoRunnableOpportunityKeys: preferredAutoRunnableOpportunityKeys(definition, familyOpportunities),
         currentStep: currentFamilyStep(definition, familyOpportunities),
         evidenceSignals: evidence.signals,
         evidenceStrength: evidence.strength,
@@ -412,6 +456,7 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
       priority: unresolved.priority,
       blocking: hasBlockingManualIssue || !decisions.some(decision => decision.blocking),
       blockingReason: hasBlockingManualIssue ? 'manual_only_failure_mode' : 'no_direct_family_evidence',
+      convergenceStatus: 'manual_only',
       semanticPolicy: unresolved.semanticPolicy,
       failureModeKeys: sortedUnique(input.failureModes.filter(mode => mode.classification === 'manual_only').map(mode => mode.key)),
       categoryIds: sortedUnique(input.failureModes.filter(mode => mode.classification === 'manual_only').flatMap(mode => mode.categoryIds)),
@@ -419,6 +464,7 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
       deprioritizedTools: [...unresolved.deprioritizedTools],
       expectedPostconditions: [...unresolved.expectedPostconditions],
       activeOpportunityKeys: [],
+      preferredAutoRunnableOpportunityKeys: [],
       currentStep: null,
       evidenceSignals: hasBlockingManualIssue
         ? sortedUnique(input.failureModes.filter(mode => mode.classification === 'manual_only').map(mode => `manual_only_failure_mode:${mode.key}`))
@@ -431,6 +477,15 @@ export function buildResidualFamilyDecisions(input: BuildResidualFamilyInput): R
   }
 
   return decisions
+}
+
+export function findSingleBlockingResidualFamilyConvergenceTarget(
+  residualFamilies: ResidualFamilyDecision[] = [],
+): ResidualFamilyDecision | null {
+  const blockingFamilies = residualFamilies.filter(family => family.blocking)
+  if (blockingFamilies.length !== 1) return null
+  const [family] = blockingFamilies
+  return family.convergenceStatus === 'preferred_tools_available' ? family : null
 }
 
 export function annotateToolOpportunitiesWithResidualFamilies(input: {
@@ -525,7 +580,12 @@ function evaluateTableSignals(previous: AnalysisResult, next: AnalysisResult): s
 
 function evaluateLinkSignals(previous: AnalysisResult, next: AnalysisResult): string[] {
   return [
-    ...blockingKeyRemoved(previous, next, ['pdfua.page_tabs', 'pdfua.annotation_alt_contents', 'pdfua.link_tagging']).map(key => `blocking_removed:${key}`),
+    ...blockingKeyRemoved(previous, next, [
+      'pdfua.page_tabs',
+      'pdfua.annotation_alt_contents',
+      'pdfua.link_tagging',
+      'pdfua.tagged_annotations',
+    ]).map(key => `blocking_removed:${key}`),
     ...categoryImprovement(previous, next, ['link_quality', 'reading_order', 'pdf_ua_compliance']).map(categoryId => `category_improved:${categoryId}`),
   ]
 }
