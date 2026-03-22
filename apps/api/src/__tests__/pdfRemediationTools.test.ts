@@ -4683,10 +4683,42 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     })
 
     const qpdf = await analyzeWithQpdf(result.buffer)
-    expect(result.action.outcome).toBe('applied')
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
     expect(qpdf.error).toBeNull()
     expect(qpdf.hasStructTree).toBe(true)
     expect(qpdf.hasMarkInfo).toBe(true)
+  }, 180_000)
+
+  it('skips bootstrap on long reports that already have stable heading structure and no figure bootstrap work', async () => {
+    const buffer = await loadProcessedAfterFixture('1988-1989_Biennial_Report.pdf')
+    const analysis = await analyzePDF(buffer, '1988-1989_Biennial_Report.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'bootstrap_struct_tree',
+        arguments: { target: 'document' },
+        rationale: 'Do not degrade stable long-report headings.',
+        confidence: 0.95,
+      },
+    })
+
+    const next = await analyzePDF(result.buffer, '1988-1989_Biennial_Report.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+
+    expect(result.action.outcome).toBe('no_effect')
+    expect(result.action.changedDocumentBytes).toBe(false)
+    expect(next.overallScore).toBe(100)
+    expect(next.categories.find(category => category.id === 'heading_structure')?.score).toBe(100)
   }, 180_000)
 
   it('plans legacy font substitution after embedding and Type1 Unicode recovery on annual-report PDFs', async () => {

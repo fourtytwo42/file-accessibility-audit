@@ -2082,6 +2082,7 @@ export async function executeRemediationTool(input: {
       }
     }
     case 'bootstrap_struct_tree': {
+      const headingScore = context.analysis.categories.find(category => category.id === 'heading_structure')?.score ?? null
       const headingCandidates = context.headingCandidates.length
         ? context.headingCandidates
         : context.pages.flatMap(page => {
@@ -2123,6 +2124,25 @@ export async function executeRemediationTool(input: {
           pageNumber: candidate.pageNumber,
           altText: bootstrapFigureAltText(candidate),
         }))
+      if (
+        context.qpdf.hasStructTree
+        && (context.qpdf.headings?.length || 0) > 0
+        && headingScore === 100
+        && figures.length === 0
+      ) {
+        return {
+          buffer,
+          action: {
+            ...baseAction,
+            details: 'Existing structure tree already exposes headings and there is no figure bootstrap work to do.',
+            autoApplied: false,
+            categoryTargets: ['heading_structure', 'reading_order'],
+            changedDocumentBytes: false,
+            outcome: 'no_effect',
+          },
+          manualReviewFlags: [],
+        }
+      }
       const result = await runPdfStructureBackend({
         buffer,
         mutation: {
