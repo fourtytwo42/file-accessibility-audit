@@ -2083,6 +2083,15 @@ export async function executeRemediationTool(input: {
     }
     case 'bootstrap_struct_tree': {
       const headingScore = context.analysis.categories.find(category => category.id === 'heading_structure')?.score ?? null
+      const bookmarkScore = context.analysis.categories.find(category => category.id === 'bookmarks')?.score ?? null
+      const pdfUaScore = context.analysis.categories.find(category => category.id === 'pdf_ua_compliance')?.score ?? null
+      const bootstrapTargetCategoryIds = new Set(['text_extractability', 'heading_structure', 'alt_text', 'reading_order', 'table_markup'])
+      const bootstrapTargetDebtRemaining = context.analysis.categories.some(category =>
+        bootstrapTargetCategoryIds.has(category.id)
+        && typeof category.score === 'number'
+        && category.score < 100,
+      )
+      const hasBlockingLocalFindings = (context.analysis.localStandards?.findings ?? []).some(finding => finding.blocking)
       const headingCandidates = context.headingCandidates.length
         ? context.headingCandidates
         : context.pages.flatMap(page => {
@@ -2126,17 +2135,18 @@ export async function executeRemediationTool(input: {
         }))
       if (
         context.qpdf.hasStructTree
-        && (context.qpdf.headings?.length || 0) > 0
-        && headingScore === 100
-        && figures.length === 0
+        && (
+          (headingScore === 100 && !bootstrapTargetDebtRemaining)
+          || (headingScore === 100 && bookmarkScore === 100 && pdfUaScore === 100 && !hasBlockingLocalFindings)
+        )
       ) {
         return {
           buffer,
           action: {
             ...baseAction,
-            details: 'Existing structure tree already exposes headings and there is no figure bootstrap work to do.',
+            details: 'Bootstrap target categories are already healthy, so skipping an unnecessary structure bootstrap pass.',
             autoApplied: false,
-            categoryTargets: ['heading_structure', 'reading_order'],
+            categoryTargets: ['text_extractability', 'heading_structure', 'alt_text', 'reading_order', 'table_markup'],
             changedDocumentBytes: false,
             outcome: 'no_effect',
           },

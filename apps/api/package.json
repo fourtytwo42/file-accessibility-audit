@@ -18,6 +18,7 @@
     "baseline:phase0:canary": "tsx src/scripts/generatePhase0Baseline.ts --corpus phase0-canary",
     "baseline:phase0:compare": "tsx src/scripts/comparePhase0Artifacts.ts --mode all",
     "baseline:processed:pairs": "tsx src/scripts/verifyProcessedRegressionPairs.ts",
+    "trace:long-reports": "tsx src/scripts/traceLongReportCleanup.ts",
     "verify:regressions": "pnpm test:regressions && pnpm baseline:phase0:compare"
   },
   "dependencies": {

@@ -4721,6 +4721,40 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(next.categories.find(category => category.id === 'heading_structure')?.score).toBe(100)
   }, 180_000)
 
+  it('skips bootstrap on long reports with stable heading structure even when other categories still cap the score', async () => {
+    const buffer = await loadProcessedAfterFixture('1996CHRIAudit.pdf')
+    const analysis = await analyzePDF(buffer, '1996CHRIAudit.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'bootstrap_struct_tree',
+        arguments: { target: 'document' },
+        rationale: 'Do not degrade stable headings on long reports that are still imperfect for non-heading reasons.',
+        confidence: 0.95,
+      },
+    })
+
+    const next = await analyzePDF(result.buffer, '1996CHRIAudit.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+
+    expect(analysis.overallScore).toBe(94)
+    expect(analysis.categories.find(category => category.id === 'heading_structure')?.score).toBe(100)
+    expect(result.action.outcome).toBe('no_effect')
+    expect(result.action.changedDocumentBytes).toBe(false)
+    expect(next.overallScore).toBe(94)
+    expect(next.categories.find(category => category.id === 'heading_structure')?.score).toBe(100)
+  }, 180_000)
+
   it('plans legacy font substitution after embedding and Type1 Unicode recovery on annual-report PDFs', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')
