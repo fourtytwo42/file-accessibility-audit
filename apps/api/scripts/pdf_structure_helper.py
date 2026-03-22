@@ -1127,6 +1127,10 @@ def split_group_into_text_and_graphics_segments(group):
             "splitSafe": False,
             "operatorPattern": "interleaved",
             "graphicsLikelyDecorative": False,
+            "containmentSafe": False,
+            "sawTextOutsideBt": saw_text_outside_bt,
+            "sawGraphicsInsideText": saw_graphics_inside_text,
+            "visibleSegmentCount": len(visible_kinds),
             "segments": segments,
         }
 
@@ -1155,11 +1159,21 @@ def split_group_into_text_and_graphics_segments(group):
     ]
     # Graphics are likely decorative (lines/borders) if they only use path/stroke ops
     graphics_likely_decorative = bool(graphics_ops) and all(op in {"m", "l", "S", "s", "re", "n", "c", "v", "y", "h", "f", "F", "f*", "B", "B*", "b", "b*", "W", "W*"} for op in graphics_ops)
+    visible_segment_count = len(visible_kinds)
+    containment_safe = (
+        not saw_graphics_inside_text
+        and visible_segment_count >= 2
+        and visible_segment_count <= 6
+    )
 
     return {
         "splitSafe": split_safe,
         "operatorPattern": operator_pattern,
         "graphicsLikelyDecorative": graphics_likely_decorative,
+        "containmentSafe": containment_safe,
+        "sawTextOutsideBt": saw_text_outside_bt,
+        "sawGraphicsInsideText": saw_graphics_inside_text,
+        "visibleSegmentCount": visible_segment_count,
         "segments": segments,
     }
 
@@ -1195,6 +1209,10 @@ def page_mcid_analysis(page_obj):
         entry["splitSafe"] = bool(split_info["splitSafe"])
         entry["graphicsLikelyDecorative"] = bool(split_info["graphicsLikelyDecorative"])
         entry["operatorPattern"] = split_info["operatorPattern"]
+        entry["containmentSafe"] = bool(split_info.get("containmentSafe", False))
+        entry["visibleSegmentCount"] = int(split_info.get("visibleSegmentCount") or 0)
+        entry["sawTextOutsideBt"] = bool(split_info.get("sawTextOutsideBt", False))
+        entry["sawGraphicsInsideText"] = bool(split_info.get("sawGraphicsInsideText", False))
     return usage
 
 
@@ -1285,8 +1303,12 @@ def struct_elem_mcid_info(pdf):
         direct_text_op_count = sum(int(usage.get(mcid, {}).get("textOpCount") or 0) for mcid in direct_mcids)
         direct_graphics_op_count = sum(int(usage.get(mcid, {}).get("graphicsOpCount") or 0) for mcid in direct_mcids)
         split_safe = any(usage.get(mcid, {}).get("splitSafe") for mcid in mcids)
+        containment_safe = any(usage.get(mcid, {}).get("containmentSafe") for mcid in mcids)
         graphics_likely_decorative = all(usage.get(mcid, {}).get("graphicsLikelyDecorative") for mcid in mcids) if has_graphics else False
         operator_pattern = next((usage.get(mcid, {}).get("operatorPattern") for mcid in mcids if usage.get(mcid, {}).get("operatorPattern")), None)
+        visible_segment_count = max(int(usage.get(mcid, {}).get("visibleSegmentCount") or 0) for mcid in mcids) if mcids else 0
+        saw_text_outside_bt = any(bool(usage.get(mcid, {}).get("sawTextOutsideBt", False)) for mcid in mcids)
+        saw_graphics_inside_text = any(bool(usage.get(mcid, {}).get("sawGraphicsInsideText", False)) for mcid in mcids)
         graphics_dominant = direct_has_graphics and (
             not direct_has_text
             or direct_graphics_op_count >= max(3, direct_text_op_count * 3)
@@ -1309,11 +1331,15 @@ def struct_elem_mcid_info(pdf):
             "directHasText": direct_has_text,
             "directHasGraphics": direct_has_graphics,
             "splitSafe": split_safe,
+            "containmentSafe": containment_safe,
             "graphicsLikelyDecorative": graphics_likely_decorative,
             "graphicsDominant": graphics_dominant,
             "textOpCount": direct_text_op_count,
             "graphicsOpCount": direct_graphics_op_count,
             "operatorPattern": operator_pattern,
+            "visibleSegmentCount": visible_segment_count,
+            "sawTextOutsideBt": saw_text_outside_bt,
+            "sawGraphicsInsideText": saw_graphics_inside_text,
             "parentTagPath": parent_tag_path(obj),
         }
         entries.append(entry)
@@ -1377,11 +1403,15 @@ def acrobat_alt_risk_nodes(pdf):
             "hasGraphics": entry["hasGraphics"],
             "hasAlt": has_alt,
             "splitSafe": entry.get("splitSafe", False),
+            "containmentSafe": entry.get("containmentSafe", False),
             "graphicsLikelyDecorative": entry.get("graphicsLikelyDecorative", False),
             "graphicsDominant": entry.get("graphicsDominant", False),
             "textOpCount": entry.get("textOpCount", 0),
             "graphicsOpCount": entry.get("graphicsOpCount", 0),
             "operatorPattern": entry.get("operatorPattern"),
+            "visibleSegmentCount": entry.get("visibleSegmentCount", 0),
+            "sawTextOutsideBt": entry.get("sawTextOutsideBt", False),
+            "sawGraphicsInsideText": entry.get("sawGraphicsInsideText", False),
             "parentTagPath": entry["parentTagPath"],
             "ownershipMode": ownership_mode,
             "duplicateOwnerRefs": duplicates,
@@ -2698,6 +2728,185 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
     return True, applied, [], [{"textMcids": text_mcids, "graphicsMcids": graphics_mcids, "figureRef": ref_string(figure_elem)}]
 
 
+def contain_mixed_mcid_owner_with_children(pdf, source_obj, risk):
+    page_obj = source_obj.get("/Pg")
+    if not isinstance(page_obj, pikepdf.Dictionary):
+        return False, [], [f"{risk['tag']} {risk['ref']} is missing a concrete /Pg reference."], []
+
+    mcids = risk.get("mcids") or []
+    if len(mcids) != 1:
+        return False, [], [f"{risk['tag']} {risk['ref']} spans multiple MCIDs and is not eligible for deterministic containment."], []
+
+    direct_mcids = direct_struct_elem_mcids(source_obj)
+    if len(direct_mcids) != 1:
+        return False, [], [f"{risk['tag']} {risk['ref']} already mixes direct and nested ownership; skipping deterministic containment."], []
+
+    existing_kids = source_obj.get("/K")
+    if isinstance(existing_kids, pikepdf.Array):
+        has_struct_children = any(
+            isinstance(child, pikepdf.Dictionary)
+            and (
+                str(child.get("/Type", "")) == "/StructElem"
+                or child.get("/S") is not None
+            )
+            for child in existing_kids
+        )
+        if has_struct_children:
+            return False, [], [f"{risk['tag']} {risk['ref']} already contains nested structure children and was skipped for deterministic containment."], []
+
+    target_mcid = int(mcids[0])
+    groups, group_index = top_level_mcid_group_index(page_obj, target_mcid)
+    if group_index is None:
+        return False, [], [f"Could not locate the top-level marked-content group for MCID {target_mcid} on {risk['pageRef']}."], []
+
+    group = groups[group_index][1]
+    split_info = split_group_into_text_and_graphics_segments(group)
+    if not split_info:
+        return False, [], [f"No containment segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+    if split_info.get("splitSafe"):
+        return False, [], [f"MCID {target_mcid} on {risk['pageRef']} is already split-safe and should use deterministic splitting."], []
+    if not split_info.get("containmentSafe"):
+        return False, [], [f"MCID {target_mcid} on {risk['pageRef']} still requires manual remediation because containment is not safe."], []
+
+    segments = split_info.get("segments") or []
+    if not segments:
+        return False, [], [f"No containment segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+
+    root = get_struct_tree_root(pdf)
+    if not isinstance(root, pikepdf.Dictionary):
+        return False, [], ["Could not locate the structure tree root for mixed-content alternate-text containment."], []
+
+    page_ref = ref_string(page_obj)
+    reserved_mcids = set(extract_page_mcids(page_obj))
+    for entry in struct_elem_mcid_info(pdf)[0]:
+        if entry.get("pageRef") != page_ref:
+            continue
+        reserved_mcids.update(entry.get("mcids") or [])
+
+    parent_tree, nums, page_key, current_entry = parent_tree_entry_for_page(root, pdf, page_obj)
+    reserved_mcids.update(index for index, owner in enumerate(current_entry) if owner is not None)
+    next_mcid = (max(reserved_mcids) + 1) if reserved_mcids else 0
+
+    graphics_likely_decorative = bool(risk.get("graphicsLikelyDecorative", False))
+    rewritten_groups = []
+    child_specs = []
+    text_mcids = []
+    graphics_mcids = []
+
+    for segment in segments:
+        instructions = segment.get("instructions") or []
+        if not instructions:
+            continue
+        if segment["kind"] == "graphics" and not segment.get("hasVisibleGraphics"):
+            if rewritten_groups:
+                rewritten_groups[-1].extend(instructions)
+            else:
+                rewritten_groups.append(list(instructions))
+            continue
+        if segment["kind"] == "graphics" and graphics_likely_decorative:
+            rewritten_groups.append([
+                pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                *instructions,
+                pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
+            ])
+            continue
+        mcid = next_mcid
+        next_mcid += 1
+        tag_name = "/Span" if segment["kind"] == "text" else "/Figure"
+        props = pikepdf.Dictionary({"/MCID": mcid})
+        rewritten_groups.append([
+            pikepdf.ContentStreamInstruction([pikepdf.Name(tag_name), props], pikepdf.Operator("BDC")),
+            *instructions,
+            pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
+        ])
+        child_specs.append({
+            "kind": segment["kind"],
+            "mcid": mcid,
+        })
+        if segment["kind"] == "text":
+            text_mcids.append(mcid)
+        else:
+            graphics_mcids.append(mcid)
+
+    if not text_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} did not produce text segments during containment."], []
+    if not graphics_likely_decorative and not graphics_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} did not produce graphics segments during containment."], []
+
+    rewritten = []
+    for index, (_, existing_group) in enumerate(groups):
+        if index != group_index:
+            rewritten.extend(existing_group)
+            continue
+        for wrapped in rewritten_groups:
+            rewritten.extend(wrapped)
+    page_obj["/Contents"] = pdf.make_stream(pikepdf.unparse_content_stream(rewritten))
+
+    highest = max(text_mcids + graphics_mcids) if graphics_mcids else max(text_mcids)
+    while len(current_entry) <= highest:
+        current_entry.append(None)
+    current_entry[target_mcid] = None
+
+    actual_text = str(source_obj.get("/ActualText") or "").strip()
+    child_refs = pikepdf.Array()
+    applied = [{
+        "ref": risk["ref"],
+        "before": f"MCID {target_mcid}",
+        "after": "child /Span and /Figure containment",
+        "details": (
+            f"Contained mixed text and graphics ownership for {risk['tag']} element {risk['ref']} "
+            f"under child structure elements while preserving the original parent tag."
+        ),
+    }]
+
+    for child in child_specs:
+        child_tag = "/Span" if child["kind"] == "text" else "/Figure"
+        child_elem = pdf.make_indirect(pikepdf.Dictionary({
+            "/Type": pikepdf.Name("/StructElem"),
+            "/S": pikepdf.Name(child_tag),
+            "/P": source_obj,
+            "/Pg": page_obj,
+            "/K": int(child["mcid"]),
+        }))
+        if child["kind"] == "graphics" and actual_text:
+            child_elem["/Alt"] = pikepdf.String(actual_text)
+        child_refs.append(child_elem)
+        current_entry[int(child["mcid"])] = child_elem
+        applied.append({
+            "ref": ref_string(child_elem),
+            "before": None,
+            "after": f"MCID {child['mcid']}",
+            "details": (
+                f"Created child {child_tag} element {ref_string(child_elem)} for contained MCID {child['mcid']} "
+                f"under {risk['tag']} {risk['ref']}."
+            ),
+        })
+
+    source_obj["/K"] = child_refs
+    existing_alt = source_obj.get("/Alt")
+    if existing_alt is not None:
+        try:
+            del source_obj["/Alt"]
+        except Exception:
+            pass
+
+    upsert_parent_tree_entry(nums, page_key, current_entry)
+    root["/ParentTree"] = parent_tree
+
+    if graphics_likely_decorative:
+        applied.append({
+            "ref": risk["ref"],
+            "before": None,
+            "after": "/Artifact",
+            "details": (
+                f"Wrapped decorative graphics segments from {risk['tag']} {risk['ref']} as /Artifact while preserving text ownership."
+            ),
+        })
+        return True, applied, [], [{"textMcids": text_mcids, "graphicsMcids": [], "figureRef": None}]
+
+    return True, applied, [], [{"textMcids": text_mcids, "graphicsMcids": graphics_mcids, "figureRef": None}]
+
+
 def mutate_repair_other_elements_alt_text(pdf, mutation):
     changed = False
     applied = []
@@ -3121,6 +3330,16 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                 continue
             # Split failed despite splitSafe=True — fall through to /Alt fallback below.
             unresolved.extend(split_warnings[:3])
+
+        if mode == "mixed_text_graphics_same_mcid" and risk.get("containmentSafe"):
+            contain_changed, contain_applied, contain_warnings, _ = contain_mixed_mcid_owner_with_children(pdf, obj, risk)
+            if contain_changed:
+                changed = True
+                repairs_applied += 1
+                applied.extend(contain_applied)
+                unresolved.extend(contain_warnings[:3])
+                continue
+            unresolved.extend(contain_warnings[:3])
 
         if mode == "mixed_text_graphics_same_mcid":
             # Element mixes text and graphics in the same MCID and could not be split.

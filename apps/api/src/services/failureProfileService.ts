@@ -800,6 +800,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       || node.ownershipMode === 'graphics_only_nonfigure'
       // split-safe: can rewrite content stream to separate text and graphics MCIDs
       || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe)
+      || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.containmentSafe)
       // orphaned_alt_empty_element: remove /Alt from empty element with no content
       || node.ownershipMode === 'orphaned_alt_empty_element'
       // nonfigure_with_alt: remove /Alt from non-Figure element that has actual content
@@ -824,7 +825,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
           : node.ownershipMode === 'orphaned_alt_empty_element'
             ? `${node.tag} has /Alt but no MCID content (empty element) — triggers "Associated with content" in Adobe Acrobat.`
             : node.ownershipMode === 'mixed_text_graphics_same_mcid'
-              ? `${node.tag} mixes text and graphics in MCID ${node.mcids?.join(', ') || 'unknown'} (${node.operatorPattern || 'mixed'}, splitSafe=${node.splitSafe}).`
+              ? `${node.tag} mixes text and graphics in MCID ${node.mcids?.join(', ') || 'unknown'} (${node.operatorPattern || 'mixed'}, splitSafe=${node.splitSafe}, containmentSafe=${node.containmentSafe}).`
               : node.ownershipMode === 'duplicate_mcid_ownership'
                 ? `${node.tag} shares MCID ownership with ${node.duplicateOwnerRefs?.join(', ') || 'another structure element'}.`
                 : node.ownershipMode === 'container_with_graphics_descendants'
@@ -1334,6 +1335,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     node.ownershipMode === 'duplicate_mcid_ownership'
     || node.ownershipMode === 'container_with_graphics_descendants'
     || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.splitSafe)
+    || (node.ownershipMode === 'mixed_text_graphics_same_mcid' && node.containmentSafe)
     || node.ownershipMode === 'graphics_only_nonfigure'
     // orphaned_alt_empty_element: remove /Alt from empty element (no content kids)
     || node.ownershipMode === 'orphaned_alt_empty_element'

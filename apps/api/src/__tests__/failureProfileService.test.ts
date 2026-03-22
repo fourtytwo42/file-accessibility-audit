@@ -1539,6 +1539,7 @@ describe('failureProfileService', () => {
               parentTagPath: ['/Document'],
               ownershipMode: 'mixed_text_graphics_same_mcid',
               splitSafe: false,
+              containmentSafe: false,
               operatorPattern: 'interleaved',
               duplicateOwnerRefs: [],
             },
@@ -1551,6 +1552,59 @@ describe('failureProfileService', () => {
 
     expect(result.failureProfile.failureModes.some(mode => mode.key === 'acrobat.other_elements_alt_text' && mode.classification === 'manual_only')).toBe(true)
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'deferred')).toBe(true)
+  })
+
+  it('treats containable mixed Acrobat-risk nodes as deterministically repairable', () => {
+    const analysis = makeAnalysisResult({
+      overallScore: 82,
+      grade: 'B',
+      verapdf: {
+        ...makeAnalysisResult().verapdf,
+        status: 'failed',
+        isCompliant: false,
+      },
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? {
+              ...category,
+              score: 60,
+              grade: 'D',
+              severity: 'Moderate',
+              findings: ['Acrobat-risk mixed text and graphics ownership remains.'],
+            }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [
+            {
+              ref: 'obj:21 0 R',
+              tag: '/H1',
+              pageRef: 'obj:1 0 R',
+              mcids: [2],
+              hasText: true,
+              hasGraphics: true,
+              parentTagPath: ['/Document'],
+              ownershipMode: 'mixed_text_graphics_same_mcid',
+              splitSafe: false,
+              containmentSafe: true,
+              operatorPattern: 'interleaved',
+              duplicateOwnerRefs: [],
+            },
+          ],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'acrobat.other_elements_alt_text' && mode.classification === 'deterministic')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_other_elements_alt_text' && opportunity.status === 'auto_runnable')).toBe(true)
   })
 
   it('keeps Acrobat-risk repair opportunity available even when alt-text already scores 100', () => {

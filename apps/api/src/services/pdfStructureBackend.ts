@@ -168,11 +168,15 @@ export interface StructureBackendMutationResult {
     hasGraphics?: boolean
     hasAlt?: boolean
     splitSafe?: boolean
+    containmentSafe?: boolean
     graphicsLikelyDecorative?: boolean
     graphicsDominant?: boolean
     textOpCount?: number
     graphicsOpCount?: number
     operatorPattern?: 'text_then_graphics' | 'graphics_then_text' | 'interleaved' | null
+    visibleSegmentCount?: number
+    sawTextOutsideBt?: boolean
+    sawGraphicsInsideText?: boolean
     parentTagPath?: string[]
     ownershipMode?: 'mixed_text_graphics_same_mcid' | 'graphics_only_nonfigure' | 'duplicate_mcid_ownership' | 'container_with_graphics_descendants' | 'orphaned_alt_empty_element' | 'nonfigure_with_alt' | 'untagged_image_mcid' | 'untagged_image_direct' | 'nested_alt_text_hides_content'
     duplicateOwnerRefs?: string[]

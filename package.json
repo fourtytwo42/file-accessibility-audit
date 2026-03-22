@@ -22,6 +22,7 @@
     "baseline:processed:capability": "pnpm --filter api baseline:processed:capability",
     "baseline:processed:font-capability": "pnpm --filter api baseline:processed:font-capability",
     "trace:97anreport": "pnpm --filter api trace:97anreport",
+    "trace:annual-reports": "pnpm --filter api trace:annual-reports",
     "trace:long-reports": "pnpm --filter api trace:long-reports",
     "trace:long-report-figures": "pnpm --filter api trace:long-report-figures",
     "trace:font-cluster": "pnpm --filter api trace:font-cluster",
