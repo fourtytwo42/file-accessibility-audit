@@ -489,6 +489,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         pageCount: 1,
         hasText: true,
         textLength: 50,
+        pages: [],
         title: null,
         author: null,
         subject: null,
@@ -683,6 +684,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
         pageCount: 1,
         hasText: true,
         textLength: 100,
+        pages: [],
         title: null,
         author: null,
         subject: null,
@@ -4863,6 +4865,18 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
 
     expect(analysis.overallScore).toBe(100)
     expect(context.figureCandidates).toHaveLength(0)
+  }, 180_000)
+
+  it('suppresses OCR page-backdrop figure candidates on long reports with extractable page text', async () => {
+    const buffer = await loadProcessedAfterFixture('1998_Madison.pdf')
+    const analysis = await analyzePDF(buffer, '1998_Madison.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    expect(context.figureCandidates.length).toBeLessThan(20)
   }, 180_000)
 
   it('skips bootstrap on long reports that already have stable heading structure and no figure bootstrap work', async () => {

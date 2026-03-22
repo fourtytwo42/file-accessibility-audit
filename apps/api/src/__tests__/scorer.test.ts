@@ -57,6 +57,7 @@ function makePdfjs(overrides: Partial<PdfjsResult> = {}): PdfjsResult {
     pageCount: 1,
     hasText: false,
     textLength: 0,
+    pages: [],
     title: null,
     author: null,
     subject: null,
@@ -379,6 +380,36 @@ describe('N/A category handling', () => {
     expect(cat.score).toBeNull()
     expect(cat.grade).toBeNull()
     expect(cat.severity).toBeNull()
+  })
+
+  it('alt_text is null for single-image OCR page backdrops without a matching structure figure', () => {
+    const qpdf = makeQpdf({
+      hasStructTree: true,
+      images: [
+        {
+          ref: 'obj:404 0 R',
+          canonicalRef: 'obj:404 0 R',
+          pageNumber: 65,
+          placementPageNumbers: [65],
+          placementCount: 1,
+          hasAlt: false,
+        },
+      ],
+    })
+    const pdfjs = makePdfjs({
+      pageCount: 65,
+      hasText: true,
+      textLength: 10_000,
+      imageCount: 1,
+      pages: [
+        { pageNumber: 65, textLength: 336, textItemCount: 40, hasMeaningfulText: true, imageCount: 1 },
+      ],
+    })
+    const result = scoreDocument(qpdf, pdfjs, makeVeraPdf(), makeStructure({
+      figures: [],
+      imageStructNodes: [],
+    }))
+    expect(findCategory(result, 'alt_text').score).toBeNull()
   })
 
   it('bookmarks is null for short documents', () => {

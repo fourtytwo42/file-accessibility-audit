@@ -51,6 +51,7 @@ function makePdfjs(overrides: Partial<PdfjsResult> = {}): PdfjsResult {
     pageCount: 1,
     hasText: true,
     textLength: 100,
+    pages: [],
     title: 'Example',
     author: null,
     subject: null,

@@ -459,7 +459,8 @@ function isGenericHeadingText(text: string | null | undefined): boolean {
 
 function effectiveAltFigureStats(
   qpdf: QpdfResult,
-  structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
+  pdfjs: PdfjsResult,
+  structure?: Pick<StructureBackendMutationResult, 'figures' | 'imageStructNodes'> | null,
 ): {
   figures: Array<{ ref: string; hasAlt: boolean; altText?: string; altQuality: AltQuality }>
   withAlt: number
@@ -469,6 +470,8 @@ function effectiveAltFigureStats(
   structureCreditApplied: boolean
 } {
   const structureFigures = structure?.figures || []
+  const structureImageNodes = structure?.imageStructNodes || []
+  const pageSummaryByNumber = new Map((pdfjs.pages || []).map(page => [page.pageNumber, page]))
   const qpdfCanonicalByRef = new Map<string, string>()
   for (const image of qpdf.images) {
     const canonicalRef = image.canonicalRef || image.ref
@@ -512,9 +515,34 @@ function effectiveAltFigureStats(
       )
       .map(figure => figure.ref),
   )
+  const protectedStructureRefs = new Set<string>()
+  for (const figure of structureFigures) {
+    if (figure.ref) protectedStructureRefs.add(figure.ref)
+    if (figure.splitSourceRef) protectedStructureRefs.add(figure.splitSourceRef)
+  }
+  for (const node of structureImageNodes) {
+    if (node.ref) protectedStructureRefs.add(node.ref)
+  }
+  const excludedOcrBackdropRefs = new Set(
+    qpdf.images
+      .filter(image => {
+        const ref = image.canonicalRef || image.ref
+        if (!ref || protectedStructureRefs.has(ref)) return false
+        if ((image.placementCount || 0) !== 1) return false
+        if (!image.pageNumber) return false
+        const pageSummary = pageSummaryByNumber.get(image.pageNumber)
+        if (!pageSummary) return false
+        return pageSummary.imageCount === 1 && pageSummary.hasMeaningfulText
+      })
+      .map(image => image.canonicalRef || image.ref),
+  )
   const filteredQpdfFigures = collapseFigureVariants(
     qpdf.images
-      .filter((img): img is typeof img & { ref: string } => !!img.ref && !excludedWrapperRefs.has(img.ref))
+      .filter((img): img is typeof img & { ref: string } =>
+        !!img.ref
+        && !excludedWrapperRefs.has(img.ref)
+        && !excludedOcrBackdropRefs.has(img.canonicalRef || img.ref),
+      )
       .map(img => ({
         ref: img.canonicalRef || img.ref,
         hasAlt: img.hasAlt,
@@ -578,7 +606,7 @@ export function scoreDocument(
     isCompliant: true,
     message: 'veraPDF passed PDF/UA validation.',
   }),
-  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures' | 'headings' | 'structuralNodes'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures' | 'imageStructNodes' | 'headings' | 'structuralNodes'> | null,
   adobe?: AdobeSummary | null,
   localStandards: LocalStandardsReport = { status: 'clear', findings: [], knownGapKeys: ['pdfua.local_coverage_unconfirmed'] },
   extras?: {
@@ -1045,7 +1073,7 @@ function scoreHeadingStructureWithContent(
 function scoreAltText(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
-  structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'figures' | 'imageStructNodes'> | null,
 ): CategoryResult {
   const altLinks: CategoryResult['helpLinks'] = [
     { label: 'Adobe: Add Alt Text to Images', url: 'https://helpx.adobe.com/acrobat/using/editing-document-structure-content-tags.html#add_alternate_text_to_links_and_figures' },
@@ -1061,7 +1089,7 @@ function scoreAltText(
     lowQualityAltCount,
     wrapperExclusionCount,
     structureCreditApplied,
-  } = effectiveAltFigureStats(qpdf, structure)
+  } = effectiveAltFigureStats(qpdf, pdfjs, structure)
 
   // QPDF found no tagged images, but pdfjs detected image rendering operations.
   // Since QPDF comprehensively parses every indirect object, if it finds zero
@@ -1167,7 +1195,7 @@ function scoreAltTextWithAcrobatRisk(
   qpdf: QpdfResult,
   pdfjs: PdfjsResult,
   verapdf: VeraPdfResult,
-  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures'> | null,
+  structure?: Pick<StructureBackendMutationResult, 'acrobatAltRiskNodes' | 'figures' | 'imageStructNodes'> | null,
 ): CategoryResult {
   const acrobatAltRiskNodes = structure?.acrobatAltRiskNodes || []
   const countsAsSubstantiveAltRisk = (node: AcrobatAltRiskNode): boolean =>
@@ -1245,7 +1273,7 @@ function scoreAltTextWithAcrobatRisk(
   ).length
   const residualUntaggedImageCount = acrobatAltRiskNodes.filter(node => node.ownershipMode === 'untagged_image_mcid').length
   if (!substantiveRiskNodes.length) {
-    const { figures, withAlt } = effectiveAltFigureStats(qpdf, structure)
+    const { figures, withAlt } = effectiveAltFigureStats(qpdf, pdfjs, structure)
     const missingWithoutAlt = Math.max(0, figures.length - withAlt)
     const decorativeAllowance = Math.min(acrobatAltRiskNodes.length, missingWithoutAlt)
     const informativeFigureCount = figures.length - decorativeAllowance
@@ -1280,7 +1308,7 @@ function scoreAltTextWithAcrobatRisk(
       ],
     }
   }
-  const { figures, withAlt: figuresWithAlt } = effectiveAltFigureStats(qpdf, structure)
+  const { figures, withAlt: figuresWithAlt } = effectiveAltFigureStats(qpdf, pdfjs, structure)
   const missingFigureCount = Math.max(0, figures.length - figuresWithAlt)
   const allDetectedFiguresHaveAlt = figures.length > 0 && figures.every(fig => fig.hasAlt)
   const guidanceOnlyResidualRisk = substantiveRiskNodes.every(node =>

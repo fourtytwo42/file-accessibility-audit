@@ -272,6 +272,26 @@ function shouldEmitFigureCandidate(input: {
   return false
 }
 
+function isLikelyOcrPageBackdropCandidate(input: {
+  targetTag?: string | null
+  pageImageCount?: number
+  placementCount?: number
+  textDensityHint: FigureCandidate['textDensityHint']
+  imageEvidence: FigureCandidate['imageEvidence']
+  informativeHint: FigureCandidate['informativeHint']
+  surroundingText: string[]
+}): boolean {
+  if (input.targetTag) return false
+  if ((input.pageImageCount || 0) !== 1) return false
+  if ((input.placementCount || 0) !== 1) return false
+  if (input.imageEvidence !== 'strong') return false
+  if (input.informativeHint !== 'informative') return false
+  const textLength = input.surroundingText.join(' ').trim().length
+  if (input.textDensityHint === 'high' && textLength >= 120) return true
+  if (input.textDensityHint === 'medium' && textLength >= 50) return true
+  return false
+}
+
 export interface ReadingOrderCandidate {
   id: string
   ref: string
@@ -1063,6 +1083,15 @@ function buildFigureCandidates(
       splitSourceTag: figure.splitSourceTag || null,
     }
     })
+    .filter(candidate => !isLikelyOcrPageBackdropCandidate({
+      targetTag: candidate.targetTag,
+      pageImageCount: candidate.pageImageCount,
+      placementCount: candidate.placementCount,
+      textDensityHint: candidate.textDensityHint,
+      imageEvidence: candidate.imageEvidence,
+      informativeHint: candidate.informativeHint,
+      surroundingText: candidate.surroundingText,
+    }))
     .filter(candidate => shouldEmitFigureCandidate({
       hasAlt: candidate.hasAlt,
       hasLowQualityAlt: candidate.hasLowQualityAlt,
@@ -1101,6 +1130,15 @@ function buildFigureCandidates(
       containsText: !!node.hasText,
     }
   })
+    .filter(candidate => !isLikelyOcrPageBackdropCandidate({
+      targetTag: candidate.targetTag,
+      pageImageCount: candidate.pageImageCount,
+      placementCount: candidate.placementCount,
+      textDensityHint: candidate.textDensityHint,
+      imageEvidence: candidate.imageEvidence,
+      informativeHint: candidate.informativeHint,
+      surroundingText: candidate.surroundingText,
+    }))
     .filter(candidate => shouldEmitFigureCandidate({
       hasAlt: candidate.hasAlt,
       hasLowQualityAlt: candidate.hasLowQualityAlt,
@@ -1155,6 +1193,15 @@ function buildFigureCandidates(
         imageEvidence,
       }
     })
+    .filter(candidate => !isLikelyOcrPageBackdropCandidate({
+      targetTag: candidate.targetTag,
+      pageImageCount: candidate.pageImageCount,
+      placementCount: candidate.placementCount,
+      textDensityHint: candidate.textDensityHint,
+      imageEvidence: candidate.imageEvidence,
+      informativeHint: candidate.informativeHint,
+      surroundingText: candidate.surroundingText,
+    }))
     .filter(candidate => shouldEmitFigureCandidate({
       hasAlt: candidate.hasAlt,
       hasLowQualityAlt: candidate.hasLowQualityAlt,
@@ -1207,7 +1254,15 @@ function buildFigureCandidates(
       textDensityHint,
       imageEvidence,
     }
-  }).filter(candidate => shouldEmitFigureCandidate({
+  }).filter(candidate => !isLikelyOcrPageBackdropCandidate({
+    targetTag: candidate.targetTag,
+    pageImageCount: candidate.pageImageCount,
+    placementCount: candidate.placementCount,
+    textDensityHint: candidate.textDensityHint,
+    imageEvidence: candidate.imageEvidence,
+    informativeHint: candidate.informativeHint,
+    surroundingText: candidate.surroundingText,
+  })).filter(candidate => shouldEmitFigureCandidate({
     hasAlt: candidate.hasAlt,
     hasLowQualityAlt: candidate.hasLowQualityAlt,
     informativeHint: candidate.informativeHint,

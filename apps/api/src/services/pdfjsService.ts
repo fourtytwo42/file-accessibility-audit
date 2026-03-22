@@ -15,6 +15,13 @@ export interface PdfjsResult {
   pageCount: number
   hasText: boolean
   textLength: number
+  pages: Array<{
+    pageNumber: number
+    textLength: number
+    textItemCount: number
+    hasMeaningfulText: boolean
+    imageCount: number
+  }>
   title: string | null
   author: string | null
   subject: string | null
@@ -55,6 +62,7 @@ export async function analyzeWithPdfjs(
     pageCount: 0,
     hasText: false,
     textLength: 0,
+    pages: [],
     title: null,
     author: null,
     subject: null,
@@ -170,6 +178,7 @@ export async function analyzeWithPdfjs(
     const OPS = pdfjsLib.OPS as Record<string, number>
     const imageOps = new Set([OPS.paintImageXObject, OPS.paintJpegXObject, OPS.paintImageXObjectRepeat].filter(v => v !== undefined))
     let imageCount = 0
+    const pageTextSummaries: PdfjsResult['pages'] = []
     for (let i = 1; i <= doc.numPages; i++) {
       if (options?.signal?.aborted) {
         const error = new Error('PDF.js cancelled') as any
@@ -177,12 +186,29 @@ export async function analyzeWithPdfjs(
         throw error
       }
       const page = await doc.getPage(i)
+      const textContent = await page.getTextContent()
       const ops = await page.getOperatorList()
+      let pageImageCount = 0
       for (const fn of ops.fnArray) {
-        if (imageOps.has(fn)) imageCount++
+        if (imageOps.has(fn)) {
+          imageCount++
+          pageImageCount++
+        }
       }
+      const pageText = textContent.items
+        .map((item: any) => item.str || '')
+        .join(' ')
+        .trim()
+      pageTextSummaries.push({
+        pageNumber: i,
+        textLength: pageText.length,
+        textItemCount: textContent.items.length,
+        hasMeaningfulText: pageText.length > 50,
+        imageCount: pageImageCount,
+      })
     }
     result.imageCount = imageCount
+    result.pages = pageTextSummaries
 
     result.textLength = totalText.trim().length
     result.hasText = result.textLength > 50 // Minimum meaningful text
