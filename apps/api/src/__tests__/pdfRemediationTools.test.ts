@@ -991,6 +991,8 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const filenames = [
       '11drug_seizures_1997-2007.pdf',
       '12drug_submissions_1997-2007.pdf',
+      '13drug_treatment_1999-2008.pdf',
+      '14felony_and_misdemeanor_filings_1999-2008.pdf',
       '15adult_probation_1999-2008.pdf',
     ] as const
 
