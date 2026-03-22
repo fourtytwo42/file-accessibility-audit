@@ -1224,12 +1224,96 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       },
     })
 
-    expect(backendSpy).toHaveBeenCalledWith(expect.objectContaining({
-      mutation: expect.objectContaining({
-        operation: 'bootstrap_struct_tree',
-        figures: [{ pageNumber: 1, altText: 'Image related to Cover chart' }],
-      }),
-    }))
+    expect(backendSpy).toHaveBeenCalledTimes(1)
+    const backendArgs = backendSpy.mock.calls[0]?.[0]
+    expect(backendArgs?.mutation).toMatchObject({
+      operation: 'bootstrap_struct_tree',
+      figures: [{ pageNumber: 1 }],
+    })
+    expect(backendArgs?.mutation.figures).toHaveLength(1)
+    expect(backendArgs?.mutation.figures[0]?.altText).toContain('Cover chart')
+  })
+
+  it('does not pass existing figure nodes back into bootstrap_struct_tree', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'bootstrap-existing-figures.pdf')
+    const inspected = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const context: PdfRemediationContext = {
+      ...inspected,
+      headingCandidates: [],
+      figureCandidates: [
+        {
+          id: 'figure:existing',
+          pageNumber: 1,
+          targetRef: 'obj:10 0 R',
+          bbox: { x: 0, y: 0, width: 0.5, height: 0.5 },
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          surroundingText: ['Existing figure.'],
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          pageImageCount: 1,
+          textDensityHint: 'high',
+          imageEvidence: 'vector',
+        },
+        {
+          id: 'figure:new',
+          pageNumber: 1,
+          targetRef: 'obj:11 0 R',
+          bbox: { x: 0, y: 0, width: 0.5, height: 0.5 },
+          hasAlt: false,
+          altText: null,
+          informativeHint: 'informative',
+          surroundingText: ['Cover chart.'],
+          repairMode: 'defer',
+          targetTag: null,
+          pageImageCount: 1,
+          textDensityHint: 'low',
+          imageEvidence: 'strong',
+        },
+      ],
+    }
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [{
+        ref: 'obj:20 0 R',
+        before: null,
+        after: '/Figure',
+        details: 'Created figure tag with alt text.',
+      }],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: buffer,
+    })
+
+    await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'bootstrap_struct_tree',
+        arguments: { target: 'document' },
+        rationale: 'Bootstrap structure tree.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalledTimes(1)
+    const backendArgs = backendSpy.mock.calls[0]?.[0]
+    expect(backendArgs?.mutation).toMatchObject({
+      operation: 'bootstrap_struct_tree',
+      figures: [{ pageNumber: 1 }],
+    })
+    expect(backendArgs?.mutation.figures).toHaveLength(1)
+    expect(backendArgs?.mutation.figures[0]?.altText).toContain('Cover chart')
   })
 
   it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {

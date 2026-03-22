@@ -2028,6 +2028,7 @@ export async function executeRemediationTool(input: {
       const figures = context.figureCandidates
         .filter(candidate =>
           (candidate.pageImageCount > 0 || candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector')
+          && candidate.targetTag !== '/Figure'
           && candidate.informativeHint !== 'decorative'
           && Number.isFinite(candidate.pageNumber)
         )
