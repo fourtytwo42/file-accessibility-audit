@@ -150,6 +150,7 @@ export function buildFailureSignature(input: {
     failureModeKeys,
     pdfClass,
     hash: hashFailureSignature(failureModeKeys, pdfClass),
+    residualFamilyIds: (input.failureProfile.residualFamilies || []).map(family => family.id),
   }
 }
 
@@ -173,6 +174,9 @@ export function buildPlaybookSequence(actions: RemediationActionRecord[]): Playb
       tool: action.tool,
       scope,
       stage: stageForTool(action.tool),
+      familyId: action.familyId,
+      familyStep: action.familyStep,
+      postconditionStatus: action.postconditionStatus,
     })
   }
   return next

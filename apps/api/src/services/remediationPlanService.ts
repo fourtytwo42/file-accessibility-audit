@@ -395,6 +395,18 @@ function toolPriority(tool: RemediationToolName): number {
   return TOOL_PRIORITY.get(tool) || 99
 }
 
+function residualFamilyPriority(
+  opportunity: ToolOpportunity,
+  residualFamilyById: Map<NonNullable<ToolOpportunity['familyId']>, number>,
+): number {
+  if (!opportunity.familyId) return Number.MAX_SAFE_INTEGER
+  return residualFamilyById.get(opportunity.familyId) ?? Number.MAX_SAFE_INTEGER
+}
+
+function residualFamilyStep(opportunity: ToolOpportunity): number {
+  return opportunity.familyStep ?? Number.MAX_SAFE_INTEGER
+}
+
 function shouldUseBootstrappedChartConformance(input: {
   analysis: AnalysisResult
   context: PdfRemediationContext
@@ -692,6 +704,9 @@ async function deterministicActions(input: {
   })
   const { failureProfile } = baseArtifacts
   const failureModeByKey = new Map(failureProfile.failureModes.map(mode => [mode.key, mode]))
+  const residualFamilyPriorityById = new Map(
+    (failureProfile.residualFamilies || []).map(family => [family.id, family.priority] as const),
+  )
   const activeIssues = activeIssueCategoryIds({
     analysis: input.analysis,
     failureModeByKey,
@@ -729,6 +744,10 @@ async function deterministicActions(input: {
   const selected: RemediationToolCall[] = []
   const selectedOpportunityKeys = new Set<string>()
   const orderedOpportunities = [...autoRunnableOpportunities].sort((a, b) => {
+    const familyPriorityDiff = residualFamilyPriority(a, residualFamilyPriorityById) - residualFamilyPriority(b, residualFamilyPriorityById)
+    if (familyPriorityDiff !== 0) return familyPriorityDiff
+    const familyStepDiff = residualFamilyStep(a) - residualFamilyStep(b)
+    if (familyStepDiff !== 0) return familyStepDiff
     const stageDiff = toolStage(a.toolName) - toolStage(b.toolName)
     if (stageDiff !== 0) return stageDiff
     const blockingDiff = Number(hasBlockingFailure(b, failureModeByKey)) - Number(hasBlockingFailure(a, failureModeByKey))

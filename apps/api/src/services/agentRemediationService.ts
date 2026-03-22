@@ -41,6 +41,7 @@ import {
 } from './pdfStructureBackend.js'
 import { REMEDIATION } from '#config'
 import { classifyPdf, recordToolOutcomes, type PdfClass } from './toolReliabilityService.js'
+import { recordFamilyOutcomes } from './familyOutcomeService.js'
 import { buildPipelineConfig, classifyPdfFull, RECLASSIFICATION_TRIGGER_TOOLS } from './pdfClassificationService.js'
 import {
   buildFailureSignature,
@@ -53,6 +54,10 @@ import { deriveDeterministicCall, heuristicFigureAltText } from './remediationCa
 import { ensureDisplayDocTitle } from './pdfOutputFinalizer.js'
 import { loadAltTextSidecar, planAltTextSidecarDirectives, syncAltTextSidecar } from './altTextSidecarService.js'
 import { draftFigureAltText } from './altTextDraftingService.js'
+import {
+  evaluateActionPostconditions,
+  semanticSidecarEligibleFamilies,
+} from './residualFamilyService.js'
 
 function summarizeVeraPdf(result: AnalysisResult): VeraPdfSummary | null {
   const summary = result.verapdf
@@ -194,6 +199,7 @@ function getBufferSha256(buffer: Buffer): string {
 }
 
 function actionHasMeaningfulProgress(action: RemediationActionRecord): boolean {
+  if (action.postconditionStatus === 'satisfied') return true
   return (action.scoreDelta || []).some(delta =>
     typeof delta.before === 'number'
     && typeof delta.after === 'number'
@@ -487,6 +493,9 @@ function toBatchActionRecord(input: {
       : undefined,
     categoryTargets: batchActionCategoryTargets(input.call.tool_name),
     changedDocumentBytes: false,
+    familyId: input.call.familyId,
+    familyStep: input.call.familyStep,
+    expectedPostconditions: input.call.expectedPostconditions,
   } satisfies Omit<RemediationActionRecord, 'outcome'>
 
   const status: 'applied' | 'no_effect' | 'unsupported' | 'failed' =
@@ -732,13 +741,21 @@ function standardsValidationImproved(previous: AnalysisResult, next: AnalysisRes
 
 function applyScoreDelta(action: RemediationActionRecord, previous: AnalysisResult, next: AnalysisResult): boolean {
   const targets = action.categoryTargets || []
-  if (!targets.length) return false
   action.scoreDelta = targets.map(categoryId => ({
     categoryId,
     before: scoreForCategory(previous, categoryId),
     after: scoreForCategory(next, categoryId),
   }))
+  const postconditions = evaluateActionPostconditions({
+    action,
+    previous,
+    next,
+  })
+  action.familyId = action.familyId || postconditions.familyId
+  action.postconditionStatus = postconditions.status
+  action.postconditionSignals = postconditions.signals
   return action.scoreDelta.some(delta => (delta.after ?? -1) > (delta.before ?? -1))
+    || action.postconditionStatus === 'satisfied'
 }
 
 function actionScoreDelta(action: RemediationActionRecord, previous: AnalysisResult, next: AnalysisResult): Array<{ categoryId: string; before: number | null; after: number | null }> {
@@ -1250,6 +1267,8 @@ async function runHeuristicFigureFallbackStage(input: {
       },
       rationale: `Heuristic fallback after AI figure generation was unavailable for page ${candidate.pageNumber}.`,
       confidence: 0.55,
+      familyId: 'native_figure_convergence' as const,
+      expectedPostconditions: ['figure_blocking_keys_shrink', 'alt_text_improves'],
     }
     const outcome = await executeRemediationTool({ buffer: workingBuffer, context, call })
     workingBuffer = outcome.buffer
@@ -1290,6 +1309,23 @@ async function runSemanticEnrichmentStage(input: {
 }> {
   const semanticStrategy = input.semanticStrategy || 'full_ai'
   if (!shouldRunSemanticStage(input.result, input.originalResult, input.context, semanticStrategy)) {
+    return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
+  }
+  const semanticArtifacts = buildFailureProfileArtifacts({
+    analysis: input.result,
+    context: input.context,
+    actions: [],
+    rejectedActions: input.rejectedActions,
+  })
+  const optionalSemanticFamilies = semanticArtifacts.failureProfile.residualFamilies.filter(family =>
+    family.semanticPolicy === 'optional_after_deterministic' && family.blocking,
+  )
+  const implicitAiFigureWork = aiFirstFigureCandidates(input.context).length > 0
+  if (
+    optionalSemanticFamilies.length > 0
+    && !semanticSidecarEligibleFamilies(semanticArtifacts.failureProfile).length
+    && !implicitAiFigureWork
+  ) {
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
   }
 
@@ -1342,8 +1378,8 @@ async function runSemanticEnrichmentStage(input: {
       return {
         ...fallback,
         manualReviewFlags: [{
-          code: 'semantic_enrichment_skipped',
-          label: 'Semantic enrichment skipped',
+          code: 'semantic_sidecar_unavailable',
+          label: 'Semantic sidecar unavailable',
           severity: 'warning',
           details: `${isSemanticStageTooLargeError(error) ? 'Semantic figure generation overflowed' : 'Semantic figure generation failed'}; heuristic alt-text fallback was used instead: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
         }],
@@ -1354,8 +1390,8 @@ async function runSemanticEnrichmentStage(input: {
       result: input.result,
       actions: [],
       manualReviewFlags: [{
-        code: 'semantic_enrichment_skipped',
-        label: 'Semantic enrichment skipped',
+        code: 'semantic_sidecar_unavailable',
+        label: 'Semantic sidecar unavailable',
         severity: 'warning',
         details: `${isSemanticStageTooLargeError(error) ? 'Skipped semantic enrichment because the provider rejected the request as too large' : 'Skipped semantic enrichment because the provider request failed'}: ${error instanceof Error ? error.message : String(error || 'unknown error')}`,
       }],
@@ -1555,6 +1591,8 @@ async function runSemanticEnrichmentStage(input: {
             arguments: { candidateId: proposal.candidateId, level: proposal.level },
             rationale: details,
             confidence: proposal.confidence,
+            familyId: 'post_bootstrap_heading_convergence',
+            expectedPostconditions: ['heading_structure_improves'],
           },
         })
       }
@@ -1591,6 +1629,8 @@ async function runSemanticEnrichmentStage(input: {
             arguments: { candidateId: proposal.candidateId, altText: proposal.altText, generationSource: 'semantic_ai' },
             rationale: details,
             confidence: proposal.confidence,
+            familyId: 'native_figure_convergence',
+            expectedPostconditions: ['figure_blocking_keys_shrink', 'alt_text_improves'],
           },
         })
       }
@@ -1624,6 +1664,8 @@ async function runSemanticEnrichmentStage(input: {
             arguments: { targets: [candidate.ref] },
             rationale: details,
             confidence: proposal.confidence,
+            familyId: 'table_structure_recovery',
+            expectedPostconditions: ['table_blocking_keys_shrink', 'table_markup_improves'],
           },
         })
       }
@@ -1651,6 +1693,8 @@ async function runSemanticEnrichmentStage(input: {
               arguments: { candidateId: proposal.candidateId, replacementText: proposal.replacementText },
               rationale: details,
               confidence: proposal.confidence,
+              familyId: 'link_tabs_and_annotation_cleanup',
+              expectedPostconditions: ['link_blocking_keys_shrink'],
             },
           })
         }
@@ -1668,6 +1712,8 @@ async function runSemanticEnrichmentStage(input: {
               },
               rationale: details,
               confidence: proposal.confidence,
+              familyId: 'link_tabs_and_annotation_cleanup',
+              expectedPostconditions: ['annotation_alt_clear', 'link_blocking_keys_shrink'],
             },
           })
         }
@@ -1707,6 +1753,8 @@ async function runSemanticEnrichmentStage(input: {
             arguments: { headings },
             rationale: `AI bookmark cleanup (${headings.length} entries): replace noisy bookmark titles with concise semantic labels.`,
             confidence: Math.min(0.98, Math.max(...batch.bookmarks.map(entry => entry.confidence))),
+            familyId: 'bookmark_language_outline_cleanup',
+            expectedPostconditions: ['bookmark_blocking_keys_shrink', 'bookmark_score_improves'],
           },
         })
       }
@@ -1888,7 +1936,8 @@ async function runSemanticEnrichmentStage(input: {
   }
 
   const skippedFigureSemanticWork = generated.reviewFlags.some(flag =>
-    flag.code === 'semantic_enrichment_skipped' && /figures semantic enrichment/i.test(flag.details),
+    (flag.code === 'semantic_enrichment_skipped' || flag.code === 'semantic_sidecar_unavailable')
+      && /figures semantic enrichment/i.test(flag.details),
   )
   const hasAltTextActions = acceptedActions.some(action =>
     action.categoryTargets?.includes('alt_text') && (action.generationSource === 'semantic_ai' || action.generationSource === 'heuristic_fallback'),
@@ -2058,6 +2107,14 @@ export async function remediatePdfWithAgent(
       playbookRunId?: string | null
     },
   ): void => {
+    const previousBlockingKeys = (input.previous.localStandards?.findings ?? [])
+      .filter(finding => finding.blocking)
+      .map(finding => finding.key)
+      .sort()
+    const nextBlockingKeys = (input.next.localStandards?.findings ?? [])
+      .filter(finding => finding.blocking)
+      .map(finding => finding.key)
+      .sort()
     const records = stageActions
       .filter(action =>
         action.outcome === 'applied'
@@ -2088,6 +2145,7 @@ export async function remediatePdfWithAgent(
               input.next.overallScore > input.previous.overallScore
               || positiveTargetDelta
               || input.standardsImproved
+              || action.postconditionStatus === 'satisfied'
             )
           ),
           playbookId: input.playbookId || null,
@@ -2095,6 +2153,32 @@ export async function remediatePdfWithAgent(
         }
       })
     recordToolOutcomes(records)
+    const familyRecords = stageActions
+      .filter(action =>
+        !!action.familyId
+        && (
+          action.outcome === 'applied'
+          || action.outcome === 'no_effect'
+          || action.outcome === 'rejected'
+          || action.outcome === 'failed'
+          || action.outcome === 'unsupported'
+        ),
+      )
+      .map(action => ({
+        familyId: action.familyId!,
+        pdfClass,
+        stepTool: action.tool,
+        postconditionStatus: action.postconditionStatus || 'unknown',
+        roundNumber: input.roundNumber,
+        stageNumber: input.stageNumber,
+        overallScoreBefore: input.previous.overallScore,
+        overallScoreAfter: input.next.overallScore,
+        blockingKeysBefore: previousBlockingKeys,
+        blockingKeysAfter: nextBlockingKeys,
+        playbookId: input.playbookId || null,
+        playbookRunId: input.playbookRunId || null,
+      }))
+    recordFamilyOutcomes(familyRecords)
   }
 
   const syncInspectionCache = (

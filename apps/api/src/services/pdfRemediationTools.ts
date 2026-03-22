@@ -1922,6 +1922,9 @@ export async function executeRemediationTool(input: {
       : undefined,
     categoryTargets: [],
     changedDocumentBytes: false,
+    familyId: call.familyId,
+    familyStep: call.familyStep,
+    expectedPostconditions: call.expectedPostconditions,
   } satisfies Omit<RemediationActionRecord, 'outcome'>
 
   switch (call.tool_name) {

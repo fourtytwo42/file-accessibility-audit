@@ -19,6 +19,7 @@ import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { ALT_REMOVAL_MODES } from './altTextScoring.js'
 import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
 import { hasMeaningfulMetadataTitle } from './remediationCallDerivationService.js'
+import { annotateToolOpportunitiesWithResidualFamilies, buildResidualFamilyDecisions } from './residualFamilyService.js'
 import type { LocalStandardsFinding } from './localStandardsService.js'
 
 interface BuildFailureProfileInput {
@@ -1758,6 +1759,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
 
 export function buildPlannerEvidenceSummary(input: {
   failureModes: FailureMode[]
+  residualFamilies?: FailureProfile['residualFamilies']
   toolOpportunities: ToolOpportunity[]
   actions: RemediationActionRecord[]
   rejectedActions: RemediationActionRecord[]
@@ -1793,6 +1795,7 @@ export function buildPlannerEvidenceSummary(input: {
 
   return {
     topFailureModeKeys: input.failureModes.slice(0, 5).map(mode => mode.key),
+    topResidualFamilyIds: (input.residualFamilies || []).slice(0, 5).map(family => family.id),
     topBlockingFailureModeKeys: input.failureModes.filter(mode => mode.blocking).slice(0, 5).map(mode => mode.key),
     topManualOnlyFailureModeKeys: input.failureModes.filter(mode => mode.classification === 'manual_only').slice(0, 5).map(mode => mode.key),
     topAutoRunnableOpportunityKeys: input.toolOpportunities
@@ -1819,7 +1822,18 @@ export function buildPlannerEvidenceSummary(input: {
 
 export function buildFailureProfile(input: BuildFailureProfileInput): FailureProfile {
   const failureModes = buildFailureModes(input)
-  const toolOpportunities = buildToolOpportunities(input, failureModes)
+  const rawToolOpportunities = buildToolOpportunities(input, failureModes)
+  const residualFamilies = buildResidualFamilyDecisions({
+    analysis: input.analysis,
+    context: input.context,
+    failureModes,
+    toolOpportunities: rawToolOpportunities,
+    actions: input.actions,
+  })
+  const toolOpportunities = annotateToolOpportunitiesWithResidualFamilies({
+    toolOpportunities: rawToolOpportunities,
+    residualFamilies,
+  })
 
   return {
     version: '2',
@@ -1831,6 +1845,7 @@ export function buildFailureProfile(input: BuildFailureProfileInput): FailurePro
     adobeStatus: input.analysis.adobe?.status,
     adobeIssueCount: input.analysis.adobe?.issueCount,
     failureModes,
+    residualFamilies,
     toolOpportunities,
     summary: {
       deterministicIssueCount: failureModes.filter(mode => mode.classification === 'deterministic').length,
@@ -1849,6 +1864,7 @@ export function buildFailureProfileArtifacts(input: BuildFailureProfileInput): {
   const failureProfile = buildFailureProfile(input)
   const plannerEvidence = buildPlannerEvidenceSummary({
     failureModes: failureProfile.failureModes,
+    residualFamilies: failureProfile.residualFamilies,
     toolOpportunities: failureProfile.toolOpportunities,
     actions: input.actions,
     rejectedActions: input.rejectedActions,

@@ -129,6 +129,26 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_tool_outcomes_tool ON tool_outcomes(tool_name);
   CREATE INDEX IF NOT EXISTS idx_tool_outcomes_tool_pdf_class ON tool_outcomes(tool_name, pdf_class);
 
+  CREATE TABLE IF NOT EXISTS family_outcomes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    family_id TEXT NOT NULL,
+    pdf_class TEXT NOT NULL,
+    step_tool TEXT NOT NULL,
+    postcondition_status TEXT NOT NULL,
+    round_number INTEGER NOT NULL,
+    stage_number INTEGER NOT NULL,
+    overall_score_before INTEGER,
+    overall_score_after INTEGER,
+    blocking_keys_before_json TEXT,
+    blocking_keys_after_json TEXT,
+    playbook_id TEXT,
+    playbook_run_id TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_family_outcomes_family ON family_outcomes(family_id);
+  CREATE INDEX IF NOT EXISTS idx_family_outcomes_family_pdf_class ON family_outcomes(family_id, pdf_class);
+
   CREATE TABLE IF NOT EXISTS playbook_entries (
     id TEXT PRIMARY KEY,
     failure_signature_hash TEXT NOT NULL,

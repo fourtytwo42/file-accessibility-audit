@@ -2131,4 +2131,49 @@ describe('failureProfileService', () => {
       expect(opportunity?.statusReasonCode).toBe('no_active_failure_mode')
     }
   })
+
+  it('emits residual families and annotates matching opportunities with family postconditions', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult({
+        categories: [
+          ...makeAnalysisResult().categories,
+          { id: 'text_extractability', label: 'Text Extractability', weight: 0.225, score: 60, grade: 'D', severity: 'Critical', findings: ['Unicode maps missing'], explanation: '', helpLinks: [] },
+        ] as any,
+        localStandards: {
+          status: 'issues_detected',
+          findings: [
+            {
+              key: 'pdfua.font_unicode',
+              label: 'Font Unicode mapping',
+              severity: 'error',
+              blocking: true,
+              categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+              confidence: 0.95,
+              evidence: ['Missing ToUnicode maps'],
+              source: 'qpdf',
+              inferred: false,
+              count: 2,
+            },
+          ] as any,
+          knownGapKeys: [],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          ...makeContext().qpdf,
+          fontsMissingToUnicode: 2,
+          fontsMissingToUnicodeBlocking: 2,
+        },
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.residualFamilies.map(entry => entry.id)).toContain('font_embedding_and_unicode')
+    expect(result.plannerEvidence.topResidualFamilyIds).toContain('font_embedding_and_unicode')
+    const opportunity = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_font_unicode_maps')
+    expect(opportunity?.familyId).toBe('font_embedding_and_unicode')
+    expect(opportunity?.familyStep).toBe(2)
+    expect(opportunity?.expectedPostconditions).toContain('font_counters_shrink')
+  })
 })

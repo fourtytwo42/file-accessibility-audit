@@ -55,8 +55,24 @@ describe('playbookService', () => {
 
     const baseModel = {
       actions: [
-        { tool: 'normalize_document_metadata', target: 'document', outcome: 'applied', changedDocumentBytes: true },
-        { tool: 'repair_native_link_structure', target: 'document', outcome: 'applied', changedDocumentBytes: true },
+        {
+          tool: 'normalize_document_metadata',
+          target: 'document',
+          outcome: 'applied',
+          changedDocumentBytes: true,
+          familyId: 'metadata_normalization',
+          familyStep: 2,
+          postconditionStatus: 'satisfied',
+        },
+        {
+          tool: 'repair_native_link_structure',
+          target: 'document',
+          outcome: 'applied',
+          changedDocumentBytes: true,
+          familyId: 'link_tabs_and_annotation_cleanup',
+          familyStep: 1,
+          postconditionStatus: 'satisfied',
+        },
       ],
       iterations: [{}, {}],
     } as any
@@ -74,6 +90,11 @@ describe('playbookService', () => {
       'normalize_document_metadata',
       'repair_native_link_structure',
     ])
+    expect(created?.toolSequence[0]).toMatchObject({
+      familyId: 'metadata_normalization',
+      familyStep: 2,
+      postconditionStatus: 'satisfied',
+    })
 
     const learnedTwice = learnFromSuccessfulRemediation({
       failureSignature: signatureA,

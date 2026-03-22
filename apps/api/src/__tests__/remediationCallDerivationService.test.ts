@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { heuristicFigureAltText } from '../services/remediationCallDerivationService.js'
+import { deriveDeterministicCall, heuristicFigureAltText } from '../services/remediationCallDerivationService.js'
 
 describe('remediationCallDerivationService', () => {
   it('does not default unknown figure hints to decorative alt text', () => {
@@ -46,5 +46,40 @@ describe('remediationCallDerivationService', () => {
     } as any)
 
     expect(altText).toBe('Organizational culture chart')
+  })
+
+  it('preserves residual family metadata on deterministic calls', () => {
+    const call = deriveDeterministicCall({
+      filename: 'example.pdf',
+      analysis: { verapdf: { failures: [] } } as any,
+      context: {
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en' },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderParentCandidates: [],
+      } as any,
+      opportunity: {
+        toolName: 'normalize_document_metadata',
+        reason: 'Normalize metadata',
+        confidence: 0.9,
+        candidateIds: [],
+        candidateGroupIds: [],
+        familyId: 'metadata_normalization',
+        familyStep: 2,
+        expectedPostconditions: ['metadata_blocking_keys_shrink'],
+      },
+      selectedActions: [],
+    })
+
+    expect(call).toMatchObject({
+      tool_name: 'normalize_document_metadata',
+      familyId: 'metadata_normalization',
+      familyStep: 2,
+      expectedPostconditions: ['metadata_blocking_keys_shrink'],
+    })
   })
 })

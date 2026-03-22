@@ -8,6 +8,7 @@ import {
   inspectPdfForRemediation,
 } from '../services/pdfRemediationTools.js'
 import type { RemediationActionRecord, RemediationToolCall } from '../services/documentModel.js'
+import { runFamilyConvergenceTrace } from '../services/familyConvergenceService.js'
 import { PROCESSED_REGRESSION_MANIFEST } from './processedRegressionManifest.js'
 
 const DIRECT_FONT_REPAIR_KEY = 'repair_font_unicode_maps:document:document'
@@ -238,14 +239,22 @@ async function buildFileReport(filename: string): Promise<ProcessedCapabilityFil
     }
   }
 
-  const repair = await executeDeterministicRepair(directRepairTool, buffer, filename)
-  const postRepair = await summarizeState(repair.buffer, filename, [repair.action])
+  const trace = await runFamilyConvergenceTrace<ProcessedCapabilityState, RemediationActionRecord>({
+    initialBuffer: buffer,
+    summarize: async (nextBuffer, actions) => summarizeState(nextBuffer, filename, actions),
+    steps: [{
+      key: directRepairTool,
+      execute: async ({ buffer: nextBuffer }) => executeDeterministicRepair(directRepairTool, nextBuffer, filename),
+    }],
+  })
+  const repair = trace.steps[0]
+  const postRepair = repair?.state ?? null
   return {
     filename,
     directRepairTool,
     baseline,
     postRepair,
-    repairOutcome: repair.action.outcome,
+    repairOutcome: repair?.action?.outcome ?? null,
   }
 }
 

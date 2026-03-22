@@ -179,11 +179,28 @@ export type RemediationToolName =
 
 export type VisibleContentChangePolicy = 'no_visible_changes' | 'limited_text_rewrites' | 'page_rebuilt'
 
+export type ResidualFamilyId =
+  | 'metadata_normalization'
+  | 'bookmark_language_outline_cleanup'
+  | 'font_embedding_and_unicode'
+  | 'table_structure_recovery'
+  | 'link_tabs_and_annotation_cleanup'
+  | 'native_figure_convergence'
+  | 'post_bootstrap_heading_convergence'
+  | 'logical_structure_marked_content'
+  | 'unresolved_manual_family'
+
+export type ResidualSemanticPolicy = 'forbidden' | 'optional_after_deterministic' | 'manual_only'
+export type FamilyPostconditionStatus = 'satisfied' | 'not_satisfied' | 'unknown'
+
 export interface RemediationToolCall {
   tool_name: RemediationToolName
   arguments: Record<string, any>
   rationale: string
   confidence: number
+  familyId?: ResidualFamilyId
+  familyStep?: number
+  expectedPostconditions?: string[]
 }
 
 export interface RemediationActionRecord {
@@ -204,6 +221,11 @@ export interface RemediationActionRecord {
   scoreDelta?: Array<{ categoryId: string; before: number | null; after: number | null }>
   validationWarnings?: string[]
   generationSource?: 'semantic_ai' | 'heuristic_fallback' | 'manual_deferred'
+  familyId?: ResidualFamilyId
+  familyStep?: number
+  expectedPostconditions?: string[]
+  postconditionStatus?: FamilyPostconditionStatus
+  postconditionSignals?: string[]
 }
 
 export interface RemediationIteration {
@@ -230,6 +252,22 @@ export type ToolOpportunityStatusReasonCode =
   | 'safe_to_run'
   | 'retry_exception'
   | 'deferred_document_scope'
+
+export interface ResidualFamilyDecision {
+  id: ResidualFamilyId
+  label: string
+  priority: number
+  blocking: boolean
+  semanticPolicy: ResidualSemanticPolicy
+  failureModeKeys: string[]
+  categoryIds: string[]
+  preferredTools: RemediationToolName[]
+  deprioritizedTools: RemediationToolName[]
+  expectedPostconditions: string[]
+  activeOpportunityKeys: string[]
+  currentStep: number | null
+  regressionCanaries: string[]
+}
 
 export interface FailureMode {
   key: string
@@ -262,6 +300,9 @@ export interface ToolOpportunity {
   statusReasonDetail?: string
   blockedReason?: string
   derivedFromFailureModeKeys: string[]
+  familyId?: ResidualFamilyId
+  familyStep?: number
+  expectedPostconditions?: string[]
 }
 
 export type ToolReliabilitySource = 'tool_and_class' | 'tool_global' | 'default'
@@ -333,12 +374,16 @@ export interface FailureSignature {
   failureModeKeys: string[]
   pdfClass: PlaybookPdfClass
   hash: string
+  residualFamilyIds?: ResidualFamilyId[]
 }
 
 export interface PlaybookStep {
   tool: RemediationToolName
   scope: ToolOpportunityScope
   stage: number
+  familyId?: ResidualFamilyId
+  familyStep?: number
+  postconditionStatus?: FamilyPostconditionStatus
 }
 
 export interface PlaybookEntry {
@@ -379,6 +424,7 @@ export interface PlaybookRun {
 
 export interface PlannerEvidenceSummary {
   topFailureModeKeys: string[]
+  topResidualFamilyIds?: ResidualFamilyId[]
   topAutoRunnableOpportunityKeys: string[]
   skippedReasonCounts: Array<{ reason: string; count: number }>
   attemptedKeys: string[]
@@ -403,6 +449,7 @@ export interface FailureProfile {
   adobeStatus?: AdobeSummary['status']
   adobeIssueCount?: number
   failureModes: FailureMode[]
+  residualFamilies: ResidualFamilyDecision[]
   toolOpportunities: ToolOpportunity[]
   summary: {
     deterministicIssueCount: number

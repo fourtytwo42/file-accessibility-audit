@@ -87,7 +87,7 @@ export function deriveDeterministicCall(input: {
   filename: string
   analysis: AnalysisResult
   context: PdfRemediationContext
-  opportunity: Pick<ToolOpportunity, 'toolName' | 'reason' | 'confidence' | 'candidateIds' | 'candidateGroupIds'>
+  opportunity: Pick<ToolOpportunity, 'toolName' | 'reason' | 'confidence' | 'candidateIds' | 'candidateGroupIds' | 'familyId' | 'familyStep' | 'expectedPostconditions'>
   selectedActions: RemediationToolCall[]
 }): RemediationToolCall | null {
   const { opportunity, context } = input
@@ -95,16 +95,25 @@ export function deriveDeterministicCall(input: {
     ? context.pdfjs.title!.trim()
     : suggestDocumentTitle({ filename: input.filename, context })
   const language = normalizeLanguageTag(context.qpdf.lang || context.pdfjs.lang || 'en') || 'en'
+  const withFamilyMetadata = (call: RemediationToolCall | null): RemediationToolCall | null => {
+    if (!call) return null
+    return {
+      ...call,
+      familyId: opportunity.familyId,
+      familyStep: opportunity.familyStep,
+      expectedPostconditions: opportunity.expectedPostconditions,
+    }
+  }
 
   switch (opportunity.toolName) {
     case 'set_pdfua_identification':
-      return { tool_name: 'set_pdfua_identification', arguments: { title, language, part: 1, conformance: 'B' }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'set_pdfua_identification', arguments: { title, language, part: 1, conformance: 'B' }, rationale: opportunity.reason, confidence: opportunity.confidence })
     case 'normalize_document_metadata':
-      return { tool_name: 'normalize_document_metadata', arguments: { title, language }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'normalize_document_metadata', arguments: { title, language }, rationale: opportunity.reason, confidence: opportunity.confidence })
     case 'set_document_title':
-      return { tool_name: 'set_document_title', arguments: { title }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'set_document_title', arguments: { title }, rationale: opportunity.reason, confidence: opportunity.confidence })
     case 'set_document_language':
-      return { tool_name: 'set_document_language', arguments: { language }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'set_document_language', arguments: { language }, rationale: opportunity.reason, confidence: opportunity.confidence })
     case 'bootstrap_struct_tree':
     case 'repair_note_tag_ids':
     case 'repair_native_marked_content_refs':
@@ -128,73 +137,73 @@ export function deriveDeterministicCall(input: {
     case 'set_tabs_all_annotated_pages':
     case 'repair_annotation_alt_text':
     case 'adobe_auto_tag':
-      return { tool_name: opportunity.toolName, arguments: { target: 'document' }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: opportunity.toolName, arguments: { target: 'document' }, rationale: opportunity.reason, confidence: opportunity.confidence })
     case 'finalize_substituted_font_conformance':
-      return { tool_name: opportunity.toolName, arguments: { target: 'document', reportedWidthFixes: reportedWidthFixes(input.analysis) }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: opportunity.toolName, arguments: { target: 'document', reportedWidthFixes: reportedWidthFixes(input.analysis) }, rationale: opportunity.reason, confidence: opportunity.confidence })
     case 'set_page_tabs': {
       const pageNumbers = [...new Set(context.pages.filter(page => page.links.length > 0).map(page => page.pageNumber))]
-      return pageNumbers.length ? { tool_name: 'set_page_tabs', arguments: { pageNumbers }, rationale: opportunity.reason, confidence: opportunity.confidence } : null
+      return withFamilyMetadata(pageNumbers.length ? { tool_name: 'set_page_tabs', arguments: { pageNumbers }, rationale: opportunity.reason, confidence: opportunity.confidence } : null)
     }
     case 'set_link_annotation_contents': {
       const candidateId = opportunity.candidateIds[0]
       const candidate = context.linkCandidates.find(entry => entry.id === candidateId)
       const contents = candidate?.suggestedText || candidate?.text || candidate?.url || ''
       if (!candidateId || !contents.trim()) return null
-      return {
+      return withFamilyMetadata({
         tool_name: 'set_link_annotation_contents',
         arguments: { candidateId, pageNumber: candidate?.pageNumber, annotationIndex: candidate?.annotationIndex, contents: contents.trim() },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
-      }
+      })
     }
     case 'replace_bookmarks_from_headings':
-      return context.headingCandidates.some(candidate => candidate.text.trim())
+      return withFamilyMetadata(context.headingCandidates.some(candidate => candidate.text.trim())
         ? { tool_name: 'replace_bookmarks_from_headings', arguments: {}, rationale: opportunity.reason, confidence: opportunity.confidence }
-        : null
+        : null)
     case 'normalize_heading_hierarchy':
-      return {
+      return withFamilyMetadata({
         tool_name: 'normalize_heading_hierarchy',
         arguments: { target: 'document' },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
-      }
+      })
     case 'create_heading_from_candidate': {
       const candidateId = opportunity.candidateIds[0]
       if (!candidateId) return null
-      return {
+      return withFamilyMetadata({
         tool_name: 'create_heading_from_candidate',
         arguments: { candidateId, level: headingLevelForCandidate(candidateId, context, input.selectedActions) },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
-      }
+      })
     }
     case 'set_table_header_cells': {
       const candidateId = opportunity.candidateIds[0]
       const candidate = context.tableCandidates.find(entry => entry.id === candidateId)
       if (!candidate?.ref) return null
-      return { tool_name: 'set_table_header_cells', arguments: { targets: [candidate.ref] }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'set_table_header_cells', arguments: { targets: [candidate.ref] }, rationale: opportunity.reason, confidence: opportunity.confidence })
     }
     case 'set_figure_alt_text':
     case 'retag_as_figure_and_set_alt': {
       const candidateId = opportunity.candidateIds[0]
       if (!candidateId || shouldPreferSemanticFigureAltText(candidateId, context)) return null
-      return {
+      return withFamilyMetadata({
         tool_name: opportunity.toolName,
         arguments: { candidateId, altText: heuristicFigureAltText(candidateId, context), generationSource: 'heuristic_fallback' },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
-      }
+      })
     }
     case 'mark_figure_decorative': {
       const candidateId = opportunity.candidateIds[0]
       if (!candidateId) return null
-      return { tool_name: 'mark_figure_decorative', arguments: { candidateId, decorative: true }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'mark_figure_decorative', arguments: { candidateId, decorative: true }, rationale: opportunity.reason, confidence: opportunity.confidence })
     }
     case 'reorder_structure_children': {
       const candidateGroupId = opportunity.candidateGroupIds[0]
       const parentGroup = context.readingOrderParentCandidates.find(entry => entry.id === candidateGroupId)
       if (!candidateGroupId || !parentGroup) return null
-      return { tool_name: 'reorder_structure_children', arguments: { candidateGroupId, parentRef: parentGroup.parentRef }, rationale: opportunity.reason, confidence: opportunity.confidence }
+      return withFamilyMetadata({ tool_name: 'reorder_structure_children', arguments: { candidateGroupId, parentRef: parentGroup.parentRef }, rationale: opportunity.reason, confidence: opportunity.confidence })
     }
     default:
       return null

@@ -190,6 +190,7 @@ vi.mock('../services/playbookService.js', () => ({
 vi.mock('../services/remediationCallDerivationService.js', () => ({
   heuristicFigureAltText: (_candidateId: string, _context: unknown) => 'Image related to County outcomes chart',
   deriveDeterministicCall,
+  hasMeaningfulMetadataTitle: (value: string | null | undefined) => typeof value === 'string' && value.trim().length > 0,
 }))
 
 vi.mock('../services/pdfOutputFinalizer.js', () => ({
@@ -3645,7 +3646,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
     expect(result.finalResult).toBe(originalResult)
-    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_sidecar_unavailable')).toBe(true)
   })
 
   it('uses heuristic alt-text fallback only after AI figure generation fails', async () => {
@@ -3824,7 +3825,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(generateSemanticRepairBatches).toHaveBeenCalledTimes(1)
     expect(executeRemediationTool.mock.calls.some(call => call[0].call.arguments.generationSource === 'heuristic_fallback')).toBe(true)
-    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_sidecar_unavailable')).toBe(true)
     expect(result.model.manualReviewFlags.some(flag => /semantic figure generation failed.*fetch failed/i.test(flag.details))).toBe(true)
   })
 
