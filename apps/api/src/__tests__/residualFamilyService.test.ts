@@ -295,6 +295,69 @@ describe('residualFamilyService', () => {
     expect(target?.id).toBe('link_tabs_and_annotation_cleanup')
   })
 
+  it('surfaces heading convergence instead of generic logical-structure debt after chart-content repair has already landed', () => {
+    const decisions = buildResidualFamilyDecisions({
+      analysis: makeAnalysis({
+        categories: [
+          { id: 'title_language', score: 100 },
+          { id: 'text_extractability', score: 100 },
+          { id: 'table_markup', score: 100 },
+          { id: 'heading_structure', score: 70 },
+          { id: 'alt_text', score: 100 },
+          { id: 'link_quality', score: 100 },
+          { id: 'reading_order', score: 85 },
+          { id: 'pdf_ua_compliance', score: 86 },
+          { id: 'bookmarks', score: 100 },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.heading_content_quality', blocking: true, count: 2 },
+          ],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          fontsMissingToUnicodeBlocking: 0,
+          unembeddedFontCount: 0,
+        },
+        figureCandidates: [],
+      }),
+      failureModes: [
+        makeFailureMode({
+          key: 'category.heading_structure',
+          source: 'category',
+          categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+          nativeToolFamilies: ['normalize_heading_hierarchy'],
+        }),
+      ],
+      toolOpportunities: [
+        makeOpportunity({
+          key: 'normalize_heading_hierarchy:document:document',
+          toolName: 'normalize_heading_hierarchy',
+          categoryTargets: ['heading_structure', 'reading_order'],
+          derivedFromFailureModeKeys: ['category.heading_structure'],
+          status: 'auto_runnable',
+        }),
+      ],
+      actions: [
+        {
+          tool: 'repair_bootstrapped_chart_content_refs',
+          target: 'document',
+          details: 'repair bootstrapped refs applied',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          outcome: 'applied',
+        } as any,
+      ],
+    })
+
+    expect(decisions.map(entry => entry.id)).toContain('post_bootstrap_heading_convergence')
+    expect(decisions.find(entry => entry.id === 'post_bootstrap_heading_convergence')?.blocking).toBe(true)
+    expect(decisions.find(entry => entry.id === 'logical_structure_marked_content')?.blocking).toBe(false)
+  })
+
   it('marks a blocking family as exhausted when its remaining preferred opportunity was already attempted', () => {
     const decisions = buildResidualFamilyDecisions({
       analysis: makeAnalysis({

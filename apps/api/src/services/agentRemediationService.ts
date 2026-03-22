@@ -13,6 +13,7 @@ import type {
   RemediationActionRecord,
   RemediationIteration,
   RemediationToolCall,
+  RemediationToolName,
   ResidualFamilyDecision,
   SemanticStrategy,
   SuggestedChange,
@@ -968,11 +969,13 @@ function dedupeToolCalls(calls: RemediationToolCall[]): RemediationToolCall[] {
 
 function shouldAllowPipelineExcludedFamilyCall(
   call: RemediationToolCall,
-  convergenceFamily: ResidualFamilyDecision | null | undefined,
+  convergenceFamilies: ResidualFamilyDecision[] | null | undefined,
 ): boolean {
-  if (!convergenceFamily) return false
-  return call.familyId === convergenceFamily.id
-    && convergenceFamily.preferredTools.includes(call.tool_name)
+  if (!convergenceFamilies?.length) return false
+  return convergenceFamilies.some(family =>
+    call.familyId === family.id
+    && family.preferredTools.includes(call.tool_name),
+  )
 }
 
 export const __test_shouldAllowPipelineExcludedFamilyCall = shouldAllowPipelineExcludedFamilyCall
@@ -1015,28 +1018,89 @@ export function __test_needsFamilyCompleteConvergence(
 
 export const __test_selectResidualCleanupFamilyTarget = selectResidualCleanupFamilyTarget
 
+const STRUCTURAL_RESIDUAL_FAMILY_IDS = new Set<ResidualFamilyDecision['id']>([
+  'post_bootstrap_heading_convergence',
+  'logical_structure_marked_content',
+])
+
+const STRUCTURAL_RESIDUAL_CLEANUP_TOOL_ORDER: RemediationToolName[] = [
+  'artifact_nonsemantic_page_elements',
+  'repair_native_marked_content_refs',
+  'repair_bootstrapped_chart_content_refs',
+  'repair_structure_conformance',
+]
+
+function residualCleanupFamilyChain(
+  failureProfile: Pick<FailureProfile, 'residualFamilies'> | null | undefined,
+  family: ResidualFamilyDecision,
+): ResidualFamilyDecision[] {
+  if (!STRUCTURAL_RESIDUAL_FAMILY_IDS.has(family.id)) {
+    return [family]
+  }
+
+  const relatedFamilies = (failureProfile?.residualFamilies || [])
+    .filter(candidate =>
+      candidate.blocking
+      && candidate.convergenceStatus === 'preferred_tools_available'
+      && STRUCTURAL_RESIDUAL_FAMILY_IDS.has(candidate.id),
+    )
+    .sort(sortResidualCleanupFamilies)
+
+  return relatedFamilies.length ? relatedFamilies : [family]
+}
+
+function residualCleanupToolOrder(families: ResidualFamilyDecision[]): RemediationToolName[] {
+  if (families.some(family => STRUCTURAL_RESIDUAL_FAMILY_IDS.has(family.id))) {
+    return STRUCTURAL_RESIDUAL_CLEANUP_TOOL_ORDER
+  }
+
+  const order: RemediationToolName[] = []
+  for (const family of families) {
+    for (const tool of family.preferredTools) {
+      if (!order.includes(tool)) {
+        order.push(tool)
+      }
+    }
+  }
+  return order
+}
+
+export const __test_residualCleanupFamilyChain = residualCleanupFamilyChain
+
 function buildResidualCleanupFamilyCalls(input: {
   filename: string
   analysis: AnalysisResult
   context: PdfRemediationContext
-  failureProfile: Pick<FailureProfile, 'toolOpportunities'>
+  failureProfile: Pick<FailureProfile, 'toolOpportunities' | 'residualFamilies'>
   family: ResidualFamilyDecision
   plannedCalls: RemediationToolCall[]
 }): RemediationToolCall[] {
+  const families = residualCleanupFamilyChain(input.failureProfile, input.family)
+  const targetFamilyIds = new Set(families.map(family => family.id))
+  const toolOrder = residualCleanupToolOrder(families)
+  const toolOrderIndex = new Map(toolOrder.map((tool, index) => [tool, index]))
+
   const plannedFamilyCalls = input.plannedCalls.filter(call =>
-    call.familyId === input.family.id
-    && input.family.preferredTools.includes(call.tool_name),
+    targetFamilyIds.has(call.familyId as ResidualFamilyDecision['id'])
+    && toolOrder.includes(call.tool_name),
   )
+    .sort((left, right) =>
+      (toolOrderIndex.get(left.tool_name) ?? Number.MAX_SAFE_INTEGER) - (toolOrderIndex.get(right.tool_name) ?? Number.MAX_SAFE_INTEGER)
+      || (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
+      || (TOOL_STAGE_ORDER.get(left.tool_name) ?? 99) - (TOOL_STAGE_ORDER.get(right.tool_name) ?? 99)
+      || right.confidence - left.confidence,
+    )
 
   const candidateCalls: RemediationToolCall[] = []
   const familyOpportunities = input.failureProfile.toolOpportunities
     .filter(opportunity =>
-      opportunity.familyId === input.family.id
-      && input.family.preferredTools.includes(opportunity.toolName)
+      targetFamilyIds.has(opportunity.familyId as ResidualFamilyDecision['id'])
+      && toolOrder.includes(opportunity.toolName)
       && opportunity.status === 'auto_runnable',
     )
     .sort((left, right) =>
-      (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
+      (toolOrderIndex.get(left.toolName) ?? Number.MAX_SAFE_INTEGER) - (toolOrderIndex.get(right.toolName) ?? Number.MAX_SAFE_INTEGER)
+      || (left.familyStep ?? Number.MAX_SAFE_INTEGER) - (right.familyStep ?? Number.MAX_SAFE_INTEGER)
       || (TOOL_STAGE_ORDER.get(left.toolName) ?? 99) - (TOOL_STAGE_ORDER.get(right.toolName) ?? 99)
       || (left.scope === 'document' ? 0 : 1) - (right.scope === 'document' ? 0 : 1)
       || right.confidence - left.confidence
@@ -2213,13 +2277,13 @@ export async function remediatePdfWithAgent(
 
   const filterCallsForPipelineWithFamilyOverride = (
     calls: RemediationToolCall[],
-    convergenceFamily?: ResidualFamilyDecision | null,
+    convergenceFamilies?: ResidualFamilyDecision[] | null,
   ): RemediationToolCall[] => {
     if (!currentPipelineConfig) return calls
     const excluded = new Set(currentPipelineConfig.excludedTools)
     return calls.filter(call =>
       !excluded.has(call.tool_name)
-      || shouldAllowPipelineExcludedFamilyCall(call, convergenceFamily),
+      || shouldAllowPipelineExcludedFamilyCall(call, convergenceFamilies),
     )
   }
 
@@ -2704,6 +2768,9 @@ export async function remediatePdfWithAgent(
         : useSeededPlanningState || shouldRefreshPlanningState
         ? selectResidualCleanupFamilyTarget(residualArtifacts.failureProfile)
         : baselineConvergenceFamily
+      const convergenceFamilies = convergenceFamily
+        ? residualCleanupFamilyChain(residualArtifacts.failureProfile, convergenceFamily)
+        : []
       const residualCalls: RemediationToolCall[] = []
 
       if (convergenceFamily) {
@@ -2804,7 +2871,7 @@ export async function remediatePdfWithAgent(
 
       const filteredResidualCalls = dedupeToolCalls(filterCallsForPipelineWithFamilyOverride(
         residualCalls,
-        convergenceFamily,
+        convergenceFamilies,
       ))
       if (!filteredResidualCalls.length) return
 

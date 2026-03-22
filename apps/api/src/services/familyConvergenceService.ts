@@ -19,6 +19,7 @@ export interface FamilyConvergenceTrace<TState, TAction> {
     key: string
     action: TAction | null
     state: TState
+    skipped?: boolean
   }>
 }
 
@@ -34,6 +35,12 @@ export async function runFamilyConvergenceTrace<TState, TAction>(input: {
 
   for (const step of input.steps) {
     if (step.shouldRun && !step.shouldRun(currentState)) {
+      stepStates.push({
+        key: step.key,
+        action: null,
+        state: currentState,
+        skipped: true,
+      })
       continue
     }
     const result = await step.execute({
@@ -48,6 +55,7 @@ export async function runFamilyConvergenceTrace<TState, TAction>(input: {
       key: step.key,
       action: result.action,
       state: currentState,
+      skipped: false,
     })
   }
 
@@ -56,4 +64,3 @@ export async function runFamilyConvergenceTrace<TState, TAction>(input: {
     steps: stepStates,
   }
 }
-

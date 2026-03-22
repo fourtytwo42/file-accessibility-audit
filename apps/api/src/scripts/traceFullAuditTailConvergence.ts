@@ -53,6 +53,7 @@ type FullAuditTailTraceReport = {
   baseline: FullAuditTailTraceState
   steps: Array<{
     key: string
+    skipped: boolean
     action: FullAuditTailTraceStepRecord | null
     state: FullAuditTailTraceState
   }>
@@ -262,7 +263,12 @@ async function tracePdf(pdfPath: string): Promise<FullAuditTailTraceReport> {
   return {
     path: absolutePath,
     baseline: trace.baseline,
-    steps: trace.steps,
+    steps: trace.steps.map(step => ({
+      key: step.key,
+      skipped: step.skipped ?? false,
+      action: step.action,
+      state: step.state,
+    })),
   }
 }
 

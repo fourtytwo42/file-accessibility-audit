@@ -310,7 +310,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         familyId: 'link_tabs_and_annotation_cleanup',
         familyStep: 1,
       },
-      {
+      [{
         id: 'link_tabs_and_annotation_cleanup',
         label: 'Link, tabs, and annotation cleanup',
         priority: 50,
@@ -329,7 +329,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         evidenceSignals: ['blocking_failure_mode:pdfua.link_tagging'],
         evidenceStrength: 20,
         regressionCanaries: ['annual_report_link_tabs_cleanup'],
-      },
+      }],
     )).toBe(true)
 
     expect(__test_shouldAllowPipelineExcludedFamilyCall(
@@ -339,7 +339,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         rationale: 'Close the remaining link family.',
         confidence: 0.9,
       },
-      {
+      [{
         id: 'post_bootstrap_heading_convergence',
         label: 'Post-bootstrap heading convergence',
         priority: 70,
@@ -358,7 +358,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         evidenceSignals: ['blocking_failure_mode:category.heading_structure'],
         evidenceStrength: 18,
         regressionCanaries: ['annual_report_heading_convergence'],
-      },
+      }],
     )).toBe(false)
   })
 
@@ -476,6 +476,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         structure: { acrobatAltRiskNodes: [{ ref: 'obj:38 0 R', tag: '/P', ownershipMode: 'graphics_only_nonfigure' }] },
       } as any,
       failureProfile: {
+        residualFamilies: [],
         toolOpportunities: [
           {
             key: 'repair_native_figure_semantics:document:document',
@@ -553,6 +554,202 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(familyCalls.map(call => call.tool_name)).toEqual([
       'repair_native_figure_semantics',
       'repair_other_elements_alt_text',
+    ])
+  })
+
+  it('continues through the structural cleanup chain so chart-content repair stays reachable after early no-op steps', async () => {
+    const {
+      __test_buildResidualCleanupFamilyCalls,
+      __test_residualCleanupFamilyChain,
+    } = await import('../services/agentRemediationService.js')
+
+    const headingFamily: any = {
+      id: 'post_bootstrap_heading_convergence' as const,
+      label: 'Post-bootstrap heading convergence',
+      priority: 70,
+      blocking: true,
+      blockingReason: 'auto_runnable:artifact_nonsemantic_page_elements',
+      convergenceStatus: 'preferred_tools_available' as const,
+      semanticPolicy: 'optional_after_deterministic' as const,
+      failureModeKeys: ['category.heading_structure'],
+      categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+      preferredTools: [
+        'artifact_nonsemantic_page_elements',
+        'normalize_heading_hierarchy',
+        'create_heading_from_candidate',
+        'repair_structure_conformance',
+        'repair_native_marked_content_refs',
+      ],
+      deprioritizedTools: ['bootstrap_struct_tree', 'repair_native_marked_content_refs'],
+      expectedPostconditions: ['heading_blocking_keys_shrink', 'heading_structure_improves'],
+      activeOpportunityKeys: [
+        'artifact_nonsemantic_page_elements:document:document',
+        'repair_native_marked_content_refs:document:document',
+      ],
+      preferredAutoRunnableOpportunityKeys: [
+        'artifact_nonsemantic_page_elements:document:document',
+        'repair_native_marked_content_refs:document:document',
+      ],
+      currentStep: 1,
+      evidenceSignals: ['auto_runnable:artifact_nonsemantic_page_elements'],
+      evidenceStrength: 18,
+      regressionCanaries: ['annual_report_heading_convergence'],
+    }
+    const logicalFamily: any = {
+      id: 'logical_structure_marked_content' as const,
+      label: 'Logical structure and marked content',
+      priority: 80,
+      blocking: true,
+      blockingReason: 'blocking_failure_mode:pdfua.logical_structure',
+      convergenceStatus: 'preferred_tools_available' as const,
+      semanticPolicy: 'forbidden' as const,
+      failureModeKeys: ['pdfua.logical_structure'],
+      categoryIds: ['reading_order', 'text_extractability', 'pdf_ua_compliance'],
+      preferredTools: [
+        'repair_native_marked_content_refs',
+        'artifact_nonsemantic_page_elements',
+        'repair_bootstrapped_chart_content_refs',
+        'repair_structure_conformance',
+      ],
+      deprioritizedTools: ['bootstrap_struct_tree'],
+      expectedPostconditions: ['logical_structure_blocking_keys_shrink', 'logical_structure_scores_improve'],
+      activeOpportunityKeys: [
+        'artifact_nonsemantic_page_elements:document:document',
+        'repair_native_marked_content_refs:document:document',
+        'repair_bootstrapped_chart_content_refs:document:document',
+        'repair_structure_conformance:document:document',
+      ],
+      preferredAutoRunnableOpportunityKeys: [
+        'artifact_nonsemantic_page_elements:document:document',
+        'repair_native_marked_content_refs:document:document',
+        'repair_bootstrapped_chart_content_refs:document:document',
+        'repair_structure_conformance:document:document',
+      ],
+      currentStep: 1,
+      evidenceSignals: ['blocking_failure_mode:pdfua.logical_structure'],
+      evidenceStrength: 26,
+      regressionCanaries: ['annual_report_structure_tail'],
+    }
+
+    expect(__test_residualCleanupFamilyChain(
+      { residualFamilies: [headingFamily, logicalFamily] },
+      headingFamily,
+    ).map(family => family.id)).toEqual([
+      'post_bootstrap_heading_convergence',
+      'logical_structure_marked_content',
+    ])
+
+    const familyCalls = __test_buildResidualCleanupFamilyCalls({
+      filename: '15adult-probation-1999-2008.runtime.pdf',
+      analysis: makeAnalysisResult({
+        overallScore: 82,
+        grade: 'B',
+        categories: [
+          { id: 'heading_structure', score: 70, grade: 'C' },
+          { id: 'reading_order', score: 80, grade: 'B' },
+          { id: 'pdf_ua_compliance', score: 75, grade: 'C' },
+        ],
+      }),
+      context: {
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2 },
+        figureCandidates: [],
+        tableCandidates: [],
+        headingCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: {},
+      } as any,
+      failureProfile: {
+        residualFamilies: [headingFamily, logicalFamily],
+        toolOpportunities: [
+          {
+            key: 'artifact_nonsemantic_page_elements:document:document',
+            toolName: 'artifact_nonsemantic_page_elements',
+            reason: 'Artifact nonsemantic page elements.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'reading_order'],
+            confidence: 0.92,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.heading_structure'],
+            familyId: 'post_bootstrap_heading_convergence',
+            familyStep: 1,
+            expectedPostconditions: ['heading_blocking_keys_shrink'],
+          },
+          {
+            key: 'repair_native_marked_content_refs:document:document',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair native marked content refs.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['pdf_ua_compliance'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+            familyId: 'logical_structure_marked_content',
+            familyStep: 1,
+            expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+          },
+          {
+            key: 'repair_bootstrapped_chart_content_refs:document:document',
+            toolName: 'repair_bootstrapped_chart_content_refs',
+            reason: 'Repair bootstrapped chart refs.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['pdf_ua_compliance'],
+            confidence: 0.89,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+            familyId: 'logical_structure_marked_content',
+            familyStep: 3,
+            expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+          },
+          {
+            key: 'repair_structure_conformance:document:document',
+            toolName: 'repair_structure_conformance',
+            reason: 'Repair structure conformance.',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['pdf_ua_compliance'],
+            confidence: 0.88,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+            familyId: 'logical_structure_marked_content',
+            familyStep: 4,
+            expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+          },
+        ],
+      },
+      family: headingFamily,
+      plannedCalls: [
+        {
+          tool_name: 'artifact_nonsemantic_page_elements',
+          arguments: { target: 'document' },
+          rationale: 'Artifact first.',
+          confidence: 0.92,
+          familyId: 'post_bootstrap_heading_convergence',
+          familyStep: 1,
+          expectedPostconditions: ['heading_blocking_keys_shrink'],
+        },
+      ],
+    })
+
+    expect(familyCalls.map(call => call.tool_name)).toEqual([
+      'artifact_nonsemantic_page_elements',
+      'repair_native_marked_content_refs',
+      'repair_bootstrapped_chart_content_refs',
+      'repair_structure_conformance',
     ])
   })
 
