@@ -262,6 +262,16 @@ function hasLowQualityFigureAltText(text: string | null | undefined): boolean {
   return new Set(['image', 'photo', 'picture', 'graphic', 'icon', 'logo', 'figure 1', 'figure 2']).has(normalized)
 }
 
+function shouldEmitFigureCandidate(input: {
+  hasAlt: boolean
+  hasLowQualityAlt?: boolean
+  informativeHint: FigureCandidate['informativeHint']
+  splitGenerated?: boolean
+}): boolean {
+  if (!input.hasAlt) return true
+  return false
+}
+
 export interface ReadingOrderCandidate {
   id: string
   ref: string
@@ -1053,6 +1063,12 @@ function buildFigureCandidates(
       splitSourceTag: figure.splitSourceTag || null,
     }
     })
+    .filter(candidate => shouldEmitFigureCandidate({
+      hasAlt: candidate.hasAlt,
+      hasLowQualityAlt: candidate.hasLowQualityAlt,
+      informativeHint: candidate.informativeHint,
+      splitGenerated: candidate.splitGenerated,
+    }))
   const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
     const qpdfImage = qpdfImageByRef.get(node.ref)
     const page = imagePages[index] || pages[index] || null
@@ -1085,6 +1101,11 @@ function buildFigureCandidates(
       containsText: !!node.hasText,
     }
   })
+    .filter(candidate => shouldEmitFigureCandidate({
+      hasAlt: candidate.hasAlt,
+      hasLowQualityAlt: candidate.hasLowQualityAlt,
+      informativeHint: candidate.informativeHint,
+    }))
   const explicitRefs = new Set([...explicitFigures, ...explicitImageStructNodes].map(candidate => candidate.targetRef).filter(Boolean))
   for (const ref of nestedFigureContainerRefs) explicitRefs.add(ref)
 
@@ -1122,6 +1143,7 @@ function buildFigureCandidates(
         placementCount: image.placementCount || 1,
         hasAlt: image.hasAlt,
         altText: image.altText || null,
+        hasLowQualityAlt: image.hasAlt && hasLowQualityFigureAltText(image.altText || null),
         informativeHint: surroundingText.length ? 'informative' as const : 'unknown' as const,
         surroundingText,
         repairMode: classification.repairMode,
@@ -1133,6 +1155,11 @@ function buildFigureCandidates(
         imageEvidence,
       }
     })
+    .filter(candidate => shouldEmitFigureCandidate({
+      hasAlt: candidate.hasAlt,
+      hasLowQualityAlt: candidate.hasLowQualityAlt,
+      informativeHint: candidate.informativeHint,
+    }))
 
   if (explicitFigures.length || explicitImageStructNodes.length || fallbackFigures.length) {
     return [...explicitFigures, ...explicitImageStructNodes, ...fallbackFigures]
@@ -1180,7 +1207,11 @@ function buildFigureCandidates(
       textDensityHint,
       imageEvidence,
     }
-  })
+  }).filter(candidate => shouldEmitFigureCandidate({
+    hasAlt: candidate.hasAlt,
+    hasLowQualityAlt: candidate.hasLowQualityAlt,
+    informativeHint: candidate.informativeHint,
+  }))
 }
 
 function buildReadingOrderCandidates(structure: StructureBackendMutationResult): ReadingOrderCandidate[] {

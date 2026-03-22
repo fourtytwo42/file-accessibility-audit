@@ -4838,6 +4838,33 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(inspect.figures.some(figure => figure.ref === 'obj:575 0 R' && figure.hasAlt)).toBe(true)
   }, 180_000)
 
+  it('does not surface already-described native figures as long-report alt-text candidates', async () => {
+    const buffer = await loadProcessedAfterFixture('1996CHRIAudit.pdf')
+    const analysis = await analyzePDF(buffer, '1996CHRIAudit.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    expect(context.structure.figures.some(figure => figure.ref === 'obj:575 0 R' && figure.hasAlt)).toBe(true)
+    expect(context.figureCandidates.some(candidate => candidate.targetRef === 'obj:575 0 R')).toBe(false)
+    expect(context.figureCandidates.length).toBeLessThan(context.structure.figures.length)
+  }, 180_000)
+
+  it('keeps stable long-report controls free of figure candidate floods when figures already have alt text', async () => {
+    const buffer = await loadProcessedAfterFixture('1988-1989_Biennial_Report.pdf')
+    const analysis = await analyzePDF(buffer, '1988-1989_Biennial_Report.pdf', {
+      skipAdobe: true,
+      skipVeraPdf: true,
+      analysisProfile: 'remediation_fast',
+    })
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    expect(analysis.overallScore).toBe(100)
+    expect(context.figureCandidates).toHaveLength(0)
+  }, 180_000)
+
   it('skips bootstrap on long reports that already have stable heading structure and no figure bootstrap work', async () => {
     const buffer = await loadProcessedAfterFixture('1988-1989_Biennial_Report.pdf')
     const analysis = await analyzePDF(buffer, '1988-1989_Biennial_Report.pdf', {
