@@ -19,6 +19,7 @@
     "baseline:phase0:compare": "tsx src/scripts/comparePhase0Artifacts.ts --mode all",
     "baseline:processed:pairs": "tsx src/scripts/verifyProcessedRegressionPairs.ts",
     "baseline:processed:font-capability": "tsx src/scripts/verifyProcessedFontCapability.ts",
+    "trace:97anreport": "tsx src/scripts/trace97anreportMetadataBookmarks.ts",
     "trace:long-reports": "tsx src/scripts/traceLongReportCleanup.ts",
     "trace:long-report-figures": "tsx src/scripts/traceLongReportFigureCleanup.ts",
     "trace:font-cluster": "tsx src/scripts/traceProcessedFontCluster.ts",

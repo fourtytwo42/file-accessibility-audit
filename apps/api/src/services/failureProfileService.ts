@@ -18,6 +18,7 @@ import { selectHighConfidenceLongReportFigureCandidates, selectHighConfidenceLon
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { ALT_REMOVAL_MODES } from './altTextScoring.js'
 import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
+import { hasMeaningfulMetadataTitle } from './remediationCallDerivationService.js'
 import type { LocalStandardsFinding } from './localStandardsService.js'
 
 interface BuildFailureProfileInput {
@@ -420,7 +421,7 @@ function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamily
     return {
       key: finding.key,
       label: finding.label,
-      nativeToolFamilies: ['replace_bookmarks_from_headings', 'normalize_document_metadata'],
+      nativeToolFamilies: ['replace_bookmarks_from_headings'],
       categoryIds: ['bookmarks', 'title_language', 'pdf_ua_compliance'],
       classification: 'deterministic',
     }
@@ -1234,10 +1235,17 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   const hasNativeStructure = input.context.qpdf.hasStructTree
     && input.context.qpdf.structTreeDepth > 0
     && (input.context.structure.structuralNodes?.length || 0) > 0
+  const currentLanguage = input.context.qpdf.lang || input.context.pdfjs.lang || ''
+  const metadataDebtActive = failureModeByKey.has('pdfua.metadata_identification')
+    || failureModeByKey.has('pdfua.document_language')
+    || failureModeByKey.has('pdfua.display_doc_title')
+    || !hasMeaningfulMetadataTitle(input.context.pdfjs.title)
+    || !currentLanguage
+    || needsLanguageTagNormalization(currentLanguage)
 
   const derivedFailureKeys = (keys: string[]) => keys.filter(key => failureModeByKey.has(key))
 
-  if (issueIds.has('title_language')) {
+  if (issueIds.has('title_language') && metadataDebtActive) {
     addOpportunity(opportunities, {
       toolName: 'normalize_document_metadata',
       reason: 'Metadata normalization can reconcile title, language, viewer preferences, and PDF/UA metadata.',
@@ -1250,7 +1258,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       blockedReason: undefined,
       derivedFromFailureModeKeys: derivedFailureKeys(['category.title_language', 'pdfua.metadata_identification']),
     })
-    if (!(input.context.pdfjs.title || '').trim()) {
+    if (!hasMeaningfulMetadataTitle(input.context.pdfjs.title)) {
       addOpportunity(opportunities, {
         toolName: 'set_document_title',
         reason: 'The document title is missing from metadata.',
@@ -1264,7 +1272,6 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
         derivedFromFailureModeKeys: derivedFailureKeys(['category.title_language']),
       })
     }
-    const currentLanguage = input.context.qpdf.lang || input.context.pdfjs.lang || ''
     if (!currentLanguage || needsLanguageTagNormalization(currentLanguage)) {
       addOpportunity(opportunities, {
         toolName: 'set_document_language',
@@ -1694,10 +1701,6 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   }
 
   if (issueIds.has('bookmarks')) {
-    const metadataDebtActive = failureModeByKey.has('category.title_language')
-      || failureModeByKey.has('pdfua.metadata_identification')
-      || failureModeByKey.has('pdfua.document_language')
-      || failureModeByKey.has('pdfua.display_doc_title')
     const prioritizedHeadingWorkPending = !!prioritizedLongReportHeadingIds?.size
     const headingConvergenceStarted = input.actions.some(action =>
       (action.tool === 'create_heading_from_candidate' || action.tool === 'normalize_heading_hierarchy')

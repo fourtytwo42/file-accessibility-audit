@@ -1230,6 +1230,65 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'set_pdfua_identification')?.status).toBe('auto_runnable')
   })
 
+  it('routes bookmark-language-only residuals to bookmark replacement instead of metadata normalization', () => {
+    const base = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      overallScore: 81,
+      grade: 'B',
+      categories: [
+        ...base.categories.map(category =>
+          category.id === 'bookmarks'
+            ? { ...category, score: 40, grade: 'F', severity: 'Critical', findings: ['Bookmark titles are noisy'] }
+            : category.id === 'title_language'
+              ? { ...category, score: 50, grade: 'F', severity: 'Moderate', findings: ['Bookmark language quality lowers inherited title/language confidence'] }
+              : category.id === 'pdf_ua_compliance'
+                ? { ...category, score: 70, grade: 'C', severity: 'Moderate', findings: ['Bookmark language quality remains unresolved'] }
+                : category),
+      ] as any,
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.bookmark_language',
+            label: 'Bookmark and outline language quality',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['bookmarks', 'title_language', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Bookmark title appears raw or OCR-noisy.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        pdfjs: { ...makeContext().pdfjs, title: '96 annual rep2', lang: 'en', hasOutlines: true },
+        qpdf: {
+          ...makeContext().qpdf,
+          hasOutlines: true,
+          lang: 'en',
+          displayDocTitle: true,
+          metadataRef: '52 0 R',
+          metadataTypeValid: true,
+          metadataSubtypeXml: true,
+          outlineTitles: ['  Letter to the governor .......................................................................................... 3'],
+        },
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'normalize_document_metadata')).toBeUndefined()
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'replace_bookmarks_from_headings')?.status).toBe('auto_runnable')
+  })
+
   it('does not emit heading or figure candidate opportunities once those categories are already complete', () => {
     const analysis = makeAnalysisResult({
       overallScore: 100,
