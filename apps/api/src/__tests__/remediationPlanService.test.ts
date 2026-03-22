@@ -1591,6 +1591,169 @@ describe('remediationPlanService', () => {
     expect(plan.actions.some(action => action.tool_name === 'replace_bookmarks_from_headings')).toBe(false)
   })
 
+  it('prioritizes post-bootstrap structural residue cleanup ahead of repeated bootstrap', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'F',
+        analysisScore: 33,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'context.post_bootstrap_structural_residue',
+            label: 'Post-bootstrap structural residue remains',
+            source: 'context',
+            count: 2,
+            categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['artifact_nonsemantic_page_elements', 'repair_bootstrapped_chart_content_refs', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+            evidence: ['Bootstrap residue remains.'],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'bootstrap',
+            toolName: 'bootstrap_struct_tree',
+            reason: 'Repeat bootstrap',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.heading_structure'],
+          },
+          {
+            key: 'artifact',
+            toolName: 'artifact_nonsemantic_page_elements',
+            reason: 'Artifact nonsemantic elements',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'pdf_ua_compliance'],
+            confidence: 0.93,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_bootstrap_structural_residue'],
+          },
+          {
+            key: 'chart-refs',
+            toolName: 'repair_bootstrapped_chart_content_refs',
+            reason: 'Repair chart refs',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'pdf_ua_compliance'],
+            confidence: 0.91,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_bootstrap_structural_residue'],
+          },
+          {
+            key: 'native-marked',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair marked-content refs',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'reading_order'],
+            confidence: 0.88,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_bootstrap_structural_residue'],
+          },
+          {
+            key: 'conformance',
+            toolName: 'repair_structure_conformance',
+            reason: 'Repair structure conformance',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure', 'reading_order'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_bootstrap_structural_residue', 'pdfua.logical_structure'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 5,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'biennial-residue.pdf',
+      analysis: {
+        overallScore: 33,
+        grade: 'F',
+        isScanned: false,
+        pageCount: 28,
+        categories: [
+          { id: 'heading_structure', label: 'Heading', score: 40, severity: 'Critical' },
+          { id: 'reading_order', label: 'Reading', score: 40, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 20, severity: 'Critical' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: {
+          lang: 'en',
+          hasStructTree: true,
+          structTreeDepth: 5,
+          formFields: [],
+          headings: [{ level: 'H1', tag: '/H1' }],
+        },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [{ imageCount: 1, graphics: [{}, {}], textLines: [{ text: 'A' }, { text: 'B' }] }],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 2,
+      actions: [{
+        tool: 'bootstrap_struct_tree',
+        target: 'document',
+        details: 'Augmented existing structure tree.',
+        confidence: 0.9,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        outcome: 'applied',
+      }] as any,
+      rejectedActions: [],
+    })
+
+    expect(new Set(plan.actions.slice(0, 2).map(action => action.tool_name))).toEqual(new Set([
+      'artifact_nonsemantic_page_elements',
+      'repair_bootstrapped_chart_content_refs',
+    ]))
+    expect(plan.actions.some(action => action.tool_name === 'bootstrap_struct_tree')).toBe(false)
+  })
+
   it('does not plan finalize_substituted_font_conformance before legacy substitution has run', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {

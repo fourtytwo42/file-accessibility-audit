@@ -1014,6 +1014,75 @@ describe('failureProfileService', () => {
       && opportunity.derivedFromFailureModeKeys.includes('context.post_heading_creation_native_structure_debt'))).toBe(true)
   })
 
+  it('emits post-bootstrap structural residue and suppresses repeated bootstrap on long reports', () => {
+    const analysis = makeAnalysisResult({
+      pageCount: 28,
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'heading_structure' || category.id === 'pdf_ua_compliance'
+          ? { ...category, score: 40, grade: 'F', severity: 'Critical', findings: ['Bootstrapped structure still needs cleanup'] }
+          : category),
+      localStandards: {
+        status: 'issues_detected',
+        findings: [{
+          key: 'pdfua.logical_structure',
+          label: 'Logical structure',
+          severity: 'error',
+          blocking: true,
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          confidence: 0.9,
+          evidence: ['Marked-content refs remain incomplete after bootstrap.'],
+          source: 'qpdf',
+          inferred: false,
+          count: 1,
+        }],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          headings: [{ level: 'H1', tag: '/H1' }],
+          hasStructTree: true,
+          structTreeDepth: 4,
+        },
+        pages: [
+          {
+            pageNumber: 1,
+            width: 612,
+            height: 792,
+            rotation: 0,
+            textLines: [{ text: 'CRIMINAL JUSTICE', fontSize: 24, bbox: { x: 72, y: 72, width: 200, height: 18 }, fontWeight: 'bold' }],
+            images: [],
+            graphics: [{ type: 'path' }, { type: 'path' }],
+            imageCount: 1,
+          },
+        ] as any,
+      }),
+      actions: [
+        makeAction({
+          tool: 'bootstrap_struct_tree',
+          target: 'document',
+          details: 'Augmented existing structure tree.',
+          outcome: 'applied',
+        }),
+      ],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.post_bootstrap_structural_residue')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'artifact_nonsemantic_page_elements'
+      && opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_structural_residue'))).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'repair_bootstrapped_chart_content_refs'
+      && opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_structural_residue'))).toBe(true)
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'bootstrap_struct_tree')?.status).not.toBe('auto_runnable')
+  })
+
   it('defers long-report bookmark replacement until metadata and heading convergence stabilize', () => {
     const analysis = makeAnalysisResult({
       pageCount: 26,

@@ -5086,6 +5086,50 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(decision.reason).toBeNull()
   })
 
+  it('accepts flat-score long-report cleanup when logical-structure debt improves', async () => {
+    const { __test_evaluateStageAcceptance } = await import('../services/agentRemediationService.js')
+    const previous = {
+      overallScore: 33,
+      verapdf: { status: 'unavailable', failures: [] },
+      localStandards: {
+        findings: [
+          { key: 'pdfua.logical_structure', blocking: true },
+        ],
+      },
+      categories: [
+        { id: 'heading_structure', score: 40, grade: 'F', severity: 'Moderate', findings: ['Heading structure incomplete'] },
+        { id: 'reading_order', score: 40, grade: 'F', severity: 'Moderate', findings: ['Logical structure incomplete'] },
+        { id: 'pdf_ua_compliance', score: 20, grade: 'F', severity: 'Moderate', findings: ['PDF/UA failures remain'] },
+      ],
+    } as any
+    const next = {
+      overallScore: 33,
+      verapdf: { status: 'unavailable', failures: [] },
+      localStandards: {
+        findings: [],
+      },
+      categories: [
+        { id: 'heading_structure', score: 40, grade: 'F', severity: 'Moderate', findings: ['Heading structure incomplete'] },
+        { id: 'reading_order', score: 40, grade: 'F', severity: 'Moderate', findings: ['Logical structure incomplete'] },
+        { id: 'pdf_ua_compliance', score: 20, grade: 'F', severity: 'Moderate', findings: ['PDF/UA failures remain'] },
+      ],
+    } as any
+    const decision = __test_evaluateStageAcceptance(previous, next, [{
+      tool: 'repair_bootstrapped_chart_content_refs',
+      target: 'document',
+      details: 'Repaired chart references after bootstrap.',
+      confidence: 0.88,
+      autoApplied: true,
+      changedVisibleContent: false,
+      changedDocumentBytes: true,
+      categoryTargets: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+      outcome: 'applied',
+    }] as any)
+
+    expect(decision.accept).toBe(true)
+    expect(decision.reason).toBeNull()
+  })
+
   it('does not treat surfaced Acrobat ownership debt as a native regression for structure conformance', async () => {
     const { __test_nativeStageRegressionReason } = await import('../services/agentRemediationService.js')
     const previous = {

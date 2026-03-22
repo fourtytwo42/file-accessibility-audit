@@ -324,6 +324,33 @@ function weakNativeBootstrapNeeded(input: BuildFailureProfileInput): boolean {
   )
 }
 
+function likelyBootstrappedStructuralResidue(input: BuildFailureProfileInput): {
+  hasResidualNonsemanticDebt: boolean
+  hasResidualBootstrappedChartDebt: boolean
+} {
+  const longReportConvergence = isLongReportConvergenceContext(input)
+  if (!longReportConvergence) {
+    return {
+      hasResidualNonsemanticDebt: false,
+      hasResidualBootstrappedChartDebt: false,
+    }
+  }
+
+  const headingsExist = (input.context.qpdf.headings?.length || 0) > 0
+    || (input.context.structure.structuralNodes?.length || 0) > 0
+  const pagesWithImageContent = input.context.pages.filter(page =>
+    page.imageCount > 0,
+  ).length
+  const likelyChartPages = input.context.pages.filter(page =>
+    page.imageCount > 0 && page.textLines.length >= 2,
+  ).length
+
+  return {
+    hasResidualNonsemanticDebt: headingsExist && pagesWithImageContent > 0,
+    hasResidualBootstrappedChartDebt: headingsExist && likelyChartPages > 0,
+  }
+}
+
 function actionTargetForOpportunity(input: {
   scope: ToolOpportunityScope
   candidateIds?: string[]
@@ -630,6 +657,7 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
 
   const postBootstrapStructureRefsAvailable = input.context.headingCandidates.length > 0
     || (input.context.qpdf.headings?.length || 0) > 0
+  const structuralResidueSignals = likelyBootstrappedStructuralResidue(input)
   if (
     bootstrapAugmentedExistingTree
     && postBootstrapStructureRefsAvailable
@@ -656,6 +684,44 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
           : headingNeedsReview
             ? 'Bootstrap added headings to an existing structure tree, but heading hierarchy still needs native cleanup.'
             : 'Bootstrap added headings to an existing structure tree, but logical-structure debt still blocks native convergence.',
+      ],
+    })
+  }
+
+  if (
+    bootstrapAugmentedExistingTree
+    && isLongReportConvergenceContext(input)
+    && (headingNeedsReview || logicalStructureBlocking)
+    && (structuralResidueSignals.hasResidualNonsemanticDebt || structuralResidueSignals.hasResidualBootstrappedChartDebt)
+  ) {
+    mergeMode(modes, {
+      key: 'context.post_bootstrap_structural_residue',
+      label: 'Post-bootstrap structural residue remains',
+      source: 'context',
+      derivedFrom: [
+        'action:bootstrap_struct_tree',
+        ...(headingNeedsReview ? ['category:heading_structure'] : []),
+        ...(logicalStructureBlocking ? ['local_standard:pdfua.logical_structure'] : []),
+        ...(structuralResidueSignals.hasResidualNonsemanticDebt ? ['context:nonsemantic_page_elements_likely'] : []),
+        ...(structuralResidueSignals.hasResidualBootstrappedChartDebt ? ['context:bootstrapped_chart_content_refs_likely'] : []),
+      ],
+      count: Number(structuralResidueSignals.hasResidualNonsemanticDebt) + Number(structuralResidueSignals.hasResidualBootstrappedChartDebt),
+      categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+      blocking: true,
+      unmatched: false,
+      classification: 'deterministic',
+      nativeToolFamilies: [
+        'artifact_nonsemantic_page_elements',
+        'repair_bootstrapped_chart_content_refs',
+        'repair_native_marked_content_refs',
+        'repair_structure_conformance',
+      ],
+      evidence: [
+        structuralResidueSignals.hasResidualNonsemanticDebt && structuralResidueSignals.hasResidualBootstrappedChartDebt
+          ? 'Bootstrap created usable structure cues, but long-report page artifacts and bootstrapped chart references still need cleanup before native structure credit can land.'
+          : structuralResidueSignals.hasResidualNonsemanticDebt
+            ? 'Bootstrap created usable structure cues, but long-report nonsemantic page elements still need cleanup before native structure credit can land.'
+            : 'Bootstrap created usable structure cues, but bootstrapped chart references still need cleanup before native structure credit can land.',
       ],
     })
   }
@@ -1069,6 +1135,14 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       .map(category => category.id),
   )
   const isLongReportConvergence = isLongReportConvergenceContext(input)
+  const bootstrapAugmentedExistingTree = input.actions.some(action =>
+    action.tool === 'bootstrap_struct_tree'
+    && action.outcome === 'applied'
+    && /Augmented existing structure tree/i.test(action.details || ''),
+  )
+  const postBootstrapStructureRefsAvailable = input.context.headingCandidates.length > 0
+    || (input.context.qpdf.headings?.length || 0) > 0
+  const postBootstrapStructuralResidue = failureModeByKey.has('context.post_bootstrap_structural_residue')
   const prioritizedLongReportHeadingIds = isLongReportConvergence && issueIds.has('heading_structure')
     ? new Set(
         selectHighConfidenceLongReportHeadingCandidates(input.context.headingCandidates, {
@@ -1376,13 +1450,23 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       derivedFromFailureModeKeys: derivedFailureKeys([
         'category.heading_structure',
         'context.post_bootstrap_native_structure_debt',
+        'context.post_bootstrap_structural_residue',
         'context.post_heading_creation_native_structure_debt',
       ]),
     })
   }
 
+  const nativeHeadingsExist = (input.context.qpdf.headings?.length || 0) > 0
   for (const candidate of input.context.headingCandidates) {
     if (!issueIds.has('heading_structure')) continue
+    if (
+      isLongReportConvergence
+      && nativeHeadingsExist
+      && postBootstrapStructuralResidue
+      && candidate.repairMode === 'safe'
+    ) {
+      continue
+    }
     if (
       prioritizedLongReportHeadingIds
       && candidate.repairMode === 'safe'
@@ -1500,6 +1584,11 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     !input.analysis.isScanned
     && (issueIds.has('text_extractability') || issueIds.has('heading_structure') || issueIds.has('alt_text') || issueIds.has('reading_order'))
     && (!input.context.qpdf.hasStructTree || weakNativeBootstrapNeeded(input))
+    && !(
+      isLongReportConvergence
+      && bootstrapAugmentedExistingTree
+      && (postBootstrapStructureRefsAvailable || postBootstrapStructuralResidue)
+    )
   ) {
     addOpportunity(opportunities, {
       toolName: 'bootstrap_struct_tree',

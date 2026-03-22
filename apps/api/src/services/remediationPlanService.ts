@@ -400,7 +400,7 @@ function shouldUseBootstrappedChartConformance(input: {
   actions: RemediationActionRecord[]
   selectedActions?: RemediationToolCall[]
 }): boolean {
-  return input.analysis.pageCount === 1
+  return (input.analysis.pageCount === 1 || (input.analysis.pageCount >= 20 && !input.analysis.isScanned))
     && input.context.qpdf.hasStructTree
     && (hasActionTool(input.actions, 'bootstrap_struct_tree')
       || hasPlannedTool(input.selectedActions ?? [], 'bootstrap_struct_tree'))
@@ -459,6 +459,7 @@ function opportunitySelectionDecision(input: {
 
   const structuralClass = classification.structuralClass
   const allowsPostBootstrapNativeConvergence = opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_native_structure_debt')
+    || opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_structural_residue')
     || opportunity.derivedFromFailureModeKeys.includes('context.post_heading_creation_native_structure_debt')
   const nativeSafeContext = !analysis.isScanned
     && isNativeTaggedSafeContext(context)
@@ -468,6 +469,7 @@ function opportunitySelectionDecision(input: {
         && !hasPlannedTool(selectedActions, 'bootstrap_struct_tree'))
     )
   const useBootstrappedChartConformance = shouldUseBootstrappedChartConformance({ analysis, context, actions, selectedActions })
+  const postBootstrapStructuralResidue = failureModeByKey.has('context.post_bootstrap_structural_residue')
   const hasAutoNativeMarkedContent = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_marked_content_refs')
   const hasAutoNativeLinkRepair = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_link_structure')
   const repairFontUnicodeOutcome = actionAttemptOutcome('repair_font_unicode_maps', actions)
@@ -494,6 +496,19 @@ function opportunitySelectionDecision(input: {
   }
 
   switch (opportunity.toolName) {
+    case 'bootstrap_struct_tree':
+      if (
+        analysis.pageCount >= 20
+        && !analysis.isScanned
+        && hasActionTool(actions, 'bootstrap_struct_tree')
+        && (
+          postBootstrapStructuralResidue
+          || (context.qpdf.headings?.length || 0) > 0
+        )
+      ) {
+        return { selectable: false, reason: 'post_bootstrap_cleanup_supersedes_repeat_bootstrap' }
+      }
+      return { selectable: true }
     case 'repair_bootstrapped_chart_content_refs':
       return {
         selectable: useBootstrappedChartConformance,
@@ -532,6 +547,16 @@ function opportunitySelectionDecision(input: {
       }
       if (structuralClass === 'native_tagged' && (hasAutoNativeMarkedContent || hasAutoNativeLinkRepair)) {
         return { selectable: false, reason: 'native_tagged_prefers_narrow_repairs' }
+      }
+      return { selectable: true }
+    case 'create_heading_from_candidate':
+      if (
+        analysis.pageCount >= 20
+        && !analysis.isScanned
+        && postBootstrapStructuralResidue
+        && (context.qpdf.headings?.length || 0) > 0
+      ) {
+        return { selectable: false, reason: 'post_bootstrap_structural_residue_blocks_heading_creation' }
       }
       return { selectable: true }
     case 'repair_type1_font_unicode_maps':
@@ -710,6 +735,7 @@ async function deterministicActions(input: {
 
   const headingStructureUnresolved = issueCategoryIds(input.analysis).includes('heading_structure')
   const postBootstrapStructureDebt = failureModeByKey.has('context.post_bootstrap_native_structure_debt')
+  const postBootstrapStructuralResidue = failureModeByKey.has('context.post_bootstrap_structural_residue')
   const postHeadingCreationStructureDebt = failureModeByKey.has('context.post_heading_creation_native_structure_debt')
   const longReportConvergence = input.analysis.pageCount >= 20 && !input.analysis.isScanned
   const longReportMetadataDebt = longReportConvergence && (
@@ -729,6 +755,20 @@ async function deterministicActions(input: {
         && opportunity.scope === 'document'
         && ['set_pdfua_identification', 'normalize_document_metadata', 'set_document_language', 'set_document_title'].includes(opportunity.toolName),
       maxSelections: 4,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        postBootstrapStructuralResidue
+        && opportunity.scope === 'document'
+        && ['artifact_nonsemantic_page_elements', 'repair_bootstrapped_chart_content_refs'].includes(opportunity.toolName),
+      maxSelections: 2,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        postBootstrapStructuralResidue
+        && opportunity.scope === 'document'
+        && ['repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName),
+      maxSelections: 2,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>

@@ -128,6 +128,9 @@ const DEEP_DIRTY_TOOLS = new Set<string>([
 const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
   'repair_structure_conformance',
   'bootstrap_struct_tree',
+  'artifact_nonsemantic_page_elements',
+  'repair_bootstrapped_chart_content_refs',
+  'repair_native_marked_content_refs',
   'set_figure_alt_text',
   'retag_as_figure_and_set_alt',
   'mark_figure_decorative',
@@ -139,6 +142,9 @@ const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
 
 const LONG_REPORT_STRUCTURE_CONVERGENCE_TOOLS = new Set<string>([
   'bootstrap_struct_tree',
+  'artifact_nonsemantic_page_elements',
+  'repair_bootstrapped_chart_content_refs',
+  'repair_native_marked_content_refs',
   'normalize_heading_hierarchy',
   'repair_structure_conformance',
 ])
@@ -343,7 +349,10 @@ function requiresDeepStructureScoring(actions: Array<Pick<RemediationActionRecor
 
 function requiresDeepStructureInspect(actions: Array<Pick<RemediationActionRecord, 'tool'>>): boolean {
   return actions.some(action =>
-    action.tool === 'repair_structure_conformance',
+    action.tool === 'repair_structure_conformance'
+    || action.tool === 'artifact_nonsemantic_page_elements'
+    || action.tool === 'repair_bootstrapped_chart_content_refs'
+    || action.tool === 'repair_native_marked_content_refs',
   )
 }
 
@@ -760,6 +769,36 @@ function hasTargetedCategoryImprovement(previous: AnalysisResult, next: Analysis
   })
 }
 
+function hasLongReportStructureImprovement(previous: AnalysisResult, next: AnalysisResult, stageActions: RemediationActionRecord[]): boolean {
+  const includesLongReportCleanupTool = stageActions.some(action =>
+    action.tool === 'artifact_nonsemantic_page_elements'
+    || action.tool === 'repair_bootstrapped_chart_content_refs'
+    || action.tool === 'repair_native_marked_content_refs'
+    || action.tool === 'repair_structure_conformance',
+  )
+  if (!includesLongReportCleanupTool) return false
+
+  const structureCategories: Array<'heading_structure' | 'reading_order' | 'pdf_ua_compliance'> = [
+    'heading_structure',
+    'reading_order',
+    'pdf_ua_compliance',
+  ]
+  const categoryImproved = structureCategories.some(categoryId => {
+    const before = scoreForCategory(previous, categoryId)
+    const after = scoreForCategory(next, categoryId)
+    return typeof before === 'number' && typeof after === 'number' && after > before
+  })
+  if (categoryImproved) return true
+
+  const previousLogicalStructureBlocking = previous.localStandards?.findings?.some(finding =>
+    finding.blocking && finding.key === 'pdfua.logical_structure',
+  ) ?? false
+  const nextLogicalStructureBlocking = next.localStandards?.findings?.some(finding =>
+    finding.blocking && finding.key === 'pdfua.logical_structure',
+  ) ?? false
+  return previousLogicalStructureBlocking && !nextLogicalStructureBlocking
+}
+
 function nativeStageRegressionReason(
   previous: AnalysisResult,
   next: AnalysisResult,
@@ -822,6 +861,7 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
   const standardsImproved = standardsValidationImproved(previous, next)
   const worstRegression = worstTargetedRegression(stageActions, previous, next)
   const targetedCategoryImproved = hasTargetedCategoryImprovement(previous, next, stageActions)
+  const longReportStructureImproved = hasLongReportStructureImprovement(previous, next, stageActions)
   const structureConformanceActions = stageActions.filter(action =>
     action.tool === 'repair_structure_conformance' && action.outcome === 'applied',
   )
@@ -851,7 +891,7 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
       worstTargetedRegression: worstRegression,
     }
   }
-  if (next.overallScore > previous.overallScore || standardsImproved || targetedCategoryImproved) {
+  if (next.overallScore > previous.overallScore || standardsImproved || targetedCategoryImproved || longReportStructureImproved) {
     return {
       accept: true,
       reason: null,
