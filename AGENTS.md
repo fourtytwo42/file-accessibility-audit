@@ -33,15 +33,15 @@ This repository supports a long-running remediation workflow over PDFs stored in
 - When using multiple agents, every active agent must have an explicit assignment recorded in `REMEDIATION_PROGRESS.md` before substantive work begins.
 - Each agent assignment must include:
   - agent name or id
-  - owned PDF(s)
+  - owned PDF
   - owned write scope
   - current hypothesis/task
   - latest attempt path
   - status: `planned`, `active`, `blocked`, `verifying`, or `done`
-- No two agents may own the same PDF at the same time unless the tracker explicitly marks one as `diagnostic-only`.
+- No two agents may own the same PDF at the same time.
 - No two agents may own overlapping write scopes at the same time unless the tracker explicitly says the overlap is intentional and names the integration owner.
 - Default ownership rule:
-  - one agent owns one PDF family or one disjoint code area
+  - one agent owns one PDF
   - the coordinating agent owns cross-file integration and final reruns
 - Before spawning or reusing an agent:
   - check `REMEDIATION_PROGRESS.md`
