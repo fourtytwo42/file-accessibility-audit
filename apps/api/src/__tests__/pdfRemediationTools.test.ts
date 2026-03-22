@@ -2848,6 +2848,45 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }
   })
 
+  it('repairs native graphics-only figure owners without aliasing decorative cleanup', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+    const figureRef = inspect.figures[0]?.ref
+    expect(figureRef).toBeTruthy()
+
+    const degraded = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: [figureRef!],
+        targetTag: 'Span',
+      },
+    })
+    expect(degraded.status).toBe('applied')
+
+    const repaired = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: {
+        operation: 'repair_native_figure_semantics',
+      },
+    })
+
+    expect(repaired.status).toBe('applied')
+    expect(repaired.changedDocumentBytes).toBe(true)
+    expect(repaired.figureOperationSummary?.figureNodesRetagged).toBeGreaterThanOrEqual(1)
+    expect(repaired.figureOperationSummary?.graphicsOnlyOwnersPromoted).toBeGreaterThanOrEqual(1)
+    expect(repaired.figureOperationSummary?.figureAltPreserved).toBeGreaterThanOrEqual(1)
+
+    const reInspect = await runPdfStructureBackend({
+      buffer: repaired.outputBuffer!,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+    expect(reInspect.structuralNodes.some(node => node.tag === '/Figure')).toBe(true)
+  })
+
   it('retags a safe Story figure candidate by wrapping it in a child /Figure', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const inspect = await runPdfStructureBackend({
@@ -4785,6 +4824,18 @@ describe('remediationPlanService', { timeout: 60_000 }, () => {
     expect(qpdf.error).toBeNull()
     expect(qpdf.hasStructTree).toBe(true)
     expect(qpdf.hasMarkInfo).toBe(true)
+  }, 180_000)
+
+  it('surfaces MCR-backed native figures when inspecting long processed reports', async () => {
+    const buffer = await loadProcessedAfterFixture('1996CHRIAudit.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+
+    expect(inspect.figures.length).toBeGreaterThan(10)
+    expect(inspect.figures[0]?.tag).toBe('/Figure')
+    expect(inspect.figures.some(figure => figure.ref === 'obj:575 0 R' && figure.hasAlt)).toBe(true)
   }, 180_000)
 
   it('skips bootstrap on long reports that already have stable heading structure and no figure bootstrap work', async () => {

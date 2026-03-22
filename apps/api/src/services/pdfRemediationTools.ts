@@ -1735,12 +1735,14 @@ function structureResultToAction(input: {
   action: RemediationActionRecord
   buffer?: Buffer
   manualReviewFlags: ModelReviewFlag[]
+  operationResult: StructureBackendMutationResult
 } {
   const condensedWarnings = Array.from(new Set(input.result.warnings.map(warning => warning.trim()).filter(Boolean)))
   const details = input.result.appliedMutations.length
     ? input.result.appliedMutations.map(mutationEntry => mutationEntry.details).join(' ')
     : condensedWarnings[0] || input.baseAction.details
   const fontSummary = input.result.fontOperationSummary
+  const figureSummary = input.result.figureOperationSummary
   const fontSummaryText = fontSummary
     ? [
         fontSummary.embeddedFontProgramsAdded ? `embedded ${fontSummary.embeddedFontProgramsAdded} font program(s)` : null,
@@ -1750,7 +1752,19 @@ function structureResultToAction(input: {
         fontSummary.widthFixesApplied ? `normalized ${fontSummary.widthFixesApplied} width fix(es)` : null,
       ].filter(Boolean).join(', ')
     : ''
-  const detailedSummary = fontSummaryText ? `${details} Font operation summary: ${fontSummaryText}.` : details
+  const figureSummaryText = figureSummary
+    ? [
+        figureSummary.figureNodesRetagged ? `retagged ${figureSummary.figureNodesRetagged} figure node(s)` : null,
+        figureSummary.figureAltPreserved ? `preserved ${figureSummary.figureAltPreserved} existing alt text value(s)` : null,
+        figureSummary.figureAltPlaceholdersCreated ? `created ${figureSummary.figureAltPlaceholdersCreated} empty alt placeholder(s)` : null,
+        figureSummary.graphicsOnlyOwnersPromoted ? `promoted ${figureSummary.graphicsOnlyOwnersPromoted} graphics-only owner(s)` : null,
+      ].filter(Boolean).join(', ')
+    : ''
+  const detailedSummary = [
+    details,
+    fontSummaryText ? `Font operation summary: ${fontSummaryText}.` : null,
+    figureSummaryText ? `Figure operation summary: ${figureSummaryText}.` : null,
+  ].filter(Boolean).join(' ')
 
   if (input.result.status === 'applied' && input.result.outputBuffer) {
     return {
@@ -1766,6 +1780,7 @@ function structureResultToAction(input: {
         outcome: 'applied',
       },
       manualReviewFlags: [],
+      operationResult: input.result,
     }
   }
 
@@ -1786,6 +1801,7 @@ function structureResultToAction(input: {
       severity: 'warning' as const,
       details: warning,
     })),
+    operationResult: input.result,
   }
 }
 
@@ -1797,6 +1813,7 @@ export async function executeRemediationTool(input: {
   buffer: Buffer
   action: RemediationActionRecord
   manualReviewFlags: ModelReviewFlag[]
+  operationResult?: StructureBackendMutationResult
 }> {
   const { buffer, context, call } = input
   const args = call.arguments || {}
@@ -1998,6 +2015,7 @@ export async function executeRemediationTool(input: {
         buffer: translated.buffer || buffer,
         action: translated.action,
         manualReviewFlags: translated.manualReviewFlags,
+        operationResult: translated.operationResult,
       }
     }
     case 'normalize_document_metadata': {
@@ -2409,6 +2427,7 @@ export async function executeRemediationTool(input: {
           targetRef: candidate.targetRef,
         },
         manualReviewFlags: translated.manualReviewFlags,
+        operationResult: translated.operationResult,
       }
     }
     case 'move_tag_in_reading_order':
@@ -2463,6 +2482,7 @@ export async function executeRemediationTool(input: {
         buffer: translated.buffer || buffer,
         action: translated.action,
         manualReviewFlags: translated.manualReviewFlags,
+        operationResult: translated.operationResult,
       }
     }
     case 'rewrite_link_visible_text':
@@ -2546,6 +2566,7 @@ export async function executeRemediationTool(input: {
         buffer: translated.buffer || buffer,
         action: translated.action,
         manualReviewFlags: translated.manualReviewFlags,
+        operationResult: translated.operationResult,
       }
     }
     case 'repair_structure_conformance': {

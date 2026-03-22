@@ -639,6 +639,12 @@ def collect_mcids(value, results):
             collect_mcids(item, results)
         return
     if isinstance(value, pikepdf.Dictionary):
+        if str(value.get("/Type")) == "/MCR":
+            mcid = value.get("/MCID")
+            try:
+                results.append(int(mcid))
+            except Exception:
+                pass
         collect_mcids(value.get("/K"), results)
 
 
@@ -4579,8 +4585,135 @@ def mutate_repair_bootstrapped_chart_content_refs(pdf, mutation):
 
 
 def mutate_repair_native_figure_semantics(pdf, mutation):
-    # Conservative alias: only mark leftover nonsemantic page elements as decorative.
-    return mutate_artifact_nonsemantic_page_elements(pdf, mutation)
+    root = get_struct_tree_root(pdf)
+    if not isinstance(root, pikepdf.Dictionary):
+        return False, [], ["repair_native_figure_semantics requires an existing structure tree."]
+
+    applied = []
+    warnings = []
+    changed = False
+    seen_refs = set()
+    mixed_owner_count = 0
+    unsafe_candidate_count = 0
+
+    def record_skip(message):
+        if len(warnings) < 8:
+            warnings.append(message)
+
+    risks_by_ref = {}
+    for risk in acrobat_alt_risk_nodes(pdf):
+        ref = risk.get("ref")
+        if ref:
+            risks_by_ref[ref] = risk
+
+    candidates = []
+    for candidate in image_struct_candidates(pdf):
+        ref = candidate.get("ref")
+        if ref:
+            candidates.append({
+                "ref": ref,
+                "tag": candidate.get("tag"),
+                "hasText": candidate.get("hasText", False),
+                "graphicsDominant": candidate.get("graphicsDominant", False),
+                "parentTagPath": candidate.get("parentTagPath") or [],
+                "risk": risks_by_ref.get(ref),
+            })
+    for risk in acrobat_alt_risk_nodes(pdf):
+        if risk.get("ownershipMode") not in {"graphics_only_nonfigure", "mixed_text_graphics_same_mcid"}:
+            continue
+        ref = risk.get("ref")
+        if not ref or ref in seen_refs:
+            continue
+        seen_refs.add(ref)
+        candidates.append({
+            "ref": ref,
+            "tag": risk.get("tag"),
+            "hasText": risk.get("hasText", False),
+            "graphicsDominant": risk.get("graphicsDominant", False),
+            "parentTagPath": risk.get("parentTagPath") or [],
+            "risk": risk,
+        })
+
+    promoted_refs = set()
+    for candidate in candidates:
+        ref = candidate.get("ref")
+        if not ref or ref in promoted_refs:
+            continue
+        obj = resolve_obj(pdf, ref)
+        if not isinstance(obj, pikepdf.Dictionary):
+            continue
+
+        before_tag = str(obj.get("/S") or "")
+        if before_tag == "/Figure":
+            continue
+
+        risk = candidate.get("risk") or {}
+        ownership_mode = risk.get("ownershipMode")
+        parent_tags = candidate.get("parentTagPath") or []
+        has_unsafe_ancestry = any(tag in UNSAFE_FIGURE_ANCESTRY for tag in parent_tags)
+        has_text = bool(candidate.get("hasText")) or bool(risk.get("hasText"))
+        graphics_dominant = bool(candidate.get("graphicsDominant")) or bool(risk.get("graphicsDominant"))
+
+        if ownership_mode == "mixed_text_graphics_same_mcid" or has_text:
+            mixed_owner_count += 1
+            record_skip(
+                f"{before_tag} {ref} still mixes text and graphics ownership; skipping native figure promotion."
+            )
+            continue
+        if has_unsafe_ancestry:
+            unsafe_candidate_count += 1
+            record_skip(
+                f"{before_tag} {ref} sits under unsafe ancestry {', '.join(parent_tags)} and was not promoted to /Figure."
+            )
+            continue
+        if before_tag not in SAFE_FIGURE_RETAG_TAGS and before_tag not in FIGURE_COMPAT_TAGS:
+            unsafe_candidate_count += 1
+            record_skip(
+                f"{before_tag} {ref} is not a safe native figure-promotion target."
+            )
+            continue
+        if not graphics_dominant and ownership_mode != "graphics_only_nonfigure":
+            unsafe_candidate_count += 1
+            record_skip(
+                f"{before_tag} {ref} did not expose strong enough native graphics ownership for deterministic figure promotion."
+            )
+            continue
+
+        existing_alt = obj.get("/Alt")
+        existing_alt_text = str(existing_alt).replace("u:", "").strip() if existing_alt is not None else ""
+
+        obj["/S"] = pikepdf.Name("/Figure")
+        if existing_alt is None:
+            obj["/Alt"] = pikepdf.String("")
+
+        applied.append({
+            "ref": ref_string(obj),
+            "before": before_tag,
+            "after": "/Figure",
+            "details": (
+                f"Retagged graphics-only native owner {ref_string(obj)} from {before_tag} to /Figure."
+                if existing_alt is None
+                else f"Retagged graphics-only native owner {ref_string(obj)} from {before_tag} to /Figure while preserving existing alternate text."
+            ),
+        })
+        if existing_alt is None:
+            applied.append({
+                "ref": ref_string(obj),
+                "before": None,
+                "after": "",
+                "details": f"Added empty /Alt placeholder to promoted native /Figure {ref_string(obj)}.",
+            })
+
+        applied.extend(remove_alt_from_descendants(obj, skip_ref=ref_string(obj), preserve_leaf_figure_alt=True))
+        if existing_alt_text:
+            applied.extend(mirror_alt_text_to_matching_struct_elems(pdf, obj, existing_alt_text))
+        changed = True
+        promoted_refs.add(ref)
+
+    if changed:
+        return True, applied, warnings[:8]
+
+    return False, [], warnings[:8] or ["No safe native figure ownership repairs were available."]
 
 
 def mutate_repair_native_table_headers(pdf, mutation):
@@ -7672,6 +7805,29 @@ def summarize_font_operation(operation, applied, warnings):
     }
 
 
+def summarize_figure_operation(operation, applied, warnings):
+    if operation not in {"repair_native_figure_semantics", "repair_other_elements_alt_text"}:
+        return None
+
+    def _details(entry):
+        return str((entry or {}).get("details") or "")
+
+    def _after(entry):
+        return str((entry or {}).get("after") or "")
+
+    details = [_details(entry) for entry in (applied or [])]
+    return {
+        "operation": operation,
+        "figureNodesRetagged": sum(1 for detail in details if "to /Figure" in detail),
+        "figureAltPreserved": sum(1 for detail in details if "preserving existing alternate text" in detail or "preserving existing alternate text." in detail or "while preserving existing alternate text" in detail),
+        "figureAltPlaceholdersCreated": sum(1 for detail in details if "Added empty /Alt placeholder" in detail),
+        "graphicsOnlyOwnersPromoted": sum(1 for detail in details if "graphics-only native owner" in detail),
+        "mixedOwnersSkipped": sum(1 for warning in (warnings or []) if "mixes text and graphics ownership" in str(warning or "")),
+        "unsafeCandidateCount": sum(1 for warning in (warnings or []) if "not promoted to /Figure" in str(warning or "") or "not a safe native figure-promotion target" in str(warning or "") or "strong enough native graphics ownership" in str(warning or "")),
+        "unresolvedWarningCount": len(warnings or []),
+    }
+
+
 def analyze_reading_order_pdfminer(pdf_path, request):
     try:
         from pdfminer.high_level import extract_pages
@@ -7900,6 +8056,7 @@ def main():
                 "status": "applied" if op_changed else ("unsupported" if op_warnings and op_warnings[0].startswith("unsupported:") else "no_effect"),
                 "changedDocumentBytes": op_changed,
                 "fontOperationSummary": summarize_font_operation(sub_op, op_applied, op_warnings),
+                "figureOperationSummary": summarize_figure_operation(sub_op, op_applied, op_warnings),
                 "appliedMutations": op_applied,
                 "warnings": op_warnings,
             })
@@ -7908,6 +8065,7 @@ def main():
             "status": "applied" if changed else "no_effect",
             "changedDocumentBytes": changed,
             "fontOperationSummary": None,
+            "figureOperationSummary": None,
             "appliedMutations": applied,
             "warnings": warnings,
             "operationResults": per_op_results,
@@ -7924,6 +8082,7 @@ def main():
                 "status": "unsupported",
                 "changedDocumentBytes": False,
                 "fontOperationSummary": None,
+                "figureOperationSummary": None,
                 "appliedMutations": [],
                 "warnings": [f"Unsupported operation: {operation}"],
                 **snap,
@@ -7938,6 +8097,7 @@ def main():
         "status": "applied" if changed else "no_effect",
         "changedDocumentBytes": changed,
         "fontOperationSummary": summarize_font_operation(operation, applied, warnings),
+        "figureOperationSummary": summarize_figure_operation(operation, applied, warnings),
         "appliedMutations": applied,
         "warnings": warnings,
         **snap,

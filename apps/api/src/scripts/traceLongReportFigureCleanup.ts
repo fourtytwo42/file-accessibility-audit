@@ -14,12 +14,23 @@ const DEFAULT_FILES = [
   '1996CHRIAudit.pdf',
   '1998_Madison.pdf',
   '1988-1989_Biennial_Report.pdf',
+  '1993-1994_Biennial_Report.pdf',
 ] as const
 
 interface FigureTraceStep {
   step: string
   outcome?: string
   changedDocumentBytes?: boolean
+  figureOperationSummary?: {
+    operation: string
+    figureNodesRetagged: number
+    figureAltPreserved: number
+    figureAltPlaceholdersCreated: number
+    graphicsOnlyOwnersPromoted: number
+    mixedOwnersSkipped: number
+    unsafeCandidateCount: number
+    unresolvedWarningCount: number
+  } | null
   score: number
   grade: string
   altText: number | null
@@ -154,6 +165,7 @@ async function traceFile(filename: string): Promise<FigureTraceFile> {
     steps.push(await summarizeStep(toolName, filename, buffer, analysis, actions, {
       outcome: outcome.action.outcome,
       changedDocumentBytes: outcome.action.changedDocumentBytes,
+      figureOperationSummary: outcome.operationResult?.figureOperationSummary || null,
     }))
   }
 
