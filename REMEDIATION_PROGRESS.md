@@ -35,8 +35,14 @@
 - Coordination mode: explicit ownership required before parallel agent work
 - Integration owner: main session / coordinating agent
 - Overlap policy:
-  - exactly one agent may own a given PDF at a time
+  - exactly one agent may own a given PDF at a time, including PDFs inside cohorts
   - no overlapping write scopes unless explicitly marked and coordinated here
+- Cohort policy:
+  - prefer assigning similar PDFs together when an agent can benefit from shared diagnosis and fixes
+  - keep cohorts small and explicit
+  - split a PDF out of a cohort as soon as it diverges from the shared blocker family
+- Active cohorts:
+  - none yet
 - Active agent assignments:
   - `coordinator`
     - status: active
@@ -47,11 +53,19 @@
 - Assignment template for future agent use:
   - `agent-name`
     - status: planned|active|blocked|verifying|done
-    - owned PDF: `...`
+    - owned PDF or owned cohort: `...`
     - owned write scope: `...`
     - task: `...`
     - latest attempt path: `...`
     - stale-after-fix rerun required: yes|no
+- Cohort template for future agent use:
+  - `cohort-name`
+    - status: planned|active|blocked|verifying|done
+    - rationale: `why these PDFs are similar`
+    - member PDFs: `...`
+    - assignment owner: `agent-name`
+    - latest shared blocker family: `...`
+    - latest shared attempt/artifact path: `...`
 ## Current Focus
 
 

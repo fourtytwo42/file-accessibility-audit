@@ -28,20 +28,40 @@ This repository supports a long-running remediation workflow over PDFs stored in
 - If concurrency is raised, record the reason and active file set in `REMEDIATION_PROGRESS.md`.
 - When running in parallel, the target operating mode is up to 4 PDFs at a time unless system load requires less.
 
+## PDF Grouping
+
+- When parallelizing the `Downloads/` campaign, prefer grouping similar PDFs into a single agent-owned cohort instead of assigning purely at random.
+- Good grouping signals include:
+  - same series or report family
+  - same year-range or naming pattern
+  - similar producer/source workflow
+  - similar blocker family after first analysis
+  - similar structural class or remediation path
+- A grouping is valid only if it is explicit in `REMEDIATION_PROGRESS.md`.
+- Each cohort entry must record:
+  - cohort name
+  - reason the PDFs are grouped
+  - member PDFs
+  - whether the cohort is diagnostic-only or remediation-active
+- Default grouping rule:
+  - keep cohorts small and coherent
+  - prefer 2-10 closely related PDFs over broad mixed batches
+  - if a PDF stops behaving like the rest of its cohort, split it out and record the split
+
 ## Agent Coordination
 
 - When using multiple agents, every active agent must have an explicit assignment recorded in `REMEDIATION_PROGRESS.md` before substantive work begins.
 - Each agent assignment must include:
   - agent name or id
-  - owned PDF
+  - owned PDF or owned cohort
   - owned write scope
   - current hypothesis/task
   - latest attempt path
   - status: `planned`, `active`, `blocked`, `verifying`, or `done`
-- No two agents may own the same PDF at the same time.
+- No two agents may own the same PDF at the same time, even when PDFs are assigned through cohorts.
 - No two agents may own overlapping write scopes at the same time unless the tracker explicitly says the overlap is intentional and names the integration owner.
 - Default ownership rule:
-  - one agent owns one PDF
+  - one agent owns one PDF or one coherent cohort of similar PDFs
   - the coordinating agent owns cross-file integration and final reruns
 - Before spawning or reusing an agent:
   - check `REMEDIATION_PROGRESS.md`
