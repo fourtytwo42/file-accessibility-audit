@@ -43,6 +43,8 @@ type EvaluateActionPostconditionsInput = {
   residualFamilies?: ResidualFamilyDecision[]
 }
 
+type LinkSummary = NonNullable<RemediationActionRecord['linkOperationSummary']>
+
 type EvaluateActionPostconditionsResult = {
   familyId?: ResidualFamilyId
   status: FamilyPostconditionStatus
@@ -590,6 +592,35 @@ function evaluateLinkSignals(previous: AnalysisResult, next: AnalysisResult): st
   ]
 }
 
+function evaluateLinkSummarySignals(action: RemediationActionRecord): string[] {
+  const summary = action.linkOperationSummary
+  if (!summary) return []
+
+  const signals: string[] = []
+  if (summary.taggedLinkCount > 0) {
+    signals.push(`link_summary:taggedLinkCount:${summary.taggedLinkCount}`)
+  }
+  if (summary.taggedAnnotationCount > 0) {
+    signals.push(`link_summary:taggedAnnotationCount:${summary.taggedAnnotationCount}`)
+  }
+  if (summary.orphanAnnotationCountReduced > 0) {
+    signals.push(`link_summary:orphanAnnotationCountReduced:${summary.orphanAnnotationCountReduced}`)
+  }
+  if (summary.repairedLinkStructureCount > 0) {
+    signals.push(`link_summary:repairedLinkStructureCount:${summary.repairedLinkStructureCount}`)
+  }
+  if (summary.annotationContentsSetCount > 0) {
+    signals.push(`link_summary:annotationContentsSetCount:${summary.annotationContentsSetCount}`)
+  }
+  if (summary.annotationTabOrderNormalizedCount > 0) {
+    signals.push(`link_summary:annotationTabOrderNormalizedCount:${summary.annotationTabOrderNormalizedCount}`)
+  }
+  if (summary.tabsSetCount > 0) {
+    signals.push(`link_summary:tabsSetCount:${summary.tabsSetCount}`)
+  }
+  return signals
+}
+
 function evaluateFigureSignals(
   previous: AnalysisResult,
   next: AnalysisResult,
@@ -642,7 +673,10 @@ export function evaluateActionPostconditions(input: EvaluateActionPostconditions
       case 'table_structure_recovery':
         return evaluateTableSignals(input.previous, input.next)
       case 'link_tabs_and_annotation_cleanup':
-        return evaluateLinkSignals(input.previous, input.next)
+        return [
+          ...evaluateLinkSignals(input.previous, input.next),
+          ...evaluateLinkSummarySignals(input.action),
+        ]
       case 'native_figure_convergence':
         return evaluateFigureSignals(input.previous, input.next, input.previousContext, input.nextContext)
       case 'post_bootstrap_heading_convergence':

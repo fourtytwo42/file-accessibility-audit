@@ -134,6 +134,43 @@ async function makePdfWithMixedAnnotations(): Promise<Buffer> {
   return Buffer.from(await doc.save())
 }
 
+async function makeTaggedPdfWithMixedAnnotations(): Promise<Buffer> {
+  const doc = await PDFDocument.create()
+  const page = doc.addPage([612, 792])
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  page.drawText('https://example.com/report', { x: 72, y: 720, size: 12, font })
+  const textAnnotation = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Text'),
+    Rect: [40, 740, 60, 760],
+    Contents: PDFString.of('note'),
+  })
+  const action = doc.context.obj({
+    S: PDFName.of('URI'),
+    URI: PDFString.of('https://example.com/report'),
+  })
+  const linkAnnotation = doc.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [72, 716, 220, 732],
+    Border: [0, 0, 0],
+    A: action,
+  })
+  page.node.set(PDFName.of('Annots'), doc.context.obj([textAnnotation, linkAnnotation]))
+
+  const markInfo = doc.context.obj({ Marked: true })
+  const structTreeRoot = doc.context.obj({
+    Type: PDFName.of('StructTreeRoot'),
+    K: doc.context.obj([]),
+    ParentTree: doc.context.obj({ Nums: [] }),
+    RoleMap: doc.context.obj({}),
+  })
+  doc.catalog.set(PDFName.of('MarkInfo'), markInfo)
+  doc.catalog.set(PDFName.of('StructTreeRoot'), structTreeRoot)
+
+  return Buffer.from(await doc.save())
+}
+
 async function makePdfWithOutOfOrderLinks(): Promise<Buffer> {
   const doc = await PDFDocument.create()
   const page = doc.addPage([612, 792])
@@ -1203,6 +1240,32 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }))
     expect(result.action.outcome).toBe('applied')
     expect(result.action.categoryTargets).toEqual(['reading_order', 'pdf_ua_compliance'])
+  })
+
+  it('tags unowned annotations on tagged legacy PDFs without failing and emits link summaries', async () => {
+    const buffer = await makeTaggedPdfWithMixedAnnotations()
+    const analysis = await analyzePDF(buffer, 'tagged-mixed-annots.pdf')
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+
+    const result = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'tag_unowned_annotations',
+        arguments: { target: 'document' },
+        rationale: 'Tag visible annotations missing structure ownership.',
+        confidence: 0.95,
+        familyId: 'link_tabs_and_annotation_cleanup',
+        familyStep: 2,
+        expectedPostconditions: ['link_blocking_keys_shrink'],
+      },
+    })
+
+    expect(['applied', 'no_effect']).toContain(result.action.outcome)
+    expect(result.action.outcome).not.toBe('failed')
+    expect(result.action.linkOperationSummary).toBeTruthy()
+    expect(result.action.linkOperationSummary?.operation).toBe('tag_unowned_annotations')
+    expect(result.action.linkOperationSummary?.unresolvedWarningCount).toBeGreaterThanOrEqual(0)
   })
 
   it('orders annotation ownership repair before annotation alt-text repair when both are planned', async () => {

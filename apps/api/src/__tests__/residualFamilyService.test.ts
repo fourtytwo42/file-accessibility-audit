@@ -452,4 +452,56 @@ describe('residualFamilyService', () => {
     } as any)
     expect(eligible.map(entry => entry.id)).toEqual(['native_figure_convergence'])
   })
+
+  it('treats backend-backed link ownership counters as satisfied link-family postconditions', () => {
+    const result = evaluateActionPostconditions({
+      action: {
+        tool: 'tag_unowned_annotations',
+        target: 'document',
+        details: 'Tagged visible annotations with native structure ownership.',
+        confidence: 0.95,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['link_quality', 'reading_order', 'pdf_ua_compliance'],
+        outcome: 'applied',
+        familyId: 'link_tabs_and_annotation_cleanup',
+        linkOperationSummary: {
+          operation: 'tag_unowned_annotations',
+          taggedLinkCount: 1,
+          taggedAnnotationCount: 2,
+          orphanAnnotationCountReduced: 2,
+          repairedLinkStructureCount: 1,
+          annotationContentsSetCount: 0,
+          annotationTabOrderNormalizedCount: 0,
+          tabsSetCount: 0,
+          unresolvedWarningCount: 0,
+        },
+      },
+      previous: makeAnalysis({
+        localStandards: {
+          findings: [
+            { key: 'pdfua.tagged_annotations', blocking: true, count: 2 },
+          ],
+        },
+      }),
+      next: makeAnalysis({
+        localStandards: {
+          findings: [
+            { key: 'pdfua.tagged_annotations', blocking: true, count: 2 },
+          ],
+        },
+      }),
+      previousContext: makeContext(),
+      nextContext: makeContext(),
+    })
+
+    expect(result.familyId).toBe('link_tabs_and_annotation_cleanup')
+    expect(result.status).toBe('satisfied')
+    expect(result.signals).toEqual(expect.arrayContaining([
+      'link_summary:taggedLinkCount:1',
+      'link_summary:taggedAnnotationCount:2',
+      'link_summary:orphanAnnotationCountReduced:2',
+    ]))
+  })
 })

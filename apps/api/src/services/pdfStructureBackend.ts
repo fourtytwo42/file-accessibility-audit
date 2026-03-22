@@ -119,6 +119,17 @@ export interface StructureBackendMutationResult {
     unsafeCandidateCount: number
     unresolvedWarningCount: number
   }
+  linkOperationSummary?: {
+    operation: string
+    taggedLinkCount: number
+    taggedAnnotationCount: number
+    orphanAnnotationCountReduced: number
+    repairedLinkStructureCount: number
+    annotationContentsSetCount: number
+    annotationTabOrderNormalizedCount: number
+    tabsSetCount: number
+    unresolvedWarningCount: number
+  }
   appliedMutations: Array<{
     ref: string
     before?: string | null
@@ -200,6 +211,7 @@ export interface StructureBackendOperationResult {
   changedDocumentBytes: boolean
   fontOperationSummary?: StructureBackendMutationResult['fontOperationSummary']
   figureOperationSummary?: StructureBackendMutationResult['figureOperationSummary']
+  linkOperationSummary?: StructureBackendMutationResult['linkOperationSummary']
   appliedMutations: StructureBackendMutationResult['appliedMutations']
   warnings: string[]
 }
@@ -263,6 +275,7 @@ export async function runPdfStructureBackend(input: {
       changedDocumentBytes: false,
       fontOperationSummary: undefined,
       figureOperationSummary: undefined,
+      linkOperationSummary: undefined,
       appliedMutations: [],
       warnings: [error?.message || 'Structure backend failed.'],
       headings: [],
@@ -345,6 +358,7 @@ export async function runPdfStructureBackendBatch(input: {
       changedDocumentBytes: false,
       fontOperationSummary: undefined,
       figureOperationSummary: undefined,
+      linkOperationSummary: undefined,
       appliedMutations: [],
       warnings: [error?.message || 'Structure backend batch failed.'],
       headings: [],

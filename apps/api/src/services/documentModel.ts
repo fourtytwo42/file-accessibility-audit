@@ -231,6 +231,17 @@ export interface RemediationActionRecord {
   expectedPostconditions?: string[]
   postconditionStatus?: FamilyPostconditionStatus
   postconditionSignals?: string[]
+  linkOperationSummary?: {
+    operation: string
+    taggedLinkCount: number
+    taggedAnnotationCount: number
+    orphanAnnotationCountReduced: number
+    repairedLinkStructureCount: number
+    annotationContentsSetCount: number
+    annotationTabOrderNormalizedCount: number
+    tabsSetCount: number
+    unresolvedWarningCount: number
+  }
 }
 
 export interface RemediationIteration {

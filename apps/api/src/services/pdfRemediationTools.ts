@@ -1829,6 +1829,7 @@ function structureResultToAction(input: {
     : condensedWarnings[0] || input.baseAction.details
   const fontSummary = input.result.fontOperationSummary
   const figureSummary = input.result.figureOperationSummary
+  const linkSummary = input.result.linkOperationSummary
   const fontSummaryText = fontSummary
     ? [
         fontSummary.embeddedFontProgramsAdded ? `embedded ${fontSummary.embeddedFontProgramsAdded} font program(s)` : null,
@@ -1846,10 +1847,22 @@ function structureResultToAction(input: {
         figureSummary.graphicsOnlyOwnersPromoted ? `promoted ${figureSummary.graphicsOnlyOwnersPromoted} graphics-only owner(s)` : null,
       ].filter(Boolean).join(', ')
     : ''
+  const linkSummaryText = linkSummary
+    ? [
+        linkSummary.taggedLinkCount ? `tagged ${linkSummary.taggedLinkCount} link structure element(s)` : null,
+        linkSummary.taggedAnnotationCount ? `tagged ${linkSummary.taggedAnnotationCount} annotation structure element(s)` : null,
+        linkSummary.orphanAnnotationCountReduced ? `reduced orphan annotation count by ${linkSummary.orphanAnnotationCountReduced}` : null,
+        linkSummary.repairedLinkStructureCount ? `repaired ${linkSummary.repairedLinkStructureCount} link-structure ownership issue(s)` : null,
+        linkSummary.annotationContentsSetCount ? `set ${linkSummary.annotationContentsSetCount} annotation /Contents value(s)` : null,
+        linkSummary.annotationTabOrderNormalizedCount ? `normalized annotation tab order on ${linkSummary.annotationTabOrderNormalizedCount} page(s)` : null,
+        linkSummary.tabsSetCount ? `set /Tabs on ${linkSummary.tabsSetCount} page(s)` : null,
+      ].filter(Boolean).join(', ')
+    : ''
   const detailedSummary = [
     details,
     fontSummaryText ? `Font operation summary: ${fontSummaryText}.` : null,
     figureSummaryText ? `Figure operation summary: ${figureSummaryText}.` : null,
+    linkSummaryText ? `Link operation summary: ${linkSummaryText}.` : null,
   ].filter(Boolean).join(' ')
 
   if (input.result.status === 'applied' && input.result.outputBuffer) {
@@ -1863,6 +1876,7 @@ function structureResultToAction(input: {
         categoryTargets: input.categoryTargets,
         changedDocumentBytes: true,
         validationWarnings: condensedWarnings,
+        linkOperationSummary: linkSummary,
         outcome: 'applied',
       },
       manualReviewFlags: [],
@@ -1879,6 +1893,7 @@ function structureResultToAction(input: {
       categoryTargets: input.categoryTargets,
       changedDocumentBytes: false,
       validationWarnings: condensedWarnings,
+      linkOperationSummary: linkSummary,
       outcome,
     },
     manualReviewFlags: condensedWarnings.map((warning, index) => ({

@@ -4542,7 +4542,7 @@ def _repair_annotation_struct_ownership(pdf, root, document, nums, next_key, ann
     }))
     struct_elem = pdf.make_indirect(pikepdf.Dictionary({
         "/Type": pikepdf.Name("/StructElem"),
-        "/S": pikepdf.Name(expected_tag.lstrip("/")),
+        "/S": pikepdf.Name(expected_tag if str(expected_tag).startswith("/") else f"/{expected_tag}"),
         "/P": document,
         "/Pg": page_obj,
         "/K": objr,
@@ -8287,6 +8287,43 @@ def summarize_figure_operation(operation, applied, warnings):
     }
 
 
+def summarize_link_operation(operation, applied, warnings):
+    if operation not in {
+        "repair_native_link_structure",
+        "tag_unowned_annotations",
+        "set_link_annotation_contents",
+        "normalize_annotation_tab_order",
+        "set_tabs_all_annotated_pages",
+        "set_page_tabs",
+    }:
+        return None
+
+    def _details(entry):
+        return str((entry or {}).get("details") or "")
+
+    details = [_details(entry) for entry in (applied or [])]
+    created_link_structs = sum(1 for detail in details if "Created /Link structure element" in detail)
+    created_annot_structs = sum(1 for detail in details if "Created /Annot structure element" in detail)
+    struct_parents_assigned = sum(1 for detail in details if "Assigned /StructParent" in detail)
+    stale_objr_removed = sum(1 for detail in details if "Removed stale OBJR" in detail)
+    hidden_link_flags_cleared = sum(1 for detail in details if "Cleared hidden flag on link annotation" in detail)
+    annotation_contents_set = sum(1 for detail in details if "Set link annotation /Contents" in detail)
+    tab_order_repairs = sum(1 for detail in details if "Reordered annotations on" in detail)
+    tabs_set = sum(1 for detail in details if "/Tabs /S" in detail)
+
+    return {
+        "operation": operation,
+        "taggedLinkCount": created_link_structs,
+        "taggedAnnotationCount": created_link_structs + created_annot_structs,
+        "orphanAnnotationCountReduced": struct_parents_assigned,
+        "repairedLinkStructureCount": created_link_structs + stale_objr_removed + hidden_link_flags_cleared,
+        "annotationContentsSetCount": annotation_contents_set,
+        "annotationTabOrderNormalizedCount": tab_order_repairs,
+        "tabsSetCount": tabs_set,
+        "unresolvedWarningCount": len(warnings or []),
+    }
+
+
 def analyze_reading_order_pdfminer(pdf_path, request):
     try:
         from pdfminer.high_level import extract_pages
@@ -8516,6 +8553,7 @@ def main():
                 "changedDocumentBytes": op_changed,
                 "fontOperationSummary": summarize_font_operation(sub_op, op_applied, op_warnings),
                 "figureOperationSummary": summarize_figure_operation(sub_op, op_applied, op_warnings),
+                "linkOperationSummary": summarize_link_operation(sub_op, op_applied, op_warnings),
                 "appliedMutations": op_applied,
                 "warnings": op_warnings,
             })
@@ -8525,6 +8563,7 @@ def main():
             "changedDocumentBytes": changed,
             "fontOperationSummary": None,
             "figureOperationSummary": None,
+            "linkOperationSummary": None,
             "appliedMutations": applied,
             "warnings": warnings,
             "operationResults": per_op_results,
@@ -8542,6 +8581,7 @@ def main():
                 "changedDocumentBytes": False,
                 "fontOperationSummary": None,
                 "figureOperationSummary": None,
+                "linkOperationSummary": None,
                 "appliedMutations": [],
                 "warnings": [f"Unsupported operation: {operation}"],
                 **snap,
@@ -8557,6 +8597,7 @@ def main():
         "changedDocumentBytes": changed,
         "fontOperationSummary": summarize_font_operation(operation, applied, warnings),
         "figureOperationSummary": summarize_figure_operation(operation, applied, warnings),
+        "linkOperationSummary": summarize_link_operation(operation, applied, warnings),
         "appliedMutations": applied,
         "warnings": warnings,
         **snap,

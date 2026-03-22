@@ -22,6 +22,7 @@
     "baseline:processed:font-capability": "tsx src/scripts/verifyProcessedFontCapability.ts",
     "diagnose:processed-intake-parity": "tsx src/scripts/diagnoseProcessedIntakeParity.ts",
     "diagnose:live-families": "tsx src/scripts/diagnoseLiveResidualFamilies.ts",
+    "trace:link-family": "tsx src/scripts/traceLinkFamilyConvergence.ts",
     "trace:97anreport": "tsx src/scripts/trace97anreportMetadataBookmarks.ts",
     "trace:annual-reports": "tsx src/scripts/traceAnnualReportOwnership.ts",
     "trace:long-reports": "tsx src/scripts/traceLongReportCleanup.ts",
