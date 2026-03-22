@@ -1604,13 +1604,13 @@ describe('scoreTableMarkup edge cases', () => {
     expect(findCategory(result, 'table_markup').score).toBe(100)
   })
 
-  it('2 tables, 1 with headers → score 40', () => {
+  it('2 tables, 1 with headers → score 55', () => {
     const qpdf = makeQpdf({
       tables: [{ hasHeaders: true }, { hasHeaders: false }],
     })
     const pdfjs = makePdfjs()
     const result = scoreDocument(qpdf, pdfjs)
-    expect(findCategory(result, 'table_markup').score).toBe(40)
+    expect(findCategory(result, 'table_markup').score).toBe(55)
   })
 
   it('tables with no headers → score 40', () => {
@@ -1620,6 +1620,20 @@ describe('scoreTableMarkup edge cases', () => {
     const pdfjs = makePdfjs()
     const result = scoreDocument(qpdf, pdfjs)
     expect(findCategory(result, 'table_markup').score).toBe(40)
+  })
+
+  it('credits strong partial native table-header recovery', () => {
+    const qpdf = makeQpdf({
+      tables: [
+        { hasHeaders: true },
+        { hasHeaders: true },
+        { hasHeaders: true },
+        { hasHeaders: true },
+        { hasHeaders: false },
+      ],
+    })
+    const result = scoreDocument(qpdf, makePdfjs())
+    expect(findCategory(result, 'table_markup').score).toBe(70)
   })
 
   it('keeps score 100 when visual-only table detections are advisory', () => {

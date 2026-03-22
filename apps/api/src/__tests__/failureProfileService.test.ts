@@ -502,6 +502,148 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => ['rewrite_link_visible_text', 'set_link_annotation_contents'].includes(opportunity.toolName))).toBe(true)
   })
 
+  it('routes annual-report residuals to table and PDF-UA cleanup after metadata normalization', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      overallScore: 51,
+      grade: 'F',
+      pageCount: 84,
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        failedChecks: 171,
+        failures: [
+          {
+            ruleId: 'tabs',
+            specification: 'PDF/UA-1',
+            clause: null,
+            testNumber: null,
+            location: null,
+            message: 'The page dictionary shall contain the key Tabs with value S.',
+            categoryIds: ['reading_order'],
+          },
+          {
+            ruleId: 'link-contents',
+            specification: 'PDF/UA-1',
+            clause: null,
+            testNumber: null,
+            location: null,
+            message: 'Link annotations shall contain an alternate description via their Contents key.',
+            categoryIds: ['link_quality'],
+          },
+          {
+            ruleId: 'font-unicode',
+            specification: 'PDF/UA-1',
+            clause: null,
+            testNumber: null,
+            location: null,
+            message: 'Glyph can not be mapped to Unicode.',
+            categoryIds: ['pdf_ua_compliance'],
+          },
+        ],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.table_regularity',
+            label: 'Table regularity',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['table_markup', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Table 1 exposes irregular row column counts (6, 11, 11).'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.font_unicode',
+            label: 'Font Unicode mapping',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['Two fonts are missing ToUnicode maps.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 2,
+          },
+          {
+            key: 'pdfua.page_tabs',
+            label: 'Page tab order metadata',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['Page dictionary is missing /Tabs /S.'],
+            source: 'composite',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.annotation_alt_contents',
+            label: 'Link annotation alternate descriptions',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['link_quality', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['Link annotations are missing Contents values.'],
+            source: 'composite',
+            inferred: false,
+            count: 3,
+          },
+        ],
+        knownGapKeys: [],
+      },
+      categories: [
+        { id: 'title_language', label: 'Document Title & Language', weight: 0.135, score: 100, grade: 'A', severity: null, findings: [], explanation: '', helpLinks: [] },
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.135, score: 60, grade: 'D', severity: 'Moderate', findings: ['Heading hierarchy skip'], explanation: '', helpLinks: [] },
+        { id: 'alt_text', label: 'Alt Text on Images', weight: 0.135, score: 100, grade: 'A', severity: null, findings: [], explanation: '', helpLinks: [] },
+        { id: 'table_markup', label: 'Table Markup', weight: 0.09, score: 40, grade: 'F', severity: 'Moderate', findings: ['Tagged tables remain irregular'], explanation: '', helpLinks: [] },
+        { id: 'link_quality', label: 'Link Quality', weight: 0.045, score: 40, grade: 'F', severity: 'Moderate', findings: ['Annotations need alternate descriptions'], explanation: '', helpLinks: [] },
+        { id: 'reading_order', label: 'Reading Order', weight: 0.045, score: 40, grade: 'F', severity: 'Critical', findings: ['Tabs order unresolved'], explanation: '', helpLinks: [] },
+        { id: 'pdf_ua_compliance', label: 'PDF/UA Compliance', weight: 0.10, score: 20, grade: 'F', severity: 'Critical', findings: ['Residual PDF/UA issues remain'], explanation: '', helpLinks: [] },
+      ] as any,
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          fontsMissingToUnicode: 2,
+          fontsMissingToUnicodeBlocking: 2,
+          tables: [{ hasHeaders: true, rowCellCounts: [6, 11, 11], dominantColumnCount: 11, isRegular: false }],
+        },
+      }),
+      actions: [
+        {
+          tool: 'normalize_document_metadata',
+          target: 'document',
+          details: 'metadata normalized',
+          confidence: 0.95,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: true,
+          categoryTargets: ['title_language'],
+          outcome: 'applied',
+        },
+      ],
+      rejectedActions: [],
+    })
+
+    const autoRunnableTools = result.failureProfile.toolOpportunities
+      .filter(opportunity => opportunity.status === 'auto_runnable')
+      .map(opportunity => opportunity.toolName)
+
+    expect(autoRunnableTools).toContain('repair_native_table_headers')
+    expect(autoRunnableTools).toContain('set_page_tabs')
+    expect(autoRunnableTools).toContain('set_link_annotation_contents')
+    expect(autoRunnableTools).toContain('repair_font_unicode_maps')
+    expect(autoRunnableTools).not.toContain('normalize_document_metadata')
+  })
+
   it('does not keep figure remediation auto-runnable for advisory-only alt-quality residue', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({

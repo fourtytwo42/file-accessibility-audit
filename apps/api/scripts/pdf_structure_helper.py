@@ -4936,8 +4936,218 @@ def mutate_repair_native_figure_semantics(pdf, mutation):
 
 
 def mutate_repair_native_table_headers(pdf, mutation):
-    # Reuse the existing in-place table-header mutation on already-tagged tables.
-    return mutate_set_table_header_cells(pdf, mutation)
+    tables = table_candidates(pdf)
+    if not tables:
+        return False, [], ["No /Table elements were found in the structure tree."]
+
+    requested = set(mutation.get("targets") or [])
+    selected = tables if not requested else [
+        table for table in tables
+        if (
+            table["ref"] in requested
+            or any(cell_ref in requested for cell_ref in table["firstRowCellRefs"])
+            or any(cell_ref in requested for cell_ref in table["headerCellRefs"])
+        )
+    ]
+    if not selected:
+        return False, [], ["Requested table targets were not found in the structure tree."]
+
+    def cell_span(cell):
+        try:
+            attrs = cell.get("/A")
+            if isinstance(attrs, pikepdf.Dictionary):
+                return max(1, int(attrs.get("/ColSpan", cell.get("/ColSpan", 1)) or 1))
+            return max(1, int(cell.get("/ColSpan", 1) or 1))
+        except Exception:
+            return 1
+
+    def cell_row_span(cell):
+        try:
+            attrs = cell.get("/A")
+            if isinstance(attrs, pikepdf.Dictionary):
+                return max(1, int(attrs.get("/RowSpan", cell.get("/RowSpan", 1)) or 1))
+            return max(1, int(cell.get("/RowSpan", 1) or 1))
+        except Exception:
+            return 1
+
+    def ensure_attrs(cell):
+        attrs = cell.get("/A")
+        if isinstance(attrs, pikepdf.Dictionary):
+            return attrs
+        attrs = pikepdf.Dictionary()
+        cell["/A"] = attrs
+        return attrs
+
+    applied = []
+    warnings = []
+    for table in selected:
+        table_obj = resolve_obj(pdf, table["ref"])
+        if not isinstance(table_obj, pikepdf.Dictionary):
+            continue
+        row_nodes = table_row_dicts(table_obj)
+        if not row_nodes:
+            continue
+        row_cells = []
+        row_column_counts = []
+        for row in row_nodes:
+            cells = [cell for cell in get_child_dicts(row) if str(cell.get("/S")) in {"/TD", "/TH"}]
+            row_cells.append(cells)
+            row_column_counts.append(sum(cell_span(cell) for cell in cells))
+        max_columns = max(row_column_counts) if row_column_counts else 0
+        if max_columns <= 1:
+            continue
+
+        header_row_indexes = []
+        header_started = False
+        for row_index, cells in enumerate(row_cells):
+            if not cells:
+                if header_started:
+                    break
+                continue
+            width = row_column_counts[row_index] if row_index < len(row_column_counts) else 0
+            tags = [str(cell.get("/S")) for cell in cells]
+            row_has_header = any(tag == "/TH" for tag in tags)
+            short_row = width < max_columns
+            next_width = row_column_counts[row_index + 1] if row_index + 1 < len(row_column_counts) else 0
+            next_is_wider = next_width >= width if next_width else False
+
+            if row_index == 0 and (short_row or row_has_header or len(cells) == 1):
+                header_row_indexes.append(row_index)
+                header_started = True
+                continue
+
+            if header_started and (row_has_header or (short_row and next_is_wider)):
+                header_row_indexes.append(row_index)
+                continue
+
+            if header_started:
+                break
+
+        if not header_row_indexes and row_cells and len(row_cells[0]) > 1:
+            header_row_indexes = [0]
+
+        if not header_row_indexes:
+            warnings.append(f"Table {table['ref']} did not expose a safe grouped-header pattern for native repair.")
+            continue
+
+        unique_headers = []
+        seen_headers = set()
+        for row_index in header_row_indexes:
+            cells = row_cells[row_index]
+            if not cells:
+                continue
+            current_width = row_column_counts[row_index] if row_index < len(row_column_counts) else 0
+            next_width = row_column_counts[row_index + 1] if row_index + 1 < len(row_column_counts) else 0
+            next_cells = row_cells[row_index + 1] if row_index + 1 < len(row_cells) else []
+            next_is_data_only = bool(next_cells) and all(str(cell.get("/S")) == "/TD" for cell in next_cells)
+
+            if len(cells) == 1 and current_width < max_columns:
+                title_cell = cells[0]
+                current_span = cell_span(title_cell)
+                attrs = ensure_attrs(title_cell)
+                attrs["/ColSpan"] = pikepdf.Integer(max_columns)
+                if str(title_cell.get("/S")) != "/TH":
+                    title_cell["/S"] = pikepdf.Name("/TH")
+                    applied.append({
+                        "ref": ref_string(title_cell),
+                        "before": "/TD",
+                        "after": "/TH",
+                        "details": f"Promoted single-cell title row {ref_string(title_cell)} to /TH for native table repair.",
+                    })
+                applied.append({
+                    "ref": ref_string(title_cell),
+                    "before": str(current_span),
+                    "after": str(max_columns),
+                    "details": f"Expanded title/header cell {ref_string(title_cell)} to /ColSpan {max_columns} so the native table grid aligns.",
+                })
+            elif current_width < max_columns and all(cell_span(cell) == 1 for cell in cells):
+                target_columns = max_columns
+                inferred_row_spans = [1] * len(cells)
+                if next_is_data_only and next_width == max_columns - 1 and len(cells) >= 2:
+                    inferred_row_spans[0] = 2
+                    target_columns = max(1, max_columns - 1)
+                deficit = target_columns - len(cells)
+                if deficit > 0:
+                    start_index = 1 if len(cells) > 1 else 0
+                    bucket_count = len(cells) - start_index
+                    if bucket_count <= 0:
+                        start_index = 0
+                        bucket_count = len(cells)
+                    base_increase, remainder = divmod(deficit, bucket_count)
+                    inferred_spans = [1] * len(cells)
+                    for index in range(start_index, len(cells)):
+                        inferred_spans[index] += base_increase
+                    for offset in range(remainder):
+                        inferred_spans[start_index + offset] += 1
+                    if sum(inferred_spans) == target_columns:
+                        for cell, inferred_span, inferred_row_span in zip(cells, inferred_spans, inferred_row_spans):
+                            attrs = ensure_attrs(cell)
+                            current_span = cell_span(cell)
+                            current_row_span = cell_row_span(cell)
+                            if current_span != inferred_span:
+                                attrs["/ColSpan"] = pikepdf.Integer(inferred_span)
+                                applied.append({
+                                    "ref": ref_string(cell),
+                                    "before": str(current_span),
+                                    "after": str(inferred_span),
+                                    "details": f"Inferred /ColSpan {inferred_span} for grouped native header cell {ref_string(cell)}.",
+                                })
+                            if inferred_row_span > 1 and current_row_span != inferred_row_span:
+                                attrs["/RowSpan"] = pikepdf.Integer(inferred_row_span)
+                                applied.append({
+                                    "ref": ref_string(cell),
+                                    "before": str(current_row_span),
+                                    "after": str(inferred_row_span),
+                                    "details": f"Inferred /RowSpan {inferred_row_span} for grouped native header cell {ref_string(cell)}.",
+                                })
+
+            for cell in cells:
+                ref = ref_string(cell)
+                if not ref:
+                    continue
+                before_tag = str(cell.get("/S"))
+                if before_tag == "/TD":
+                    cell["/S"] = pikepdf.Name("/TH")
+                    applied.append({
+                        "ref": ref,
+                        "before": before_tag,
+                        "after": "/TH",
+                        "details": f"Promoted native table header cell {ref} from /TD to /TH.",
+                    })
+                if str(cell.get("/Scope")) != "/Column":
+                    cell["/Scope"] = pikepdf.Name("/Column")
+                    applied.append({
+                        "ref": ref,
+                        "before": None,
+                        "after": "/Scope /Column",
+                        "details": f"Set native table header scope to /Column on {ref}.",
+                    })
+                if ref not in seen_headers:
+                    seen_headers.add(ref)
+                    unique_headers.append(cell)
+
+        if unique_headers:
+            last_header_row = max(header_row_indexes)
+            for row_index, row in enumerate(row_nodes):
+                if row_index <= last_header_row:
+                    continue
+                for cell in get_child_dicts(row):
+                    if str(cell.get("/S")) != "/TD":
+                        continue
+                    if cell.get("/Headers") is not None:
+                        continue
+                    cell["/Headers"] = pikepdf.Array(unique_headers)
+                    applied.append({
+                        "ref": ref_string(cell),
+                        "before": None,
+                        "after": "/Headers",
+                        "details": f"Linked native data cell {ref_string(cell)} to {len(unique_headers)} repaired header cells.",
+                    })
+
+    if applied:
+        return True, applied, warnings[:8]
+
+    return False, [], warnings[:8] or ["No eligible native tables were regularized."]
 
 
 def mutate_repair_native_reading_order(pdf, mutation):

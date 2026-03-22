@@ -1753,12 +1753,22 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
   }
   findings.push('How to fix: In Adobe Acrobat, open the Tags panel → expand each <Table> tag → find the header row → change the cell tags from <TD> to <TH>. This tells screen readers "this cell is a column/row header" so they can announce it with each data cell.')
 
+  const headerCoverage = withHeaders / qpdf.tables.length
+  let score = withHeaders > 0
+    ? headerCoverage >= 0.8
+      ? 70
+      : headerCoverage >= 0.5
+        ? 55
+        : 40
+    : 40
+
   // Apply secondary signal from visual table detection
   if (tableStructure?.status === 'ok' && (tableStructure.untaggedTables ?? 0) > 0) {
     const highConfidenceUntagged = tableStructure.highConfidenceUntaggedTables ?? tableStructure.untaggedTables ?? 0
     const advisoryUntagged = tableStructure.advisoryUntaggedTables ?? 0
     if (highConfidenceUntagged > 0) {
       findings.push(`${highConfidenceUntagged} high-confidence table(s) were detected visually without matching PDF tags. Screen readers may miss these data tables.`)
+      score = Math.min(score, highConfidenceUntagged <= 2 ? 55 : 40)
     }
     if (advisoryUntagged > 0) {
       findings.push(`${advisoryUntagged} low-confidence visual table detection(s) were treated as advisory only.`)
@@ -1769,9 +1779,9 @@ function scoreTableMarkup(qpdf: QpdfResult, tableStructure?: TableStructureResul
     id: 'table_markup',
     label: 'Table Markup',
     weight: SCORING_WEIGHTS.table_markup,
-    score: withHeaders > 0 ? 40 : 40,
-    grade: getGrade(40),
-    severity: getSeverity(40),
+    score,
+    grade: getGrade(score),
+    severity: getSeverity(score),
     findings,
     explanation: tableExplanation,
     helpLinks: tableLinks,

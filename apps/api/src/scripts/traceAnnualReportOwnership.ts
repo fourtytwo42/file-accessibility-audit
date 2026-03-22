@@ -30,12 +30,28 @@ interface AnnualReportTraceStep {
     titleLanguage: number | null
   }
   blockingFindingKeys: string[]
+  advisoryFindingKeys: string[]
   mixedOwnership: {
     total: number
     splitSafe: number
     containmentSafe: number
     unsplittable: number
   }
+  tableCandidates: {
+    total: number
+    safe: number
+    deferred: number
+    withHeaders: number
+  }
+  fontSignals: {
+    unembeddedFontCount: number
+    fontsMissingToUnicode: number
+    fontsMissingToUnicodeBlocking: number
+    cidSetRiskFontCount: number
+    legacyWidthRiskFontCount: number
+  }
+  pageTabsFindingCount: number
+  annotationAltContentsCount: number
   acrobatAltRiskCount: number
   highConfidenceUntaggedTables: number
   advisoryUntaggedTables: number
@@ -100,12 +116,34 @@ async function summarizeStep(
     blockingFindingKeys: (analysis.localStandards?.findings || [])
       .filter((finding: any) => finding.blocking)
       .map((finding: any) => finding.key),
+    advisoryFindingKeys: (analysis.localStandards?.findings || [])
+      .filter((finding: any) => !finding.blocking)
+      .map((finding: any) => finding.key),
     mixedOwnership: {
       total: mixedOwnershipNodes.length,
       splitSafe: mixedOwnershipNodes.filter((node: any) => node.splitSafe).length,
       containmentSafe: mixedOwnershipNodes.filter((node: any) => node.containmentSafe).length,
       unsplittable: mixedOwnershipNodes.filter((node: any) => !node.splitSafe && !node.containmentSafe).length,
     },
+    tableCandidates: {
+      total: context.tableCandidates.length,
+      safe: context.tableCandidates.filter(candidate => candidate.repairMode === 'safe').length,
+      deferred: context.tableCandidates.filter(candidate => candidate.repairMode === 'defer').length,
+      withHeaders: context.tableCandidates.filter(candidate => candidate.hasHeaders).length,
+    },
+    fontSignals: {
+      unembeddedFontCount: context.qpdf.unembeddedFontCount ?? 0,
+      fontsMissingToUnicode: context.qpdf.fontsMissingToUnicode ?? 0,
+      fontsMissingToUnicodeBlocking: context.qpdf.fontsMissingToUnicodeBlocking ?? 0,
+      cidSetRiskFontCount: context.qpdf.cidSetRiskFontCount ?? 0,
+      legacyWidthRiskFontCount: context.qpdf.legacyWidthRiskFontCount ?? 0,
+    },
+    pageTabsFindingCount: (analysis.localStandards?.findings || [])
+      .filter((finding: any) => finding.key === 'pdfua.page_tabs')
+      .reduce((sum: number, finding: any) => sum + (Number(finding.count) || 1), 0),
+    annotationAltContentsCount: (analysis.localStandards?.findings || [])
+      .filter((finding: any) => finding.key === 'pdfua.annotation_alt_contents')
+      .reduce((sum: number, finding: any) => sum + (Number(finding.count) || 1), 0),
     acrobatAltRiskCount: acrobatAltRiskNodes.length,
     highConfidenceUntaggedTables: tableStructure.highConfidenceUntaggedTables ?? tableStructure.untaggedTables ?? 0,
     advisoryUntaggedTables: tableStructure.advisoryUntaggedTables ?? 0,
@@ -133,40 +171,111 @@ async function traceFile(filename: string): Promise<AnnualReportTraceFile> {
     await summarizeStep('baseline', filename, buffer, analysis, actions),
   ]
 
-  for (const toolName of ['repair_structure_conformance', 'repair_other_elements_alt_text'] as const) {
+  {
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const outcome = await executeRemediationTool({
       buffer,
       context,
       call: {
-        tool_name: toolName,
+        tool_name: 'normalize_document_metadata',
         arguments: { target: 'document' },
-        rationale: 'Annual-report ownership trace.',
+        rationale: 'Annual-report metadata-first closure trace.',
         confidence: 0.95,
       },
     })
     buffer = outcome.buffer
     actions.push(outcome.action)
     analysis = await analyzeForTrace(buffer, filename)
-    steps.push(await summarizeStep(toolName, filename, buffer, analysis, actions, {
+    steps.push(await summarizeStep('normalize_document_metadata', filename, buffer, analysis, actions, {
       outcome: outcome.action.outcome,
       changedDocumentBytes: outcome.action.changedDocumentBytes,
     }))
   }
 
   {
+    let context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const nativeOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'repair_native_table_headers',
+    )
+    if (nativeOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'repair_native_table_headers',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report native table-regularity trace.',
+          confidence: 0.92,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('repair_native_table_headers', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const tabsOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'set_page_tabs',
+    )
+    if (tabsOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'set_page_tabs',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report page-tab cleanup trace.',
+          confidence: 0.9,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('set_page_tabs', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
     let batchChanged = false
     let batchOutcome = 'no_effect'
     let context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
-    const candidates = context.tableCandidates.filter(candidate => candidate.repairMode === 'safe' && !candidate.hasHeaders && !!candidate.ref)
+    const linkOpportunities = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.filter((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'set_link_annotation_contents',
+    )
+    const candidateIds = new Set(linkOpportunities.flatMap((opportunity: any) => opportunity.candidateIds || []))
+    const candidates = context.linkCandidates.filter(candidate => candidateIds.has(candidate.id))
     for (const candidate of candidates.slice(0, 24)) {
       const outcome = await executeRemediationTool({
         buffer,
         context,
         call: {
-          tool_name: 'set_table_header_cells',
-          arguments: { candidateId: candidate.id, ref: candidate.ref },
-          rationale: 'Annual-report table-header trace batch.',
+          tool_name: 'set_link_annotation_contents',
+          arguments: { candidateId: candidate.id, pageNumber: candidate.pageNumber, annotationIndex: candidate.annotationIndex, contents: candidate.text },
+          rationale: 'Annual-report annotation alternate-description trace batch.',
           confidence: 0.9,
         },
       })
@@ -177,41 +286,64 @@ async function traceFile(filename: string): Promise<AnnualReportTraceFile> {
       analysis = await analyzeForTrace(buffer, filename)
       context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     }
-    steps.push(await summarizeStep('set_table_header_cells_batch', filename, buffer, analysis, actions, {
-      outcome: batchOutcome,
-      changedDocumentBytes: batchChanged,
-    }))
+    if (candidates.length) {
+      steps.push(await summarizeStep('set_link_annotation_contents_batch', filename, buffer, analysis, actions, {
+        outcome: batchOutcome,
+        changedDocumentBytes: batchChanged,
+      }))
+    }
   }
 
   {
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
-    const metadataOpportunity = buildFailureProfileArtifacts({
+    const fontOpportunity = buildFailureProfileArtifacts({
       analysis,
       context,
       actions,
       rejectedActions: [],
     }).failureProfile.toolOpportunities.find((opportunity: any) =>
-      opportunity.status === 'auto_runnable' && opportunity.toolName === 'normalize_document_metadata',
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'repair_font_unicode_maps',
     )
-    if (metadataOpportunity) {
+    if (fontOpportunity) {
       const outcome = await executeRemediationTool({
         buffer,
         context,
         call: {
-          tool_name: 'normalize_document_metadata',
+          tool_name: 'repair_font_unicode_maps',
           arguments: { target: 'document' },
-          rationale: 'Annual-report metadata cleanup trace.',
+          rationale: 'Annual-report font Unicode closure trace.',
           confidence: 0.9,
         },
       })
       buffer = outcome.buffer
       actions.push(outcome.action)
       analysis = await analyzeForTrace(buffer, filename)
-      steps.push(await summarizeStep('normalize_document_metadata', filename, buffer, analysis, actions, {
+      steps.push(await summarizeStep('repair_font_unicode_maps', filename, buffer, analysis, actions, {
         outcome: outcome.action.outcome,
         changedDocumentBytes: outcome.action.changedDocumentBytes,
       }))
     }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const outcome = await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'repair_structure_conformance',
+        arguments: { target: 'document' },
+        rationale: 'Annual-report final structural convergence trace.',
+        confidence: 0.9,
+      },
+    })
+    buffer = outcome.buffer
+    actions.push(outcome.action)
+    analysis = await analyzeForTrace(buffer, filename)
+    steps.push(await summarizeStep('repair_structure_conformance', filename, buffer, analysis, actions, {
+      outcome: outcome.action.outcome,
+      changedDocumentBytes: outcome.action.changedDocumentBytes,
+    }))
   }
 
   return { filename, steps }
