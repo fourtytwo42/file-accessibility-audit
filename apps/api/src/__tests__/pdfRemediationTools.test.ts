@@ -6,6 +6,7 @@ import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFString, Stand
 import { REMEDIATION } from '#config'
 import { analyzePDF } from '../services/pdfAnalyzer.js'
 import { remediatePdfWithAgent } from '../services/agentRemediationService.js'
+import { buildFailureProfileArtifacts } from '../services/failureProfileService.js'
 import { analyzeWithQpdf } from '../services/qpdfService.js'
 import * as pdfStructureBackend from '../services/pdfStructureBackend.js'
 import { runPdfStructureBackend } from '../services/pdfStructureBackend.js'
@@ -1017,6 +1018,63 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       expect(remediated.finalResult.grade).toBe('A')
       expect(appliedTools).toContain('repair_font_unicode_maps')
       expect(remediated.model.rejectedActions || []).toEqual([])
+    }
+  }, 600_000)
+
+  it('clears processed-after font-unicode blockers directly after repair_font_unicode_maps', async () => {
+    const filenames = [
+      '11drug_seizures_1997-2007.pdf',
+      '12drug_submissions_1997-2007.pdf',
+      '13drug_treatment_1999-2008.pdf',
+      '14felony_and_misdemeanor_filings_1999-2008.pdf',
+      '15adult_probation_1999-2008.pdf',
+    ] as const
+
+    for (const filename of filenames) {
+      const buffer = await loadProcessedAfterFixture(filename)
+      const before = await analyzePDF(buffer, filename, {
+        skipAdobe: true,
+        skipVeraPdf: true,
+        analysisProfile: 'remediation_fast',
+      })
+      const beforeContext = await inspectPdfForRemediation(buffer, before, { inspectMode: 'light' })
+
+      expect(before.overallScore).toBeLessThan(100)
+      expect(beforeContext.qpdf.fontsMissingToUnicodeBlocking ?? beforeContext.qpdf.fontsMissingToUnicode ?? 0).toBeGreaterThan(0)
+
+      const result = await executeRemediationTool({
+        buffer,
+        context: beforeContext,
+        call: {
+          tool_name: 'repair_font_unicode_maps',
+          arguments: { target: 'document' },
+          rationale: 'Lock the direct processed-after font capability.',
+          confidence: 0.95,
+        },
+      })
+
+      const after = await analyzePDF(result.buffer, filename, {
+        skipAdobe: true,
+        skipVeraPdf: true,
+        analysisProfile: 'remediation_fast',
+      })
+      const afterContext = await inspectPdfForRemediation(result.buffer, after, { inspectMode: 'light' })
+      const afterArtifacts = buildFailureProfileArtifacts({
+        analysis: after,
+        context: afterContext,
+        actions: [result.action],
+        rejectedActions: [],
+      })
+
+      expect(result.action.outcome).toBe('applied')
+      expect(after.overallScore).toBe(100)
+      expect(after.grade).toBe('A')
+      expect(afterContext.qpdf.fontsMissingToUnicode).toBe(0)
+      expect(afterContext.qpdf.fontsMissingToUnicodeBlocking).toBe(0)
+      expect(after.localStandards?.findings.some(finding => finding.key === 'pdfua.font_unicode' && finding.blocking)).toBe(false)
+      expect(afterArtifacts.failureProfile.toolOpportunities.some(opportunity =>
+        opportunity.status === 'auto_runnable' && opportunity.toolName === 'repair_font_unicode_maps',
+      )).toBe(false)
     }
   }, 600_000)
 

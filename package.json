@@ -21,6 +21,7 @@
     "baseline:processed:pairs": "pnpm --filter api baseline:processed:pairs",
     "trace:long-reports": "pnpm --filter api trace:long-reports",
     "trace:long-report-figures": "pnpm --filter api trace:long-report-figures",
+    "trace:font-cluster": "pnpm --filter api trace:font-cluster",
     "verify:regressions": "pnpm --filter api verify:regressions",
     "verify:env": "bash ./scripts/verify-env.sh",
     "start:all": "kill-port 6103 6102 && sleep 1 && echo '\\n[start:all] API → http://localhost:6103  |  WEB → http://localhost:6102\\n' && PORT=6103 pnpm --filter api start & PORT=6102 pnpm --filter web start & wait",
