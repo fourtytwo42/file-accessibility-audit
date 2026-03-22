@@ -7,12 +7,13 @@ import {
   executeRemediationTool,
   inspectPdfForRemediation,
 } from '../services/pdfRemediationTools.js'
-import type { RemediationActionRecord } from '../services/documentModel.js'
+import type { RemediationActionRecord, RemediationToolCall } from '../services/documentModel.js'
 import { PROCESSED_REGRESSION_MANIFEST } from './processedRegressionManifest.js'
 
 const DIRECT_FONT_REPAIR_KEY = 'repair_font_unicode_maps:document:document'
+const DIRECT_BOOKMARK_REPAIR_KEY = 'replace_bookmarks_from_headings:document:document'
 
-export interface ProcessedFontCapabilityState {
+export interface ProcessedCapabilityState {
   filename: string
   overallScore: number
   grade: string
@@ -28,14 +29,17 @@ export interface ProcessedFontCapabilityState {
   }
 }
 
-export interface ProcessedFontCapabilityFileReport {
+export interface ProcessedCapabilityFileReport {
   filename: string
-  baseline: ProcessedFontCapabilityState
-  postRepair: ProcessedFontCapabilityState
-  repairOutcome: string
+  directRepairTool: 'repair_font_unicode_maps' | 'replace_bookmarks_from_headings' | null
+  baseline: ProcessedCapabilityState
+  postRepair: ProcessedCapabilityState | null
+  repairOutcome: string | null
 }
 
-export interface ProcessedFontCapabilityIssue {
+export type ProcessedFontCapabilityFileReport = ProcessedCapabilityFileReport
+
+export interface ProcessedCapabilityIssue {
   key: string
   filename: string
   message: string
@@ -48,12 +52,12 @@ export interface ProcessedStaticAfterAnalysis {
   plannerAutoRunnableKeys: string[]
 }
 
-export interface ProcessedFontCapabilityClassification {
+export interface ProcessedCapabilityClassification {
   fontOnlyStaticMisses: string[]
   nonFontStaticMisses: string[]
 }
 
-export interface ProcessedFontCapabilityArtifact {
+export interface ProcessedCapabilityArtifact {
   generatedAt: string
   summary: {
     fileCount: number
@@ -63,14 +67,16 @@ export interface ProcessedFontCapabilityArtifact {
     regressionCount: number
   }
   buckets: {
-    baselineImperfectButDirectlyRepairable: string[]
-    stillUnresolvedAfterDirectFontRepair: string[]
-    nonFontStaticMisses: string[]
+    fontOnlyDirectlyRepairable: string[]
+    nonFontDirectlyRepairable: string[]
+    stillUnresolvedAfterDirectRepair: string[]
   }
   nextTrueBlockers: string[]
-  regressions: ProcessedFontCapabilityIssue[]
-  files: ProcessedFontCapabilityFileReport[]
+  regressions: ProcessedCapabilityIssue[]
+  files: ProcessedCapabilityFileReport[]
 }
+
+export type ProcessedFontCapabilityArtifact = ProcessedCapabilityArtifact
 
 function repoRoot(): string {
   return path.resolve(process.cwd(), '../..')
@@ -80,16 +86,16 @@ function timestampForFilename(input: Date): string {
   return input.toISOString().replace(/[:]/g, '-').replace(/\.\d{3}Z$/, 'Z')
 }
 
-function gradeWeight(grade: string): number {
-  return ['F', 'D', 'C', 'B', 'A'].indexOf(grade)
-}
-
 function isPerfectScore(score: number, grade: string): boolean {
   return score === 100 && grade === 'A'
 }
 
 function isFontAutoRunnableKey(key: string): boolean {
   return key === DIRECT_FONT_REPAIR_KEY
+}
+
+function isBookmarkAutoRunnableKey(key: string): boolean {
+  return key === DIRECT_BOOKMARK_REPAIR_KEY
 }
 
 function isStaticMiss(entry: ProcessedStaticAfterAnalysis): boolean {
@@ -104,7 +110,7 @@ async function summarizeState(
   buffer: Buffer,
   filename: string,
   actions: RemediationActionRecord[],
-): Promise<ProcessedFontCapabilityState> {
+): Promise<ProcessedCapabilityState> {
   const analysis = await analyzePDF(buffer, filename, {
     analysisProfile: 'remediation_fast',
     skipAdobe: true,
@@ -154,7 +160,7 @@ async function analyzeProcessedAfterFile(filename: string): Promise<ProcessedSta
 
 export function classifyProcessedStaticMisses(
   files: ProcessedStaticAfterAnalysis[],
-): ProcessedFontCapabilityClassification {
+): ProcessedCapabilityClassification {
   const fontOnlyStaticMisses: string[] = []
   const nonFontStaticMisses: string[] = []
 
@@ -173,116 +179,197 @@ export function classifyProcessedStaticMisses(
   }
 }
 
-async function buildFileReport(filename: string): Promise<ProcessedFontCapabilityFileReport> {
-  const pdfPath = path.join(repoRoot(), 'Processed', 'After', filename)
-  const buffer = await fs.readFile(pdfPath) as Buffer
-  const baseline = await summarizeState(buffer, filename, [])
-  const beforeAnalysis = await analyzePDF(buffer, filename, {
+function chooseDeterministicRepairTool(
+  baseline: Pick<ProcessedCapabilityState, 'plannerAutoRunnableKeys'>,
+): ProcessedCapabilityFileReport['directRepairTool'] {
+  const keys = baseline.plannerAutoRunnableKeys
+  if (keys.length === 1 && isFontAutoRunnableKey(keys[0])) return 'repair_font_unicode_maps'
+  if (keys.length === 1 && isBookmarkAutoRunnableKey(keys[0])) return 'replace_bookmarks_from_headings'
+  return null
+}
+
+async function executeDeterministicRepair(
+  tool: NonNullable<ProcessedCapabilityFileReport['directRepairTool']>,
+  buffer: Buffer,
+  filename: string,
+): Promise<{ action: RemediationActionRecord; buffer: Buffer }> {
+  const analysis = await analyzePDF(buffer, filename, {
     analysisProfile: 'remediation_fast',
     skipAdobe: true,
     skipVeraPdf: true,
   })
-  const beforeContext = await inspectPdfForRemediation(buffer, beforeAnalysis, { inspectMode: 'light' })
-  const repair = await executeRemediationTool({
+  const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+  const call: RemediationToolCall = tool === 'repair_font_unicode_maps'
+    ? {
+        tool_name: 'repair_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Processed capability verification for direct font repair.',
+        confidence: 0.95,
+      }
+    : {
+        tool_name: 'replace_bookmarks_from_headings',
+        arguments: { target: 'document' },
+        rationale: 'Processed capability verification for direct bookmark repair.',
+        confidence: 0.95,
+      }
+  const result = await executeRemediationTool({
     buffer,
-    context: beforeContext,
-    call: {
-      tool_name: 'repair_font_unicode_maps',
-      arguments: { target: 'document' },
-      rationale: 'Processed font capability verification.',
-      confidence: 0.95,
-    },
+    context,
+    call,
   })
+  return {
+    action: result.action,
+    buffer: result.buffer,
+  }
+}
+
+async function buildFileReport(filename: string): Promise<ProcessedCapabilityFileReport> {
+  const pdfPath = path.join(repoRoot(), 'Processed', 'After', filename)
+  const buffer = await fs.readFile(pdfPath) as Buffer
+  const baseline = await summarizeState(buffer, filename, [])
+  const directRepairTool = chooseDeterministicRepairTool(baseline)
+  if (!directRepairTool) {
+    return {
+      filename,
+      directRepairTool,
+      baseline,
+      postRepair: null,
+      repairOutcome: null,
+    }
+  }
+
+  const repair = await executeDeterministicRepair(directRepairTool, buffer, filename)
   const postRepair = await summarizeState(repair.buffer, filename, [repair.action])
   return {
     filename,
+    directRepairTool,
     baseline,
     postRepair,
     repairOutcome: repair.action.outcome,
   }
 }
 
-function isDirectlyRepairable(file: ProcessedFontCapabilityFileReport): boolean {
-  return file.repairOutcome === 'applied'
-    && isPerfectScore(file.postRepair.overallScore, file.postRepair.grade)
-    && !file.postRepair.blockingFindingKeys.includes('pdfua.font_unicode')
-    && file.postRepair.qpdf.fontsMissingToUnicodeBlocking === 0
-    && !file.postRepair.plannerAutoRunnableKeys.some(isFontAutoRunnableKey)
+function isDirectlyRepairable(file: ProcessedCapabilityFileReport): boolean {
+  if (!file.directRepairTool || !file.postRepair || file.repairOutcome !== 'applied') return false
+  if (!isPerfectScore(file.postRepair.overallScore, file.postRepair.grade)) return false
+  if (file.directRepairTool === 'repair_font_unicode_maps') {
+    return !file.postRepair.blockingFindingKeys.includes('pdfua.font_unicode')
+      && file.postRepair.qpdf.fontsMissingToUnicodeBlocking === 0
+      && !file.postRepair.plannerAutoRunnableKeys.some(isFontAutoRunnableKey)
+  }
+  if (file.directRepairTool === 'replace_bookmarks_from_headings') {
+    return !file.postRepair.blockingFindingKeys.includes('pdfua.bookmark_language')
+      && !file.postRepair.plannerAutoRunnableKeys.some(isBookmarkAutoRunnableKey)
+  }
+  return false
 }
 
 export function evaluateProcessedFontCapabilityArtifact(
-  files: ProcessedFontCapabilityFileReport[],
-  classification?: ProcessedFontCapabilityClassification,
-): ProcessedFontCapabilityArtifact {
-  const regressions: ProcessedFontCapabilityIssue[] = []
+  files: ProcessedCapabilityFileReport[],
+  classification?: ProcessedCapabilityClassification,
+): ProcessedCapabilityArtifact {
+  const regressions: ProcessedCapabilityIssue[] = []
 
   for (const file of files) {
+    if (!file.directRepairTool) {
+      regressions.push({
+        key: `unsupported_direct_repair:${file.filename}`,
+        filename: file.filename,
+        message: `${file.filename} does not yet have a supported deterministic direct-repair path.`,
+      })
+      continue
+    }
+
     if (file.repairOutcome !== 'applied') {
       regressions.push({
         key: `repair_not_applied:${file.filename}`,
         filename: file.filename,
-        message: `${file.filename} no longer reports an applied repair_font_unicode_maps outcome.`,
+        message: `${file.filename} no longer reports an applied ${file.directRepairTool} outcome.`,
       })
+      continue
     }
 
-    if (file.postRepair.overallScore !== 100 || file.postRepair.grade !== 'A') {
+    if (!file.postRepair || file.postRepair.overallScore !== 100 || file.postRepair.grade !== 'A') {
       regressions.push({
         key: `post_repair_not_perfect:${file.filename}`,
         filename: file.filename,
-        message: `${file.filename} only reached ${file.postRepair.overallScore}/${file.postRepair.grade} after direct repair.`,
+        message: `${file.filename} only reached ${file.postRepair?.overallScore ?? 'n/a'}/${file.postRepair?.grade ?? 'n/a'} after direct repair.`,
       })
     }
 
-    if (file.postRepair.blockingFindingKeys.includes('pdfua.font_unicode')) {
-      regressions.push({
-        key: `post_repair_font_unicode_blocking:${file.filename}`,
-        filename: file.filename,
-        message: `${file.filename} still has blocking pdfua.font_unicode after direct repair.`,
-      })
+    if (file.directRepairTool === 'repair_font_unicode_maps') {
+      if (file.postRepair?.blockingFindingKeys.includes('pdfua.font_unicode')) {
+        regressions.push({
+          key: `post_repair_font_unicode_blocking:${file.filename}`,
+          filename: file.filename,
+          message: `${file.filename} still has blocking pdfua.font_unicode after direct repair.`,
+        })
+      }
+
+      if ((file.postRepair?.qpdf.fontsMissingToUnicodeBlocking ?? 0) > 0) {
+        regressions.push({
+          key: `post_repair_blocking_counter:${file.filename}`,
+          filename: file.filename,
+          message: `${file.filename} still has ${(file.postRepair?.qpdf.fontsMissingToUnicodeBlocking ?? 0)} blocking ToUnicode counter(s) after direct repair.`,
+        })
+      }
+
+      if (file.postRepair?.plannerAutoRunnableKeys.some(isFontAutoRunnableKey)) {
+        regressions.push({
+          key: `post_repair_font_auto_runnable:${file.filename}`,
+          filename: file.filename,
+          message: `${file.filename} still exposes repair_font_unicode_maps as auto-runnable after direct repair.`,
+        })
+      }
     }
 
-    if (file.postRepair.qpdf.fontsMissingToUnicodeBlocking > 0) {
-      regressions.push({
-        key: `post_repair_blocking_counter:${file.filename}`,
-        filename: file.filename,
-        message: `${file.filename} still has ${file.postRepair.qpdf.fontsMissingToUnicodeBlocking} blocking ToUnicode counter(s) after direct repair.`,
-      })
-    }
+    if (file.directRepairTool === 'replace_bookmarks_from_headings') {
+      if (file.postRepair?.blockingFindingKeys.includes('pdfua.bookmark_language')) {
+        regressions.push({
+          key: `post_repair_bookmark_language_blocking:${file.filename}`,
+          filename: file.filename,
+          message: `${file.filename} still has blocking pdfua.bookmark_language after direct repair.`,
+        })
+      }
 
-    if (file.postRepair.plannerAutoRunnableKeys.some(isFontAutoRunnableKey)) {
-      regressions.push({
-        key: `post_repair_font_auto_runnable:${file.filename}`,
-        filename: file.filename,
-        message: `${file.filename} still exposes repair_font_unicode_maps as auto-runnable after direct repair.`,
-      })
+      if (file.postRepair?.plannerAutoRunnableKeys.some(isBookmarkAutoRunnableKey)) {
+        regressions.push({
+          key: `post_repair_bookmark_auto_runnable:${file.filename}`,
+          filename: file.filename,
+          message: `${file.filename} still exposes replace_bookmarks_from_headings as auto-runnable after direct repair.`,
+        })
+      }
     }
   }
 
-  const baselineImperfectButDirectlyRepairable = files
-    .filter(file => !isPerfectScore(file.baseline.overallScore, file.baseline.grade) && isDirectlyRepairable(file))
+  const fontOnlyDirectlyRepairable = files
+    .filter(file => isDirectlyRepairable(file) && file.directRepairTool === 'repair_font_unicode_maps')
     .map(file => file.filename)
     .sort()
-  const stillUnresolvedAfterDirectFontRepair = files
+  const nonFontDirectlyRepairable = files
+    .filter(file => isDirectlyRepairable(file) && file.directRepairTool !== 'repair_font_unicode_maps')
+    .map(file => file.filename)
+    .sort()
+  const stillUnresolvedAfterDirectRepair = files
     .filter(file => !isDirectlyRepairable(file))
     .map(file => file.filename)
     .sort()
-  const nonFontStaticMisses = [...(classification?.nonFontStaticMisses ?? [])].sort()
 
   return {
     generatedAt: new Date().toISOString(),
     summary: {
       fileCount: files.length,
       baselineImperfectCount: files.filter(file => !isPerfectScore(file.baseline.overallScore, file.baseline.grade)).length,
-      directRepairableCount: baselineImperfectButDirectlyRepairable.length,
-      unresolvedAfterDirectRepairCount: stillUnresolvedAfterDirectFontRepair.length,
+      directRepairableCount: fontOnlyDirectlyRepairable.length + nonFontDirectlyRepairable.length,
+      unresolvedAfterDirectRepairCount: stillUnresolvedAfterDirectRepair.length,
       regressionCount: regressions.length,
     },
     buckets: {
-      baselineImperfectButDirectlyRepairable,
-      stillUnresolvedAfterDirectFontRepair,
-      nonFontStaticMisses,
+      fontOnlyDirectlyRepairable,
+      nonFontDirectlyRepairable,
+      stillUnresolvedAfterDirectRepair,
     },
-    nextTrueBlockers: [...stillUnresolvedAfterDirectFontRepair, ...nonFontStaticMisses].sort((a, b) => {
+    nextTrueBlockers: [...stillUnresolvedAfterDirectRepair].sort((a, b) => {
       const aScore = classification?.nonFontStaticMisses.includes(a) ? 0 : 1
       const bScore = classification?.nonFontStaticMisses.includes(b) ? 0 : 1
       return aScore - bScore || a.localeCompare(b)
@@ -292,7 +379,7 @@ export function evaluateProcessedFontCapabilityArtifact(
   }
 }
 
-async function discoverCurrentStaticMisses(): Promise<ProcessedFontCapabilityClassification> {
+async function discoverCurrentStaticMisses(): Promise<ProcessedCapabilityClassification> {
   const analyses: ProcessedStaticAfterAnalysis[] = []
   for (const pair of PROCESSED_REGRESSION_MANIFEST.pairs) {
     analyses.push(await analyzeProcessedAfterFile(pair.afterFilename))
@@ -303,16 +390,18 @@ async function discoverCurrentStaticMisses(): Promise<ProcessedFontCapabilityCla
 async function main() {
   const filenames = process.argv.slice(2)
   const classification = await discoverCurrentStaticMisses()
-  const targetFiles = filenames.length ? filenames : classification.fontOnlyStaticMisses
-  const files: ProcessedFontCapabilityFileReport[] = []
+  const targetFiles = filenames.length
+    ? filenames
+    : [...classification.fontOnlyStaticMisses, ...classification.nonFontStaticMisses]
+  const files: ProcessedCapabilityFileReport[] = []
   for (const filename of targetFiles) {
     files.push(await buildFileReport(filename))
   }
 
   const artifact = evaluateProcessedFontCapabilityArtifact(files, classification)
-  const outputDir = path.join(repoRoot(), 'MitigationAttempts', 'processed-font-capability')
+  const outputDir = path.join(repoRoot(), 'MitigationAttempts', 'processed-capability')
   await fs.mkdir(outputDir, { recursive: true })
-  const outputPath = path.join(outputDir, `${timestampForFilename(new Date())}.processed-font-capability.json`)
+  const outputPath = path.join(outputDir, `${timestampForFilename(new Date())}.processed-capability.json`)
   await fs.writeFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8')
 
   console.log(JSON.stringify({

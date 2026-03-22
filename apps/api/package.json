@@ -18,11 +18,13 @@
     "baseline:phase0:canary": "tsx src/scripts/generatePhase0Baseline.ts --corpus phase0-canary",
     "baseline:phase0:compare": "tsx src/scripts/comparePhase0Artifacts.ts --mode all",
     "baseline:processed:pairs": "tsx src/scripts/verifyProcessedRegressionPairs.ts",
+    "baseline:processed:capability": "tsx src/scripts/verifyProcessedFontCapability.ts",
     "baseline:processed:font-capability": "tsx src/scripts/verifyProcessedFontCapability.ts",
     "trace:97anreport": "tsx src/scripts/trace97anreportMetadataBookmarks.ts",
     "trace:long-reports": "tsx src/scripts/traceLongReportCleanup.ts",
     "trace:long-report-figures": "tsx src/scripts/traceLongReportFigureCleanup.ts",
     "trace:font-cluster": "tsx src/scripts/traceProcessedFontCluster.ts",
+    "verify:processed:capability": "pnpm baseline:processed:capability",
     "verify:processed:font-capability": "pnpm baseline:processed:font-capability",
     "verify:regressions": "pnpm test:regressions && pnpm baseline:phase0:compare"
   },
