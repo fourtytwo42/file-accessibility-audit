@@ -960,6 +960,107 @@ describe('failureProfileService', () => {
     ])
   })
 
+  it('caps long-report figure opportunities to a bounded high-confidence subset and emits figure residue', () => {
+    const analysis = makeAnalysisResult({
+      pageCount: 32,
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? { ...category, score: 42, grade: 'F', severity: 'Critical', findings: ['Figure alt text missing'] }
+          : category),
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          hasStructTree: true,
+          structTreeDepth: 5,
+        },
+        structure: {
+          ...makeContext().structure,
+          structuralNodes: [{ ref: 'obj:1 0 R', tag: '/Document' }],
+        } as any,
+        figureCandidates: [
+          { id: 'figure:1', pageNumber: 1, targetRef: 'obj:20 0 R', bbox: null, hasAlt: false, altText: null, informativeHint: 'informative', surroundingText: ['Chart'], repairMode: 'set_alt', targetTag: '/Figure', parentTagPath: [], pageImageCount: 1, textDensityHint: 'low', imageEvidence: 'strong' },
+          { id: 'figure:2', pageNumber: 2, targetRef: 'obj:21 0 R', bbox: null, hasAlt: false, altText: null, informativeHint: 'informative', surroundingText: ['Map'], repairMode: 'set_alt', targetTag: '/Figure', parentTagPath: [], pageImageCount: 1, textDensityHint: 'low', imageEvidence: 'strong' },
+          { id: 'figure:3', pageNumber: 3, targetRef: 'obj:22 0 R', bbox: null, hasAlt: false, altText: null, informativeHint: 'informative', surroundingText: ['Timeline'], repairMode: 'retag_then_set_alt', targetTag: '/P', parentTagPath: [], pageImageCount: 1, textDensityHint: 'medium', imageEvidence: 'strong' },
+          { id: 'figure:4', pageNumber: 4, targetRef: 'obj:23 0 R', bbox: null, hasAlt: false, altText: null, informativeHint: 'informative', surroundingText: ['Infographic'], repairMode: 'set_alt', targetTag: '/Figure', parentTagPath: [], pageImageCount: 1, textDensityHint: 'medium', imageEvidence: 'vector' },
+          { id: 'figure:5', pageNumber: 5, targetRef: 'obj:24 0 R', bbox: null, hasAlt: false, altText: null, informativeHint: 'unknown', surroundingText: ['Logo'], repairMode: 'set_alt', targetTag: '/Figure', parentTagPath: [], pageImageCount: 1, textDensityHint: 'medium', imageEvidence: 'strong' },
+          { id: 'figure:6', pageNumber: 6, targetRef: 'obj:25 0 R', bbox: null, hasAlt: false, altText: null, informativeHint: 'decorative', surroundingText: ['Border ornament'], repairMode: 'set_alt', targetTag: '/Figure', parentTagPath: [], pageImageCount: 1, textDensityHint: 'high', imageEvidence: 'vector' },
+        ] as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const figureOpportunities = result.failureProfile.toolOpportunities.filter(opportunity =>
+      ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName)
+      && opportunity.scope === 'candidate'
+      && opportunity.status === 'auto_runnable')
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.long_report_figure_residue')).toBe(true)
+    expect(figureOpportunities.map(opportunity => opportunity.candidateIds[0])).toEqual([
+      'figure:3',
+      'figure:1',
+      'figure:2',
+      'figure:4',
+      'figure:5',
+    ])
+    expect(result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'repair_native_figure_semantics'
+      && opportunity.scope === 'document')?.status).toBe('auto_runnable')
+    expect(result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'set_figure_alt_text'
+      && opportunity.scope === 'document')?.status).not.toBe('auto_runnable')
+  })
+
+  it('keeps broad decorative and document-wide figure repairs deferred on stable long-report figure quality residue', () => {
+    const analysis = makeAnalysisResult({
+      pageCount: 24,
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'alt_text'
+          ? { ...category, score: 94, grade: 'B', severity: 'Moderate', findings: ['Figure alt quality warning'] }
+          : category),
+      localStandards: {
+        status: 'issues_detected',
+        findings: [{
+          key: 'pdfua.figure_alt_quality',
+          label: 'Figure alt quality',
+          severity: 'warning',
+          blocking: false,
+          categoryIds: ['alt_text'],
+          confidence: 0.8,
+          evidence: ['Existing alt text is low quality.'],
+          source: 'qpdf',
+          inferred: false,
+          count: 1,
+        }],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        figureCandidates: [
+          { id: 'figure:1', pageNumber: 1, targetRef: 'obj:20 0 R', bbox: null, hasAlt: true, altText: 'Logo', informativeHint: 'informative', surroundingText: ['Agency logo'], repairMode: 'set_alt', targetTag: '/Figure', parentTagPath: [], pageImageCount: 1, textDensityHint: 'low', imageEvidence: 'strong' },
+        ] as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'set_figure_alt_text'
+      && opportunity.scope === 'document')?.status).not.toBe('auto_runnable')
+    expect(result.failureProfile.toolOpportunities.find(opportunity =>
+      opportunity.toolName === 'mark_figure_decorative'
+      && opportunity.scope === 'document')?.status).not.toBe('auto_runnable')
+  })
+
   it('emits post-heading-creation native structure debt after accepted heading creation', () => {
     const analysis = makeAnalysisResult({
       pageCount: 24,

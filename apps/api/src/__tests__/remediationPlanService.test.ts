@@ -1339,6 +1339,165 @@ describe('remediationPlanService', () => {
     expect(plan.actions[1]?.tool_name).toBe('normalize_document_metadata')
   })
 
+  it('prioritizes long-report figure cleanup ahead of bounded candidate-level figure work', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: true,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'large',
+      remediationDepth: 'moderate',
+    })
+
+    const figureOpportunities = Array.from({ length: 6 }, (_, index) => ({
+      key: `set_figure_alt_text:candidate:${index + 1}`,
+      toolName: 'set_figure_alt_text',
+      reason: `Repair figure ${index + 1}`,
+      scope: 'candidate',
+      candidateIds: [`figure:${index + 1}`],
+      candidateGroupIds: [],
+      pageNumbers: [index + 1],
+      categoryTargets: ['alt_text'],
+      confidence: 0.7,
+      status: 'auto_runnable',
+      derivedFromFailureModeKeys: ['context.long_report_figure_residue'],
+    }))
+
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 89,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'context.long_report_figure_residue',
+            label: 'Long-report figure cleanup residue remains',
+            source: 'context',
+            count: 1,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_native_figure_semantics', 'repair_other_elements_alt_text', 'set_figure_alt_text'],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'repair_native_figure_semantics:document',
+            toolName: 'repair_native_figure_semantics',
+            reason: 'Repair native figure semantics',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['alt_text'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.long_report_figure_residue'],
+          },
+          {
+            key: 'repair_other_elements_alt_text:document',
+            toolName: 'repair_other_elements_alt_text',
+            reason: 'Repair Acrobat ownership residue',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['alt_text'],
+            confidence: 0.88,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.long_report_figure_residue'],
+          },
+          ...figureOpportunities,
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 8,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: ['context.long_report_figure_residue'],
+        topBlockingFailureModeKeys: ['context.long_report_figure_residue'],
+        topManualOnlyFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: ['repair_native_figure_semantics:document'],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+        attemptedOpportunityKeys: [],
+        rejectedOpportunityKeys: [],
+        noEffectOpportunityKeys: [],
+        statusCounts: [{ status: 'auto_runnable', count: 8 }],
+        reasonCodeCounts: [{ reasonCode: 'safe_to_run', count: 8 }],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: '1998_Madison.pdf',
+      analysis: {
+        overallScore: 89,
+        grade: 'B',
+        isScanned: false,
+        pageCount: 40,
+        categories: [
+          { id: 'alt_text', label: 'Alt text', score: 50, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 89, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: 'Report', lang: 'en', links: [] },
+        qpdf: { lang: 'en', hasStructTree: true, structTreeDepth: 6, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: figureOpportunities.map((_, index) => ({
+          id: `figure:${index + 1}`,
+          pageNumber: index + 1,
+          targetRef: `obj:${200 + index} 0 R`,
+          surroundingText: ['Chart summary'],
+          informativeHint: 'informative',
+          repairMode: 'set_alt',
+          targetTag: '/Figure',
+          parentTagPath: [],
+          pageImageCount: 1,
+          textDensityHint: 'low',
+          imageEvidence: 'strong',
+        })),
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.slice(0, 2).map(action => action.tool_name)).toEqual([
+      'repair_native_figure_semantics',
+      'repair_other_elements_alt_text',
+    ])
+    expect(plan.actions.filter(action => action.tool_name === 'set_figure_alt_text')).toHaveLength(5)
+  })
+
   it('prioritizes native structure convergence ahead of bookmark replacement after heading creation', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {

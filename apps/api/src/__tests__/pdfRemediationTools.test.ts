@@ -23,6 +23,7 @@ import {
   inspectPdfForRemediation,
   needsAltTextDeepInspection,
   normalizedExistingHeadingLevel,
+  selectHighConfidenceLongReportFigureCandidates,
   selectHighConfidenceLongReportHeadingCandidates,
 } from '../services/pdfRemediationTools.js'
 import type { PdfRemediationContext } from '../services/pdfRemediationTools.js'
@@ -1450,6 +1451,103 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     ])
 
     expect(selected.map(candidate => candidate.id)).toEqual(['heading:1', 'heading:2', 'heading:3'])
+  })
+
+  it('keeps only the strongest informative figure candidates for long-report convergence', () => {
+    const selected = selectHighConfidenceLongReportFigureCandidates([
+      {
+        id: 'figure:1',
+        pageNumber: 1,
+        targetRef: 'obj:1 0 R',
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Chart summary'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      },
+      {
+        id: 'figure:2',
+        pageNumber: 2,
+        targetRef: 'obj:2 0 R',
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Map detail'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'low',
+        imageEvidence: 'strong',
+      },
+      {
+        id: 'figure:3',
+        pageNumber: 3,
+        targetRef: 'obj:3 0 R',
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Annotated timeline'],
+        repairMode: 'retag_then_set_alt',
+        targetTag: '/P',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'medium',
+        imageEvidence: 'strong',
+      },
+      {
+        id: 'figure:4',
+        pageNumber: 4,
+        targetRef: 'obj:4 0 R',
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'informative',
+        surroundingText: ['Figure caption'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'medium',
+        imageEvidence: 'vector',
+      },
+      {
+        id: 'figure:5',
+        pageNumber: 5,
+        targetRef: 'obj:5 0 R',
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'unknown',
+        surroundingText: ['Agency logo'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'medium',
+        imageEvidence: 'strong',
+      },
+      {
+        id: 'figure:6',
+        pageNumber: 6,
+        targetRef: 'obj:6 0 R',
+        hasAlt: false,
+        altText: null,
+        informativeHint: 'decorative',
+        surroundingText: ['Border ornament'],
+        repairMode: 'set_alt',
+        targetTag: '/Figure',
+        parentTagPath: [],
+        pageImageCount: 1,
+        textDensityHint: 'high',
+        imageEvidence: 'vector',
+      },
+    ])
+
+    expect(selected.map(candidate => candidate.id)).toEqual(['figure:1', 'figure:2', 'figure:4', 'figure:3', 'figure:5'])
   })
 
   it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {

@@ -546,6 +546,36 @@ export function selectHighConfidenceLongReportHeadingCandidates(
     .slice(0, options?.maxCandidates ?? 3)
 }
 
+function longReportFigureCandidateScore(candidate: FigureCandidate): number {
+  let score = 0
+  score += candidate.repairMode === 'set_alt' ? 50 : candidate.repairMode === 'retag_then_set_alt' ? 35 : -40
+  score += candidate.informativeHint === 'informative' ? 40 : candidate.informativeHint === 'unknown' ? 10 : -20
+  score += candidate.imageEvidence === 'strong' ? 25 : candidate.imageEvidence === 'vector' ? 10 : 0
+  score += candidate.textDensityHint === 'low' ? 20 : candidate.textDensityHint === 'medium' ? 8 : -12
+  score += candidate.pageNumber === 1 ? 12 : Math.max(0, 8 - candidate.pageNumber)
+  if (candidate.targetTag === '/Figure') score += 8
+  if (candidate.hasLowQualityAlt) score += 10
+  if (candidate.splitGenerated) score -= 30
+  if ((candidate.surroundingText || []).some(line => looksLikeProseHeadingText(line) && line.length > 80)) score -= 10
+  return score
+}
+
+export function selectHighConfidenceLongReportFigureCandidates(
+  candidates: FigureCandidate[],
+  options?: { maxCandidates?: number },
+): FigureCandidate[] {
+  return [...candidates]
+    .filter(candidate => candidate.repairMode !== 'defer')
+    .sort((a, b) => {
+      const scoreDiff = longReportFigureCandidateScore(b) - longReportFigureCandidateScore(a)
+      if (scoreDiff !== 0) return scoreDiff
+      const pageDiff = a.pageNumber - b.pageNumber
+      if (pageDiff !== 0) return pageDiff
+      return a.id.localeCompare(b.id)
+    })
+    .slice(0, options?.maxCandidates ?? 5)
+}
+
 function normalizeBookmarkText(text: string): string {
   const stopWords = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'via'])
   const normalized = text

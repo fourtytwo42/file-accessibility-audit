@@ -26,6 +26,7 @@ const PLAN_REMEDIATION_TOOL = 'plan_pdf_remediation'
 const MAX_ACTIONS = 32
 const RESERVED_HEADING_ACTIONS = 8
 const LONG_REPORT_RESERVED_HEADING_ACTIONS = 3
+const LONG_REPORT_RESERVED_FIGURE_ACTIONS = 5
 
 const STRUCTURE_BOOTSTRAP_STAGE = new Set<RemediationToolName>([
   'bootstrap_struct_tree',
@@ -559,6 +560,22 @@ function opportunitySelectionDecision(input: {
         return { selectable: false, reason: 'post_bootstrap_structural_residue_blocks_heading_creation' }
       }
       return { selectable: true }
+    case 'set_figure_alt_text':
+    case 'retag_as_figure_and_set_alt':
+    case 'mark_figure_decorative':
+      if (
+        analysis.pageCount >= 20
+        && !analysis.isScanned
+        && failureModeByKey.has('context.long_report_figure_residue')
+        && selectedActions.filter(action =>
+          action.tool_name === 'set_figure_alt_text'
+          || action.tool_name === 'retag_as_figure_and_set_alt'
+          || action.tool_name === 'mark_figure_decorative',
+        ).length >= LONG_REPORT_RESERVED_FIGURE_ACTIONS
+      ) {
+        return { selectable: false, reason: 'long_report_figure_candidate_limit_reached' }
+      }
+      return { selectable: true }
     case 'repair_type1_font_unicode_maps':
       return {
         selectable: attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
@@ -737,6 +754,7 @@ async function deterministicActions(input: {
   const postBootstrapStructureDebt = failureModeByKey.has('context.post_bootstrap_native_structure_debt')
   const postBootstrapStructuralResidue = failureModeByKey.has('context.post_bootstrap_structural_residue')
   const postHeadingCreationStructureDebt = failureModeByKey.has('context.post_heading_creation_native_structure_debt')
+  const longReportFigureResidue = failureModeByKey.has('context.long_report_figure_residue')
   const longReportConvergence = input.analysis.pageCount >= 20 && !input.analysis.isScanned
   const longReportMetadataDebt = longReportConvergence && (
     failureModeByKey.has('category.title_language')
@@ -797,6 +815,27 @@ async function deterministicActions(input: {
         && opportunity.toolName === 'create_heading_from_candidate'
         && opportunity.scope === 'candidate',
       maxSelections: headingSelectionLimit,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        longReportFigureResidue
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_native_figure_semantics',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        longReportFigureResidue
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_other_elements_alt_text',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        longReportFigureResidue
+        && opportunity.scope === 'candidate'
+        && ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName),
+      maxSelections: LONG_REPORT_RESERVED_FIGURE_ACTIONS,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) => !isCandidateFloodOpportunity(opportunity),

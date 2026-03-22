@@ -14,7 +14,7 @@ import type {
   ToolOpportunityStatus,
   ToolOpportunityStatusReasonCode,
 } from './documentModel.js'
-import { selectHighConfidenceLongReportHeadingCandidates } from './pdfRemediationTools.js'
+import { selectHighConfidenceLongReportFigureCandidates, selectHighConfidenceLongReportHeadingCandidates } from './pdfRemediationTools.js'
 import type { PdfRemediationContext } from './pdfRemediationTools.js'
 import { ALT_REMOVAL_MODES } from './altTextScoring.js'
 import { needsLanguageTagNormalization, normalizeLanguageTag } from './languageTags.js'
@@ -69,6 +69,7 @@ const FIGURE_ADVISORY_FAILURE_MODE_KEYS = new Set([
   'pdfua.figure_alt_quality',
 ])
 const LONG_REPORT_HEADING_LIMIT = 3
+const LONG_REPORT_FIGURE_LIMIT = 5
 
 function isLongReportConvergenceContext(input: BuildFailureProfileInput): boolean {
   return input.analysis.pageCount >= 20
@@ -831,6 +832,53 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     })
   }
 
+  const hasNativeStructure = input.context.qpdf.hasStructTree
+    && input.context.qpdf.structTreeDepth > 0
+    && (input.context.structure.structuralNodes?.length || 0) > 0
+  const longReportFigureCandidates = altTextNeedsReview
+    ? input.context.figureCandidates.filter(candidate => candidate.repairMode !== 'defer')
+    : []
+  const longReportFigureFlood = longReportFigureCandidates.length > LONG_REPORT_FIGURE_LIMIT
+  const hasCredibleDecorativeLongReportFigure = longReportFigureCandidates.some(candidate =>
+    candidate.informativeHint === 'decorative',
+  )
+  if (
+    isLongReportConvergenceContext(input)
+    && altTextNeedsReview
+    && hasNativeStructure
+    && (longReportFigureFlood || unresolvedAltRiskNodes.length > 0)
+  ) {
+    mergeMode(modes, {
+      key: 'context.long_report_figure_residue',
+      label: 'Long-report figure cleanup residue remains',
+      source: 'context',
+      derivedFrom: [
+        'category:alt_text',
+        ...(longReportFigureFlood ? ['context:long_report_figure_candidate_flood'] : []),
+        ...(unresolvedAltRiskNodes.length > 0 ? ['acrobat:other_elements_alt_text'] : []),
+      ],
+      count: longReportFigureCandidates.length + unresolvedAltRiskNodes.length,
+      categoryIds: ['alt_text', 'pdf_ua_compliance'],
+      blocking: true,
+      unmatched: false,
+      classification: 'deterministic',
+      nativeToolFamilies: [
+        'repair_native_figure_semantics',
+        ...(unresolvedAltRiskNodes.length > 0 ? ['repair_other_elements_alt_text'] as const : []),
+        'set_figure_alt_text',
+        'retag_as_figure_and_set_alt',
+        ...(hasCredibleDecorativeLongReportFigure ? ['mark_figure_decorative'] as const : []),
+      ],
+      evidence: [
+        unresolvedAltRiskNodes.length > 0 && longReportFigureFlood
+          ? 'Long-report figure cleanup still has Acrobat-style ownership residue and too many candidate-level figure repairs to schedule safely at once.'
+          : unresolvedAltRiskNodes.length > 0
+            ? 'Long-report figure cleanup still has Acrobat-style ownership residue that should be repaired before broader candidate-level alt work.'
+            : 'Long-report figure cleanup still exposes too many candidate-level figure repairs to schedule safely at once.',
+      ],
+    })
+  }
+
   const tableNeedsReview = (categoryScore(input, 'table_markup') ?? 100) < 100
   const blockedTables = tableNeedsReview
     ? input.context.tableCandidates.filter(candidate => candidate.repairMode !== 'safe')
@@ -992,6 +1040,7 @@ function applyFigureOpportunityPolicy(
   input: BuildFailureProfileInput,
   failureModeByKey: Map<string, FailureMode>,
 ): void {
+  const longReportConvergence = isLongReportConvergenceContext(input)
   const blockingAltFailures = new Set(
     [...failureModeByKey.values()]
       .filter(mode => mode.blocking && mode.categoryIds.includes('alt_text'))
@@ -1004,6 +1053,12 @@ function applyFigureOpportunityPolicy(
       || node.ownershipMode === 'untagged_image_mcid')
     && (ALT_REMOVAL_MODES.has(node.ownershipMode ?? '') ? node.hasAlt : !node.hasAlt)
   ).length
+  const hasHighConfidenceInformativeLongReportFigure = longReportConvergence
+    && input.context.figureCandidates.some(candidate =>
+      candidate.repairMode !== 'defer'
+      && candidate.informativeHint !== 'decorative'
+      && (candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector'),
+    )
 
   for (const opportunity of opportunities.values()) {
     if (!FIGURE_REMEDIATION_TOOLS.has(opportunity.toolName)) continue
@@ -1015,6 +1070,25 @@ function applyFigureOpportunityPolicy(
 
     if (blockingAltFailures.size === 0 && substantiveUnresolvedAltRiskCount === 0 && onlyAdvisoryFigureResidue) {
       opportunity.blockedReason = 'Only advisory figure alternate-text quality residue remains; do not keep figure remediation auto-runnable.'
+      continue
+    }
+
+    if (
+      longReportConvergence
+      && opportunity.scope === 'document'
+      && ['set_figure_alt_text', 'retag_as_figure_and_set_alt'].includes(opportunity.toolName)
+    ) {
+      opportunity.blockedReason = 'Use bounded candidate-level figure repairs for long-report figure convergence.'
+      continue
+    }
+
+    if (
+      longReportConvergence
+      && opportunity.toolName === 'mark_figure_decorative'
+      && opportunity.scope === 'document'
+      && hasHighConfidenceInformativeLongReportFigure
+    ) {
+      opportunity.blockedReason = 'Prefer informative figure cleanup before broad decorative classification on long reports.'
     }
   }
 }
@@ -1150,6 +1224,16 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
         }).map(candidate => candidate.id),
       )
     : null
+  const prioritizedLongReportFigureIds = isLongReportConvergence && issueIds.has('alt_text')
+    ? new Set(
+        selectHighConfidenceLongReportFigureCandidates(input.context.figureCandidates, {
+          maxCandidates: LONG_REPORT_FIGURE_LIMIT,
+        }).map(candidate => candidate.id),
+      )
+    : null
+  const hasNativeStructure = input.context.qpdf.hasStructTree
+    && input.context.qpdf.structTreeDepth > 0
+    && (input.context.structure.structuralNodes?.length || 0) > 0
 
   const derivedFailureKeys = (keys: string[]) => keys.filter(key => failureModeByKey.has(key))
 
@@ -1217,10 +1301,6 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     })
   }
 
-  const hasNativeStructure = input.context.qpdf.hasStructTree
-    && input.context.qpdf.structTreeDepth > 0
-    && (input.context.structure.structuralNodes?.length || 0) > 0
-
   if (hasNativeStructure && issueIds.has('alt_text')) {
     addOpportunity(opportunities, {
       toolName: 'repair_native_figure_semantics',
@@ -1232,7 +1312,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       categoryTargets: ['alt_text'],
       confidence: 0.74,
       blockedReason: undefined,
-      derivedFromFailureModeKeys: derivedFailureKeys(['category.alt_text', 'pdfua.figure_alt_or_artifact']),
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.alt_text', 'pdfua.figure_alt_or_artifact', 'context.long_report_figure_residue']),
     })
   }
 
@@ -1270,7 +1350,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       blockedReason: deterministicAcrobatRiskNodes.length
         ? undefined
         : 'Mixed text and graphics share the same marked-content block with no safe deterministic repair.',
-      derivedFromFailureModeKeys: derivedFailureKeys(['acrobat.other_elements_alt_text']),
+      derivedFromFailureModeKeys: derivedFailureKeys(['acrobat.other_elements_alt_text', 'context.long_report_figure_residue']),
     })
   }
 
@@ -1492,6 +1572,13 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
 
   for (const candidate of input.context.figureCandidates) {
     if (!issueIds.has('alt_text')) continue
+    if (
+      prioritizedLongReportFigureIds
+      && candidate.repairMode !== 'defer'
+      && !prioritizedLongReportFigureIds.has(candidate.id)
+    ) {
+      continue
+    }
     const toolName = candidate.informativeHint === 'decorative'
       ? 'mark_figure_decorative'
       : candidate.repairMode === 'retag_then_set_alt'
@@ -1509,7 +1596,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       categoryTargets: ['alt_text'],
       confidence: candidate.informativeHint === 'decorative' ? 0.7 : 0.62,
       blockedReason: candidate.repairMode === 'defer' ? (candidate.unsafeReason || 'Figure candidate requires semantic or manual review.') : undefined,
-      derivedFromFailureModeKeys: derivedFailureKeys(['category.alt_text', 'context.figure_candidates_blocked', 'pdfua.figure_alt_or_artifact']),
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.alt_text', 'context.figure_candidates_blocked', 'pdfua.figure_alt_or_artifact', 'context.long_report_figure_residue']),
     })
   }
 
