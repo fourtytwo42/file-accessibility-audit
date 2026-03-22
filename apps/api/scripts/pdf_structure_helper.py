@@ -4126,10 +4126,11 @@ def mutate_repair_structure_conformance(pdf, mutation):
 
     ensure_mark_info(catalog)
     document = ensure_document_struct_elem(pdf, root)
+    role_map_changed, role_map_applied = ensure_common_role_map_aliases(root)
     parent_tree, nums = ensure_parent_tree(root, pdf)
     next_key = int(root.get("/ParentTreeNextKey", 0) or 0)
-    applied = []
-    changed = False
+    applied = list(role_map_applied)
+    changed = role_map_changed
 
     for page in pdf.pages:
         page_obj = page.obj
@@ -4216,6 +4217,33 @@ def mutate_repair_note_tag_ids(pdf, mutation):
     if not changed:
         return False, [], ["No /Note or /Footnote structure elements required ID repair."]
     return changed, applied, []
+
+
+def ensure_common_role_map_aliases(struct_root):
+    if not isinstance(struct_root, pikepdf.Dictionary):
+        return False, []
+    role_map = struct_root.get("/RoleMap")
+    if not isinstance(role_map, pikepdf.Dictionary):
+        role_map = pikepdf.Dictionary()
+        struct_root["/RoleMap"] = role_map
+    aliases = [
+        ("/Lbody", "/LBody", "Mapped legacy /Lbody structure type to standard /LBody."),
+    ]
+    applied = []
+    changed = False
+    for legacy_tag, standard_tag, details in aliases:
+        current = role_map.get(legacy_tag)
+        if str(current or "") == standard_tag:
+            continue
+        role_map[pikepdf.Name(legacy_tag)] = pikepdf.Name(standard_tag)
+        applied.append({
+            "ref": ref_string(struct_root),
+            "before": str(current) if current is not None else None,
+            "after": standard_tag,
+            "details": details,
+        })
+        changed = True
+    return changed, applied
 
 
 def mutate_repair_native_marked_content_refs(pdf, mutation):
@@ -7524,7 +7552,9 @@ def mutate_normalize_heading_hierarchy(pdf, mutation):
     if not heading_nodes:
         return False, [], ["No heading tags were found in the structure tree."]
 
-    applied = []
+    root = get_struct_tree_root(pdf)
+    role_map_changed, role_map_applied = ensure_common_role_map_aliases(root)
+    applied = list(role_map_applied)
     normalized_levels_by_ref = {}
     sibling_levels_by_parent_ref = {}
 

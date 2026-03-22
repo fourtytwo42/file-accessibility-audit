@@ -55,6 +55,14 @@ interface AnnualReportTraceStep {
   acrobatAltRiskCount: number
   highConfidenceUntaggedTables: number
   advisoryUntaggedTables: number
+  structureSignals: {
+    structuralNodeCount: number
+    readingOrderNodeCount: number
+    readingOrderParentCount: number
+    figureCount: number
+    headingCount: number
+    imageStructNodeCount: number
+  }
   autoRunnableKeys: string[]
 }
 
@@ -147,6 +155,14 @@ async function summarizeStep(
     acrobatAltRiskCount: acrobatAltRiskNodes.length,
     highConfidenceUntaggedTables: tableStructure.highConfidenceUntaggedTables ?? tableStructure.untaggedTables ?? 0,
     advisoryUntaggedTables: tableStructure.advisoryUntaggedTables ?? 0,
+    structureSignals: {
+      structuralNodeCount: context.structure.structuralNodes?.length ?? 0,
+      readingOrderNodeCount: context.structure.readingOrderNodes?.length ?? 0,
+      readingOrderParentCount: context.structure.readingOrderParents?.length ?? 0,
+      figureCount: context.structure.figures?.length ?? 0,
+      headingCount: context.structure.headings?.length ?? 0,
+      imageStructNodeCount: context.structure.imageStructNodes?.length ?? 0,
+    },
     autoRunnableKeys: artifacts.failureProfile.toolOpportunities
       .filter((opportunity: any) => opportunity.status === 'auto_runnable')
       .map((opportunity: any) => opportunity.key),
@@ -420,20 +436,144 @@ async function traceFile(filename: string): Promise<AnnualReportTraceFile> {
 
   {
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const nativeMarkedContentOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'repair_native_marked_content_refs',
+    )
+    if (nativeMarkedContentOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'repair_native_marked_content_refs',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report native marked-content bridge trace.',
+          confidence: 0.9,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('repair_native_marked_content_refs', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const artifactOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'artifact_nonsemantic_page_elements',
+    )
+    if (artifactOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'artifact_nonsemantic_page_elements',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report nonsemantic artifact cleanup trace.',
+          confidence: 0.88,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('artifact_nonsemantic_page_elements', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const bootstrappedChartOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'repair_bootstrapped_chart_content_refs',
+    )
+    if (bootstrappedChartOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'repair_bootstrapped_chart_content_refs',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report bootstrapped chart content-ref trace.',
+          confidence: 0.82,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('repair_bootstrapped_chart_content_refs', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const headingOpportunity = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions,
+      rejectedActions: [],
+    }).failureProfile.toolOpportunities.find((opportunity: any) =>
+      opportunity.status === 'auto_runnable' && opportunity.toolName === 'normalize_heading_hierarchy',
+    )
+    if (headingOpportunity) {
+      const outcome = await executeRemediationTool({
+        buffer,
+        context,
+        call: {
+          tool_name: 'normalize_heading_hierarchy',
+          arguments: { target: 'document' },
+          rationale: 'Annual-report heading and role-map normalization trace.',
+          confidence: 0.88,
+        },
+      })
+      buffer = outcome.buffer
+      actions.push(outcome.action)
+      analysis = await analyzeForTrace(buffer, filename)
+      steps.push(await summarizeStep('normalize_heading_hierarchy', filename, buffer, analysis, actions, {
+        outcome: outcome.action.outcome,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+      }))
+    }
+  }
+
+  {
+    const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
     const outcome = await executeRemediationTool({
       buffer,
       context,
       call: {
         tool_name: 'repair_structure_conformance',
         arguments: { target: 'document' },
-        rationale: 'Annual-report final structural convergence trace.',
+        rationale: 'Annual-report final logical-structure convergence trace.',
         confidence: 0.9,
       },
     })
     buffer = outcome.buffer
     actions.push(outcome.action)
     analysis = await analyzeForTrace(buffer, filename)
-    steps.push(await summarizeStep('repair_structure_conformance', filename, buffer, analysis, actions, {
+    steps.push(await summarizeStep('repair_structure_conformance_logical', filename, buffer, analysis, actions, {
       outcome: outcome.action.outcome,
       changedDocumentBytes: outcome.action.changedDocumentBytes,
     }))

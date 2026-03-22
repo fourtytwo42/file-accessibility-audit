@@ -2795,6 +2795,49 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(reInspect.headings.map(heading => heading.tag).slice(0, 4)).toEqual(['/H1', '/H1', '/H1', '/H1'])
   }, 60_000)
 
+  it('repair_structure_conformance adds a standard RoleMap alias for legacy /Lbody tags', async () => {
+    const buffer = await makePdf()
+    const bootstrapped = await runPdfStructureBackend({
+      buffer,
+      mutation: {
+        operation: 'bootstrap_struct_tree',
+        headings: [
+          { text: 'Document title', level: 'H1', pageNumber: 1 },
+          { text: 'Section one', level: 'H2', pageNumber: 1 },
+        ],
+        figures: [],
+      },
+    })
+
+    expect(bootstrapped.outputBuffer).toBeDefined()
+    const inspectBootstrapped = await runPdfStructureBackend({
+      buffer: bootstrapped.outputBuffer!,
+      mutation: { operation: 'inspect' },
+    })
+    const degraded = await runPdfStructureBackend({
+      buffer: bootstrapped.outputBuffer!,
+      mutation: {
+        operation: 'retag_node',
+        targets: [inspectBootstrapped.headings[1]!.ref],
+        targetTag: 'Lbody',
+      },
+    })
+
+    expect(degraded.outputBuffer).toBeDefined()
+    const degradedQpdf = await analyzeWithQpdf(degraded.outputBuffer!)
+    expect(degradedQpdf.unmappedRoleMapTags).toContain('/Lbody')
+
+    const repaired = await runPdfStructureBackend({
+      buffer: degraded.outputBuffer!,
+      mutation: { operation: 'repair_structure_conformance' },
+    })
+
+    expect(repaired.status).toBe('applied')
+    expect(repaired.outputBuffer).toBeDefined()
+    const repairedQpdf = await analyzeWithQpdf(repaired.outputBuffer!)
+    expect(repairedQpdf.unmappedRoleMapTags).not.toContain('/Lbody')
+  }, 60_000)
+
   it('retags a safe figure candidate and restores alt text', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const inspect = await runPdfStructureBackend({
