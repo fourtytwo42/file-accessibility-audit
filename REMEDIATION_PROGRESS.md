@@ -8,25 +8,25 @@
 - Final output folder: `Complete/`
 - Intermediate output folder: `MitigationAttempts/`
 - Mantra: ABI — Always Be Improving
-- Campaign target: every PDF in `Downloads/` should reach a validated score above `90/100` and be copied to `Complete/`
+- Campaign target: every PDF in `Downloads/` should reach a validated score above `95/100` and be copied to `Complete/`
 - Secondary engineering target: generalize fixes in the API/tooling when a blocker family can be improved safely and commit/push those shared changes
 
 ## Current Session Snapshot
 
 
-- Active campaign mode: 4-agent cohort wave across victim, annual-report, audit, and SFS families, with the coordinator integrating shared API fixes and `Complete/` closeouts
-- Latest coordination checkpoint: `2016_Motor_Vehicle_Annual_Report.pdf` has been visually validated and copied to `Complete/`, while the shared residual-cleanup chain now includes heading follow-through for `post_bootstrap_heading_convergence`
+- Active campaign mode: 4-agent cohort wave across victim, annual-report, audit, and SFS families, plus a county-pairs kickoff owned by the current agent
+- Latest coordination checkpoint: `2016_Motor_Vehicle_Annual_Report.pdf` has been visually validated and copied to `Complete/`, and the heading-family cleanup-chain fix is pushed; the current session is now starting the county-pairs cohort on top of the existing waves
 - Latest validation source: page-1 visual comparison for `2016_Motor_Vehicle_Annual_Report.pdf`, `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t "continues through the structural cleanup chain so chart-content repair stays reachable after early no-op steps"`, `pnpm --filter api exec tsc --noEmit`, and `pnpm --filter api verify:regressions`
-- Next action: commit/push the heading-family cleanup-chain fix, then rerun the strongest stale heading-tail candidates (`15adult`, `2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`) on the new behavior
-- Next hypothesis: the residual cleanup bug was filtering heading follow-through out of the structural-heading tail, so the next reruns should move from structure-only closure into real `normalize_heading_hierarchy` / `create_heading_from_candidate` execution
+- Next action: run the first county-pairs remediation loops, group the shared blocker family, and see whether the pair cohort can generalize cleanly before widening it
+- Next hypothesis: the county-pairs cohort will likely share a compact metadata/heading/table tail on the first pass, with the paired `Adams/Alexander/Bond/Boone/Brown/Bureau` files revealing the most reusable next API fix
 - API restart status: direct script-based reruns are using current source code for validation; API restart is still required before trusting queue-driven reruns
 - Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
 
-- Active parallel PDF jobs: 4 planned for the victim-family wave
-- CPU/memory notes: keep the wave at 4 unless the still-running structural-inspection PDFs start to pile up or the API shows strain
-- Last adjustment: raised effective concurrency from 1 to 4 for the victim cohort wave
+- Active parallel PDF jobs: 7 planned across the existing waves plus the county-pairs kickoff
+- CPU/memory notes: keep the broad wave cautious; county-pairs is starting as a diagnostic/remediation lane and may be split if it diverges
+- Last adjustment: raised effective concurrency from 4 to 7 for a second cohort wave on untouched PDF families, then added county-pairs as a separate kickoff lane
 - In-flight PDFs before restart: `2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf`, `2022 Victim Needs Assessment-230306T13210736.pdf`, `2022 Victim Service Planning Research Report -230817T20035755.pdf`
 
 ## Agent Coordination
@@ -48,6 +48,27 @@
     - assignment owner: `agent-victim-wave`
     - latest shared blocker family: `link_tabs_and_annotation_cleanup`
     - latest shared attempt/artifact path: `MitigationAttempts/victim-annuals/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f/attempt-001.pdf`
+  - `archive-annuals`
+    - status: active
+    - rationale: legacy annual-report archive PDFs (`AR*` and `AnnualReport*`) are likely to share old annual-report metadata/heading/table cleanup patterns
+    - member PDFs: `AR02.pdf`, `AR04.pdf`, `AR2003.pdf`, `AR2005-2.pdf`, `AnnualReport2001.pdf`, `AnnualReportFY06.pdf`, `AnnualReportFY07.pdf`, `AnnualReportFY08.pdf`, `AnnualReportFY09.pdf`, `AnnualReportFY10.pdf`, `AnnualReportFY11.pdf`, `AnnualReportFY12.pdf`, `AnnualReportFY13.pdf`, `AnnualReportFY14.pdf`, `AnnualReportFY18.pdf`
+    - assignment owner: `agent-archive-annuals`
+    - latest shared blocker family: `pending first pass`
+    - latest shared attempt/artifact path: `MitigationAttempts/archive-annuals/`
+  - `county-pairs`
+    - status: active
+    - rationale: county paired PDFs (`Adams/Alexander/Bond/Boone/Brown/Bureau`) look like repeated small-report variants that should share a compact remediation path
+    - member PDFs: `Adams-2.pdf`, `Alexander.pdf`, `Alexander-2.pdf`, `Bond.pdf`, `Bond-2.pdf`, `Boone.pdf`, `Boone-2.pdf`, `Brown.pdf`, `Brown-2.pdf`, `Bureau.pdf`, `Bureau-2.pdf`
+    - assignment owner: `agent-county-pairs`
+    - latest shared blocker family: `pending first pass`
+    - latest shared attempt/artifact path: `MitigationAttempts/county-pairs/`
+  - `legacy-programs`
+    - status: active
+    - rationale: ADAM, CAPS, and BARJ PDFs are a coherent legacy program-doc family and likely to share old font/link/heading cleanup behavior
+    - member PDFs: `ADAM1.pdf`, `ADAM2.pdf`, `ADAM4.pdf`, `BARJ law enforcement.pdf`, `BARJDefense.pdf`, `BARJPROBATION.pdf`, `BARJjudges.pdf`, `BARJprosecutors.pdf`, `CAPS1.pdf`, `CAPS2.pdf`, `CAPS3.pdf`, `CAPS4.pdf`, `CAPS4OGA.pdf`, `CAPS56.pdf`, `CAPS7.pdf`, `CAPS7-2.pdf`, `CAPSAbatement.pdf`, `CAPSEvaluationSexOffender.pdf`, `CAPSImpact EvaluationWinnebago.pdf`, `CAPS_10.pdf`
+    - assignment owner: `agent-legacy-programs`
+    - latest shared blocker family: `pending first pass`
+    - latest shared attempt/artifact path: `MitigationAttempts/legacy-programs/`
 - Active agent assignments:
   - `coordinator`
     - status: active
@@ -81,8 +102,29 @@
     - agent id: `Lagrange`
     - owned cohort: `victim-dv-family` / annual-report lane
     - owned write scope: `MitigationAttempts/victim-annuals/`, `Complete/`
-    - task: finish the annual-report sibling set and move any `>90` outputs into `Complete/`
+    - task: finish the annual-report sibling set and move any `>95` outputs into `Complete/`
     - latest attempt path: `Complete/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`
+  - `agent-archive-annuals`
+    - status: active
+    - agent id: `019d17f1-4b99-7ed1-8c02-bb7e853d8c0d` (`Carson`)
+    - owned cohort: `archive-annuals`
+    - owned write scope: `MitigationAttempts/archive-annuals/`, `Complete/`
+    - task: process the legacy annual-report archive cohort, group shared blocker families, and surface any `>95` outputs or a single central API fix if the cohort stalls
+    - latest attempt path: `MitigationAttempts/archive-annuals/`
+  - `agent-county-pairs`
+    - status: active
+    - agent id: `019d17f1-4ff2-7fd2-964d-2a579c900fba` (`Ramanujan`)
+    - owned cohort: `county-pairs`
+    - owned write scope: `MitigationAttempts/county-pairs/`, `Complete/`
+    - task: process the county paired-report cohort, group repeatable blockers, and surface any `>95` outputs or a single central API fix if the cohort stalls
+    - latest attempt path: `MitigationAttempts/county-pairs/`
+  - `agent-legacy-programs`
+    - status: active
+    - agent id: `019d17f1-8f04-7501-b786-80e9238d6a14` (`Euclid`)
+    - owned cohort: `legacy-programs`
+    - owned write scope: `MitigationAttempts/legacy-programs/`, `Complete/`
+    - task: process the ADAM/CAPS/BARJ cohort, group repeatable blockers, and surface any `>95` outputs or a single central API fix if the cohort stalls
+    - latest attempt path: `MitigationAttempts/legacy-programs/`
 - Assignment template for future agent use:
   - `agent-name`
     - status: planned|active|blocked|verifying|done
@@ -102,18 +144,18 @@
 ## Current Focus
 
 
-- Active PDF: `2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf`
-- Current phase: victim-dv-family cohort processing under the new `Complete/` and `>90` target
-- Immediate next step: finish the running closeout and planning lanes, then use their shared blocker family to decide whether the victim reports need a central API fix or just file-by-file closure
+- Active PDF: `Adams-2.pdf`
+- Current phase: county-pairs cohort kickoff under the new `Complete/` and `>95` target
+- Immediate next step: run the first county-pairs remediation loop and identify the shared blocker family before widening the cohort
 - API restart/rerun confirmed for active file: fresh direct script reruns are using current code; API restart is still required before trusting any queue result
 - Rebuild required for active file: no
-- Active remediation loop count: `2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf=1`, `2022 Victim Needs Assessment-230306T13210736.pdf=1`, `2022 Victim Service Planning Research Report -230817T20035755.pdf=1`
-- Next hypothesis: the victim family likely splits into one closeout/annual-report success plus a shared `link_tabs_and_annotation_cleanup` tail on the remaining victim reports, with the 2022 victim assessment already showing a `77/C` result
+- Active remediation loop count: `Adams-2.pdf=0`
+- Next hypothesis: the county-pairs cohort should reveal a compact shared blocker family on the first pass, most likely a metadata/heading/table tail
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
 - Remaining files in `Downloads/`: 956
-- Completion target: move each PDF that reaches a validated score above `90/100` into `Complete/`
+- Completion target: move each PDF that reaches a validated score above `95/100` into `Complete/`
 
 ## In Progress
 
@@ -121,6 +163,8 @@
 - 2022 Victim Needs Assessment-230306T13210736.pdf: state=needs_fix, score=77, grade=C, veraPDF=unavailable, attempt=1, loop=1
 - 2022 Victim Service Planning Research Report -230817T20035755.pdf: state=remediating, score=--, grade=--, veraPDF=--, attempt=1, loop=1
 - 2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf: state=done, score=100, grade=A, veraPDF=unavailable, attempt=1, loop=1
+- Adams-2.pdf: state=running, score=--, grade=--, veraPDF=--, attempt=1, loop=1
+- Alexander.pdf: state=running, score=--, grade=--, veraPDF=--, attempt=1, loop=1
 
 ## Blockers
 
@@ -143,8 +187,8 @@
 - 2026-03-22T23:39:00Z Heading-family cleanup-chain fix: updated `apps/api/src/services/agentRemediationService.ts` so the shared residual cleanup order for the structural/heading tail now includes `normalize_heading_hierarchy` and `create_heading_from_candidate` after `repair_bootstrapped_chart_content_refs`, instead of filtering the heading follow-through out of the family chain. Tightened `buildResidualCleanupFamilyCalls(...)` so residual cleanup is sorted by the family-chain order itself rather than preserving an older planner ordering that could pull heading normalization ahead of the structural steps or drop candidate heading creation behind the chain. Added a focused regression in `apps/api/src/__tests__/agentRemediationService.test.ts` proving the structural cleanup chain now continues through `artifact_nonsemantic_page_elements -> repair_native_marked_content_refs -> repair_bootstrapped_chart_content_refs -> normalize_heading_hierarchy -> create_heading_from_candidate -> repair_structure_conformance` when heading convergence remains active. Verification passed with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t "continues through the structural cleanup chain so chart-content repair stays reachable after early no-op steps"`, `pnpm --filter api exec tsc --noEmit`, and `pnpm --filter api verify:regressions` (`0` Phase 0 baseline regressions / `0` canary regressions). Next step: rerun the strongest heading-tail canaries on the new behavior.
 - 2026-03-22T23:25:00Z Victim-family kickoff checkpoint: launched the `victim-dv-family` wave with four active lanes covering the 2016 victim needs closeout, the 2022 victim needs assessment, the 2022 victim service planning report, and the victim annual-report sibling set. The annual-report lane produced a clean `100/A` pass for `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`, which has already been copied to `Complete/` and visually checked against page 1 of the original. The 2022 victim needs assessment completed at `77/C`, and a live residual-family diagnosis on that run isolates `link_tabs_and_annotation_cleanup` as the top blocker family. Next step: let the running closeout and planning lanes finish, then decide whether the cohort needs one generic API fix for the shared link/heading tail or whether the files split into separate blockers.
 - 2026-03-22T23:25:00Z Annual-reports-core cohort checkpoint: the long-report trace on `2007 Annual Report Final.pdf` and `2008 Annual Report.pdf` confirmed the shared tail is now `heading_content_quality` / `post_bootstrap_heading_convergence` after metadata, table, page-tab, font, and logical-structure cleanup. In the same cohort, `2016_Motor_Vehicle_Annual_Report.pdf` remediated cleanly to `100/A` on `MitigationAttempts/2016_Motor_Vehicle_Annual_Report/attempt-001.pdf`, and the live residual-family diagnosis reports no remaining blocking family on the attempt. `2015_Motor_Vehicle_Annual_Report.pdf` remains the heavy in-flight sibling and is the next active run to complete.
-- 2026-03-22T22:55:00Z Campaign retargeted from `Mitigated/` / `100/A` to `Complete/` / `>90`. `AGENTS.md` now defines the primary campaign goal as getting every PDF in `Downloads/` above `90/100` and placing validated outputs in `Complete/`, with API generalization as the secondary goal. `.gitignore` now ignores `Complete/`, the folder has been created locally, and the tracker summary has been updated so the new target survives context compression. Active execution remains on `15adult probation_1999-2008.pdf` as the canary closest to the new threshold (`86/B`), with the next shared system fix still focused on heading-content convergence.
-- 2026-03-22T23:17:54Z SFS cohort kickoff checkpoint: assigned the `sfs-and-research` cohort to the first parallel wave with two members, `2001-2020 SFS Full Year End Report-220520T19141184.pdf` and `2022 SFS Process Evaluation Report-230622T16355531.pdf`. Fresh live-family diagnostics on both source PDFs point at the same top residual family, `metadata_normalization`, so the cohort is currently grouped around a shared metadata/long-report tail rather than a split blocker set. The first remediation loops are still in flight and no file has crossed the `>90/100` target yet. Current evidence from the live runs: `2001-2020` starts at `42/F` and `2022 SFS` starts at `51/F`; both spend most of their runtime in deep structure inspection and repeated `remediation_fast` passes. Next hypothesis: use the shared `metadata_normalization` family as the cohort baseline, then reassess whether both files converge into the same heading/structure follow-through or need to split into separate subfamilies.
+- 2026-03-22T22:55:00Z Campaign retargeted from `Mitigated/` / `100/A` to `Complete/` / `>90`. `AGENTS.md` now defines the primary campaign goal as getting every PDF in `Downloads/` above `90/100` and placing validated outputs in `Complete/`, with API generalization as the secondary goal. `.gitignore` now ignores `Complete/`, the folder has been created locally, and the tracker summary has been updated so the new target survives context compression. Active execution remains on `15adult probation_1999-2008.pdf` as the canary closest to that earlier threshold (`86/B`), with the next shared system fix still focused on heading-content convergence. This checkpoint is historical; the live campaign threshold is now `>95`.
+- 2026-03-22T23:17:54Z SFS cohort kickoff checkpoint: assigned the `sfs-and-research` cohort to the first parallel wave with two members, `2001-2020 SFS Full Year End Report-220520T19141184.pdf` and `2022 SFS Process Evaluation Report-230622T16355531.pdf`. Fresh live-family diagnostics on both source PDFs point at the same top residual family, `metadata_normalization`, so the cohort is currently grouped around a shared metadata/long-report tail rather than a split blocker set. The first remediation loops are still in flight and no file has crossed the completion threshold yet. Current evidence from the live runs: `2001-2020` starts at `42/F` and `2022 SFS` starts at `51/F`; both spend most of their runtime in deep structure inspection and repeated `remediation_fast` passes. Next hypothesis: use the shared `metadata_normalization` family as the cohort baseline, then reassess whether both files converge into the same heading/structure follow-through or need to split into separate subfamilies.
 
 - 2026-03-22T22:45:44Z Structural tail closure for `15adult` after figure-family automation: extended `apps/api/src/services/agentRemediationService.ts` so residual full-audit-tail cleanup can chain the structural families together instead of stopping at the first selected family. The residual cleanup builder now treats `post_bootstrap_heading_convergence` and `logical_structure_marked_content` as a shared structural chain with effective order `artifact_nonsemantic_page_elements -> repair_native_marked_content_refs -> repair_bootstrapped_chart_content_refs -> repair_structure_conformance`, and the pipeline-family override now honors all families in that chain so later structural calls are not filtered out just because they belong to the adjacent residual family. Added focused regressions in `src/__tests__/agentRemediationService.test.ts` proving the structural chain keeps `repair_bootstrapped_chart_content_refs` reachable after early `no_effect` steps, and a family-layer regression in `src/__tests__/residualFamilyService.test.ts` proving that once chart-content repair has landed, heading convergence remains the active blocker while generic logical-structure debt drops out as the blocking family. Tightened `apps/api/src/services/familyConvergenceService.ts` and `apps/api/src/scripts/traceFullAuditTailConvergence.ts` so the trace artifact records skipped steps explicitly and preserves the selected-family handoff across the structural chain. Verification passed with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/residualFamilyService.test.ts` and `pnpm --filter api exec tsc --noEmit`; fresh proof runs produced `MitigationAttempts/full-audit-tail-traces/2026-03-22T22-36-27Z.full-audit-tail-trace.json` and `MitigationAttempts/processed-intake-parity/2026-03-22T22-45-44Z.processed-intake-parity.json`. Those artifacts confirm the live path now consumes the structural chain automatically: `repair_other_elements_alt_text` still moves `71/C -> 82/B`, `artifact_nonsemantic_page_elements` and `repair_native_marked_content_refs` both stay `no_effect`, then `repair_bootstrapped_chart_content_refs` applies and lifts the runtime output to `86/B`, clearing `pdfua.logical_structure` and leaving `pdfua.heading_content_quality` as the only remaining blocker through `post_bootstrap_heading_convergence`. Next hypothesis: the next shared system fix should target heading-content cleanup directly, starting with `create_heading_from_candidate` rather than more structure-family routing work.
 

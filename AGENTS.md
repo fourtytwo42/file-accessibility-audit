@@ -5,7 +5,7 @@ This repository supports a long-running remediation workflow over PDFs stored in
 ## Mantra
 
 - ABI: Always Be Improving.
-- The primary goal is to get every PDF in `Downloads/` to a validated score above `90/100` and place the successful output in `Complete/`.
+- The primary goal is to get every PDF in `Downloads/` to a validated score above `95/100` and place the successful output in `Complete/`.
 - The secondary goal is to improve the shared API remediation system so future PDFs benefit from each general fix without regression.
 - The goal is not only to mitigate individual PDFs, but to continuously improve the shared remediation system so future PDFs pass with less manual intervention.
 - Default posture: continue the remediation campaign unless a real blocker prevents progress.
@@ -80,7 +80,7 @@ This repository supports a long-running remediation workflow over PDFs stored in
 - Use the API remediation/audit pipeline to produce remediated PDFs.
 - Treat every PDF as a system test case for the broader product goal: the app should be able to remediate PDFs to Adobe accessibility standards generically, not just through one-off file-specific fixes.
 - Avoid regressions: a change that helps one PDF but weakens other PDFs or document classes is incomplete until the shared system is stable again.
-- If a PDF does not reach `>90/100`, determine why from the API results and improve the system itself:
+- If a PDF does not reach `>95/100`, determine why from the API results and improve the system itself:
   - API services
   - remediation planner
   - scoring/reporting
@@ -89,7 +89,7 @@ This repository supports a long-running remediation workflow over PDFs stored in
 
 ## Output Rules
 
-- Only place PDFs in `Complete/` when they have reached a validated score above `90/100` per this app's API analysis and passed the visual first-page check.
+- Only place PDFs in `Complete/` when they have reached a validated score above `95/100` per this app's API analysis and passed the visual first-page check.
 - Keep exactly one final completed copy per source PDF in `Complete/`.
 - Use `MitigationAttempts/` for temporary reruns, experimental outputs, and investigation artifacts.
 - Do not keep duplicate final copies in `Complete/`.
@@ -107,15 +107,15 @@ This repository supports a long-running remediation workflow over PDFs stored in
 ## Quality Standard
 
 - The target for every PDF in `Downloads/` is:
-  - overall score strictly above `90/100`
-  - grade `A` when achievable; otherwise preserve the highest validated score above `90`
+  - overall score strictly above `95/100`
+  - grade `A` when achievable; otherwise preserve the highest validated score above `95`
   - no unresolved Adobe accessibility-checker failures
 - The broader product target is that these standards should be achievable by the app across the corpus without causing regressions on PDFs that already passed.
 - `veraPDF` is deprecated in this repository and must not be used as an acceptance gate.
 - A mitigation is not considered successful unless the remediated PDF also visually matches the original on the first page.
 - Validate visual fidelity by taking a screenshot of page 1 of the original PDF and page 1 of the remediated PDF and comparing them directly.
 - Pay special attention to images, logos, charts, and obvious layout/content loss on the first page.
-- If the first page does not visually match, the mitigation is not complete even if the score is above `90/100`.
+- If the first page does not visually match, the mitigation is not complete even if the score is above `95/100`.
 - If visual fidelity regresses, update the remediation approach and re-run until the PDF is both accessible and visually faithful.
 - Bookmark cleanup should be AI-driven for long/noisy documents when semantic cleanup is available.
 - If bookmarks are still raw, fragmented, OCR-noisy, or obviously not AI-cleaned, treat that as an incomplete remediation/system issue and improve the pipeline.
@@ -131,10 +131,10 @@ For each PDF:
 3. If the PDF reaches the current score target, take screenshots of page 1 of the original and remediated PDFs and compare them.
 4. Check the remediated first page yourself, especially images and obvious visual structure.
 5. Confirm bookmark cleanup used the intended AI path when applicable and that the resulting bookmarks are clean.
-6. If the PDF is not above `90/100`, or if the first page does not visually match, or if the bookmarks are not properly AI-cleaned, identify the exact blockers.
+6. If the PDF is not above `95/100`, or if the first page does not visually match, or if the bookmarks are not properly AI-cleaned, identify the exact blockers.
 7. Patch the API/tooling so that the blocker is handled generically, not just for one file, and verify that the change does not regress previously-working PDFs.
 8. Re-run the same PDF through the API.
-9. Repeat until the output is above `90/100`, the first page visually matches the original, and bookmarks are acceptable.
+9. Repeat until the output is above `95/100`, the first page visually matches the original, and bookmarks are acceptable.
 10. Move the single final passing PDF into `Complete/`.
 11. If a file still fails after multiple repair loops, document the exact blockers in `REMEDIATION_PROGRESS.md`, keep it out of `Complete/`, and continue improving the shared system.
 
@@ -234,7 +234,7 @@ Acceptance rule for system fixes:
 
 A PDF is only complete when all of the following are true:
 
-- API result is above `90/100`
+- API result is above `95/100`
 - Grade is recorded, with `A` preferred but not required when the score threshold is satisfied
 - No unresolved Adobe accessibility-checker failures remain for the latest validated output
 - The latest run was produced after the latest relevant code changes
@@ -278,7 +278,7 @@ When resuming after interruption or context compression:
   - active file
   - current blockers
   - recent system fixes
-  - completed files above `90/100` moved to `Complete/`
+  - completed files above `95/100` moved to `Complete/`
   - unresolved files that are still blocked
   - whether API restart/rerun confirmation has been completed for the active file
   - the current remediation loop count for the active PDF
@@ -313,7 +313,7 @@ When resuming after interruption or context compression:
   - large movement of page-1 blocks that changes the document's look materially
   - page rendered mostly white or partially blank
 - If the first page fails visual comparison, do not consider the PDF done.
-- Update the remediation logic to preserve visual fidelity while keeping the file above `90/100`.
+- Update the remediation logic to preserve visual fidelity while keeping the file above `95/100`.
 
 ## Bookmark Validation
 
@@ -385,7 +385,7 @@ When resuming after interruption or context compression:
 
 ## Unresolved Files
 
-- If a PDF cannot yet be brought above `90/100` with acceptable first-page fidelity and bookmarks, do not move it to `Complete/`.
+- If a PDF cannot yet be brought above `95/100` with acceptable first-page fidelity and bookmarks, do not move it to `Complete/`.
 - Keep the latest investigation notes and blocker summary in `REMEDIATION_PROGRESS.md`.
 - Continue using the file to improve the system generically.
 
