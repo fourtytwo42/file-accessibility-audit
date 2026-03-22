@@ -28,6 +28,31 @@ This repository supports a long-running remediation workflow over PDFs stored in
 - If concurrency is raised, record the reason and active file set in `REMEDIATION_PROGRESS.md`.
 - When running in parallel, the target operating mode is up to 4 PDFs at a time unless system load requires less.
 
+## Agent Coordination
+
+- When using multiple agents, every active agent must have an explicit assignment recorded in `REMEDIATION_PROGRESS.md` before substantive work begins.
+- Each agent assignment must include:
+  - agent name or id
+  - owned PDF(s)
+  - owned write scope
+  - current hypothesis/task
+  - latest attempt path
+  - status: `planned`, `active`, `blocked`, `verifying`, or `done`
+- No two agents may own the same PDF at the same time unless the tracker explicitly marks one as `diagnostic-only`.
+- No two agents may own overlapping write scopes at the same time unless the tracker explicitly says the overlap is intentional and names the integration owner.
+- Default ownership rule:
+  - one agent owns one PDF family or one disjoint code area
+  - the coordinating agent owns cross-file integration and final reruns
+- Before spawning or reusing an agent:
+  - check `REMEDIATION_PROGRESS.md`
+  - claim the PDF and write scope there first
+  - note whether the assignment is PDF work, code work, or diagnostic work
+- After an agent finishes or is interrupted:
+  - update the assignment entry
+  - record what changed
+  - release or reassign the PDF/write scope explicitly
+- If an agent makes a system-level API fix, record which in-flight PDFs now need reruns because their earlier outputs are stale.
+
 ## Core Rules
 
 - Do not edit PDFs directly by hand.

@@ -29,6 +29,29 @@
 - CPU/memory notes: single-file second-pass loop to keep restart boundaries clean while Adobe gaps are being investigated
 - Last adjustment: reduced effective concurrency to 1 for the second-pass campaign
 - In-flight PDFs before restart: none
+
+## Agent Coordination
+
+- Coordination mode: explicit ownership required before parallel agent work
+- Integration owner: main session / coordinating agent
+- Overlap policy:
+  - no duplicate PDF ownership
+  - no overlapping write scopes unless explicitly marked and coordinated here
+- Active agent assignments:
+  - `coordinator`
+    - status: active
+    - owned PDFs: `15adult probation_1999-2008.pdf`
+    - owned write scope: `apps/api/src/services/*`, `apps/api/src/scripts/*`, `apps/api/src/__tests__/*`, `REMEDIATION_PROGRESS.md`
+    - task: push the active canary above `90/100`, then continue the `Downloads/` campaign alphabetically
+    - latest attempt path: `MitigationAttempts/processed-intake-parity/2026-03-22T22-45-44Z.processed-intake-parity.json`
+- Assignment template for future agent use:
+  - `agent-name`
+    - status: planned|active|blocked|verifying|done
+    - owned PDFs: `...`
+    - owned write scope: `...`
+    - task: `...`
+    - latest attempt path: `...`
+    - stale-after-fix rerun required: yes|no
 ## Current Focus
 
 
