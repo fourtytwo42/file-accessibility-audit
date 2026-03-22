@@ -1230,8 +1230,8 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       operation: 'bootstrap_struct_tree',
       figures: [{ pageNumber: 1 }],
     })
-    expect(backendArgs?.mutation.figures).toHaveLength(1)
-    expect(backendArgs?.mutation.figures[0]?.altText).toContain('Cover chart')
+    expect(backendArgs?.mutation.figures ?? []).toHaveLength(1)
+    expect(backendArgs?.mutation.figures?.[0]?.altText).toContain('Cover chart')
   })
 
   it('does not pass existing figure nodes back into bootstrap_struct_tree', async () => {
@@ -1312,8 +1312,88 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       operation: 'bootstrap_struct_tree',
       figures: [{ pageNumber: 1 }],
     })
-    expect(backendArgs?.mutation.figures).toHaveLength(1)
-    expect(backendArgs?.mutation.figures[0]?.altText).toContain('Cover chart')
+    expect(backendArgs?.mutation.figures ?? []).toHaveLength(1)
+    expect(backendArgs?.mutation.figures?.[0]?.altText).toContain('Cover chart')
+  })
+
+  it('filters noisy OCR heading fragments when replacing bookmarks from headings', async () => {
+    const buffer = await makePdf()
+    const analysis = await analyzePDF(buffer, 'bookmark-noise.pdf')
+    const inspected = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
+    const context: PdfRemediationContext = {
+      ...inspected,
+      headingCandidates: [
+        {
+          id: 'heading:1',
+          pageNumber: 1,
+          text: 'CRIMINAL JUSTICE',
+          bbox: { x: 0.1, y: 0.1, width: 0.8, height: 0.05 },
+          fontSize: 18,
+          fontWeight: 'bold',
+          nearbyContext: [],
+          targetRef: 'obj:10 0 R',
+          existingTag: '/H1',
+          repairMode: 'safe',
+        },
+        {
+          id: 'heading:2',
+          pageNumber: 1,
+          text: 'ConTENTS',
+          bbox: { x: 0.1, y: 0.2, width: 0.8, height: 0.05 },
+          fontSize: 16,
+          fontWeight: 'bold',
+          nearbyContext: [],
+          targetRef: 'obj:11 0 R',
+          existingTag: '/H2',
+          repairMode: 'safe',
+        },
+        {
+          id: 'heading:3',
+          pageNumber: 2,
+          text: 'MANACINC IN ADDITION TO HELPING APPELLATE PROSECUTORS KEEP BETTER TRACK OF',
+          bbox: { x: 0.1, y: 0.3, width: 0.8, height: 0.05 },
+          fontSize: 14,
+          fontWeight: 'bold',
+          nearbyContext: [],
+          targetRef: 'obj:12 0 R',
+          existingTag: '/H2',
+          repairMode: 'safe',
+        },
+      ],
+    }
+    const backendSpy = vi.spyOn(pdfStructureBackend, 'runPdfStructureBackend').mockResolvedValue({
+      status: 'applied',
+      changedDocumentBytes: true,
+      appliedMutations: [],
+      warnings: [],
+      headings: [],
+      structuralNodes: [],
+      tables: [],
+      figures: [],
+      imageStructNodes: [],
+      acrobatAltRiskNodes: [],
+      readingOrderNodes: [],
+      readingOrderParents: [],
+      outputBuffer: buffer,
+    })
+
+    await executeRemediationTool({
+      buffer,
+      context,
+      call: {
+        tool_name: 'replace_bookmarks_from_headings',
+        arguments: { target: 'document' },
+        rationale: 'Replace bookmarks.',
+        confidence: 0.9,
+      },
+    })
+
+    expect(backendSpy).toHaveBeenCalledTimes(1)
+    const headings = backendSpy.mock.calls[0]?.[0]?.mutation?.headings
+    expect(headings).toEqual([
+      expect.objectContaining({ text: 'Criminal Justice', pageNumber: 1 }),
+      expect.objectContaining({ text: 'Contents', pageNumber: 1 }),
+    ])
   })
 
   it('normalizes the first created heading candidate to H1 even when H2 is requested', async () => {

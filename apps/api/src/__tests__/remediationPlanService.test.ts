@@ -1185,6 +1185,140 @@ describe('remediationPlanService', () => {
 
     expect(plan.actions[0]?.tool_name).toBe('normalize_heading_hierarchy')
   })
+
+  it('prioritizes post-bootstrap native structure convergence ahead of bookmark cleanup', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'C',
+        analysisScore: 72,
+        veraPdfStatus: 'unavailable',
+        veraPdfFailedChecks: 0,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'context.post_bootstrap_native_structure_debt',
+            label: 'Post-bootstrap native structure debt remains',
+            source: 'context',
+            count: 1,
+            categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+            evidence: ['Bootstrap added headings, but native structure debt remains.'],
+          },
+          {
+            key: 'category.bookmarks',
+            label: 'Bookmarks',
+            source: 'category',
+            count: 1,
+            categoryIds: ['bookmarks'],
+            blocking: false,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['replace_bookmarks_from_headings'],
+            evidence: ['Missing bookmarks'],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'normalize-headings',
+            toolName: 'normalize_heading_hierarchy',
+            reason: 'Normalize headings',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['heading_structure'],
+            confidence: 0.92,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['context.post_bootstrap_native_structure_debt'],
+          },
+          {
+            key: 'replace-bookmarks',
+            toolName: 'replace_bookmarks_from_headings',
+            reason: 'Build bookmarks',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['bookmarks'],
+            confidence: 0.55,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.bookmarks'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 2,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'biennial.pdf',
+      analysis: {
+        overallScore: 72,
+        grade: 'C',
+        isScanned: false,
+        pageCount: 24,
+        categories: [
+          { id: 'heading_structure', label: 'Heading', score: 60, severity: 'Moderate' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 40, severity: 'Moderate' },
+          { id: 'bookmarks', label: 'Bookmarks', score: 0, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: {
+          lang: 'en',
+          hasStructTree: true,
+          structTreeDepth: 5,
+          formFields: [],
+          headings: [{ level: 'H1', tag: '/H1' }],
+        },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 2,
+      actions: [{
+        tool: 'bootstrap_struct_tree',
+        target: 'document',
+        details: 'Augmented existing structure tree under obj:360 0 R.',
+        confidence: 0.9,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        outcome: 'applied',
+      }] as any,
+      rejectedActions: [],
+    })
+
+    expect(plan.actions[0]?.tool_name).toBe('normalize_heading_hierarchy')
+    expect(plan.actions.some(action => action.tool_name === 'replace_bookmarks_from_headings')).toBe(false)
+  })
+
   it('does not plan finalize_substituted_font_conformance before legacy substitution has run', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {

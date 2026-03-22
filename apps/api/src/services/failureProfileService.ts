@@ -590,6 +590,14 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   }
 
   const headingNeedsReview = (categoryScore(input, 'heading_structure') ?? 100) < 100
+  const logicalStructureBlocking = input.analysis.localStandards?.findings?.some(finding =>
+    finding.blocking && finding.key === 'pdfua.logical_structure',
+  ) ?? false
+  const bootstrapAugmentedExistingTree = input.actions.some(action =>
+    action.tool === 'bootstrap_struct_tree'
+    && action.outcome === 'applied'
+    && /Augmented existing structure tree/i.test(action.details || ''),
+  )
   const blockedHeadings = headingNeedsReview
     ? input.context.headingCandidates.filter(candidate => candidate.repairMode !== 'safe')
     : []
@@ -606,6 +614,38 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
       classification: 'semantic',
       nativeToolFamilies: ['create_heading_from_candidate'],
       evidence: blockedHeadings.map(candidate => candidate.unsafeReason || candidate.text).slice(0, 3),
+    })
+  }
+
+  const postBootstrapStructureRefsAvailable = input.context.headingCandidates.length > 0
+    || (input.context.qpdf.headings?.length || 0) > 0
+  if (
+    bootstrapAugmentedExistingTree
+    && postBootstrapStructureRefsAvailable
+    && (headingNeedsReview || logicalStructureBlocking)
+  ) {
+    mergeMode(modes, {
+      key: 'context.post_bootstrap_native_structure_debt',
+      label: 'Post-bootstrap native structure debt remains',
+      source: 'context',
+      derivedFrom: [
+        'action:bootstrap_struct_tree',
+        ...(headingNeedsReview ? ['category:heading_structure'] : []),
+        ...(logicalStructureBlocking ? ['local_standard:pdfua.logical_structure'] : []),
+      ],
+      count: 1,
+      categoryIds: ['heading_structure', 'reading_order', 'pdf_ua_compliance'],
+      blocking: logicalStructureBlocking || headingNeedsReview,
+      unmatched: false,
+      classification: 'deterministic',
+      nativeToolFamilies: ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+      evidence: [
+        headingNeedsReview && logicalStructureBlocking
+          ? 'Bootstrap added headings to an existing structure tree, but heading hierarchy and native structure debt still block convergence.'
+          : headingNeedsReview
+            ? 'Bootstrap added headings to an existing structure tree, but heading hierarchy still needs native cleanup.'
+            : 'Bootstrap added headings to an existing structure tree, but logical-structure debt still blocks native convergence.',
+      ],
     })
   }
 
@@ -1266,7 +1306,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       categoryTargets: ['heading_structure'],
       confidence: 0.92,
       blockedReason: undefined,
-      derivedFromFailureModeKeys: derivedFailureKeys(['category.heading_structure']),
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.heading_structure', 'context.post_bootstrap_native_structure_debt']),
     })
   }
 

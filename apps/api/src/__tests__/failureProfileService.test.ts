@@ -813,6 +813,64 @@ describe('failureProfileService', () => {
       && opportunity.status === 'auto_runnable')).toBe(true)
   })
 
+  it('emits post-bootstrap native structure debt after augmenting an existing structure tree', () => {
+    const analysis = makeAnalysisResult({
+      categories: makeAnalysisResult().categories.map(category =>
+        category.id === 'heading_structure' || category.id === 'pdf_ua_compliance'
+          ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Post-bootstrap structure debt'] }
+          : category),
+      localStandards: {
+        status: 'issues_detected',
+        findings: [{
+          key: 'pdfua.logical_structure',
+          label: 'Logical structure',
+          severity: 'error',
+          blocking: true,
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          confidence: 0.9,
+          evidence: ['ParentTree mismatch remains.'],
+          source: 'qpdf',
+          inferred: false,
+          count: 1,
+        }],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          headings: [{ level: 'H1', tag: '/H1' }],
+          hasStructTree: true,
+          structTreeDepth: 5,
+        },
+        structure: {
+          ...makeContext().structure,
+          structuralNodes: [{ ref: '1 0 R', tag: '/Document' }],
+        } as any,
+      }),
+      actions: [
+        makeAction({
+          tool: 'bootstrap_struct_tree',
+          target: 'document',
+          details: 'Augmented existing structure tree under obj:360 0 R.',
+          outcome: 'applied',
+        }),
+      ],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.post_bootstrap_native_structure_debt')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'normalize_heading_hierarchy'
+      && opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_native_structure_debt'))).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_marked_content_refs')).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_structure_conformance')).toBe(true)
+  })
+
   it('does not emit heading or figure candidate opportunities once those categories are already complete', () => {
     const analysis = makeAnalysisResult({
       overallScore: 100,

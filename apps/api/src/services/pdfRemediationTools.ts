@@ -481,10 +481,28 @@ function looksLikeProseHeadingText(text: string): boolean {
 }
 
 function normalizeBookmarkText(text: string): string {
-  return text
+  const stopWords = new Set(['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'from', 'in', 'of', 'on', 'or', 'the', 'to', 'vs', 'via'])
+  const normalized = text
     .replace(/\s+/g, ' ')
     .replace(/\s+([,.;:!?])/g, '$1')
     .trim()
+  if (!normalized) return normalized
+  return normalized
+    .split(' ')
+    .map((word, index) => {
+      if (!/[A-Za-z]/.test(word)) return word
+      const lower = word.toLowerCase()
+      const hasWeirdMixedCase = /[A-Z]/.test(word)
+        && /[a-z]/.test(word)
+        && !/^[A-Z][a-z]+(?:['-][A-Za-z]+)?$/.test(word)
+      const allUpper = word === word.toUpperCase() && /[A-Z]/.test(word)
+      if (index > 0 && stopWords.has(lower)) return lower
+      if (hasWeirdMixedCase || allUpper) {
+        return lower.charAt(0).toUpperCase() + lower.slice(1)
+      }
+      return word
+    })
+    .join(' ')
 }
 
 function looksLikeBookmarkNoise(text: string): boolean {
@@ -493,9 +511,11 @@ function looksLikeBookmarkNoise(text: string): boolean {
   if (normalized.length < 4) return true
   if (!/[A-Za-z]/.test(normalized)) return true
   if (normalized.length > 90) return true
-  if ((normalized.match(/\b\w+\b/g) || []).length > 12) return true
+  const words = normalized.match(/\b[\p{L}\p{N}&/-]+\b/gu) || []
+  if (words.length > 8) return true
   if (/^[A-Z]\s+[a-z].{12,}/.test(normalized)) return true
   if (/^[a-z]/.test(normalized)) return true
+  if (looksLikeProseHeadingText(normalized) && words.length > 6) return true
   if (/(we are pleased|under the leadership|for the agency|state fiscal year|provides statistical|the weeks that followed)/i.test(normalized)) return true
   return false
 }

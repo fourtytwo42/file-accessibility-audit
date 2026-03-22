@@ -137,6 +137,12 @@ const DEEP_STRUCTURE_SCORING_TOOLS = new Set<string>([
   'normalize_nested_figure_containers',
 ])
 
+const LONG_REPORT_STRUCTURE_CONVERGENCE_TOOLS = new Set<string>([
+  'bootstrap_struct_tree',
+  'normalize_heading_hierarchy',
+  'repair_structure_conformance',
+])
+
 const CANDIDATE_SENSITIVE_TOOLS = new Set<string>([
   'create_heading_from_candidate',
   'set_table_header_cells',
@@ -341,6 +347,14 @@ function requiresDeepStructureInspect(actions: Array<Pick<RemediationActionRecor
   )
 }
 
+function requiresLongReportStructureInspect(
+  actions: Array<Pick<RemediationActionRecord, 'tool'>>,
+  baselineResult: AnalysisResult,
+): boolean {
+  return baselineResult.pageCount >= 20
+    && actions.some(action => LONG_REPORT_STRUCTURE_CONVERGENCE_TOOLS.has(action.tool))
+}
+
 function hasDeterministicAcrobatOwnershipRisk(context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): boolean {
   return (context?.structure?.acrobatAltRiskNodes || []).some(node => {
     const unresolved = ['duplicate_mcid_ownership', 'container_with_graphics_descendants', 'graphics_only_nonfigure', 'untagged_image_mcid', 'untagged_image_direct'].includes(node.ownershipMode || '')
@@ -387,6 +401,7 @@ function buildBatchMutationForCall(
       const figures = context.figureCandidates
         .filter(candidate =>
           candidate.pageImageCount > 0
+          && candidate.targetTag !== '/Figure'
           && candidate.informativeHint !== 'decorative'
           && Number.isFinite(candidate.pageNumber),
         )
@@ -2749,7 +2764,8 @@ export async function remediatePdfWithAgent(
 
       const analyzedAttempt = await analyzeIntermediate(attemptBuffer, checkpointResult, {
         forceStructureForScoring: requiresDeepStructureScoring(attemptEntries.map(entry => entry.action)),
-        preferDeepStructureInspect: requiresDeepStructureInspect(attemptEntries.map(entry => entry.action)),
+        preferDeepStructureInspect: requiresDeepStructureInspect(attemptEntries.map(entry => entry.action))
+          || requiresLongReportStructureInspect(attemptEntries.map(entry => entry.action), checkpointResult),
       })
       const attemptRegressionReason = nativeStageRegressionReason(
         checkpointResult,
@@ -2796,7 +2812,8 @@ export async function remediatePdfWithAgent(
           ? analyzedAttempt
           : await analyzeIntermediate(entry.afterBuffer, checkpointResult, {
               forceStructureForScoring: requiresDeepStructureScoring([entry.action]),
-              preferDeepStructureInspect: requiresDeepStructureInspect([entry.action]),
+              preferDeepStructureInspect: requiresDeepStructureInspect([entry.action])
+                || requiresLongReportStructureInspect([entry.action], checkpointResult),
             })
         const entryRegressionReason = nativeStageRegressionReason(
           priorResultForEntry,
@@ -3014,7 +3031,8 @@ export async function remediatePdfWithAgent(
 
       const analyzedReplay = await analyzeIntermediate(replay.buffer, input.stageStartResult, {
         forceStructureForScoring: requiresDeepStructureScoring(replay.actions),
-        preferDeepStructureInspect: requiresDeepStructureInspect(replay.actions),
+        preferDeepStructureInspect: requiresDeepStructureInspect(replay.actions)
+          || requiresLongReportStructureInspect(replay.actions, input.stageStartResult),
       })
       const appliedAcrobatAltRepair = replay.actions.some(action =>
         action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
@@ -3146,7 +3164,8 @@ export async function remediatePdfWithAgent(
       if (!nativeTaggedSafeMode && stageChangedDocument) {
         const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
           forceStructureForScoring: requiresDeepStructureScoring(stageActions),
-          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions),
+          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions)
+            || requiresLongReportStructureInspect(stageActions, stageStartResult),
         })
         const isAcrobatAltRepair = stageActions.some(
           action => action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
@@ -3378,7 +3397,8 @@ export async function remediatePdfWithAgent(
     if (!nativeTaggedSafeMode && stageChangedDocument) {
       const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
         forceStructureForScoring: requiresDeepStructureScoring(stageActions),
-        preferDeepStructureInspect: requiresDeepStructureInspect(stageActions),
+        preferDeepStructureInspect: requiresDeepStructureInspect(stageActions)
+          || requiresLongReportStructureInspect(stageActions, stageStartResult),
       })
       // repair_other_elements_alt_text fixes Adobe Acrobat issues not reflected in our score model
       const isAcrobatAltRepair = stageActions.some(
@@ -3619,7 +3639,8 @@ export async function remediatePdfWithAgent(
       if (!nativeTaggedSafeMode && stageChangedDocument) {
         const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
           forceStructureForScoring: requiresDeepStructureScoring(stageActions),
-          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions),
+          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions)
+            || requiresLongReportStructureInspect(stageActions, stageStartResult),
         })
         const isAcrobatAltRepair = stageActions.some(a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied')
         const acceptanceDecision = evaluateStageAcceptance(stageStartResult, analyzedStage, stageActions)

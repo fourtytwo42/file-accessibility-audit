@@ -456,10 +456,14 @@ function opportunitySelectionDecision(input: {
   if (CANDIDATE_ONLY_TOOLS.has(opportunity.toolName) && opportunity.scope === 'document') return { selectable: false, reason: `candidate_only_scope:${opportunity.toolName}` }
 
   const structuralClass = classification.structuralClass
+  const allowsPostBootstrapNativeConvergence = opportunity.derivedFromFailureModeKeys.includes('context.post_bootstrap_native_structure_debt')
   const nativeSafeContext = !analysis.isScanned
     && isNativeTaggedSafeContext(context)
-    && !hasActionTool(actions, 'bootstrap_struct_tree')
-    && !hasPlannedTool(selectedActions, 'bootstrap_struct_tree')
+    && (
+      allowsPostBootstrapNativeConvergence
+      || (!hasActionTool(actions, 'bootstrap_struct_tree')
+        && !hasPlannedTool(selectedActions, 'bootstrap_struct_tree'))
+    )
   const useBootstrappedChartConformance = shouldUseBootstrappedChartConformance({ analysis, context, actions, selectedActions })
   const hasAutoNativeMarkedContent = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_marked_content_refs')
   const hasAutoNativeLinkRepair = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_link_structure')
@@ -701,10 +705,18 @@ async function deterministicActions(input: {
   })
 
   const headingStructureUnresolved = issueCategoryIds(input.analysis).includes('heading_structure')
+  const postBootstrapStructureDebt = failureModeByKey.has('context.post_bootstrap_native_structure_debt')
   const selectionPasses: Array<{
     includeOpportunity: (opportunity: ToolOpportunity) => boolean
     maxSelections?: number
   }> = [
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        postBootstrapStructureDebt
+        && opportunity.scope === 'document'
+        && ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName),
+      maxSelections: 3,
+    },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         headingStructureUnresolved
