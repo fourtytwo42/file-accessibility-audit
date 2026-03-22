@@ -23,6 +23,7 @@
     "baseline:processed:font-capability": "pnpm --filter api baseline:processed:font-capability",
     "diagnose:processed-intake-parity": "pnpm --filter api diagnose:processed-intake-parity",
     "diagnose:live-families": "pnpm --filter api diagnose:live-families",
+    "trace:full-audit-tail": "pnpm --filter api trace:full-audit-tail",
     "trace:link-family": "pnpm --filter api trace:link-family",
     "trace:97anreport": "pnpm --filter api trace:97anreport",
     "trace:annual-reports": "pnpm --filter api trace:annual-reports",

@@ -983,11 +983,37 @@ function familyCompletionTarget(
   return findSingleBlockingResidualFamilyConvergenceTarget(failureProfile?.residualFamilies || [])
 }
 
+function sortResidualCleanupFamilies(left: ResidualFamilyDecision, right: ResidualFamilyDecision): number {
+  return Number(right.blocking) - Number(left.blocking)
+    || left.priority - right.priority
+    || right.evidenceStrength - left.evidenceStrength
+    || left.id.localeCompare(right.id)
+}
+
+function selectResidualCleanupFamilyTarget(
+  failureProfile: Pick<FailureProfile, 'residualFamilies'> | null | undefined,
+): ResidualFamilyDecision | null {
+  const single = familyCompletionTarget(failureProfile)
+  if (single) return single
+
+  const candidates = [...(failureProfile?.residualFamilies || [])]
+    .filter(family =>
+      family.blocking
+      && family.convergenceStatus === 'preferred_tools_available'
+      && family.preferredAutoRunnableOpportunityKeys.length > 0,
+    )
+    .sort(sortResidualCleanupFamilies)
+
+  return candidates[0] || null
+}
+
 export function __test_needsFamilyCompleteConvergence(
   failureProfile: Pick<FailureProfile, 'residualFamilies'> | null | undefined,
 ): boolean {
   return !!familyCompletionTarget(failureProfile)
 }
+
+export const __test_selectResidualCleanupFamilyTarget = selectResidualCleanupFamilyTarget
 
 function rejectAction(input: {
   action: RemediationActionRecord
@@ -2537,7 +2563,7 @@ export async function remediatePdfWithAgent(
       rejectedActions,
       iterations,
     })
-    let baselineConvergenceFamily = familyCompletionTarget(currentResidualArtifacts.failureProfile)
+    let baselineConvergenceFamily = selectResidualCleanupFamilyTarget(currentResidualArtifacts.failureProfile)
     let seededPlanningState: {
       result: AnalysisResult
       context: PdfRemediationContext
@@ -2557,7 +2583,7 @@ export async function remediatePdfWithAgent(
             rejectedActions,
             iterations,
           })
-          const seededFamily = familyCompletionTarget(seededPlanningArtifacts.failureProfile)
+          const seededFamily = selectResidualCleanupFamilyTarget(seededPlanningArtifacts.failureProfile)
           if (seededFamily) {
             baselineConvergenceFamily = seededFamily
             seededPlanningState = {
@@ -2604,8 +2630,8 @@ export async function remediatePdfWithAgent(
           })
         : currentResidualArtifacts
       const convergenceFamily = useSeededPlanningState || shouldRefreshPlanningState
-        ? familyCompletionTarget(residualArtifacts.failureProfile)
-        : null
+        ? selectResidualCleanupFamilyTarget(residualArtifacts.failureProfile)
+        : baselineConvergenceFamily
       const residualCalls: RemediationToolCall[] = []
 
       if (convergenceFamily) {
@@ -2618,7 +2644,8 @@ export async function remediatePdfWithAgent(
           rejectedActions,
           pipelineConfig: currentPipelineConfig,
         })
-        let familyCalls = familyPlan.actions.filter(call =>
+        const plannedFamilyActions = familyPlan?.actions || []
+        let familyCalls = plannedFamilyActions.filter(call =>
           call.familyId === convergenceFamily.id
           && convergenceFamily.preferredTools.includes(call.tool_name),
         )
