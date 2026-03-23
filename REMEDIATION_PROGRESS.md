@@ -14,19 +14,19 @@
 ## Current Session Snapshot
 
 
-- Active campaign mode: 4-agent cohort wave across victim, annual-report, audit, and SFS families, plus a county-pairs kickoff owned by the current agent
-- Latest coordination checkpoint: `2016_Motor_Vehicle_Annual_Report.pdf` has been visually validated and copied to `Complete/`, and the heading-family cleanup-chain fix is pushed; the current session is now starting the county-pairs cohort on top of the existing waves
-- Latest validation source: page-1 visual comparison for `2016_Motor_Vehicle_Annual_Report.pdf`, `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t "continues through the structural cleanup chain so chart-content repair stays reachable after early no-op steps"`, `pnpm --filter api exec tsc --noEmit`, and `pnpm --filter api verify:regressions`
-- Next action: run the first county-pairs remediation loops, group the shared blocker family, and see whether the pair cohort can generalize cleanly before widening it
-- Next hypothesis: the county-pairs cohort will likely share a compact metadata/heading/table tail on the first pass, with the paired `Adams/Alexander/Bond/Boone/Brown/Bureau` files revealing the most reusable next API fix
+- Active campaign mode: unattended orchestrator path aligned to `Complete/` with `>=95` acceptance and default concurrency `6`, alongside the live cohort-agent wave
+- Latest coordination checkpoint: the orchestrator policy now matches the campaign goal exactly: `Complete/` instead of `Mitigated/`, first validated `>=95` visual match is accepted immediately, bookmark/process cleanup can continue afterward, and the unattended queue target is now `6` active slots by default
+- Latest validation source: `pnpm --filter api exec vitest run src/__tests__/remediationOrchestrator.test.ts`, `pnpm --filter api exec tsc --noEmit`, and `pnpm verify:regressions`
+- Next action: use `pnpm orchestrator` as the ongoing unattended queue runner while the cohort agents keep surfacing reusable family fixes
+- Next hypothesis: keeping the unattended runner aligned with `Complete/` + `>=95` + visual fidelity will raise throughput immediately, while family-based API fixes from the agent lanes continue to improve the hit rate on future PDFs
 - API restart status: direct script-based reruns are using current source code for validation; API restart is still required before trusting queue-driven reruns
 - Build status: no rebuild required unless a fresh rerun still reflects stale behavior after restart
 ## Current Concurrency
 
 
-- Active parallel PDF jobs: 7 planned across the existing waves plus the county-pairs kickoff
-- CPU/memory notes: keep the broad wave cautious; county-pairs is starting as a diagnostic/remediation lane and may be split if it diverges
-- Last adjustment: raised effective concurrency from 4 to 7 for a second cohort wave on untouched PDF families, then added county-pairs as a separate kickoff lane
+- Active parallel PDF jobs: target `6` active unattended jobs by default, plus agent-owned cohort investigations when capacity allows
+- CPU/memory notes: prefer keeping the six unattended slots full; reduce below `6` only when CPU or memory pressure requires it
+- Last adjustment: changed the unattended orchestrator default from `4` to `6` and aligned closeout acceptance to `>=95` plus visual fidelity
 - In-flight PDFs before restart: `2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf`, `2022 Victim Needs Assessment-230306T13210736.pdf`, `2022 Victim Service Planning Research Report -230817T20035755.pdf`
 
 ## Agent Coordination
@@ -144,13 +144,13 @@
 ## Current Focus
 
 
-- Active PDF: `Adams-2.pdf`
-- Current phase: county-pairs cohort kickoff under the new `Complete/` and `>95` target
-- Immediate next step: run the first county-pairs remediation loop and identify the shared blocker family before widening the cohort
+- Active PDF: unattended queue mode plus active cohorts; no single file is the only focus now
+- Current phase: ongoing `Complete/` campaign automation under the new `>=95` closeout rule
+- Immediate next step: keep the unattended orchestrator feeding `Downloads/` into `Complete/` while the cohort lanes continue finding reusable fixes
 - API restart/rerun confirmed for active file: fresh direct script reruns are using current code; API restart is still required before trusting any queue result
 - Rebuild required for active file: no
 - Active remediation loop count: `Adams-2.pdf=0`
-- Next hypothesis: the county-pairs cohort should reveal a compact shared blocker family on the first pass, most likely a metadata/heading/table tail
+- Next hypothesis: the fastest path is to accept the first validated `>=95` visual match into `Complete/`, then let subsequent generic fixes raise the floor for the remaining PDFs instead of delaying closeout
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.
@@ -183,6 +183,9 @@
 
 ## Recent Events
 
+- 2026-03-23T00:09:00Z Unattended campaign runner policy hardening: aligned `apps/api/src/services/remediationOrchestrator.ts` with the live `Complete/` campaign by changing the final output directory from `Mitigated/` to `Complete/`, raising default unattended concurrency from `4` to `6`, and changing closeout acceptance from `100/A` to the first validated `>=95` visual match. Bookmark/process cleanup is now recorded for follow-up rather than blocking `Complete/` placement, which matches the campaign's efficiency-first rule. Added focused regression coverage in `src/__tests__/remediationOrchestrator.test.ts` and verified with `pnpm --filter api exec vitest run src/__tests__/remediationOrchestrator.test.ts`, `pnpm --filter api exec tsc --noEmit`, and `pnpm verify:regressions`.
+- 2026-03-22T23:58:00Z Annual-report heading-tail rerun sweep under the new shared heading-chain fix: `2007 Annual Report Final.pdf` completed at `74/C` on `MitigationAttempts/2007_Annual_Report_Final/attempt-007-heading-chain.pdf` with `32` Acrobat alt-risk nodes still present and `nonfigure_with_alt=0`; `2008 Annual Report.pdf` completed at `77/C` on `MitigationAttempts/2008_Annual_Report/attempt-006-heading-chain.pdf`; `2015_Motor_Vehicle_Annual_Report.pdf` completed at `100/A` on `MitigationAttempts/2015_Motor_Vehicle_Annual_Report/attempt-002-heading-chain.pdf`; and `2016_Motor_Vehicle_Annual_Report.pdf` remains a confirmed `100/A` candidate at `MitigationAttempts/2016_Motor_Vehicle_Annual_Report/attempt-001.pdf`. The new behavior clearly narrows the heading family on the MV siblings, but the annual pair still does not cross `90/100`, so the shared blocker remains a heading/content tail rather than a planning or link-family issue.
+- 2026-03-22T23:50:00Z Annual-report heading-chain rerun under the shared `f343d5a` fix: stale heading-tail files were rerun for `2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`, and the in-flight MV siblings in the `annual-reports-core` cohort. Fresh confirmed outcomes so far: `2015_Motor_Vehicle_Annual_Report.pdf` reached `100/A` on `MitigationAttempts/2015_Motor_Vehicle_Annual_Report/attempt-002-heading-chain.pdf`, and `2016_Motor_Vehicle_Annual_Report.pdf` remains a confirmed `100/A` candidate at `MitigationAttempts/2016_Motor_Vehicle_Annual_Report/attempt-001.pdf`. The annual-report pair still narrows under the new behavior but does not fully close yet: `2008 Annual Report.pdf` landed at `77/C` on `MitigationAttempts/2008_Annual_Report/attempt-006-heading-chain.pdf`, and `2007 Annual Report Final.pdf` is still in flight on `MitigationAttempts/2007_Annual_Report_Final/attempt-007-heading-chain.pdf` at checkpoint time. Current interpretation: the new heading-chain behavior clearly helps the MV siblings, but the shared annual-report family still has a stubborn `heading_content_quality` / `post_bootstrap_heading_convergence` tail on the long-report pair.
 - 2026-03-22T23:35:21Z Annual-report closeout: rendered and visually compared page 1 of `Downloads/2016_Motor_Vehicle_Annual_Report.pdf` and `MitigationAttempts/2016_Motor_Vehicle_Annual_Report/attempt-001.pdf`; the first page matches cleanly, so the passing `100/A` artifact has been copied to `Complete/2016_Motor_Vehicle_Annual_Report.pdf`.
 - 2026-03-22T23:39:00Z Heading-family cleanup-chain fix: updated `apps/api/src/services/agentRemediationService.ts` so the shared residual cleanup order for the structural/heading tail now includes `normalize_heading_hierarchy` and `create_heading_from_candidate` after `repair_bootstrapped_chart_content_refs`, instead of filtering the heading follow-through out of the family chain. Tightened `buildResidualCleanupFamilyCalls(...)` so residual cleanup is sorted by the family-chain order itself rather than preserving an older planner ordering that could pull heading normalization ahead of the structural steps or drop candidate heading creation behind the chain. Added a focused regression in `apps/api/src/__tests__/agentRemediationService.test.ts` proving the structural cleanup chain now continues through `artifact_nonsemantic_page_elements -> repair_native_marked_content_refs -> repair_bootstrapped_chart_content_refs -> normalize_heading_hierarchy -> create_heading_from_candidate -> repair_structure_conformance` when heading convergence remains active. Verification passed with `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts -t "continues through the structural cleanup chain so chart-content repair stays reachable after early no-op steps"`, `pnpm --filter api exec tsc --noEmit`, and `pnpm --filter api verify:regressions` (`0` Phase 0 baseline regressions / `0` canary regressions). Next step: rerun the strongest heading-tail canaries on the new behavior.
 - 2026-03-22T23:25:00Z Victim-family kickoff checkpoint: launched the `victim-dv-family` wave with four active lanes covering the 2016 victim needs closeout, the 2022 victim needs assessment, the 2022 victim service planning report, and the victim annual-report sibling set. The annual-report lane produced a clean `100/A` pass for `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`, which has already been copied to `Complete/` and visually checked against page 1 of the original. The 2022 victim needs assessment completed at `77/C`, and a live residual-family diagnosis on that run isolates `link_tabs_and_annotation_cleanup` as the top blocker family. Next step: let the running closeout and planning lanes finish, then decide whether the cohort needs one generic API fix for the shared link/heading tail or whether the files split into separate blockers.

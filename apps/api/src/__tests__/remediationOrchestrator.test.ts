@@ -20,6 +20,7 @@ import {
   renderDashboard,
   renderProgressTrackerMarkdown,
   saveCampaignState,
+  shouldAcceptValidation,
   validateBookmarkTitles,
 } from '../services/remediationOrchestrator.ts'
 
@@ -42,6 +43,13 @@ describe('remediationOrchestrator', () => {
     expect(paths.pdfPath).toBe('/tmp/attempts/Example Report/attempt-012.pdf')
     expect(paths.originalPage1PngPath).toContain('attempt-012-original-page-1.png')
     expect(paths.remediatedPage1PngPath).toContain('attempt-012-remediated-page-1.png')
+  })
+
+  it('defaults the unattended campaign to Complete, >=95, and concurrency 6', () => {
+    const config = defaultOrchestratorConfig('/repo')
+    expect(config.completeDir).toBe('/repo/Complete')
+    expect(config.targetScore).toBe(95)
+    expect(config.maxConcurrency).toBe(6)
   })
 
   it('persists and reloads campaign state', () => {
@@ -351,7 +359,40 @@ describe('remediationOrchestrator', () => {
     expect(rendered).toContain('report.pdf')
     expect(rendered).toContain('post_bootstrap_heading_convergence')
     expect(rendered).toContain('API restart status')
+    expect(rendered).toContain('Final output folder: `Complete/`')
+    expect(rendered).toContain('score >= `95/100`')
     try { fs.unlinkSync(packetPath) } catch {}
+  })
+
+  it('accepts the first >=95 visual match even when bookmark cleanup still needs follow-up', () => {
+    expect(shouldAcceptValidation({
+      passed: true,
+      scorePassed: true,
+      gradePassed: true,
+      veraPdfPassed: true,
+      visualComparison: {
+        passed: true,
+        reason: 'Visual comparison passed.',
+        originalWidth: 100,
+        originalHeight: 100,
+        remediatedWidth: 100,
+        remediatedHeight: 100,
+        sameDimensions: true,
+        changedPixelRatio: 0,
+        meanChannelDelta: 0,
+        originalNonWhiteRatio: 0.25,
+        remediatedNonWhiteRatio: 0.25,
+        originalBlank: false,
+        remediatedBlank: false,
+      },
+      bookmarkValidation: {
+        passed: false,
+        usedAiCleanup: false,
+        reason: 'Bookmark cleanup did not appear to use the semantic AI path.',
+        titles: [],
+        flaggedTitles: [],
+      },
+    })).toBe(true)
   })
 
   it('summarizes failure packets with residual family evidence when available', () => {

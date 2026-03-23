@@ -247,11 +247,12 @@ export interface OrchestratorConfig {
   repoRoot: string
   apiBaseUrl: string
   downloadsDir: string
-  mitigatedDir: string
+  completeDir: string
   attemptsRootDir: string
   stateFilePath: string
   progressTrackerPath: string
   maxConcurrency: number
+  targetScore: number
   cpuLoadThreshold: number
   memoryUsageThreshold: number
   page1RenderScale: number
@@ -280,11 +281,12 @@ export function defaultOrchestratorConfig(repoRoot = process.cwd()): Orchestrato
     repoRoot,
     apiBaseUrl: process.env.ORCHESTRATOR_API_BASE_URL || 'http://127.0.0.1:6103',
     downloadsDir: path.join(repoRoot, 'Downloads'),
-    mitigatedDir: path.join(repoRoot, 'Mitigated'),
+    completeDir: path.join(repoRoot, 'Complete'),
     attemptsRootDir: path.join(repoRoot, 'MitigationAttempts'),
     stateFilePath: path.join(repoRoot, 'MitigationAttempts', 'orchestrator-state.json'),
     progressTrackerPath: path.join(repoRoot, 'REMEDIATION_PROGRESS.md'),
-    maxConcurrency: Math.max(1, Number(process.env.ORCHESTRATOR_MAX_CONCURRENCY || 4)),
+    maxConcurrency: Math.max(1, Number(process.env.ORCHESTRATOR_MAX_CONCURRENCY || 6)),
+    targetScore: Math.max(1, Number(process.env.ORCHESTRATOR_TARGET_SCORE || 95)),
     cpuLoadThreshold: Math.max(0.1, Number(process.env.ORCHESTRATOR_CPU_LOAD_THRESHOLD || 0.85)),
     memoryUsageThreshold: Math.max(0.1, Number(process.env.ORCHESTRATOR_MEMORY_USAGE_THRESHOLD || 0.85)),
     page1RenderScale: Math.max(1, Number(process.env.ORCHESTRATOR_PAGE1_RENDER_SCALE || 1.5)),
@@ -979,11 +981,11 @@ export async function runValidationPipeline(
   const qpdf = await analyzeWithQpdf(rebuiltBuffer)
   const bookmarkValidation = validateBookmarkTitles(qpdf.outlineTitles || [], detail)
   const veraPdf = currentVeraPdfStatus(detail)
-  const scorePassed = detail.overallScore === 100
-  const gradePassed = detail.grade === 'A'
+  const scorePassed = (detail.overallScore || 0) >= config.targetScore
+  const gradePassed = detail.grade === 'A' || scorePassed
   const veraPdfPassed = true
   const validation: ValidationResult = {
-    passed: scorePassed && gradePassed && veraPdfPassed && visualComparison.passed && bookmarkValidation.passed,
+    passed: scorePassed && visualComparison.passed,
     scorePassed,
     gradePassed,
     veraPdfPassed,
@@ -1032,9 +1034,9 @@ export function shouldAcceptValidation(validation: ValidationResult): boolean {
   return validation.passed
 }
 
-export async function copyPassingOutputToMitigated(downloadedPdfPath: string, mitigatedDir: string, filename: string): Promise<string> {
-  await fs.promises.mkdir(mitigatedDir, { recursive: true })
-  const destination = path.join(mitigatedDir, filename)
+export async function copyPassingOutputToComplete(downloadedPdfPath: string, completeDir: string, filename: string): Promise<string> {
+  await fs.promises.mkdir(completeDir, { recursive: true })
+  const destination = path.join(completeDir, filename)
   await fs.promises.copyFile(downloadedPdfPath, destination)
   return destination
 }
@@ -1120,8 +1122,8 @@ export function renderProgressTrackerMarkdown(state: CampaignState, config: Orch
     .map(filePath => `\`${path.relative(config.repoRoot, filePath)}\``)
     .join(', ') || 'None'
   const resultSummary = completed.length
-    ? `${completed.length} file(s) fully mitigated; latest completed: ${completed.at(-1)?.filename || 'n/a'}`
-    : 'No files fully mitigated yet in this campaign state.'
+    ? `${completed.length} file(s) accepted into Complete/; latest completed: ${completed.at(-1)?.filename || 'n/a'}`
+    : 'No files accepted into Complete/ yet in this campaign state.'
   const lines: string[] = []
   lines.push('# Remediation Progress')
   lines.push('')
@@ -1130,16 +1132,17 @@ export function renderProgressTrackerMarkdown(state: CampaignState, config: Orch
   lines.push('- Status: In progress')
   lines.push(`- Branch: \`${readCurrentGitBranch(config.repoRoot)}\``)
   lines.push('- Input folder: `Downloads/`')
-  lines.push('- Final output folder: `Mitigated/`')
+  lines.push('- Final output folder: `Complete/`')
   lines.push('- Intermediate output folder: `MitigationAttempts/`')
   lines.push('- Mantra: ABI — Always Be Improving')
+  lines.push(`- Completion threshold: score >= \`${config.targetScore}/100\` plus visual page-1 fidelity`)
   lines.push('')
   lines.push('## Current Session Snapshot')
   lines.push('')
   lines.push(`- Active PDF: ${activeDisplay}`)
   lines.push(`- Latest attempt path: ${latestAttemptPaths}`)
   lines.push(`- Latest result summary: ${resultSummary}`)
-  lines.push(`- Latest validation source: ${completed.length ? 'Fresh API remediation plus visual compare' : 'Awaiting first passing validation in current campaign state'}`)
+  lines.push(`- Latest validation source: ${completed.length ? 'Fresh API remediation plus visual compare; bookmark/process improvements may continue after Complete placement' : 'Awaiting first passing validation in current campaign state'}`)
   lines.push(`- Next action: ${blocked.length > 0 ? 'Autofix the current blocker batch, restart API, and rerun affected PDFs' : active.length > 0 ? 'Let the active API batch finish and validate outputs' : 'Queue the next PDFs from Downloads through the API'}`)
   lines.push(`- Next hypothesis: ${blocked[0] ? trimForDisplay(blocked[0].latestBookmarkValidation?.reason || blocked[0].latestVisualComparison?.reason || 'Generic remediation gap needs a system fix', 160) : 'Keep improving shared remediation quality while preserving visual fidelity.'}`)
   lines.push(`- API restart status: ${state.lastApiRestartAt ? `Last restart recorded at ${state.lastApiRestartAt}` : 'No orchestrator-managed restart recorded yet'}`)
@@ -1156,7 +1159,7 @@ export function renderProgressTrackerMarkdown(state: CampaignState, config: Orch
   lines.push('')
   lines.push(`- Active PDF: ${activeDisplay}`)
   lines.push(`- Current phase: ${blocked.length > 0 ? 'Autofix / rerun loop' : active.length > 0 ? 'API remediation and validation' : 'Queue preparation'}`)
-  lines.push(`- Immediate next step: ${blocked.length > 0 ? 'Run Codex autofix on failure packets, then restart PM2 API and rerun' : active.length > 0 ? 'Validate the next completed outputs' : 'Upload the next eligible PDFs from Downloads'}`)
+  lines.push(`- Immediate next step: ${blocked.length > 0 ? 'Run Codex autofix on failure packets, then restart PM2 API and rerun' : active.length > 0 ? 'Validate the next completed outputs and move any >= target score matches into Complete immediately' : 'Upload the next eligible PDFs from Downloads'}`)
   lines.push(`- API restart/rerun confirmed for active file: ${state.lastApiRestartAt ? 'Yes' : 'No'}`)
   lines.push('- Rebuild required for active file: No')
   lines.push(`- Active remediation loop count: ${active.map(entry => `${entry.filename}=${entry.loopCount}`).join(', ') || 'None'}`)
@@ -1575,7 +1578,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
             latestVeraPdfStatus: currentVeraPdfStatus(await client.queueItemDetail(entry.queueItemId!)).status,
           }
           if (shouldAcceptValidation(outcome.validation)) {
-            await copyPassingOutputToMitigated(outcome.downloadedPdfPath, config.mitigatedDir, entry.filename)
+            await copyPassingOutputToComplete(outcome.downloadedPdfPath, config.completeDir, entry.filename)
             state.files[entry.filename] = {
               ...state.files[entry.filename],
               lifecycleState: 'done',
@@ -1583,7 +1586,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
               latestFailurePacketPath: null,
               lastUpdatedAt: nowIso(),
             }
-            state = appendEvent(state, `Moved to Mitigated: ${entry.filename}`)
+            state = appendEvent(state, `Moved to Complete: ${entry.filename}`)
           } else {
             state.files[entry.filename] = {
               ...state.files[entry.filename],
