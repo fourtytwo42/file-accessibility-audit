@@ -55,6 +55,8 @@
 - Shared fix candidate under validation:
   - deterministic figure alt text fallback when semantic generation returns an empty alt string
   - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant
+- Strict-gate complete:
+  - `Alexander-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 
 ## Pending Files
 
