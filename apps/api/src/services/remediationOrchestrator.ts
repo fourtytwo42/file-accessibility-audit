@@ -151,6 +151,9 @@ export interface ValidationResult {
   scorePassed: boolean
   gradePassed: boolean
   veraPdfPassed: boolean
+  blockingFailureModesClear: boolean
+  blockingResidualFamiliesClear: boolean
+  criticalManualReviewClear: boolean
   visualComparison: VisualComparisonResult
   bookmarkValidation: BookmarkValidationResult
 }
@@ -951,6 +954,18 @@ function currentVeraPdfStatus(detail: QueueItemDetail): { status: string | null;
   }
 }
 
+function currentBlockingFailureModes(detail: QueueItemDetail): QueueFailureModeSummary[] {
+  return (detail.standardsDetail?.failureModes || []).filter(mode => mode.blocking)
+}
+
+function currentBlockingResidualFamilies(detail: QueueItemDetail): PlannerResidualFamilySummary[] {
+  return (detail.standardsDetail?.plannerEvidence?.topResidualFamilySummaries || []).filter(family => family.blocking)
+}
+
+function hasCriticalManualReviewFlags(detail: QueueItemDetail): boolean {
+  return (detail.manualReviewFlags || []).some(flag => flag.severity === 'critical')
+}
+
 export async function runValidationPipeline(
   client: QueueApiClient,
   entry: TrackedPdfState,
@@ -981,14 +996,28 @@ export async function runValidationPipeline(
   const qpdf = await analyzeWithQpdf(rebuiltBuffer)
   const bookmarkValidation = validateBookmarkTitles(qpdf.outlineTitles || [], detail)
   const veraPdf = currentVeraPdfStatus(detail)
+  const blockingFailureModes = currentBlockingFailureModes(detail)
+  const blockingResidualFamilies = currentBlockingResidualFamilies(detail)
+  const criticalManualReviewClear = !hasCriticalManualReviewFlags(detail)
   const scorePassed = (detail.overallScore || 0) >= config.targetScore
-  const gradePassed = detail.grade === 'A' || scorePassed
-  const veraPdfPassed = true
+  const gradePassed = detail.grade === 'A'
+  const veraPdfPassed = veraPdf.status !== 'failed'
+  const blockingFailureModesClear = blockingFailureModes.length === 0
+  const blockingResidualFamiliesClear = blockingResidualFamilies.length === 0
   const validation: ValidationResult = {
-    passed: scorePassed && visualComparison.passed,
+    passed: scorePassed
+      && gradePassed
+      && veraPdfPassed
+      && blockingFailureModesClear
+      && blockingResidualFamiliesClear
+      && criticalManualReviewClear
+      && visualComparison.passed,
     scorePassed,
     gradePassed,
     veraPdfPassed,
+    blockingFailureModesClear,
+    blockingResidualFamiliesClear,
+    criticalManualReviewClear,
     visualComparison,
     bookmarkValidation,
   }
@@ -1135,14 +1164,14 @@ export function renderProgressTrackerMarkdown(state: CampaignState, config: Orch
   lines.push('- Final output folder: `Complete/`')
   lines.push('- Intermediate output folder: `MitigationAttempts/`')
   lines.push('- Mantra: ABI — Always Be Improving')
-  lines.push(`- Completion threshold: score >= \`${config.targetScore}/100\` plus visual page-1 fidelity`)
+    lines.push(`- Completion threshold: score >= \`${config.targetScore}/100\`, grade \`A\`, no blocking accessibility debt, no critical manual-review debt, and visual page-1 fidelity`)
   lines.push('')
   lines.push('## Current Session Snapshot')
   lines.push('')
   lines.push(`- Active PDF: ${activeDisplay}`)
   lines.push(`- Latest attempt path: ${latestAttemptPaths}`)
   lines.push(`- Latest result summary: ${resultSummary}`)
-  lines.push(`- Latest validation source: ${completed.length ? 'Fresh API remediation plus visual compare; bookmark/process improvements may continue after Complete placement' : 'Awaiting first passing validation in current campaign state'}`)
+  lines.push(`- Latest validation source: ${completed.length ? 'Fresh API remediation plus blocker-free accessibility validation plus visual compare; bookmark/process improvements may continue after Complete placement' : 'Awaiting first passing validation in current campaign state'}`)
   lines.push(`- Next action: ${blocked.length > 0 ? 'Autofix the current blocker batch, restart API, and rerun affected PDFs' : active.length > 0 ? 'Let the active API batch finish and validate outputs' : 'Queue the next PDFs from Downloads through the API'}`)
   lines.push(`- Next hypothesis: ${blocked[0] ? trimForDisplay(blocked[0].latestBookmarkValidation?.reason || blocked[0].latestVisualComparison?.reason || 'Generic remediation gap needs a system fix', 160) : 'Keep improving shared remediation quality while preserving visual fidelity.'}`)
   lines.push(`- API restart status: ${state.lastApiRestartAt ? `Last restart recorded at ${state.lastApiRestartAt}` : 'No orchestrator-managed restart recorded yet'}`)

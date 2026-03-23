@@ -360,16 +360,19 @@ describe('remediationOrchestrator', () => {
     expect(rendered).toContain('post_bootstrap_heading_convergence')
     expect(rendered).toContain('API restart status')
     expect(rendered).toContain('Final output folder: `Complete/`')
-    expect(rendered).toContain('score >= `95/100`')
+    expect(rendered).toContain('no blocking accessibility debt')
     try { fs.unlinkSync(packetPath) } catch {}
   })
 
-  it('accepts the first >=95 visual match even when bookmark cleanup still needs follow-up', () => {
+  it('accepts a blocker-free A-grade visual match even when bookmark cleanup still needs follow-up', () => {
     expect(shouldAcceptValidation({
       passed: true,
       scorePassed: true,
       gradePassed: true,
       veraPdfPassed: true,
+      blockingFailureModesClear: true,
+      blockingResidualFamiliesClear: true,
+      criticalManualReviewClear: true,
       visualComparison: {
         passed: true,
         reason: 'Visual comparison passed.',
@@ -393,6 +396,40 @@ describe('remediationOrchestrator', () => {
         flaggedTitles: [],
       },
     })).toBe(true)
+  })
+
+  it('rejects a high score visual match when blocking accessibility debt remains', () => {
+    expect(shouldAcceptValidation({
+      passed: false,
+      scorePassed: true,
+      gradePassed: true,
+      veraPdfPassed: true,
+      blockingFailureModesClear: false,
+      blockingResidualFamiliesClear: true,
+      criticalManualReviewClear: true,
+      visualComparison: {
+        passed: true,
+        reason: 'Visual comparison passed.',
+        originalWidth: 100,
+        originalHeight: 100,
+        remediatedWidth: 100,
+        remediatedHeight: 100,
+        sameDimensions: true,
+        changedPixelRatio: 0,
+        meanChannelDelta: 0,
+        originalNonWhiteRatio: 0.25,
+        remediatedNonWhiteRatio: 0.25,
+        originalBlank: false,
+        remediatedBlank: false,
+      },
+      bookmarkValidation: {
+        passed: true,
+        usedAiCleanup: true,
+        reason: 'Bookmark cleanup looked acceptable.',
+        titles: ['Executive Summary'],
+        flaggedTitles: [],
+      },
+    })).toBe(false)
   })
 
   it('summarizes failure packets with residual family evidence when available', () => {
