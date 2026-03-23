@@ -83,6 +83,8 @@
   - `Boone.pdf` reached `90/B` on `attempt-002.pdf`; it remains below the strict gate and stays in the county queue
 - County lane expansion:
   - `Brown-2.pdf` is now in remediation from the raw source and should stay with the same county-outline family until evidence says otherwise
+- Strict-gate complete:
+  - `Brown-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 - Shared fix candidate under validation:
   - deterministic figure alt text fallback when semantic generation returns an empty alt string
   - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant
