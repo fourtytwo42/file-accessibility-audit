@@ -839,7 +839,10 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
     && input.context.qpdf.structTreeDepth > 0
     && (input.context.structure.structuralNodes?.length || 0) > 0
   const longReportFigureCandidates = altTextNeedsReview
-    ? input.context.figureCandidates.filter(candidate => candidate.repairMode !== 'defer')
+    ? input.context.figureCandidates.filter(candidate =>
+        candidate.repairMode !== 'defer'
+        && (!candidate.hasAlt || !!candidate.hasLowQualityAlt),
+      )
     : []
   const longReportFigureFlood = longReportFigureCandidates.length > LONG_REPORT_FIGURE_LIMIT
   const hasCredibleDecorativeLongReportFigure = longReportFigureCandidates.some(candidate =>
@@ -886,19 +889,25 @@ function buildFailureModes(input: BuildFailureProfileInput): FailureMode[] {
   const blockedTables = tableNeedsReview
     ? input.context.tableCandidates.filter(candidate => candidate.repairMode !== 'safe')
     : []
-  if (blockedTables.length) {
+  const qpdfTableCount = input.context.qpdf.tables?.length ?? 0
+  const tableCandidateSurfaceMissing = tableNeedsReview && blockedTables.length === 0 && qpdfTableCount > 0
+  if (blockedTables.length || tableCandidateSurfaceMissing) {
     mergeMode(modes, {
       key: 'context.table_candidates_blocked',
       label: 'Table candidates need semantic or manual review',
       source: 'context',
-      derivedFrom: blockedTables.map(candidate => `table_candidate:${candidate.id}`),
-      count: blockedTables.length,
+      derivedFrom: tableCandidateSurfaceMissing
+        ? ['context:qpdf_table_surface_missing']
+        : blockedTables.map(candidate => `table_candidate:${candidate.id}`),
+      count: tableCandidateSurfaceMissing ? qpdfTableCount : blockedTables.length,
       categoryIds: ['table_markup'],
-      blocking: false,
+      blocking: tableCandidateSurfaceMissing,
       unmatched: false,
-      classification: 'semantic',
+      classification: tableCandidateSurfaceMissing ? 'deterministic' : 'semantic',
       nativeToolFamilies: ['set_table_header_cells'],
-      evidence: blockedTables.map(candidate => candidate.unsafeReason || candidate.ref).slice(0, 3),
+      evidence: tableCandidateSurfaceMissing
+        ? ['qpdf still reports tagged tables, but the structure snapshot did not surface table candidates for targeted repair.']
+        : blockedTables.map(candidate => candidate.unsafeReason || candidate.ref).slice(0, 3),
     })
   }
 
@@ -1237,6 +1246,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
   const hasNativeStructure = input.context.qpdf.hasStructTree
     && input.context.qpdf.structTreeDepth > 0
     && (input.context.structure.structuralNodes?.length || 0) > 0
+  const qpdfTableCount = input.context.qpdf.tables?.length ?? 0
   const currentLanguage = input.context.qpdf.lang || input.context.pdfjs.lang || ''
   const metadataDebtActive = failureModeByKey.has('pdfua.metadata_identification')
     || failureModeByKey.has('pdfua.document_language')
@@ -1376,6 +1386,23 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
       confidence: 0.58,
       blockedReason: undefined,
       derivedFromFailureModeKeys: derivedFailureKeys(['category.table_markup']),
+    })
+  }
+
+  if (issueIds.has('table_markup') && qpdfTableCount > 0) {
+    addOpportunity(opportunities, {
+      toolName: 'repair_native_table_headers',
+      reason: input.context.tableCandidates.length > 0
+        ? 'The document exposes table debt and qpdf still sees tables, so native table header repair remains available.'
+        : 'The document exposes table debt, but the backend structure snapshot did not surface table candidates; try native table header repair directly.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['table_markup'],
+      confidence: input.context.tableCandidates.length > 0 ? 0.58 : 0.5,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys(['category.table_markup', 'context.table_candidates_blocked', 'pdfua.table_regularity']),
     })
   }
 

@@ -423,6 +423,62 @@ describe('failureProfileService', () => {
     expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_table_headers')).toBe(true)
   })
 
+  it('surfaces document-level native table repair when qpdf sees tables but the structure snapshot does not', () => {
+    const baseAnalysis = makeAnalysisResult()
+    const analysis = makeAnalysisResult({
+      verapdf: {
+        ...baseAnalysis.verapdf,
+        status: 'unavailable',
+        executionStatus: 'missing_binary',
+        failedChecks: 0,
+        failures: [],
+      },
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.table_regularity',
+            label: 'Table regularity',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['table_markup', 'pdf_ua_compliance'],
+            confidence: 0.92,
+            evidence: ['Table 1 exposes irregular row column counts (6, 11, 11).'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+      categories: [
+        ...baseAnalysis.categories.filter(category => category.id !== 'table_markup'),
+        { id: 'table_markup', label: 'Table Markup', weight: 0.09, score: 40, grade: 'F', severity: 'Moderate', findings: ['Tagged tables still have irregular row/column structure'], explanation: '', helpLinks: [] },
+      ] as any,
+    })
+
+    const context = makeContext({
+      analysis,
+      tableCandidates: [],
+      qpdf: {
+        ...makeContext().qpdf,
+        tables: [
+          { hasHeaders: true, rowCellCounts: [6, 11, 11], dominantColumnCount: 11, isRegular: false },
+        ],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.failureModes.some(mode => mode.key === 'context.table_candidates_blocked' && mode.blocking)).toBe(true)
+    expect(result.failureProfile.toolOpportunities.some(opportunity => opportunity.toolName === 'repair_native_table_headers' && opportunity.scope === 'document')).toBe(true)
+  })
+
   it('maps alt-quality, heading-content, complex-table, and link-text findings into existing repair opportunities', () => {
     const baseAnalysis = makeAnalysisResult()
     const analysis = makeAnalysisResult({

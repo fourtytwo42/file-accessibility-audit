@@ -14,7 +14,7 @@
 
 - Active PDF: `2019 Illinois Methamphetamine Study-191218T21562198.pdf`, `Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf`, `Alternatives to Incarceration.pdf`, `An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf`
 - Latest attempt path: `MitigationAttempts/2019 Illinois Methamphetamine Study-191218T21562198/attempt-001.pdf`, `MitigationAttempts/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010/attempt-001.pdf`, `MitigationAttempts/Alternatives to Incarceration/attempt-001.pdf`, `MitigationAttempts/An Evaluation of Redeploy Illinois - St. Clair County and Peoria County/attempt-001.pdf`, `MitigationAttempts/An Evaluation of the Adams County SWAP/attempt-001.pdf`, `MitigationAttempts/An Evaluation of the IDOC Juvenile Sex Offender Treatment Program/attempt-001.pdf`
-- Latest result summary: 6 file(s) accepted into Complete/; latest completed: BARJ law enforcement.pdf
+- Latest result summary: 7 file(s) accepted into Complete/; latest completed: 2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf
 - Latest validation source: Fresh API remediation plus blocker-free accessibility validation plus visual compare; bookmark/process improvements may continue after Complete placement
 - Next action: Autofix the current blocker batch, restart API, and rerun affected PDFs
 - Next hypothesis: Bookmark cleanup did not appear to use the semantic AI path.
@@ -26,6 +26,13 @@
 - Owned PDFs: `2011 MV Annual Report.pdf`, `2012_MV_Annual_Report.pdf`, `2013_MV_Annual_Report.pdf`, `2014_MV_Annual_Report.pdf`, `2015_Motor_Vehicle_Annual_Report.pdf`, `2016_Motor_Vehicle_Annual_Report.pdf`, `2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`
 - Shared fix candidate under validation: safer heading target remapping that refuses container-only targets without a real text-bearing descendant
 - Shared fix candidate under validation: text-aware heading target selection now refuses structurally safe nodes that do not actually carry text, and `create_heading_tag` skips blank top-level heading candidates
+- Table-heavy split:
+  - `2007 Annual Report Final.pdf` and `2008 Annual Report.pdf` are now the active table-family branch
+  - shared hypothesis: table recovery needs a document-level bridge when qpdf reports tables but the structure snapshot does not surface candidate refs
+  - shared fix candidate under validation: table opportunity generation now promotes `repair_native_table_headers` when `table_markup` debt exists and qpdf still sees tables, even if the backend snapshot missed explicit table candidates
+- Strict-gate complete:
+  - `2011 MV Annual Report.pdf` reached `100/A` on `attempt-002-heading-chain.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+  - `2013_MV_Annual_Report.pdf` reached `100/A` on `attempt-002-heading-chain.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 - Latest reruns:
   - `2011 MV Annual Report.pdf` -> `MitigationAttempts/2011_MV_Annual_Report/attempt-002-heading-remap.pdf`
     - strict analysis: `89/B`
@@ -41,6 +48,13 @@
   - hypothesis: blank H1s were being promoted through structurally safe but textless heading targets
 - Strict complete in this cohort so far:
   - `2015_Motor_Vehicle_Annual_Report.pdf`
+  - `2011 MV Annual Report.pdf`
+  - `2013_MV_Annual_Report.pdf`
+- Latest annual split:
+  - `2014_MV_Annual_Report.pdf` still blocks on `pdfua.logical_structure` and `pdfua.heading_content_quality`
+  - `2007 Annual Report Final.pdf` and `2008 Annual Report.pdf` now split into the table-heavy tail with `table_markup` / `pdfua.table_regularity` plus heading debt
+  - shared reusable fix candidate under investigation: table structure recovery and table-to-heading credit handoff for annual report tails
+  - fresh rerun in flight: `2008 Annual Report.pdf` -> `MitigationAttempts/2008_Annual_Report/attempt-008-table-bridge.pdf`
 
 ## Current Concurrency
 
@@ -67,8 +81,8 @@
 - Status: remediation-active
 - Active lane hypothesis: the county batch is not bookmark-only; `replace_bookmarks_from_headings` can lift some files, but `alt_text` is still the remaining limiter on the current representative file
 - Current representative attempt chain: `MitigationAttempts/county-pairs/Adams-2/attempt-001.pdf` -> `attempt-002.pdf` -> `attempt-003.pdf` -> `attempt-004.pdf`
-- Representative result: `Adams-2.pdf` reached `90/B` on `attempt-003.pdf` and stayed at `90/B` on `attempt-004.pdf`
-- Representative blockers after remediation: `alt_text` remains at `40` while bookmarks/heading/reading-order/title-language are now passing
+- Representative result: `Adams-2.pdf` reached `96/B` on `attempt-006.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- Representative blockers after remediation: no blocking accessibility debt remains on the latest revalidation; the remaining difference is nonblocking score/grade debt
 - Next hypothesis: the county lane likely needs stronger semantic alt-text / figure cleanup, not another bookmark-only pass
 - Current in-flight pair:
   - `Alexander.pdf` reached `91/B` on `attempt-002.pdf` and is being pushed again from `attempt-003.pdf`
@@ -80,6 +94,8 @@
   - `Bond-2.pdf` is now in remediation from the raw source and should be treated as the next sibling in the county-outline family
 - County lane expansion:
   - `Boone.pdf` is now in remediation from the raw source and is being processed under the same county-outline family hypothesis
+- New county result:
+  - `Boone.pdf` reached `90/B` on `attempt-001.pdf`; the page-1 visual comparison passed, but it remains below the strict gate and stays in remediation
 - Strict-gate complete:
   - `Bond-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 - County lane expansion:
@@ -99,6 +115,38 @@
   - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant
 - Strict-gate complete:
   - `Alexander-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- Strict-gate complete:
+  - `Adams-2.pdf` reached `96/B` on `attempt-006.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- Strict-gate complete:
+  - `Alexander.pdf` reached `100/A` on `attempt-004.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- Strict-gate complete:
+  - `Alexander.pdf` reached `100/A` on `attempt-004.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+
+## Victim/DV Cohort
+
+- Cohort name: `victim-dv-family`
+- Reason grouped: victim services, DV reports, and annual-style long reports with repeated semantic cleanup patterns
+- Owned PDFs:
+  - `2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf`
+  - `2022 Victim Needs Assessment-230306T13210736.pdf`
+  - `2022 Victim Service Planning Research Report -230817T20035755.pdf`
+  - `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`
+  - `2024 Task Force on Missing and Murdered Chicago Women Annual Report_Final-250114T18393571.pdf`
+  - `2024_DVFRC_Annual_Report_4_15_f637ee1fcc_compressed-251217T14311834.pdf`
+  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf`
+- Status: remediation-active
+- Dominant subfamilies from the latest failure packets:
+  - `bookmark_language_outline_cleanup`
+  - `link_tabs_and_annotation_cleanup`
+  - `native_figure_convergence`
+- Strict-gate complete so far:
+  - `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf` -> `Complete/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`
+- Current active rerun:
+  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-002.pdf` (in flight; strict-gate revalidation using the current API)
+- Shared fix candidates under watch:
+  - stronger semantic bookmark synthesis fallback for long reports
+  - tighter link/annotation ownership repair
+  - native figure alt-text fallback and heading cleanup handoff
 
 ## Pending Files
 
@@ -130,7 +178,6 @@
 - 2022 SFS Process Evaluation Report-230622T16355531.pdf: state=needs_fix, score=67, grade=D, veraPDF=unavailable, attempt=1, loop=1
 - 2022 Victim Needs Assessment-230306T13210736.pdf: state=needs_fix, score=52, grade=F, veraPDF=unavailable, attempt=1, loop=1
 - 2022 Victim Service Planning Research Report -230817T20035755.pdf: state=needs_fix, score=52, grade=F, veraPDF=unavailable, attempt=1, loop=1
-- 2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf: state=needs_fix, score=70, grade=C, veraPDF=unavailable, attempt=1, loop=1
 - 2023 Deaths in Custody Annual Report-240216T22514713.pdf: state=needs_fix, score=70, grade=C, veraPDF=unavailable, attempt=1, loop=1
 - 2024 Task Force on Missing and Murdered Chicago Women Annual Report_Final-250114T18393571.pdf: state=needs_fix, score=52, grade=F, veraPDF=unavailable, attempt=1, loop=1
 - 2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf: state=needs_fix, score=68, grade=D, veraPDF=unavailable, attempt=1, loop=1
