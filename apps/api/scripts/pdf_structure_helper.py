@@ -22,7 +22,7 @@ HEADING_COMPAT_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Sect",
 FIGURE_COMPAT_TAGS = {"/Figure", "/P", "/Span", "/Div", "/NonStruct", "/Shape", "/InlineShape", "/Normal"}
 SAFE_FIGURE_RETAG_TAGS = {"/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Shape", "/InlineShape", "/Normal"}
 UNSAFE_FIGURE_ANCESTRY = {"/Table", "/TR", "/TH", "/TD", "/TOC", "/TOCI", "/Link", "/L", "/LI"}
-FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Story"}
+FIGURE_WRAP_TAGS = {"/LI", "/TH", "/TD", "/Sect", "/P", "/Span", "/Div", "/NonStruct", "/TextBox", "/Story"}
 LEGACY_HEADING_TAG_RE = re.compile(r"^/heading\s+(\d+)$", re.IGNORECASE)
 
 
@@ -720,14 +720,21 @@ def child_refs_and_tags(parent):
 
 def structural_nodes(pdf):
     nodes = []
+    page_usage_by_ref = {}
     for index, obj in enumerate(iter_struct_elems(pdf)):
         parent = obj.get("/P")
+        page_obj = page_ref_for_struct_elem(obj)
+        page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
+        mcids = normalized_struct_elem_mcids(obj)
+        usage = page_usage_by_ref.setdefault(page_ref, page_mcid_analysis(page_obj)) if page_ref and isinstance(page_obj, pikepdf.Dictionary) else {}
+        has_text = any(usage.get(mcid, {}).get("hasText") for mcid in mcids)
         nodes.append({
             "ref": ref_string(obj),
             "tag": str(obj.get("/S")),
             "parentRef": ref_string(parent) if isinstance(parent, pikepdf.Dictionary) else None,
             "orderIndex": index,
             "parentTagPath": parent_tag_path(obj),
+            "hasText": has_text,
         })
     return [node for node in nodes if node["ref"]]
 
@@ -906,7 +913,7 @@ def figure_candidates(pdf):
                 isinstance(k, pikepdf.Dictionary) and page_ref_for_struct_elem(k) is not None
                 for k in kid_list
             )
-            if not has_objr and not (has_struct_children and has_page_backed_child):
+            if not has_objr and not (has_struct_children and has_page_backed_child) and not has_descendant_page_backed_struct_content(obj):
                 continue
         page_obj = page_ref_for_struct_elem(obj)
         page_ref = ref_string(page_obj) if isinstance(page_obj, pikepdf.Dictionary) else None
@@ -959,6 +966,7 @@ def figure_candidates(pdf):
             "hasAlt": bool(alt_text),
             "altText": alt_text,
             "childFigureCount": count_descendant_figures(obj),
+            "hasPageBackedDescendantContent": has_descendant_page_backed_struct_content(obj),
             "parentTagPath": parent_tag_path(obj),
             "pageRef": page_ref,
             "mcids": mcids,
@@ -1390,6 +1398,8 @@ def acrobat_alt_risk_nodes(pdf):
         if entry["tag"] == "/Figure":
             continue
         if ownership_mode is None:
+            continue
+        if has_descendant_leaf_figure_with_alt(entry["obj"]):
             continue
         obj = entry.get("obj")
         has_alt = isinstance(obj, pikepdf.Dictionary) and obj.get("/Alt") is not None
@@ -1823,7 +1833,7 @@ def reading_order_parents(pdf):
 
 
 def mutate_create_heading_tag(pdf, mutation):
-    candidates = top_level_heading_candidates(pdf)
+    candidates = [candidate for candidate in top_level_heading_candidates(pdf) if str(candidate.get("text") or "").strip()]
     if not candidates:
         return False, [], ["No /P heading candidates were found in the structure tree."]
 
@@ -2381,6 +2391,31 @@ def has_descendant_leaf_figure_with_alt(node):
     elif isinstance(kids, pikepdf.Dictionary):
         return visit(kids)
     return False
+
+
+def has_descendant_page_backed_struct_content(node):
+    visited = set()
+
+    def visit(value, is_root=False):
+        if not isinstance(value, pikepdf.Dictionary):
+            return False
+        node_ref = ref_string(value)
+        if node_ref and node_ref in visited:
+            return False
+        if node_ref:
+            visited.add(node_ref)
+        if not is_root and page_ref_for_struct_elem(value) is not None:
+            return True
+        kids = value.get("/K")
+        if isinstance(kids, pikepdf.Array):
+            for child in kids:
+                if visit(child):
+                    return True
+        elif isinstance(kids, pikepdf.Dictionary):
+            return visit(kids)
+        return False
+
+    return visit(node, is_root=True)
 
 
 def ensure_page_content_struct_elem(pdf, document, page_obj):

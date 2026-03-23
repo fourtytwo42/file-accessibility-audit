@@ -138,7 +138,7 @@ export interface StructureBackendMutationResult {
   }>
   warnings: string[]
   headings: Array<{ ref: string; tag: string; parentRef?: string | null; text?: string | null }>
-  structuralNodes: Array<{ ref: string; tag: string; parentRef?: string | null; orderIndex: number; parentTagPath?: string[] }>
+  structuralNodes: Array<{ ref: string; tag: string; parentRef?: string | null; orderIndex: number; parentTagPath?: string[]; hasText?: boolean }>
   tables: Array<{
     ref: string
     firstRowCellRefs: string[]

@@ -25,6 +25,7 @@
 
 - Owned PDFs: `2011 MV Annual Report.pdf`, `2012_MV_Annual_Report.pdf`, `2013_MV_Annual_Report.pdf`, `2014_MV_Annual_Report.pdf`, `2015_Motor_Vehicle_Annual_Report.pdf`, `2016_Motor_Vehicle_Annual_Report.pdf`, `2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`
 - Shared fix candidate under validation: safer heading target remapping that refuses container-only targets without a real text-bearing descendant
+- Shared fix candidate under validation: text-aware heading target selection now refuses structurally safe nodes that do not actually carry text, and `create_heading_tag` skips blank top-level heading candidates
 - Latest reruns:
   - `2011 MV Annual Report.pdf` -> `MitigationAttempts/2011_MV_Annual_Report/attempt-002-heading-remap.pdf`
     - strict analysis: `89/B`
@@ -34,6 +35,10 @@
     - strict analysis: `70/C`
     - blocking local standards: `pdfua.logical_structure`, `pdfua.heading_content_quality`
     - visual page-1 compare: passed
+- In-flight rerun:
+  - `2011 MV Annual Report.pdf` -> `MitigationAttempts/2011_MV_Annual_Report/attempt-003-text-aware.pdf`
+  - `2014_MV_Annual_Report.pdf` -> `MitigationAttempts/2014_MV_Annual_Report/attempt-003-text-aware.pdf`
+  - hypothesis: blank H1s were being promoted through structurally safe but textless heading targets
 - Strict complete in this cohort so far:
   - `2015_Motor_Vehicle_Annual_Report.pdf`
 
@@ -85,6 +90,10 @@
   - `Brown-2.pdf` is now in remediation from the raw source and should stay with the same county-outline family until evidence says otherwise
 - Strict-gate complete:
   - `Brown-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- New county in-flight file:
+  - `Bureau-2.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
+- New county result:
+  - `Bureau.pdf` reached `96/B` on `attempt-002.pdf`; it is still below the strict gate and remains in the county queue
 - Shared fix candidate under validation:
   - deterministic figure alt text fallback when semantic generation returns an empty alt string
   - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant

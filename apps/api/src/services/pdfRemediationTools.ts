@@ -108,6 +108,10 @@ function isUnsafeHeadingTag(tag?: string | null): boolean {
   return !!tag && UNSAFE_HEADING_TAGS.includes(tag as (typeof UNSAFE_HEADING_TAGS)[number])
 }
 
+function isTextBearingHeadingTarget(node: { hasText?: boolean } | null | undefined): boolean {
+  return node?.hasText !== false
+}
+
 export function normalizedExistingHeadingLevel(tag?: string | null): string | null {
   if (!tag) return null
   if (/^\/?H[1-6]$/i.test(tag)) {
@@ -130,10 +134,10 @@ function remapHeadingTarget(
       .filter((node): node is NonNullable<typeof node> => !!node?.ref)
       .map(node => [node.ref as string, node]),
   )
-  if (isSafeHeadingTag(initial.tag) && initial.tag !== '/Sect' && initial.tag !== '/Story') return initial
+  if (isSafeHeadingTag(initial.tag) && initial.tag !== '/Sect' && initial.tag !== '/Story' && isTextBearingHeadingTarget(initial)) return initial
   if (initial.parentRef) {
     const parent = structuralByRef.get(initial.parentRef)
-    if (parent && isSafeHeadingTag(parent.tag) && parent.tag !== '/Sect' && parent.tag !== '/Story') {
+    if (parent && isSafeHeadingTag(parent.tag) && parent.tag !== '/Sect' && parent.tag !== '/Story' && isTextBearingHeadingTarget(parent)) {
       return parent
     }
   }
@@ -148,7 +152,7 @@ function remapHeadingTarget(
         if (candidate.orderIndex > initial.orderIndex + 12) break
         continue
       }
-      if (isSafeHeadingTag(candidate.tag)) return candidate
+      if (isSafeHeadingTag(candidate.tag) && isTextBearingHeadingTarget(candidate)) return candidate
       if (
         candidate.parentRef !== initial.ref
         && !candidate.parentTagPath?.includes('/Sect')
@@ -162,6 +166,7 @@ function remapHeadingTarget(
     if (
       next
       && isSafeHeadingTag(next.tag)
+      && isTextBearingHeadingTarget(next)
       && (
         next.parentRef === initial.parentRef
         || next.parentRef === initial.ref
@@ -172,6 +177,7 @@ function remapHeadingTarget(
     if (
       previous
       && isSafeHeadingTag(previous.tag)
+      && isTextBearingHeadingTarget(previous)
       && (
         previous.parentRef === initial.parentRef
         || previous.parentRef === initial.ref
@@ -212,6 +218,7 @@ export interface FigureCandidate {
   splitGenerated?: boolean
   splitSourceRef?: string | null
   splitSourceTag?: string | null
+  hasPageBackedDescendantContent?: boolean
 }
 
 function normalizeFigureAltQualityText(text: string | null | undefined): string {
@@ -269,8 +276,12 @@ function shouldEmitFigureCandidate(input: {
   hasLowQualityAlt?: boolean
   informativeHint: FigureCandidate['informativeHint']
   splitGenerated?: boolean
+  hasPageBackedDescendantContent?: boolean
 }): boolean {
   if (!input.hasAlt) return true
+  if (input.hasPageBackedDescendantContent) return true
+  if (input.splitGenerated) return true
+  if (input.hasLowQualityAlt) return true
   return false
 }
 
@@ -597,7 +608,10 @@ export function selectHighConfidenceLongReportFigureCandidates(
   options?: { maxCandidates?: number },
 ): FigureCandidate[] {
   return [...candidates]
-    .filter(candidate => candidate.repairMode !== 'defer')
+    .filter(candidate =>
+      candidate.repairMode !== 'defer'
+      && (!candidate.hasAlt || !!candidate.hasLowQualityAlt),
+    )
     .sort((a, b) => {
       const scoreDiff = longReportFigureCandidateScore(b) - longReportFigureCandidateScore(a)
       if (scoreDiff !== 0) return scoreDiff
@@ -782,11 +796,15 @@ function textNear(lines: RemediationPageFact['textLines'], index: number): strin
 
 export function needsAltTextDeepInspection(analysis: AnalysisResult): boolean {
   const altTextCategory = analysis.categories.find(category => category.id === 'alt_text')
+  const altTextNeedsReview = (altTextCategory?.score ?? 100) < 100
   const hasUntaggedImageFindings = (altTextCategory?.findings || []).some(finding =>
     /none have accessibility tags|not tagged as <figure>|not tagged as \/figure|images exist in the pdf but are not tagged|cannot identify them or read any alternative text/i.test(finding))
   const hasAcrobatAltRiskFindings = (altTextCategory?.findings || []).some(finding =>
     /acrobat.risk|acrobat-risk|other-elements alternate text|graphics content is still owned by non-\/figure|acrobat-style|non-figure.*graphics|graphics.*non-figure/i.test(finding))
-  if (hasAcrobatAltRiskFindings || hasUntaggedImageFindings) {
+  const hasGenericMissingAltFindings = (altTextCategory?.findings || []).some(finding =>
+    /missing alt text|have alternative text|image\(s\) are missing alt text|figure\(s\) have alt text/i.test(finding),
+  )
+  if (hasAcrobatAltRiskFindings || hasUntaggedImageFindings || (altTextNeedsReview && hasGenericMissingAltFindings)) {
     // Once scoring has already surfaced Acrobat-risk ownership findings, keep deep inspection
     // enabled for follow-up remediation rounds regardless of the current category score.
     // The same applies when analysis shows images exist but are not tagged as /Figure:
@@ -990,6 +1008,13 @@ function buildFigureCandidates(
         unsafeReason: `unsafe_ancestry: Target ${targetRef} is associated with ${unsafeTag ? targetTag : unsafeParent} and is not safe to retag as /Figure.`,
       }
     }
+    if (targetTag === '/Sect' && (imageEvidence === 'strong' || imageEvidence === 'vector')) {
+      return {
+        repairMode: 'retag_then_set_alt' as const,
+        targetTag,
+        parentTagPath,
+      }
+    }
     if (isTableCellWrapCandidate) {
       return {
         repairMode: 'retag_then_set_alt' as const,
@@ -1083,6 +1108,7 @@ function buildFigureCandidates(
       splitGenerated: !!figure.splitGenerated,
       splitSourceRef: figure.splitSourceRef || null,
       splitSourceTag: figure.splitSourceTag || null,
+      hasPageBackedDescendantContent: (figure as any).hasPageBackedDescendantContent,
     }
     })
     .filter(candidate => !isLikelyOcrPageBackdropCandidate({
@@ -1099,8 +1125,9 @@ function buildFigureCandidates(
       hasLowQualityAlt: candidate.hasLowQualityAlt,
       informativeHint: candidate.informativeHint,
       splitGenerated: candidate.splitGenerated,
+      hasPageBackedDescendantContent: candidate.hasPageBackedDescendantContent,
     }))
-  const explicitImageStructNodes = (structure.imageStructNodes || []).filter(node => !node.hasText).map((node, index) => {
+  const explicitImageStructNodes = (structure.imageStructNodes || []).map((node, index) => {
     const qpdfImage = qpdfImageByRef.get(node.ref)
     const page = imagePages[index] || pages[index] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
@@ -1130,6 +1157,10 @@ function buildFigureCandidates(
       textDensityHint,
       imageEvidence: evidence,
       containsText: !!node.hasText,
+      splitGenerated: !!(node as any).splitGenerated,
+      splitSourceRef: null,
+      splitSourceTag: null,
+      hasPageBackedDescendantContent: false,
     }
   })
     .filter(candidate => !isLikelyOcrPageBackdropCandidate({
@@ -1145,6 +1176,8 @@ function buildFigureCandidates(
       hasAlt: candidate.hasAlt,
       hasLowQualityAlt: candidate.hasLowQualityAlt,
       informativeHint: candidate.informativeHint,
+      splitGenerated: candidate.splitGenerated,
+      hasPageBackedDescendantContent: candidate.hasPageBackedDescendantContent,
     }))
   const explicitRefs = new Set([...explicitFigures, ...explicitImageStructNodes].map(candidate => candidate.targetRef).filter(Boolean))
   for (const ref of nestedFigureContainerRefs) explicitRefs.add(ref)

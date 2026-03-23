@@ -852,6 +852,15 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(target).toBeNull()
   })
 
+  it('skips structurally safe heading targets that do not actually carry text', () => {
+    const target = __test_remapHeadingTarget([
+      { ref: 'obj:40 0 R', tag: '/P', parentRef: 'obj:7 0 R', orderIndex: 0, parentTagPath: ['None'], hasText: false },
+      { ref: 'obj:41 0 R', tag: '/TextBox', parentRef: 'obj:7 0 R', orderIndex: 1, parentTagPath: ['None'], hasText: true },
+    ], 0)
+
+    expect(target?.ref).toBe('obj:41 0 R')
+  })
+
   it('remaps link-backed heading candidates to their safe parent text node', () => {
     const target = __test_remapHeadingTarget([
       { ref: 'obj:434 0 R', tag: '/Link', parentRef: 'obj:473 0 R', orderIndex: 19, parentTagPath: ['/P', '/Sect', '/Part', '/Document', 'None'] },
