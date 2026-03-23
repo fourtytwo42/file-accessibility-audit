@@ -51,10 +51,11 @@
   - `2011 MV Annual Report.pdf`
   - `2013_MV_Annual_Report.pdf`
 - Latest annual split:
-  - `2014_MV_Annual_Report.pdf` still blocks on `pdfua.logical_structure` and `pdfua.heading_content_quality`
-  - `2007 Annual Report Final.pdf` and `2008 Annual Report.pdf` now split into the table-heavy tail with `table_markup` / `pdfua.table_regularity` plus heading debt
+  - `2014_MV_Annual_Report.pdf` still blocks on `pdfua.logical_structure` and `pdfua.heading_content_quality` in `full_final` (`70/C`)
+  - `2007 Annual Report Final.pdf` is the table-backed branch: qpdf reports 5 tables, 5 table candidates are surfaced, and the blocker set is `context.table_candidates_blocked` + `pdfua.table_regularity` + `pdfua.logical_structure`
+  - `2007 Annual Report Final.pdf` rerun in flight: `MitigationAttempts/2007_Annual_Report_Final/attempt-008-table-bridge.pdf`
+  - `2008 Annual Report.pdf` remains the table-heavy branch under the new table bridge; fresh rerun in flight: `MitigationAttempts/2008_Annual_Report/attempt-008-table-bridge.pdf`
   - shared reusable fix candidate under investigation: table structure recovery and table-to-heading credit handoff for annual report tails
-  - fresh rerun in flight: `2008 Annual Report.pdf` -> `MitigationAttempts/2008_Annual_Report/attempt-008-table-bridge.pdf`
 
 ## Current Concurrency
 
@@ -96,6 +97,20 @@
   - `Boone.pdf` is now in remediation from the raw source and is being processed under the same county-outline family hypothesis
 - New county result:
   - `Boone.pdf` reached `90/B` on `attempt-001.pdf`; the page-1 visual comparison passed, but it remains below the strict gate and stays in remediation
+- County lane expansion:
+  - `Boone-2.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
+- Strict-gate complete:
+  - `Boone-2.pdf` reached `100/A` on `attempt-001.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- New county result:
+  - `Brown.pdf` reached `96/B` on `attempt-001.pdf`; the page-1 visual comparison passed, but it remains below the strict gate and stays in remediation
+- New county blocker:
+  - `Bureau.pdf` timed out during semantic remediation on `attempt-001.pdf`; keep it in the county-outline family and retry after the semantic provider stabilizes
+- County lane expansion:
+  - `Calhoun.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
+- New county blocker:
+  - `Calhoun.pdf` timed out during semantic remediation on `attempt-001.pdf`; keep it in the county-outline family and retry after the semantic provider stabilizes
+- County lane expansion:
+  - `Carroll.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
 - Strict-gate complete:
   - `Bond-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 - County lane expansion:
@@ -142,7 +157,10 @@
 - Strict-gate complete so far:
   - `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf` -> `Complete/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`
 - Current active rerun:
-  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-002.pdf` (in flight; strict-gate revalidation using the current API)
+  - `2022 Victim Service Planning Research Report -230817T20035755.pdf` -> `MitigationAttempts/victim-planning/2022 Victim Service Planning Research Report -230817T20035755/attempt-002-strict.pdf` (in flight; strict-gate revalidation using the current API)
+  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-002-strict.pdf` (now active as the next nearest victim-family candidate)
+- Latest settled after-state:
+  - `2022 Victim Service Planning Research Report -230817T20035755.pdf` -> `84/B` strict after-state in `MitigationAttempts/victim-planning/2022 Victim Service Planning Research Report -230817T20035755/attempt-002-strict.pdf`
 - Shared fix candidates under watch:
   - stronger semantic bookmark synthesis fallback for long reports
   - tighter link/annotation ownership repair
