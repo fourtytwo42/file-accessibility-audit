@@ -21,6 +21,22 @@
 - API restart status: No orchestrator-managed restart recorded yet
 - Build status: Restart preferred; rebuild only if stale behavior persists after restart
 
+## MV Annual Cohort
+
+- Owned PDFs: `2011 MV Annual Report.pdf`, `2012_MV_Annual_Report.pdf`, `2013_MV_Annual_Report.pdf`, `2014_MV_Annual_Report.pdf`, `2015_Motor_Vehicle_Annual_Report.pdf`, `2016_Motor_Vehicle_Annual_Report.pdf`, `2007 Annual Report Final.pdf`, `2008 Annual Report.pdf`
+- Shared fix candidate under validation: safer heading target remapping that refuses container-only targets without a real text-bearing descendant
+- Latest reruns:
+  - `2011 MV Annual Report.pdf` -> `MitigationAttempts/2011_MV_Annual_Report/attempt-002-heading-remap.pdf`
+    - strict analysis: `89/B`
+    - blocking local standards: `pdfua.heading_content_quality`
+    - visual page-1 compare: passed
+  - `2014_MV_Annual_Report.pdf` -> `MitigationAttempts/2014_MV_Annual_Report/attempt-002-heading-remap.pdf`
+    - strict analysis: `70/C`
+    - blocking local standards: `pdfua.logical_structure`, `pdfua.heading_content_quality`
+    - visual page-1 compare: passed
+- Strict complete in this cohort so far:
+  - `2015_Motor_Vehicle_Annual_Report.pdf`
+
 ## Current Concurrency
 
 - Active parallel PDF jobs: 6 active
@@ -53,6 +69,20 @@
   - `Alexander.pdf` reached `91/B` on `attempt-002.pdf` and is being pushed again from `attempt-003.pdf`
   - `Alexander-2.pdf` is in remediation from the raw source and is following the same county outline tail
   - `Bond.pdf` is now in remediation from the raw source and should follow the same county outline tail if it behaves similarly
+- New county result:
+  - `Bond.pdf` reached `90/B` on `attempt-002.pdf`; it is still below the strict gate and remains a shared county-outline tail case
+- New county in-flight file:
+  - `Bond-2.pdf` is now in remediation from the raw source and should be treated as the next sibling in the county-outline family
+- County lane expansion:
+  - `Boone.pdf` is now in remediation from the raw source and is being processed under the same county-outline family hypothesis
+- Strict-gate complete:
+  - `Bond-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
+- County lane expansion:
+  - `Brown.pdf` is now in remediation from the raw source and should continue the same county-outline family pattern unless it diverges
+- New county result:
+  - `Boone.pdf` reached `90/B` on `attempt-002.pdf`; it remains below the strict gate and stays in the county queue
+- County lane expansion:
+  - `Brown-2.pdf` is now in remediation from the raw source and should stay with the same county-outline family until evidence says otherwise
 - Shared fix candidate under validation:
   - deterministic figure alt text fallback when semantic generation returns an empty alt string
   - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant
