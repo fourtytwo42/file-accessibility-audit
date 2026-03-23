@@ -164,6 +164,7 @@ vi.mock('../services/remediationPlanService.js', () => ({
 vi.mock('../services/semanticEnrichmentService.js', () => ({
   generateSemanticRepairBatches,
   hasSemanticRepairConfig: () => true,
+  bookmarkTargets: (context: any) => context.headingCandidates || [],
 }))
 
 vi.mock('../services/ocrService.js', () => ({
@@ -4825,6 +4826,130 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           pageNumber: 6,
           targetRef: null,
         }],
+      },
+    })
+  })
+
+  it('falls back to deterministic bookmark synthesis when the semantic bookmark batch returns no usable titles', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 6,
+    }
+    const originalResult: AnalysisResult = {
+      filename: 'fallback-bookmarks.pdf',
+      pageCount: 6,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 0, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 88,
+      grade: 'B',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult(),
+      categories: [
+        { id: 'bookmarks', label: 'Bookmarks / Navigation', weight: 0.1, score: 0, grade: 'F', severity: 'Critical', findings: ['Missing bookmarks'], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Annual report', lang: 'en', pageCount: 6 },
+      qpdf: {
+        lang: 'en',
+        headings: [],
+        tables: [],
+        images: [],
+        formFields: [],
+        hasStructTree: true,
+        outlineCount: 0,
+        outlineTitles: [],
+        structTreeDepth: 2,
+      },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [
+        {
+          id: 'heading:1',
+          pageNumber: 1,
+          text: 'Introduction',
+          bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+          fontSize: 18,
+          fontWeight: 'bold',
+          nearbyContext: [],
+          targetRef: 'ref-1',
+          existingTag: null,
+          repairMode: 'safe',
+        },
+        {
+          id: 'heading:2',
+          pageNumber: 3,
+          text: 'Program overview',
+          bbox: { x: 0, y: 0, width: 1, height: 0.1 },
+          fontSize: 16,
+          fontWeight: 'bold',
+          nearbyContext: [],
+          targetRef: 'ref-2',
+          existingTag: null,
+          repairMode: 'safe',
+        },
+      ],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: [], actions: [] })
+    generateSemanticRepairBatches.mockResolvedValue({
+      batches: [{
+        batchType: 'bookmarks',
+        headings: [],
+        figures: [],
+        tables: [],
+        links: [],
+        bookmarks: [],
+      }],
+      reviewFlags: [],
+    })
+    executeRemediationTool.mockResolvedValue({
+      buffer: Buffer.from('bookmark-fixed'),
+      action: {
+        tool: 'replace_bookmarks_from_headings',
+        target: 'document',
+        details: 'Deterministic bookmark fallback',
+        confidence: 0.55,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: true,
+        categoryTargets: ['bookmarks'],
+        generationSource: 'manual_deferred',
+        outcome: 'applied',
+      },
+      manualReviewFlags: [],
+    })
+    analyzePDF.mockResolvedValue(originalResult)
+
+    await remediatePdfWithAgent(Buffer.from('pdf'), 'fallback-bookmarks.pdf', originalResult)
+
+    const bookmarkCall = executeRemediationTool.mock.calls
+      .map(call => call[0].call)
+      .find(call => call.tool_name === 'replace_bookmarks_from_headings' && Array.isArray(call.arguments?.headings))
+    expect(bookmarkCall).toMatchObject({
+      tool_name: 'replace_bookmarks_from_headings',
+      arguments: {
+        headings: [
+          { text: 'Introduction', level: 'H1', pageNumber: 1, targetRef: 'ref-1' },
+          { text: 'Program overview', level: 'H2', pageNumber: 3, targetRef: 'ref-2' },
+        ],
       },
     })
   })

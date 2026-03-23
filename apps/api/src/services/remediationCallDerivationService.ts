@@ -2,6 +2,7 @@ import type { AnalysisResult } from './pdfAnalyzer.js'
 import type { RemediationActionRecord, RemediationToolCall, ToolOpportunity } from './documentModel.js'
 import { normalizeLanguageTag } from './languageTags.js'
 import { hasSemanticRepairConfig } from './semanticEnrichmentService.js'
+import { bookmarkTargets } from './semanticEnrichmentService.js'
 import { normalizedExistingHeadingLevel, type PdfRemediationContext } from './pdfRemediationTools.js'
 import { draftFigureAltText } from './altTextDraftingService.js'
 
@@ -157,9 +158,21 @@ export function deriveDeterministicCall(input: {
       })
     }
     case 'replace_bookmarks_from_headings':
-      return withFamilyMetadata(context.headingCandidates.some(candidate => candidate.text.trim())
-        ? { tool_name: 'replace_bookmarks_from_headings', arguments: {}, rationale: opportunity.reason, confidence: opportunity.confidence }
-        : null)
+      return withFamilyMetadata({
+        tool_name: 'replace_bookmarks_from_headings',
+        arguments: {
+          headings: bookmarkTargets(context)
+            .map(candidate => ({
+              text: candidate.text,
+              level: candidate.pageNumber === 1 ? 'H1' : 'H2',
+              targetRef: candidate.targetRef || undefined,
+              pageNumber: candidate.pageNumber,
+            }))
+            .filter(entry => entry.text && (entry.targetRef || Number.isFinite(entry.pageNumber))),
+        },
+        rationale: opportunity.reason,
+        confidence: opportunity.confidence,
+      })
     case 'normalize_heading_hierarchy':
       return withFamilyMetadata({
         tool_name: 'normalize_heading_hierarchy',

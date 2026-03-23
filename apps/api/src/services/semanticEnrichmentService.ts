@@ -614,7 +614,7 @@ function chooseBookmarkSeedText(candidateText: string, outlineTitle?: string): s
     : candidateNormalized
 }
 
-function bookmarkTargets(context: PdfRemediationContext): HeadingCandidate[] {
+export function bookmarkTargets(context: PdfRemediationContext): HeadingCandidate[] {
   const outlineTitles = (context.qpdf.outlineTitles || [])
     .map(title => decodeOutlineTitleForPrompt(String(title || '')))
     .filter(Boolean)

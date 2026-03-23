@@ -35,7 +35,7 @@ import {
 } from './pdfRemediationTools.js'
 import { buildFailureProfileArtifacts } from './failureProfileService.js'
 import { planRemediationActions, TOOL_STAGE_ORDER } from './remediationPlanService.js'
-import { generateSemanticRepairBatches, hasSemanticRepairConfig, type SemanticBatchResult } from './semanticEnrichmentService.js'
+import { bookmarkTargets, generateSemanticRepairBatches, hasSemanticRepairConfig, type SemanticBatchResult } from './semanticEnrichmentService.js'
 import { isOcrAvailable, ocrPdfToSearchablePdf } from './ocrService.js'
 import {
   runPdfStructureBackendBatch,
@@ -1536,10 +1536,12 @@ async function runSemanticEnrichmentStage(input: {
     family.semanticPolicy === 'optional_after_deterministic' && family.blocking,
   )
   const implicitAiFigureWork = aiFirstFigureCandidates(input.context).length > 0
+  const implicitBookmarkWork = bookmarkTargets(input.context).length > 0
   if (
     optionalSemanticFamilies.length > 0
     && !semanticSidecarEligibleFamilies(semanticArtifacts.failureProfile).length
     && !implicitAiFigureWork
+    && !implicitBookmarkWork
   ) {
     return { buffer: input.buffer, result: input.result, actions: [], manualReviewFlags: [], usedInheritedVeraPdf: false }
   }
@@ -1949,14 +1951,23 @@ async function runSemanticEnrichmentStage(input: {
           }
         })
         .filter(Boolean)
-      const key = `replace_bookmarks_from_headings:${headings.length}`
-      if (!headings.length || input.previousActionNames.includes(key)) {
+      const fallbackHeadings = bookmarkTargets(context)
+        .map(candidate => ({
+          text: candidate.text,
+          level: candidate.pageNumber === 1 ? 'H1' as const : 'H2' as const,
+          targetRef: candidate.targetRef || undefined,
+          pageNumber: candidate.pageNumber,
+        }))
+      const selectedHeadings = headings.length ? headings : fallbackHeadings
+      const key = 'replace_bookmarks_from_headings:document'
+      const proposalConfidence = batch.bookmarks.length ? Math.max(...batch.bookmarks.map(entry => entry.confidence)) : 0.55
+      if (!selectedHeadings.length || input.previousActionNames.includes(key)) {
         deferredActions.push(semanticDeferredAction({
           tool: 'replace_bookmarks_from_headings',
           target: 'document',
           candidateId: 'document',
-          confidence: headings.length ? batch.bookmarks[0]?.confidence || 0 : 0,
-          details: 'AI bookmark proposal did not produce enough confident bookmark titles.',
+          confidence: batch.bookmarks.length ? proposalConfidence : 0,
+          details: 'Bookmark proposal did not produce usable bookmark titles.',
           categoryTargets: ['bookmarks'],
         }))
       } else {
@@ -1965,9 +1976,11 @@ async function runSemanticEnrichmentStage(input: {
           categoryTargets: ['bookmarks'],
           call: {
             tool_name: 'replace_bookmarks_from_headings',
-            arguments: { headings },
-            rationale: `AI bookmark cleanup (${headings.length} entries): replace noisy bookmark titles with concise semantic labels.`,
-            confidence: Math.min(0.98, Math.max(...batch.bookmarks.map(entry => entry.confidence))),
+            arguments: { headings: selectedHeadings },
+            rationale: headings.length
+              ? `AI bookmark cleanup (${selectedHeadings.length} entries): replace noisy bookmark titles with concise semantic labels.`
+              : `Deterministic bookmark cleanup (${selectedHeadings.length} entries): synthesize bookmarks from cleaned heading targets.`,
+            confidence: headings.length ? Math.min(0.98, proposalConfidence) : 0.55,
             familyId: 'bookmark_language_outline_cleanup',
             expectedPostconditions: ['bookmark_blocking_keys_shrink', 'bookmark_score_improves'],
           },

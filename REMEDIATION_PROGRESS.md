@@ -8,14 +8,14 @@
 - Final output folder: `Complete/`
 - Intermediate output folder: `MitigationAttempts/`
 - Mantra: ABI — Always Be Improving
-- Completion threshold: score >= `95/100` plus visual page-1 fidelity
+- Completion threshold: score >= `95/100`, grade `A`, no blocking accessibility debt, no critical manual-review debt, and visual page-1 fidelity
 
 ## Current Session Snapshot
 
 - Active PDF: `2019 Illinois Methamphetamine Study-191218T21562198.pdf`, `Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf`, `Alternatives to Incarceration.pdf`, `An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf`
 - Latest attempt path: `MitigationAttempts/2019 Illinois Methamphetamine Study-191218T21562198/attempt-001.pdf`, `MitigationAttempts/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010/attempt-001.pdf`, `MitigationAttempts/Alternatives to Incarceration/attempt-001.pdf`, `MitigationAttempts/An Evaluation of Redeploy Illinois - St. Clair County and Peoria County/attempt-001.pdf`, `MitigationAttempts/An Evaluation of the Adams County SWAP/attempt-001.pdf`, `MitigationAttempts/An Evaluation of the IDOC Juvenile Sex Offender Treatment Program/attempt-001.pdf`
-- Latest result summary: 4 file(s) accepted into Complete/; latest completed: ADAM2.pdf
-- Latest validation source: Fresh API remediation plus visual compare; bookmark/process improvements may continue after Complete placement
+- Latest result summary: 6 file(s) accepted into Complete/; latest completed: BARJ law enforcement.pdf
+- Latest validation source: Fresh API remediation plus blocker-free accessibility validation plus visual compare; bookmark/process improvements may continue after Complete placement
 - Next action: Autofix the current blocker batch, restart API, and rerun affected PDFs
 - Next hypothesis: Bookmark cleanup did not appear to use the semantic AI path.
 - API restart status: No orchestrator-managed restart recorded yet
@@ -24,7 +24,7 @@
 ## Current Concurrency
 
 - Active parallel PDF jobs: 6 active
-- CPU/memory notes: load 26%, memory 61%
+- CPU/memory notes: load 0%, memory 40%
 - Last adjustment: current cap 6
 - In-flight PDFs before restart: `2019 Illinois Methamphetamine Study-191218T21562198.pdf`, `Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf`, `Alternatives to Incarceration.pdf`, `An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf`
 
@@ -93,12 +93,13 @@
 
 - 2012_MV_Annual_Report.pdf: state=done, score=95, grade=B, veraPDF=unavailable, attempt=1, loop=1
 - 2015_Motor_Vehicle_Annual_Report.pdf: state=done, score=100, grade=A, veraPDF=unavailable, attempt=1, loop=1
+- 2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf: state=done, score=100, grade=A, veraPDF=unavailable, attempt=2, loop=2
 - ADAM1.pdf: state=done, score=100, grade=A, veraPDF=unavailable, attempt=1, loop=1
 - ADAM2.pdf: state=done, score=100, grade=A, veraPDF=unavailable, attempt=1, loop=1
+- BARJ law enforcement.pdf: state=done, score=100, grade=A, veraPDF=unavailable, attempt=3, loop=3
 
 ## Recent Events
 
-- 2026-03-23T01:56:39.497Z Upload started: age2.pdf
 - 2026-03-23T01:56:42.482Z Needs fix: 2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf: Acrobat-style other-elements alternate text | score 68 | grade D
 - 2026-03-23T01:57:44.138Z Upload started: Alexander-2.pdf
 - 2026-03-23T01:57:44.676Z Needs fix: Adams-2.pdf: Logical structure and marked content | score 69 | grade D
@@ -113,6 +114,7 @@
 - 2026-03-23T02:07:34.045Z Upload started: An Evaluation of the IDOC Juvenile Sex Offender Treatment Program.pdf
 - 2026-03-23T02:07:39.718Z Needs fix: A Crime Analysts Guide to Mapping.pdf: Figure candidates need semantic or manual review | score 60 | grade D
 - 2026-03-23T02:07:45.247Z API session renewed for client 63738b31-dad2-4468-ada1-85f2a71fa08d
+- 2026-03-23T02:08:11.558Z API session ready for client 63738b31-dad2-4468-ada1-85f2a71fa08d
 
 ## Notes
 
