@@ -111,6 +111,10 @@
   - `Calhoun.pdf` timed out during semantic remediation on `attempt-001.pdf`; keep it in the county-outline family and retry after the semantic provider stabilizes
 - County lane expansion:
   - `Carroll.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
+- New county blocker:
+  - `Carroll.pdf` timed out during semantic remediation on `attempt-001.pdf`; keep it in the county-outline family and retry after the semantic provider stabilizes
+- County lane expansion:
+  - `Carroll-2.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
 - Strict-gate complete:
   - `Bond-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 - County lane expansion:
