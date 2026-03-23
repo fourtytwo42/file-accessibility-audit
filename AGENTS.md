@@ -67,8 +67,15 @@ This repository supports a long-running remediation workflow over PDFs stored in
   - one agent owns one PDF or one coherent cohort of similar PDFs
   - the coordinating agent owns cross-file integration and final reruns
 - Preferred campaign mode:
-  - keep 6 active agent lanes running whenever practical
+  - keep 1 unattended orchestrator process plus 5 active agent lanes running whenever practical
+  - the orchestrator owns continuous queue processing through `Downloads/`
+  - the 5 agent lanes own continual cohort processing and shared-fix discovery
   - group PDFs by creator, organization, publication time, or shared remediation path so one fix can unlock a whole set efficiently
+- Continual lane rule:
+  - an agent lane should keep moving through its owned cohort without waiting for a new per-file prompt
+  - after a passing `Complete/` closeout, continue immediately to the next similar PDF in the same cohort
+  - after a stalled or blocked file, record the blocker and continue to the next similar file or the next best matching cohort
+  - only stop the lane when explicitly interrupted or when no similar eligible work remains
 - Before spawning or reusing an agent:
   - check `REMEDIATION_PROGRESS.md`
   - claim the PDF and write scope there first
