@@ -172,7 +172,7 @@
   - `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf` -> `Complete/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`
 - Current active rerun:
   - `2022 Victim Service Planning Research Report -230817T20035755.pdf` -> `MitigationAttempts/victim-planning/2022 Victim Service Planning Research Report -230817T20035755/attempt-002-strict.pdf` (in flight; strict-gate revalidation using the current API)
-  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-003-strict.pdf` (now active after the semantic-timeout resilience fix)
+  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-004-strict.pdf` (now active after the semantic-timeout + 5xx resilience fixes)
 - Latest settled after-state:
   - `2022 Victim Service Planning Research Report -230817T20035755.pdf` -> `84/B` strict after-state in `MitigationAttempts/victim-planning/2022 Victim Service Planning Research Report -230817T20035755/attempt-002-strict.pdf`
 - Shared fix candidates under watch:

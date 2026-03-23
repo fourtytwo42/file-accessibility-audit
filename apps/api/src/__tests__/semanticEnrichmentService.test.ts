@@ -1039,6 +1039,34 @@ describe('semanticEnrichmentService', () => {
     expect(generated.reviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
   })
 
+  it('treats semantic provider 5xx errors as a recoverable skipped sidecar', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: false,
+      status: 502,
+      text: async () => 'bad gateway',
+    })) as any)
+
+    const generated = await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        headingCandidates: [makeContext().headingCandidates[0]],
+        figureCandidates: [],
+        tableCandidates: [],
+        linkCandidates: [],
+      },
+    })
+
+    expect(generated.batches).toHaveLength(0)
+    expect(generated.reviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+    expect(generated.reviewFlags.some(flag => /semantic provider unavailable/i.test(flag.details))).toBe(true)
+  })
+
   it('times out hung semantic provider requests instead of waiting indefinitely', async () => {
     vi.useFakeTimers()
     process.env.SEMANTIC_REQUEST_TIMEOUT_MS = '5'
@@ -1064,9 +1092,11 @@ describe('semanticEnrichmentService', () => {
       },
     })
 
-    const rejection = expect(promise).rejects.toThrow(/semantic provider request timed out/i)
     await vi.advanceTimersByTimeAsync(10)
-    await rejection
+    const generated = await promise
+    expect(generated.batches).toHaveLength(0)
+    expect(generated.reviewFlags.some(flag => flag.code === 'semantic_enrichment_skipped')).toBe(true)
+    expect(generated.reviewFlags.some(flag => /semantic provider unavailable/i.test(flag.details))).toBe(true)
     delete process.env.SEMANTIC_REQUEST_TIMEOUT_MS
     vi.useRealTimers()
   })

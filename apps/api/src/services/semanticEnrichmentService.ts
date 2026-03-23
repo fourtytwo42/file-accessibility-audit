@@ -417,6 +417,14 @@ function isSemanticPayloadTooLargeError(error: unknown): boolean {
   return /context_length_exceeded|length limit exceeded|request too large|payload too large|semantic repair request failed:\s*413/i.test(message)
 }
 
+function isSemanticProviderUnavailableError(error: unknown): boolean {
+  if (error instanceof SemanticRepairRequestError) {
+    return error.statusCode >= 500
+  }
+  const message = error instanceof Error ? error.message : String(error || '')
+  return /\b50[0-9]\b|fetch failed|networkerror|econnreset|econnrefused|etimedout|timeout|timed out|socket hang up/i.test(message)
+}
+
 function normalizeBatchResult(
   batchType: SemanticBatchResult['batchType'],
   payload: any,
@@ -970,6 +978,12 @@ async function resolveBatchWithFallbacks(input: {
     }
   } catch (error) {
     if (!isSemanticPayloadTooLargeError(error)) {
+      if (isSemanticProviderUnavailableError(error)) {
+        return {
+          results: [],
+          reviewFlags: [skippedSemanticFlag(input.batch, `semantic provider unavailable: ${error instanceof Error ? error.message : String(error || 'unknown')}`)],
+        }
+      }
       throw error
     }
 
