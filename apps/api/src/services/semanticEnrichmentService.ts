@@ -1,6 +1,7 @@
 import { cropDataUrlRegion, renderPdfPageToDataUrl } from './pdfRenderService.js'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import type { ModelReviewFlag } from './documentModel.js'
+import { draftFigureAltText } from './altTextDraftingService.js'
 import type {
   FigureCandidate,
   HeadingCandidate,
@@ -420,6 +421,7 @@ function normalizeBatchResult(
   batchType: SemanticBatchResult['batchType'],
   payload: any,
   allowedIds: Set<string>,
+  figureTargetsById: Map<string, SemanticFigureTarget> = new Map(),
   bookmarkTargetsById: Map<string, { pageNumber: number; targetRef?: string | null }> = new Map(),
 ): SemanticBatchResult {
   const headings = Array.isArray(payload?.headings)
@@ -432,16 +434,34 @@ function normalizeBatchResult(
         rationale: sanitizeText(entry.rationale, MAX_TEXT),
       }))
     : []
-  const figures = Array.isArray(payload?.figures)
-    ? payload.figures
-      .filter((entry: any) => allowedIds.has(String(entry?.candidateId || '')))
-      .map((entry: any) => ({
-        candidateId: String(entry.candidateId),
-        decorative: Boolean(entry.decorative),
-        altText: sanitizeText(entry.altText, MAX_ALT_TEXT),
-        confidence: clampConfidence(entry.confidence),
-        rationale: sanitizeText(entry.rationale, MAX_TEXT),
-      }))
+  const figurePayloadById = new Map(
+    Array.isArray(payload?.figures)
+      ? payload.figures
+        .filter((entry: any) => allowedIds.has(String(entry?.candidateId || '')))
+        .map((entry: any) => [String(entry.candidateId), entry] as const)
+      : [],
+  )
+  const figures = figureTargetsById.size
+    ? [...figureTargetsById.values()].map(target => {
+        const entry = figurePayloadById.get(target.candidateId) as any
+        const decorative = entry ? Boolean(entry.decorative) : false
+        const altText = (() => {
+          const candidateAlt = sanitizeText(entry?.altText, MAX_ALT_TEXT)
+          if (decorative || candidateAlt) return candidateAlt
+          return draftFigureAltText({
+            pageNumber: target.pageNumber,
+            surroundingText: target.surroundingText,
+            decorative,
+          })
+        })()
+        return {
+          candidateId: target.candidateId,
+          decorative,
+          altText,
+          confidence: clampConfidence(entry?.confidence ?? 0.8),
+          rationale: sanitizeText(entry?.rationale || (entry ? '' : 'Semantic model returned no figure proposal; using deterministic fallback alt text.'), MAX_TEXT),
+        }
+      })
     : []
   const tables = Array.isArray(payload?.tables)
     ? payload.tables
@@ -884,6 +904,7 @@ async function resolveBatchWithFallbacks(input: {
   stripImages?: boolean
 }): Promise<{ results: SemanticBatchResult[]; reviewFlags: ModelReviewFlag[] }> {
   const prepared = await buildBatchInputs(input.batch, input.stripImages ? new Map() : input.pageImages)
+  const figureTargetsById = new Map(prepared.figures.map(item => [item.candidateId, item]))
   const estimatedSize = estimateBatchSize({
     document: input.document,
     batchType: input.batch.batchType,
@@ -944,7 +965,7 @@ async function resolveBatchWithFallbacks(input: {
       }),
     }])
     return {
-      results: [normalizeBatchResult(input.batch.batchType, payload, prepared.allowedIds, bookmarkTargetsById)],
+      results: [normalizeBatchResult(input.batch.batchType, payload, prepared.allowedIds, figureTargetsById, bookmarkTargetsById)],
       reviewFlags: [],
     }
   } catch (error) {

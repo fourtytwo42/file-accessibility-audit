@@ -38,6 +38,24 @@
 - Active remediation loop count: 2019 Illinois Methamphetamine Study-191218T21562198.pdf=1, Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf=1, Alternatives to Incarceration.pdf=1, An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf=1, An Evaluation of the Adams County SWAP.pdf=1, An Evaluation of the IDOC Juvenile Sex Offender Treatment Program.pdf=1
 - Next hypothesis: 2001-2020 SFS Full Year End Report-220520T19141184.pdf: Logical structure and marked content | score 65 | grade D
 
+## County Outline Lane
+
+- Cohort name: `county-outline-family`
+- Reason grouped: county / outline-heavy reports with shared navigation and semantic cleanup behavior
+- Member PDFs: `Adams-2.pdf`, `Alexander.pdf`, `Alexander-2.pdf`, `Bond.pdf`, `Bond-2.pdf`, `Boone.pdf`, `Boone-2.pdf`, `Brown.pdf`, `Brown-2.pdf`, `Bureau.pdf`, `Bureau-2.pdf`
+- Status: remediation-active
+- Active lane hypothesis: the county batch is not bookmark-only; `replace_bookmarks_from_headings` can lift some files, but `alt_text` is still the remaining limiter on the current representative file
+- Current representative attempt chain: `MitigationAttempts/county-pairs/Adams-2/attempt-001.pdf` -> `attempt-002.pdf` -> `attempt-003.pdf` -> `attempt-004.pdf`
+- Representative result: `Adams-2.pdf` reached `90/B` on `attempt-003.pdf` and stayed at `90/B` on `attempt-004.pdf`
+- Representative blockers after remediation: `alt_text` remains at `40` while bookmarks/heading/reading-order/title-language are now passing
+- Next hypothesis: the county lane likely needs stronger semantic alt-text / figure cleanup, not another bookmark-only pass
+- Current in-flight pair:
+  - `Alexander.pdf` reached `91/B` on `attempt-002.pdf` and is being pushed again from `attempt-003.pdf`
+  - `Alexander-2.pdf` is in remediation from the raw source and is following the same county outline tail
+- Shared fix candidate under validation:
+  - deterministic figure alt text fallback when semantic generation returns an empty alt string
+  - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant
+
 ## Pending Files
 
 - Default order: alphabetical unless reprioritized here.

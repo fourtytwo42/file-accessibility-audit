@@ -179,7 +179,9 @@ function remapHeadingTarget(
       )
     ) return previous
   }
-  return initial.tag === '/Sect' || initial.tag === '/Story' ? initial : null
+  // Container nodes can be traversed for safe descendants, but they should not be
+  // promoted directly to headings if we could not find a real text-bearing target.
+  return null
 }
 
 export const __test_remapHeadingTarget = remapHeadingTarget

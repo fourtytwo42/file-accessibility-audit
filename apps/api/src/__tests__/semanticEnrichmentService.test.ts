@@ -398,6 +398,50 @@ describe('semanticEnrichmentService', () => {
     )
   })
 
+  it('falls back to deterministic figure alt text when the model returns an empty alt string', async () => {
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        choices: [{
+          message: {
+            tool_calls: [{
+              function: {
+                name: 'propose_semantic_repairs',
+                arguments: JSON.stringify({
+                  figures: [
+                    { candidateId: 'figure:1', decorative: false, altText: '', confidence: 0.91, rationale: 'Image is meaningful but the model did not describe it.' },
+                  ],
+                }),
+              },
+            }],
+          },
+        }],
+      }),
+    })) as any)
+
+    const generated = await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        headingCandidates: [],
+        tableCandidates: [],
+        linkCandidates: [],
+      },
+    })
+
+    expect(generated.batches).toHaveLength(1)
+    expect(generated.batches[0]?.figures[0]).toMatchObject({
+      candidateId: 'figure:1',
+      decorative: false,
+      altText: 'of outcomes',
+    })
+  })
+
   it('includes informative figures even when they already have alt text', async () => {
     const { buildSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const context = makeContext()
@@ -962,6 +1006,11 @@ describe('semanticEnrichmentService', () => {
             },
           }],
         }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 413,
+        text: async () => '{"error":{"message":"context_length_exceeded"}}',
       })
       .mockResolvedValueOnce({
         ok: false,
