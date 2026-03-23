@@ -52,6 +52,7 @@
 - Current in-flight pair:
   - `Alexander.pdf` reached `91/B` on `attempt-002.pdf` and is being pushed again from `attempt-003.pdf`
   - `Alexander-2.pdf` is in remediation from the raw source and is following the same county outline tail
+  - `Bond.pdf` is now in remediation from the raw source and should follow the same county outline tail if it behaves similarly
 - Shared fix candidate under validation:
   - deterministic figure alt text fallback when semantic generation returns an empty alt string
   - safer heading target remapping so container-only outline nodes are not promoted without a real text-bearing descendant
