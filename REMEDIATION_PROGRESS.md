@@ -30,6 +30,7 @@
   - `2007 Annual Report Final.pdf` and `2008 Annual Report.pdf` are now the active table-family branch
   - shared hypothesis: table recovery needs a document-level bridge when qpdf reports tables but the structure snapshot does not surface candidate refs
   - shared fix candidate under validation: table opportunity generation now promotes `repair_native_table_headers` when `table_markup` debt exists and qpdf still sees tables, even if the backend snapshot missed explicit table candidates
+  - shared follow-on fix candidate: semantic sidecar 5xx/provider outages are now recoverable skips so deterministic table recovery can continue instead of aborting the run
 - Strict-gate complete:
   - `2011 MV Annual Report.pdf` reached `100/A` on `attempt-002-heading-chain.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
   - `2013_MV_Annual_Report.pdf` reached `100/A` on `attempt-002-heading-chain.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
@@ -53,7 +54,7 @@
 - Latest annual split:
   - `2014_MV_Annual_Report.pdf` still blocks on `pdfua.logical_structure` and `pdfua.heading_content_quality` in `full_final` (`70/C`)
   - `2007 Annual Report Final.pdf` is the table-backed branch: qpdf reports 5 tables, 5 table candidates are surfaced, and the blocker set is `context.table_candidates_blocked` + `pdfua.table_regularity` + `pdfua.logical_structure`
-  - `2007 Annual Report Final.pdf` rerun in flight: `MitigationAttempts/2007_Annual_Report_Final/attempt-008-table-bridge.pdf`
+  - `2007 Annual Report Final.pdf` rerun was restarted after the semantic-sidecar resilience fix; previous stale run was cleared
   - `2008 Annual Report.pdf` remains the table-heavy branch under the new table bridge; fresh rerun in flight: `MitigationAttempts/2008_Annual_Report/attempt-008-table-bridge.pdf`
   - shared reusable fix candidate under investigation: table structure recovery and table-to-heading credit handoff for annual report tails
 
