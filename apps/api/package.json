@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#config": "../../audit.config.ts"
+    "#config": "./config.ts"
   },
   "scripts": {
     "dev": "NODE_OPTIONS=--max-old-space-size=2048 tsx watch src/index.ts",
