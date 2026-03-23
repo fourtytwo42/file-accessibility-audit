@@ -115,6 +115,16 @@
   - `Carroll.pdf` timed out during semantic remediation on `attempt-001.pdf`; keep it in the county-outline family and retry after the semantic provider stabilizes
 - County lane expansion:
   - `Carroll-2.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
+- New county blocker:
+  - `Carroll-2.pdf` timed out during semantic remediation on `attempt-001.pdf`; keep it in the county-outline family and retry after the semantic provider stabilizes
+- County lane expansion:
+  - `Cass.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
+- County lane expansion:
+  - `Cass-2.pdf` remains the next county sibling to queue after `Cass.pdf` if it diverges or finishes
+- New county result:
+  - `Cass.pdf` finished at `80/B`; the run exposed the same county-family late tail and the write target folder needed to be created before saving output
+- County lane expansion:
+  - `Cass-2.pdf` is now in remediation from the raw source and should follow the same county-outline family unless it diverges
 - Strict-gate complete:
   - `Bond-2.pdf` reached `100/A` on `attempt-002.pdf`, passed the page-1 visual compare, and was copied into `Complete/`
 - County lane expansion:
@@ -162,7 +172,7 @@
   - `2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf` -> `Complete/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf`
 - Current active rerun:
   - `2022 Victim Service Planning Research Report -230817T20035755.pdf` -> `MitigationAttempts/victim-planning/2022 Victim Service Planning Research Report -230817T20035755/attempt-002-strict.pdf` (in flight; strict-gate revalidation using the current API)
-  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-002-strict.pdf` (now active as the next nearest victim-family candidate)
+  - `2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582.pdf` -> `MitigationAttempts/victim-planning/2024_Domestic Violence Pretrial Working Group_Final_Report-241115T20303582/attempt-003-strict.pdf` (now active after the semantic-timeout resilience fix)
 - Latest settled after-state:
   - `2022 Victim Service Planning Research Report -230817T20035755.pdf` -> `84/B` strict after-state in `MitigationAttempts/victim-planning/2022 Victim Service Planning Research Report -230817T20035755/attempt-002-strict.pdf`
 - Shared fix candidates under watch:

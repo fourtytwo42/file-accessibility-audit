@@ -1414,7 +1414,7 @@ function isSemanticStageTooLargeError(error: unknown): boolean {
 function isSemanticStageRecoverableProviderError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error || '')
   return isSemanticStageTooLargeError(error)
-    || /fetch failed|networkerror|econnreset|econnrefused|etimedout|socket hang up/i.test(message)
+    || /fetch failed|networkerror|econnreset|econnrefused|etimedout|timeout|timed out|socket hang up/i.test(message)
 }
 
 function semanticDeferredAction(input: {
@@ -4130,6 +4130,7 @@ export async function remediatePdfWithAgent(
 
     const bootstrapWasApplied = actions.some(a => a.tool === 'bootstrap_struct_tree' && a.outcome === 'applied')
     const altTextStillBroken = (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
+    const semanticFigureCandidates = aiFirstFigureCandidates(stageContext)
     const altRepairAlreadyApplied = actions.some(a => a.tool === 'repair_other_elements_alt_text' && (a.outcome === 'applied' || a.outcome === 'no_effect'))
       if (canExitEarlyToFinalCleanup(currentResult, currentPipelineConfig?.earlyExitScore || REMEDIATION.EARLY_EXIT_SCORE_THRESHOLD)) {
         const blockingFamilyTarget = currentFamilyCompletionTarget(stageContext)
@@ -4140,8 +4141,10 @@ export async function remediatePdfWithAgent(
       }
     if (round > 1 && !roundChangedDocument && (!needsStructuralPersistenceRound(currentResult, latestContext) || round >= REMEDIATION.MIN_STRUCTURAL_ROUNDS)) break
     if (stopAfterRound) break
-    // Post-bootstrap second pass (round 1 only): when bootstrap created a struct tree, re-inspect for alt risks and run stages 5+.
-    if (round === 1 && bootstrapWasApplied && altTextStillBroken && !altRepairAlreadyApplied) {
+    // Post-bootstrap / post-alt-text second pass (round 1 only): when alt text is still broken
+    // and figure candidates remain, re-inspect and run stages 5+ so semantic figure labeling
+    // can follow structural alt-text repair instead of being suppressed by it.
+    if (round === 1 && altTextStillBroken && semanticFigureCandidates.length > 0) {
     if (options?.signal?.aborted) {
       const error = new Error('Remediation cancelled') as Error & { aborted?: boolean }
       error.aborted = true
@@ -4152,11 +4155,11 @@ export async function remediatePdfWithAgent(
     currentTitle = stageContext.pdfjs.title || currentTitle
     currentLanguage = stageContext.qpdf.lang || stageContext.pdfjs.lang || currentLanguage
 
-	    const postBootstrapPlan = await planRemediationActions({
-	      filename,
-	      analysis: currentResult,
-	      context: stageContext,
-	      iteration: 2,
+    const postBootstrapPlan = await planRemediationActions({
+      filename,
+      analysis: currentResult,
+      context: stageContext,
+      iteration: 2,
 	      actions,
 	      rejectedActions,
 	      pipelineConfig: currentPipelineConfig,

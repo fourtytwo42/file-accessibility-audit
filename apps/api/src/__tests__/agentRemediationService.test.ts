@@ -2138,6 +2138,11 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           { tool_name: 'set_figure_alt_text', arguments: { candidateId: 'figure:1', altText: 'County logo' }, rationale: 'Add alt text', confidence: 0.9 },
         ],
       })
+      .mockResolvedValueOnce({
+        done: true,
+        unresolvedIssues: [],
+        actions: [],
+      })
       .mockResolvedValueOnce({ done: true, unresolvedIssues: [], actions: [] })
 
     executeRemediationTool.mockResolvedValueOnce({
@@ -4209,6 +4214,76 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
     expect(result.finalResult).toBe(originalResult)
     expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_sidecar_unavailable')).toBe(true)
+  })
+
+  it('treats semantic provider timeouts as recoverable and records a semantic sidecar warning', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+
+    const originalResult: AnalysisResult = {
+      filename: 'semantic-timeout.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 1, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 60,
+      grade: 'D',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 1,
+        failures: [{ ruleId: 'headings', specification: null, clause: null, testNumber: null, location: null, message: 'Heading issue', categoryIds: ['heading_structure'] }],
+      }),
+      categories: [
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Overview', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [{
+        id: 'heading:1:1',
+        pageNumber: 1,
+        text: 'Overview',
+        bbox: { x: 0, y: 0, width: 0.3, height: 0.05 },
+        fontSize: 18,
+        fontWeight: 'bold',
+        nearbyContext: ['Nearby context'],
+        targetRef: 'obj:10 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      }],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: ['heading_structure'], actions: [] })
+    generateSemanticRepairBatches.mockRejectedValue(new Error('semantic provider request timed out after 45000ms'))
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'semantic-timeout.pdf', originalResult)
+
+    expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
+    expect(result.finalResult).toBe(originalResult)
+    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_sidecar_unavailable')).toBe(true)
+    expect(result.model.manualReviewFlags.some(flag => /semantic provider request timed out/i.test(flag.details))).toBe(true)
   })
 
   it('uses heuristic alt-text fallback only after AI figure generation fails', async () => {
