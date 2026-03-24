@@ -3,10 +3,11 @@ import os from 'node:os'
 import path from 'node:path'
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import db from '../db/sqlite.js'
 import queueRoutes from '../routes/queue.js'
 import { createClient, createQueueItem, updateQueueItem } from '../services/queueStore.js'
+import * as queuePromotionService from '../services/queuePromotionService.js'
 
 let server: ReturnType<express.Express['listen']>
 let baseUrl = ''
@@ -71,6 +72,7 @@ describe('queue routes', () => {
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     const rows = db.prepare('SELECT document_model_path FROM queue_items').all() as Array<{ document_model_path: string | null }>
     for (const row of rows) {
       if (row.document_model_path && fs.existsSync(row.document_model_path)) {
@@ -503,5 +505,320 @@ describe('queue routes', () => {
     const count = db.prepare('SELECT COUNT(*) as count FROM queue_items WHERE client_id = ?')
       .get(clientId) as { count: number }
     expect(count.count).toBe(1)
+  })
+
+  it('claim assigns ownership metadata to the latest visible queue lineage', async () => {
+    const clientId = randomClientId('claim1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'owned.pdf',
+      md5: '6'.repeat(32),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(item.id, {
+      state: 'failed',
+      original_storage_path: 'C:\\queue\\owned.pdf',
+      owner_kind: null,
+      owner_id: null,
+      job_group: null,
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/claim`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(clientId, cookie),
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        filename: 'owned.pdf',
+        ownerId: 'agent-lane-1',
+        jobGroup: 'mv-family',
+      }),
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.item.ownerKind).toBe('agent')
+    expect(body.item.ownerId).toBe('agent-lane-1')
+    expect(body.item.jobGroup).toBe('mv-family')
+  })
+
+  it('start-or-reuse returns the current fresh active item for the owned filename', async () => {
+    const clientId = randomClientId('reuse1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'reused.pdf',
+      md5: '7'.repeat(32),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(item.id, {
+      state: 'processing',
+      processing_stage: 'Analyzing',
+      owner_kind: 'agent',
+      owner_id: 'old-owner',
+      result_freshness: 'fresh',
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/start-or-reuse`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(clientId, cookie),
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        filename: 'reused.pdf',
+        ownerId: 'new-owner',
+        jobGroup: 'general',
+      }),
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.reused).toBe(true)
+    expect(body.item.id).toBe(item.id)
+    expect(body.item.ownerId).toBe('new-owner')
+    expect(body.item.jobGroup).toBe('general')
+  })
+
+  it('freshness returns ownership, freshness, and promotion metadata', async () => {
+    const clientId = randomClientId('fresh1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'freshness.pdf',
+      md5: '8'.repeat(32),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(item.id, {
+      owner_kind: 'agent',
+      owner_id: 'agent-77',
+      job_group: 'county',
+      supersedes_item_id: 'older-item',
+      runtime_generation: 'runtime:test',
+      code_version: 'code:test',
+      result_freshness: 'stale_after_restart',
+      promotion_status: 'rejected',
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/items/${item.id}/freshness`, {
+      headers: authHeaders(clientId, cookie),
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.itemId).toBe(item.id)
+    expect(body.ownerKind).toBe('agent')
+    expect(body.ownerId).toBe('agent-77')
+    expect(body.jobGroup).toBe('county')
+    expect(body.supersedesItemId).toBe('older-item')
+    expect(body.runtimeGeneration).toBe('runtime:test')
+    expect(body.codeVersion).toBe('code:test')
+    expect(body.resultFreshness).toBe('stale_after_restart')
+    expect(body.promotionStatus).toBe('rejected')
+  })
+
+  it('emit-blocker stores a normalized blocker packet on the queue item', async () => {
+    const clientId = randomClientId('blocker1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'blocked.pdf',
+      md5: '9'.repeat(32),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/items/${item.id}/emit-blocker`, {
+      method: 'POST',
+      headers: {
+        ...authHeaders(clientId, cookie),
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        blockerType: 'shared_fix_needed',
+        subsystem: 'planner',
+        summary: 'Document-level routing still bypasses candidate-scoped table repair.',
+        reusable: true,
+        artifactPaths: ['/tmp/evidence.json'],
+      }),
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.item.promotionStatus).toBe('rejected')
+    expect(body.item.promotionRejectionReason).toContain('bypasses')
+    expect(body.blockerReport.subsystem).toBe('planner')
+
+    const row = db.prepare('SELECT blocker_report_json, promotion_status FROM queue_items WHERE id = ?').get(item.id) as any
+    expect(row.promotion_status).toBe('rejected')
+    expect(JSON.parse(row.blocker_report_json).blockerType).toBe('shared_fix_needed')
+  })
+
+  it('validate-for-complete proxies the promotion validator output', async () => {
+    const clientId = randomClientId('validate1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'validate.pdf',
+      md5: 'a1'.padEnd(32, '1'),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+
+    vi.spyOn(queuePromotionService, 'validateQueueItemForComplete').mockResolvedValue({
+      validation: {
+        passed: false,
+        scorePassed: true,
+        gradePassed: true,
+        veraPdfPassed: true,
+        blockingFailureModesClear: false,
+        blockingResidualFamiliesClear: true,
+        criticalManualReviewClear: true,
+        visualComparison: {
+          passed: false,
+          reason: 'page mismatch',
+          originalWidth: 1,
+          originalHeight: 1,
+          remediatedWidth: 1,
+          remediatedHeight: 1,
+          sameDimensions: true,
+          changedPixelRatio: 0,
+          meanChannelDelta: 0,
+          originalNonWhiteRatio: 0.1,
+          remediatedNonWhiteRatio: 0.1,
+          originalBlank: false,
+          remediatedBlank: false,
+        },
+        bookmarkValidation: {
+          passed: true,
+          usedAiCleanup: true,
+          reason: 'ok',
+          titles: [],
+          flaggedTitles: [],
+        },
+        freshnessPassed: true,
+        queueStateEligible: true,
+        promotionEligible: false,
+        resultFreshness: 'fresh',
+        queueState: 'complete',
+        reasons: ['visual mismatch'],
+      },
+      artifacts: {
+        reviewAssetsDir: '/tmp/review',
+        rebuiltPdfPath: '/tmp/rebuilt.pdf',
+        originalPdfPath: '/tmp/original.pdf',
+        originalPage1PngPath: '/tmp/original.png',
+        remediatedPage1PngPath: '/tmp/remediated.png',
+        visualComparisonJsonPath: '/tmp/compare.json',
+        failurePacketJsonPath: '/tmp/failure.json',
+      },
+      failurePacket: {
+        filename: 'validate.pdf',
+        queueItemId: item.id,
+        latestAttemptPath: '/tmp/rebuilt.pdf',
+        latestQueueSummary: { score: 96, grade: 'A', verapdfStatus: 'passed', failedChecks: 0 },
+        topFailureModes: [],
+        topBlockingResidualFamilyIds: [],
+        topResidualFamilies: [],
+        semanticSidecarState: 'not_flagged',
+        visualComparison: null,
+        bookmarkValidation: null,
+        freshPostRestartRemediation: true,
+        generatedAt: '2026-03-24T00:00:00.000Z',
+      },
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/items/${item.id}/validate-for-complete`, {
+      method: 'POST',
+      headers: authHeaders(clientId, cookie),
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.validation.promotionEligible).toBe(false)
+    expect(body.failurePacketPath).toBe('/tmp/failure.json')
+  })
+
+  it('promote returns the promoted destination when the validator allows it', async () => {
+    const clientId = randomClientId('promote1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'promote.pdf',
+      md5: 'b2'.padEnd(32, '2'),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+
+    vi.spyOn(queuePromotionService, 'promoteQueueItemToComplete').mockResolvedValue({
+      destinationPath: '/tmp/Complete/promote.pdf',
+      validation: {
+        passed: true,
+        scorePassed: true,
+        gradePassed: true,
+        veraPdfPassed: true,
+        blockingFailureModesClear: true,
+        blockingResidualFamiliesClear: true,
+        criticalManualReviewClear: true,
+        visualComparison: {
+          passed: true,
+          reason: 'ok',
+          originalWidth: 1,
+          originalHeight: 1,
+          remediatedWidth: 1,
+          remediatedHeight: 1,
+          sameDimensions: true,
+          changedPixelRatio: 0,
+          meanChannelDelta: 0,
+          originalNonWhiteRatio: 0.1,
+          remediatedNonWhiteRatio: 0.1,
+          originalBlank: false,
+          remediatedBlank: false,
+        },
+        bookmarkValidation: {
+          passed: true,
+          usedAiCleanup: true,
+          reason: 'ok',
+          titles: [],
+          flaggedTitles: [],
+        },
+        freshnessPassed: true,
+        queueStateEligible: true,
+        promotionEligible: true,
+        resultFreshness: 'fresh',
+        queueState: 'complete',
+        reasons: [],
+      },
+      artifacts: {
+        reviewAssetsDir: '/tmp/review',
+        rebuiltPdfPath: '/tmp/rebuilt.pdf',
+        originalPdfPath: '/tmp/original.pdf',
+        originalPage1PngPath: '/tmp/original.png',
+        remediatedPage1PngPath: '/tmp/remediated.png',
+        visualComparisonJsonPath: '/tmp/compare.json',
+        failurePacketJsonPath: '/tmp/failure.json',
+      },
+    })
+
+    const { cookie } = await bootstrap(clientId)
+    const response = await fetch(`${baseUrl}/api/queue/items/${item.id}/promote`, {
+      method: 'POST',
+      headers: authHeaders(clientId, cookie),
+    })
+
+    expect(response.status).toBe(200)
+    const body = await response.json()
+    expect(body.destinationPath).toBe('/tmp/Complete/promote.pdf')
+    expect(body.validation.promotionEligible).toBe(true)
   })
 })

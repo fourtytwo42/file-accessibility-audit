@@ -6,6 +6,7 @@ import { createCanvas, loadImage } from '@napi-rs/canvas'
 import { analyzeWithQpdf } from './qpdfService.js'
 import { renderPdfPageToDataUrl } from './pdfRenderService.js'
 import type { PlannerResidualFamilySummary, ResidualFamilyId } from './documentModel.js'
+import { markQueueItemsResultFreshness } from './queueStore.js'
 
 type PdfjsLib = typeof import('pdfjs-dist/legacy/build/pdf.mjs')
 
@@ -881,7 +882,7 @@ export async function compareRenderedPageImages(originalPng: Buffer, remediatedP
   }
 }
 
-async function renderPdfPage1ToPng(pdfBuffer: Buffer, scale: number): Promise<Buffer> {
+export async function renderPdfPage1ToPng(pdfBuffer: Buffer, scale: number): Promise<Buffer> {
   const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs') as PdfjsLib
   const doc = await pdfjsLib.getDocument({ data: new Uint8Array(pdfBuffer), useSystemFonts: true, verbosity: 0 }).promise
   try {
@@ -1419,6 +1420,14 @@ async function queueAwaitingRestartEntries(client: QueueApiClient, state: Campai
   return next
 }
 
+function markAffectedQueueItemsStale(state: CampaignState, filenames: string[]): void {
+  const ids = filenames
+    .map(filename => state.files[filename]?.queueItemId)
+    .filter((value): value is string => !!value)
+  if (!ids.length) return
+  markQueueItemsResultFreshness(ids, 'stale_after_restart')
+}
+
 
 export async function runRemediationOrchestrator(config: OrchestratorConfig, deps: OrchestratorRunDependencies = {}): Promise<void> {
   const client = deps.client || new QueueApiClient({ baseUrl: config.apiBaseUrl })
@@ -1526,6 +1535,7 @@ export async function runRemediationOrchestrator(config: OrchestratorConfig, dep
             if (autofix.success) {
               state = appendEvent(state, `Autofix batch completed: ${needsFix.map(entry => entry.filename).join(', ')}`)
               state = markEntriesAwaitingRestart(state, needsFix.map(entry => entry.filename))
+              markAffectedQueueItemsStale(state, needsFix.map(entry => entry.filename))
               state = appendEvent(state, `Autofix completed; restart and rerun required for: ${needsFix.map(entry => entry.filename).join(', ')}`)
               saveCampaignState(config.stateFilePath, state)
               try {

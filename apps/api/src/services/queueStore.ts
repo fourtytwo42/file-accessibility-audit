@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
+import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import db from '../db/sqlite.js'
 import { BATCH_QUEUE } from '#config'
@@ -31,6 +32,10 @@ export type ReconstructionStatus =
   | 'completed'
   | 'manual_review_required'
   | 'failed'
+
+export type QueueOwnerKind = 'coordinator' | 'agent' | 'orchestrator'
+export type QueueResultFreshness = 'fresh' | 'stale_after_restart' | 'superseded'
+export type QueuePromotionStatus = 'unvalidated' | 'eligible' | 'promoted' | 'rejected'
 
 export interface QueueItemRecord {
   id: string
@@ -82,6 +87,16 @@ export interface QueueItemRecord {
   adobe_summary_json: string | null
   original_adobe_summary_json: string | null
   rebuilt_adobe_summary_json: string | null
+  owner_kind: QueueOwnerKind | null
+  owner_id: string | null
+  job_group: string | null
+  supersedes_item_id: string | null
+  runtime_generation: string | null
+  code_version: string | null
+  result_freshness: QueueResultFreshness
+  promotion_status: QueuePromotionStatus
+  promotion_rejection_reason: string | null
+  blocker_report_json: string | null
   created_at: string
   updated_at: string
   upload_started_at: string | null
@@ -124,6 +139,16 @@ export interface QueueItem {
   aiSuggestedChanges: SuggestedChange[]
   confidenceSummary: ConfidenceSummary | null
   manualReviewFlags: ModelReviewFlag[]
+  ownerKind: QueueOwnerKind | null
+  ownerId: string | null
+  jobGroup: string | null
+  supersedesItemId: string | null
+  runtimeGeneration: string | null
+  codeVersion: string | null
+  resultFreshness: QueueResultFreshness
+  promotionStatus: QueuePromotionStatus
+  promotionRejectionReason: string | null
+  blockerReport: any | null
   createdAt: string
   updatedAt: string
   uploadStartedAt: string | null
@@ -162,6 +187,16 @@ export interface QueueItemSummary {
   standardsSummary?: QueueItemStandardsSummary | null
   error: any | null
   reconstructionError: any | null
+  ownerKind: QueueOwnerKind | null
+  ownerId: string | null
+  jobGroup: string | null
+  supersedesItemId: string | null
+  runtimeGeneration: string | null
+  codeVersion: string | null
+  resultFreshness: QueueResultFreshness
+  promotionStatus: QueuePromotionStatus
+  promotionRejectionReason: string | null
+  blockerReport: any | null
   createdAt: string
   updatedAt: string
   uploadStartedAt: string | null
@@ -283,6 +318,19 @@ const REBUILT_ROOT = path.join(STORAGE_ROOT, 'rebuilt')
 const MODEL_ROOT = path.join(STORAGE_ROOT, 'models')
 const REVIEW_ROOT = path.join(STORAGE_ROOT, 'review-assets')
 const STAGING_ROOT = path.join(STORAGE_ROOT, 'staging')
+
+function detectCodeVersion(): string {
+  const configured = process.env.APP_CODE_VERSION || process.env.GIT_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA
+  if (configured) return configured
+  try {
+    return execSync('git rev-parse HEAD', { cwd: projectRoot, stdio: ['ignore', 'pipe', 'ignore'] }).toString('utf8').trim()
+  } catch {
+    return 'unknown'
+  }
+}
+
+const CURRENT_RUNTIME_GENERATION = process.env.API_RUNTIME_GENERATION || `runtime:${process.pid}:${new Date().toISOString()}`
+const CURRENT_CODE_VERSION = detectCodeVersion()
 
 for (const dir of [STORAGE_ROOT, ORIGINAL_ROOT, REBUILT_ROOT, MODEL_ROOT, REVIEW_ROOT, STAGING_ROOT]) {
   if (!fs.existsSync(dir)) {
@@ -618,6 +666,14 @@ export function getQueueStorageRoots() {
   }
 }
 
+export function getCurrentRuntimeGeneration(): string {
+  return CURRENT_RUNTIME_GENERATION
+}
+
+export function getCurrentCodeVersion(): string {
+  return CURRENT_CODE_VERSION
+}
+
 export function nowIso(): string {
   return new Date().toISOString()
 }
@@ -662,6 +718,16 @@ export function serializeQueueItemSummary(row: QueueItemRecord): QueueItemSummar
     standardsSummary: buildStandardsSummary(row),
     error: parseJson<any | null>(row.error_json, null),
     reconstructionError: parseJson<any | null>(row.reconstruction_error_json || row.remediation_error_json, null),
+    ownerKind: row.owner_kind,
+    ownerId: row.owner_id,
+    jobGroup: row.job_group,
+    supersedesItemId: row.supersedes_item_id,
+    runtimeGeneration: row.runtime_generation,
+    codeVersion: row.code_version,
+    resultFreshness: row.result_freshness || 'fresh',
+    promotionStatus: row.promotion_status || 'unvalidated',
+    promotionRejectionReason: row.promotion_rejection_reason,
+    blockerReport: parseJson<any | null>(row.blocker_report_json, null),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     uploadStartedAt: row.upload_started_at,
@@ -775,6 +841,17 @@ export function listVisibleQueueItemsByFilename(clientId: string, filename: stri
   `).all(clientId, filename) as QueueItemRecord[]
 }
 
+export function getLatestVisibleQueueItemByFilename(clientId: string, filename: string): QueueItemRecord | undefined {
+  return listVisibleQueueItemsByFilename(clientId, filename)[0]
+}
+
+export function getFreshActiveQueueItemByFilename(clientId: string, filename: string): QueueItemRecord | undefined {
+  return listVisibleQueueItemsByFilename(clientId, filename).find(row =>
+    (row.state === 'uploading' || row.state === 'queued' || row.state === 'processing')
+    && (row.result_freshness || 'fresh') === 'fresh',
+  )
+}
+
 export function listTransientQueueItemsByFilename(clientId: string, filename: string): QueueItemRecord[] {
   return db.prepare(`
     SELECT * FROM queue_items
@@ -796,6 +873,10 @@ export function createQueueItem(input: {
   md5?: string
   sizeBytes: number
   mimeType?: string | null
+  ownerKind?: QueueOwnerKind | null
+  ownerId?: string | null
+  jobGroup?: string | null
+  supersedesItemId?: string | null
 }): QueueItemRecord {
   const id = crypto.randomUUID()
   const timestamp = nowIso()
@@ -806,10 +887,31 @@ export function createQueueItem(input: {
       id, client_id, filename, md5, size_bytes, mime_type, state,
       upload_progress, processing_progress, processing_stage, hidden,
       processing_path, path_fallbacks_json,
-      remediation_status, document_model_status, created_at, updated_at, upload_started_at, expires_at
+      remediation_status, document_model_status,
+      owner_kind, owner_id, job_group, supersedes_item_id,
+      runtime_generation, code_version, result_freshness,
+      promotion_status, promotion_rejection_reason, blocker_report_json,
+      created_at, updated_at, upload_started_at, expires_at
     )
-    VALUES (?, ?, ?, ?, ?, ?, 'uploading', 0, 0, 'Waiting for upload', 0, 'agent_patch', '[]', 'pending', 'pending', ?, ?, ?, ?)
-  `).run(id, input.clientId, input.filename, dedupeToken, input.sizeBytes, input.mimeType ?? null, timestamp, timestamp, timestamp, expiresAt)
+    VALUES (?, ?, ?, ?, ?, ?, 'uploading', 0, 0, 'Waiting for upload', 0, 'agent_patch', '[]', 'pending', 'pending', ?, ?, ?, ?, ?, ?, 'fresh', 'unvalidated', NULL, NULL, ?, ?, ?, ?)
+  `).run(
+    id,
+    input.clientId,
+    input.filename,
+    dedupeToken,
+    input.sizeBytes,
+    input.mimeType ?? null,
+    input.ownerKind ?? null,
+    input.ownerId ?? null,
+    input.jobGroup ?? null,
+    input.supersedesItemId ?? null,
+    CURRENT_RUNTIME_GENERATION,
+    CURRENT_CODE_VERSION,
+    timestamp,
+    timestamp,
+    timestamp,
+    expiresAt,
+  )
   return getQueueItemById(id)!
 }
 
@@ -880,6 +982,16 @@ export function updateQueueItem(id: string, patch: Partial<QueueItemRecord>): Qu
       adobe_summary_json = ?,
       original_adobe_summary_json = ?,
       rebuilt_adobe_summary_json = ?,
+      owner_kind = ?,
+      owner_id = ?,
+      job_group = ?,
+      supersedes_item_id = ?,
+      runtime_generation = ?,
+      code_version = ?,
+      result_freshness = ?,
+      promotion_status = ?,
+      promotion_rejection_reason = ?,
+      blocker_report_json = ?,
       updated_at = ?,
       upload_started_at = ?,
       upload_completed_at = ?,
@@ -935,6 +1047,16 @@ export function updateQueueItem(id: string, patch: Partial<QueueItemRecord>): Qu
     next.adobe_summary_json,
     next.original_adobe_summary_json,
     next.rebuilt_adobe_summary_json,
+    next.owner_kind,
+    next.owner_id,
+    next.job_group,
+    next.supersedes_item_id,
+    next.runtime_generation,
+    next.code_version,
+    next.result_freshness,
+    next.promotion_status,
+    next.promotion_rejection_reason,
+    next.blocker_report_json,
     next.updated_at,
     next.upload_started_at,
     next.upload_completed_at,
@@ -1144,6 +1266,18 @@ export function listClientsWithQueuedItems(): string[] {
 
 export function markQueueItemHidden(id: string): QueueItemRecord {
   return updateQueueItem(id, { hidden: 1 })
+}
+
+export function markQueueItemsResultFreshness(itemIds: string[], freshness: QueueResultFreshness): void {
+  for (const itemId of itemIds) {
+    const row = getQueueItemById(itemId)
+    if (!row) continue
+    updateQueueItem(itemId, {
+      result_freshness: freshness,
+      promotion_status: freshness === 'fresh' ? row.promotion_status : 'unvalidated',
+      promotion_rejection_reason: freshness === 'fresh' ? row.promotion_rejection_reason : null,
+    })
+  }
 }
 
 export function deleteQueueItemPermanently(id: string): void {

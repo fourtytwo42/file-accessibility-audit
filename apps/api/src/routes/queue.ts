@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { Router, type IRouter, type Response } from 'express'
 import multer from 'multer'
 import { BATCH_QUEUE } from '#config'
@@ -11,6 +12,10 @@ import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams, re
 import {
   cleanupExpiredQueueItems,
   createQueueItem,
+  getCurrentCodeVersion,
+  getCurrentRuntimeGeneration,
+  getFreshActiveQueueItemByFilename,
+  getLatestVisibleQueueItemByFilename,
   deleteQueueItemPermanently,
   failStaleUploads,
   getQueueCounts,
@@ -32,10 +37,14 @@ import {
   serializeQueueItemSummary,
   updateQueueItem,
 } from '../services/queueStore.js'
+import { promoteQueueItemToComplete, validateQueueItemForComplete } from '../services/queuePromotionService.js'
 import { beginClientUpload } from '../services/uploadActivity.js'
 
 const router: IRouter = Router()
 const { stagingRoot } = getQueueStorageRoots()
+const moduleDir = path.dirname(fileURLToPath(import.meta.url))
+const repoRoot = path.resolve(moduleDir, '..', '..', '..')
+const downloadsRoot = path.join(repoRoot, 'Downloads')
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -72,6 +81,96 @@ function queueHousekeepingThrottled(): void {
 
 function readItemId(value: string | string[] | undefined): string {
   return Array.isArray(value) ? value[0] : value || ''
+}
+
+function readOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+function internalSourcePdfPath(filename: string): string | null {
+  const candidate = path.join(downloadsRoot, sanitizeBasename(filename))
+  return fs.existsSync(candidate) ? candidate : null
+}
+
+async function createQueueItemFromInternalSource(req: ClientSessionRequest, input: {
+  filename: string
+  ownerId?: string | null
+  jobGroup?: string | null
+  supersedesItemId?: string | null
+}): Promise<QueueItemRecord> {
+  const sourcePath = internalSourcePdfPath(input.filename)
+  if (!sourcePath) throw new Error(`Source PDF not found in Downloads/: ${input.filename}`)
+  const stat = await fs.promises.stat(sourcePath)
+  const item = createQueueItem({
+    clientId: req.clientId!,
+    filename: sanitizeBasename(input.filename),
+    sizeBytes: stat.size,
+    mimeType: 'application/pdf',
+    ownerKind: 'agent',
+    ownerId: input.ownerId ?? null,
+    jobGroup: input.jobGroup ?? null,
+    supersedesItemId: input.supersedesItemId ?? null,
+  })
+  const destination = queueItemDiskPath(item.id, item.filename)
+  await fs.promises.copyFile(sourcePath, destination)
+  const queued = updateQueueItem(item.id, {
+    state: 'queued',
+    storage_path: destination,
+    original_storage_path: destination,
+    upload_progress: 100,
+    processing_progress: 0,
+    processing_stage: 'Queued for analysis',
+    upload_completed_at: nowIso(),
+    owner_kind: 'agent',
+    owner_id: input.ownerId ?? null,
+    job_group: input.jobGroup ?? null,
+    supersedes_item_id: input.supersedesItemId ?? null,
+    runtime_generation: getCurrentRuntimeGeneration(),
+    code_version: getCurrentCodeVersion(),
+    result_freshness: 'fresh',
+    promotion_status: 'unvalidated',
+    promotion_rejection_reason: null,
+    blocker_report_json: null,
+    error_json: null,
+  })
+  emitQueueItemUpsert(queued.id)
+  setImmediate(() => queueItemForProcessing(queued.id))
+  return queued
+}
+
+function claimQueueLineage(req: ClientSessionRequest, filename: string, ownerId?: string | null, jobGroup?: string | null): QueueItemRecord {
+  const existing = getLatestVisibleQueueItemByFilename(req.clientId!, filename)
+  if (existing) {
+    return updateQueueItem(existing.id, {
+      owner_kind: 'agent',
+      owner_id: ownerId ?? null,
+      job_group: jobGroup ?? null,
+    })
+  }
+
+  const sourcePath = internalSourcePdfPath(filename)
+  const placeholder = createQueueItem({
+    clientId: req.clientId!,
+    filename: sanitizeBasename(filename),
+    sizeBytes: sourcePath ? fs.statSync(sourcePath).size : 0,
+    mimeType: 'application/pdf',
+    ownerKind: 'agent',
+    ownerId: ownerId ?? null,
+    jobGroup: jobGroup ?? null,
+  })
+  return updateQueueItem(placeholder.id, {
+    state: 'queued',
+    upload_progress: sourcePath ? 100 : 0,
+    processing_stage: sourcePath ? 'Claimed awaiting internal start' : 'Claimed without source artifact',
+    owner_kind: 'agent',
+    owner_id: ownerId ?? null,
+    job_group: jobGroup ?? null,
+    runtime_generation: getCurrentRuntimeGeneration(),
+    code_version: getCurrentCodeVersion(),
+    result_freshness: 'fresh',
+    promotion_status: 'unvalidated',
+    promotion_rejection_reason: null,
+  })
 }
 
 function allVisibleItemsForClient(clientId: string): QueueItemRecord[] {
@@ -142,6 +241,12 @@ router.post('/queue/upload', requireClientSession, trackActiveUpload, upload.sin
       processing_progress: 0,
       processing_stage: 'Queued for analysis',
       upload_completed_at: nowIso(),
+      runtime_generation: getCurrentRuntimeGeneration(),
+      code_version: getCurrentCodeVersion(),
+      result_freshness: 'fresh',
+      promotion_status: 'unvalidated',
+      promotion_rejection_reason: null,
+      blocker_report_json: null,
       error_json: null,
     })
     emitQueueItemUpsert(queued.id)
@@ -209,6 +314,82 @@ router.get('/queue/selectable-ids', requireClientSession, (req: ClientSessionReq
   res.json({ ids: listSelectableQueueItemIds(req.clientId!, scope) })
 })
 
+router.post('/queue/claim', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  queueHousekeepingThrottled()
+  const filename = readOptionalString(req.body?.filename)
+  if (!filename) {
+    res.status(400).json({ error: 'filename is required' })
+    return
+  }
+  const ownerId = readOptionalString(req.body?.ownerId)
+  const jobGroup = readOptionalString(req.body?.jobGroup)
+  const item = claimQueueLineage(req, filename, ownerId, jobGroup)
+  emitQueueItemUpsert(item.id)
+  res.json({ item: serializeQueueItemSummary(item) })
+})
+
+router.post('/queue/start-or-reuse', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+  queueHousekeepingThrottled()
+  const filename = readOptionalString(req.body?.filename)
+  const ownerId = readOptionalString(req.body?.ownerId)
+  const jobGroup = readOptionalString(req.body?.jobGroup)
+  if (!filename || !ownerId) {
+    res.status(400).json({ error: 'filename and ownerId are required' })
+    return
+  }
+
+  try {
+    const freshActive = getFreshActiveQueueItemByFilename(req.clientId!, filename)
+    if (freshActive) {
+      const claimed = updateQueueItem(freshActive.id, {
+        owner_kind: 'agent',
+        owner_id: ownerId,
+        job_group: jobGroup,
+      })
+      emitQueueItemUpsert(claimed.id)
+      res.json({ reused: true, item: serializeQueueItemSummary(claimed) })
+      return
+    }
+
+    const latest = getLatestVisibleQueueItemByFilename(req.clientId!, filename)
+    if (latest && latest.state !== 'uploading' && latest.state !== 'queued' && latest.state !== 'processing' && (latest.original_storage_path || latest.storage_path)) {
+      const requeued = requeueItem(latest.id, 'remediate')
+      if (requeued) {
+        const claimed = updateQueueItem(requeued.id, {
+          owner_kind: 'agent',
+          owner_id: ownerId,
+          job_group: jobGroup,
+          runtime_generation: getCurrentRuntimeGeneration(),
+          code_version: getCurrentCodeVersion(),
+          result_freshness: 'fresh',
+          promotion_status: 'unvalidated',
+          promotion_rejection_reason: null,
+          blocker_report_json: null,
+        })
+        emitQueueItemUpsert(claimed.id)
+        res.json({ reused: false, item: serializeQueueItemSummary(claimed) })
+        return
+      }
+    }
+
+    const created = await createQueueItemFromInternalSource(req, {
+      filename,
+      ownerId,
+      jobGroup,
+      supersedesItemId: latest?.id ?? null,
+    })
+    if (latest) {
+      updateQueueItem(latest.id, { result_freshness: 'superseded' })
+      emitQueueItemUpsert(latest.id)
+    }
+    res.json({ reused: false, item: serializeQueueItemSummary(created) })
+  } catch (err) {
+    res.status(500).json({
+      error: err instanceof Error ? err.message : 'Failed to start or reuse queue item',
+    })
+  }
+})
+
 router.get('/queue/items/:id', requireClientSession, (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
   if (!item || item.client_id !== req.clientId || item.hidden) {
@@ -216,6 +397,101 @@ router.get('/queue/items/:id', requireClientSession, (req: ClientSessionRequest,
     return
   }
   res.json({ item: serializeQueueItemDetail(item) })
+})
+
+router.get('/queue/items/:id/freshness', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  if (!item || item.client_id !== req.clientId || item.hidden) {
+    res.status(404).json({ error: 'Queue item not found' })
+    return
+  }
+  res.json({
+    itemId: item.id,
+    runtimeGeneration: item.runtime_generation,
+    currentRuntimeGeneration: getCurrentRuntimeGeneration(),
+    codeVersion: item.code_version,
+    currentCodeVersion: getCurrentCodeVersion(),
+    resultFreshness: item.result_freshness || 'fresh',
+    supersedesItemId: item.supersedes_item_id,
+    promotionStatus: item.promotion_status || 'unvalidated',
+    ownerKind: item.owner_kind,
+    ownerId: item.owner_id,
+    jobGroup: item.job_group,
+  })
+})
+
+router.post('/queue/items/:id/validate-for-complete', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  if (!item || item.client_id !== req.clientId || item.hidden) {
+    res.status(404).json({ error: 'Queue item not found' })
+    return
+  }
+  try {
+    const outcome = await validateQueueItemForComplete(item)
+    res.json({
+      itemId: item.id,
+      validation: outcome.validation,
+      artifacts: outcome.artifacts,
+      failurePacketPath: outcome.failurePacket ? outcome.artifacts.failurePacketJsonPath : null,
+    })
+  } catch (err) {
+    res.status(500).json({
+      error: err instanceof Error ? err.message : 'Failed to validate queue item for complete promotion',
+    })
+  }
+})
+
+router.post('/queue/items/:id/promote', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  if (!item || item.client_id !== req.clientId || item.hidden) {
+    res.status(404).json({ error: 'Queue item not found' })
+    return
+  }
+  try {
+    const promoted = await promoteQueueItemToComplete(item)
+    res.json({
+      itemId: item.id,
+      destinationPath: promoted.destinationPath,
+      validation: promoted.validation,
+    })
+  } catch (err) {
+    res.status(400).json({
+      error: err instanceof Error ? err.message : 'Queue item is not eligible for promotion',
+    })
+  }
+})
+
+router.post('/queue/items/:id/emit-blocker', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+  const item = getQueueItemById(readItemId(req.params.id))
+  if (!item || item.client_id !== req.clientId || item.hidden) {
+    res.status(404).json({ error: 'Queue item not found' })
+    return
+  }
+
+  const blockerType = readOptionalString(req.body?.blockerType)
+  const subsystem = readOptionalString(req.body?.subsystem)
+  const summary = readOptionalString(req.body?.summary)
+  const artifactPaths = Array.isArray(req.body?.artifactPaths)
+    ? req.body.artifactPaths.filter((value: unknown): value is string => typeof value === 'string')
+    : []
+  const reusable = typeof req.body?.reusable === 'boolean' ? req.body.reusable : true
+
+  const blockerReport = {
+    generatedAt: nowIso(),
+    blockerType: blockerType || 'unspecified',
+    subsystem: subsystem || 'unknown',
+    summary: summary || 'No blocker summary provided.',
+    reusable,
+    artifactPaths,
+  }
+
+  const updated = updateQueueItem(item.id, {
+    blocker_report_json: JSON.stringify(blockerReport),
+    promotion_status: 'rejected',
+    promotion_rejection_reason: blockerReport.summary,
+  })
+  emitQueueItemUpsert(updated.id)
+  res.json({ item: serializeQueueItemSummary(updated), blockerReport })
 })
 
 router.get('/queue/items/:id/versions', requireClientSession, (req: ClientSessionRequest, res: Response) => {
@@ -273,6 +549,12 @@ router.post('/queue/items/:id/retry', requireClientSession, (req: ClientSessionR
     state: 'queued',
     remediation_status: 'pending',
     document_model_status: 'pending',
+    runtime_generation: getCurrentRuntimeGeneration(),
+    code_version: getCurrentCodeVersion(),
+    result_freshness: 'fresh',
+    promotion_status: 'unvalidated',
+    promotion_rejection_reason: null,
+    blocker_report_json: null,
     processing_progress: 0,
     processing_stage: 'Queued for retry',
     processing_path: 'agent_patch',
