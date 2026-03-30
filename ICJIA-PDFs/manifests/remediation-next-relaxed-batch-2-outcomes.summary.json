@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-03-28T06:00:18.760Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-2-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 50,
+    "processed": 50,
+    "readyToReplace": 50,
+    "failedAfterRemediation": 0,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3911",
+    "publicationTitle": "MOULTRIE County Profile",
+    "priorityRank": 50,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Moultrie.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Moultrie.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Moultrie.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Moultrie.json",
+    "status": "ready_to_replace",
+    "processedAt": "2026-03-28T06:00:18.759Z",
+    "durationMs": 650672,
+    "original": {
+      "overallScore": 24,
+      "grade": "F",
+      "pageCount": 32,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 100,
+      "grade": "A",
+      "pageCount": 32,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": true,
+      "reasons": [],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3911-MOULTRIE_County_Profile.pdf",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Moultrie.pdf",
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3911-MOULTRIE_County_Profile.remediation.json",
+      "failureReportPath": null
+    }
+  }
+}

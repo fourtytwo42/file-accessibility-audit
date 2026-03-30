@@ -1,0 +1,1462 @@
+{
+  "generatedAt": "2026-03-28T22:50:40.659Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-lower-confidence-batch-2-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 32,
+    "processed": 32,
+    "readyToReplace": 16,
+    "failedAfterRemediation": 16,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "4474",
+      "publicationTitle": "Behavioral and Public Health Perspectives on Violence Prevention: A Survey of Illinois Practitioners",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Practitioner_Survey Article_7-18-2019_V2-191011T20091800.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Practitioner_Survey Article_7-18-2019_V2-191011T20091800.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Practitioner_Survey Article_7-18-2019_V2-191011T20091800.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Practitioner_Survey Article_7-18-2019_V2-191011T20091800.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:23:21.503Z",
+      "durationMs": 75874,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 16,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 16,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, below 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4474-Behavioral_and_Public_Health_Perspectives_on_Violence_Prevention_A_Survey_of_Illinois_Practitioners.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4474-Behavioral_and_Public_Health_Perspectives_on_Violence_Prevention_A_Survey_of_Illinois_Practitioners.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4474-Behavioral_and_Public_Health_Perspectives_on_Violence_Prevention_A_Survey_of_Illinois_Practitioners.failure.json"
+      }
+    },
+    {
+      "publicationId": "4478",
+      "publicationTitle": "How Illinois Service Providers Support Young Victims of Crime: Findings from an Illinois HEALS Survey",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/DSP_top_line_090619-191011T20093738.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/DSP_top_line_090619-191011T20093738.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/DSP_top_line_090619-191011T20093738.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/DSP_top_line_090619-191011T20093738.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:24:26.573Z",
+      "durationMs": 140944,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 15,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 85,
+        "grade": "B",
+        "pageCount": 15,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 85, below 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Alt Text on Images, Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4478-How_Illinois_Service_Providers_Support_Young_Victims_of_Crime_Findings_from_an_Illinois_HEALS_Survey.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4478-How_Illinois_Service_Providers_Support_Young_Victims_of_Crime_Findings_from_an_Illinois_HEALS_Survey.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4478-How_Illinois_Service_Providers_Support_Young_Victims_of_Crime_Findings_from_an_Illinois_HEALS_Survey.failure.json"
+      }
+    },
+    {
+      "publicationId": "4625",
+      "publicationTitle": "Alcohol-Impaired Driving in Illinois",
+      "priorityRank": 9,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/DUI_Article_072619-191011T20091425.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/DUI_Article_072619-191011T20091425.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/DUI_Article_072619-191011T20091425.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/DUI_Article_072619-191011T20091425.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:26:32.406Z",
+      "durationMs": 190903,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 25,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 84,
+        "grade": "B",
+        "pageCount": 25,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 84, below 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4625-Alcohol-Impaired_Driving_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4625-Alcohol-Impaired_Driving_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4625-Alcohol-Impaired_Driving_in_Illinois.failure.json"
+      }
+    },
+    {
+      "publicationId": "4770",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Annual Report",
+      "priorityRank": 11,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/2024_DVFRC_Annual_Report_4_15_f637ee1fcc_compressed-251217T14311834.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/2024_DVFRC_Annual_Report_4_15_f637ee1fcc_compressed-251217T14311834.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/2024_DVFRC_Annual_Report_4_15_f637ee1fcc_compressed-251217T14311834.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/2024_DVFRC_Annual_Report_4_15_f637ee1fcc_compressed-251217T14311834.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:30:24.278Z",
+      "durationMs": 231871,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, below 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Alt Text on Images, Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4770-2024_Domestic_Violence_Fatality_Review_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4770-2024_Domestic_Violence_Fatality_Review_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4770-2024_Domestic_Violence_Fatality_Review_Annual_Report.failure.json"
+      }
+    },
+    {
+      "publicationId": "4639",
+      "publicationTitle": "Adjusting Work Conditions During the COVID-19 Pandemic: A Survey of Illinois Mental Health Court Staff",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/MHC COVID 19 FINAL UPDATED-201029T18113004.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/MHC COVID 19 FINAL UPDATED-201029T18113004.pdf",
+      "fileUrl": "https://icjia.illinois.gov/researchhub/files/MHC%20COVID%2019%20FINAL%20UPDATED-201029T18113004.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/MHC COVID 19 FINAL UPDATED-201029T18113004.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T21:34:06.708Z",
+      "durationMs": 721079,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/MHC COVID 19 FINAL UPDATED-201029T18113004.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4646",
+      "publicationTitle": "Youth Development: An Overview of Related Factors and Interventions",
+      "priorityRank": 10,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Youth Development_An Overview of Related Factors and Interventions-200305T16163952.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Youth Development_An Overview of Related Factors and Interventions-200305T16163952.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:36:19.884Z",
+      "durationMs": 713311,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 85,
+        "grade": "B",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 85, below 100.",
+          "Blocking local standards findings remain: pdfua.table_regularity",
+          "Categories still below 100: Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.table_regularity"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4646-Youth_Development_An_Overview_of_Related_Factors_and_Interventions.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4646-Youth_Development_An_Overview_of_Related_Factors_and_Interventions.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4646-Youth_Development_An_Overview_of_Related_Factors_and_Interventions.failure.json"
+      }
+    },
+    {
+      "publicationId": "4636",
+      "publicationTitle": "Conducting Research Interviews on Sensitive Topics",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/sensitive interviewing article PDF for posting-200817T14463987.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/sensitive interviewing article PDF for posting-200817T14463987.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/sensitive interviewing article PDF for posting-200817T14463987.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/sensitive interviewing article PDF for posting-200817T14463987.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T21:37:37.629Z",
+      "durationMs": 932000,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4636-Conducting_Research_Interviews_on_Sensitive_Topics.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/sensitive interviewing article PDF for posting-200817T14463987.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4636-Conducting_Research_Interviews_on_Sensitive_Topics.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4740",
+      "publicationTitle": "2024 Task Force on Missing and Murdered Chicago Women Annual Report",
+      "priorityRank": 14,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/2024 Task Force on Missing and Murdered Chicago Women Annual Report_Final-250114T18393571.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/2024 Task Force on Missing and Murdered Chicago Women Annual Report_Final-250114T18393571.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/2024%20Task%20Force%20on%20Missing%20and%20Murdered%20Chicago%20Women%20Annual%20Report_Final-250114T18393571.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/2024 Task Force on Missing and Murdered Chicago Women Annual Report_Final-250114T18393571.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:38:53.377Z",
+      "durationMs": 153493,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 21,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 21,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4740-2024_Task_Force_on_Missing_and_Murdered_Chicago_Women_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4740-2024_Task_Force_on_Missing_and_Murdered_Chicago_Women_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4740-2024_Task_Force_on_Missing_and_Murdered_Chicago_Women_Annual_Report.failure.json"
+      }
+    },
+    {
+      "publicationId": "4087",
+      "publicationTitle": "A Primer on Drug Addiction Crime and Treatment",
+      "priorityRank": 15,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/A Primer on Drug Addiction, Crime and Treatment Nov 2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/A Primer on Drug Addiction, Crime and Treatment Nov 2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/A%20Primer%20on%20Drug%20Addiction,%20Crime%20and%20Treatment%20Nov%202007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/A Primer on Drug Addiction, Crime and Treatment Nov 2007.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:38:55.529Z",
+      "durationMs": 77900,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 63,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 82,
+        "grade": "B",
+        "pageCount": 63,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 82, below 100.",
+          "Categories still below 100: Heading Structure"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Heading Structure"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4087-A_Primer_on_Drug_Addiction_Crime_and_Treatment.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4087-A_Primer_on_Drug_Addiction_Crime_and_Treatment.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4087-A_Primer_on_Drug_Addiction_Crime_and_Treatment.failure.json"
+      }
+    },
+    {
+      "publicationId": "4546",
+      "publicationTitle": "The Intersection of Homelessness and the Criminal Justice System",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Homelessness_PDF-191011T20092064.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Homelessness_PDF-191011T20092064.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Homelessness_PDF-191011T20092064.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Homelessness_PDF-191011T20092064.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T21:44:38.033Z",
+      "durationMs": 1352404,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4546-The_Intersection_of_Homelessness_and_the_Criminal_Justice_System.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/Homelessness_PDF-191011T20092064.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4546-The_Intersection_of_Homelessness_and_the_Criminal_Justice_System.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4104",
+      "publicationTitle": "METHAMPHETAMINE AND VIOLENCE IN ILLINOIS",
+      "priorityRank": 16,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/METHAMPHETAMINE AND VIOLENCE IN ILLINOIS 062009.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/METHAMPHETAMINE AND VIOLENCE IN ILLINOIS 062009.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/METHAMPHETAMINE%20AND%20VIOLENCE%20IN%20ILLINOIS%20062009.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/METHAMPHETAMINE AND VIOLENCE IN ILLINOIS 062009.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T21:47:34.677Z",
+      "durationMs": 521299,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 76,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 84,
+        "grade": "B",
+        "pageCount": 76,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 84, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4104-METHAMPHETAMINE_AND_VIOLENCE_IN_ILLINOIS.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4104-METHAMPHETAMINE_AND_VIOLENCE_IN_ILLINOIS.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4104-METHAMPHETAMINE_AND_VIOLENCE_IN_ILLINOIS.failure.json"
+      }
+    },
+    {
+      "publicationId": "4674",
+      "publicationTitle": "Addressing Police Officer Stress: Programs and Practices",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Addressing Police Stress FINAL-220523T17215932.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Addressing Police Stress FINAL-220523T17215932.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Addressing%20Police%20Stress%20FINAL-220523T17215932.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Addressing Police Stress FINAL-220523T17215932.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T21:49:12.356Z",
+      "durationMs": 1626727,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4674-Addressing_Police_Officer_Stress_Programs_and_Practices.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/Addressing Police Stress FINAL-220523T17215932.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4674-Addressing_Police_Officer_Stress_Programs_and_Practices.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4673",
+      "publicationTitle": "Understanding Police Officer Stress: A Review of the Literature",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Understanding Police Stress FINAL-220523T17244145.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Understanding Police Stress FINAL-220523T17244145.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Understanding%20Police%20Stress%20FINAL-220523T17244145.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Understanding Police Stress FINAL-220523T17244145.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T21:49:23.457Z",
+      "durationMs": 1637828,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4673-Understanding_Police_Officer_Stress_A_Review_of_the_Literature.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/Understanding Police Stress FINAL-220523T17244145.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4673-Understanding_Police_Officer_Stress_A_Review_of_the_Literature.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4637",
+      "publicationTitle": "Individual and Community Trauma: Individual Experiences in Collective Environments",
+      "priorityRank": 12,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Individual and Community Trauma- Individual Experiences in Collective Environments-200715T15003405.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Individual and Community Trauma- Individual Experiences in Collective Environments-200715T15003405.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Individual and Community Trauma- Individual Experiences in Collective Environments-200715T15003405.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Individual and Community Trauma- Individual Experiences in Collective Environments-200715T15003405.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T21:52:26.576Z",
+      "durationMs": 1322297,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 13,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 13,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4637-Individual_and_Community_Trauma_Individual_Experiences_in_Collective_Environments.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Individual and Community Trauma- Individual Experiences in Collective Environments-200715T15003405.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4637-Individual_and_Community_Trauma_Individual_Experiences_in_Collective_Environments.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "priorityRank": 13,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:03:46.352Z",
+      "durationMs": 1779643,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4641",
+      "publicationTitle": "Illinois Criminal Diversion Racial Impact Data Collection",
+      "priorityRank": 19,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:03:57.668Z",
+      "durationMs": 982990,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4641-Illinois_Criminal_Diversion_Racial_Impact_Data_Collection.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4641-Illinois_Criminal_Diversion_Racial_Impact_Data_Collection.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4484",
+      "publicationTitle": "Youth Alcohol Use: National and Illinois Trends, Consequences, and Interventions",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Youth and Alcohol-200720T16430485.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Youth and Alcohol-200720T16430485.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Youth and Alcohol-200720T16430485.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Youth and Alcohol-200720T16430485.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:03:58.982Z",
+      "durationMs": 2513353,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4484-Youth_Alcohol_Use_National_and_Illinois_Trends_Consequences_and_Interventions.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Youth and Alcohol-200720T16430485.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4484-Youth_Alcohol_Use_National_and_Illinois_Trends_Consequences_and_Interventions.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4494",
+      "publicationTitle": "An Evaluation of Transitional Housing Programs in Illinois for Victims of Domestic Violence and/or Human Trafficking",
+      "priorityRank": 25,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/full-report-of-TH-100319-191015T19583998.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/full-report-of-TH-100319-191015T19583998.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/full-report-of-TH-100319-191015T19583998.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/full-report-of-TH-100319-191015T19583998.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:07:51.689Z",
+      "durationMs": 232707,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 49,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 91,
+        "grade": "B",
+        "pageCount": 49,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 91, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4494-An_Evaluation_of_Transitional_Housing_Programs_in_Illinois_for_Victims_of_Domestic_Violence_and_or_Human_Trafficking.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4494-An_Evaluation_of_Transitional_Housing_Programs_in_Illinois_for_Victims_of_Domestic_Violence_and_or_Human_Trafficking.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4494-An_Evaluation_of_Transitional_Housing_Programs_in_Illinois_for_Victims_of_Domestic_Violence_and_or_Human_Trafficking.failure.json"
+      }
+    },
+    {
+      "publicationId": "4164",
+      "publicationTitle": "Student Perceptions of Campus Safety Initiatives Assessing Views of Critical Incident Prevention and Response",
+      "priorityRank": 24,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Campus_Study_Final_Report_June2010.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Campus_Study_Final_Report_June2010.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Campus_Study_Final_Report_June2010.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/Campus_Study_Final_Report_June2010.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:08:40.178Z",
+      "durationMs": 282509,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 72,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 78,
+        "grade": "C",
+        "pageCount": 72,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 78, below 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.font_unicode",
+          "Categories still below 100: Text Extractability, Form Accessibility, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.font_unicode"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Form Accessibility",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4164-Student_Perceptions_of_Campus_Safety_Initiatives_Assessing_Views_of_Critical_Incident_Prevention_and_Response.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4164-Student_Perceptions_of_Campus_Safety_Initiatives_Assessing_Views_of_Critical_Incident_Prevention_and_Response.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4164-Student_Perceptions_of_Campus_Safety_Initiatives_Assessing_Views_of_Critical_Incident_Prevention_and_Response.failure.json"
+      }
+    },
+    {
+      "publicationId": "4553",
+      "publicationTitle": "Reducing Substance Use Disorders and Related Offending: A Continuum of Evidence-Informed Practices in the Criminal Justice System",
+      "priorityRank": 20,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Continuum_Handout_043017-191011T20094312.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Continuum_Handout_043017-191011T20094312.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Continuum_Handout_043017-191011T20094312.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Continuum_Handout_043017-191011T20094312.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:09:51.935Z",
+      "durationMs": 1239578,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 21,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 21,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4553-Reducing_Substance_Use_Disorders_and_Related_Offending_A_Continuum_of_Evidence-Informed_Practices_in_the_Criminal_Justice_System.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/Continuum_Handout_043017-191011T20094312.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4553-Reducing_Substance_Use_Disorders_and_Related_Offending_A_Continuum_of_Evidence-Informed_Practices_in_the_Criminal_Justice_System.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3834",
+      "publicationTitle": "Illinois Integrated Justice Information System Strategic Plan 20032004",
+      "priorityRank": 26,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/iijisStrategicPlan0304.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/iijisStrategicPlan0304.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/iijisStrategicPlan0304.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/iijisStrategicPlan0304.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:11:23.843Z",
+      "durationMs": 212154,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 79,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 90,
+        "grade": "B",
+        "pageCount": 79,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 90, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3834-Illinois_Integrated_Justice_Information_System_Strategic_Plan_20032004.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3834-Illinois_Integrated_Justice_Information_System_Strategic_Plan_20032004.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3834-Illinois_Integrated_Justice_Information_System_Strategic_Plan_20032004.failure.json"
+      }
+    },
+    {
+      "publicationId": "4131",
+      "publicationTitle": "Redeploy Illinois 2nd Judicial Circuit Pilot Site Impact and Implementation Evaluation Report",
+      "priorityRank": 28,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Redeploy Illinois 2nd Judicial Circuit.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Redeploy Illinois 2nd Judicial Circuit.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Redeploy%20Illinois%202nd%20Judicial%20Circuit.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/Redeploy Illinois 2nd Judicial Circuit.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:11:25.021Z",
+      "durationMs": 93084,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 68,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 68,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4131-Redeploy_Illinois_2nd_Judicial_Circuit_Pilot_Site_Impact_and_Implementation_Evaluation_Report.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ResearchReports/Redeploy Illinois 2nd Judicial Circuit.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4131-Redeploy_Illinois_2nd_Judicial_Circuit_Pilot_Site_Impact_and_Implementation_Evaluation_Report.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3825",
+      "publicationTitle": "The Efficacy of Illinois Sexual Assault Nurse Examiner (SANE) Pilot Program",
+      "priorityRank": 27,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/SANE.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/SANE.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/SANE.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/SANE.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:11:37.319Z",
+      "durationMs": 177140,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 62,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 94,
+        "grade": "B",
+        "pageCount": 62,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 94, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3825-The_Efficacy_of_Illinois_Sexual_Assault_Nurse_Examiner_SANE_Pilot_Program.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3825-The_Efficacy_of_Illinois_Sexual_Assault_Nurse_Examiner_SANE_Pilot_Program.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3825-The_Efficacy_of_Illinois_Sexual_Assault_Nurse_Examiner_SANE_Pilot_Program.failure.json"
+      }
+    },
+    {
+      "publicationId": "4130",
+      "publicationTitle": "Redeploy Illinois Macon County Pilot Site Impact and Implementation Evaluation Report",
+      "priorityRank": 29,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Redeploy Illinois Macon County.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Redeploy Illinois Macon County.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Redeploy Illinois Macon County.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/Redeploy Illinois Macon County.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:13:01.940Z",
+      "durationMs": 98095,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 73,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 73,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4130-Redeploy_Illinois_Macon_County_Pilot_Site_Impact_and_Implementation_Evaluation_Report.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ResearchReports/Redeploy Illinois Macon County.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4130-Redeploy_Illinois_Macon_County_Pilot_Site_Impact_and_Implementation_Evaluation_Report.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3776",
+      "publicationTitle": "An Implementation Assessment of the Domestic Violence Probation Projects in Lake Winnebago and Kankakee Counties",
+      "priorityRank": 32,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/ImplementationKank.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/ImplementationKank.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/ImplementationKank.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/ImplementationKank.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:14:07.294Z",
+      "durationMs": 65353,
+      "original": {
+        "overallScore": 19,
+        "grade": "F",
+        "pageCount": 74,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 74,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3776-An_Implementation_Assessment_of_the_Domestic_Violence_Probation_Projects_in_Lake_Winnebago_and_Kankakee_Counties.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ResearchReports/ImplementationKank.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3776-An_Implementation_Assessment_of_the_Domestic_Violence_Probation_Projects_in_Lake_Winnebago_and_Kankakee_Counties.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4177",
+      "publicationTitle": "The Peoria Pulling Levers Drug Market Intervention A Review of Program Process Changes in Perception and Crime Impact",
+      "priorityRank": 30,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:15:17.363Z",
+      "durationMs": 232341,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 73,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 73,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4177-The_Peoria_Pulling_Levers_Drug_Market_Intervention_A_Review_of_Program_Process_Changes_in_Perception_and_Crime_Impact.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ResearchReports/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4177-The_Peoria_Pulling_Levers_Drug_Market_Intervention_A_Review_of_Program_Process_Changes_in_Perception_and_Crime_Impact.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4028",
+      "publicationTitle": "Illinois Integrated Justice Information System (IIJIS) 2005 Annual Report",
+      "priorityRank": 17,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/iijis2005.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/iijis2005.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/iijis2005.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/iijis2005.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:15:53.309Z",
+      "durationMs": 2217779,
+      "original": {
+        "overallScore": 14,
+        "grade": "F",
+        "pageCount": 23,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B",
+        "pageCount": 23,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 83, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4028-Illinois_Integrated_Justice_Information_System_IIJIS_2005_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4028-Illinois_Integrated_Justice_Information_System_IIJIS_2005_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4028-Illinois_Integrated_Justice_Information_System_IIJIS_2005_Annual_Report.failure.json"
+      }
+    },
+    {
+      "publicationId": "4531",
+      "publicationTitle": "S.T.O.P. Violence Against Women In Illinois A Multi-Year Plan: FFY14-16",
+      "priorityRank": 31,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/Implementation_Plan_d063c59a59.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/Implementation_Plan_d063c59a59.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/Implementation_Plan_d063c59a59.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/192.241.146.85/Implementation_Plan_d063c59a59.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:29:25.974Z",
+      "durationMs": 1068654,
+      "original": {
+        "overallScore": 18,
+        "grade": "F",
+        "pageCount": 63,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 64,
+        "grade": "D",
+        "pageCount": 63,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 64, below 100.",
+          "Blocking local standards findings remain: pdfua.font_unicode",
+          "Categories still below 100: Text Extractability, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_unicode"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/192.241.146.85/4531-S.T.O.P._Violence_Against_Women_In_Illinois_A_Multi-Year_Plan_FFY14-16.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4531-S.T.O.P._Violence_Against_Women_In_Illinois_A_Multi-Year_Plan_FFY14-16.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4531-S.T.O.P._Violence_Against_Women_In_Illinois_A_Multi-Year_Plan_FFY14-16.failure.json"
+      }
+    },
+    {
+      "publicationId": "4115",
+      "publicationTitle": "2004 Annual Report Motor Vehicle Theft Prevention Council",
+      "priorityRank": 21,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/ar2004.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/ar2004.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/ar2004.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/mvtpc/ar2004.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:29:52.238Z",
+      "durationMs": 2428781,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 83, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4115-2004_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4115-2004_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4115-2004_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json"
+      }
+    },
+    {
+      "publicationId": "4562",
+      "publicationTitle": "BRIDGES TO JUSTICE: A COMMUNITY ENGAGEMENT TOOLKIT FOR ADULT DIVERSION PROGRAMS",
+      "priorityRank": 23,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/ICJIA_ARI_Toolkit_2017.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/ICJIA_ARI_Toolkit_2017.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/ICJIA_ARI_Toolkit_2017.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/ICJIA_ARI_Toolkit_2017.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:41:10.879Z",
+      "durationMs": 2244526,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 64,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 64,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4562-BRIDGES_TO_JUSTICE_A_COMMUNITY_ENGAGEMENT_TOOLKIT_FOR_ADULT_DIVERSION_PROGRAMS.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/ICJIA_ARI_Toolkit_2017.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4562-BRIDGES_TO_JUSTICE_A_COMMUNITY_ENGAGEMENT_TOOLKIT_FOR_ADULT_DIVERSION_PROGRAMS.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4687",
+      "publicationTitle": "The Relationship Between Demographics, Region and Outcomes in Adult Redeploy Illinois Funded Programs",
+      "priorityRank": 18,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/DRO ARI FInal PDF with cover for posting-221209T19184767.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/DRO ARI FInal PDF with cover for posting-221209T19184767.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/DRO%20ARI%20FInal%20PDF%20with%20cover%20for%20posting-221209T19184767.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/DRO ARI FInal PDF with cover for posting-221209T19184767.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T22:41:25.775Z",
+      "durationMs": 3407741,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4687-The_Relationship_Between_Demographics_Region_and_Outcomes_in_Adult_Redeploy_Illinois_Funded_Programs.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/DRO ARI FInal PDF with cover for posting-221209T19184767.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4687-The_Relationship_Between_Demographics_Region_and_Outcomes_in_Adult_Redeploy_Illinois_Funded_Programs.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4605",
+      "publicationTitle": "Addressing Opioid Use Disorders in Community Corrections: A Survey of Illinois Probation Departments",
+      "priorityRank": 22,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T22:50:40.658Z",
+      "durationMs": 3494081,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 23,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 94,
+        "grade": "B",
+        "pageCount": 23,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 94, below 100.",
+          "Blocking local standards findings remain: pdfua.table_regularity",
+          "Categories still below 100: Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.table_regularity"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Table Markup",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4605-Addressing_Opioid_Use_Disorders_in_Community_Corrections_A_Survey_of_Illinois_Probation_Departments.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4605-Addressing_Opioid_Use_Disorders_in_Community_Corrections_A_Survey_of_Illinois_Probation_Departments.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4605-Addressing_Opioid_Use_Disorders_in_Community_Corrections_A_Survey_of_Illinois_Probation_Departments.failure.json"
+      }
+    }
+  ]
+}

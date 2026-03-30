@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-03-28T02:08:31.805Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 146,
+    "shortlistedCandidates": 50,
+    "byTier": {
+      "highest": 44,
+      "high": 6
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4660",
+      "publicationTitle": "Civil Rights Discrimination Complaint Form",
+      "selectorScore": 149,
+      "waveTier": "highest",
+      "pageCount": 7,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "agency_upload",
+      "serverHost": "192.241.146.85"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "3550",
+      "publicationTitle": "McGruff Will Your Familys Car be Stolen This Year",
+      "selectorScore": 147,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "3591",
+      "publicationTitle": "An Implementation Evaluation of the Enhanced Domestic Violence Probation Program in Champaign County",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "3652",
+      "publicationTitle": "Citizen Awareness Local Involvement Fuel Community Policing Program",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "3596",
+      "publicationTitle": "Community Policing in Chicago An Evaluation",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "3595",
+      "publicationTitle": "Evaluation of the Little Village Gang Violence Reduction Project The First Three Years",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "3649",
+      "publicationTitle": "Intimate Partner Violence in Illinois",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3613",
+      "publicationTitle": "Perceptions of Crime Trends in Illinois",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "3645",
+      "publicationTitle": "The Juvenile Justice Reform Act",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "3639",
+      "publicationTitle": "Trends in Illinois crime 19941998",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "3599",
+      "publicationTitle": "Probation Trends in Illinois",
+      "selectorScore": 144,
+      "waveTier": "highest",
+      "pageCount": 5,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "4488",
+      "publicationTitle": "Protecting Participants of Social Science Research",
+      "selectorScore": 143,
+      "waveTier": "highest",
+      "pageCount": 13,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "4192",
+      "publicationTitle": "InfoNet database reveals Illinois domestic violence victim demographics trends",
+      "selectorScore": 140,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "4129",
+      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 6",
+      "selectorScore": 140,
+      "waveTier": "highest",
+      "pageCount": 12,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "4189",
+      "publicationTitle": "Study measures impact of government services on juvenile community reentry",
+      "selectorScore": 138,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

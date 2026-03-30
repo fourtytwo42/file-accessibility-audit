@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-03-28T00:04:42.412Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 50,
+    "processed": 50,
+    "readyToReplace": 16,
+    "failedAfterRemediation": 34,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3998",
+    "publicationTitle": "The Festering Problem of Methamphetamine in Illinois",
+    "priorityRank": 48,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/winter.spring 04.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/winter.spring 04.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/winter.spring%2004.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/compiler/winter.spring 04.json",
+    "status": "failed_after_remediation",
+    "processedAt": "2026-03-28T00:04:42.411Z",
+    "durationMs": 87527,
+    "original": {
+      "overallScore": 21,
+      "grade": "F",
+      "pageCount": 8,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 75,
+      "grade": "C",
+      "pageCount": 8,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is C, not A.",
+        "Final overall score is 75, below 100.",
+        "Blocking local standards findings remain: pdfua.font_embedding",
+        "Categories still below 100: Text Extractability, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.font_embedding"
+      ],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "PDF/UA Compliance"
+      ]
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.failure.json"
+    }
+  }
+}

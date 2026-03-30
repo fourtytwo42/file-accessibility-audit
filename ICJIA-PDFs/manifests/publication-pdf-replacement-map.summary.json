@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-03-25T22:52:00.249Z",
+  "sourceDump": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/api-dumps/2026-03-25T21-19-49-164Z/publications.json",
+  "totalPdfRows": 1056,
+  "uniqueFileUrls": 1022,
+  "byStorageKind": {
+    "legacy_archive": 927,
+    "agency_upload": 20,
+    "researchhub_upload": 109,
+    "other_pdf": 0
+  },
+  "byServerHost": {
+    "143.244.146.43": 927,
+    "157.230.3.215": 109,
+    "192.241.146.85": 20
+  },
+  "missingCount": 3,
+  "outputJson": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/publication-pdf-replacement-map.json",
+  "outputCsv": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/exports/csv/publication-pdf-replacement-map.csv"
+}

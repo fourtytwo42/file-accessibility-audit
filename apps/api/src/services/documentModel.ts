@@ -1,3 +1,5 @@
+import type { PromotionGateResult } from './promotionGate.js'
+
 export type DocumentModelStatus = 'pending' | 'processing' | 'completed' | 'failed'
 
 export interface BoundingBox {
@@ -569,9 +571,15 @@ export interface DocumentModel {
         downgradedDeepAnalyses: number
         finalBlockingKeys: string[]
         lateConverged?: boolean
+        finalStopReason?: 'same_family_no_progress' | 'no_mutation' | 'family_shifted' | 'budget_exhausted' | 'completed'
       }
     }
+    residualCleanup?: {
+      dominantFamily?: 'structure' | 'figure' | 'mixed' | 'unknown'
+      finalStopReason?: 'same_family_no_progress' | 'no_mutation' | 'family_shifted' | 'budget_exhausted' | 'completed'
+    }
   } | null
+  promotionGate?: PromotionGateResult | null
   manualReviewFlags: ModelReviewFlag[]
   aiAppliedChanges: AppliedChange[]
   aiSuggestedChanges: SuggestedChange[]

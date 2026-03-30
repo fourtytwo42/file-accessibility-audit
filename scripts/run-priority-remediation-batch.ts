@@ -1,7 +1,11 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
+import { pathToFileURL } from 'node:url'
 import { analyzePDF } from '../apps/api/src/services/pdfAnalyzer.ts'
 import { remediatePdfWithAgent } from '../apps/api/src/services/agentRemediationService.ts'
+import { evaluatePromotionGate } from '../apps/api/src/services/promotionGate.ts'
+import type { PromotionLifecycleStatus } from '../apps/api/src/services/promotionLedger.ts'
 
 type PriorityCandidate = {
   priorityRank: number
@@ -54,11 +58,8 @@ type OutcomeRecord = {
   fileUrl: string | null
   storageKind: string | null
   originalReportPath: string
-  status:
-    | 'ready_to_replace'
-    | 'failed_after_remediation'
-    | 'source_missing'
-    | 'processing_error'
+  status: 'remediated_pass_candidate' | 'ready_to_replace' | 'failed_after_remediation' | 'source_missing' | 'processing_error'
+  promotionStatus: PromotionLifecycleStatus | null
   processedAt: string
   durationMs: number
   original: {
@@ -86,6 +87,11 @@ type OutcomeRecord = {
     detailedReportPath: string | null
     failureReportPath: string | null
   }
+  checksums?: {
+    gateEvaluatedBufferSha256: string | null
+    remediatedPdfSha256: string | null
+    stagedReplacementSha256: string | null
+  }
   deferred?: {
     reasonCode: string
     skipNextBatch: boolean
@@ -101,6 +107,7 @@ type OutcomesManifest = {
     targetCandidates: number
     processed: number
     readyToReplace: number
+    remediatedPassCandidates?: number
     failedAfterRemediation: number
     sourceMissing: number
     processingError: number
@@ -213,11 +220,17 @@ function timeoutFailureRecord(
       criticalManualReviewFlagCodes: [],
       unresolvedCategoryLabels: [],
     },
+    promotionStatus: null,
     artifacts: {
       remediatedPdfPath: null,
       stagedReplacementPath: null,
       detailedReportPath: null,
       failureReportPath,
+    },
+    checksums: {
+      gateEvaluatedBufferSha256: null,
+      remediatedPdfSha256: null,
+      stagedReplacementSha256: null,
     },
     deferred: {
       reasonCode: 'excessive_runtime_loop',
@@ -357,10 +370,12 @@ function normalizePriorityManifest(value: unknown): PriorityManifest {
 }
 
 function saveOutcomes(manifest: OutcomesManifest, targetCandidates: number): void {
+  const remediatedPassCandidates = manifest.outcomes.filter(entry => entry.status === 'remediated_pass_candidate' || entry.status === 'ready_to_replace').length
   const totals = {
     targetCandidates,
     processed: manifest.outcomes.length,
-    readyToReplace: manifest.outcomes.filter(entry => entry.status === 'ready_to_replace').length,
+    readyToReplace: remediatedPassCandidates,
+    remediatedPassCandidates,
     failedAfterRemediation: manifest.outcomes.filter(entry => entry.status === 'failed_after_remediation').length,
     sourceMissing: manifest.outcomes.filter(entry => entry.status === 'source_missing').length,
     processingError: manifest.outcomes.filter(entry => entry.status === 'processing_error').length,
@@ -382,45 +397,12 @@ function saveOutcomes(manifest: OutcomesManifest, targetCandidates: number): voi
   })
 }
 
-function gateRemediatedResult(input: {
-  finalResult: any
-  manualReviewFlags: Array<{ code: string; severity: string; label?: string; details?: string }>
-}): {
-  passed: boolean
-  reasons: string[]
-  blockingLocalFindingKeys: string[]
-  criticalManualReviewFlagCodes: string[]
-  unresolvedCategoryLabels: string[]
-} {
-  const ignoredBlockingFindingKeys = new Set(['category.color_contrast'])
-  const ignoredCategoryLabels = new Set(['Color Contrast'])
-  const blockingLocalFindingKeys = (input.finalResult.localStandards?.findings || [])
-    .filter((finding: any) => finding.blocking)
-    .filter((finding: any) => !ignoredBlockingFindingKeys.has(finding.key))
-    .map((finding: any) => finding.key)
-  const criticalManualReviewFlagCodes = (input.manualReviewFlags || [])
-    .filter(flag => flag.severity === 'critical')
-    .map(flag => flag.code)
-  const unresolvedCategoryLabels = (input.finalResult.categories || [])
-    .filter((category: any) => typeof category.score === 'number' && category.score < 100)
-    .filter((category: any) => !ignoredCategoryLabels.has(category.label))
-    .map((category: any) => category.label)
+function sha256Hex(buffer: Buffer): string {
+  return crypto.createHash('sha256').update(buffer).digest('hex')
+}
 
-  const reasons: string[] = []
-  if (input.finalResult.isScanned) reasons.push('Document still appears scanned/image-only after remediation.')
-  if (input.finalResult.grade !== 'A') reasons.push(`Final grade is ${input.finalResult.grade}, not A.`)
-  if (input.finalResult.overallScore < 100) reasons.push(`Final overall score is ${input.finalResult.overallScore}, below 100.`)
-  if (blockingLocalFindingKeys.length) reasons.push(`Blocking local standards findings remain: ${blockingLocalFindingKeys.join(', ')}`)
-  if (criticalManualReviewFlagCodes.length) reasons.push(`Critical manual review flags remain: ${criticalManualReviewFlagCodes.join(', ')}`)
-  if (unresolvedCategoryLabels.length) reasons.push(`Categories still below 100: ${unresolvedCategoryLabels.join(', ')}`)
-
-  return {
-    passed: reasons.length === 0,
-    reasons,
-    blockingLocalFindingKeys,
-    criticalManualReviewFlagCodes,
-    unresolvedCategoryLabels,
-  }
+async function sha256OfFile(filePath: string): Promise<string> {
+  return sha256Hex(await fs.promises.readFile(filePath))
 }
 
 async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRecord> {
@@ -455,11 +437,17 @@ async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRe
         criticalManualReviewFlagCodes: [],
         unresolvedCategoryLabels: [],
       },
+      promotionStatus: null,
       artifacts: {
         remediatedPdfPath: null,
         stagedReplacementPath: null,
         detailedReportPath: null,
         failureReportPath,
+      },
+      checksums: {
+        gateEvaluatedBufferSha256: null,
+        remediatedPdfSha256: null,
+        stagedReplacementSha256: null,
       },
     }
     writeJson(failureReportPath, record)
@@ -491,10 +479,11 @@ async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRe
     ensureDir(path.dirname(remediatedPdfPath))
     await fs.promises.writeFile(remediatedPdfPath, remediation.buffer)
 
-    const gate = gateRemediatedResult({
-      finalResult: remediation.finalResult,
+    const gate = evaluatePromotionGate({
+      analysisResult: remediation.finalResult,
       manualReviewFlags: remediation.model.manualReviewFlags || [],
     })
+    const gateEvaluatedBufferSha256 = sha256Hex(remediation.buffer)
 
     const detailed = {
       generatedAt: new Date().toISOString(),
@@ -525,15 +514,37 @@ async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRe
         failureProfile: remediation.model.failureProfile,
       },
       gate,
+      promotionStatus: null,
+      checksums: {
+        gateEvaluatedBufferSha256,
+        remediatedPdfSha256: null,
+        stagedReplacementSha256: null,
+      },
       remediatedPdfPath,
       stagedReplacementPath: gate.passed ? stagedReplacementPath : null,
     }
-    writeJson(detailedReportPath, detailed)
 
     if (gate.passed) {
       ensureDir(path.dirname(stagedReplacementPath))
       await fs.promises.copyFile(remediatedPdfPath, stagedReplacementPath)
     } else {
+      // Failure details are written after checksum collection so the report records
+      // the exact bytes used for the final gate evaluation.
+    }
+
+    const remediatedPdfSha256 = await sha256OfFile(remediatedPdfPath)
+    const stagedReplacementSha256 = gate.passed ? await sha256OfFile(stagedReplacementPath) : null
+    if (remediatedPdfSha256 !== gateEvaluatedBufferSha256) {
+      throw new Error('Saved remediated PDF bytes do not match the final gate-evaluated buffer.')
+    }
+    if (gate.passed && stagedReplacementSha256 !== gateEvaluatedBufferSha256) {
+      throw new Error('Staged replacement bytes do not match the final gate-evaluated buffer.')
+    }
+
+    detailed.checksums.remediatedPdfSha256 = remediatedPdfSha256
+    detailed.checksums.stagedReplacementSha256 = stagedReplacementSha256
+    writeJson(detailedReportPath, detailed)
+    if (!gate.passed) {
       writeJson(failureReportPath, detailed)
     }
 
@@ -549,7 +560,8 @@ async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRe
       fileUrl: candidate.fileUrl,
       storageKind: candidate.storageKind,
       originalReportPath: candidate.reportPath,
-      status: gate.passed ? 'ready_to_replace' : 'failed_after_remediation',
+      status: gate.passed ? 'remediated_pass_candidate' : 'failed_after_remediation',
+      promotionStatus: null,
       processedAt: new Date().toISOString(),
       durationMs: Date.now() - startedAt,
       original: {
@@ -570,6 +582,11 @@ async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRe
         stagedReplacementPath: gate.passed ? stagedReplacementPath : null,
         detailedReportPath,
         failureReportPath: gate.passed ? null : failureReportPath,
+      },
+      checksums: {
+        gateEvaluatedBufferSha256,
+        remediatedPdfSha256,
+        stagedReplacementSha256,
       },
     }
   } catch (error) {
@@ -616,11 +633,17 @@ async function processCandidate(candidate: PriorityCandidate): Promise<OutcomeRe
         criticalManualReviewFlagCodes: [],
         unresolvedCategoryLabels: [],
       },
+      promotionStatus: null,
       artifacts: {
         remediatedPdfPath: null,
         stagedReplacementPath: null,
         detailedReportPath: null,
         failureReportPath,
+      },
+      checksums: {
+        gateEvaluatedBufferSha256: null,
+        remediatedPdfSha256: null,
+        stagedReplacementSha256: null,
       },
     }
     writeJson(failureReportPath, record)
@@ -663,7 +686,9 @@ async function main(): Promise<void> {
   console.log(JSON.stringify({ completed: outcomes.totals.processed, totals: outcomes.totals }, null, 2))
 }
 
-main().catch(error => {
-  console.error(error instanceof Error ? error.stack || error.message : String(error))
-  process.exit(1)
-})
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(error => {
+    console.error(error instanceof Error ? error.stack || error.message : String(error))
+    process.exit(1)
+  })
+}

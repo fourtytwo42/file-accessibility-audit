@@ -1,0 +1,133 @@
+{
+  "generatedAt": "2026-03-26T02:53:31.657Z",
+  "sourceReportRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan",
+  "scannedReportsConsidered": 909,
+  "selectedCandidates": 259,
+  "byTier": {
+    "highest": 22,
+    "medium": 166,
+    "high": 71
+  },
+  "top10": [
+    {
+      "priorityRank": 1,
+      "passLikelihoodScore": 105,
+      "priorityTier": "highest",
+      "publicationId": "4758",
+      "publicationTitle": "Firearm Prohibitors and Records Improvement Task Force 2025 Report",
+      "overallScore": 61,
+      "grade": "D",
+      "pageCount": 20,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/2025FirearmProhibitorsReport-250626T19175938.pdf"
+    },
+    {
+      "priorityRank": 2,
+      "passLikelihoodScore": 101,
+      "priorityTier": "highest",
+      "publicationId": "4744",
+      "publicationTitle": "Lewd Sexual Display in a Penal Institution: 2024 Report",
+      "overallScore": 57,
+      "grade": "F",
+      "pageCount": 12,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Lewd Sexual Display in Prison 2024 Annual Report 1-26-25-250127T16462808.pdf"
+    },
+    {
+      "priorityRank": 3,
+      "passLikelihoodScore": 97,
+      "priorityTier": "medium",
+      "publicationId": "4700",
+      "publicationTitle": "R3 2022 Annual Report",
+      "overallScore": 75,
+      "grade": "C",
+      "pageCount": 23,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/R3_Report_Final_c3f12abc60.pdf"
+    },
+    {
+      "priorityRank": 4,
+      "passLikelihoodScore": 96,
+      "priorityTier": "highest",
+      "publicationId": "4534",
+      "publicationTitle": "Safe From the Start Year 13: 2001-2014",
+      "overallScore": 56,
+      "grade": "F",
+      "pageCount": 48,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf"
+    },
+    {
+      "priorityRank": 5,
+      "passLikelihoodScore": 89,
+      "priorityTier": "highest",
+      "publicationId": "4726",
+      "publicationTitle": "InfoNet: State Fiscal Year 2023 Highlights",
+      "overallScore": 53,
+      "grade": "F",
+      "pageCount": 1,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/SFY23 InfoNet Infographic-240305T20320674.pdf"
+    },
+    {
+      "priorityRank": 6,
+      "passLikelihoodScore": 88,
+      "priorityTier": "highest",
+      "publicationId": "4771",
+      "publicationTitle": "Lewd Sexual Display in a Penal Institution: State Fiscal Year 2025 Report",
+      "overallScore": 52,
+      "grade": "F",
+      "pageCount": 16,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/FINAL Lewd Sexual Display in Prison 2025 Annual Report-251222T18474645.pdf"
+    },
+    {
+      "priorityRank": 7,
+      "passLikelihoodScore": 87,
+      "priorityTier": "highest",
+      "publicationId": "4699",
+      "publicationTitle": "Criminal History Record Checks for Federally Assisted Housing Applications: Annual Report",
+      "overallScore": 57,
+      "grade": "F",
+      "pageCount": 8,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Federally Assisted Housing Criminal Records Check Annual Report 2023-230328T20561734.pdf"
+    },
+    {
+      "priorityRank": 8,
+      "passLikelihoodScore": 85,
+      "priorityTier": "high",
+      "publicationId": "4659",
+      "publicationTitle": "Civil Rights Policy 2019",
+      "overallScore": 41,
+      "grade": "F",
+      "pageCount": 8,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/Civil_Rights_Policy_2019_98afd9b363.pdf"
+    },
+    {
+      "priorityRank": 9,
+      "passLikelihoodScore": 84,
+      "priorityTier": "highest",
+      "publicationId": "4768",
+      "publicationTitle": "Implementation Evaluation of a Program to Assist Victims of Violent Crime: Staff and Stakeholder Feedback",
+      "overallScore": 52,
+      "grade": "F",
+      "pageCount": 50,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/ESL CERT Leadership Team Evaluation-251210T19070206.pdf"
+    },
+    {
+      "priorityRank": 10,
+      "passLikelihoodScore": 83,
+      "priorityTier": "high",
+      "publicationId": "4750",
+      "publicationTitle": "2024-2025 Illinois Traffic and Pedestrian Stop Data Use and Collection Task Force Findings",
+      "overallScore": 47,
+      "grade": "F",
+      "pageCount": 17,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Traffic and Pedestrian Stop Data Use and Collection Task Force 2025 Report - FINAL 2-24-25-250328T14564559.pdf"
+    }
+  ]
+}

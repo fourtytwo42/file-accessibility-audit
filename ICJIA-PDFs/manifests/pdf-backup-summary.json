@@ -1,0 +1,12 @@
+{
+  "recordedAt": "2026-03-25T21:23:14.872Z",
+  "sourceDump": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/api-dumps/2026-03-25T21-19-49-164Z/publications.json",
+  "totalPdfRows": 1056,
+  "completedPublicationIds": 1056,
+  "downloaded": 1013,
+  "skippedExisting": 34,
+  "failed": 9,
+  "backupRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/original-pdfs",
+  "eventsPath": "/home/hendo420/pdfaf/ICJIA-PDFs/logs/pdf-backup-events.jsonl",
+  "statePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pdf-backup-state.json"
+}

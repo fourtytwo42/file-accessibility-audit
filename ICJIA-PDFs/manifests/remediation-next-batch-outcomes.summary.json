@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-03-27T23:46:16.561Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-batch-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 20,
+    "processed": 20,
+    "readyToReplace": 10,
+    "failedAfterRemediation": 7,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4183",
+    "publicationTitle": "Juvenile reform specialized services help fuel fight against probationer recidivism",
+    "priorityRank": 18,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-27T23:46:16.560Z",
+    "durationMs": 3728161,
+    "original": {
+      "overallScore": 22,
+      "grade": "F",
+      "pageCount": 8,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 60-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.failure.json"
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-03-26T02:50:00Z",
+  "replacementMapPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/publication-pdf-replacement-map.json",
+  "passingStatusPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/complete-passing-publication-status.json",
+  "targetFileCount": 910,
+  "limit": null,
+  "analyzed": 909,
+  "skippedExisting": 0,
+  "failed": 1,
+  "normalReportCount": 909,
+  "repairedFallbackReportCount": 1,
+  "totalTerminalReportCount": 910,
+  "terminalStatus": "complete_with_one_partial_repair_exception",
+  "exceptionsPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remaining-source-scan.exceptions.json",
+  "reportRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan",
+  "groupPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remaining-source-scan-groups.json",
+  "groupCsvPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/exports/csv/remaining-source-scan-groups.csv"
+}

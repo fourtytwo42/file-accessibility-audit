@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-03-27T20:27:38.000Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 259,
+    "processed": 259,
+    "readyToReplace": 67,
+    "failedAfterRemediation": 191,
+    "sourceMissing": 0,
+    "processingError": 1,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4573",
+    "publicationTitle": "Ad Hoc Victim Services Committee Research Report",
+    "priorityRank": 253,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 39,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-27T20:27:38.000Z",
+    "durationMs": 18878000,
+    "original": {
+      "overallScore": 45,
+      "grade": "F",
+      "pageCount": 145,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing was manually stopped after excessive runtime in repeated remediation loops.",
+        "This file should be treated as broken/deferred for the current wave and skipped in the next batch unless the loop behavior is fixed."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4573-Ad_Hoc_Victim_Services_Committee_Research_Report.failure.json"
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Runner was manually stopped after more than five hours of repeated light-inspection and remediation_fast loops without terminalizing."
+    }
+  }
+}

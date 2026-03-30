@@ -1,0 +1,221 @@
+{
+  "startedAt": "2026-03-30T02:44:12.811Z",
+  "generatedAt": "2026-03-30T03:20:38.750Z",
+  "status": "running",
+  "fatalError": null,
+  "totals": {
+    "cases": 5,
+    "completed": 3,
+    "remaining": 2,
+    "pass": 0,
+    "hardFail": 2,
+    "processingError": 1
+  },
+  "byInspectionPattern": {
+    "deep_only": 0,
+    "light_only": 0,
+    "mixed": 2,
+    "unknown": 0,
+    "generic_timeout_wording": 0
+  },
+  "byDominantPhase": {
+    "ownership": 0,
+    "figure_description": 2,
+    "structure": 0,
+    "mixed": 0,
+    "unknown": 0
+  },
+  "latestCompletedCase": {
+    "name": "Court System Get The Facts",
+    "category": "structure",
+    "terminalState": "processing_error",
+    "durationMs": 1623040
+  },
+  "outcomes": [
+    {
+      "name": "Kendall County Profile",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "category": "ownership",
+      "ok": true,
+      "durationMs": 309067,
+      "terminalState": "hard_fail",
+      "initial": {
+        "overallScore": 24,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure"
+        ]
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "remediationMetrics": {
+          "inspections": {
+            "lightFresh": 4,
+            "lightReused": 5,
+            "deepFresh": 6,
+            "deepReused": 4,
+            "deepDowngradedToLight": 9
+          },
+          "phases": {
+            "ownershipState": {
+              "initialRiskCount": 5,
+              "finalRiskCount": 0,
+              "freshDeepInspections": 4,
+              "reusedInspections": 1,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "figureDescriptionState": {
+              "initialMissingAltCount": 2,
+              "finalMissingAltCount": 4,
+              "initialDecorativeFigureCount": 0,
+              "finalDecorativeFigureCount": 0,
+              "freshDeepInspections": 6,
+              "reusedInspections": 3,
+              "downgradedToLight": true,
+              "lateConverged": true,
+              "focusedRescueSkippedBecauseLateConverged": true,
+              "finalStopReason": "same_blocking_keys"
+            },
+            "structureState": {
+              "freshDeepAnalyses": 1,
+              "downgradedDeepAnalyses": 0,
+              "lateConverged": false,
+              "finalBlockingKeys": [
+                "pdfua.figure_alt_or_artifact"
+              ]
+            }
+          }
+        },
+        "inspectionProfile": {
+          "pattern": "mixed",
+          "dominantPhase": "figure_description",
+          "deepDowngradedToLight": true
+        }
+      },
+      "figurePhaseDiagnostic": {
+        "focusedRescueRan": false,
+        "skippedBecauseLateConverged": true,
+        "finalStopReason": "same_blocking_keys"
+      }
+    },
+    {
+      "name": "CSEC 2008 Research Bulletin",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "category": "figure_description",
+      "ok": true,
+      "durationMs": 229401,
+      "terminalState": "hard_fail",
+      "initial": {
+        "overallScore": 22,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure",
+          "pdfua.page_tabs"
+        ]
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.logical_structure"
+        ],
+        "remediationMetrics": {
+          "inspections": {
+            "lightFresh": 8,
+            "lightReused": 29,
+            "deepFresh": 9,
+            "deepReused": 0,
+            "deepDowngradedToLight": 28
+          },
+          "phases": {
+            "ownershipState": {
+              "initialRiskCount": 1,
+              "finalRiskCount": 0,
+              "freshDeepInspections": 6,
+              "reusedInspections": 0,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "figureDescriptionState": {
+              "initialMissingAltCount": 4,
+              "finalMissingAltCount": 0,
+              "initialDecorativeFigureCount": 1,
+              "finalDecorativeFigureCount": 1,
+              "freshDeepInspections": 7,
+              "reusedInspections": 0,
+              "downgradedToLight": false,
+              "lateConverged": false,
+              "focusedRescueRan": true,
+              "finalStopReason": "completed"
+            },
+            "structureState": {
+              "freshDeepAnalyses": 0,
+              "downgradedDeepAnalyses": 0,
+              "lateConverged": false,
+              "finalBlockingKeys": [
+                "pdfua.figure_alt_or_artifact",
+                "pdfua.logical_structure"
+              ]
+            }
+          }
+        },
+        "inspectionProfile": {
+          "pattern": "mixed",
+          "dominantPhase": "figure_description",
+          "deepDowngradedToLight": true
+        }
+      },
+      "figurePhaseDiagnostic": {
+        "focusedRescueRan": true,
+        "skippedBecauseLateConverged": false,
+        "finalStopReason": "completed"
+      }
+    },
+    {
+      "name": "Court System Get The Facts",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
+      "category": "structure",
+      "ok": false,
+      "durationMs": 1623040,
+      "terminalState": "processing_error",
+      "initial": {
+        "overallScore": 26,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure",
+          "pdfua.metadata_identification"
+        ]
+      },
+      "final": null,
+      "figurePhaseDiagnostic": {
+        "focusedRescueRan": false,
+        "skippedBecauseLateConverged": false,
+        "finalStopReason": "budget_exhausted"
+      },
+      "error": {
+        "code": "EXCESSIVE_RUNTIME",
+        "message": "Inspection budget exceeded (light=4, deep=9, total=13)."
+      }
+    }
+  ]
+}

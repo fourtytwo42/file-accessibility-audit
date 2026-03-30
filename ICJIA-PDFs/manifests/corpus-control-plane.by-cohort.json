@@ -1,0 +1,161 @@
+{
+  "generatedAt": "2026-03-30T20:53:28.151Z",
+  "cohorts": {
+    "short_high_likelihood": {
+      "totalRows": 27,
+      "byCurrentCorpusStatus": {
+        "verified_pass": 18,
+        "discovered": 0,
+        "analyzed": 1,
+        "queued_for_remediation": 0,
+        "remediated_fail": 7,
+        "processing_error": 1,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "samplePublicationIds": [
+        "3513",
+        "3659",
+        "3669",
+        "3671",
+        "3685",
+        "3755",
+        "3873",
+        "3907",
+        "3912",
+        "3915"
+      ]
+    },
+    "figure_heavy": {
+      "totalRows": 686,
+      "byCurrentCorpusStatus": {
+        "verified_pass": 17,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 628,
+        "processing_error": 41,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "samplePublicationIds": [
+        "3460",
+        "3468",
+        "3485",
+        "3487",
+        "3489",
+        "3494",
+        "3495",
+        "3539",
+        "3567",
+        "3582"
+      ]
+    },
+    "structure_heavy": {
+      "totalRows": 143,
+      "byCurrentCorpusStatus": {
+        "verified_pass": 42,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 98,
+        "processing_error": 3,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "samplePublicationIds": [
+        "3465",
+        "3483",
+        "3496",
+        "3518",
+        "3530",
+        "3550",
+        "3566",
+        "3569",
+        "3575",
+        "3577"
+      ]
+    },
+    "font_heavy": {
+      "totalRows": 14,
+      "byCurrentCorpusStatus": {
+        "verified_pass": 0,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 14,
+        "processing_error": 0,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "samplePublicationIds": [
+        "3838",
+        "4099",
+        "4144",
+        "4151",
+        "4156",
+        "4166",
+        "4168",
+        "4172",
+        "4173",
+        "4174"
+      ]
+    },
+    "long_report": {
+      "totalRows": 11,
+      "byCurrentCorpusStatus": {
+        "verified_pass": 9,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 2,
+        "processing_error": 0,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "samplePublicationIds": [
+        "3703",
+        "3710",
+        "3829",
+        "3840",
+        "3865",
+        "3900",
+        "4010",
+        "4085",
+        "4091",
+        "4103"
+      ]
+    },
+    "manual_tail": {
+      "totalRows": 175,
+      "byCurrentCorpusStatus": {
+        "verified_pass": 0,
+        "discovered": 3,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 117,
+        "processing_error": 55,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "samplePublicationIds": [
+        "3419",
+        "3421",
+        "3423",
+        "3424",
+        "3425",
+        "3426",
+        "3427",
+        "3428",
+        "3429",
+        "3430"
+      ]
+    }
+  }
+}

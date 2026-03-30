@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-03-29T02:37:10.456Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-lower-confidence-batch-4-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 100,
+    "processed": 100,
+    "readyToReplace": 19,
+    "failedAfterRemediation": 79,
+    "sourceMissing": 0,
+    "processingError": 2,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3942",
+    "publicationTitle": "Lake County Juvenile Profile",
+    "priorityRank": 99,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Lake.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Lake.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Lake.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/JuvenileCounty/Lake.json",
+    "status": "failed_after_remediation",
+    "processedAt": "2026-03-29T02:37:10.455Z",
+    "durationMs": 621184,
+    "original": {
+      "overallScore": 24,
+      "grade": "F",
+      "pageCount": 131,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 96,
+      "grade": "B",
+      "pageCount": 131,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 96, below 100.",
+        "Categories still below 100: Alt Text on Images"
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": [
+        "Alt Text on Images"
+      ]
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3942-Lake_County_Juvenile_Profile.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3942-Lake_County_Juvenile_Profile.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3942-Lake_County_Juvenile_Profile.failure.json"
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "generatedAt": "2026-03-27T20:47:21.717Z",
+  "totals": {
+    "remainingPublicationRowsConsidered": 690,
+    "shortlistedCandidates": 20,
+    "byTier": {
+      "highest": 12,
+      "high": 8
+    }
+  },
+  "top10": [
+    {
+      "nextWaveRank": 1,
+      "publicationId": "4050",
+      "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+      "passLikelihoodScore": 73,
+      "waveTier": "highest",
+      "overallScore": 29,
+      "pageCount": 2,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 2,
+      "publicationId": "4677",
+      "publicationTitle": "Parole and Mandatory Supervised Release in Illinois",
+      "passLikelihoodScore": 72,
+      "waveTier": "highest",
+      "overallScore": 28,
+      "pageCount": 21,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextWaveRank": 3,
+      "publicationId": "3787",
+      "publicationTitle": "Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
+      "passLikelihoodScore": 72,
+      "waveTier": "highest",
+      "overallScore": 28,
+      "pageCount": 12,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 4,
+      "publicationId": "4506",
+      "publicationTitle": "Issues in Policing Rural Areas: A Review of the Literature",
+      "passLikelihoodScore": 72,
+      "waveTier": "highest",
+      "overallScore": 28,
+      "pageCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 5,
+      "publicationId": "4509",
+      "publicationTitle": "Criminal Justice System Utilization in Rural Areas",
+      "passLikelihoodScore": 72,
+      "waveTier": "highest",
+      "overallScore": 28,
+      "pageCount": 17,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 6,
+      "publicationId": "4153",
+      "publicationTitle": "Juvenile corrections and parole",
+      "passLikelihoodScore": 70,
+      "waveTier": "highest",
+      "overallScore": 26,
+      "pageCount": 2,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 7,
+      "publicationId": "4167",
+      "publicationTitle": "Juvenile court",
+      "passLikelihoodScore": 70,
+      "waveTier": "highest",
+      "overallScore": 26,
+      "pageCount": 2,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 8,
+      "publicationId": "4169",
+      "publicationTitle": "Juvenile sentencing",
+      "passLikelihoodScore": 70,
+      "waveTier": "highest",
+      "overallScore": 26,
+      "pageCount": 2,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextWaveRank": 9,
+      "publicationId": "4731",
+      "publicationTitle": "State Fiscal Year 2024 Illinois Freedom from Drone Surveillance Act Report (without Appendices)",
+      "passLikelihoodScore": 70,
+      "waveTier": "highest",
+      "overallScore": 26,
+      "pageCount": 5,
+      "storageKind": "agency_upload",
+      "serverHost": "192.241.146.85"
+    },
+    {
+      "nextWaveRank": 10,
+      "publicationId": "4739",
+      "publicationTitle": "SFY24 ICJIA Annual Report",
+      "passLikelihoodScore": 68,
+      "waveTier": "highest",
+      "overallScore": 28,
+      "pageCount": 30,
+      "storageKind": "agency_upload",
+      "serverHost": "192.241.146.85"
+    }
+  ]
+}

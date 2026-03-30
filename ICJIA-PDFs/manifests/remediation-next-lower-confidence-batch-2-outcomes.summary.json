@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-03-28T22:50:40.659Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-lower-confidence-batch-2-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 32,
+    "processed": 32,
+    "readyToReplace": 16,
+    "failedAfterRemediation": 16,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4605",
+    "publicationTitle": "Addressing Opioid Use Disorders in Community Corrections: A Survey of Illinois Probation Departments",
+    "priorityRank": 22,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "157.230.3.215",
+    "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.pdf",
+    "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.pdf",
+    "storageKind": "researchhub_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Opioid_MAT_Probation_Article_PDF_102618-191011T20092013.json",
+    "status": "failed_after_remediation",
+    "processedAt": "2026-03-28T22:50:40.658Z",
+    "durationMs": 3494081,
+    "original": {
+      "overallScore": 26,
+      "grade": "F",
+      "pageCount": 23,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 94,
+      "grade": "B",
+      "pageCount": 23,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 94, below 100.",
+        "Blocking local standards findings remain: pdfua.table_regularity",
+        "Categories still below 100: Table Markup, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.table_regularity"
+      ],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": [
+        "Table Markup",
+        "PDF/UA Compliance"
+      ]
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4605-Addressing_Opioid_Use_Disorders_in_Community_Corrections_A_Survey_of_Illinois_Probation_Departments.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4605-Addressing_Opioid_Use_Disorders_in_Community_Corrections_A_Survey_of_Illinois_Probation_Departments.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4605-Addressing_Opioid_Use_Disorders_in_Community_Corrections_A_Survey_of_Illinois_Probation_Departments.failure.json"
+    }
+  }
+}

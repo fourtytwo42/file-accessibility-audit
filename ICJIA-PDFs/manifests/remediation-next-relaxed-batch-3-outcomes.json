@@ -1,0 +1,1924 @@
+{
+  "generatedAt": "2026-03-28T14:18:27.726Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-3-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 46,
+    "processed": 46,
+    "readyToReplace": 41,
+    "failedAfterRemediation": 1,
+    "sourceMissing": 0,
+    "processingError": 4,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3754",
+      "publicationTitle": "PIATT County Profile",
+      "priorityRank": 3,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Piatt.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Piatt.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Piatt.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Piatt.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:22:02.656Z",
+      "durationMs": 845396,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3754-PIATT_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Piatt.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3754-PIATT_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3749",
+      "publicationTitle": "OGLE County Profile",
+      "priorityRank": 1,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Ogle.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Ogle.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Ogle.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Ogle.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:22:03.863Z",
+      "durationMs": 846603,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3749-OGLE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Ogle.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3749-OGLE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3745",
+      "publicationTitle": "PERRY County Profile",
+      "priorityRank": 2,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Perry.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Perry.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Perry.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Perry.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:22:15.019Z",
+      "durationMs": 857759,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3745-PERRY_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Perry.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3745-PERRY_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3751",
+      "publicationTitle": "PIKE County Profile",
+      "priorityRank": 4,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Pike.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Pike.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Pike.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Pike.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:22:15.318Z",
+      "durationMs": 858058,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3751-PIKE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Pike.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3751-PIKE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3750",
+      "publicationTitle": "POPE County Profile",
+      "priorityRank": 5,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Pope.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Pope.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Pope.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Pope.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:22:16.140Z",
+      "durationMs": 858880,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3750-POPE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Pope.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3750-POPE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3723",
+      "publicationTitle": "RICHLAND County Profile",
+      "priorityRank": 8,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Richland.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Richland.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Richland.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Richland.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:22:37.744Z",
+      "durationMs": 880484,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3723-RICHLAND_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Richland.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3723-RICHLAND_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3861",
+      "publicationTitle": "PUTNAM County Profile",
+      "priorityRank": 7,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Putnam.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Putnam.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Putnam.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Putnam.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:23:02.396Z",
+      "durationMs": 905136,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3861-PUTNAM_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Putnam.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3861-PUTNAM_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3741",
+      "publicationTitle": "PULASKI County Profile",
+      "priorityRank": 6,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Pulaski.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Pulaski.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Pulaski.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Pulaski.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:23:09.556Z",
+      "durationMs": 912296,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3741-PULASKI_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Pulaski.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3741-PULASKI_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3733",
+      "publicationTitle": "UNION County Profile",
+      "priorityRank": 14,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Union.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Union.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Union.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Union.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:29:34.010Z",
+      "durationMs": 416265,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3733-UNION_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Union.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3733-UNION_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3721",
+      "publicationTitle": "SHELBY County Profile",
+      "priorityRank": 10,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Shelby.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Shelby.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Shelby.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Shelby.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:35:56.079Z",
+      "durationMs": 832215,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3721-SHELBY_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Shelby.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3721-SHELBY_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3720",
+      "publicationTitle": "STARK County Profile",
+      "priorityRank": 11,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Stark.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Stark.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Stark.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Stark.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:35:56.441Z",
+      "durationMs": 821422,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3720-STARK_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Stark.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3720-STARK_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3732",
+      "publicationTitle": "SALINE County Profile",
+      "priorityRank": 9,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Saline.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Saline.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Saline.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Saline.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:35:56.442Z",
+      "durationMs": 833785,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3732-SALINE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Saline.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3732-SALINE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3910",
+      "publicationTitle": "WARREN County Profile",
+      "priorityRank": 17,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Warren.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Warren.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Warren.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Warren.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:36:52.451Z",
+      "durationMs": 438440,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3910-WARREN_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Warren.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3910-WARREN_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3719",
+      "publicationTitle": "STEPHENSON County Profile",
+      "priorityRank": 12,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Stephenson.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Stephenson.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Stephenson.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Stephenson.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:36:54.263Z",
+      "durationMs": 878944,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3719-STEPHENSON_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Stephenson.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3719-STEPHENSON_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3736",
+      "publicationTitle": "TAZEWELL County Profile",
+      "priorityRank": 13,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Tazewell.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Tazewell.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Tazewell.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Tazewell.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:37:14.930Z",
+      "durationMs": 898790,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3736-TAZEWELL_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Tazewell.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3736-TAZEWELL_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3908",
+      "publicationTitle": "VERMILLION County Profile",
+      "priorityRank": 15,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Vermilion.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Vermilion.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Vermilion.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Vermilion.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:37:41.560Z",
+      "durationMs": 879164,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3908-VERMILLION_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Vermilion.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3908-VERMILLION_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3909",
+      "publicationTitle": "WABASH County Profile",
+      "priorityRank": 16,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Wabash.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Wabash.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Wabash.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Wabash.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:37:50.938Z",
+      "durationMs": 881382,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3909-WABASH_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Wabash.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3909-WABASH_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3920",
+      "publicationTitle": "Report of Governor Ryans Summit on Gangs Guns and Drugs",
+      "priorityRank": 24,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/summit/summit.report.3.7.01.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/summit/summit.report.3.7.01.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/summit/summit.report.3.7.01.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/summit/summit.report.3.7.01.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:38:43.906Z",
+      "durationMs": 62345,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3920-Report_of_Governor_Ryans_Summit_on_Gangs_Guns_and_Drugs.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/summit/summit.report.3.7.01.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3920-Report_of_Governor_Ryans_Summit_on_Gangs_Guns_and_Drugs.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3779",
+      "publicationTitle": "WAYNE County Profile",
+      "priorityRank": 19,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Wayne.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Wayne.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Wayne.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Wayne.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:42:52.889Z",
+      "durationMs": 416447,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3779-WAYNE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Wayne.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3779-WAYNE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3730",
+      "publicationTitle": "WHITE County Profile",
+      "priorityRank": 20,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/White.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/White.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/White.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/White.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:43:08.855Z",
+      "durationMs": 432413,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3730-WHITE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/White.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3730-WHITE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3856",
+      "publicationTitle": "WASHINGTON County Profile",
+      "priorityRank": 18,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Washington.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Washington.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Washington.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Washington.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:43:12.248Z",
+      "durationMs": 436168,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3856-WASHINGTON_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Washington.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3856-WASHINGTON_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3728",
+      "publicationTitle": "WILLIAMSON County Profile",
+      "priorityRank": 22,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Williamson.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Williamson.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Williamson.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Williamson.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:43:46.784Z",
+      "durationMs": 412520,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3728-WILLIAMSON_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Williamson.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3728-WILLIAMSON_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3734",
+      "publicationTitle": "WILL County Profile",
+      "priorityRank": 21,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Will.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Will.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Will.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Will.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:50:44.599Z",
+      "durationMs": 832147,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3734-WILL_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Will.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3734-WILL_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3735",
+      "publicationTitle": "WOODFORD County Profile",
+      "priorityRank": 23,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Woodford.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Woodford.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Woodford.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Woodford.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:51:29.253Z",
+      "durationMs": 854323,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3735-WOODFORD_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Woodford.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3735-WOODFORD_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4762",
+      "publicationTitle": "Statewide Violence Prevention Plan for Illinois | 2025-2029",
+      "priorityRank": 28,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Full_Report_Statewide_Violence_Prevention_Plan_2025-2029_2025_Update-compressed-250806T20135931.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Full_Report_Statewide_Violence_Prevention_Plan_2025-2029_2025_Update-compressed-250806T20135931.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Full_Report_Statewide_Violence_Prevention_Plan_2025-2029_2025_Update-compressed-250806T20135931.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Full_Report_Statewide_Violence_Prevention_Plan_2025-2029_2025_Update-compressed-250806T20135931.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-28T06:54:36.998Z",
+      "durationMs": 688143,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 35,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 35,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, below 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4762-Statewide_Violence_Prevention_Plan_for_Illinois_2025-2029.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4762-Statewide_Violence_Prevention_Plan_for_Illinois_2025-2029.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4762-Statewide_Violence_Prevention_Plan_for_Illinois_2025-2029.failure.json"
+      }
+    },
+    {
+      "publicationId": "4120",
+      "publicationTitle": "ADAMS County Profile",
+      "priorityRank": 29,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Adams.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Adams.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Adams.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Adams.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:57:56.679Z",
+      "durationMs": 884431,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4120-ADAMS_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Adams.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4120-ADAMS_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3650",
+      "publicationTitle": "FORD County Profile",
+      "priorityRank": 30,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Ford.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Ford.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Ford.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Ford.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T06:58:08.962Z",
+      "durationMs": 862177,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3650-FORD_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Ford.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3650-FORD_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3676",
+      "publicationTitle": "HENDERSON County Profile",
+      "priorityRank": 34,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Henderson.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Henderson.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Henderson.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Henderson.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:04:53.248Z",
+      "durationMs": 416569,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3676-HENDERSON_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Henderson.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3676-HENDERSON_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3747",
+      "publicationTitle": "MACOUPIN County Profile",
+      "priorityRank": 35,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Macoupin.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Macoupin.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Macoupin.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Macoupin.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:05:12.577Z",
+      "durationMs": 423614,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3747-MACOUPIN_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Macoupin.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3747-MACOUPIN_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3677",
+      "publicationTitle": "FULTON County Profile",
+      "priorityRank": 31,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Fulton.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Fulton.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Fulton.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Fulton.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:05:19.950Z",
+      "durationMs": 875350,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3677-FULTON_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Fulton.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3677-FULTON_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3616",
+      "publicationTitle": "GREENE County Profile",
+      "priorityRank": 32,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Greene.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Greene.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Greene.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Greene.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:05:53.741Z",
+      "durationMs": 864487,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3616-GREENE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Greene.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3616-GREENE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3620",
+      "publicationTitle": "GRUNDY County Profile",
+      "priorityRank": 33,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Grundy.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Grundy.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Grundy.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Grundy.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:08:44.859Z",
+      "durationMs": 847860,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3620-GRUNDY_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Grundy.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3620-GRUNDY_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3748",
+      "publicationTitle": "PEORIA County Profile",
+      "priorityRank": 38,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Peoria.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Peoria.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Peoria.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Peoria.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:12:13.980Z",
+      "durationMs": 414030,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3748-PEORIA_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Peoria.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3748-PEORIA_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3722",
+      "publicationTitle": "MCDONOUGH County Profile",
+      "priorityRank": 36,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/McDonough.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/McDonough.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/McDonough.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/McDonough.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:19:16.854Z",
+      "durationMs": 863603,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3722-MCDONOUGH_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/McDonough.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3722-MCDONOUGH_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3724",
+      "publicationTitle": "SANGAMON County Profile",
+      "priorityRank": 41,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Sangamon.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Sangamon.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Sangamon.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Sangamon.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:19:20.869Z",
+      "durationMs": 426888,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3724-SANGAMON_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Sangamon.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3724-SANGAMON_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3913",
+      "publicationTitle": "MONROE County Profile",
+      "priorityRank": 37,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Monroe.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Monroe.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Monroe.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Monroe.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:19:26.322Z",
+      "durationMs": 853744,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3913-MONROE_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Monroe.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3913-MONROE_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3726",
+      "publicationTitle": "RANDOLPH County Profile",
+      "priorityRank": 39,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Randolph.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Randolph.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Randolph.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Randolph.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:20:31.236Z",
+      "durationMs": 877494,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3726-RANDOLPH_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Randolph.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3726-RANDOLPH_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3731",
+      "publicationTitle": "ROCK ISLAND County Profile",
+      "priorityRank": 40,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Rock_Island.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Rock_Island.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Rock_Island.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Rock_Island.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:23:15.037Z",
+      "durationMs": 870178,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3731-ROCK_ISLAND_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Rock_Island.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3731-ROCK_ISLAND_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4136",
+      "publicationTitle": "Violent Crime and Victims Gender 2002 An Examination of Differences in Correlates of Male and Female Nonfatal Violent Victimization in the State of Illinois 2002",
+      "priorityRank": 46,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Violent Crime and Victims Gender 2002.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Violent Crime and Victims Gender 2002.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Violent%20Crime%20and%20Victims%20Gender%202002.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/Violent Crime and Victims Gender 2002.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:23:58.711Z",
+      "durationMs": 43673,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4136-Violent_Crime_and_Victims_Gender_2002_An_Examination_of_Differences_in_Correlates_of_Male_and_Female_Nonfatal_Violent_Victimization_in_the_State_of_Illinois_2002.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ResearchReports/Violent Crime and Victims Gender 2002.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4136-Violent_Crime_and_Victims_Gender_2002_An_Examination_of_Differences_in_Correlates_of_Male_and_Female_Nonfatal_Violent_Victimization_in_the_State_of_Illinois_2002.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3729",
+      "publicationTitle": "SCHUYLER County Profile",
+      "priorityRank": 42,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Schuyler.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Schuyler.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Schuyler.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Schuyler.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:32:52.927Z",
+      "durationMs": 816072,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3729-SCHUYLER_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Schuyler.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3729-SCHUYLER_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3725",
+      "publicationTitle": "ST CLAIR County Profile",
+      "priorityRank": 43,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/St_Clair.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/St_Clair.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/St_Clair.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/St_Clair.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:32:56.144Z",
+      "durationMs": 815275,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3725-ST_CLAIR_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/St_Clair.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3725-ST_CLAIR_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "3738",
+      "publicationTitle": "WINNEBAGO County Profile",
+      "priorityRank": 44,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Winnebago.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Winnebago.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Winnebago.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Winnebago.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-28T07:33:55.558Z",
+      "durationMs": 869235,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3738-WINNEBAGO_County_Profile.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/CountyProfiles/Winnebago.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3738-WINNEBAGO_County_Profile.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4629",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2019 Annual Report",
+      "priorityRank": 25,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/FY19 ICJIA Annual Report Final.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/FY19 ICJIA Annual Report Final.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/FY19%20ICJIA%20Annual%20Report%20Final.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/FY19 ICJIA Annual Report Final.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-28T07:39:26.817Z",
+      "durationMs": 3695879,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4629-Illinois_Criminal_Justice_Information_Authority_2019_Annual_Report.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    },
+    {
+      "publicationId": "4652",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2020 Annual Report",
+      "priorityRank": 26,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/FY20 ICJIA Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/FY20 ICJIA Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/FY20%20ICJIA%20Annual%20Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/FY20 ICJIA Annual Report.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-28T07:40:32.338Z",
+      "durationMs": 3708431,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4652-Illinois_Criminal_Justice_Information_Authority_2020_Annual_Report.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    },
+    {
+      "publicationId": "4606",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2018 Annual Report",
+      "priorityRank": 27,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY18.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY18.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY18.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY18.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-28T07:44:24.613Z",
+      "durationMs": 3691723,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4606-Illinois_Criminal_Justice_Information_Authority_2018_Annual_Report.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    },
+    {
+      "publicationId": "3460",
+      "publicationTitle": "Community Policing in Chicago Year One An Interim Report",
+      "priorityRank": 45,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/CAPS1.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-28T08:20:48.137Z",
+      "durationMs": 3616900,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    }
+  ]
+}

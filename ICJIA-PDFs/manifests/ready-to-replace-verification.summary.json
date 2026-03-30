@@ -1,0 +1,53 @@
+{
+  "generatedAt": "2026-03-30T16:06:01.533Z",
+  "totals": {
+    "publicationRows": 392,
+    "uniqueTargets": 383,
+    "passedTargets": 84,
+    "failedTargets": 299,
+    "erroredTargets": 0,
+    "missingTargets": 0,
+    "passedPublicationRows": 86,
+    "failedPublicationRows": 306,
+    "erroredPublicationRows": 0,
+    "missingPublicationRows": 0,
+    "verifiedPromotionLedgerRows": 86
+  },
+  "latestVerifiedTarget": {
+    "key": "local:/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
+    "mode": "local_staged",
+    "sourcePathOrUrl": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
+    "filename": "PPRS-251003T13340815.pdf",
+    "verifiedAt": "2026-03-30T16:05:55.808Z",
+    "durationMs": 177591,
+    "passed": false,
+    "missing": false,
+    "error": null,
+    "summary": {
+      "overallScore": 89,
+      "grade": "B",
+      "pageCount": 10,
+      "isScanned": false
+    },
+    "gate": {
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 89, not 100.",
+        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Alt Text on Images",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/PPRS-251003T13340815.pdf.json"
+    }
+  },
+  "promotionLedgerPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/verified-promotion-ledger.json"
+}

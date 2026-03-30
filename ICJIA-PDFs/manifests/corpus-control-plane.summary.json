@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-03-30T20:53:28.151Z",
+  "summary": {
+    "totalRows": 1056,
+    "byCurrentCorpusStatus": {
+      "verified_pass": 86,
+      "discovered": 3,
+      "analyzed": 1,
+      "queued_for_remediation": 0,
+      "remediated_fail": 866,
+      "processing_error": 100,
+      "deferred_manual": 0,
+      "staged_for_replacement": 0,
+      "replaced_remote": 0
+    },
+    "byCohortLabel": {
+      "short_high_likelihood": 27,
+      "figure_heavy": 686,
+      "structure_heavy": 143,
+      "font_heavy": 14,
+      "long_report": 11,
+      "manual_tail": 175
+    },
+    "byStorageKind": {
+      "legacy_archive": 927,
+      "researchhub_upload": 109,
+      "agency_upload": 20
+    },
+    "statusByCohort": {
+      "short_high_likelihood": {
+        "verified_pass": 18,
+        "discovered": 0,
+        "analyzed": 1,
+        "queued_for_remediation": 0,
+        "remediated_fail": 7,
+        "processing_error": 1,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "figure_heavy": {
+        "verified_pass": 17,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 628,
+        "processing_error": 41,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "structure_heavy": {
+        "verified_pass": 42,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 98,
+        "processing_error": 3,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "font_heavy": {
+        "verified_pass": 0,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 14,
+        "processing_error": 0,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "long_report": {
+        "verified_pass": 9,
+        "discovered": 0,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 2,
+        "processing_error": 0,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      },
+      "manual_tail": {
+        "verified_pass": 0,
+        "discovered": 3,
+        "analyzed": 0,
+        "queued_for_remediation": 0,
+        "remediated_fail": 117,
+        "processing_error": 55,
+        "deferred_manual": 0,
+        "staged_for_replacement": 0,
+        "replaced_remote": 0
+      }
+    },
+    "verifiedPassRowsFromLedger": 86,
+    "remainingRowsExcludingVerifiedPass": 970
+  },
+  "validation": {
+    "ok": true,
+    "errors": [],
+    "warnings": []
+  },
+  "sources": {
+    "replacementMapPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/publication-pdf-replacement-map.json",
+    "verificationPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/ready-to-replace-verification.json",
+    "verificationClassifiedPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/ready-to-replace-verification.classified.json",
+    "promotionLedgerPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/verified-promotion-ledger.json",
+    "regressionBenchmarkPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json",
+    "outcomeManifestCount": 13,
+    "candidateManifestCount": 17
+  }
+}

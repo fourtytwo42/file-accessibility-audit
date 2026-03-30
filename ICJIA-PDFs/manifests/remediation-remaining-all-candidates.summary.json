@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-03-29T03:04:55.884Z",
+  "sourceReportRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "selectedCandidates": 223,
+    "byTier": {
+      "medium": 223
+    }
+  },
+  "top15": [
+    {
+      "priorityRank": 1,
+      "publicationId": "3597",
+      "publicationTitle": "Evaluation of the Cook County Juvenile Sheriffs Work Alternative Program",
+      "pageCount": 4,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 2,
+      "publicationId": "3608",
+      "publicationTitle": "Champaign County Enhanced Domestic Violence Probation Program Evaluated",
+      "pageCount": 4,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 3,
+      "publicationId": "3653",
+      "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
+      "pageCount": 4,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 4,
+      "publicationId": "3660",
+      "publicationTitle": "Kankakee MEG unit employs problem solving approach to combat drug crime",
+      "pageCount": 4,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 5,
+      "publicationId": "3687",
+      "publicationTitle": "Prison Sentences for Drug Offenses",
+      "pageCount": 4,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 6,
+      "publicationId": "3791",
+      "publicationTitle": "Implementing the Strategic Plan for Criminal Justice",
+      "pageCount": 8,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 7,
+      "publicationId": "3832",
+      "publicationTitle": "Balanced and Restorative Justice",
+      "pageCount": 8,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 8,
+      "publicationId": "3790",
+      "publicationTitle": "Methamphetamine in Illinois An Examination of an Emerging Drug",
+      "pageCount": 12,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 8,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 9,
+      "publicationId": "3994",
+      "publicationTitle": "Community Policing in Chicago The Chicago Alternative Policing Strategy (CAPS) Year Ten",
+      "pageCount": 12,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 10,
+      "publicationId": "4631",
+      "publicationTitle": "Introduction: Deflection: Police-Led Responses to Behavioral Health Challenges",
+      "pageCount": 13,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 11,
+      "publicationId": "4491",
+      "publicationTitle": "A State and National Overview of Methamphetamine Trends",
+      "pageCount": 15,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 12,
+      "publicationId": "4649",
+      "publicationTitle": "The Effect of Media Coverage of Sexual Assault on Hotline Calling: An Examination of Rape Crisis Hotline Calls in Illinois",
+      "pageCount": 18,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 13,
+      "publicationId": "3661",
+      "publicationTitle": "A Generation of Change 30 Years of Criminal Justice in Illinois",
+      "pageCount": 20,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 14,
+      "publicationId": "3697",
+      "publicationTitle": "Working Together The Case for Integration of Criminal Justice Information Systems",
+      "pageCount": 20,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    },
+    {
+      "priorityRank": 15,
+      "publicationId": "3759",
+      "publicationTitle": "Authority Hosts Criminal Justice Planning Assembly",
+      "pageCount": 20,
+      "isScanned": false,
+      "manualOnlyFailureModeCount": 0,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
+      "serverHost": "143.244.146.43",
+      "storageKind": "legacy_archive"
+    }
+  ]
+}

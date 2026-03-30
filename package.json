@@ -43,6 +43,8 @@
     "agency:scan-remaining": "tsx scripts/scan-remaining-publication-pdfs.ts",
     "agency:build-priority-list": "tsx scripts/build-remediation-priority-list.ts",
     "agency:build-next-batch": "tsx scripts/build-next-remediation-batch.ts",
+    "agency:build-control-plane": "tsx scripts/build-corpus-control-plane.ts",
+    "agency:validate-control-plane": "tsx scripts/validate-corpus-control-plane.ts",
     "agency:run-priority-remediation": "tsx scripts/run-priority-remediation-batch.ts",
     "agency:verify-ready": "tsx scripts/verify-ready-to-replace.ts",
     "agency:benchmark-remediation": "tsx scripts/run-remediation-regression-benchmark.ts",

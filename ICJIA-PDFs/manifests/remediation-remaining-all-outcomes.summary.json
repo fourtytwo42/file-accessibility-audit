@@ -1,0 +1,66 @@
+{
+  "generatedAt": "2026-03-29T17:08:04.265Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 223,
+    "processed": 223,
+    "readyToReplace": 13,
+    "failedAfterRemediation": 141,
+    "sourceMissing": 0,
+    "processingError": 69,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3637",
+    "publicationTitle": "Chicago Homicide Dataset OffenderLevel File (OLF)1965 to 1995 Users guide and codebook",
+    "priorityRank": 195,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 8,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/CHD_OLFguide.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CHD_OLFguide.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/CHD_OLFguide.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/CHD_OLFguide.json",
+    "status": "failed_after_remediation",
+    "processedAt": "2026-03-29T12:46:55.944Z",
+    "durationMs": 1661412,
+    "original": {
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 103,
+      "isScanned": true
+    },
+    "final": {
+      "overallScore": 62,
+      "grade": "D",
+      "pageCount": 103,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is D, not A.",
+        "Final overall score is 62, below 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure",
+        "Categories still below 100: Text Extractability, Heading Structure, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure"
+      ],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "PDF/UA Compliance"
+      ]
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3637-Chicago_Homicide_Dataset_OffenderLevel_File_OLF_1965_to_1995_Users_guide_and_codebook.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3637-Chicago_Homicide_Dataset_OffenderLevel_File_OLF_1965_to_1995_Users_guide_and_codebook.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3637-Chicago_Homicide_Dataset_OffenderLevel_File_OLF_1965_to_1995_Users_guide_and_codebook.failure.json"
+    }
+  }
+}

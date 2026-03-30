@@ -1,0 +1,132 @@
+{
+  "generatedAt": "2026-03-27T22:18:23.645Z",
+  "totals": {
+    "remainingPublicationRowsConsidered": 670,
+    "shortlistedCandidates": 20,
+    "byTier": {
+      "highest": 20
+    }
+  },
+  "top10": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4590",
+      "publicationTitle": "Research at a Glance Impacts of Probationer Screening and Services on Probation Success and Future Arrests",
+      "selectorScore": 108,
+      "waveTier": "highest",
+      "pageCount": 1,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "4077",
+      "publicationTitle": "Minorities Overrepresented in Illinois Juvenile Correctional Facilities",
+      "selectorScore": 105,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "4188",
+      "publicationTitle": "Corrections data illustrate juvenile incarceration trends in Illinois",
+      "selectorScore": 105,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "4068",
+      "publicationTitle": "Examining incarceration trends among minority youth in Illinois",
+      "selectorScore": 105,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "4069",
+      "publicationTitle": "Macon County Redeploy Illinois pilot program aids juvenile offenders",
+      "selectorScore": 105,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "4081",
+      "publicationTitle": "Redeploy Illinois program decreases incarceration rates among juveniles",
+      "selectorScore": 105,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "4082",
+      "publicationTitle": "State survey results quantify crime victimization patterns",
+      "selectorScore": 105,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3867",
+      "publicationTitle": "Community Policing Accountability in Management in the Chicago Police Department",
+      "selectorScore": 103,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "4078",
+      "publicationTitle": "Community reentry challenges daunt exoffenders quest for a fresh start",
+      "selectorScore": 103,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "4098",
+      "publicationTitle": "Prescription drug abuse drug treatment needs on rise in Illinois",
+      "selectorScore": 103,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

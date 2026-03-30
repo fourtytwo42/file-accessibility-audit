@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-03-26T02:50:00Z",
+  "exceptions": [
+    {
+      "type": "source_corrupt_repaired_partial",
+      "originalRemotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "originalLocalCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "originalMd5": "b74e64495501cbda5575ff352f7313ef",
+      "originalObservedPageCount": 187,
+      "failureReason": "Failed to parse invalid PDF object; broken xref/startxref and truncated object 565 0 stream/endobj near EOF.",
+      "repairedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/repaired-pdfs/ResearchReports/Trends and Issues 90.repaired.qpdf.pdf",
+      "repairedMd5": "6e225c839824d85dc10a4bef1770d4f9",
+      "repairedPageCount": 143,
+      "repairedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/repair-trials/Trends and Issues 90.repaired.qpdf.json",
+      "terminalStatus": "report_generated_from_partial_repair",
+      "notes": [
+        "The repaired PDF is syntactically valid and analyzable by the scan pipeline.",
+        "The repaired copy lost pages relative to the original metadata-detected page count, so it is not a faithful full recovery.",
+        "Do not retry the original source in the normal scan loop unless a better source copy is found."
+      ]
+    }
+  ]
+}

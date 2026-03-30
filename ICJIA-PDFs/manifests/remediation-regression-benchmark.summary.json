@@ -1,0 +1,337 @@
+{
+  "startedAt": "2026-03-29T22:57:24.440Z",
+  "generatedAt": "2026-03-30T01:40:29.944Z",
+  "status": "completed",
+  "fatalError": null,
+  "totals": {
+    "cases": 5,
+    "completed": 5,
+    "remaining": 0,
+    "pass": 1,
+    "hardFail": 3,
+    "processingError": 1
+  },
+  "byInspectionPattern": {
+    "deep_only": 0,
+    "light_only": 0,
+    "mixed": 4,
+    "unknown": 0,
+    "generic_timeout_wording": 0
+  },
+  "byDominantPhase": {
+    "ownership": 0,
+    "figure_description": 4,
+    "structure": 0,
+    "mixed": 0,
+    "unknown": 0
+  },
+  "latestCompletedCase": {
+    "name": "Criminal Sentencing Layout",
+    "category": "structure",
+    "terminalState": "hard_fail",
+    "durationMs": 489226
+  },
+  "outcomes": [
+    {
+      "name": "Kendall County Profile",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "category": "ownership",
+      "ok": true,
+      "durationMs": 449324,
+      "terminalState": "pass",
+      "initial": {
+        "overallScore": 24,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure"
+        ]
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "blockingLocalFindingKeys": [],
+        "remediationMetrics": {
+          "inspections": {
+            "lightFresh": 4,
+            "lightReused": 5,
+            "deepFresh": 8,
+            "deepReused": 4,
+            "deepDowngradedToLight": 9
+          },
+          "phases": {
+            "ownershipState": {
+              "initialRiskCount": 5,
+              "finalRiskCount": 0,
+              "freshDeepInspections": 5,
+              "reusedInspections": 1,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "figureDescriptionState": {
+              "initialMissingAltCount": 2,
+              "finalMissingAltCount": 4,
+              "initialDecorativeFigureCount": 0,
+              "finalDecorativeFigureCount": 0,
+              "freshDeepInspections": 7,
+              "reusedInspections": 3,
+              "downgradedToLight": false,
+              "lateConverged": true
+            },
+            "structureState": {
+              "freshDeepAnalyses": 1,
+              "downgradedDeepAnalyses": 0,
+              "lateConverged": false,
+              "finalBlockingKeys": []
+            }
+          }
+        },
+        "inspectionProfile": {
+          "pattern": "mixed",
+          "dominantPhase": "figure_description",
+          "deepDowngradedToLight": true
+        }
+      }
+    },
+    {
+      "name": "CSEC 2008 Research Bulletin",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "category": "figure_description",
+      "ok": true,
+      "durationMs": 209763,
+      "terminalState": "hard_fail",
+      "initial": {
+        "overallScore": 22,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure",
+          "pdfua.page_tabs"
+        ]
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.logical_structure"
+        ],
+        "remediationMetrics": {
+          "inspections": {
+            "lightFresh": 8,
+            "lightReused": 29,
+            "deepFresh": 9,
+            "deepReused": 0,
+            "deepDowngradedToLight": 28
+          },
+          "phases": {
+            "ownershipState": {
+              "initialRiskCount": 1,
+              "finalRiskCount": 0,
+              "freshDeepInspections": 6,
+              "reusedInspections": 0,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "figureDescriptionState": {
+              "initialMissingAltCount": 4,
+              "finalMissingAltCount": 0,
+              "initialDecorativeFigureCount": 1,
+              "finalDecorativeFigureCount": 1,
+              "freshDeepInspections": 7,
+              "reusedInspections": 0,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "structureState": {
+              "freshDeepAnalyses": 0,
+              "downgradedDeepAnalyses": 0,
+              "lateConverged": false,
+              "finalBlockingKeys": [
+                "pdfua.figure_alt_or_artifact",
+                "pdfua.logical_structure"
+              ]
+            }
+          }
+        },
+        "inspectionProfile": {
+          "pattern": "mixed",
+          "dominantPhase": "figure_description",
+          "deepDowngradedToLight": true
+        }
+      }
+    },
+    {
+      "name": "Court System Get The Facts",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
+      "category": "structure",
+      "ok": false,
+      "durationMs": 1520647,
+      "terminalState": "processing_error",
+      "initial": {
+        "overallScore": 26,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure",
+          "pdfua.metadata_identification"
+        ]
+      },
+      "final": null,
+      "error": {
+        "code": "EXCESSIVE_RUNTIME",
+        "message": "Inspection budget exceeded (light=4, deep=9, total=13)."
+      }
+    },
+    {
+      "name": "SFY24 ICJIA Annual Report",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+      "category": "long_report",
+      "ok": true,
+      "durationMs": 5434816,
+      "terminalState": "hard_fail",
+      "initial": {
+        "overallScore": 28,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.logical_structure",
+          "pdfua.metadata_identification"
+        ]
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B",
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.logical_structure"
+        ],
+        "remediationMetrics": {
+          "inspections": {
+            "lightFresh": 2,
+            "lightReused": 2,
+            "deepFresh": 6,
+            "deepReused": 0,
+            "deepDowngradedToLight": 3
+          },
+          "phases": {
+            "ownershipState": {
+              "initialRiskCount": 0,
+              "finalRiskCount": 0,
+              "freshDeepInspections": 0,
+              "reusedInspections": 0,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "figureDescriptionState": {
+              "initialMissingAltCount": 15,
+              "finalMissingAltCount": 0,
+              "initialDecorativeFigureCount": 1,
+              "finalDecorativeFigureCount": 1,
+              "freshDeepInspections": 7,
+              "reusedInspections": 1,
+              "downgradedToLight": true,
+              "lateConverged": true
+            },
+            "structureState": {
+              "freshDeepAnalyses": 1,
+              "downgradedDeepAnalyses": 0,
+              "lateConverged": false,
+              "finalBlockingKeys": [
+                "pdfua.figure_alt_or_artifact",
+                "pdfua.logical_structure"
+              ]
+            }
+          }
+        },
+        "inspectionProfile": {
+          "pattern": "mixed",
+          "dominantPhase": "figure_description",
+          "deepDowngradedToLight": true
+        }
+      }
+    },
+    {
+      "name": "Criminal Sentencing Layout",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "category": "structure",
+      "ok": true,
+      "durationMs": 489226,
+      "terminalState": "hard_fail",
+      "initial": {
+        "overallScore": 26,
+        "grade": "F",
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title",
+          "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.logical_structure",
+          "pdfua.metadata_identification"
+        ]
+      },
+      "final": {
+        "overallScore": 76,
+        "grade": "C",
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "remediationMetrics": {
+          "inspections": {
+            "lightFresh": 5,
+            "lightReused": 4,
+            "deepFresh": 10,
+            "deepReused": 4,
+            "deepDowngradedToLight": 9
+          },
+          "phases": {
+            "ownershipState": {
+              "initialRiskCount": 115,
+              "finalRiskCount": 0,
+              "freshDeepInspections": 4,
+              "reusedInspections": 1,
+              "downgradedToLight": false,
+              "lateConverged": false
+            },
+            "figureDescriptionState": {
+              "initialMissingAltCount": 110,
+              "finalMissingAltCount": 110,
+              "initialDecorativeFigureCount": 0,
+              "finalDecorativeFigureCount": 0,
+              "freshDeepInspections": 9,
+              "reusedInspections": 3,
+              "downgradedToLight": false,
+              "lateConverged": true
+            },
+            "structureState": {
+              "freshDeepAnalyses": 0,
+              "downgradedDeepAnalyses": 0,
+              "lateConverged": false,
+              "finalBlockingKeys": [
+                "pdfua.figure_alt_or_artifact"
+              ]
+            }
+          }
+        },
+        "inspectionProfile": {
+          "pattern": "mixed",
+          "dominantPhase": "figure_description",
+          "deepDowngradedToLight": true
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-03-25T23:20:44.847Z",
+  "completeDir": "/home/hendo420/pdfaf/Complete",
+  "replacementMapPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/publication-pdf-replacement-map.json",
+  "stagedCount": 104,
+  "unmatchedCount": 9,
+  "byServerHost": {
+    "143.244.146.43": 96,
+    "192.241.146.85": 2,
+    "157.230.3.215": 6
+  },
+  "outputs": {
+    "manifestJson": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/complete-passing-replacements.json",
+    "publicationStatusJson": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/complete-passing-publication-status.json",
+    "summaryJson": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/complete-passing-replacements.summary.json",
+    "csv": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/exports/csv/complete-passing-replacements.csv"
+  }
+}

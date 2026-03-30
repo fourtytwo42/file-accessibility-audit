@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-03-28T23:11:04.567Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 110,
+    "shortlistedCandidates": 100,
+    "byTier": {
+      "highest": 1,
+      "high": 99
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4635",
+      "publicationTitle": "A Guide to Conducting Field Observations",
+      "selectorScore": 139,
+      "waveTier": "highest",
+      "pageCount": 6,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 19,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "4655",
+      "publicationTitle": "A Preliminary Outcome Evaluation of Lake County's Police Referral to Substance Use Disorder Treatment Program",
+      "selectorScore": 117,
+      "waveTier": "high",
+      "pageCount": 20,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 17,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "3775",
+      "publicationTitle": "Criminal Justice Plan for the State of Illinois",
+      "selectorScore": 111,
+      "waveTier": "high",
+      "pageCount": 144,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "4583",
+      "publicationTitle": "An Overview of Medication-Assisted Treatment for Opioid Use Disorders for Criminal Justice-Involved Individuals",
+      "selectorScore": 110,
+      "waveTier": "high",
+      "pageCount": 23,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 17,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "4031",
+      "publicationTitle": "CLEAR and ICLEAR A Status Report on New Information Technology and its Impact on Management the Organization and CrimeFighting Strategies",
+      "selectorScore": 110,
+      "waveTier": "high",
+      "pageCount": 114,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 16,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "4014",
+      "publicationTitle": "Developing profiles of violent offenders and identifying groups of violent offenders at high risk of recidivism and treatment failure",
+      "selectorScore": 110,
+      "waveTier": "high",
+      "pageCount": 115,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "3641",
+      "publicationTitle": "Community Policing in Chicago Years Five and Six An Interim Report",
+      "selectorScore": 110,
+      "waveTier": "high",
+      "pageCount": 119,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3970",
+      "publicationTitle": "A Study of Disproportionate Minority Representation in the Cook County Juvenile Justice System Part I Assessment of Disproportionate Minority Representation at Key Decision Points in the Cook County Juvenile Justice System",
+      "selectorScore": 110,
+      "waveTier": "high",
+      "pageCount": 124,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "4179",
+      "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey APPENDIX",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 86,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "4117",
+      "publicationTitle": "Program Completion Behavioral Change and Rearrest for the Batterer Intervention System of Cook County Illinois",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 90,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "3992",
+      "publicationTitle": "Evaluation of the Gang Violence Reduction Project in Little Village",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 99,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "3979",
+      "publicationTitle": "Scott County Juvenile Profile",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 100,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "3967",
+      "publicationTitle": "Pope County Juvenile Profile",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 106,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "3830",
+      "publicationTitle": "Schuyler County Juvenile Profile",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 106,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "3798",
+      "publicationTitle": "Cumberland County Juvenile Profile",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 108,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

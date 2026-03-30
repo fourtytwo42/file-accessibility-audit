@@ -6236,6 +6236,138 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })
   })
 
+  it('stops residual cleanup after a changed but no-progress pass for the same structure family', async () => {
+    const { __test_didResidualCleanupProgressImprove } = await import('../services/agentRemediationService.js')
+
+    expect(__test_didResidualCleanupProgressImprove(
+      {
+        bucket: 'structure',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        figureBlockingKeys: [],
+        figureUnresolvedIssueLabels: [],
+        informativeFigureMissingAltCount: 0,
+      },
+      {
+        bucket: 'structure',
+        signature: 'after',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        figureBlockingKeys: [],
+        figureUnresolvedIssueLabels: [],
+        informativeFigureMissingAltCount: 0,
+      },
+      true,
+    )).toBe(false)
+  })
+
+  it('allows a second residual family pass when structure debt actually improves', async () => {
+    const { __test_didResidualCleanupProgressImprove } = await import('../services/agentRemediationService.js')
+
+    expect(__test_didResidualCleanupProgressImprove(
+      {
+        bucket: 'structure',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure', 'pdfua.heading_content_quality'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        figureBlockingKeys: [],
+        figureUnresolvedIssueLabels: [],
+        informativeFigureMissingAltCount: 0,
+      },
+      {
+        bucket: 'structure',
+        signature: 'after',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: [],
+        figureBlockingKeys: [],
+        figureUnresolvedIssueLabels: [],
+        informativeFigureMissingAltCount: 0,
+      },
+      true,
+    )).toBe(true)
+  })
+
+  it('blocks another deep follow-up for a converged structure family but allows a shifted figure family', async () => {
+    const { __test_shouldAllowResidualFamilyDeepFollowUp } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowResidualFamilyDeepFollowUp({
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'structure',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: true,
+          figure: false,
+          mixed: false,
+        },
+      },
+      bucket: 'structure',
+      familyId: 'logical_structure_marked_content',
+      stageIntroducedNewFamily: false,
+    })).toBe(false)
+
+    expect(__test_shouldAllowResidualFamilyDeepFollowUp({
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'structure',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: true,
+          figure: false,
+          mixed: false,
+        },
+      },
+      bucket: 'figure',
+      familyId: 'native_figure_convergence',
+      stageIntroducedNewFamily: true,
+    })).toBe(true)
+  })
+
+  it('defers late figure work while structure-led residual debt remains unconverged', async () => {
+    const { __test_shouldDeferLateFigureWorkUntilStructureConverges } = await import('../services/agentRemediationService.js')
+
+    const analysis = makeAnalysisResult({
+      overallScore: 55,
+      grade: 'D',
+      categories: [
+        { id: 'reading_order', score: 40, grade: 'F' },
+        { id: 'alt_text', score: 60, grade: 'D' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 2 } as any,
+        ],
+      } as any,
+    })
+
+    expect(__test_shouldDeferLateFigureWorkUntilStructureConverges({
+      analysis,
+      context: {
+        figureCandidates: [
+          { informativeHint: 'informative', graphicsLikelyDecorative: false, hasAlt: false },
+        ],
+      } as any,
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'structure',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+    })).toBe(true)
+  })
+
   it('retries unresolved set_alt figure candidates during the late heuristic pass', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {

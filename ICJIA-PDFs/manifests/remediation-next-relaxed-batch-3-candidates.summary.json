@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-03-28T06:07:11.284Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 46,
+    "shortlistedCandidates": 46,
+    "byTier": {
+      "high": 46
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "3749",
+      "publicationTitle": "OGLE County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "3745",
+      "publicationTitle": "PERRY County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "3754",
+      "publicationTitle": "PIATT County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "3751",
+      "publicationTitle": "PIKE County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "3750",
+      "publicationTitle": "POPE County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "3741",
+      "publicationTitle": "PULASKI County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "3861",
+      "publicationTitle": "PUTNAM County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3723",
+      "publicationTitle": "RICHLAND County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "3732",
+      "publicationTitle": "SALINE County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "3721",
+      "publicationTitle": "SHELBY County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "3720",
+      "publicationTitle": "STARK County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "3719",
+      "publicationTitle": "STEPHENSON County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "3736",
+      "publicationTitle": "TAZEWELL County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "3733",
+      "publicationTitle": "UNION County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "3908",
+      "publicationTitle": "VERMILLION County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

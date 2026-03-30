@@ -68,3 +68,9 @@ apps/api/check_post_remediation.mts
 apps/api/check_split.mts
 Research/
 archive/
+
+# ICJIA corpus workspace: keep durable manifests and README, ignore generated bulk artifacts
+ICJIA-PDFs/*
+!ICJIA-PDFs/README.md
+!ICJIA-PDFs/manifests/
+!ICJIA-PDFs/manifests/**

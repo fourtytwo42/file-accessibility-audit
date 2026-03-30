@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-03-30T16:06:01.533Z",
+  "summary": {
+    "verifiedPassRows": 86,
+    "byPromotionStatus": {
+      "verified_pass": 86
+    }
+  },
+  "latestVerifiedPromotion": {
+    "publicationId": "4742",
+    "publicationTitle": "Illinois Juvenile Justice System Data Trends Pre- and Post-COVID-19",
+    "sourceKind": "batch_ready",
+    "sourcePathOrUrl": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/IJJC Data Trends article-250331T16235728.pdf",
+    "sourceFileUrl": "https://researchhub.icjia-api.cloud/uploads/IJJC%20Data%20Trends%20article-250331T16235728.pdf",
+    "localFinalArtifactPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4742-Illinois_Juvenile_Justice_System_Data_Trends_Pre-_and_Post-COVID-19.pdf",
+    "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/IJJC Data Trends article-250331T16235728.pdf",
+    "currentSourceChecksumSha256": "be1e1387ffff1cf6e39278f2c6777f3ae486287c8939281090897414ae0b7a15",
+    "replacementChecksumSha256": "3190c0c1df36fb215af020bb77a68459205ea57a429cce8a6f0b56449a0e161d",
+    "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/IJJC_Data_Trends_article-250331T16235728.pdf.json",
+    "verificationTimestamp": "2026-03-30T16:02:58.674Z",
+    "verificationSummary": {
+      "passed": true,
+      "overallScore": 100,
+      "grade": "A",
+      "pageCount": 26,
+      "isScanned": false,
+      "reasons": [],
+      "blockingLocalFindingKeys": [],
+      "unresolvedCategoryLabels": [],
+      "criticalManualReviewFlagCodes": []
+    },
+    "promotionStatus": "verified_pass"
+  }
+}

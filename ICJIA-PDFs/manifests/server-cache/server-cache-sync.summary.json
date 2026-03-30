@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-03-25T22:55:24.393Z",
+  "replacementMapPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/publication-pdf-replacement-map.json",
+  "sshKeyPath": "/home/hendo420/pdfaf/.tmp/ssh/icjia_archive_ed25519",
+  "servers": [
+    {
+      "host": "143.244.146.43",
+      "sshTarget": "forge@143.244.146.43",
+      "remoteRoot": "/home/forge/archive.icjia-api.cloud/root/files",
+      "localRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43",
+      "fileCount": 890,
+      "skippedMissing": 0
+    },
+    {
+      "host": "192.241.146.85",
+      "sshTarget": "forge@192.241.146.85",
+      "remoteRoot": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads",
+      "localRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85",
+      "fileCount": 20,
+      "skippedMissing": 0
+    },
+    {
+      "host": "157.230.3.215",
+      "sshTarget": "forge@157.230.3.215",
+      "remoteRoot": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads",
+      "localRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215",
+      "fileCount": 104,
+      "skippedMissing": 3
+    }
+  ],
+  "summaryByHost": {
+    "143.244.146.43": {
+      "syncedTargets": 890,
+      "skippedMissing": 0
+    },
+    "192.241.146.85": {
+      "syncedTargets": 20,
+      "skippedMissing": 0
+    },
+    "157.230.3.215": {
+      "syncedTargets": 104,
+      "skippedMissing": 3
+    }
+  }
+}

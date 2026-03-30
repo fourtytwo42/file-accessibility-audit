@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-03-28T21:20:07.795Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 32,
+    "shortlistedCandidates": 32,
+    "byTier": {
+      "highest": 21,
+      "high": 11
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4636",
+      "publicationTitle": "Conducting Research Interviews on Sensitive Topics",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 8,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "4474",
+      "publicationTitle": "Behavioral and Public Health Perspectives on Violence Prevention: A Survey of Illinois Practitioners",
+      "selectorScore": 143,
+      "waveTier": "highest",
+      "pageCount": 16,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "4639",
+      "publicationTitle": "Adjusting Work Conditions During the COVID-19 Pandemic: A Survey of Illinois Mental Health Court Staff",
+      "selectorScore": 137,
+      "waveTier": "highest",
+      "pageCount": 12,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "4673",
+      "publicationTitle": "Understanding Police Officer Stress: A Review of the Literature",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 14,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "4674",
+      "publicationTitle": "Addressing Police Officer Stress: Programs and Practices",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 14,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "4546",
+      "publicationTitle": "The Intersection of Homelessness and the Criminal Justice System",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 14,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "4478",
+      "publicationTitle": "How Illinois Service Providers Support Young Victims of Crime: Findings from an Illinois HEALS Survey",
+      "selectorScore": 134,
+      "waveTier": "highest",
+      "pageCount": 15,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 16,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "4484",
+      "publicationTitle": "Youth Alcohol Use: National and Illinois Trends, Consequences, and Interventions",
+      "selectorScore": 130,
+      "waveTier": "highest",
+      "pageCount": 19,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "4625",
+      "publicationTitle": "Alcohol-Impaired Driving in Illinois",
+      "selectorScore": 130,
+      "waveTier": "highest",
+      "pageCount": 25,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "4646",
+      "publicationTitle": "Youth Development: An Overview of Related Factors and Interventions",
+      "selectorScore": 129,
+      "waveTier": "highest",
+      "pageCount": 12,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 16,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "4770",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Annual Report",
+      "selectorScore": 129,
+      "waveTier": "highest",
+      "pageCount": 20,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 16,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "4637",
+      "publicationTitle": "Individual and Community Trauma: Individual Experiences in Collective Environments",
+      "selectorScore": 128,
+      "waveTier": "highest",
+      "pageCount": 13,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 16,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "selectorScore": 125,
+      "waveTier": "highest",
+      "pageCount": 20,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 15,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "4740",
+      "publicationTitle": "2024 Task Force on Missing and Murdered Chicago Women Annual Report",
+      "selectorScore": 124,
+      "waveTier": "highest",
+      "pageCount": 21,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 16,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "4087",
+      "publicationTitle": "A Primer on Drug Addiction Crime and Treatment",
+      "selectorScore": 123,
+      "waveTier": "highest",
+      "pageCount": 63,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

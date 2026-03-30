@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-03-28T04:20:14.465Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 50,
+    "processed": 50,
+    "readyToReplace": 13,
+    "failedAfterRemediation": 32,
+    "sourceMissing": 0,
+    "processingError": 5,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4473",
+    "publicationTitle": "Factors Influencing the Sentencing of Convicted Felons in Illinois",
+    "priorityRank": 50,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-28T04:20:14.464Z",
+    "durationMs": 3775578,
+    "original": {
+      "overallScore": 25,
+      "grade": "F",
+      "pageCount": 31,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 60-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4473-Factors_Influencing_the_Sentencing_of_Convicted_Felons_in_Illinois.failure.json"
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+    }
+  }
+}

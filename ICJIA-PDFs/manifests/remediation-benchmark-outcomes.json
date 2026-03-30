@@ -1,0 +1,544 @@
+{
+  "generatedAt": "2026-03-29T21:41:42.558Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-benchmark-candidates.json",
+  "concurrency": 3,
+  "totals": {
+    "targetCandidates": 12,
+    "processed": 12,
+    "readyToReplace": 0,
+    "failedAfterRemediation": 0,
+    "sourceMissing": 0,
+    "processingError": 12,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "priorityRank": 1,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:34:41.437Z",
+      "durationMs": 83251,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/3614-KENDALL_County_Profile.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    },
+    {
+      "publicationId": "4463",
+      "publicationTitle": "Fighting the Opioid Crisis through Substance Use Disorder Treatment: A Study of a Police Program Model in Illinois",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Opioid_Police_Program_Model-191011T20092721.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Opioid_Police_Program_Model-191011T20092721.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Opioid_Police_Program_Model-191011T20092721.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Opioid_Police_Program_Model-191011T20092721.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:37:56.733Z",
+      "durationMs": 129795,
+      "original": {
+        "overallScore": 34,
+        "grade": "F",
+        "pageCount": 11,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/157.230.3.215/4463-Fighting_the_Opioid_Crisis_through_Substance_Use_Disorder_Treatment_A_Study_of_a_Police_Program_Model_in_Illinois.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=0, deep=9, total=9)."
+      }
+    },
+    {
+      "publicationId": "4092",
+      "publicationTitle": "Analysis of InfoNet Data from Domestic Violence Agencies Full Report",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Analysis%20of%20InfoNet%20Data%20from%20Domestic%20Violence%20Agencies.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:38:18.639Z",
+      "durationMs": 151701,
+      "original": {
+        "overallScore": 42,
+        "grade": "F",
+        "pageCount": 165,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4092-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Full_Report.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=9, deep=0, total=9)."
+      }
+    },
+    {
+      "publicationId": "4069",
+      "publicationTitle": "Macon County Redeploy Illinois pilot program aids juvenile offenders",
+      "priorityRank": 6,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/MACON COUNTY.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/MACON COUNTY.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/MACON%20COUNTY.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ProgEvalSummary/MACON COUNTY.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:39:23.364Z",
+      "durationMs": 64725,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4069-Macon_County_Redeploy_Illinois_pilot_program_aids_juvenile_offenders.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=0, deep=9, total=9)."
+      }
+    },
+    {
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:40:08.126Z",
+      "durationMs": 131393,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=9, deep=6, total=15)."
+      }
+    },
+    {
+      "publicationId": "4470",
+      "publicationTitle": "Co-occurring Mental Health and Substance Use Disorders of Women in Prison: An Evaluation of the WestCare Foundation’s Dual Diagnosis Program in Illinois",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:40:14.819Z",
+      "durationMs": 267881,
+      "original": {
+        "overallScore": 45,
+        "grade": "F",
+        "pageCount": 53,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4470-Co-occurring_Mental_Health_and_Substance_Use_Disorders_of_Women_in_Prison_An_Evaluation_of_the_WestCare_Foundation_s_Dual_Diagnosis_Program_in_Illinois.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=0, deep=9, total=9)."
+      }
+    },
+    {
+      "publicationId": "4184",
+      "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "priorityRank": 9,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/CSEC%202008%20Research%20Bulletin.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:41:24.538Z",
+      "durationMs": 69718,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=9, deep=5, total=14)."
+      }
+    },
+    {
+      "publicationId": "4078",
+      "publicationTitle": "Community reentry challenges daunt exoffenders quest for a fresh start",
+      "priorityRank": 8,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Community%20re-entry%20challenges%20daunt%20ex-offenders.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:41:26.627Z",
+      "durationMs": 78501,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=0, deep=9, total=9)."
+      }
+    },
+    {
+      "publicationId": "4612",
+      "publicationTitle": "Overdose Fatality Review Teams Literature Review",
+      "priorityRank": 7,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Overdose Fatality Review Team Literature Review Final-210219T19112457.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Overdose Fatality Review Team Literature Review Final-210219T19112457.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Overdose Fatality Review Team Literature Review Final-210219T19112457.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Overdose Fatality Review Team Literature Review Final-210219T19112457.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:41:37.895Z",
+      "durationMs": 134531,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 11,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4612-Overdose_Fatality_Review_Teams_Literature_Review.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=9, deep=5, total=14)."
+      }
+    },
+    {
+      "publicationId": "4641",
+      "publicationTitle": "Illinois Criminal Diversion Racial Impact Data Collection",
+      "priorityRank": 10,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:43:00.548Z",
+      "durationMs": 96009,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4641-Illinois_Criminal_Diversion_Racial_Impact_Data_Collection.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=0, deep=9, total=9)."
+      }
+    },
+    {
+      "publicationId": "3912",
+      "publicationTitle": "Court System",
+      "priorityRank": 11,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/GetTheFacts/GTF_CourtSystem.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T19:43:38.747Z",
+      "durationMs": 132120,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/3912-Court_System.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=0, deep=9, total=9)."
+      }
+    },
+    {
+      "publicationId": "4739",
+      "publicationTitle": "SFY24 ICJIA Annual Report",
+      "priorityRank": 12,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/192.241.146.85/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-29T20:28:10.689Z",
+      "durationMs": 2792793,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 30,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget before reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/192.241.146.85/4739-SFY24_ICJIA_Annual_Report.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=4, deep=9, total=13)."
+      }
+    }
+  ]
+}

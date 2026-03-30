@@ -249,6 +249,46 @@ This file stores durable project facts, proven workflows, known exceptions, and 
       - genuine figure-debt improvement allows one more follow-up
     - `apps/api/src/__tests__/runRemediationRegressionBenchmark.test.ts`
       - benchmark figure-phase diagnostic derivation
+
+- 2026-03-30 residual-family churn control pass:
+  - `apps/api/src/services/agentRemediationService.ts`
+    - added a shared residual-cleanup tracker for pre-final-rescue churn control
+    - deep follow-up admission can now be denied when the same residual family already changed bytes without measurable progress
+    - residual cleanup now distinguishes buckets:
+      - `structure`
+      - `figure`
+      - `mixed`
+      - `unknown`
+    - late figure sweeps are now deferred when structure or mixed residual debt is still unconverged
+    - `runFinalResidualRepairs()` now records residual-family progress and can stop early on:
+      - `same_family_no_progress`
+      - `no_mutation`
+      - `family_shifted`
+  - `apps/api/src/services/documentModel.ts`
+    - `remediationMetrics` now optionally includes:
+      - `phases.structureState.finalStopReason`
+      - `residualCleanup.dominantFamily`
+      - `residualCleanup.finalStopReason`
+  - `scripts/run-remediation-regression-benchmark.ts`
+    - benchmark outcomes now include additive `residualCleanupDiagnostic`
+    - processing errors with inspection-budget wording derive:
+      - `residualCleanupDiagnostic.finalStopReason: budget_exhausted`
+  - validation:
+    - `pnpm --filter api build`
+    - focused helper tests for residual cleanup progress, deep-follow-up admission, and late-figure deferral all passed
+  - fresh post-patch benchmark rerun launched with:
+    - summary:
+      - `ICJIA-PDFs/manifests/remediation-regression-benchmark.residual-churn.summary.json`
+    - artifacts:
+      - `ICJIA-PDFs/artifacts/remediation-regression-benchmark-residual-churn/`
+
+- 2026-03-30 long-range planning artifact:
+  - primary roadmap for finishing the ICJIA corpus and extracting a reusable remediation API:
+    - `docs/12-icjia-corpus-and-general-api-roadmap.md`
+  - this doc is the main staged plan for:
+    - cohort-based completion of remaining ICJIA PDFs
+    - strict replace-only-after-verified-pass workflow
+    - extraction of a self-contained verbose grader/fixer API suitable for upstream integration
     - package command:
       - `pnpm agency:benchmark-remediation`
   - validation notes:
@@ -1679,6 +1719,146 @@ First confirmed in-flight files:
   - `Trends in violent crime and the justice systems response`
 
 ## Things To Remember Going Forward
+
+- 2026-03-30 Stage 0 truth-model freeze implementation:
+  - shared promotion/replacement gate now lives in:
+    - `apps/api/src/services/promotionGate.ts`
+  - the same gate contract is now used by:
+    - `agentRemediationService.ts`
+    - `scripts/run-priority-remediation-batch.ts`
+    - `scripts/verify-ready-to-replace.ts`
+  - gate semantics:
+    - require:
+      - grade `A`
+      - overall score `100`
+      - no blocking local findings except `category.color_contrast`
+      - no critical manual review flags
+      - no scored categories below `100` except `Color Contrast`
+    - still rejects documents that remain scanned/image-only
+  - `DocumentModel` now carries additive `promotionGate` output so terminal remediation results expose the exact shared pass/fail reasons.
+  - priority batch outcomes no longer write new success rows as `ready_to_replace`:
+    - new successful remediation status is:
+      - `remediated_pass_candidate`
+    - remediation success is now intentionally separate from verified promotion readiness
+    - verification still reads legacy `ready_to_replace` rows for backward compatibility
+  - batch runner now records byte-invariant checksums for:
+    - the final gate-evaluated buffer
+    - the saved remediated artifact
+    - the staged replacement candidate
+  - if the saved or staged bytes do not match the gate-evaluated final buffer hash, the batch now fails that item instead of silently trusting the earlier result
+  - `scripts/verify-ready-to-replace.ts` now writes a durable verified-promotion ledger:
+    - manifest:
+      - `ICJIA-PDFs/manifests/verified-promotion-ledger.json`
+    - summary:
+      - `ICJIA-PDFs/manifests/verified-promotion-ledger.summary.json`
+    - rows are created only for verification-passing items
+    - each row records:
+      - publication identity
+      - source kind / source path
+      - local final artifact path
+      - staged replacement path
+      - current source checksum
+      - replacement checksum
+      - verification report path
+      - verification timestamp
+      - promotion status `verified_pass`
+  - both `scripts/verify-ready-to-replace.ts` and `scripts/run-priority-remediation-batch.ts` are now safe to import in tests or helper contexts because they only call `main()` on direct execution
+
+- 2026-03-30 Stage 0 truth-model freeze operational refresh:
+  - reran:
+    - `pnpm agency:verify-ready`
+  - refreshed authoritative artifacts:
+    - `ICJIA-PDFs/manifests/ready-to-replace-verification.json`
+    - `ICJIA-PDFs/manifests/ready-to-replace-verification.summary.json`
+    - `ICJIA-PDFs/manifests/verified-promotion-ledger.json`
+    - `ICJIA-PDFs/manifests/verified-promotion-ledger.summary.json`
+    - `ICJIA-PDFs/manifests/ready-to-replace-verification.classified.json`
+    - `ICJIA-PDFs/manifests/ready-to-replace-verification.classified.summary.json`
+  - refresh timestamp:
+    - `2026-03-30T16:06:01.533Z`
+  - refreshed verification totals:
+    - `392` publication rows
+    - `383` unique targets
+    - `84` passed targets
+    - `299` failed targets
+    - `0` errored targets
+    - `0` missing targets
+    - `86` passed publication rows
+    - `306` failed publication rows
+    - `86` verified promotion ledger rows
+  - ledger consistency checks:
+    - all ledger rows currently have promotion status `verified_pass`
+    - all ledger rows come from verification-passing rows only
+    - duplicate publication rows that share the same staged replacement path can legitimately produce multiple verified ledger rows
+  - refreshed classified verification totals:
+    - `84` verified-pass targets
+    - `2` soft-fail advisory targets
+    - `297` hard-fail targets
+    - `86` verified-pass publication rows
+    - `2` soft-fail advisory publication rows
+    - `304` hard-fail publication rows
+  - Stage 0 operational rule confirmed:
+    - promotion truth now comes from `verified-promotion-ledger.json`, not historical `ready_to_replace` flags in legacy manifests
+    - legacy `ready_to_replace` rows remain verifier inputs for backward compatibility only
+  - practical outcome:
+    - Stage 0 is now operationally complete in this workspace without starting Stage 1 queue/control-plane work
+
+- 2026-03-30 Stage 1 manifest-first corpus control plane implementation:
+  - new builder script:
+    - `scripts/build-corpus-control-plane.ts`
+  - new validator script:
+    - `scripts/validate-corpus-control-plane.ts`
+  - new shared builder/validation service:
+    - `apps/api/src/services/corpusControlPlane.ts`
+  - package scripts:
+    - `pnpm agency:build-control-plane`
+    - `pnpm agency:validate-control-plane`
+  - authoritative Stage 1 artifacts:
+    - `ICJIA-PDFs/manifests/corpus-control-plane.json`
+    - `ICJIA-PDFs/manifests/corpus-control-plane.summary.json`
+    - `ICJIA-PDFs/manifests/corpus-control-plane.by-cohort.json`
+    - `ICJIA-PDFs/manifests/corpus-control-plane-canaries.json`
+  - builder inputs currently include:
+    - `publication-pdf-replacement-map.json`
+    - `verified-promotion-ledger.json`
+    - `ready-to-replace-verification.json`
+    - `ready-to-replace-verification.classified.json`
+    - remediation `*-outcomes.json`
+    - remediation `*-candidates.json`
+    - `remediation-regression-benchmark.summary.json`
+  - current canonical corpus baseline from `corpus-control-plane.summary.json`:
+    - `1056` total rows
+    - status counts:
+      - `verified_pass: 86`
+      - `discovered: 3`
+      - `analyzed: 1`
+      - `queued_for_remediation: 0`
+      - `remediated_fail: 866`
+      - `processing_error: 100`
+      - `deferred_manual: 0`
+      - `staged_for_replacement: 0`
+      - `replaced_remote: 0`
+    - cohort counts:
+      - `short_high_likelihood: 27`
+      - `figure_heavy: 686`
+      - `structure_heavy: 143`
+      - `font_heavy: 14`
+      - `long_report: 11`
+      - `manual_tail: 175`
+    - `verifiedPassRowsFromLedger: 86`
+    - `remainingRowsExcludingVerifiedPass: 970`
+  - current source-kind/storage baseline:
+    - `legacy_archive: 927`
+    - `researchhub_upload: 109`
+    - `agency_upload: 20`
+  - validation state:
+    - `pnpm agency:validate-control-plane` currently returns:
+      - `ok: true`
+      - no errors
+      - no warnings
+  - operational rule:
+    - Stage 1 corpus statuses are manifest-only and are not written into the SQLite queue schema in this phase
+    - Stage 0 promotion truth from the verified promotion ledger still outranks every other source in the Stage 1 builder
 
 - If a lasting fact changes, update this file.
 - If a mistake is discovered and corrected, record it here.

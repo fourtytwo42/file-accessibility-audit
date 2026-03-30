@@ -1,0 +1,157 @@
+{
+  "generatedAt": "2026-03-28T23:09:59.159Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 12,
+    "shortlistedCandidates": 12,
+    "byTier": {
+      "high": 12
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4655",
+      "publicationTitle": "A Preliminary Outcome Evaluation of Lake County's Police Referral to Substance Use Disorder Treatment Program",
+      "selectorScore": 117,
+      "waveTier": "high",
+      "pageCount": 20,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 17,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "4583",
+      "publicationTitle": "An Overview of Medication-Assisted Treatment for Opioid Use Disorders for Criminal Justice-Involved Individuals",
+      "selectorScore": 110,
+      "waveTier": "high",
+      "pageCount": 23,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 17,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "4179",
+      "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey APPENDIX",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 86,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "4117",
+      "publicationTitle": "Program Completion Behavioral Change and Rearrest for the Batterer Intervention System of Cook County Illinois",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 90,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "3992",
+      "publicationTitle": "Evaluation of the Gang Violence Reduction Project in Little Village",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 99,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "3979",
+      "publicationTitle": "Scott County Juvenile Profile",
+      "selectorScore": 109,
+      "waveTier": "high",
+      "pageCount": 100,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "3860",
+      "publicationTitle": "A Summary of Drug Enforcement Activities Across Illinois Multijurisdictional Enforcement Groups and Task Forces",
+      "selectorScore": 108,
+      "waveTier": "high",
+      "pageCount": 86,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3594",
+      "publicationTitle": "IncidentBased Crime Analysis Manual Utilizing LocalLevel Incident Reports for Solving Crimes",
+      "selectorScore": 108,
+      "waveTier": "high",
+      "pageCount": 91,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "3582",
+      "publicationTitle": "A Time Study of Juvenile Probation Services in Illinois",
+      "selectorScore": 108,
+      "waveTier": "high",
+      "pageCount": 96,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "3487",
+      "publicationTitle": "An Evaluation of the Homicide and Violent Crime Strike Force Program in Madison and St Clair Counties",
+      "selectorScore": 108,
+      "waveTier": "high",
+      "pageCount": 98,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "4614",
+      "publicationTitle": "An Evaluation of Transitional Housing Programs in Illinois for Victims of Domestic Violence and/or Human Trafficking",
+      "selectorScore": 98,
+      "waveTier": "high",
+      "pageCount": 49,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 17,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "4615",
+      "publicationTitle": "Illinois Helping Everyone Access Linked Systems Action Plan",
+      "selectorScore": 96,
+      "waveTier": "high",
+      "pageCount": 82,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

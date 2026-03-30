@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-03-28T04:34:47.962Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 96,
+    "shortlistedCandidates": 50,
+    "byTier": {
+      "high": 50
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "3704",
+      "publicationTitle": "CHRISTIAN County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "3702",
+      "publicationTitle": "CLARK County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "3708",
+      "publicationTitle": "CLAY County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "3714",
+      "publicationTitle": "CLINTON County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "3693",
+      "publicationTitle": "COLES County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "3717",
+      "publicationTitle": "CRAWFORD County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "3715",
+      "publicationTitle": "CUMBERLAND County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3629",
+      "publicationTitle": "DE KALB County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "3628",
+      "publicationTitle": "DE WITT County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "4133",
+      "publicationTitle": "Drug Abuse Treatment and Probationer Recidivism",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "3699",
+      "publicationTitle": "DU PAGE County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "3713",
+      "publicationTitle": "EDGAR County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "3626",
+      "publicationTitle": "EDWARDS County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "3627",
+      "publicationTitle": "EFFINGHAM County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "3727",
+      "publicationTitle": "FAYETTE County Profile",
+      "selectorScore": 112,
+      "waveTier": "high",
+      "pageCount": 32,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

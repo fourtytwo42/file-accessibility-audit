@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-03-27T22:15:08.855Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 20,
+    "processed": 20,
+    "readyToReplace": 2,
+    "failedAfterRemediation": 17,
+    "sourceMissing": 0,
+    "processingError": 1,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4739",
+    "publicationTitle": "SFY24 ICJIA Annual Report",
+    "priorityRank": 10,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 68,
+    "serverHost": "192.241.146.85",
+    "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+    "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+    "storageKind": "agency_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/192.241.146.85/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-27T22:15:08.854Z",
+    "durationMs": 3611325,
+    "original": {
+      "overallScore": 28,
+      "grade": "F",
+      "pageCount": 30,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 60-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4739-SFY24_ICJIA_Annual_Report.failure.json"
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+    }
+  }
+}

@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-03-28T00:41:21.917Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 18,
+    "shortlistedCandidates": 18,
+    "byTier": {
+      "highest": 15,
+      "high": 3
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "3912",
+      "publicationTitle": "Court System",
+      "selectorScore": 137,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "selectorScore": 137,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "4100",
+      "publicationTitle": "Lake County probation program addresses womenspecific needs",
+      "selectorScore": 136,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "4079",
+      "publicationTitle": "Peoria St Clair counties initiate Redeploy Illinois youth programs",
+      "selectorScore": 136,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "4193",
+      "publicationTitle": "Prostitution study finds Chicago girls trafficked through coercion violence",
+      "selectorScore": 136,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "3679",
+      "publicationTitle": "Drug Offenders on Probation",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "3864",
+      "publicationTitle": "Examining Restorative Justice",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "3763",
+      "publicationTitle": "Trends in violent crime and the justice systems response",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "4035",
+      "publicationTitle": "Comparison of official and unofficial sources of criminal history record information",
+      "selectorScore": 133,
+      "waveTier": "highest",
+      "pageCount": 7,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "4026",
+      "publicationTitle": "A Profile of the Illinois State Police Motor Vehicle Theft Intelligence Clearinghouse",
+      "selectorScore": 132,
+      "waveTier": "highest",
+      "pageCount": 8,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "4017",
+      "publicationTitle": "A Profile of the State and Local Auto Theft Enforcement Program (SLATE)",
+      "selectorScore": 131,
+      "waveTier": "highest",
+      "pageCount": 9,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "4701",
+      "publicationTitle": "Evaluation of Youth Mental Health First Aid Training for Illinois Schools",
+      "selectorScore": 129,
+      "waveTier": "highest",
+      "pageCount": 18,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 9,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "4558",
+      "publicationTitle": "Probable posttraumatic stress disorder in a sample of urban jail detainees",
+      "selectorScore": 124,
+      "waveTier": "highest",
+      "pageCount": 16,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "4134",
+      "publicationTitle": "The Disproportionate Incarceration of African Americans for Drug CrimesThe Illinois Perspective",
+      "selectorScore": 121,
+      "waveTier": "highest",
+      "pageCount": 24,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "4051",
+      "publicationTitle": "2005 Annual Report Motor Vehicle Theft Prevention Council",
+      "selectorScore": 120,
+      "waveTier": "highest",
+      "pageCount": 24,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

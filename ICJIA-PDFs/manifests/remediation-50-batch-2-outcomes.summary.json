@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-03-28T01:55:00.120Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-2-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 18,
+    "processed": 18,
+    "readyToReplace": 11,
+    "failedAfterRemediation": 4,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4703",
+    "publicationTitle": "FY22 ICJIA Annual Report",
+    "priorityRank": 18,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "192.241.146.85",
+    "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.pdf",
+    "fileUrl": "https://agency.icjia-api.cloud/uploads/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.pdf",
+    "storageKind": "agency_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/192.241.146.85/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-28T01:55:00.119Z",
+    "durationMs": 3718642,
+    "original": {
+      "overallScore": 27,
+      "grade": "F",
+      "pageCount": 30,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 60-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4703-FY22_ICJIA_Annual_Report.failure.json"
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+    }
+  }
+}

@@ -1,0 +1,896 @@
+{
+  "generatedAt": "2026-03-27T23:46:16.561Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-batch-candidates.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 20,
+    "processed": 20,
+    "readyToReplace": 10,
+    "failedAfterRemediation": 7,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3867",
+      "publicationTitle": "Community Policing Accountability in Management in the Chicago Police Department",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/accountability.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/accountability.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/accountability.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ProgEvalSummary/accountability.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T22:29:03.192Z",
+      "durationMs": 92160,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 80,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 80, below 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3867-Community_Policing_Accountability_in_Management_in_the_Chicago_Police_Department.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3867-Community_Policing_Accountability_in_Management_in_the_Chicago_Police_Department.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3867-Community_Policing_Accountability_in_Management_in_the_Chicago_Police_Department.failure.json"
+      }
+    },
+    {
+      "publicationId": "4082",
+      "publicationTitle": "State survey results quantify crime victimization patterns",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/crime victimization survey.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/crime victimization survey.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/crime victimization survey.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/crime victimization survey.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:31:16.023Z",
+      "durationMs": 224991,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4082-State_survey_results_quantify_crime_victimization_patterns.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/crime victimization survey.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4082-State_survey_results_quantify_crime_victimization_patterns.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4068",
+      "publicationTitle": "Examining incarceration trends among minority youth in Illinois",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/juveniles to IDOC - race.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/juveniles to IDOC - race.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/juveniles to IDOC - race.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/juveniles to IDOC - race.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T22:31:37.670Z",
+      "durationMs": 246638,
+      "original": {
+        "overallScore": 18,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 99,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 99, below 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4068-Examining_incarceration_trends_among_minority_youth_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4068-Examining_incarceration_trends_among_minority_youth_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4068-Examining_incarceration_trends_among_minority_youth_in_Illinois.failure.json"
+      }
+    },
+    {
+      "publicationId": "4081",
+      "publicationTitle": "Redeploy Illinois program decreases incarceration rates among juveniles",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Redeploy%20Illinois%20program%20decreases%20incarceration%20rates%20among%20juveniles.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:36:38.203Z",
+      "durationMs": 547171,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4081-Redeploy_Illinois_program_decreases_incarceration_rates_among_juveniles.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4081-Redeploy_Illinois_program_decreases_incarceration_rates_among_juveniles.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4069",
+      "publicationTitle": "Macon County Redeploy Illinois pilot program aids juvenile offenders",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/MACON COUNTY.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/MACON COUNTY.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/MACON%20COUNTY.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/ProgEvalSummary/MACON COUNTY.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:36:43.119Z",
+      "durationMs": 552087,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4069-Macon_County_Redeploy_Illinois_pilot_program_aids_juvenile_offenders.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ProgEvalSummary/MACON COUNTY.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4069-Macon_County_Redeploy_Illinois_pilot_program_aids_juvenile_offenders.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4182",
+      "publicationTitle": "State criminal justice survey seeks methods to stem drug use violence",
+      "priorityRank": 11,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/State criminal justice survey Sept 2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/State criminal justice survey Sept 2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/State criminal justice survey Sept 2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/State criminal justice survey Sept 2007.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:38:09.504Z",
+      "durationMs": 391834,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4182-State_criminal_justice_survey_seeks_methods_to_stem_drug_use_violence.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/State criminal justice survey Sept 2007.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4182-State_criminal_justice_survey_seeks_methods_to_stem_drug_use_violence.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4098",
+      "publicationTitle": "Prescription drug abuse drug treatment needs on rise in Illinois",
+      "priorityRank": 10,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Prescription drug November 2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Prescription drug November 2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Prescription%20drug%20November%202008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/Prescription drug November 2008.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:38:31.139Z",
+      "durationMs": 435116,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/Prescription drug November 2008.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4184",
+      "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "priorityRank": 12,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/CSEC%202008%20Research%20Bulletin.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:41:58.184Z",
+      "durationMs": 319980,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4078",
+      "publicationTitle": "Community reentry challenges daunt exoffenders quest for a fresh start",
+      "priorityRank": 9,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Community%20re-entry%20challenges%20daunt%20ex-offenders.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:43:18.268Z",
+      "durationMs": 855076,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4188",
+      "publicationTitle": "Corrections data illustrate juvenile incarceration trends in Illinois",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Corrections%20data%20illustrate%20juvenile%20incarceration%20trends%20in%20Illinois.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T22:44:08.398Z",
+      "durationMs": 997366,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 90,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 90, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.failure.json"
+      }
+    },
+    {
+      "publicationId": "4590",
+      "publicationTitle": "Research at a Glance Impacts of Probationer Screening and Services on Probation Success and Future Arrests",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:44:44.344Z",
+      "durationMs": 1033313,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4047",
+      "publicationTitle": "Lengthy criminal histories shown among incarcerated lowlevel felony offenders",
+      "priorityRank": 19,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf//AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T22:45:45.810Z",
+      "durationMs": 61466,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 85,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 85, below 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.failure.json"
+      }
+    },
+    {
+      "publicationId": "3465",
+      "publicationTitle": "Are you a Victim of Domestic Violence",
+      "priorityRank": 20,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/ruvictim.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/ruvictim.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/ruvictim.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/brochures/ruvictim.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T22:46:13.580Z",
+      "durationMs": 27769,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 84,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 84, below 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "PDF/UA Compliance"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.failure.json"
+      }
+    },
+    {
+      "publicationId": "4071",
+      "publicationTitle": "Examining trends and data on incarcerated youth in Illinois",
+      "priorityRank": 14,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/juveniles to IDOC.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/juveniles to IDOC.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/juveniles to IDOC.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/juveniles to IDOC.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:47:19.503Z",
+      "durationMs": 549999,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4071-Examining_trends_and_data_on_incarcerated_youth_in_Illinois.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/juveniles to IDOC.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4071-Examining_trends_and_data_on_incarcerated_youth_in_Illinois.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4066",
+      "publicationTitle": "Technological innovation fuels identity theft fraud epidemic",
+      "priorityRank": 13,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/identitytheft.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/identitytheft.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/identitytheft.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/identitytheft.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T22:51:38.184Z",
+      "durationMs": 895064,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 85,
+        "grade": "B",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 85, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4066-Technological_innovation_fuels_identity_theft_fraud_epidemic.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4066-Technological_innovation_fuels_identity_theft_fraud_epidemic.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4066-Technological_innovation_fuels_identity_theft_fraud_epidemic.failure.json"
+      }
+    },
+    {
+      "publicationId": "4072",
+      "publicationTitle": "Forensic DNA evidence 21st century criminal justice tool",
+      "priorityRank": 15,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/DNA testing.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/DNA testing.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/DNA%20testing.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/Bulletins/DNA testing.json",
+      "status": "ready_to_replace",
+      "processedAt": "2026-03-27T22:52:40.263Z",
+      "durationMs": 849124,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/Bulletins/DNA testing.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.remediation.json",
+        "failureReportPath": null
+      }
+    },
+    {
+      "publicationId": "4077",
+      "publicationTitle": "Minorities Overrepresented in Illinois Juvenile Correctional Facilities",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Minorities overrepresented.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Minorities overrepresented.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Minorities overrepresented.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/AtAGlance/Minorities overrepresented.json",
+      "status": "failed_after_remediation",
+      "processedAt": "2026-03-27T23:01:32.208Z",
+      "durationMs": 2041176,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, below 100.",
+          "Categories still below 100: Alt Text on Images"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images"
+        ]
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4077-Minorities_Overrepresented_in_Illinois_Juvenile_Correctional_Facilities.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4077-Minorities_Overrepresented_in_Illinois_Juvenile_Correctional_Facilities.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4077-Minorities_Overrepresented_in_Illinois_Juvenile_Correctional_Facilities.failure.json"
+      }
+    },
+    {
+      "publicationId": "4097",
+      "publicationTitle": "Communities take on youth violence",
+      "priorityRank": 16,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/Summer Compiler 2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/Summer Compiler 2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/Summer%20Compiler%202008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/compiler/Summer Compiler 2008.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-27T23:43:59.138Z",
+      "durationMs": 3720953,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4097-Communities_take_on_youth_violence.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    },
+    {
+      "publicationId": "4187",
+      "publicationTitle": "The response to domestic violence  Updated protocol aids law enforcement officials states attorneys and the judiciary in addressing abuse issues",
+      "priorityRank": 17,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/WinterSpring08CompilerVol25No2.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/WinterSpring08CompilerVol25No2.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/WinterSpring08CompilerVol25No2.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/compiler/WinterSpring08CompilerVol25No2.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-27T23:45:21.020Z",
+      "durationMs": 3722752,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4187-The_response_to_domestic_violence_Updated_protocol_aids_law_enforcement_officials_states_attorneys_and_the_judiciary_in_addressing_abuse_issues.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    },
+    {
+      "publicationId": "4183",
+      "publicationTitle": "Juvenile reform specialized services help fuel fight against probationer recidivism",
+      "priorityRank": 18,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-27T23:46:16.560Z",
+      "durationMs": 3728161,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.failure.json"
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded 3600000ms without producing a terminal outcome."
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-03-28T02:07:51.834Z",
+  "selectionProfile": {
+    "description": "Strict next-batch selector for PDFs most likely to pass after automated remediation, favoring short non-scanned documents with low-complexity blocker profiles.",
+    "limit": 50,
+    "exclusionRules": [
+      "Exclude publications already covered by seeded passing replacements or prior remediation outcomes.",
+      "Exclude scanned/image-only PDFs.",
+      "Exclude any PDF with manual-only failure modes.",
+      "Exclude PDFs over 30 pages.",
+      "Exclude PDFs with more than 5 blocker families or more than 10 blocking findings.",
+      "Exclude compiler/newsletter-style PDFs due to observed timeout risk."
+    ],
+    "preferredSignals": [
+      "short page count",
+      "few blocker families",
+      "few blocking findings",
+      "many autorunnable opportunities",
+      "metadata/font/link cleanup family mix"
+    ],
+    "riskSignals": [
+      "table structure recovery",
+      "logical structure / marked content complexity",
+      "native figure convergence",
+      "compiler/newsletter file patterns"
+    ]
+  },
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 0,
+    "shortlistedCandidates": 0,
+    "byTier": {}
+  },
+  "candidates": []
+}

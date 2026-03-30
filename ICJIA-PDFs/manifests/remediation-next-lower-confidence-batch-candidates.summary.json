@@ -1,0 +1,194 @@
+{
+  "generatedAt": "2026-03-28T14:17:46.641Z",
+  "totals": {
+    "scannedReportsConsidered": 909,
+    "eligibleAfterFiltering": 77,
+    "shortlistedCandidates": 50,
+    "byTier": {
+      "highest": 27,
+      "high": 23
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4002",
+      "publicationTitle": "Driving under the influence DUI laws andenforcement in Illinois and the US",
+      "selectorScore": 145,
+      "waveTier": "highest",
+      "pageCount": 16,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "4493",
+      "publicationTitle": "Police Technology: Acoustic Gunshot Detection Systems",
+      "selectorScore": 144,
+      "waveTier": "highest",
+      "pageCount": 9,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "4492",
+      "publicationTitle": "Provider-Reported Challenges & Opportunities in Supporting Young Victims of Crime",
+      "selectorScore": 143,
+      "waveTier": "highest",
+      "pageCount": 10,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "4495",
+      "publicationTitle": "Provider-Reported Challenges and Opportunities in Supporting Young Victims of Crime",
+      "selectorScore": 143,
+      "waveTier": "highest",
+      "pageCount": 10,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "4737",
+      "publicationTitle": "Evaluation of Youth Mental Health First Aid Trainings for Illinois Schools, 2022-2023",
+      "selectorScore": 142,
+      "waveTier": "highest",
+      "pageCount": 18,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "4585",
+      "publicationTitle": "Collaboration in Criminal Justice: A Review of the Literature on Criminal Justice Coordinating Councils",
+      "selectorScore": 138,
+      "waveTier": "highest",
+      "pageCount": 11,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "4485",
+      "publicationTitle": "Demystifying Program Evaluation in Criminal Justice: A Guide for Practitioners",
+      "selectorScore": 138,
+      "waveTier": "highest",
+      "pageCount": 12,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "4607",
+      "publicationTitle": "The Victim-Offender Overlap: Examining the Relationship Between Victimization and Offending",
+      "selectorScore": 137,
+      "waveTier": "highest",
+      "pageCount": 12,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "4565",
+      "publicationTitle": "Procedural Justice in Policing: How the Process of Justice Impacts Public Attitudes and Law Enforcement Outcomes",
+      "selectorScore": 136,
+      "waveTier": "highest",
+      "pageCount": 13,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "4688",
+      "publicationTitle": "A Profile of Latinx Participants in Adult Redeploy Illinois",
+      "selectorScore": 136,
+      "waveTier": "highest",
+      "pageCount": 14,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "4497",
+      "publicationTitle": "Pathways to Victimization Disclosure: Who LGBTQ+ Victims Tell and Why",
+      "selectorScore": 135,
+      "waveTier": "highest",
+      "pageCount": 15,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "4505",
+      "publicationTitle": "Concentrations of Incarceration: Consequences of Communities with High Prison Admissions and Returns",
+      "selectorScore": 134,
+      "waveTier": "highest",
+      "pageCount": 15,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "4633",
+      "publicationTitle": "Exploring School Violence and Safety Concerns",
+      "selectorScore": 133,
+      "waveTier": "highest",
+      "pageCount": 16,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 14,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "4645",
+      "publicationTitle": "Policies and Programs to Address Individuals Who Perpetrate Intimate Partner Violence",
+      "selectorScore": 133,
+      "waveTier": "highest",
+      "pageCount": 17,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "4465",
+      "publicationTitle": "An Examination of Illinois and National Pretrial Practices, Detention, and Reform Efforts",
+      "selectorScore": 133,
+      "waveTier": "highest",
+      "pageCount": 17,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 13,
+      "storageKind": "researchhub_upload",
+      "serverHost": "157.230.3.215"
+    }
+  ]
+}

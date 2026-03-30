@@ -1,0 +1,791 @@
+ADAM/ADAM1.pdf
+ADAM/ADAM2.pdf
+ADAM/ADAM4.pdf
+ADAM/adam3.pdf
+AnnualReport/1988-1989 Biennial Report.pdf
+AnnualReport/1993-1994 Biennial Report.pdf
+AnnualReport/2000AnnualReport.pdf
+AnnualReport/97anreport.pdf
+AnnualReport/98anreport.pdf
+AnnualReport/99anreport.pdf
+AnnualReport/AR02.pdf
+AnnualReport/AR04.pdf
+AnnualReport/AR2005.pdf
+AnnualReport/AnnualReport2001.pdf
+AnnualReport/AnnualReportFY06.pdf
+AnnualReport/AnnualReportFY07.pdf
+AnnualReport/AnnualReportFY08.pdf
+AnnualReport/AnnualReportFY09.pdf
+AnnualReport/AnnualReportFY10.pdf
+AnnualReport/AnnualReportFY11.pdf
+AnnualReport/AnnualReportFY12.pdf
+AnnualReport/AnnualReportFY13.pdf
+AnnualReport/AnnualReportFY14.pdf
+AnnualReport/AnnualReportFY18.pdf
+AnnualReport/FY17_AR.pdf
+AnnualReport/ICJIA 1985 Annual Report.pdf
+AnnualReport/ICJIA 1987 Annual Report.pdf
+AnnualReport/ICJIA 1990 Annual Report.pdf
+AnnualReport/ICJIA 1991-1992 Annual Report.pdf
+AnnualReport/ICJIA 1995 Annual Report.pdf
+AnnualReport/ICJIA 1996 Annual Report.pdf
+AnnualReport/ICJIA 1997 Annual Report.pdf
+AnnualReport/IMVTPC 1999 Annual Report.pdf
+AnnualReport/ar03.pdf
+AtAGlance/Arrests.pdf
+AtAGlance/BIPRAAG.pdf
+AtAGlance/Child homicide final.pdf
+AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf
+AtAGlance/DMCcommitments.pdf
+AtAGlance/GDRAAG.pdf
+AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf
+AtAGlance/INFONET July 2008.pdf
+AtAGlance/MRT.pdf
+AtAGlance/Minorities overrepresented.pdf
+AtAGlance/elderabuseRAAG.pdf
+AtAGlance/vol1_no3_Class4felonyoffenders.pdf
+BARJ/BARJ law enforcement.pdf
+BARJ/BARJDefense.pdf
+BARJ/BARJPROBATION.pdf
+BARJ/BARJjudges.pdf
+BARJ/BARJprosecutors.pdf
+BARJ/ICJIA Corrections.pdf
+BARJ/SCHOOL BARJ GUIDEBOOOK.pdf
+BARJ/detention.pdf
+Bulletins/Annes House_022013.pdf
+Bulletins/CHD_OLFguide.pdf
+Bulletins/CHRI RB.pdf
+Bulletins/CHRIVol2Num7.pdf
+Bulletins/CSEC 2008 Research Bulletin.pdf
+Bulletins/Chicago sex exploitation Sept 2008.pdf
+Bulletins/Community re-entry challenges daunt ex-offenders.pdf
+Bulletins/Crimetrends.pdf
+Bulletins/Crowding at the Cook County Jail.pdf
+Bulletins/DMC.pdf
+Bulletins/DNA testing.pdf
+Bulletins/Disparity.pdf
+Bulletins/Disproportionate reporting March 2008.pdf
+Bulletins/Elderabuse2.pdf
+Bulletins/Electronically Monitored Home Confinement.pdf
+Bulletins/IIJISSurveys.pdf
+Bulletins/Illinois Facsimile Network.pdf
+Bulletins/Illinois' Computerized Criminal History.pdf
+Bulletins/Impact of Prior Criminal History.pdf
+Bulletins/Intro to Illinois Uniform Crime Reports.pdf
+Bulletins/Law Expands Access to Juv Justice Info.pdf
+Bulletins/PTSD_1114.pdf
+Bulletins/Prescription drug November 2008.pdf
+Bulletins/Prescription_drugs_062011.pdf
+Bulletins/Pretrial Release and Crime in Cook County.pdf
+Bulletins/Recidivism Among Different Types of Prison Releasees.pdf
+Bulletins/Repeat Offenders in Illinois.pdf
+Bulletins/ResBdelinq girls.pdf
+Bulletins/Research_Brief_SPAC_Felony_Sentences_052011.pdf
+Bulletins/SHR_CHD_9_13_19991.pdf
+Bulletins/Spatial and Temporal Analysis of Crime.pdf
+Bulletins/State Court Backlogs in Illinois and the United States.pdf
+Bulletins/State criminal justice survey Sept 2007.pdf
+Bulletins/Street Gangs and Crime.pdf
+Bulletins/The Pace of Recidivism in Illinois.pdf
+Bulletins/age2.pdf
+Bulletins/at_a_glance2004.pdf
+Bulletins/chicago_communities.pdf
+Bulletins/childhomicide.pdf
+Bulletins/crime victimization survey.pdf
+Bulletins/disprop.pdf
+Bulletins/duifinal.pdf
+Bulletins/employment.pdf
+Bulletins/felony.pdf
+Bulletins/funds.pdf
+Bulletins/gangrecidivism.pdf
+Bulletins/health_prisoner_reentry1.pdf
+Bulletins/homicide.pdf
+Bulletins/identitytheft.pdf
+Bulletins/interstateIndex.pdf
+Bulletins/juvenile justice trends.pdf
+Bulletins/juvenile reentry July 2008.pdf
+Bulletins/juveniles to IDOC - race.pdf
+Bulletins/juveniles to IDOC.pdf
+Bulletins/mental illness.pdf
+Bulletins/meth.pdf
+Bulletins/meth_in_IL.pdf
+Bulletins/pretrialjuvenile.pdf
+Bulletins/residential_mobility.pdf
+Bulletins/subabuse_vol2no1.pdf
+Bulletins/treatment.pdf
+Bulletins/treatment_matching.pdf
+CHRI/2003CHRIAudit.pdf
+CHRI/2006CHRIAuditReport.pdf
+CountyProfiles/Adams.pdf
+CountyProfiles/Alexander.pdf
+CountyProfiles/Bond.pdf
+CountyProfiles/Boone.pdf
+CountyProfiles/Brown.pdf
+CountyProfiles/Bureau.pdf
+CountyProfiles/Calhoun.pdf
+CountyProfiles/Carroll.pdf
+CountyProfiles/Cass.pdf
+CountyProfiles/Champaign.pdf
+CountyProfiles/Christian.pdf
+CountyProfiles/Clark.pdf
+CountyProfiles/Clay.pdf
+CountyProfiles/Clinton.pdf
+CountyProfiles/Coles.pdf
+CountyProfiles/Cook.pdf
+CountyProfiles/Crawford.pdf
+CountyProfiles/Cumberland.pdf
+CountyProfiles/DeKalb.pdf
+CountyProfiles/DeWitt.pdf
+CountyProfiles/Douglas.pdf
+CountyProfiles/DuPage.pdf
+CountyProfiles/Edgar.pdf
+CountyProfiles/Edwards.pdf
+CountyProfiles/Effingham.pdf
+CountyProfiles/Fayette.pdf
+CountyProfiles/Ford.pdf
+CountyProfiles/Franklin.pdf
+CountyProfiles/Fulton.pdf
+CountyProfiles/Gallatin.pdf
+CountyProfiles/Greene.pdf
+CountyProfiles/Grundy.pdf
+CountyProfiles/Hamilton.pdf
+CountyProfiles/Hancock.pdf
+CountyProfiles/Hardin.pdf
+CountyProfiles/Henderson.pdf
+CountyProfiles/Henry.pdf
+CountyProfiles/Iroquois.pdf
+CountyProfiles/Jackson.pdf
+CountyProfiles/Jasper.pdf
+CountyProfiles/Jefferson.pdf
+CountyProfiles/Jersey.pdf
+CountyProfiles/JoDaviess.pdf
+CountyProfiles/Johnson.pdf
+CountyProfiles/Kane.pdf
+CountyProfiles/Kankakee.pdf
+CountyProfiles/Kendall.pdf
+CountyProfiles/Knox.pdf
+CountyProfiles/LaSalle.pdf
+CountyProfiles/Lake.pdf
+CountyProfiles/Lawrence.pdf
+CountyProfiles/Lee.pdf
+CountyProfiles/Livingston.pdf
+CountyProfiles/Logan.pdf
+CountyProfiles/Macon.pdf
+CountyProfiles/Macoupin.pdf
+CountyProfiles/Madison.pdf
+CountyProfiles/Marion.pdf
+CountyProfiles/Marshall.pdf
+CountyProfiles/Mason.pdf
+CountyProfiles/Massac.pdf
+CountyProfiles/McDonough.pdf
+CountyProfiles/McHenry.pdf
+CountyProfiles/McLean.pdf
+CountyProfiles/Menard.pdf
+CountyProfiles/Mercer.pdf
+CountyProfiles/Monroe.pdf
+CountyProfiles/Montgomery.pdf
+CountyProfiles/Morgan.pdf
+CountyProfiles/Moultrie.pdf
+CountyProfiles/Ogle.pdf
+CountyProfiles/Peoria.pdf
+CountyProfiles/Perry.pdf
+CountyProfiles/Piatt.pdf
+CountyProfiles/Pike.pdf
+CountyProfiles/Pope.pdf
+CountyProfiles/Pulaski.pdf
+CountyProfiles/Putnam.pdf
+CountyProfiles/Randolph.pdf
+CountyProfiles/Richland.pdf
+CountyProfiles/Rock_Island.pdf
+CountyProfiles/Saline.pdf
+CountyProfiles/Sangamon.pdf
+CountyProfiles/Schuyler.pdf
+CountyProfiles/Scott.pdf
+CountyProfiles/Shelby.pdf
+CountyProfiles/St_Clair.pdf
+CountyProfiles/Stark.pdf
+CountyProfiles/Stephenson.pdf
+CountyProfiles/Tazewell.pdf
+CountyProfiles/Union.pdf
+CountyProfiles/Vermilion.pdf
+CountyProfiles/Wabash.pdf
+CountyProfiles/Warren.pdf
+CountyProfiles/Washington.pdf
+CountyProfiles/Wayne.pdf
+CountyProfiles/White.pdf
+CountyProfiles/Will.pdf
+CountyProfiles/Williamson.pdf
+CountyProfiles/Winnebago.pdf
+CountyProfiles/Woodford.pdf
+Criminal Justice Plan/StateCriminalJusticePlan.pdf
+DV in Peoria Sangamon and Tazewell Counties.pdf
+GetTheFacts/CrimSentencLayout.pdf
+GetTheFacts/GET THE FACTS Juvenile arrests.pdf
+GetTheFacts/GTF-CJS_arrests.pdf
+GetTheFacts/GTF-CJS_corrections.pdf
+GetTheFacts/GTF-CJS_criminalrecords.pdf
+GetTheFacts/GTF-CJS_victims.pdf
+GetTheFacts/GTF-juvenilecorrections.pdf
+GetTheFacts/GTF-juvenilesentencing.pdf
+GetTheFacts/GTF_CourtSystem.pdf
+GetTheFacts/GTF_Courts_092011.pdf
+GetTheFacts/GTF_Criminal_Sentencing_082011.pdf
+GetTheFacts/GTF_JuvenileJustice.pdf
+GetTheFacts/GTF_Juvenile_Criminal_Records_072011.pdf
+GetTheFacts/GTF_Pretrial_process_092011.pdf
+GetTheFacts/Get the Facts Juvenile Pretrial.pdf
+GetTheFacts/Get the Facts Juvenile court.pdf
+GetTheFacts/cops2.pdf
+GetTheFacts/victim2.pdf
+ICJIA_ILEITF_HB5613_Report_ 120117.pdf
+JFacts/Child Abuse Trends/1997-2007/8child abuse_1997-2007.pdf
+JFacts/Court Trends/1999-2008/14felony and misdemeanor filings_1999-2008.pdf
+JFacts/Court Trends/1999-2008/15adult probation_1999-2008.pdf
+JFacts/Crime Trends/1999-2008/1total offenses_1999-2008.pdf
+JFacts/Crime Trends/1999-2008/2total arrests_1999-2008.pdf
+JFacts/Crime Trends/1999-2008/3violent offenses_1999-2008.pdf
+JFacts/Crime Trends/1999-2008/4violent arrests_1999-2008.pdf
+JFacts/Crime Trends/1999-2008/5property offenses_1999-2008.pdf
+JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf
+JFacts/Domestic Violence Trends/1999-2008/7domestic offenses_1999-2008.pdf
+JFacts/Drug Trends/1997-2007/11drug seizures_1997-2007.pdf
+JFacts/Drug Trends/1997-2007/12drug submissions_1997-2007.pdf
+JFacts/Drug Trends/1999-2008/10drug arrests_1999-2008.pdf
+JFacts/Drug Trends/1999-2008/13drug treatment_1999-2008.pdf
+JFacts/Elder Abuse Trends/2000-2009/9elder abuse_2000-2009.pdf
+JuvenileCounty/Adams.pdf
+JuvenileCounty/Alexander.pdf
+JuvenileCounty/Bond.pdf
+JuvenileCounty/Boone.pdf
+JuvenileCounty/Brown.pdf
+JuvenileCounty/Bureau.pdf
+JuvenileCounty/Calhoun.pdf
+JuvenileCounty/Carroll.pdf
+JuvenileCounty/Cass.pdf
+JuvenileCounty/Champaign.pdf
+JuvenileCounty/Christian.pdf
+JuvenileCounty/Clark.pdf
+JuvenileCounty/Clay.pdf
+JuvenileCounty/Clinton.pdf
+JuvenileCounty/Coles.pdf
+JuvenileCounty/Cook.pdf
+JuvenileCounty/Crawford.pdf
+JuvenileCounty/Cumberland.pdf
+JuvenileCounty/DeKalb.pdf
+JuvenileCounty/DeWitt.pdf
+JuvenileCounty/Douglas.pdf
+JuvenileCounty/DuPage.pdf
+JuvenileCounty/Edgar.pdf
+JuvenileCounty/Edwards.pdf
+JuvenileCounty/Effingham.pdf
+JuvenileCounty/Fayette.pdf
+JuvenileCounty/Ford.pdf
+JuvenileCounty/Franklin.pdf
+JuvenileCounty/Fulton.pdf
+JuvenileCounty/Gallatin.pdf
+JuvenileCounty/Greene.pdf
+JuvenileCounty/Grundy.pdf
+JuvenileCounty/Hamilton.pdf
+JuvenileCounty/Hancock.pdf
+JuvenileCounty/Hardin.pdf
+JuvenileCounty/Henderson.pdf
+JuvenileCounty/Henry.pdf
+JuvenileCounty/Iroquois.pdf
+JuvenileCounty/Jackson.pdf
+JuvenileCounty/Jasper.pdf
+JuvenileCounty/Jefferson.pdf
+JuvenileCounty/Jersey.pdf
+JuvenileCounty/Jo Daviess.pdf
+JuvenileCounty/Johnson.pdf
+JuvenileCounty/Kane.pdf
+JuvenileCounty/Kankakee.pdf
+JuvenileCounty/Kendall.pdf
+JuvenileCounty/Knox.pdf
+JuvenileCounty/LaSalle.pdf
+JuvenileCounty/Lake.pdf
+JuvenileCounty/Lawrence.pdf
+JuvenileCounty/Lee.pdf
+JuvenileCounty/Livingston.pdf
+JuvenileCounty/Logan.pdf
+JuvenileCounty/Macon.pdf
+JuvenileCounty/Macoupin.pdf
+JuvenileCounty/Madison.pdf
+JuvenileCounty/Marion.pdf
+JuvenileCounty/Marshall.pdf
+JuvenileCounty/Mason.pdf
+JuvenileCounty/Massac.pdf
+JuvenileCounty/McDonough.pdf
+JuvenileCounty/McHenry.pdf
+JuvenileCounty/McLean.pdf
+JuvenileCounty/Menard.pdf
+JuvenileCounty/Mercer.pdf
+JuvenileCounty/Monroe.pdf
+JuvenileCounty/Montgomery.pdf
+JuvenileCounty/Morgan.pdf
+JuvenileCounty/Moultrie.pdf
+JuvenileCounty/Ogle.pdf
+JuvenileCounty/Peoria.pdf
+JuvenileCounty/Perry.pdf
+JuvenileCounty/Piatt.pdf
+JuvenileCounty/Pike.pdf
+JuvenileCounty/Pope.pdf
+JuvenileCounty/Pulaski.pdf
+JuvenileCounty/Putnam.pdf
+JuvenileCounty/Randolph.pdf
+JuvenileCounty/Richland.pdf
+JuvenileCounty/Rock Island.pdf
+JuvenileCounty/Saline.pdf
+JuvenileCounty/Sangamon.pdf
+JuvenileCounty/Schuyler.pdf
+JuvenileCounty/Scott.pdf
+JuvenileCounty/Shelby.pdf
+JuvenileCounty/St Clair.pdf
+JuvenileCounty/Stark.pdf
+JuvenileCounty/Stephenson.pdf
+JuvenileCounty/Tazewell.pdf
+JuvenileCounty/Union.pdf
+JuvenileCounty/Vermilion.pdf
+JuvenileCounty/Wabash.pdf
+JuvenileCounty/Warren.pdf
+JuvenileCounty/Washington.pdf
+JuvenileCounty/Wayne.pdf
+JuvenileCounty/White.pdf
+JuvenileCounty/Whiteside.pdf
+JuvenileCounty/Will.pdf
+JuvenileCounty/Williamson.pdf
+JuvenileCounty/Winnebago.pdf
+JuvenileCounty/Woodford.pdf
+ProgEvalSummary/CLEAR.pdf
+ProgEvalSummary/Cook County pilot program reduce female DUI recidivism.pdf
+ProgEvalSummary/Lake County women July 2008.pdf
+ProgEvalSummary/MACON COUNTY.pdf
+ProgEvalSummary/Peoria, St. Clair counties initiate Redeploy Illinois youth programs.pdf
+ProgEvalSummary/Program_Eval_Sheridan_Year6_072011.pdf
+ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.pdf
+ProgEvalSummary/Sheridan.pdf
+ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf
+ProgEvalSummary/accountability.pdf
+ProgEvalSummary/caps prob solv.pdf
+ProgEvalSummary/caps10.pdf
+ProgEvalSummary/moralreconation.pdf
+ProgEvalSummary/sex off probation.pdf
+ProgEvalSummary/sheridancorrections.pdf
+ResearchReports/04-07MVStrategy.pdf
+ResearchReports/1996CHRIAudit.pdf
+ResearchReports/1998 Madison.pdf
+ResearchReports/2000Probation Outcome Study.pdf
+ResearchReports/2004MEGTFSummary.pdf
+ResearchReports/A Crime Analysts Guide to Mapping.pdf
+ResearchReports/A Primer on Drug Addiction, Crime and Treatment Nov 2007.pdf
+ResearchReports/A Study Gun Addendum .pdf
+ResearchReports/A Time Study of Juvenile Probation Services in Illinois.pdf
+ResearchReports/ARI_DUPAGE_030315.pdf
+ResearchReports/An Evaluation Rearrest and Reincarceration After Discharge.pdf
+ResearchReports/An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf
+ResearchReports/An Evaluation of the Adams County SWAP.pdf
+ResearchReports/An Evaluation of the IDOC Juvenile Sex Offender Treatment Program.pdf
+ResearchReports/An Evaluation of the IDOC.pdf
+ResearchReports/An EvaluationSangWin.pdf
+ResearchReports/An Implementation_Project in Cook County.pdf
+ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies ES.pdf
+ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.pdf
+ResearchReports/Analysis of Shelter Utilization by Victims of Domestic Violence 0210.pdf
+ResearchReports/Blueprint for the Future.pdf
+ResearchReports/CAPS1.pdf
+ResearchReports/CAPS2.pdf
+ResearchReports/CAPS3.pdf
+ResearchReports/CAPS4.pdf
+ResearchReports/CAPS56.pdf
+ResearchReports/CAPS7.pdf
+ResearchReports/CAPSAbatement.pdf
+ResearchReports/CAPSEvaluationSexOffender.pdf
+ResearchReports/CAPSImpact EvaluationWinnebago.pdf
+ResearchReports/CAPS_10.pdf
+ResearchReports/CCSAOVWAP.pdf
+ResearchReports/CHRA Disposition Reporting in Cook County.pdf
+ResearchReports/CIPRCampusReport122008.pdf
+ResearchReports/CIT_Year1_July_2012.pdf
+ResearchReports/CLEAR and ICLEAR report Aug 2007.pdf
+ResearchReports/CLEAR2004.pdf
+ResearchReports/CSEC 2008 ICJIA REPORT.pdf
+ResearchReports/CVPP_Parent_Program_080215.pdf
+ResearchReports/CWHRS.pdf
+ResearchReports/CampusCrimeReport032010.pdf
+ResearchReports/Campus_Crime_Report_082011.pdf
+ResearchReports/Campus_Study_Final_Report_June2010.pdf
+ResearchReports/Casino Gambling and Crime in Chicago.pdf
+ResearchReports/Chicago Alley Lighting Project.pdf
+ResearchReports/Coder Guide Chicago Homicide Dataset.pdf
+ResearchReports/Coles Vermilion and Madison.pdf
+ResearchReports/Community Policing in Chicago Years 8 and 9.pdf
+ResearchReports/Community Reintegration Trajectories.pdf
+ResearchReports/Comparative Analysis of Probation Intake in IL.pdf
+ResearchReports/ComparisonEvaluationFindingsSexOffenderProbationProjectsSixCounties.pdf
+ResearchReports/Comprehensive Examination of the Illinois CHRI System.pdf
+ResearchReports/Cook Co CBTSFO Final Report_July 2007.pdf
+ResearchReports/Cook County DMR_Part I.pdf
+ResearchReports/Cook County DMR_Part II.pdf
+ResearchReports/Cook County States Attorneys Office Narcotics Nuisance Abatement.pdf
+ResearchReports/CookCountyDVInt.pdf
+ResearchReports/Cook_County_Deferred_Prosecution_Evaluation_0715.pdf
+ResearchReports/Developing recidivism.pdf
+ResearchReports/Disproportionate Incarceration of African Americans for Drug Crimes.pdf
+ResearchReports/Disproportionate Sentencing Report.pdf
+ResearchReports/Drug Abuse Treatment and Probationer Recidivism.pdf
+ResearchReports/Drug and Violent Crime in Illinios 1996.pdf
+ResearchReports/DuPage Co State's Attorney's Drug Control Task Force.pdf
+ResearchReports/Dynamics of Aging.pdf
+ResearchReports/Eval - IDOC Gang-Free Envt Progr.pdf
+ResearchReports/Eval - Post-Release Status of Substance Abuse Prog Participants.pdf
+ResearchReports/Eval of the HenryMercer Task Force.pdf
+ResearchReports/Eval of the Pretrial and Drug InterventionPrograms.pdf
+ResearchReports/EvalHom.pdf
+ResearchReports/EvalMJDrug.pdf
+ResearchReports/Eval_Christian_Peoria_Winnebago_Day.pdf
+ResearchReports/Evaluation of the Lake County Adult Probation.pdf
+ResearchReports/EvaluationKank.pdf
+ResearchReports/Evaluation_2013_CVPP_Parent_Program_1014.pdf
+ResearchReports/Evaluation_2013_CVPP_Reentry_Program_0215.pdf
+ResearchReports/Evaluation_YEP_Report_062014.pdf
+ResearchReports/Examining at-risk and delinquent girls in Illinois.pdf
+ResearchReports/Examining_IL_probationer_characteristics_and_outcomes_092011.pdf
+ResearchReports/Examining_multi-jurisdictional_drug_task_force_operations_Aug2012.pdf
+ResearchReports/FINAL REPORT The Impact of Illinois Truth-in-Sentencing Law 0609.pdf
+ResearchReports/Female Criminality.pdf
+ResearchReports/FemaleDel_IDOC.pdf
+ResearchReports/Female_Inmate_Report_through_SFY2011_122011.pdf
+ResearchReports/Final report of the Go To 2040 Crime and Justice Planning Initiative 072309.pdf
+ResearchReports/FocusGroup.pdf
+ResearchReports/GVRP_Eval.pdf
+ResearchReports/Gang and Gang Activity in Illinois.pdf
+ResearchReports/How to Handle Seasonality.pdf
+ResearchReports/ICJIA Needs Assessment Survey APPENDIX Feb 2007.pdf
+ResearchReports/ICJIA Needs Assessment Survey Final Report Feb 2007.pdf
+ResearchReports/IDJJ_Recidivism_Court_Evaluation_082012.pdf
+ResearchReports/IDJJ_Recidivism_Delinquents_082012.pdf
+ResearchReports/IERTF Final Report.pdf
+ResearchReports/IIJIS2006.pdf
+ResearchReports/IIJIS_CHRIcomparisons.pdf
+ResearchReports/IJJC2003annualreport.pdf
+ResearchReports/IJJC2004annualreport.pdf
+ResearchReports/ILCVS.pdf
+ResearchReports/IL_Juvenile_Justice_System_Walkthrough_0810.pdf
+ResearchReports/Illinois Crime Victimization Survey 2002 Data Analysis.pdf
+ResearchReports/Illinois Going Home Program 052008.pdf
+ResearchReports/Illinois State Police Gang Crime Witness Protection Program.pdf
+ResearchReports/Illinois TIS.pdf
+ResearchReports/IllinoisMYStrat.pdf
+ResearchReports/ImplementationKank.pdf
+ResearchReports/ImplementationWinn.pdf
+ResearchReports/Incident-Based Crime Analysis Manual.pdf
+ResearchReports/InterimJuvenSexOffProg1998.pdf
+ResearchReports/InventoryandExaminationofRestorativeJusticePracticesforYouthIllinois_042013.pdf
+ResearchReports/Is Crime Predictable.pdf
+ResearchReports/IsCrimeSeasonal1984.pdf
+ResearchReports/JJSRFDIL2012_Annual_Report_082914.pdf
+ResearchReports/JJSRF_Data_2008_Annual_Rpt_March_2011.pdf
+ResearchReports/Jail Data Link Final Report May 2009.pdf
+ResearchReports/Jail Study_Final_Report_0910.pdf
+ResearchReports/Juvenile Justice Council Guidebook and Evaluation Manual.pdf
+ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf
+ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf
+ResearchReports/Juvenile Justice Reform Provisions_Part 1.pdf
+ResearchReports/Juvenile Justice Risk Factor Data 2005 Annual Report.pdf
+ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Annual Report.pdf
+ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf
+ResearchReports/Juvenile Justice System and Risk Factor Data 2007 Annual Report.pdf
+ResearchReports/Juvenile Justice System and Risk Factor Data 2007 Appendix H Data Tables.pdf
+ResearchReports/Juvenile Recidivism in Illinois_063013.pdf
+ResearchReports/Juvenile Reentry Experience as Characterized by Multiple Systems Involvement.pdf
+ResearchReports/Juvenile_Justice_System_Eval_Manual_07_2001.pdf
+ResearchReports/Juvenile_Justice_System_Guidebook_08_2001.pdf
+ResearchReports/Lake_Co._PTSD_report_May2010.pdf
+ResearchReports/LittleVillageGVRP.pdf
+ResearchReports/Long-termDuPageWinnebago.pdf
+ResearchReports/MDT_Report_July_2013.pdf
+ResearchReports/METHAMPHETAMINE AND VIOLENCE IN ILLINOIS 062009.pdf
+ResearchReports/Mental health screening and the juvenile justice system.pdf
+ResearchReports/Meth Quick Facts_Judicial_Circuit8.pdf
+ResearchReports/Murder in Illinois 1973 to 1982.pdf
+ResearchReports/NSRHVST_101813.pdf
+ResearchReports/Needs Assessment Summary.pdf
+ResearchReports/Needs.pdf
+ResearchReports/NewApproaches.pdf
+ResearchReports/OverviewDVChildAbuseElderAbuse.pdf
+ResearchReports/PTSD_Female_Prisoners_Report_1110.pdf
+ResearchReports/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.pdf
+ResearchReports/Perceptions of Police Ethics.pdf
+ResearchReports/Policies_and_Procedures_of_the_Illinois_Criminal_Justice_System_Aug2012.pdf
+ResearchReports/Pre-TrialJuv.pdf
+ResearchReports/Pretrial Process in Cook County.pdf
+ResearchReports/PrivacySchmrivacy_FINAL.pdf
+ResearchReports/Probation_Supervised_Released_Imprisoned_Sex_Offenders_Report_1210.pdf
+ResearchReports/Promising Approaches to Gangs.pdf
+ResearchReports/RVDCMHP_122014.pdf
+ResearchReports/Redeploy Illinois 2nd Judicial Circuit.pdf
+ResearchReports/Redeploy Illinois Macon County.pdf
+ResearchReports/ReducingPublicViolenceandHomicideinChicago.pdf
+ResearchReports/Reentry_Sheridan_Report_012012.pdf
+ResearchReports/Results of the 1997 Illinois Adult Probation Outcome Study.pdf
+ResearchReports/SANE.pdf
+ResearchReports/SLM_Case_Study_Report_051115.pdf
+ResearchReports/SWICC_Year_3_Evaluations_Report_March_2011.pdf
+ResearchReports/Safe_From_the_Start_Evaluation_Report_050614.pdf
+ResearchReports/SaferReturnReport_June_2012.pdf
+ResearchReports/Safety_Net_Works_Initiative_March_2011.pdf
+ResearchReports/Sex Trafficking Report May 2008.pdf
+ResearchReports/Sheridan_6_year_eval_report_01_2011.pdf
+ResearchReports/Specifications in Patterns Over Time in Chicago Homicide.pdf
+ResearchReports/StateDrugViolentCrimeStrategy1989.pdf
+ResearchReports/Strategy1994.pdf
+ResearchReports/The GeoArchive Handbook.pdf
+ResearchReports/Trends and Issues 90.pdf
+ResearchReports/Updated Graphs Major Trends in Chicago Homicide.pdf
+ResearchReports/VictimAndSurvivor.pdf
+ResearchReports/Victimization and help seeking behaviors among female prisoners in Illinois.pdf
+ResearchReports/Violent Crime and Victims Gender 2002.pdf
+ResearchReports/YEP_Report_0815.pdf
+ResearchReports/female_inmate_report_062011.pdf
+ResearchReports/iijis2005.pdf
+ResearchReports/iijisStrategicPlan0304.pdf
+ResearchReports/juvenile2000study.pdf
+ResearchReports/methcircuit1.pdf
+ResearchReports/methcircuit2.pdf
+ResearchReports/methcircuit4.pdf
+ResearchReports/methcircuit5.pdf
+ResearchReports/methethnography.pdf
+ResearchReports/moralreconation.pdf
+Summit_Reports/ARI-CJCC_summit_report_050818.pdf
+TI 2008/T&I 2008 Full Report.pdf
+TIUpdate/CHRI.pdf
+TIUpdate/T&I 1987.pdf
+TIUpdate/T&I 1989 Focus on Drugs, AIDS, DUI.pdf
+TIUpdate/T&I 1990.pdf
+TIUpdate/T&I 1991 Edu & CRJ.pdf
+TIUpdate/T&I 1997.pdf
+TIUpdate/Web Edition CRIME TRENDS 032509.pdf
+TIUpdate/campus.pdf
+TIUpdate/crime99.pdf
+TIUpdate/crimet&i.pdf
+TIUpdate/drugprobation.pdf
+TIUpdate/drugsent.pdf
+TIUpdate/dv.pdf
+TIUpdate/felony.pdf
+TIUpdate/hate.pdf
+TIUpdate/juvreform.pdf
+TIUpdate/perception.pdf
+TIUpdate/probation.pdf
+TIUpdate/restorative.pdf
+TIUpdate/sentencing.pdf
+TIUpdate/ticorrections.pdf
+TIUpdate/violent.pdf
+brochures/A Trip to the State Fair.pdf
+brochures/Be Street Smart.pdf
+brochures/Cool Kids Resolve Conflict Peacefully.pdf
+brochures/Parents can help Prevent Gangs.pdf
+brochures/Play it Safe.pdf
+brochures/Safe.pdf
+brochures/SafetyPlan.pdf
+brochures/Seniors.pdf
+brochures/Winners dont use Drugs.pdf
+brochures/bor_english.pdf
+brochures/bor_polish.pdf
+brochures/bor_spanish.pdf
+brochures/coloring book.pdf
+brochures/crook.pdf
+brochures/expungement.pdf
+brochures/infovictims03a.pdf
+brochures/ruvictim.pdf
+brochures/vessa.pdf
+compfall98.pdf
+compiler/36612 Cmplr WNTR_SPRNG_07.pdf
+compiler/Alternatives to Incarceration.pdf
+compiler/Authority Endorses Proposed CHRI Act.pdf
+compiler/Authority Proposes Data Quality Program.pdf
+compiler/Authority Studying Juvenile Data Policies.pdf
+compiler/Battle of the Backlog.pdf
+compiler/Busting up a Big Business.pdf
+compiler/Community Policing.pdf
+compiler/Compiler Fall 1985.pdf
+compiler/Compiler Fall 1986.pdf
+compiler/Compiler Fall 1988.pdf
+compiler/Compiler Spring 1986.pdf
+compiler/Compiler Summer 1986.pdf
+compiler/Compiler Winter1987.pdf
+compiler/CompilerSummer2007.pdf
+compiler/Counterattack on Violence.pdf
+compiler/Criminal History Records.pdf
+compiler/Dealing with Sex Offenders.pdf
+compiler/DrugsCJS.pdf
+compiler/Education and Criminal Justice.pdf
+compiler/Evaluation up Close.pdf
+compiler/Family Violence.pdf
+compiler/From Arrest to Trial.pdf
+compiler/Information Networks Expanding.pdf
+compiler/Information Technology for Criminal Justice.pdf
+compiler/JAA Grant Plan Approved.pdf
+compiler/Juvenile Justice System in IL.pdf
+compiler/Juveniles & the Criminal Justice System.pdf
+compiler/Logging on to the Future.pdf
+compiler/New Federal Justice Aid Coming to Illinois.pdf
+compiler/New Ways to get the Job Done.pdf
+compiler/On the Alert.pdf
+compiler/Raising the Stakes.pdf
+compiler/Responding to Juv Crime.pdf
+compiler/Rethinking Probation.pdf
+compiler/State Submits Drug Enforcement Plan.pdf
+compiler/Street Gangs and Violence.pdf
+compiler/Summer 2006.pdf
+compiler/Summer Compiler 2008.pdf
+compiler/Technology for Law Enforcement.pdf
+compiler/Tight Space, Tight Deadline.pdf
+compiler/Winter Spring.pdf
+compiler/WinterSpring08CompilerVol25No2.pdf
+compiler/comp_summer02.pdf
+compiler/compiler_spring02.pdf
+compiler/compilerfall2002.pdf
+compiler/fall03.pdf
+compiler/fall99.pdf
+compiler/spring01.pdf
+compiler/summer04.pdf
+compiler/summer2000.pdf
+compiler/summer2003.pdf
+compiler/winter.spring 04.pdf
+compiler/winter2003.pdf
+compiler/winter_spring2000.pdf
+compspring98.pdf
+compspring99.pdf
+compsum98.pdf
+compsum99.pdf
+compwin99.pdf
+cwhrs/collaboration-3a.pdf
+drone/Drone_Report_2015.pdf
+drone/Drone_Report_2021_full.pdf
+grants/grantbook01.pdf
+mcgruff/mgmotor.pdf
+mcgruff/mgneigh.pdf
+mcgruff/mgrural.pdf
+megprofiles/BATF_Profile_082012.pdf
+megprofiles/Blackhawk Area Task Force.pdf
+megprofiles/CIEG_112012.pdf
+megprofiles/Central Illinois Enforcement Group.pdf
+megprofiles/DuPage Metropolitan Enforcement Group.pdf
+megprofiles/DuPage_MEG_Profile_042012.pdf
+megprofiles/ECITF_122012.pdf
+megprofiles/East Central Illinois Task Force.pdf
+megprofiles/Joliet Metropolitan Area Narcotics Squad.pdf
+megprofiles/KAMEG_112012.pdf
+megprofiles/Kankakee Area Metropolitan Enforcement Group.pdf
+megprofiles/LCMEG_112012.pdf
+megprofiles/Lake County Metropolitan Enforcement Group.pdf
+megprofiles/MANS_122012.pdf
+megprofiles/MCNEG_092012.pdf
+megprofiles/MEGSI_122012.pdf
+megprofiles/MEGTFSummary.pdf
+megprofiles/Metropolitan Enforcement Group of Southwestern Illinois.pdf
+megprofiles/Multi-County Narcotics Enforcement Group.pdf
+megprofiles/NCNTF_122012.pdf
+megprofiles/North Central Narcotics Task Force.pdf
+megprofiles/QCMEG_092012.pdf
+megprofiles/Quad-Cities Metropolitan Enforcement Group.pdf
+megprofiles/SCIDTF_112012.pdf
+megprofiles/SEIDTF_122012.pdf
+megprofiles/SIDTF_122012.pdf
+megprofiles/SIEG_122012.pdf
+megprofiles/SLANT_Profile_082012.pdf
+megprofiles/South Central Illinois Drug Task Force.pdf
+megprofiles/Southeastern Illinois Drug Task Force.pdf
+megprofiles/Southern Illinois Drug Task Force.pdf
+megprofiles/Southern Illinois Enforcement Group.pdf
+megprofiles/State Line Area Narcotics Team.pdf
+megprofiles/Task Force 6.pdf
+megprofiles/Task Force X.pdf
+megprofiles/TaskForce6_MEG_Aug2012.pdf
+megprofiles/VMEG_Aug2012.pdf
+megprofiles/Vermilion County Metropolitan Enforcement Group.pdf
+megprofiles/WCITF_MEG_Aug2012.pdf
+megprofiles/West Central Illinois Task Force.pdf
+megprofiles/Zone 3_ LaSalle Task Force.pdf
+mvtpc/2001 MV Annual Report.pdf
+mvtpc/2006 Annual Report.pdf
+mvtpc/2007 Annual Report Final.pdf
+mvtpc/2008 Annual Report.pdf
+mvtpc/2009 MV Annual Report.pdf
+mvtpc/2010 MV Annual Report.pdf
+mvtpc/2011 MV Annual Report.pdf
+mvtpc/2012_MV_Annual_Report.pdf
+mvtpc/2013_MV_Annual_Report.pdf
+mvtpc/2014_MV_Annual_Report.pdf
+mvtpc/AR2003.pdf
+mvtpc/BATTLE03.pdf
+mvtpc/Clearinghouse03.pdf
+mvtpc/KCAT03.pdf
+mvtpc/MVAnnual2000.pdf
+mvtpc/MetroEast03.pdf
+mvtpc/NEMAT03.pdf
+mvtpc/NIATTF03.pdf
+mvtpc/SLATE03.pdf
+mvtpc/SOS03.pdf
+mvtpc/TriCounty03.pdf
+mvtpc/ar2004.pdf
+mvtpc/ar2005.pdf
+news/2015_Motor_Vehicle_Annual_Report.pdf
+news/2016_Motor_Vehicle_Annual_Report.pdf
+news/Safe_From_the_Start_Year13_Report_070615.pdf
+oga/Availability and Use of Intermediate Sanctions.pdf
+oga/CAPS4OGA.pdf
+oga/CAPS7.pdf
+oga/CCASo.pdf
+oga/CCH.pdf
+oga/CMVoga.pdf
+oga/Chicago Arestees Surveyed.pdf
+oga/Combating the High Murder Rate.pdf
+oga/Cook County Sex Offender Probation Program.pdf
+oga/County Prosecution Programs.pdf
+oga/DVprobOGA.pdf
+oga/Drug Court Provides Treatment Alternative.pdf
+oga/Drug Law Enforcement.pdf
+oga/Drug Testing and Community Supervision.pdf
+oga/EJJOGA.pdf
+oga/Effects of NTAs.pdf
+oga/Evaluation of the Homicide and Violent Crime Task Force in St. Clair and Madison Counties.pdf
+oga/Evaluations of the SWAP in Madison and Adams.pdf
+oga/Firearms and Crime in Illinois.pdf
+oga/GVRP.pdf
+oga/Geography of Arrests for Violent Crime.pdf
+oga/Homicide Task Force Helps Solve Tough Cases.pdf
+oga/Juvenile Offenders and Violent Crime.pdf
+oga/MEGTF2.pdf
+oga/Making A Prison Gang Free.pdf
+oga/Needs Assessment.pdf
+oga/Pretrial and Drug Intervention Programs.pdf
+oga/Probation in IL.pdf
+oga/Reducing Youth Gang Violence.pdf
+oga/SPTDVoga.pdf
+oga/Seizure and Forfeiture of Drug Offenders' Assets.pdf
+oga/Sex Offender Treatment at the IL Youth Center-Harrisburg.pdf
+oga/Targeting Drug Activity.pdf
+oga/Timeliness, Accuracy and Completeness.pdf
+oga/Trends in Illinois Crime 1993-1997.pdf
+oga/VCTFOGA.pdf
+oga/abateOGA.pdf
+oga/caps2pdf.pdf
+oga/caps3oga.pdf
+oga/chdv.pdf
+oga/cjplan2.pdf
+oga/family conf.pdf
+oga/final revised CookDRC.OGA.pdf
+oga/gang_oga.pdf
+oga/jjreform.pdf
+oga/juv probation.pdf
+oga/juvdayreport.pdf
+oga/juvenile.pdf.pdf
+oga/kmeg-oga.pdf
+oga/kmegoga.pdf
+oga/ogav2n9.pdf
+oga/ogav3n1.pdf
+oga/outcomes.pdf
+oga/probation.pdf
+oga/sexoffogaPDF.pdf
+oga/station adjust.pdf
+summit/summit.report.3.7.01.pdf

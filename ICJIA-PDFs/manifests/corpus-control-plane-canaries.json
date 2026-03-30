@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-03-30T20:53:28.152Z",
+  "summary": {
+    "totalCanaries": 5,
+    "matchedPublicationIds": 5,
+    "unmatchedCanaries": 0,
+    "byCohortLabel": {
+      "short_high_likelihood": 1,
+      "figure_heavy": 3,
+      "structure_heavy": 1,
+      "font_heavy": 0,
+      "long_report": 0,
+      "manual_tail": 0
+    }
+  },
+  "rows": [
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "benchmarkName": "Kendall County Profile",
+      "benchmarkCategory": "ownership",
+      "benchmarkTerminalState": "pass",
+      "cohortLabel": "figure_heavy",
+      "currentCorpusStatus": "remediated_fail"
+    },
+    {
+      "publicationId": "4184",
+      "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "benchmarkName": "CSEC 2008 Research Bulletin",
+      "benchmarkCategory": "figure_description",
+      "benchmarkTerminalState": "hard_fail",
+      "cohortLabel": "figure_heavy",
+      "currentCorpusStatus": "remediated_fail"
+    },
+    {
+      "publicationId": "3912",
+      "publicationTitle": "Court System",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
+      "benchmarkName": "Court System Get The Facts",
+      "benchmarkCategory": "structure",
+      "benchmarkTerminalState": "processing_error",
+      "cohortLabel": "short_high_likelihood",
+      "currentCorpusStatus": "processing_error"
+    },
+    {
+      "publicationId": "4739",
+      "publicationTitle": "SFY24 ICJIA Annual Report",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_24_ICJIA_Annual_Report_FINAL_2538a182e5_1731f93851.pdf",
+      "benchmarkName": "SFY24 ICJIA Annual Report",
+      "benchmarkCategory": "long_report",
+      "benchmarkTerminalState": "hard_fail",
+      "cohortLabel": "structure_heavy",
+      "currentCorpusStatus": "processing_error"
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "benchmarkName": "Criminal Sentencing Layout",
+      "benchmarkCategory": "structure",
+      "benchmarkTerminalState": "hard_fail",
+      "cohortLabel": "figure_heavy",
+      "currentCorpusStatus": "remediated_fail"
+    }
+  ]
+}

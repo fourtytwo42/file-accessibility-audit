@@ -39,6 +39,10 @@ type BenchmarkOutcome = {
     skippedBecauseLateConverged: boolean
     finalStopReason: 'no_mutation' | 'no_debt_reduction' | 'same_blocking_keys' | 'budget_exhausted' | 'completed' | null
   } | null
+  residualCleanupDiagnostic: {
+    dominantFamily: 'structure' | 'figure' | 'mixed' | 'unknown'
+    finalStopReason: 'same_family_no_progress' | 'no_mutation' | 'family_shifted' | 'budget_exhausted' | 'completed' | null
+  } | null
   error?: {
     code: string | null
     message: string
@@ -126,6 +130,26 @@ export function deriveFigurePhaseDiagnostic(input: {
     return {
       focusedRescueRan: false,
       skippedBecauseLateConverged: false,
+      finalStopReason: 'budget_exhausted',
+    }
+  }
+  return null
+}
+
+export function deriveResidualCleanupDiagnostic(input: {
+  remediationMetrics: DocumentModel['remediationMetrics'] | null | undefined
+  errorMessage?: string | null
+}): BenchmarkOutcome['residualCleanupDiagnostic'] {
+  const residualCleanup = input.remediationMetrics?.residualCleanup
+  if (residualCleanup) {
+    return {
+      dominantFamily: residualCleanup.dominantFamily || 'unknown',
+      finalStopReason: residualCleanup.finalStopReason || null,
+    }
+  }
+  if (input.errorMessage && /inspection budget exceeded/i.test(input.errorMessage)) {
+    return {
+      dominantFamily: 'unknown',
       finalStopReason: 'budget_exhausted',
     }
   }
@@ -285,6 +309,9 @@ async function runCase(entry: BenchmarkCase): Promise<BenchmarkOutcome> {
       figurePhaseDiagnostic: deriveFigurePhaseDiagnostic({
         remediationMetrics: remediation.model.remediationMetrics || null,
       }),
+      residualCleanupDiagnostic: deriveResidualCleanupDiagnostic({
+        remediationMetrics: remediation.model.remediationMetrics || null,
+      }),
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
@@ -302,6 +329,10 @@ async function runCase(entry: BenchmarkCase): Promise<BenchmarkOutcome> {
       },
       final: null,
       figurePhaseDiagnostic: deriveFigurePhaseDiagnostic({
+        remediationMetrics: null,
+        errorMessage: message,
+      }),
+      residualCleanupDiagnostic: deriveResidualCleanupDiagnostic({
         remediationMetrics: null,
         errorMessage: message,
       }),

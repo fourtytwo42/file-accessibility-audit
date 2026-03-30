@@ -1,0 +1,191 @@
+{
+  "generatedAt": "2026-03-27T23:58:12.485Z",
+  "totals": {
+    "shortlistedCandidates": 50,
+    "byTier": {
+      "highest": 50
+    }
+  },
+  "top15": [
+    {
+      "nextBatchRank": 1,
+      "publicationId": "4121",
+      "publicationTitle": "Prescription drug abuse accidental overdose on rise in Illinois",
+      "selectorScore": 142.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 8,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 2,
+      "publicationId": "3606",
+      "publicationTitle": "Information for Crime Victims",
+      "selectorScore": 136.5,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 3,
+      "publicationId": "3651",
+      "publicationTitle": "McGruff You can fight crime in your neighborhood",
+      "selectorScore": 136.5,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 4,
+      "publicationId": "3981",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Polish)",
+      "selectorScore": 136.5,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 5,
+      "publicationId": "4041",
+      "publicationTitle": "Reported elder abuse cases on the rise in Illinois",
+      "selectorScore": 136.5,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 6,
+      "publicationId": "4046",
+      "publicationTitle": "Chicago Homicide Dataset Series Childrens risk of homicide victimization records 31year increase",
+      "selectorScore": 136.5,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 7,
+      "publicationId": "4135",
+      "publicationTitle": "Juvenile arrest rates reveal significant racial disparity",
+      "selectorScore": 136.5,
+      "waveTier": "highest",
+      "pageCount": 2,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 8,
+      "publicationId": "4055",
+      "publicationTitle": "CLEAR offers enhanced police efficiencies increased accountability",
+      "selectorScore": 135.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 9,
+      "publicationId": "4196",
+      "publicationTitle": "Screening for serious mental illness among offenders",
+      "selectorScore": 135.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 9,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 10,
+      "publicationId": "3610",
+      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "selectorScore": 133.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 11,
+      "publicationId": "3656",
+      "publicationTitle": "Evaluation of the Kankakee Metropolitan Enforcement Group",
+      "selectorScore": 133.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 12,
+      "publicationId": "3663",
+      "publicationTitle": "Juvenile Probation Programs Evaluated",
+      "selectorScore": 133.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 13,
+      "publicationId": "3665",
+      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
+      "selectorScore": 133.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 14,
+      "publicationId": "3670",
+      "publicationTitle": "Violent Crime Task Force Cracks Tough Homicide Cases in Kankakee County",
+      "selectorScore": 133.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    },
+    {
+      "nextBatchRank": 15,
+      "publicationId": "3683",
+      "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
+      "selectorScore": 133.5,
+      "waveTier": "highest",
+      "pageCount": 4,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "storageKind": "legacy_archive",
+      "serverHost": "143.244.146.43"
+    }
+  ]
+}

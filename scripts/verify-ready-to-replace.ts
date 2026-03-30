@@ -1,6 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
+import { pathToFileURL } from 'node:url'
 import { analyzePDF } from '../apps/api/src/services/pdfAnalyzer.ts'
+import { createVerifiedPromotionLedgerRow } from '../apps/api/src/services/promotionLedger.ts'
+import { evaluatePromotionGate } from '../apps/api/src/services/promotionGate.ts'
 
 type ReadyRow = {
   publicationId: string
@@ -9,6 +13,8 @@ type ReadyRow = {
   serverHost: string | null
   remotePath: string | null
   stagedReplacementPath: string | null
+  localFinalArtifactPath: string | null
+  criticalManualReviewFlagCodes: string[]
   sourceKind: 'complete_seed' | 'batch_ready' | 'already_replaced_remote'
   sourceManifest: string
   sourceStatus: string
@@ -19,6 +25,7 @@ type VerificationTarget = {
   mode: 'local_staged' | 'remote_live'
   sourcePathOrUrl: string
   filename: string
+  criticalManualReviewFlagCodes: string[]
 }
 
 type VerificationResult = {
@@ -41,6 +48,7 @@ type VerificationResult = {
     reasons: string[]
     blockingLocalFindingKeys: string[]
     unresolvedCategoryLabels: string[]
+    criticalManualReviewFlagCodes: string[]
   }
   artifacts: {
     reportPath: string
@@ -54,12 +62,23 @@ type PublicationVerificationRow = ReadyRow & {
   verificationError: string | null
 }
 
+type PromotionLedgerManifest = {
+  generatedAt: string
+  summary: {
+    verifiedPassRows: number
+    byPromotionStatus: Record<string, number>
+  }
+  rows: Array<ReturnType<typeof createVerifiedPromotionLedgerRow> extends infer T ? Exclude<T, null> : never>
+}
+
 const repoRoot = '/home/hendo420/pdfaf'
 const icjiaRoot = path.join(repoRoot, 'ICJIA-PDFs')
 const manifestsRoot = path.join(icjiaRoot, 'manifests')
 const reportsRoot = path.join(icjiaRoot, 'reports', 'test-runs', 'ready-verification')
 const verificationManifestPath = path.join(manifestsRoot, 'ready-to-replace-verification.json')
 const verificationSummaryPath = path.join(manifestsRoot, 'ready-to-replace-verification.summary.json')
+const promotionLedgerPath = path.join(manifestsRoot, 'verified-promotion-ledger.json')
+const promotionLedgerSummaryPath = path.join(manifestsRoot, 'verified-promotion-ledger.summary.json')
 
 const concurrency = Number(process.env.ICJIA_VERIFY_CONCURRENCY || 8)
 
@@ -80,40 +99,6 @@ function safeStem(value: string): string {
   return value.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '') || 'item'
 }
 
-function ignoredCategoryLabels(): Set<string> {
-  return new Set(['Color Contrast'])
-}
-
-function ignoredBlockingKeys(): Set<string> {
-  return new Set(['category.color_contrast'])
-}
-
-function buildGate(result: any): VerificationResult['gate'] & { passed: boolean } {
-  const blockingLocalFindingKeys = (result.localStandards?.findings || [])
-    .filter((finding: any) => finding.blocking)
-    .map((finding: any) => String(finding.key))
-    .filter(key => !ignoredBlockingKeys().has(key))
-
-  const unresolvedCategoryLabels = (result.categories || [])
-    .filter((category: any) => typeof category.score === 'number' && category.score < 100)
-    .map((category: any) => String(category.label))
-    .filter(label => !ignoredCategoryLabels().has(label))
-
-  const reasons: string[] = []
-  if (result.isScanned) reasons.push('Document still appears scanned/image-only.')
-  if (result.grade !== 'A') reasons.push(`Final grade is ${result.grade}, not A.`)
-  if (result.overallScore !== 100) reasons.push(`Final overall score is ${result.overallScore}, not 100.`)
-  if (blockingLocalFindingKeys.length) reasons.push(`Blocking local standards findings remain: ${blockingLocalFindingKeys.join(', ')}`)
-  if (unresolvedCategoryLabels.length) reasons.push(`Categories still below 100: ${unresolvedCategoryLabels.join(', ')}`)
-
-  return {
-    passed: reasons.length === 0,
-    reasons,
-    blockingLocalFindingKeys,
-    unresolvedCategoryLabels,
-  }
-}
-
 function loadReadyRows(): ReadyRow[] {
   const rows: ReadyRow[] = []
 
@@ -128,6 +113,8 @@ function loadReadyRows(): ReadyRow[] {
       serverHost: row.serverHost ? String(row.serverHost) : null,
       remotePath: row.remotePath ? String(row.remotePath) : null,
       stagedReplacementPath: row.stagedReplacementPath ? String(row.stagedReplacementPath) : null,
+      localFinalArtifactPath: row.sourceCompleteFilePath ? String(row.sourceCompleteFilePath) : null,
+      criticalManualReviewFlagCodes: Array.isArray(row.criticalManualReviewFlagCodes) ? row.criticalManualReviewFlagCodes.map(String) : [],
       sourceKind: row.status === 'replaced_on_remote' ? 'already_replaced_remote' : 'complete_seed',
       sourceManifest: completeStatusPath,
       sourceStatus: String(row.status || 'passing_from_complete'),
@@ -139,7 +126,8 @@ function loadReadyRows(): ReadyRow[] {
     const manifestPath = path.join(manifestsRoot, name)
     const doc = readJson<{ outcomes?: Array<any> }>(manifestPath)
     for (const outcome of doc.outcomes || []) {
-      if (outcome?.status !== 'ready_to_replace' || !outcome.publicationId) continue
+      const outcomeStatus = String(outcome?.status || '')
+      if (!(outcomeStatus === 'ready_to_replace' || outcomeStatus === 'remediated_pass_candidate') || !outcome.publicationId) continue
       rows.push({
         publicationId: String(outcome.publicationId),
         publicationTitle: outcome.publicationTitle ? String(outcome.publicationTitle) : null,
@@ -147,9 +135,11 @@ function loadReadyRows(): ReadyRow[] {
         serverHost: outcome.serverHost ? String(outcome.serverHost) : null,
         remotePath: outcome.remotePath ? String(outcome.remotePath) : null,
         stagedReplacementPath: outcome.artifacts?.stagedReplacementPath ? String(outcome.artifacts.stagedReplacementPath) : null,
+        localFinalArtifactPath: outcome.artifacts?.remediatedPdfPath ? String(outcome.artifacts.remediatedPdfPath) : null,
+        criticalManualReviewFlagCodes: Array.isArray(outcome.gate?.criticalManualReviewFlagCodes) ? outcome.gate.criticalManualReviewFlagCodes.map(String) : [],
         sourceKind: 'batch_ready',
         sourceManifest: manifestPath,
-        sourceStatus: 'ready_to_replace',
+        sourceStatus: outcomeStatus,
       })
     }
   }
@@ -170,7 +160,14 @@ function buildTargets(rows: ReadyRow[]): Map<string, VerificationTarget> {
           mode: 'remote_live',
           sourcePathOrUrl: row.fileUrl,
           filename: path.basename(row.fileUrl),
+          criticalManualReviewFlagCodes: [...row.criticalManualReviewFlagCodes],
         })
+      } else {
+        const existing = targets.get(key)!
+        existing.criticalManualReviewFlagCodes = Array.from(new Set([
+          ...existing.criticalManualReviewFlagCodes,
+          ...row.criticalManualReviewFlagCodes,
+        ]))
       }
       continue
     }
@@ -183,7 +180,14 @@ function buildTargets(rows: ReadyRow[]): Map<string, VerificationTarget> {
         mode: 'local_staged',
         sourcePathOrUrl: row.stagedReplacementPath,
         filename: path.basename(row.stagedReplacementPath),
+        criticalManualReviewFlagCodes: [...row.criticalManualReviewFlagCodes],
       })
+    } else {
+      const existing = targets.get(key)!
+      existing.criticalManualReviewFlagCodes = Array.from(new Set([
+        ...existing.criticalManualReviewFlagCodes,
+        ...row.criticalManualReviewFlagCodes,
+      ]))
     }
   }
 
@@ -200,6 +204,22 @@ async function readTargetBuffer(target: VerificationTarget): Promise<Buffer> {
     throw new Error(`HTTP ${response.status} fetching ${target.sourcePathOrUrl}`)
   }
   return Buffer.from(await response.arrayBuffer())
+}
+
+function sha256Hex(buffer: Buffer): string {
+  return crypto.createHash('sha256').update(buffer).digest('hex')
+}
+
+async function checksumForSourcePathOrUrl(sourcePathOrUrl: string | null): Promise<string | null> {
+  if (!sourcePathOrUrl) return null
+  if (/^https?:\/\//i.test(sourcePathOrUrl)) {
+    const response = await fetch(sourcePathOrUrl)
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} fetching ${sourcePathOrUrl}`)
+    }
+    return sha256Hex(Buffer.from(await response.arrayBuffer()))
+  }
+  return sha256Hex(await fs.promises.readFile(sourcePathOrUrl))
 }
 
 function reportPathForTarget(target: VerificationTarget): string {
@@ -219,7 +239,10 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
       skipVeraPdf: true,
     })
 
-    const gate = buildGate(result)
+    const gate = evaluatePromotionGate({
+      analysisResult: result,
+      criticalManualReviewFlagCodes: target.criticalManualReviewFlagCodes,
+    })
     const record: VerificationResult = {
       key: target.key,
       mode: target.mode,
@@ -240,6 +263,7 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
         reasons: gate.reasons,
         blockingLocalFindingKeys: gate.blockingLocalFindingKeys,
         unresolvedCategoryLabels: gate.unresolvedCategoryLabels,
+        criticalManualReviewFlagCodes: gate.criticalManualReviewFlagCodes,
       },
       artifacts: {
         reportPath,
@@ -286,6 +310,7 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
         reasons: [message],
         blockingLocalFindingKeys: [],
         unresolvedCategoryLabels: [],
+        criticalManualReviewFlagCodes: [],
       },
       artifacts: {
         reportPath,
@@ -331,6 +356,57 @@ async function main(): Promise<void> {
   })
 
   const verificationResults = Array.from(targetResults.values())
+  const sourceChecksumCache = new Map<string, string | null>()
+  const replacementChecksumCache = new Map<string, string | null>()
+
+  const promotionLedgerRows = []
+  for (const row of publicationRows) {
+    if (!row.verificationPassed || !row.stagedReplacementPath) continue
+    const verification = targetResults.get(row.verificationKey)
+    if (!verification) continue
+
+    const sourceChecksumKey = row.fileUrl || ''
+    let currentSourceChecksumSha256: string | null = null
+    if (sourceChecksumKey) {
+      if (!sourceChecksumCache.has(sourceChecksumKey)) {
+        sourceChecksumCache.set(sourceChecksumKey, await checksumForSourcePathOrUrl(row.fileUrl))
+      }
+      currentSourceChecksumSha256 = sourceChecksumCache.get(sourceChecksumKey) ?? null
+    }
+
+    const replacementChecksumKey = row.stagedReplacementPath
+    if (!replacementChecksumCache.has(replacementChecksumKey)) {
+      replacementChecksumCache.set(replacementChecksumKey, await checksumForSourcePathOrUrl(replacementChecksumKey))
+    }
+    const replacementChecksumSha256 = replacementChecksumCache.get(replacementChecksumKey) ?? null
+
+    const ledgerRow = createVerifiedPromotionLedgerRow({
+      publicationId: row.publicationId,
+      publicationTitle: row.publicationTitle,
+      sourceKind: row.sourceKind,
+      sourcePathOrUrl: row.remotePath || row.fileUrl,
+      sourceFileUrl: row.fileUrl,
+      localFinalArtifactPath: row.localFinalArtifactPath,
+      stagedReplacementPath: row.stagedReplacementPath,
+      currentSourceChecksumSha256,
+      replacementChecksumSha256,
+      verificationReportPath: verification.artifacts.reportPath,
+      verificationTimestamp: verification.verifiedAt,
+      verificationSummary: {
+        passed: verification.passed,
+        overallScore: verification.summary.overallScore,
+        grade: verification.summary.grade,
+        pageCount: verification.summary.pageCount,
+        isScanned: verification.summary.isScanned,
+        reasons: verification.gate.reasons,
+        blockingLocalFindingKeys: verification.gate.blockingLocalFindingKeys,
+        unresolvedCategoryLabels: verification.gate.unresolvedCategoryLabels,
+        criticalManualReviewFlagCodes: verification.gate.criticalManualReviewFlagCodes,
+      },
+    })
+    if (ledgerRow) promotionLedgerRows.push(ledgerRow)
+  }
+
   const summary = {
     generatedAt: new Date().toISOString(),
     totals: {
@@ -344,8 +420,10 @@ async function main(): Promise<void> {
       failedPublicationRows: publicationRows.filter(row => !row.verificationPassed && !row.verificationMissing && !row.verificationError).length,
       erroredPublicationRows: publicationRows.filter(row => Boolean(row.verificationError) && !row.verificationMissing).length,
       missingPublicationRows: publicationRows.filter(row => row.verificationMissing).length,
+      verifiedPromotionLedgerRows: promotionLedgerRows.length,
     },
     latestVerifiedTarget: verificationResults.at(-1) || null,
+    promotionLedgerPath,
   }
 
   writeJson(verificationManifestPath, {
@@ -355,11 +433,30 @@ async function main(): Promise<void> {
     publicationRows,
   })
   writeJson(verificationSummaryPath, summary)
+  const promotionLedgerManifest: PromotionLedgerManifest = {
+    generatedAt: summary.generatedAt,
+    summary: {
+      verifiedPassRows: promotionLedgerRows.length,
+      byPromotionStatus: promotionLedgerRows.reduce<Record<string, number>>((acc, row) => {
+        acc[row.promotionStatus] = (acc[row.promotionStatus] || 0) + 1
+        return acc
+      }, {}),
+    },
+    rows: promotionLedgerRows,
+  }
+  writeJson(promotionLedgerPath, promotionLedgerManifest)
+  writeJson(promotionLedgerSummaryPath, {
+    generatedAt: promotionLedgerManifest.generatedAt,
+    summary: promotionLedgerManifest.summary,
+    latestVerifiedPromotion: promotionLedgerRows.at(-1) || null,
+  })
 
   console.log(JSON.stringify(summary, null, 2))
 }
 
-main().catch(error => {
-  console.error(error instanceof Error ? error.stack || error.message : String(error))
-  process.exit(1)
-})
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(error => {
+    console.error(error instanceof Error ? error.stack || error.message : String(error))
+    process.exit(1)
+  })
+}
