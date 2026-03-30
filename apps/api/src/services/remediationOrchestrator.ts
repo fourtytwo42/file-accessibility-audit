@@ -1006,9 +1006,7 @@ export async function runValidationPipeline(
   const blockingFailureModesClear = blockingFailureModes.length === 0
   const blockingResidualFamiliesClear = blockingResidualFamilies.length === 0
   const validation: ValidationResult = {
-    passed: scorePassed
-      && gradePassed
-      && veraPdfPassed
+    passed: veraPdfPassed
       && blockingFailureModesClear
       && blockingResidualFamiliesClear
       && criticalManualReviewClear
@@ -1165,7 +1163,7 @@ export function renderProgressTrackerMarkdown(state: CampaignState, config: Orch
   lines.push('- Final output folder: `Complete/`')
   lines.push('- Intermediate output folder: `MitigationAttempts/`')
   lines.push('- Mantra: ABI — Always Be Improving')
-    lines.push(`- Completion threshold: score >= \`${config.targetScore}/100\`, grade \`A\`, no blocking accessibility debt, no critical manual-review debt, and visual page-1 fidelity`)
+    lines.push('- Completion threshold: WCAG 2.1 AA-aligned closure with no blocking accessibility debt, no critical manual-review debt, and visual page-1 fidelity; score/grade are supporting signals, not the standalone gate')
   lines.push('')
   lines.push('## Current Session Snapshot')
   lines.push('')

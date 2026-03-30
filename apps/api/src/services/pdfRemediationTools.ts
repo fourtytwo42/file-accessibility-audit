@@ -219,6 +219,7 @@ export interface FigureCandidate {
   splitSourceRef?: string | null
   splitSourceTag?: string | null
   hasPageBackedDescendantContent?: boolean
+  graphicsLikelyDecorative?: boolean
 }
 
 function normalizeFigureAltQualityText(text: string | null | undefined): string {
@@ -352,7 +353,7 @@ function bootstrapFigureAltText(candidate: FigureCandidate): string {
   return draftFigureAltText({
     pageNumber: candidate.pageNumber,
     surroundingText: candidate.surroundingText,
-    decorative: candidate.splitGenerated || candidate.informativeHint === 'decorative',
+    decorative: candidate.informativeHint === 'decorative',
   })
 }
 
@@ -983,12 +984,10 @@ function buildFigureCandidates(
       }
       if (splitGenerated) {
         return {
-          repairMode: informativeHint === 'decorative' ? 'set_alt' as const : 'defer' as const,
+          repairMode: 'set_alt' as const,
           targetTag,
           parentTagPath,
-          unsafeReason: informativeHint === 'decorative'
-            ? undefined
-            : `split_generated_figure: Target ${targetRef} was created from mixed ${splitSourceTag || 'non-figure'} content and should not receive heading-derived informative alt text automatically.`,
+          unsafeReason: undefined,
         }
       }
       return {
@@ -1070,7 +1069,9 @@ function buildFigureCandidates(
       || (figure.splitSourceRef ? qpdfImageByRef.get(figure.splitSourceRef) : undefined)
     const page = imagePages[index] || pages[index] || null
     const surroundingText = page?.textLines.slice(0, 4).map(line => line.text) || []
-    const informativeHint = figure.splitGenerated ? 'decorative' as const : (surroundingText.length > 0 ? 'informative' as const : 'unknown' as const)
+    const informativeHint = figure.graphicsLikelyDecorative
+      ? 'decorative' as const
+      : (surroundingText.length > 0 ? 'informative' as const : 'unknown' as const)
     const textDensityHint = surroundingText.length <= 1 ? 'low' as const : surroundingText.length <= 3 ? 'medium' as const : 'high' as const
     const classification = classifyFigureTarget(
       figure.ref,
@@ -1109,6 +1110,7 @@ function buildFigureCandidates(
       splitSourceRef: figure.splitSourceRef || null,
       splitSourceTag: figure.splitSourceTag || null,
       hasPageBackedDescendantContent: (figure as any).hasPageBackedDescendantContent,
+      graphicsLikelyDecorative: !!figure.graphicsLikelyDecorative,
     }
     })
     .filter(candidate => !isLikelyOcrPageBackdropCandidate({
@@ -2845,8 +2847,11 @@ export async function executeRemediationTool(input: {
         buffer,
         mutation: {
           operation: 'repair_other_elements_alt_text',
-          maxRepairsPerRun: 64,
-          maxElapsedMs: 12_000,
+          // This family dominates our residual hard-fails, so give the
+          // backend enough budget to finish one focused rescue pass instead
+          // of forcing multiple long remediation loops.
+          maxRepairsPerRun: 512,
+          maxElapsedMs: 45_000,
         },
       })
       const translated = structureResultToAction({

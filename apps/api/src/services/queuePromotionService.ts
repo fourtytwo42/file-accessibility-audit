@@ -25,7 +25,7 @@ import {
 } from './queueStore.js'
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url))
-const projectRoot = path.resolve(moduleDir, '..', '..')
+const projectRoot = path.resolve(moduleDir, '..', '..', '..', '..')
 
 export interface QueuePromotionValidationResult extends ValidationResult {
   freshnessPassed: boolean
@@ -154,8 +154,6 @@ export async function validateQueueItemForComplete(rowOrId: QueueItemRecord | st
 
   const promotionEligible = queueStateEligible
     && freshnessPassed
-    && scorePassed
-    && gradePassed
     && veraPdfPassed
     && blockingFailureModesClear
     && blockingResidualFamiliesClear

@@ -3,14 +3,18 @@ import os from 'node:os'
 import path from 'node:path'
 import express from 'express'
 import cookieParser from 'cookie-parser'
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import db from '../db/sqlite.js'
 import queueRoutes from '../routes/queue.js'
 import { createClient, createQueueItem, updateQueueItem } from '../services/queueStore.js'
 import * as queuePromotionService from '../services/queuePromotionService.js'
+import { getFixFamiliesReportPath, getRemediationLedgerPath } from '../services/remediationLedgerService.js'
 
 let server: ReturnType<express.Express['listen']>
 let baseUrl = ''
+const INTERNAL_WORKER_TOKEN = 'test-internal-worker-token'
+let testNeedsApiFixDir = ''
+let testRemediationDataDir = ''
 
 function randomClientId(seed: string): string {
   const hex = seed.replace(/[^a-f0-9]/gi, '').toLowerCase().padEnd(12, '0').slice(0, 12)
@@ -59,6 +63,7 @@ function writeDocumentModel(name: string, data: unknown): string {
 
 describe('queue routes', () => {
   beforeAll(async () => {
+    process.env.INTERNAL_QUEUE_WORKER_TOKEN = INTERNAL_WORKER_TOKEN
     const app = express()
     app.use(express.json())
     app.use(cookieParser())
@@ -71,6 +76,13 @@ describe('queue routes', () => {
     baseUrl = `http://127.0.0.1:${address.port}`
   })
 
+  beforeEach(() => {
+    testNeedsApiFixDir = fs.mkdtempSync(path.join(os.tmpdir(), 'needs-api-fix-'))
+    testRemediationDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'remediation-data-'))
+    process.env.NEEDS_API_FIX_ROOT = testNeedsApiFixDir
+    process.env.REMEDIATION_DATA_ROOT = testRemediationDataDir
+  })
+
   afterEach(() => {
     vi.restoreAllMocks()
     const rows = db.prepare('SELECT document_model_path FROM queue_items').all() as Array<{ document_model_path: string | null }>
@@ -79,6 +91,12 @@ describe('queue routes', () => {
         fs.unlinkSync(row.document_model_path)
       }
     }
+    if (testNeedsApiFixDir && fs.existsSync(testNeedsApiFixDir)) {
+      fs.rmSync(testNeedsApiFixDir, { recursive: true, force: true })
+    }
+    if (testRemediationDataDir && fs.existsSync(testRemediationDataDir)) {
+      fs.rmSync(testRemediationDataDir, { recursive: true, force: true })
+    }
     db.prepare('DELETE FROM queue_items').run()
     db.prepare('DELETE FROM browser_sessions').run()
     db.prepare('DELETE FROM browser_clients').run()
@@ -86,6 +104,9 @@ describe('queue routes', () => {
 
   afterAll(async () => {
     await new Promise<void>((resolve, reject) => server.close(err => err ? reject(err) : resolve()))
+    delete process.env.INTERNAL_QUEUE_WORKER_TOKEN
+    delete process.env.NEEDS_API_FIX_ROOT
+    delete process.env.REMEDIATION_DATA_ROOT
   })
 
   it('returns a DB-backed queue status snapshot ordered by updatedAt desc', async () => {
@@ -546,6 +567,72 @@ describe('queue routes', () => {
     expect(body.item.jobGroup).toBe('mv-family')
   })
 
+  it('allows internal worker token access on agent-safe routes without a browser cookie', async () => {
+    const clientId = randomClientId('worker1')
+    createClient(clientId)
+    const item = createQueueItem({
+      clientId,
+      filename: 'worker-owned.pdf',
+      md5: '11'.repeat(16),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+    updateQueueItem(item.id, {
+      state: 'failed',
+      original_storage_path: 'C:\\queue\\worker-owned.pdf',
+    })
+
+    const claimResponse = await fetch(`${baseUrl}/api/queue/claim`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-client-id': clientId,
+        'x-internal-worker-token': INTERNAL_WORKER_TOKEN,
+      },
+      body: JSON.stringify({
+        filename: 'worker-owned.pdf',
+        ownerId: 'internal-worker-1',
+        jobGroup: 'worker-test',
+      }),
+    })
+
+    expect(claimResponse.status).toBe(200)
+    const claimBody = await claimResponse.json()
+    expect(claimBody.item.ownerId).toBe('internal-worker-1')
+
+    const freshnessResponse = await fetch(`${baseUrl}/api/queue/items/${item.id}/freshness`, {
+      headers: {
+        'x-client-id': clientId,
+        'x-internal-worker-token': INTERNAL_WORKER_TOKEN,
+      },
+    })
+
+    expect(freshnessResponse.status).toBe(200)
+    const freshnessBody = await freshnessResponse.json()
+    expect(freshnessBody.itemId).toBe(item.id)
+  })
+
+  it('still requires a browser session on normal queue routes without internal token bypass', async () => {
+    const clientId = randomClientId('worker2')
+    createClient(clientId)
+    createQueueItem({
+      clientId,
+      filename: 'normal-route.pdf',
+      md5: '12'.repeat(16),
+      sizeBytes: 100,
+      mimeType: 'application/pdf',
+    })
+
+    const response = await fetch(`${baseUrl}/api/queue/status`, {
+      headers: {
+        'x-client-id': clientId,
+        'x-internal-worker-token': INTERNAL_WORKER_TOKEN,
+      },
+    })
+
+    expect(response.status).toBe(401)
+  })
+
   it('start-or-reuse returns the current fresh active item for the owned filename', async () => {
     const clientId = randomClientId('reuse1')
     createClient(clientId)
@@ -635,6 +722,76 @@ describe('queue routes', () => {
       sizeBytes: 100,
       mimeType: 'application/pdf',
     })
+    updateQueueItem(item.id, {
+      state: 'processing',
+      processing_stage: 'Applying PDF fixes (stage 1)',
+      processing_progress: 49,
+      overall_score: 83,
+      grade: 'B',
+      result_json: JSON.stringify({
+        overallScore: 83,
+        grade: 'B',
+        verapdf: { status: 'failed', failedChecks: 4, failures: [{ message: 'Needs repair' }] },
+      }),
+      manual_review_flags_json: JSON.stringify([
+        {
+          code: 'critical_structure',
+          label: 'Critical structure debt',
+          severity: 'critical',
+          details: 'Logical structure still broken.',
+        },
+      ]),
+      document_model_path: writeDocumentModel('needs-api-fix-detail', {
+        version: '6',
+        sourceType: 'native-text',
+        manualReviewFlags: [],
+        aiAppliedChanges: [],
+        aiSuggestedChanges: [],
+        confidenceSummary: null,
+        failureProfile: {
+          version: '2',
+          generatedAt: '2026-03-24T00:00:00.000Z',
+          analysisGrade: 'B',
+          analysisScore: 83,
+          veraPdfStatus: 'failed',
+          veraPdfFailedChecks: 4,
+          adobeStatus: 'failed',
+          adobeIssueCount: 3,
+          failureModes: [
+            {
+              key: 'pdfua.logical_structure',
+              label: 'Logical structure',
+              source: 'derived',
+              reportingCategory: 'structure_tree',
+              sourceDetail: 'derived_family',
+              derivedFrom: ['derived:pdfua.logical_structure'],
+              count: 3,
+              categoryIds: ['structure_tree'],
+              blocking: true,
+              unmatched: false,
+              classification: 'deterministic',
+              nativeToolFamilies: ['repair_structure_tree'],
+              evidence: ['Structure tree is incomplete'],
+            },
+          ],
+          toolOpportunities: [],
+          summary: {
+            deterministicIssueCount: 1,
+            semanticIssueCount: 0,
+            manualOnlyIssueCount: 0,
+            blockedOpportunityCount: 1,
+            autoRunnableOpportunityCount: 0,
+          },
+        },
+        classification: {
+          structuralClass: 'native_tagged',
+        },
+        plannerEvidence: {
+          topBlockingResidualFamilyIds: ['logical_structure_marked_content'],
+          topResidualFamilyIds: ['logical_structure_marked_content'],
+        },
+      }),
+    })
 
     const { cookie } = await bootstrap(clientId)
     const response = await fetch(`${baseUrl}/api/queue/items/${item.id}/emit-blocker`, {
@@ -657,10 +814,52 @@ describe('queue routes', () => {
     expect(body.item.promotionStatus).toBe('rejected')
     expect(body.item.promotionRejectionReason).toContain('bypasses')
     expect(body.blockerReport.subsystem).toBe('planner')
+    expect(typeof body.needsApiFix.recordPath).toBe('string')
+    expect(fs.existsSync(body.needsApiFix.recordPath)).toBe(true)
+    expect(fs.existsSync(getRemediationLedgerPath())).toBe(true)
+    expect(fs.existsSync(getFixFamiliesReportPath())).toBe(true)
 
     const row = db.prepare('SELECT blocker_report_json, promotion_status FROM queue_items WHERE id = ?').get(item.id) as any
     expect(row.promotion_status).toBe('rejected')
-    expect(JSON.parse(row.blocker_report_json).blockerType).toBe('shared_fix_needed')
+    const blockerPayload = JSON.parse(row.blocker_report_json)
+    expect(blockerPayload.blockerType).toBe('shared_fix_needed')
+    expect(blockerPayload.needsApiFixRecordPath).toBe(body.needsApiFix.recordPath)
+
+    const record = JSON.parse(fs.readFileSync(body.needsApiFix.recordPath, 'utf8'))
+    expect(record.filename).toBe('blocked.pdf')
+    expect(record.subsystem).toBe('planner')
+    expect(record.reusable).toBe(true)
+    expect(record.classification.fixFamily).toBe('logical_structure_marked_content')
+    expect(record.classification.blockerKind).toBe('manual_review_blocker')
+    expect(record.classification.pipelineStage).toBe('remediation')
+    expect(record.classification.structuralClass).toBe('native_tagged')
+    expect(record.classification.residualFamilyIds).toEqual(['logical_structure_marked_content'])
+    expect(record.classification.topFailureModeKeys).toEqual(['pdfua.logical_structure'])
+    expect(record.classification.visualFidelity).toBe('not_run')
+    expect(record.classification.bookmarkState).toBe('unknown')
+    expect(record.classification.semanticSidecarState).toBe('not_flagged')
+    expect(record.classification.likelyNextGenericFix).toBe('Logical structure')
+    expect(record.classification.generalizationConfidence).toBe('high')
+    expect(record.explanation.queueState).toBe('processing')
+    expect(record.explanation.processingStage).toBe('Applying PDF fixes (stage 1)')
+    expect(record.explanation.processingProgress).toBe(49)
+    expect(record.explanation.overallScore).toBe(83)
+    expect(record.explanation.grade).toBe('B')
+    expect(record.explanation.likelyNextFixArea).toBe('Logical structure')
+    expect(record.explanation.topFailureModes[0].key).toBe('pdfua.logical_structure')
+    expect(record.explanation.criticalManualReviewFlags[0].code).toBe('critical_structure')
+
+    const ledgerLines = fs.readFileSync(getRemediationLedgerPath(), 'utf8').trim().split('\n').filter(Boolean)
+    expect(ledgerLines).toHaveLength(1)
+    const ledgerEntry = JSON.parse(ledgerLines[0])
+    expect(ledgerEntry.outcome).toBe('needs_api_fix')
+    expect(ledgerEntry.filename).toBe('blocked.pdf')
+
+    const fixFamiliesReport = JSON.parse(fs.readFileSync(getFixFamiliesReportPath(), 'utf8'))
+    expect(fixFamiliesReport.totalBlockedPdfs).toBe(1)
+    expect(fixFamiliesReport.totalFamilies).toBe(1)
+    expect(fixFamiliesReport.families[0].fixFamily).toBe('logical_structure_marked_content')
+    expect(fixFamiliesReport.families[0].filenames).toEqual(['blocked.pdf'])
   })
 
   it('validate-for-complete proxies the promotion validator output', async () => {
@@ -820,5 +1019,11 @@ describe('queue routes', () => {
     const body = await response.json()
     expect(body.destinationPath).toBe('/tmp/Complete/promote.pdf')
     expect(body.validation.promotionEligible).toBe(true)
+
+    const ledgerLines = fs.readFileSync(getRemediationLedgerPath(), 'utf8').trim().split('\n').filter(Boolean)
+    expect(ledgerLines).toHaveLength(1)
+    const ledgerEntry = JSON.parse(ledgerLines[0])
+    expect(ledgerEntry.outcome).toBe('complete')
+    expect(ledgerEntry.completeDestinationPath).toBe('/tmp/Complete/promote.pdf')
   })
 })

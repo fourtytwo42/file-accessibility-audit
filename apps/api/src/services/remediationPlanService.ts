@@ -342,6 +342,22 @@ function hasBlockingFailure(opportunity: ToolOpportunity, failureModeByKey: Map<
   return opportunity.derivedFromFailureModeKeys.some(key => failureModeByKey.get(key)?.blocking)
 }
 
+function hasPreferredCandidateScopedTableHeaderRepair(input: {
+  opportunity: ToolOpportunity
+  autoRunnableOpportunities: ToolOpportunity[]
+}): boolean {
+  const { opportunity, autoRunnableOpportunities } = input
+  if (opportunity.toolName !== 'repair_native_table_headers') return false
+  if (!opportunity.derivedFromFailureModeKeys.includes('pdfua.table_regularity')) return false
+
+  return autoRunnableOpportunities.some(candidate =>
+    candidate.toolName === 'set_table_header_cells'
+    && candidate.scope === 'candidate'
+    && candidate.status === 'auto_runnable'
+    && candidate.derivedFromFailureModeKeys.some(key => opportunity.derivedFromFailureModeKeys.includes(key)),
+  )
+}
+
 function activeIssueCategoryIds(input: {
   analysis: AnalysisResult
   failureModeByKey: Map<string, FailureMode>
@@ -531,8 +547,17 @@ function opportunitySelectionDecision(input: {
     case 'repair_native_link_structure':
     case 'tag_unowned_annotations':
     case 'repair_native_figure_semantics':
-    case 'repair_native_table_headers':
     case 'repair_native_reading_order':
+      return {
+        selectable: nativeSafeContext && classAllowsNativeSafeRepair(structuralClass),
+        reason: nativeSafeContext && classAllowsNativeSafeRepair(structuralClass)
+          ? undefined
+          : `structural_class_blocks_native_safe:${structuralClass}`,
+      }
+    case 'repair_native_table_headers':
+      if (hasPreferredCandidateScopedTableHeaderRepair({ opportunity, autoRunnableOpportunities })) {
+        return { selectable: false, reason: 'superseded_by_candidate_table_header_repair' }
+      }
       return {
         selectable: nativeSafeContext && classAllowsNativeSafeRepair(structuralClass),
         reason: nativeSafeContext && classAllowsNativeSafeRepair(structuralClass)

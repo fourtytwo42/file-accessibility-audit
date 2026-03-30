@@ -191,11 +191,113 @@ type RemediationTimingSummary = {
   stagesExecuted: number
 }
 
+type InspectionPhase = 'ownership_state' | 'figure_description_state' | 'structure_state'
+
+type InspectionPhaseTracker = {
+  lastSignature?: string
+  stableRepeats: number
+  downgradedToLight: boolean
+  freshDeepInspections: number
+  reusedInspections: number
+  lateConverged: boolean
+  focusedRescueRan?: boolean
+  focusedRescueSkippedBecauseLateConverged?: boolean
+  finalStopReason?: FigureDescriptionStopReason
+}
+
+type PhaseProgressSnapshot = {
+  phase: InspectionPhase
+  signature: string
+  blockingKeys: string[]
+  unresolvedIssueLabels: string[]
+  categoryScores: {
+    altText: number | null
+    pdfUa: number | null
+    headingStructure: number | null
+    readingOrder: number | null
+  }
+  ownershipRiskCount: number
+  informativeFigureMissingAltCount: number
+  decorativeFigureCount: number
+}
+
+type LatePhaseConvergenceTracker = {
+  converged: boolean
+  lastSnapshot: PhaseProgressSnapshot | null
+  lastMutationChangedDocument: boolean
+  lastProgressed: boolean | null
+  noProgressPasses: number
+}
+
+type LateFigureSweepDecision = {
+  allowed: boolean
+  reason:
+    | 'phase_converged'
+    | 'alt_text_already_clean'
+    | 'no_recent_mutation'
+    | 'stable_no_progress'
+    | 'no_candidates'
+    | 'no_candidate_progress'
+    | null
+  snapshot: PhaseProgressSnapshot | null
+  candidateCount: number
+}
+
+type FigureDescriptionStopReason =
+  | 'no_mutation'
+  | 'no_debt_reduction'
+  | 'same_blocking_keys'
+  | 'budget_exhausted'
+  | 'completed'
+
+type FigureRescueMethod = 'native_semantics' | 'authoritative_alt' | 'heuristic_candidates'
+
+type LightVerificationLoopState = {
+  lastSignature?: string
+  lastMutationChangedDocument: boolean
+}
+
+type RemediationMetricsState = {
+  inspections: {
+    lightFresh: number
+    lightReused: number
+    deepFresh: number
+    deepReused: number
+    deepDowngradedToLight: number
+  }
+  phases: Record<InspectionPhase, InspectionPhaseTracker>
+  ownershipRiskInitial: number | null
+  figureMissingAltInitial: number | null
+  decorativeFigureInitial: number | null
+  structureDeepFreshAnalyses: number
+  structureDeepAnalysesDowngraded: number
+}
+
 type StageAcceptanceDecision = {
   accept: boolean
   reason: string | null
   standardsImproved: boolean
   worstTargetedRegression: number
+}
+
+function createInspectionPhaseTracker(): InspectionPhaseTracker {
+  return {
+    stableRepeats: 0,
+    downgradedToLight: false,
+    freshDeepInspections: 0,
+    reusedInspections: 0,
+    lateConverged: false,
+  }
+}
+
+function createLatePhaseConvergenceTracker(): LatePhaseConvergenceTracker {
+  return {
+    converged: false,
+    lastSnapshot: null,
+    lastMutationChangedDocument: false,
+    lastProgressed: null,
+    noProgressPasses: 0,
+  }
 }
 
 function getBufferSha256(buffer: Buffer): string {
@@ -285,7 +387,7 @@ function stageBatchBootstrapFigureAltText(candidate: PdfRemediationContext['figu
   return draftFigureAltText({
     pageNumber: candidate.pageNumber,
     surroundingText: candidate.surroundingText,
-    decorative: candidate.splitGenerated || candidate.informativeHint === 'decorative',
+    decorative: candidate.informativeHint === 'decorative',
   })
 }
 
@@ -659,6 +761,269 @@ function unresolvedIssues(result: AnalysisResult): string[] {
     .map(category => category.label)
 }
 
+function blockingLocalFindingKeys(result: AnalysisResult): string[] {
+  return (result.localStandards?.findings ?? [])
+    .filter(finding => finding.blocking)
+    .map(finding => finding.key)
+    .sort((left, right) => left.localeCompare(right))
+}
+
+function hasBlockingLocalFinding(result: AnalysisResult, key: string): boolean {
+  return blockingLocalFindingKeys(result).includes(key)
+}
+
+function hasUnresolvedCategoryLabel(result: AnalysisResult, label: string): boolean {
+  return unresolvedIssues(result).includes(label)
+}
+
+function informativeFigureMissingAltCount(context: PdfRemediationContext | null | undefined): number {
+  return (context?.figureCandidates || []).filter(candidate =>
+    candidate.informativeHint !== 'decorative'
+    && !candidate.graphicsLikelyDecorative
+    && !candidate.hasAlt,
+  ).length
+}
+
+function decorativeFigureCount(context: PdfRemediationContext | null | undefined): number {
+  return (context?.figureCandidates || []).filter(candidate =>
+    candidate.informativeHint === 'decorative' || !!candidate.graphicsLikelyDecorative,
+  ).length
+}
+
+function ownershipStateSignature(
+  result: AnalysisResult,
+  context: PdfRemediationContext | null | undefined,
+): string {
+  const blockingKeys = blockingLocalFindingKeys(result).filter(key =>
+    key === 'pdfua.untagged_rendered_images'
+    || key === 'pdfua.nested_alt_text'
+    || key === 'pdfua.figure_alt_or_artifact',
+  )
+  return JSON.stringify({
+    blockingKeys,
+    acrobatOwnershipRiskCount: acrobatOwnershipRiskCount(context ?? null),
+  })
+}
+
+function figureDescriptionStateSignature(
+  result: AnalysisResult,
+  context: PdfRemediationContext | null | undefined,
+): string {
+  return JSON.stringify({
+    altTextScore: scoreForCategory(result, 'alt_text'),
+    pdfUaScore: scoreForCategory(result, 'pdf_ua_compliance'),
+    blockingKeys: blockingLocalFindingKeys(result).filter(key =>
+      key === 'pdfua.figure_alt_or_artifact'
+      || key === 'pdfua.nested_alt_text'
+      || key === 'pdfua.untagged_rendered_images',
+    ),
+    informativeFiguresMissingAlt: informativeFigureMissingAltCount(context),
+    decorativeFigures: decorativeFigureCount(context),
+  })
+}
+
+function structureStateSignature(result: AnalysisResult): string {
+  return JSON.stringify({
+    blockingKeys: blockingLocalFindingKeys(result).filter(key =>
+      key === 'pdfua.logical_structure'
+      || key === 'pdfua.heading_content_quality',
+    ),
+    unresolvedIssues: unresolvedIssues(result).filter(label =>
+      label === 'Heading Structure'
+      || label === 'Reading Order'
+      || label === 'PDF/UA Compliance',
+    ),
+  })
+}
+
+function relevantBlockingKeysForPhase(
+  phase: InspectionPhase,
+  result: AnalysisResult,
+): string[] {
+  const blockingKeys = blockingLocalFindingKeys(result)
+  switch (phase) {
+    case 'ownership_state':
+      return blockingKeys.filter(key =>
+        key === 'pdfua.untagged_rendered_images'
+        || key === 'pdfua.nested_alt_text'
+        || key === 'pdfua.figure_alt_or_artifact',
+      )
+    case 'figure_description_state':
+      return blockingKeys.filter(key =>
+        key === 'pdfua.figure_alt_or_artifact'
+        || key === 'pdfua.nested_alt_text'
+        || key === 'pdfua.untagged_rendered_images',
+      )
+    case 'structure_state':
+      return blockingKeys.filter(key =>
+        key === 'pdfua.logical_structure'
+        || key === 'pdfua.heading_content_quality',
+      )
+  }
+}
+
+function relevantUnresolvedIssueLabelsForPhase(
+  phase: InspectionPhase,
+  result: AnalysisResult,
+): string[] {
+  const unresolved = unresolvedIssues(result)
+  switch (phase) {
+    case 'ownership_state':
+    case 'figure_description_state':
+      return unresolved.filter(label =>
+        label === 'Alt Text on Images'
+        || label === 'PDF/UA Compliance',
+      )
+    case 'structure_state':
+      return unresolved.filter(label =>
+        label === 'Heading Structure'
+        || label === 'Reading Order'
+        || label === 'PDF/UA Compliance',
+      )
+  }
+}
+
+function buildPhaseProgressSnapshot(
+  phase: InspectionPhase,
+  result: AnalysisResult,
+  context: PdfRemediationContext | null | undefined,
+): PhaseProgressSnapshot {
+  return {
+    phase,
+    signature: phase === 'ownership_state'
+      ? ownershipStateSignature(result, context)
+      : phase === 'figure_description_state'
+        ? figureDescriptionStateSignature(result, context)
+        : structureStateSignature(result),
+    blockingKeys: relevantBlockingKeysForPhase(phase, result),
+    unresolvedIssueLabels: relevantUnresolvedIssueLabelsForPhase(phase, result),
+    categoryScores: {
+      altText: scoreForCategory(result, 'alt_text'),
+      pdfUa: scoreForCategory(result, 'pdf_ua_compliance'),
+      headingStructure: scoreForCategory(result, 'heading_structure'),
+      readingOrder: scoreForCategory(result, 'reading_order'),
+    },
+    ownershipRiskCount: acrobatOwnershipRiskCount(context ?? null),
+    informativeFigureMissingAltCount: informativeFigureMissingAltCount(context),
+    decorativeFigureCount: decorativeFigureCount(context),
+  }
+}
+
+function didLatePhaseProgressImprove(
+  previous: PhaseProgressSnapshot,
+  next: PhaseProgressSnapshot,
+  changedDocumentBytes: boolean,
+): boolean {
+  if (!changedDocumentBytes) return false
+  switch (previous.phase) {
+    case 'ownership_state':
+      return next.ownershipRiskCount < previous.ownershipRiskCount
+        || next.blockingKeys.length < previous.blockingKeys.length
+    case 'figure_description_state':
+      return next.informativeFigureMissingAltCount < previous.informativeFigureMissingAltCount
+        || next.blockingKeys.length < previous.blockingKeys.length
+    case 'structure_state':
+      return next.blockingKeys.length < previous.blockingKeys.length
+        || next.categoryScores.headingStructure !== previous.categoryScores.headingStructure
+        || next.categoryScores.readingOrder !== previous.categoryScores.readingOrder
+        || next.unresolvedIssueLabels.length < previous.unresolvedIssueLabels.length
+  }
+}
+
+export const __test_buildPhaseProgressSnapshot = buildPhaseProgressSnapshot
+export const __test_didLatePhaseProgressImprove = didLatePhaseProgressImprove
+
+function lightVerificationSignature(result: AnalysisResult): string {
+  return JSON.stringify({
+    blockingKeys: blockingLocalFindingKeys(result),
+    unresolvedIssues: unresolvedIssues(result).sort((left, right) => left.localeCompare(right)),
+    scores: {
+      altText: scoreForCategory(result, 'alt_text'),
+      pdfUa: scoreForCategory(result, 'pdf_ua_compliance'),
+      headingStructure: scoreForCategory(result, 'heading_structure'),
+      readingOrder: scoreForCategory(result, 'reading_order'),
+      textExtractability: scoreForCategory(result, 'text_extractability'),
+    },
+  })
+}
+
+function shouldShortCircuitStableLightVerification(input: {
+  state: LightVerificationLoopState
+  nextSignature: string
+}): boolean {
+  return !input.state.lastMutationChangedDocument
+    && !!input.state.lastSignature
+    && input.state.lastSignature === input.nextSignature
+}
+
+export const __test_shouldShortCircuitStableLightVerification = shouldShortCircuitStableLightVerification
+
+function remediationStateSignature(result: AnalysisResult): string {
+  const categoryScores = (result.categories ?? [])
+    .map(category => ({
+      id: category.id,
+      score: typeof category.score === 'number' ? category.score : null,
+    }))
+    .sort((left, right) => left.id.localeCompare(right.id))
+
+  return JSON.stringify({
+    overallScore: result.overallScore,
+    grade: result.grade,
+    isScanned: result.isScanned,
+    unresolvedIssues: unresolvedIssues(result).sort((left, right) => left.localeCompare(right)),
+    blockingLocalFindingKeys: blockingLocalFindingKeys(result),
+    categoryScores,
+  })
+}
+
+function remediationCoarseStateSignature(result: AnalysisResult): string {
+  return JSON.stringify({
+    grade: result.grade,
+    isScanned: result.isScanned,
+    unresolvedIssues: unresolvedIssues(result).sort((left, right) => left.localeCompare(right)),
+    blockingLocalFindingKeys: blockingLocalFindingKeys(result),
+  })
+}
+
+const MAX_STABLE_STATE_REPEATS = 2
+const MAX_COARSE_STABLE_STATE_REPEATS = 1
+const MAX_LIGHT_INSPECTIONS_PER_FILE = 8
+const MAX_DEEP_INSPECTIONS_PER_FILE = 8
+const MAX_TOTAL_INSPECTIONS_PER_FILE = 14
+const MAX_POST_OWNERSHIP_FIGURE_REPAIRS = 8
+// Large residual figure debt rarely converges with repeated deep rescue.
+// Once we stop making measurable progress, fail honestly instead of re-spending
+// the deep inspection budget on another broad rescue loop.
+const MASS_UNRESOLVED_FIGURE_DEBT_THRESHOLD = 24
+
+const OWNERSHIP_STATE_TOOLS = new Set<string>([
+  'repair_other_elements_alt_text',
+  'repair_native_figure_semantics',
+  'normalize_nested_figure_containers',
+  'repair_structure_conformance',
+])
+
+const FIGURE_DESCRIPTION_STATE_TOOLS = new Set<string>([
+  'repair_other_elements_alt_text',
+  'repair_native_figure_semantics',
+  'normalize_nested_figure_containers',
+  'set_figure_alt_text',
+  'retag_as_figure_and_set_alt',
+  'mark_figure_decorative',
+])
+
+const STRUCTURE_STATE_TOOLS = new Set<string>([
+  'bootstrap_struct_tree',
+  'artifact_nonsemantic_page_elements',
+  'repair_native_marked_content_refs',
+  'repair_bootstrapped_chart_content_refs',
+  'normalize_heading_hierarchy',
+  'create_heading_from_candidate',
+  'repair_structure_conformance',
+  'reorder_structure_children',
+  'repair_native_reading_order',
+])
+
 function scoreForCategory(result: AnalysisResult, categoryId: string): number | null {
   if (!Array.isArray(result?.categories)) return null
   const category = result.categories.find(entry => entry.id === categoryId)
@@ -759,7 +1124,11 @@ function applyScoreDelta(action: RemediationActionRecord, previous: AnalysisResu
   action.familyId = action.familyId || postconditions.familyId
   action.postconditionStatus = postconditions.status
   action.postconditionSignals = postconditions.signals
-  return action.scoreDelta.some(delta => (delta.after ?? -1) > (delta.before ?? -1))
+  return action.scoreDelta.some(delta =>
+    typeof delta.before === 'number'
+    && typeof delta.after === 'number'
+    && (delta.after - delta.before) >= 2,
+  )
     || action.postconditionStatus === 'satisfied'
 }
 
@@ -931,6 +1300,104 @@ function evaluateStageAcceptance(previous: AnalysisResult, next: AnalysisResult,
 }
 
 export const __test_evaluateStageAcceptance = evaluateStageAcceptance
+
+function shouldRunLateFigureSweep(input: {
+  tracker: LatePhaseConvergenceTracker
+  analysis: AnalysisResult
+  context: PdfRemediationContext | null | undefined
+  candidateCount: number
+}): LateFigureSweepDecision {
+  if (input.tracker.converged) {
+    return { allowed: false, reason: 'phase_converged', snapshot: input.tracker.lastSnapshot, candidateCount: input.candidateCount }
+  }
+  if ((scoreForCategory(input.analysis, 'alt_text') ?? 100) >= 100) {
+    return { allowed: false, reason: 'alt_text_already_clean', snapshot: input.tracker.lastSnapshot, candidateCount: input.candidateCount }
+  }
+  const snapshot = buildPhaseProgressSnapshot('figure_description_state', input.analysis, input.context)
+  if (input.candidateCount <= 0) {
+    return { allowed: false, reason: 'no_candidates', snapshot, candidateCount: input.candidateCount }
+  }
+  if (input.tracker.lastSnapshot && !input.tracker.lastMutationChangedDocument) {
+    return { allowed: false, reason: 'no_recent_mutation', snapshot, candidateCount: input.candidateCount }
+  }
+  if (input.tracker.lastProgressed === false && input.tracker.noProgressPasses > 0) {
+    return { allowed: false, reason: 'stable_no_progress', snapshot, candidateCount: input.candidateCount }
+  }
+  if (input.tracker.lastSnapshot && snapshot.signature === input.tracker.lastSnapshot.signature && input.tracker.lastProgressed !== true) {
+    return { allowed: false, reason: 'no_candidate_progress', snapshot, candidateCount: input.candidateCount }
+  }
+  return { allowed: true, reason: null, snapshot, candidateCount: input.candidateCount }
+}
+
+export const __test_shouldRunLateFigureSweep = shouldRunLateFigureSweep
+
+function shouldUseFigureOnlyLateRescuePath(input: {
+  analysis: AnalysisResult
+  context: PdfRemediationContext | null | undefined
+}): boolean {
+  if (acrobatOwnershipRiskCount(input.context ?? null) > 0) return false
+  const blockingKeys = blockingLocalFindingKeys(input.analysis)
+  const structureBlockingKeys = blockingKeys.filter(key =>
+    key === 'pdfua.logical_structure'
+    || key === 'pdfua.heading_content_quality',
+  )
+  if (structureBlockingKeys.length > 0) return false
+  const figureBlockingKeys = blockingKeys.filter(key =>
+    key === 'pdfua.figure_alt_or_artifact'
+    || key === 'pdfua.nested_alt_text'
+    || key === 'pdfua.untagged_rendered_images',
+  )
+  return figureBlockingKeys.length > 0
+    && figureBlockingKeys.length === blockingKeys.length
+}
+
+type FocusedFigureRescueStopDecision = {
+  stop: boolean
+  reason: FigureDescriptionStopReason | null
+}
+
+function shouldStopFocusedFigureRescue(input: {
+  before: PhaseProgressSnapshot
+  after: PhaseProgressSnapshot
+  changedDocumentBytes: boolean
+  noProgressMethods: Set<FigureRescueMethod>
+  attemptedMethods: Set<FigureRescueMethod>
+  largeResidualDebt: boolean
+}): FocusedFigureRescueStopDecision {
+  if (!input.changedDocumentBytes) {
+    return {
+      stop: true,
+      reason: 'no_mutation',
+    }
+  }
+  if (input.after.informativeFigureMissingAltCount >= input.before.informativeFigureMissingAltCount) {
+    const blockingKeysUnchanged = JSON.stringify([...input.after.blockingKeys].sort())
+      === JSON.stringify([...input.before.blockingKeys].sort())
+    if (blockingKeysUnchanged) {
+      return {
+        stop: true,
+        reason: 'same_blocking_keys',
+      }
+    }
+    return {
+      stop: true,
+      reason: 'no_debt_reduction',
+    }
+  }
+  if (input.largeResidualDebt && [...input.attemptedMethods].some(method => input.noProgressMethods.has(method))) {
+    return {
+      stop: true,
+      reason: 'no_debt_reduction',
+    }
+  }
+  return {
+    stop: false,
+    reason: null,
+  }
+}
+
+export const __test_shouldUseFigureOnlyLateRescuePath = shouldUseFigureOnlyLateRescuePath
+export const __test_shouldStopFocusedFigureRescue = shouldStopFocusedFigureRescue
 
 function cleanupEligibleCategoryIds(): Set<string> {
   return new Set([
@@ -1414,7 +1881,7 @@ function isSemanticStageTooLargeError(error: unknown): boolean {
 function isSemanticStageRecoverableProviderError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error || '')
   return isSemanticStageTooLargeError(error)
-    || /fetch failed|networkerror|econnreset|econnrefused|etimedout|timeout|timed out|socket hang up/i.test(message)
+    || /fetch failed|networkerror|econnreset|econnrefused|etimedout|timeout|timed out|socket hang up|\b50[234]\b|all candidate accounts are cooling down|provider request failed|invalid_request_error/i.test(message)
 }
 
 function semanticDeferredAction(input: {
@@ -1447,6 +1914,7 @@ async function runHeuristicFigureFallbackStage(input: {
   context: Awaited<ReturnType<typeof inspectPdfForRemediation>>
   previousActionNames: string[]
   inspectionCache: RemediationInspectionCache
+  maxCandidates?: number
 }): Promise<{
   buffer: Buffer
   result: AnalysisResult
@@ -1464,8 +1932,9 @@ async function runHeuristicFigureFallbackStage(input: {
   let context = input.context
   let usedInheritedVeraPdf = false
   const attemptedTargets = new Set<string>()
+  const maxCandidates = Math.max(1, input.maxCandidates ?? Number.MAX_SAFE_INTEGER)
 
-  while (true) {
+  while (attemptedTargets.size < maxCandidates) {
     const candidate = heuristicEligibleFigureCandidates(context).find(entry => {
       const stableKey = entry.targetRef || entry.id
       return !attemptedTargets.has(stableKey)
@@ -1722,7 +2191,7 @@ async function runSemanticEnrichmentStage(input: {
       const batchResult = await runPdfStructureBackendBatch({
         buffer: working,
         mutations,
-        includeSnapshot: false,
+        includeSnapshot: true,
         inspectMode: inspectModeForResult(baselineResult),
       })
       const operationResults = batchResult.operationResults || []
@@ -1765,7 +2234,13 @@ async function runSemanticEnrichmentStage(input: {
       }
       if (operationResults.some(result => result.changedDocumentBytes)) {
         changedDocument = true
-        context = await inspectPdfForRemediation(working, baselineResult, {
+        context = buildRemediationContextFromSnapshot({
+          analysis: baselineResult,
+          qpdf: context.qpdf,
+          pdfjs: context.pdfjs,
+          pages: context.pages,
+          structure: batchResult,
+          inspectMode: inspectModeForResult(baselineResult),
           cache: input.inspectionCache,
         })
       }
@@ -2260,6 +2735,33 @@ export async function remediatePdfWithAgent(
     roundsExecuted: 0,
     stagesExecuted: 0,
   }
+  const remediationMetrics: RemediationMetricsState = {
+    inspections: {
+      lightFresh: 0,
+      lightReused: 0,
+      deepFresh: 0,
+      deepReused: 0,
+      deepDowngradedToLight: 0,
+    },
+    phases: {
+      ownership_state: createInspectionPhaseTracker(),
+      figure_description_state: createInspectionPhaseTracker(),
+      structure_state: createInspectionPhaseTracker(),
+    },
+    ownershipRiskInitial: null,
+    figureMissingAltInitial: null,
+    decorativeFigureInitial: null,
+    structureDeepFreshAnalyses: 0,
+    structureDeepAnalysesDowngraded: 0,
+  }
+  const latePhaseConvergence: Record<InspectionPhase, LatePhaseConvergenceTracker> = {
+    ownership_state: createLatePhaseConvergenceTracker(),
+    figure_description_state: createLatePhaseConvergenceTracker(),
+    structure_state: createLatePhaseConvergenceTracker(),
+  }
+  const lightVerificationLoopState: LightVerificationLoopState = {
+    lastMutationChangedDocument: true,
+  }
   let pdfClass: PdfClass = classifyPdf({ analysis: originalResult, context: null })
 
   const refreshClassification = (analysis: AnalysisResult, context: Awaited<ReturnType<typeof inspectPdfForRemediation>> | null): void => {
@@ -2274,6 +2776,150 @@ export async function remediatePdfWithAgent(
     })
     currentPipelineConfig = buildPipelineConfig(currentClassification)
     pdfClass = classifyPdf({ analysis, context })
+  }
+
+  const resetInspectionPhasesForTool = (tool: string): void => {
+    const resetPhase = (phase: InspectionPhase) => {
+      remediationMetrics.phases[phase].stableRepeats = 0
+      remediationMetrics.phases[phase].lastSignature = undefined
+      remediationMetrics.phases[phase].downgradedToLight = false
+    }
+    if (OWNERSHIP_STATE_TOOLS.has(tool)) resetPhase('ownership_state')
+    if (FIGURE_DESCRIPTION_STATE_TOOLS.has(tool)) resetPhase('figure_description_state')
+    if (STRUCTURE_STATE_TOOLS.has(tool)) resetPhase('structure_state')
+  }
+
+  const recordInspectionPhaseState = (
+    phase: InspectionPhase,
+    signature: string,
+    options: { fresh: boolean },
+  ): void => {
+    const tracker = remediationMetrics.phases[phase]
+    if (options.fresh) {
+      tracker.freshDeepInspections += 1
+    } else {
+      tracker.reusedInspections += 1
+    }
+    if (tracker.lastSignature === signature) {
+      tracker.stableRepeats += 1
+    } else {
+      tracker.lastSignature = signature
+      tracker.stableRepeats = 0
+    }
+    if (tracker.stableRepeats >= 1) {
+      tracker.downgradedToLight = true
+    }
+  }
+
+  const activeDeepInspectionPhase = (
+    analysis: AnalysisResult,
+    context: PdfRemediationContext | null | undefined,
+  ): InspectionPhase | null => {
+    const blockingKeys = blockingLocalFindingKeys(analysis)
+    if (
+      acrobatOwnershipRiskCount(context ?? null) > 0
+      || blockingKeys.includes('pdfua.untagged_rendered_images')
+      || blockingKeys.includes('pdfua.nested_alt_text')
+    ) {
+      return 'ownership_state'
+    }
+    if (
+      blockingKeys.includes('pdfua.figure_alt_or_artifact')
+      || hasUnresolvedCategoryLabel(analysis, 'Alt Text on Images')
+    ) {
+      return 'figure_description_state'
+    }
+    if (
+      blockingKeys.includes('pdfua.logical_structure')
+      || blockingKeys.includes('pdfua.heading_content_quality')
+      || hasUnresolvedCategoryLabel(analysis, 'Heading Structure')
+      || hasUnresolvedCategoryLabel(analysis, 'Reading Order')
+    ) {
+      return 'structure_state'
+    }
+    return null
+  }
+
+  const deepInspectionSignatureForPhase = (
+    phase: InspectionPhase,
+    analysis: AnalysisResult,
+    context: PdfRemediationContext | null | undefined,
+  ): string => {
+    switch (phase) {
+      case 'ownership_state':
+        return ownershipStateSignature(analysis, context)
+      case 'figure_description_state':
+        return figureDescriptionStateSignature(analysis, context)
+      case 'structure_state':
+        return structureStateSignature(analysis)
+    }
+  }
+
+  const shouldDowngradeDeepInspectToLight = (
+    analysis: AnalysisResult,
+    context: PdfRemediationContext | null | undefined,
+  ): boolean => {
+    const phase = activeDeepInspectionPhase(analysis, context)
+    if (!phase) return false
+    return remediationMetrics.phases[phase].downgradedToLight
+  }
+
+  const shouldPreferDeepStructureInspect = (
+    requested: boolean,
+    result: AnalysisResult,
+  ): boolean => {
+    if (!requested) return false
+    if (!remediationMetrics.phases.structure_state.downgradedToLight) {
+      remediationMetrics.structureDeepFreshAnalyses += 1
+      return true
+    }
+    remediationMetrics.structureDeepAnalysesDowngraded += 1
+    return false
+  }
+
+  const noteDocumentMutation = (action: RemediationActionRecord): void => {
+    markInspectionDirtyFromAction(inspectionState, action)
+    if (action.changedDocumentBytes && action.outcome !== 'rejected') {
+      lightVerificationLoopState.lastMutationChangedDocument = true
+      if (OWNERSHIP_STATE_TOOLS.has(action.tool)) latePhaseConvergence.ownership_state.lastMutationChangedDocument = true
+      if (FIGURE_DESCRIPTION_STATE_TOOLS.has(action.tool)) latePhaseConvergence.figure_description_state.lastMutationChangedDocument = true
+      if (STRUCTURE_STATE_TOOLS.has(action.tool)) latePhaseConvergence.structure_state.lastMutationChangedDocument = true
+      resetInspectionPhasesForTool(action.tool)
+    }
+  }
+
+  const markLatePhaseConverged = (phase: InspectionPhase): void => {
+    latePhaseConvergence[phase].converged = true
+    remediationMetrics.phases[phase].lateConverged = true
+  }
+
+  const setFigureDescriptionStopReason = (reason: FigureDescriptionStopReason): void => {
+    remediationMetrics.phases.figure_description_state.finalStopReason = reason
+  }
+
+  const updateLatePhaseProgress = (input: {
+    phase: InspectionPhase
+    before: PhaseProgressSnapshot
+    afterAnalysis: AnalysisResult
+    afterContext: PdfRemediationContext | null | undefined
+    changedDocumentBytes: boolean
+    noProgressLimit: number
+  }): boolean => {
+    const tracker = latePhaseConvergence[input.phase]
+    const after = buildPhaseProgressSnapshot(input.phase, input.afterAnalysis, input.afterContext)
+    const improved = didLatePhaseProgressImprove(input.before, after, input.changedDocumentBytes)
+    tracker.lastSnapshot = after
+    tracker.lastMutationChangedDocument = false
+    tracker.lastProgressed = improved
+    if (improved) {
+      tracker.noProgressPasses = 0
+      return true
+    }
+    tracker.noProgressPasses += 1
+    if (tracker.noProgressPasses >= input.noProgressLimit) {
+      markLatePhaseConverged(input.phase)
+    }
+    return false
   }
 
   const stageEnabled = (stageNum: number): boolean => {
@@ -2462,15 +3108,39 @@ export async function remediatePdfWithAgent(
     analysis: AnalysisResult,
     inspectMode: RemediationInspectMode = inspectModeForResult(analysis),
   ): Promise<Awaited<ReturnType<typeof inspectPdfForRemediation>>> => {
-    const metricKey = inspectMode === 'alt_text_deep' ? 'deepInspections' : 'lightInspections'
-    remediationTimings[metricKey] += 1
-    const requestedPayload = inspectionCache.contextsByMode?.[inspectMode]
+    const activePhase = activeDeepInspectionPhase(analysis, latestContext)
+    const requestedDeepInspect = inspectMode === 'alt_text_deep'
+    const effectiveInspectMode: RemediationInspectMode = requestedDeepInspect && shouldDowngradeDeepInspectToLight(analysis, latestContext)
+      ? 'light'
+      : inspectMode
+    if (requestedDeepInspect && effectiveInspectMode === 'light') {
+      remediationMetrics.inspections.deepDowngradedToLight += 1
+    }
+    const requestedPayload = inspectionCache.contextsByMode?.[effectiveInspectMode]
     const nextBufferSha256 = getBufferSha256(buffer)
-    const dirtyForMode = inspectMode === 'alt_text_deep'
+    const dirtyForMode = effectiveInspectMode === 'alt_text_deep'
       ? inspectionState.deepAltDirty
       : inspectionState.structureDirty
     const cacheMatchesCurrentBuffer = inspectionState.bufferSha256 === nextBufferSha256
       && inspectionCache.bufferSha256 === nextBufferSha256
+    const nextLightSignature = effectiveInspectMode === 'light'
+      ? lightVerificationSignature(analysis)
+      : null
+
+    if (effectiveInspectMode === 'light' && nextLightSignature) {
+      const rebound = rebindContextFromCache(analysis, 'light')
+      if (rebound && shouldShortCircuitStableLightVerification({
+        state: lightVerificationLoopState,
+        nextSignature: nextLightSignature,
+      })) {
+        latestContext = rebound
+        refreshClassification(analysis, rebound)
+        remediationMetrics.inspections.lightReused += 1
+        lightVerificationLoopState.lastSignature = nextLightSignature
+        lightVerificationLoopState.lastMutationChangedDocument = false
+        return rebound
+      }
+    }
 
     if (!dirtyForMode && requestedPayload && cacheMatchesCurrentBuffer) {
       const reused = buildRemediationContextFromSnapshot({
@@ -2479,24 +3149,61 @@ export async function remediatePdfWithAgent(
         pdfjs: requestedPayload.pdfjs,
         pages: requestedPayload.pages,
         structure: requestedPayload.structure,
-        inspectMode,
+        inspectMode: effectiveInspectMode,
         cache: inspectionCache,
       })
       latestContext = reused
       syncInspectionCache(reused)
       refreshClassification(analysis, reused)
       inspectionState.bufferSha256 = nextBufferSha256
-      inspectionState.lastInspectMode = inspectMode
+      inspectionState.lastInspectMode = effectiveInspectMode
       inspectionState.semanticDirty = false
+      if (effectiveInspectMode === 'alt_text_deep') {
+        remediationMetrics.inspections.deepReused += 1
+      } else {
+        remediationMetrics.inspections.lightReused += 1
+        if (nextLightSignature) {
+          lightVerificationLoopState.lastSignature = nextLightSignature
+          lightVerificationLoopState.lastMutationChangedDocument = false
+        }
+      }
+      if (activePhase) {
+        recordInspectionPhaseState(activePhase, deepInspectionSignatureForPhase(activePhase, analysis, reused), {
+          fresh: false,
+        })
+      }
       return reused
     }
 
+    const metricKey = effectiveInspectMode === 'alt_text_deep' ? 'deepInspections' : 'lightInspections'
+    remediationTimings[metricKey] += 1
+    if (effectiveInspectMode === 'alt_text_deep') {
+      remediationMetrics.inspections.deepFresh += 1
+    } else {
+      remediationMetrics.inspections.lightFresh += 1
+      if (nextLightSignature) {
+        lightVerificationLoopState.lastSignature = nextLightSignature
+        lightVerificationLoopState.lastMutationChangedDocument = false
+      }
+    }
+    const totalInspections = remediationTimings.lightInspections + remediationTimings.deepInspections
+    const inspectionBudgetExceeded = remediationTimings.lightInspections > MAX_LIGHT_INSPECTIONS_PER_FILE
+      || remediationTimings.deepInspections > MAX_DEEP_INSPECTIONS_PER_FILE
+      || totalInspections > MAX_TOTAL_INSPECTIONS_PER_FILE
+    if (inspectionBudgetExceeded) {
+      const error = new Error(
+        `Inspection budget exceeded (light=${remediationTimings.lightInspections}, deep=${remediationTimings.deepInspections}, total=${totalInspections}).`,
+      ) as Error & { code?: string }
+      error.code = 'EXCESSIVE_RUNTIME'
+      throw error
+    }
+
     const inspected = await inspectPdfForRemediation(buffer, analysis, {
-      inspectMode,
+      inspectMode: effectiveInspectMode,
       cache: inspectionCache,
     })
     if (!hasInspectionPayload(inspected)) {
-      const rebound = rebindContextFromCache(analysis, inspectMode)
+      const rebound = rebindContextFromCache(analysis, effectiveInspectMode)
       if (rebound) return rebound
       throw new Error(`inspectPdfForRemediation returned an invalid context for ${filename}`)
     }
@@ -2504,12 +3211,17 @@ export async function remediatePdfWithAgent(
     syncInspectionCache(inspected)
     refreshClassification(analysis, inspected)
     inspectionState.bufferSha256 = nextBufferSha256
-    inspectionState.lastInspectMode = inspectMode
+    inspectionState.lastInspectMode = effectiveInspectMode
     inspectionState.structureDirty = false
-    if (inspectMode === 'alt_text_deep') {
+    if (effectiveInspectMode === 'alt_text_deep') {
       inspectionState.deepAltDirty = false
     }
     inspectionState.semanticDirty = false
+    if (activePhase) {
+      recordInspectionPhaseState(activePhase, deepInspectionSignatureForPhase(activePhase, analysis, inspected), {
+        fresh: true,
+      })
+    }
     return inspected
   }
 
@@ -2527,7 +3239,11 @@ export async function remediatePdfWithAgent(
       forceStructureForScoring: analysisOptions?.forceStructureForScoring,
       preferDeepStructureInspect: analysisOptions?.preferDeepStructureInspect,
     })
-    return hasResultCategories(analyzed) ? analyzed : baselineResult
+    const next = hasResultCategories(analyzed) ? analyzed : baselineResult
+    if (analysisOptions?.preferDeepStructureInspect && hasResultCategories(next)) {
+      recordInspectionPhaseState('structure_state', structureStateSignature(next), { fresh: true })
+    }
+    return next
   }
 
   const analyzeAuthoritative = async (
@@ -2609,7 +3325,7 @@ export async function remediatePdfWithAgent(
       ]))
       if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
       workingBuffer = outcome.buffer
-      markInspectionDirtyFromAction(inspectionState, outcome.action)
+      noteDocumentMutation(outcome.action)
       currentResult = await analyzeIntermediate(workingBuffer, currentResult)
       currentResultHasFreshVeraPdf = false
       reviewedContext = await inspectRemediationContext(workingBuffer, currentResult, 'light')
@@ -2634,7 +3350,10 @@ export async function remediatePdfWithAgent(
     let previousRiskCount = -1
 
     while (passes < REMEDIATION.MAX_ACROBAT_OWNERSHIP_PASSES_PER_ROUND) {
+      if (latePhaseConvergence.ownership_state.converged) break
       const deepContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+      const beforeSnapshot = buildPhaseProgressSnapshot('ownership_state', currentResult, deepContext)
+      latePhaseConvergence.ownership_state.lastSnapshot = beforeSnapshot
       const currentRiskCount = acrobatOwnershipRiskCount(deepContext)
       if (currentRiskCount <= 0) break
 
@@ -2665,7 +3384,7 @@ export async function remediatePdfWithAgent(
       if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') break
 
       workingBuffer = outcome.buffer
-      markInspectionDirtyFromAction(inspectionState, outcome.action)
+      noteDocumentMutation(outcome.action)
       currentResult = await analyzeIntermediate(workingBuffer, currentResult)
       currentResultHasFreshVeraPdf = false
 
@@ -2673,10 +3392,21 @@ export async function remediatePdfWithAgent(
       const nextRiskCount = acrobatOwnershipRiskCount(afterContext)
       const reduction = currentRiskCount - nextRiskCount
       passes += 1
+      const improved = updateLatePhaseProgress({
+        phase: 'ownership_state',
+        before: beforeSnapshot,
+        afterAnalysis: currentResult,
+        afterContext,
+        changedDocumentBytes: outcome.action.changedDocumentBytes,
+        noProgressLimit: 2,
+      })
 
       if (reduction >= REMEDIATION.MIN_ACROBAT_RISK_REDUCTION_TO_CONTINUE) {
         stagnantPasses = 0
       } else {
+        stagnantPasses += 1
+      }
+      if (!improved) {
         stagnantPasses += 1
       }
 
@@ -2686,6 +3416,80 @@ export async function remediatePdfWithAgent(
 
       previousRiskCount = nextRiskCount
     }
+  }
+
+  const runBoundedPostOwnershipFigureRepairPass = async (input: {
+    stageNumber: number
+    stageLabel: string
+    maxCandidates?: number
+  }): Promise<void> => {
+    if (latePhaseConvergence.figure_description_state.converged) return
+    if ((scoreForCategory(currentResult, 'alt_text') ?? 100) >= 100) return
+    const contextForDecision = latestContext || await inspectRemediationContext(workingBuffer, currentResult, 'light')
+    const followupCandidates = heuristicEligibleFigureCandidates(contextForDecision)
+      .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+    const sweepDecision = shouldRunLateFigureSweep({
+      tracker: latePhaseConvergence.figure_description_state,
+      analysis: currentResult,
+      context: contextForDecision,
+      candidateCount: followupCandidates.length,
+    })
+    if (!sweepDecision.allowed) {
+      if (sweepDecision.reason === 'stable_no_progress' || sweepDecision.reason === 'no_candidate_progress') {
+        markLatePhaseConverged('figure_description_state')
+      }
+      return
+    }
+    const altContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+    const beforeSnapshot = buildPhaseProgressSnapshot('figure_description_state', currentResult, altContext)
+    latePhaseConvergence.figure_description_state.lastSnapshot = beforeSnapshot
+
+    stagesRun.add(input.stageNumber)
+    const stageStartResult = currentResult
+    const followupStage = await runHeuristicFigureFallbackStage({
+      buffer: workingBuffer,
+      result: currentResult,
+      context: altContext,
+      previousActionNames,
+      inspectionCache,
+      maxCandidates: input.maxCandidates ?? MAX_POST_OWNERSHIP_FIGURE_REPAIRS,
+    })
+    if (!followupStage.actions.length) return
+
+    if (!followupStage.buffer.equals(workingBuffer)) {
+      workingBuffer = followupStage.buffer
+    }
+    currentResult = followupStage.result
+    currentResultHasFreshVeraPdf = !followupStage.usedInheritedVeraPdf
+    actions.push(...followupStage.actions)
+    allExecutedActions.push(...followupStage.actions)
+    manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, followupStage.manualReviewFlags)
+    for (const action of followupStage.actions) noteDocumentMutation(action)
+    previousActionNames = Array.from(new Set([
+      ...previousActionNames,
+      ...followupStage.actions.flatMap(actionHistoryKeys),
+    ]))
+    latestContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+    const changedFigureBytes = followupStage.actions.some(action => action.changedDocumentBytes)
+    updateLatePhaseProgress({
+      phase: 'figure_description_state',
+      before: beforeSnapshot,
+      afterAnalysis: currentResult,
+      afterContext: latestContext,
+      changedDocumentBytes: changedFigureBytes,
+      noProgressLimit: 1,
+    })
+    persistStageToolOutcomes(followupStage.actions, {
+      previous: stageStartResult,
+      next: currentResult,
+      roundNumber: round,
+      stageNumber: input.stageNumber,
+      standardsImproved: standardsValidationImproved(stageStartResult, currentResult),
+    })
+    options?.onProgress?.({
+      stage: input.stageLabel,
+      percent: 96,
+    })
   }
 
   const familyCompletionTargetForState = (analysis: AnalysisResult, context: PdfRemediationContext) => familyCompletionTarget(buildFailureProfileArtifacts({
@@ -2746,7 +3550,7 @@ export async function remediatePdfWithAgent(
 
     let familyPasses = 0
 
-    while (familyPasses < 3) {
+    while (familyPasses < 2) {
       const executionMode = residualCleanupExecutionMode({
         hasBaselineFamily: !!baselineConvergenceFamily,
         hasSeededPlanningState: !!seededPlanningState,
@@ -2913,7 +3717,7 @@ export async function remediatePdfWithAgent(
         if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
         changed = true
         workingBuffer = outcome.buffer
-        markInspectionDirtyFromAction(inspectionState, outcome.action)
+        noteDocumentMutation(outcome.action)
         currentResult = await analyzeIntermediate(workingBuffer, currentResult)
         currentResultHasFreshVeraPdf = false
         const refreshedContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
@@ -2934,6 +3738,284 @@ export async function remediatePdfWithAgent(
         return
       }
       familyPasses += 1
+    }
+  }
+
+  const runFocusedFinalRescue = async (): Promise<void> => {
+    let rescuePasses = 0
+    let lastSignature = remediationStateSignature(currentResult)
+    const figureMethodsWithNoProgress = new Set<FigureRescueMethod>()
+    const figureMethodsAttempted = new Set<FigureRescueMethod>()
+
+    while (rescuePasses < 2) {
+      const needsAltRescue =
+        hasBlockingLocalFinding(currentResult, 'pdfua.untagged_rendered_images')
+        || hasBlockingLocalFinding(currentResult, 'pdfua.nested_alt_text')
+        || hasBlockingLocalFinding(currentResult, 'pdfua.figure_alt_or_artifact')
+        || hasUnresolvedCategoryLabel(currentResult, 'Alt Text on Images')
+      const needsFontRescue =
+        hasBlockingLocalFinding(currentResult, 'pdfua.font_unicode')
+        || hasUnresolvedCategoryLabel(currentResult, 'Text Extractability')
+      const needsStructureRescue =
+        hasBlockingLocalFinding(currentResult, 'pdfua.logical_structure')
+        || hasBlockingLocalFinding(currentResult, 'pdfua.heading_content_quality')
+        || hasUnresolvedCategoryLabel(currentResult, 'Heading Structure')
+        || hasUnresolvedCategoryLabel(currentResult, 'Reading Order')
+
+      if (!needsAltRescue && !needsFontRescue && !needsStructureRescue) {
+        setFigureDescriptionStopReason('completed')
+        break
+      }
+
+      const currentLightContext = latestContext
+        || rebindContextFromCache(currentResult, 'light')
+        || await inspectRemediationContextSafely(workingBuffer, currentResult, 'light')
+      const figureOnlyRescuePath = needsAltRescue && shouldUseFigureOnlyLateRescuePath({
+        analysis: currentResult,
+        context: currentLightContext,
+      })
+      const altPhaseAlreadyConverged = latePhaseConvergence.figure_description_state.converged
+      const canAttemptAltRescue = needsAltRescue && !altPhaseAlreadyConverged
+      if (needsAltRescue && altPhaseAlreadyConverged) {
+        remediationMetrics.phases.figure_description_state.focusedRescueSkippedBecauseLateConverged = true
+        setFigureDescriptionStopReason(remediationMetrics.phases.figure_description_state.finalStopReason || 'same_blocking_keys')
+      }
+
+      const inspectMode: RemediationInspectMode = canAttemptAltRescue ? 'alt_text_deep' : inspectModeForResult(currentResult)
+      let context = latestContext
+        || rebindContextFromCache(currentResult, inspectMode)
+        || await inspectRemediationContextSafely(workingBuffer, currentResult, inspectMode)
+      if (!context) break
+
+      const rescueCalls: RemediationToolCall[] = []
+      if (canAttemptAltRescue) {
+        remediationMetrics.phases.figure_description_state.focusedRescueRan = true
+        rescueCalls.push(
+          {
+            tool_name: 'normalize_nested_figure_containers',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: normalize nested figure wrappers before re-checking Acrobat-style figure ownership.',
+            confidence: 0.97,
+          },
+          {
+            tool_name: 'repair_native_figure_semantics',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: retag native figure ownership to reduce non-/Figure graphics parents.',
+            confidence: 0.96,
+          },
+          {
+            tool_name: 'repair_other_elements_alt_text',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: repair Acrobat-style alternate-text ownership risks on non-/Figure graphics containers.',
+            confidence: 0.97,
+          },
+        )
+      }
+
+      if (needsFontRescue && !figureOnlyRescuePath) {
+        if ((context.qpdf.unembeddedFontCount ?? 0) > 0) {
+          rescueCalls.push({
+            tool_name: 'embed_missing_fonts_in_place',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: embed any remaining unembedded fonts before final verification.',
+            confidence: 0.94,
+          })
+        }
+        rescueCalls.push(
+          {
+            tool_name: 'repair_font_unicode_maps',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: rebuild missing ToUnicode maps for remaining fonts.',
+            confidence: 0.95,
+          },
+          {
+            tool_name: 'repair_type1_font_unicode_maps',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: repair Type1 font Unicode maps that remain unresolved.',
+            confidence: 0.92,
+          },
+        )
+      }
+
+      if (needsStructureRescue && !figureOnlyRescuePath) {
+        rescueCalls.push(
+          {
+            tool_name: 'normalize_heading_hierarchy',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: normalize heading hierarchy before final structural repair.',
+            confidence: 0.95,
+          },
+          {
+            tool_name: 'repair_native_marked_content_refs',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: repair marked-content references that still block structure conformance.',
+            confidence: 0.94,
+          },
+          {
+            tool_name: 'repair_bootstrapped_chart_content_refs',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: reconcile residual bootstrapped content references before final validation.',
+            confidence: 0.9,
+          },
+          {
+            tool_name: 'repair_structure_conformance',
+            arguments: { target: 'document' },
+            rationale: 'Focused final rescue: run one last structure-conformance repair on the exact final document state.',
+            confidence: 0.96,
+          },
+        )
+      }
+
+      const stageActions: RemediationActionRecord[] = []
+      let changedDocument = false
+      const beforeFigureSnapshot = canAttemptAltRescue
+        ? buildPhaseProgressSnapshot('figure_description_state', currentResult, context)
+        : null
+      const attemptedFigureMethodsThisPass = new Set<FigureRescueMethod>()
+      const largeResidualDebt = canAttemptAltRescue
+        && beforeFigureSnapshot !== null
+        && beforeFigureSnapshot.informativeFigureMissingAltCount >= MASS_UNRESOLVED_FIGURE_DEBT_THRESHOLD
+
+      for (const call of dedupeToolCalls(rescueCalls)) {
+        if (call.tool_name === 'normalize_nested_figure_containers' || call.tool_name === 'repair_native_figure_semantics') {
+          if (figureMethodsWithNoProgress.has('native_semantics')) continue
+          attemptedFigureMethodsThisPass.add('native_semantics')
+        }
+        if (call.tool_name === 'repair_other_elements_alt_text') {
+          if (figureMethodsWithNoProgress.has('authoritative_alt')) continue
+          attemptedFigureMethodsThisPass.add('authoritative_alt')
+        }
+        const outcome = await executeRemediationTool({
+          buffer: workingBuffer,
+          context,
+          call,
+        })
+        stageActions.push(outcome.action)
+        actions.push(outcome.action)
+        allExecutedActions.push(outcome.action)
+        manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, outcome.manualReviewFlags)
+        if (!outcome.action.changedDocumentBytes || outcome.action.outcome === 'rejected') continue
+        workingBuffer = outcome.buffer
+        changedDocument = true
+        noteDocumentMutation(outcome.action)
+        context = await inspectRemediationContextSafely(
+          workingBuffer,
+          currentResult,
+          needsAltRescue ? 'alt_text_deep' : 'light',
+        ) || context
+      }
+
+      if (canAttemptAltRescue && !figureMethodsWithNoProgress.has('heuristic_candidates')) {
+        const lateCandidates = heuristicEligibleFigureCandidates(context)
+          .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+
+        if (lateCandidates.length > 0 && (!largeResidualDebt || attemptedFigureMethodsThisPass.size === 0 || latePhaseConvergence.figure_description_state.lastProgressed === true)) {
+          attemptedFigureMethodsThisPass.add('heuristic_candidates')
+          const heuristicStage = await runHeuristicFigureFallbackStage({
+            buffer: workingBuffer,
+            result: currentResult,
+            context,
+            previousActionNames,
+            inspectionCache,
+          })
+          if (!heuristicStage.buffer.equals(workingBuffer)) {
+            workingBuffer = heuristicStage.buffer
+            changedDocument = true
+          }
+          currentResult = heuristicStage.result
+          currentResultHasFreshVeraPdf = !heuristicStage.usedInheritedVeraPdf
+          actions.push(...heuristicStage.actions)
+          allExecutedActions.push(...heuristicStage.actions)
+          stageActions.push(...heuristicStage.actions)
+          manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, heuristicStage.manualReviewFlags)
+          for (const action of heuristicStage.actions) noteDocumentMutation(action)
+          context = await inspectRemediationContextSafely(
+            workingBuffer,
+            currentResult,
+            needsAltRescue ? 'alt_text_deep' : 'light',
+          ) || context
+        }
+      }
+
+      previousActionNames = Array.from(new Set([
+        ...previousActionNames,
+        ...stageActions.flatMap(actionHistoryKeys),
+      ]))
+
+      if (!changedDocument) {
+        if (canAttemptAltRescue) {
+          markLatePhaseConverged('figure_description_state')
+          setFigureDescriptionStopReason('no_mutation')
+        }
+        break
+      }
+
+      const rescueStartResult = currentResult
+      workingBuffer = await ensureDisplayDocTitle(workingBuffer)
+      currentResult = await analyzeAuthoritative(workingBuffer, currentResult)
+      currentResultHasFreshVeraPdf = true
+      latestContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
+        || await inspectRemediationContextSafely(workingBuffer, currentResult, inspectModeForResult(currentResult))
+        || latestContext
+      if (latestContext) {
+        refreshClassification(currentResult, latestContext)
+      }
+      persistStageToolOutcomes(stageActions, {
+        previous: rescueStartResult,
+        next: currentResult,
+        roundNumber: round,
+        stageNumber: 98,
+        standardsImproved: standardsValidationImproved(rescueStartResult, currentResult),
+      })
+
+      if (beforeFigureSnapshot && latestContext) {
+        const afterFigureSnapshot = buildPhaseProgressSnapshot('figure_description_state', currentResult, latestContext)
+        const stopDecision = shouldStopFocusedFigureRescue({
+          before: beforeFigureSnapshot,
+          after: afterFigureSnapshot,
+          changedDocumentBytes: true,
+          noProgressMethods: figureMethodsWithNoProgress,
+          attemptedMethods: attemptedFigureMethodsThisPass,
+          largeResidualDebt,
+        })
+        if (stopDecision.stop) {
+          for (const method of attemptedFigureMethodsThisPass) {
+            figureMethodsWithNoProgress.add(method)
+          }
+          updateLatePhaseProgress({
+            phase: 'figure_description_state',
+            before: beforeFigureSnapshot,
+            afterAnalysis: currentResult,
+            afterContext: latestContext,
+            changedDocumentBytes: true,
+            noProgressLimit: 1,
+          })
+          setFigureDescriptionStopReason(stopDecision.reason || 'same_blocking_keys')
+          break
+        }
+        for (const method of attemptedFigureMethodsThisPass) {
+          figureMethodsAttempted.add(method)
+        }
+      }
+
+      const nextSignature = remediationStateSignature(currentResult)
+      if (nextSignature === lastSignature) {
+        if (canAttemptAltRescue) {
+          markLatePhaseConverged('figure_description_state')
+          setFigureDescriptionStopReason('same_blocking_keys')
+        }
+        break
+      }
+      lastSignature = nextSignature
+      rescuePasses += 1
+    }
+
+    if (
+      remediationMetrics.phases.figure_description_state.focusedRescueRan
+      && !remediationMetrics.phases.figure_description_state.finalStopReason
+      && figureMethodsAttempted.size > 0
+    ) {
+      setFigureDescriptionStopReason('completed')
     }
   }
 
@@ -2984,6 +4066,9 @@ export async function remediatePdfWithAgent(
   options?.onProgress?.({ stage: 'Inspecting PDF structure', percent: 20 })
   let stageContext = await inspectRemediationContext(workingBuffer, currentResult)
   await syncAltTextReviewSidecar(stageContext)
+  remediationMetrics.ownershipRiskInitial = acrobatOwnershipRiskCount(stageContext)
+  remediationMetrics.figureMissingAltInitial = informativeFigureMissingAltCount(stageContext)
+  remediationMetrics.decorativeFigureInitial = decorativeFigureCount(stageContext)
 
   nativeTaggedSafeMode = isNativeTaggedSafeContext(stageContext, currentResult)
   currentTitle = stageContext.pdfjs.title || currentTitle
@@ -3055,6 +4140,7 @@ export async function remediatePdfWithAgent(
     manualReviewFlags: ModelReviewFlag[]
     changedDocument: boolean
     usedBatch: boolean
+    afterContext?: Awaited<ReturnType<typeof inspectPdfForRemediation>>
     batchCluster?: NonNullable<StageExecutionEntry['batchCluster']>
   }> => {
     if (calls.length <= 1) {
@@ -3087,7 +4173,7 @@ export async function remediatePdfWithAgent(
     const batchResult = await runPdfStructureBackendBatch({
       buffer,
       mutations: mutations as StructureBackendMutationRequest[],
-      includeSnapshot: false,
+      includeSnapshot: true,
       inspectMode: inspectModeForResult(currentResult),
     })
     const operationResults = batchResult.operationResults || []
@@ -3117,13 +4203,26 @@ export async function remediatePdfWithAgent(
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, translated.manualReviewFlags)
       return translated.action
     })
+    const outputBuffer = batchResult.outputBuffer || buffer
+    const afterContext = changedDocument && batchResult.outputBuffer
+      ? buildRemediationContextFromSnapshot({
+          analysis: currentResult,
+          qpdf: context.qpdf,
+          pdfjs: context.pdfjs,
+          pages: context.pages,
+          structure: batchResult,
+          inspectMode: inspectModeForResult(currentResult),
+          cache: inspectionCache,
+        })
+      : undefined
 
     return {
-      buffer: batchResult.outputBuffer || buffer,
+      buffer: outputBuffer,
       actions,
       manualReviewFlags,
       changedDocument,
       usedBatch: true,
+      afterContext,
       batchCluster: {
         id: nextBatchClusterId++,
         calls,
@@ -3242,11 +4341,14 @@ export async function remediatePdfWithAgent(
         let afterLanguage = attemptLanguage
 
         if (execution.changedDocument) {
-          afterContext = await inspectRemediationContext(
-            execution.buffer,
-            checkpointResult,
-            clusterAppliedStructureConformance ? 'alt_text_deep' : undefined,
-          )
+          const requestedInspectMode = clusterAppliedStructureConformance ? 'alt_text_deep' : inspectModeForResult(checkpointResult)
+          afterContext = execution.afterContext && requestedInspectMode === inspectModeForResult(checkpointResult)
+            ? execution.afterContext
+            : await inspectRemediationContext(
+                execution.buffer,
+                checkpointResult,
+                clusterAppliedStructureConformance ? 'alt_text_deep' : undefined,
+              )
           afterTitle = afterContext.pdfjs.title || attemptTitle
           afterLanguage = afterContext.qpdf.lang || afterContext.pdfjs.lang || attemptLanguage
           attemptChangedDocument = true
@@ -3328,8 +4430,11 @@ export async function remediatePdfWithAgent(
 
       const analyzedAttempt = await analyzeIntermediate(attemptBuffer, checkpointResult, {
         forceStructureForScoring: requiresDeepStructureScoring(attemptEntries.map(entry => entry.action)),
-        preferDeepStructureInspect: requiresDeepStructureInspect(attemptEntries.map(entry => entry.action))
-          || requiresLongReportStructureInspect(attemptEntries.map(entry => entry.action), checkpointResult),
+        preferDeepStructureInspect: shouldPreferDeepStructureInspect(
+          requiresDeepStructureInspect(attemptEntries.map(entry => entry.action))
+            || requiresLongReportStructureInspect(attemptEntries.map(entry => entry.action), checkpointResult),
+          checkpointResult,
+        ),
       })
       const attemptRegressionReason = nativeStageRegressionReason(
         checkpointResult,
@@ -3376,8 +4481,11 @@ export async function remediatePdfWithAgent(
           ? analyzedAttempt
           : await analyzeIntermediate(entry.afterBuffer, checkpointResult, {
               forceStructureForScoring: requiresDeepStructureScoring([entry.action]),
-              preferDeepStructureInspect: requiresDeepStructureInspect([entry.action])
-                || requiresLongReportStructureInspect([entry.action], checkpointResult),
+              preferDeepStructureInspect: shouldPreferDeepStructureInspect(
+                requiresDeepStructureInspect([entry.action])
+                  || requiresLongReportStructureInspect([entry.action], checkpointResult),
+                checkpointResult,
+              ),
             })
         const entryRegressionReason = nativeStageRegressionReason(
           priorResultForEntry,
@@ -3595,8 +4703,11 @@ export async function remediatePdfWithAgent(
 
       const analyzedReplay = await analyzeIntermediate(replay.buffer, input.stageStartResult, {
         forceStructureForScoring: requiresDeepStructureScoring(replay.actions),
-        preferDeepStructureInspect: requiresDeepStructureInspect(replay.actions)
-          || requiresLongReportStructureInspect(replay.actions, input.stageStartResult),
+        preferDeepStructureInspect: shouldPreferDeepStructureInspect(
+          requiresDeepStructureInspect(replay.actions)
+            || requiresLongReportStructureInspect(replay.actions, input.stageStartResult),
+          input.stageStartResult,
+        ),
       })
       const appliedAcrobatAltRepair = replay.actions.some(action =>
         action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
@@ -3721,15 +4832,18 @@ export async function remediatePdfWithAgent(
           actions.push(...execution.actions)
           allExecutedActions.push(...execution.actions)
           manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, execution.manualReviewFlags)
-          for (const action of execution.actions) markInspectionDirtyFromAction(inspectionState, action)
+          for (const action of execution.actions) noteDocumentMutation(action)
         }
       }
 
       if (!nativeTaggedSafeMode && stageChangedDocument) {
         const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
           forceStructureForScoring: requiresDeepStructureScoring(stageActions),
-          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions)
-            || requiresLongReportStructureInspect(stageActions, stageStartResult),
+          preferDeepStructureInspect: shouldPreferDeepStructureInspect(
+            requiresDeepStructureInspect(stageActions)
+              || requiresLongReportStructureInspect(stageActions, stageStartResult),
+            stageStartResult,
+          ),
         })
         const isAcrobatAltRepair = stageActions.some(
           action => action.tool === 'repair_other_elements_alt_text' && action.outcome === 'applied',
@@ -3881,6 +4995,10 @@ export async function remediatePdfWithAgent(
 
   let consecutiveNoProgressStages = 0
   let lastPlanSignature = JSON.stringify(plan.actions.map(call => `${call.tool_name}:${JSON.stringify(call.arguments || {})}`))
+  let stableStateRepeats = 0
+  let lastStableStateSignature = remediationStateSignature(currentResult)
+  let coarseStableStateRepeats = 0
+  let lastCoarseStableStateSignature = remediationCoarseStateSignature(currentResult)
 
   while (!playbookFastPathSucceeded && round <= (currentPipelineConfig?.maxRounds || REMEDIATION.MAX_REMEDIATION_ROUNDS)) {
     remediationTimings.roundsExecuted += 1
@@ -3954,15 +5072,18 @@ export async function remediatePdfWithAgent(
       stageActions.push(...execution.actions)
       actions.push(...execution.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, execution.manualReviewFlags)
-      for (const action of execution.actions) markInspectionDirtyFromAction(inspectionState, action)
+      for (const action of execution.actions) noteDocumentMutation(action)
     }
 
     // Non-native mode: single analysis per stage (instead of per action)
     if (!nativeTaggedSafeMode && stageChangedDocument) {
       const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
         forceStructureForScoring: requiresDeepStructureScoring(stageActions),
-        preferDeepStructureInspect: requiresDeepStructureInspect(stageActions)
-          || requiresLongReportStructureInspect(stageActions, stageStartResult),
+        preferDeepStructureInspect: shouldPreferDeepStructureInspect(
+          requiresDeepStructureInspect(stageActions)
+            || requiresLongReportStructureInspect(stageActions, stageStartResult),
+          stageStartResult,
+        ),
       })
       // repair_other_elements_alt_text fixes Adobe Acrobat issues not reflected in our score model
       const isAcrobatAltRepair = stageActions.some(
@@ -4084,13 +5205,48 @@ export async function remediatePdfWithAgent(
       ...stageActions.flatMap(actionHistoryKeys),
     ]))
     if (stageChangedDocument) roundChangedDocument = true
-    if (stageChangedDocument && !stageImprovedStandards && !stageImprovedTargets && !stageAppliedAcrobatAltRepair) {
+    if (stageChangedDocument && !stageImprovedStandards && !stageImprovedTargets) {
       consecutiveNoProgressStages += 1
+      const currentStableStateSignature = remediationStateSignature(currentResult)
+      const currentCoarseStableStateSignature = remediationCoarseStateSignature(currentResult)
+      if (currentStableStateSignature === lastStableStateSignature) {
+        stableStateRepeats += 1
+      } else {
+        stableStateRepeats = 0
+        lastStableStateSignature = currentStableStateSignature
+      }
+      if (currentCoarseStableStateSignature === lastCoarseStableStateSignature) {
+        coarseStableStateRepeats += 1
+      } else {
+        coarseStableStateRepeats = 0
+        lastCoarseStableStateSignature = currentCoarseStableStateSignature
+      }
+      if (stableStateRepeats >= MAX_STABLE_STATE_REPEATS) {
+        stopAfterRound = true
+        manualReviewFlags = addFlag(manualReviewFlags, {
+          code: `stage_${stageNum}_stable_state_loop`,
+          label: 'Stable remediation state loop detected',
+          severity: 'warning',
+          details: `Stopped after repeated no-progress remediation cycles where the analyzed accessibility state did not change ${stableStateRepeats + 1} times.`,
+        })
+      } else if (coarseStableStateRepeats >= MAX_COARSE_STABLE_STATE_REPEATS) {
+        stopAfterRound = true
+        manualReviewFlags = addFlag(manualReviewFlags, {
+          code: `stage_${stageNum}_coarse_stable_state_loop`,
+          label: 'Coarse remediation state loop detected',
+          severity: 'warning',
+          details: `Stopped after repeated no-progress remediation cycles where the blocking findings and unresolved categories stayed the same ${coarseStableStateRepeats + 1} times${stageAppliedAcrobatAltRepair ? ', including Acrobat-style alt-text repair passes that did not reduce blockers' : ''}.`,
+        })
+      }
       if (round > 1 && consecutiveNoProgressStages >= REMEDIATION.MAX_NO_PROGRESS_STAGES) {
         stopAfterRound = true
       }
     } else if (stageChangedDocument) {
       consecutiveNoProgressStages = 0
+      stableStateRepeats = 0
+      coarseStableStateRepeats = 0
+      lastStableStateSignature = remediationStateSignature(currentResult)
+      lastCoarseStableStateSignature = remediationCoarseStateSignature(currentResult)
     }
 
 	    if (stageChangedDocument) {
@@ -4203,14 +5359,17 @@ export async function remediatePdfWithAgent(
         actions.push(...execution.actions)
         allExecutedActions.push(...execution.actions)
         manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, execution.manualReviewFlags)
-        for (const action of execution.actions) markInspectionDirtyFromAction(inspectionState, action)
+        for (const action of execution.actions) noteDocumentMutation(action)
       }
 
       if (!nativeTaggedSafeMode && stageChangedDocument) {
         const analyzedStage = await analyzeIntermediate(workingBuffer, stageStartResult, {
           forceStructureForScoring: requiresDeepStructureScoring(stageActions),
-          preferDeepStructureInspect: requiresDeepStructureInspect(stageActions)
-            || requiresLongReportStructureInspect(stageActions, stageStartResult),
+          preferDeepStructureInspect: shouldPreferDeepStructureInspect(
+            requiresDeepStructureInspect(stageActions)
+              || requiresLongReportStructureInspect(stageActions, stageStartResult),
+            stageStartResult,
+          ),
         })
         const isAcrobatAltRepair = stageActions.some(a => a.tool === 'repair_other_elements_alt_text' && a.outcome === 'applied')
         const acceptanceDecision = evaluateStageAcceptance(stageStartResult, analyzedStage, stageActions)
@@ -4332,6 +5491,10 @@ export async function remediatePdfWithAgent(
   if (acrobatOwnershipRiskCount(latestContext) > 0) {
     await runAcrobatOwnershipConvergence()
     latestContext = await inspectRemediationContext(workingBuffer, currentResult, inspectModeForResult(currentResult))
+    await runBoundedPostOwnershipFigureRepairPass({
+      stageNumber: 89,
+      stageLabel: 'Applying bounded post-ownership figure alt repairs',
+    })
   }
 
   // Record as a single iteration for model compatibility
@@ -4373,7 +5536,7 @@ export async function remediatePdfWithAgent(
     currentResultHasFreshVeraPdf = !semanticStage.usedInheritedVeraPdf
     actions.push(...semanticStage.actions)
     manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, semanticStage.manualReviewFlags)
-    for (const action of semanticStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+    for (const action of semanticStage.actions) noteDocumentMutation(action)
     previousActionNames = Array.from(new Set([
       ...previousActionNames,
       ...semanticStage.actions.flatMap(actionHistoryKeys),
@@ -4421,7 +5584,7 @@ export async function remediatePdfWithAgent(
       currentResultHasFreshVeraPdf = !bookmarkStage.usedInheritedVeraPdf
       actions.push(...bookmarkStage.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, bookmarkStage.manualReviewFlags)
-      for (const action of bookmarkStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      for (const action of bookmarkStage.actions) noteDocumentMutation(action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
         ...bookmarkStage.actions.flatMap(actionHistoryKeys),
@@ -4444,11 +5607,20 @@ export async function remediatePdfWithAgent(
   const lateAltPassNeeded = !skipDirectToFinalCleanup
     && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
   if (lateAltPassNeeded) {
-    const lateAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
-    const lateHeuristicFigureCandidates = heuristicEligibleFigureCandidates(lateAltContext)
+    const lateDecisionContext = latestContext || await inspectRemediationContext(workingBuffer, currentResult, 'light')
+    const lateHeuristicFigureCandidates = heuristicEligibleFigureCandidates(lateDecisionContext)
       .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+    const sweepDecision = shouldRunLateFigureSweep({
+      tracker: latePhaseConvergence.figure_description_state,
+      analysis: currentResult,
+      context: lateDecisionContext,
+      candidateCount: lateHeuristicFigureCandidates.length,
+    })
 
-    if (lateHeuristicFigureCandidates.length > 0) {
+    if (sweepDecision.allowed) {
+      const lateAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+      const beforeSnapshot = buildPhaseProgressSnapshot('figure_description_state', currentResult, lateAltContext)
+      latePhaseConvergence.figure_description_state.lastSnapshot = beforeSnapshot
       stagesRun.add(92)
       const lateAltStageStartResult = currentResult
       const lateAltStage = await runHeuristicFigureFallbackStage({
@@ -4457,6 +5629,7 @@ export async function remediatePdfWithAgent(
         context: lateAltContext,
         previousActionNames,
         inspectionCache,
+        maxCandidates: MAX_POST_OWNERSHIP_FIGURE_REPAIRS,
       })
       if (!lateAltStage.buffer.equals(workingBuffer)) {
         workingBuffer = lateAltStage.buffer
@@ -4465,12 +5638,21 @@ export async function remediatePdfWithAgent(
       currentResultHasFreshVeraPdf = !lateAltStage.usedInheritedVeraPdf
       actions.push(...lateAltStage.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, lateAltStage.manualReviewFlags)
-      for (const action of lateAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      for (const action of lateAltStage.actions) noteDocumentMutation(action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
         ...lateAltStage.actions.flatMap(actionHistoryKeys),
       ]))
       latestContext = await inspectRemediationContext(workingBuffer, currentResult)
+      const changedFigureBytes = lateAltStage.actions.some(action => action.changedDocumentBytes)
+      updateLatePhaseProgress({
+        phase: 'figure_description_state',
+        before: beforeSnapshot,
+        afterAnalysis: currentResult,
+        afterContext: latestContext,
+        changedDocumentBytes: changedFigureBytes,
+        noProgressLimit: 1,
+      })
       persistStageToolOutcomes(lateAltStage.actions, {
         previous: lateAltStageStartResult,
         next: currentResult,
@@ -4478,6 +5660,8 @@ export async function remediatePdfWithAgent(
         stageNumber: 92,
         standardsImproved: standardsValidationImproved(lateAltStageStartResult, currentResult),
       })
+    } else if (sweepDecision.reason === 'stable_no_progress' || sweepDecision.reason === 'no_candidate_progress') {
+      markLatePhaseConverged('figure_description_state')
     }
   }
 
@@ -4569,7 +5753,7 @@ export async function remediatePdfWithAgent(
       finalCleanupActions.push(action)
       actions.push(action)
       allExecutedActions.push(action)
-      markInspectionDirtyFromAction(inspectionState, action)
+      noteDocumentMutation(action)
     }
     if (batchResult.changedDocumentBytes && batchResult.outputBuffer) {
       workingBuffer = batchResult.outputBuffer
@@ -4628,11 +5812,20 @@ export async function remediatePdfWithAgent(
   const postCleanupAltPassNeeded = !skipDirectToFinalCleanup
     && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
   if (postCleanupAltPassNeeded) {
-    const postCleanupAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
-    const postCleanupHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postCleanupAltContext)
+    const postCleanupDecisionContext = latestContext || await inspectRemediationContext(workingBuffer, currentResult, 'light')
+    const postCleanupHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postCleanupDecisionContext)
       .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
+    const sweepDecision = shouldRunLateFigureSweep({
+      tracker: latePhaseConvergence.figure_description_state,
+      analysis: currentResult,
+      context: postCleanupDecisionContext,
+      candidateCount: postCleanupHeuristicFigureCandidates.length,
+    })
 
-    if (postCleanupHeuristicFigureCandidates.length > 0) {
+    if (sweepDecision.allowed) {
+      const postCleanupAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+      const beforeSnapshot = buildPhaseProgressSnapshot('figure_description_state', currentResult, postCleanupAltContext)
+      latePhaseConvergence.figure_description_state.lastSnapshot = beforeSnapshot
       stagesRun.add(93)
       const postCleanupAltStageStartResult = currentResult
       const postCleanupAltStage = await runHeuristicFigureFallbackStage({
@@ -4641,6 +5834,7 @@ export async function remediatePdfWithAgent(
         context: postCleanupAltContext,
         previousActionNames,
         inspectionCache,
+        maxCandidates: MAX_POST_OWNERSHIP_FIGURE_REPAIRS,
       })
       if (!postCleanupAltStage.buffer.equals(workingBuffer)) {
         workingBuffer = postCleanupAltStage.buffer
@@ -4649,12 +5843,21 @@ export async function remediatePdfWithAgent(
       currentResultHasFreshVeraPdf = !postCleanupAltStage.usedInheritedVeraPdf
       actions.push(...postCleanupAltStage.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, postCleanupAltStage.manualReviewFlags)
-      for (const action of postCleanupAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      for (const action of postCleanupAltStage.actions) noteDocumentMutation(action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
         ...postCleanupAltStage.actions.flatMap(actionHistoryKeys),
       ]))
       latestContext = await inspectRemediationContext(workingBuffer, currentResult)
+      const changedFigureBytes = postCleanupAltStage.actions.some(action => action.changedDocumentBytes)
+      updateLatePhaseProgress({
+        phase: 'figure_description_state',
+        before: beforeSnapshot,
+        afterAnalysis: currentResult,
+        afterContext: latestContext,
+        changedDocumentBytes: changedFigureBytes,
+        noProgressLimit: 1,
+      })
       persistStageToolOutcomes(postCleanupAltStage.actions, {
         previous: postCleanupAltStageStartResult,
         next: currentResult,
@@ -4662,6 +5865,8 @@ export async function remediatePdfWithAgent(
         stageNumber: 93,
         standardsImproved: standardsValidationImproved(postCleanupAltStageStartResult, currentResult),
       })
+    } else if (sweepDecision.reason === 'stable_no_progress' || sweepDecision.reason === 'no_candidate_progress') {
+      markLatePhaseConverged('figure_description_state')
     }
   }
 
@@ -4684,12 +5889,25 @@ export async function remediatePdfWithAgent(
     && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100
   if (postAnalysisAltPassNeeded) {
     let postAnalysisSweepCount = 0
-    while (postAnalysisSweepCount < 3 && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100) {
-      const postAnalysisAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
-      const postAnalysisHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postAnalysisAltContext)
+    while (postAnalysisSweepCount < 2 && (scoreForCategory(currentResult, 'alt_text') ?? 100) < 100) {
+      const postAnalysisDecisionContext = latestContext || await inspectRemediationContext(workingBuffer, currentResult, 'light')
+      const postAnalysisHeuristicFigureCandidates = heuristicEligibleFigureCandidates(postAnalysisDecisionContext)
         .filter(candidate => shouldRetryLateHeuristicFigureCandidate(candidate, previousActionNames))
-
-      if (postAnalysisHeuristicFigureCandidates.length === 0) break
+      const sweepDecision = shouldRunLateFigureSweep({
+        tracker: latePhaseConvergence.figure_description_state,
+        analysis: currentResult,
+        context: postAnalysisDecisionContext,
+        candidateCount: postAnalysisHeuristicFigureCandidates.length,
+      })
+      if (!sweepDecision.allowed) {
+        if (sweepDecision.reason === 'stable_no_progress' || sweepDecision.reason === 'no_candidate_progress') {
+          markLatePhaseConverged('figure_description_state')
+        }
+        break
+      }
+      const postAnalysisAltContext = await inspectRemediationContext(workingBuffer, currentResult, 'alt_text_deep')
+      const beforeSnapshot = buildPhaseProgressSnapshot('figure_description_state', currentResult, postAnalysisAltContext)
+      latePhaseConvergence.figure_description_state.lastSnapshot = beforeSnapshot
 
       stagesRun.add(94)
       const postAnalysisAltStageStartResult = currentResult
@@ -4699,6 +5917,7 @@ export async function remediatePdfWithAgent(
         context: postAnalysisAltContext,
         previousActionNames,
         inspectionCache,
+        maxCandidates: MAX_POST_OWNERSHIP_FIGURE_REPAIRS,
       })
       const changedResidualFigures = postAnalysisAltStage.actions.some(action => action.changedDocumentBytes)
       if (!postAnalysisAltStage.buffer.equals(workingBuffer)) {
@@ -4708,11 +5927,12 @@ export async function remediatePdfWithAgent(
       currentResultHasFreshVeraPdf = !postAnalysisAltStage.usedInheritedVeraPdf
       actions.push(...postAnalysisAltStage.actions)
       manualReviewFlags = mergeManualReviewFlags(manualReviewFlags, postAnalysisAltStage.manualReviewFlags)
-      for (const action of postAnalysisAltStage.actions) markInspectionDirtyFromAction(inspectionState, action)
+      for (const action of postAnalysisAltStage.actions) noteDocumentMutation(action)
       previousActionNames = Array.from(new Set([
         ...previousActionNames,
         ...postAnalysisAltStage.actions.flatMap(actionHistoryKeys),
       ]))
+      const changedFigureBytes = postAnalysisAltStage.actions.some(action => action.changedDocumentBytes)
       persistStageToolOutcomes(postAnalysisAltStage.actions, {
         previous: postAnalysisAltStageStartResult,
         next: currentResult,
@@ -4720,17 +5940,53 @@ export async function remediatePdfWithAgent(
         stageNumber: 94,
         standardsImproved: standardsValidationImproved(postAnalysisAltStageStartResult, currentResult),
       })
-      if (!changedResidualFigures) break
+      if (!changedResidualFigures) {
+        updateLatePhaseProgress({
+          phase: 'figure_description_state',
+          before: beforeSnapshot,
+          afterAnalysis: currentResult,
+          afterContext: latestContext,
+          changedDocumentBytes: changedFigureBytes,
+          noProgressLimit: 1,
+        })
+        break
+      }
       workingBuffer = await ensureDisplayDocTitle(workingBuffer)
       currentResult = await analyzeAuthoritative(workingBuffer, currentResult)
       currentResultHasFreshVeraPdf = true
       latestContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
+      updateLatePhaseProgress({
+        phase: 'figure_description_state',
+        before: beforeSnapshot,
+        afterAnalysis: currentResult,
+        afterContext: latestContext,
+        changedDocumentBytes: changedFigureBytes,
+        noProgressLimit: 1,
+      })
       postAnalysisSweepCount += 1
     }
   }
 
   await applyReviewedAltTextSidecar()
   await runFinalResidualRepairs()
+  await runBoundedPostOwnershipFigureRepairPass({
+    stageNumber: 96,
+    stageLabel: 'Applying bounded final figure alt repairs',
+  })
+
+  // Always re-analyze the exact final bytes we are about to save/stage.
+  // Late cleanup steps can still mutate the PDF after earlier authoritative
+  // audits, so the returned finalResult must reflect the actual final buffer.
+  workingBuffer = await ensureDisplayDocTitle(workingBuffer)
+  currentResult = await analyzeAuthoritative(workingBuffer, currentResult)
+  currentResultHasFreshVeraPdf = true
+  latestContext = rebindContextFromCache(currentResult, inspectModeForResult(currentResult))
+    || await inspectRemediationContextSafely(workingBuffer, currentResult, inspectModeForResult(currentResult))
+    || latestContext
+  if (latestContext) {
+    refreshClassification(currentResult, latestContext)
+  }
+  await runFocusedFinalRescue()
 
   previousActionNames = Array.from(new Set([
     ...previousActionNames,
@@ -4750,6 +6006,9 @@ export async function remediatePdfWithAgent(
     rejectedActions,
     iterations,
   })
+  const finalOwnershipRiskCount = acrobatOwnershipRiskCount(finalContext)
+  const finalFigureMissingAltCount = informativeFigureMissingAltCount(finalContext)
+  const finalDecorativeFigureCount = decorativeFigureCount(finalContext)
 
   const finalModel: DocumentModel = {
     version: '6',
@@ -4768,6 +6027,44 @@ export async function remediatePdfWithAgent(
     plannerEvidence: finalProfileArtifacts.plannerEvidence,
     classification: currentClassification || null,
     pipelineConfig: currentPipelineSummary(),
+    remediationMetrics: {
+      inspections: { ...remediationMetrics.inspections },
+      phases: {
+        ownershipState: {
+          initialRiskCount: remediationMetrics.ownershipRiskInitial ?? 0,
+          finalRiskCount: finalOwnershipRiskCount,
+          freshDeepInspections: remediationMetrics.phases.ownership_state.freshDeepInspections,
+          reusedInspections: remediationMetrics.phases.ownership_state.reusedInspections,
+          downgradedToLight: remediationMetrics.phases.ownership_state.downgradedToLight,
+          lateConverged: remediationMetrics.phases.ownership_state.lateConverged,
+        },
+        figureDescriptionState: {
+          initialMissingAltCount: remediationMetrics.figureMissingAltInitial ?? 0,
+          finalMissingAltCount: finalFigureMissingAltCount,
+          initialDecorativeFigureCount: remediationMetrics.decorativeFigureInitial ?? 0,
+          finalDecorativeFigureCount: finalDecorativeFigureCount,
+          freshDeepInspections: remediationMetrics.phases.figure_description_state.freshDeepInspections,
+          reusedInspections: remediationMetrics.phases.figure_description_state.reusedInspections,
+          downgradedToLight: remediationMetrics.phases.figure_description_state.downgradedToLight,
+          lateConverged: remediationMetrics.phases.figure_description_state.lateConverged,
+          focusedRescueRan: remediationMetrics.phases.figure_description_state.focusedRescueRan,
+          focusedRescueSkippedBecauseLateConverged: remediationMetrics.phases.figure_description_state.focusedRescueSkippedBecauseLateConverged,
+          finalStopReason: remediationMetrics.phases.figure_description_state.finalStopReason,
+        },
+        structureState: {
+          freshDeepAnalyses: remediationMetrics.structureDeepFreshAnalyses,
+          downgradedDeepAnalyses: remediationMetrics.structureDeepAnalysesDowngraded,
+          lateConverged: remediationMetrics.phases.structure_state.lateConverged,
+          finalBlockingKeys: blockingLocalFindingKeys(currentResult).filter(key =>
+            key === 'pdfua.logical_structure'
+            || key === 'pdfua.heading_content_quality'
+            || key === 'pdfua.figure_alt_or_artifact'
+            || key === 'pdfua.untagged_rendered_images'
+            || key === 'pdfua.nested_alt_text',
+          ),
+        },
+      },
+    },
     finalAudit: {
       overallScore: currentResult.overallScore,
       grade: currentResult.grade,
@@ -4788,6 +6085,7 @@ export async function remediatePdfWithAgent(
     deepInspections: remediationTimings.deepInspections,
     roundsExecuted: remediationTimings.roundsExecuted,
     stagesExecuted: remediationTimings.stagesExecuted,
+    remediationMetrics: finalModel.remediationMetrics,
   }))
 
   if (matchedPlaybook && matchedPlaybookRun && playbookFastPathSucceeded) {

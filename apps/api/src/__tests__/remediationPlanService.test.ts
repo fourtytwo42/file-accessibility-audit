@@ -21,6 +21,7 @@ vi.mock('../services/toolReliabilityService.js', () => ({
 
 vi.mock('../services/semanticEnrichmentService.js', () => ({
   hasSemanticRepairConfig: () => false,
+  bookmarkTargets: () => [],
 }))
 
 vi.mock('../services/languageTags.js', () => ({
@@ -2203,5 +2204,238 @@ describe('remediationPlanService', () => {
     })
 
     expect(plan.actions[0]?.tool_name).toBe('normalize_heading_hierarchy')
+  })
+
+  it('prefers candidate-scoped table header repair over document-level native repair for table regularity', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: true,
+        hasSimpleTables: true,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'C',
+        analysisScore: 83,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 3,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'pdfua.table_regularity',
+          label: 'Table regularity',
+          source: 'local_standards',
+          count: 1,
+          categoryIds: ['table_markup', 'pdf_ua_compliance'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: ['repair_native_table_headers', 'set_table_header_cells'],
+          evidence: [],
+        }],
+        toolOpportunities: [
+          {
+            key: 'table-doc',
+            toolName: 'repair_native_table_headers',
+            reason: 'Repair native headers at document scope',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['table_markup'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.table_regularity'],
+          },
+          {
+            key: 'table-candidate-1',
+            toolName: 'set_table_header_cells',
+            reason: 'Repair table 1 header cells',
+            scope: 'candidate',
+            candidateIds: ['table:1'],
+            candidateGroupIds: [],
+            pageNumbers: [1],
+            categoryTargets: ['table_markup'],
+            confidence: 0.92,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.table_regularity'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 2,
+        },
+        residualFamilies: [],
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'tables.pdf',
+      analysis: {
+        overallScore: 83,
+        grade: 'B',
+        isScanned: false,
+        pageCount: 10,
+        categories: [{ id: 'table_markup', label: 'Table Markup', score: 40, severity: 'Moderate' }],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 2, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [{ id: 'table:1', ref: 'obj:465 0 R' }],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'set_table_header_cells')).toBe(true)
+    expect(plan.actions.some(action => action.tool_name === 'repair_native_table_headers')).toBe(false)
+  })
+
+  it('keeps document-level native table repair as fallback when candidate table routes are rejected', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: true,
+        hasSimpleTables: true,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'C',
+        analysisScore: 83,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 3,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'pdfua.table_regularity',
+          label: 'Table regularity',
+          source: 'local_standards',
+          count: 1,
+          categoryIds: ['table_markup', 'pdf_ua_compliance'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: ['repair_native_table_headers', 'set_table_header_cells'],
+          evidence: [],
+        }],
+        toolOpportunities: [
+          {
+            key: 'table-doc',
+            toolName: 'repair_native_table_headers',
+            reason: 'Repair native headers at document scope',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['table_markup'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.table_regularity'],
+          },
+          {
+            key: 'table-candidate-1',
+            toolName: 'set_table_header_cells',
+            reason: 'Repair table 1 header cells',
+            scope: 'candidate',
+            candidateIds: ['table:1'],
+            candidateGroupIds: [],
+            pageNumbers: [1],
+            categoryTargets: ['table_markup'],
+            confidence: 0.92,
+            status: 'rejected',
+            derivedFromFailureModeKeys: ['pdfua.table_regularity'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 1,
+        },
+        residualFamilies: [],
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: ['table-candidate-1'],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'tables.pdf',
+      analysis: {
+        overallScore: 83,
+        grade: 'B',
+        isScanned: false,
+        pageCount: 10,
+        categories: [{ id: 'table_markup', label: 'Table Markup', score: 40, severity: 'Moderate' }],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 2, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [{ id: 'table:1', ref: 'obj:465 0 R' }],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: 'obj:1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_native_table_headers')).toBe(true)
   })
 })

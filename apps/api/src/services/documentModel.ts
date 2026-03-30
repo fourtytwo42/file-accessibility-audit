@@ -534,6 +534,44 @@ export interface DocumentModel {
     authoringTool: PdfAuthoringTool
     fontProfile: PdfFontProfile
   } | null
+  remediationMetrics?: {
+    inspections: {
+      lightFresh: number
+      lightReused: number
+      deepFresh: number
+      deepReused: number
+      deepDowngradedToLight: number
+    }
+    phases: {
+      ownershipState: {
+        initialRiskCount: number
+        finalRiskCount: number
+        freshDeepInspections: number
+        reusedInspections: number
+        downgradedToLight: boolean
+        lateConverged?: boolean
+      }
+      figureDescriptionState: {
+        initialMissingAltCount: number
+        finalMissingAltCount: number
+        initialDecorativeFigureCount: number
+        finalDecorativeFigureCount: number
+        freshDeepInspections: number
+        reusedInspections: number
+        downgradedToLight: boolean
+        lateConverged?: boolean
+        focusedRescueRan?: boolean
+        focusedRescueSkippedBecauseLateConverged?: boolean
+        finalStopReason?: 'no_mutation' | 'no_debt_reduction' | 'same_blocking_keys' | 'budget_exhausted' | 'completed'
+      }
+      structureState: {
+        freshDeepAnalyses: number
+        downgradedDeepAnalyses: number
+        finalBlockingKeys: string[]
+        lateConverged?: boolean
+      }
+    }
+  } | null
   manualReviewFlags: ModelReviewFlag[]
   aiAppliedChanges: AppliedChange[]
   aiSuggestedChanges: SuggestedChange[]

@@ -2525,6 +2525,28 @@ def top_level_mcid_group_index(page_obj, target_mcid):
     return groups, None
 
 
+def resolve_target_mcids_for_risk(source_obj, risk):
+    direct_mcids = list(direct_struct_elem_mcids(source_obj))
+    if direct_mcids:
+        target_mcids = direct_mcids
+    else:
+        target_mcids = []
+        risk_mcids = risk.get("mcids") or []
+        for raw_mcid in risk_mcids:
+            try:
+                target_mcids.append(int(raw_mcid))
+            except Exception:
+                continue
+    normalized = []
+    seen = set()
+    for mcid in target_mcids:
+        if mcid in seen:
+            continue
+        seen.add(mcid)
+        normalized.append(mcid)
+    return normalized
+
+
 def replace_struct_elem_mcids(elem, mcids):
     if not isinstance(elem, pikepdf.Dictionary):
         return
@@ -2538,6 +2560,43 @@ def replace_struct_elem_mcids(elem, mcids):
         elem["/K"] = int(mcids[0])
         return
     elem["/K"] = pikepdf.Array([int(mcid) for mcid in mcids])
+
+
+def replace_target_mcids_preserving_children(elem, target_mcids, replacements_by_target):
+    kids = elem.get("/K")
+    if not isinstance(kids, pikepdf.Array):
+        flattened = []
+        for target_mcid in target_mcids:
+            flattened.extend(replacements_by_target.get(int(target_mcid), []))
+        replace_struct_elem_mcids(elem, flattened)
+        return
+
+    target_set = {int(mcid) for mcid in target_mcids}
+    rewritten = pikepdf.Array()
+    replaced_any = False
+    for child in kids:
+        child_mcid = None
+        if isinstance(child, int):
+            child_mcid = int(child)
+        elif isinstance(child, pikepdf.Dictionary) and str(child.get("/Type", "")) == "/MCR":
+            raw_mcid = child.get("/MCID")
+            try:
+                child_mcid = int(raw_mcid)
+            except Exception:
+                child_mcid = None
+
+        if child_mcid is not None and child_mcid in target_set:
+            replaced_any = True
+            for replacement in replacements_by_target.get(child_mcid, []):
+                rewritten.append(int(replacement))
+            continue
+        rewritten.append(child)
+
+    if not replaced_any:
+        for target_mcid in target_mcids:
+            for replacement in replacements_by_target.get(int(target_mcid), []):
+                rewritten.append(int(replacement))
+    elem["/K"] = rewritten
 
 
 def parent_tree_entry_for_page(root, pdf, page_obj):
@@ -2599,32 +2658,52 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
     if not isinstance(page_obj, pikepdf.Dictionary):
         return False, [], [f"{risk['tag']} {risk['ref']} is missing a concrete /Pg reference."], []
 
-    mcids = risk.get("mcids") or []
-    if len(mcids) != 1:
-        return False, [], [f"{risk['tag']} {risk['ref']} spans multiple MCIDs and is not eligible for deterministic splitting."], []
+    target_mcids = resolve_target_mcids_for_risk(source_obj, risk)
+    if not target_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} does not expose any deterministic direct MCIDs for splitting."], []
 
-    target_mcid = int(mcids[0])
-    groups, group_index = top_level_mcid_group_index(page_obj, target_mcid)
-    if group_index is None:
-        return False, [], [f"Could not locate the top-level marked-content group for MCID {target_mcid} on {risk['pageRef']}."], []
+    groups = parse_top_level_content_groups(page_obj)
+    group_rewrites = {}
+    per_target_segments = []
+    preserved_target_mcids = []
+    for target_mcid in target_mcids:
+        _, group_index = top_level_mcid_group_index(page_obj, target_mcid)
+        if group_index is None:
+            return False, [], [f"Could not locate the top-level marked-content group for MCID {target_mcid} on {risk['pageRef']}."], []
+        if group_index in group_rewrites:
+            continue
+        group = groups[group_index][1]
+        split_info = split_group_into_text_and_graphics_segments(group)
+        if not split_info:
+            return False, [], [f"No split segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+        segments = split_info.get("segments") or []
+        visible_segments = [
+            segment for segment in segments
+            if segment.get("kind") == "text" or segment.get("hasVisibleGraphics")
+        ]
+        visible_graphics = any(
+            segment.get("kind") == "graphics" and segment.get("hasVisibleGraphics")
+            for segment in segments
+        )
+        visible_text = any(segment.get("kind") == "text" for segment in visible_segments)
+        if not visible_graphics:
+            preserved_target_mcids.append(target_mcid)
+            continue
+        visible_segments = [
+            segment for segment in segments
+            if segment.get("kind") == "text" or segment.get("hasVisibleGraphics")
+        ]
+        relaxed_split_safe = bool(
+            split_info
+            and split_info.get("operatorPattern") in {"graphics_then_text", "text_then_graphics"}
+            and len(visible_segments) <= 2
+        )
+        if not visible_text or (not split_info.get("splitSafe") and not relaxed_split_safe):
+            return False, [], [f"{risk['tag']} {risk['ref']} remains in mode mixed_text_graphics_same_mcid."], []
+        per_target_segments.append((target_mcid, group_index, segments))
 
-    group = groups[group_index][1]
-    split_info = split_group_into_text_and_graphics_segments(group)
-    visible_segments = [
-        segment for segment in (split_info.get("segments") or [])
-        if segment.get("kind") == "text" or segment.get("hasVisibleGraphics")
-    ] if split_info else []
-    relaxed_split_safe = bool(
-        split_info
-        and split_info.get("operatorPattern") in {"graphics_then_text", "text_then_graphics"}
-        and len(visible_segments) <= 2
-    )
-    if not split_info or (not split_info.get("splitSafe") and not relaxed_split_safe):
-        return False, [], [f"{risk['tag']} {risk['ref']} remains in mode mixed_text_graphics_same_mcid."], []
-
-    segments = split_info.get("segments") or []
-    if not segments:
-        return False, [], [f"No split segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+    if not per_target_segments:
+        return False, [], [f"{risk['tag']} {risk['ref']} does not expose a mixed direct MCID group that can be split automatically."], []
 
     root = get_struct_tree_root(pdf)
     if not isinstance(root, pikepdf.Dictionary):
@@ -2648,40 +2727,45 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
 
     text_mcids = []
     graphics_mcids = []
-    rewritten_groups = []
-    for segment in segments:
-        instructions = segment.get("instructions") or []
-        if not instructions:
-            continue
-        if segment["kind"] == "graphics" and not segment.get("hasVisibleGraphics"):
-            if rewritten_groups:
-                rewritten_groups[-1].extend(instructions)
-            else:
-                rewritten_groups.append(list(instructions))
-            continue
-        if segment["kind"] == "graphics" and graphics_likely_decorative:
-            # Wrap as /Artifact — no MCID needed, no struct element entry
+    text_mcids_by_target = {}
+    for target_mcid, group_index, segments in per_target_segments:
+        rewritten_groups = []
+        target_text_mcids = []
+        for segment in segments:
+            instructions = segment.get("instructions") or []
+            if not instructions:
+                continue
+            if segment["kind"] == "graphics" and not segment.get("hasVisibleGraphics"):
+                if rewritten_groups:
+                    rewritten_groups[-1].extend(instructions)
+                else:
+                    rewritten_groups.append(list(instructions))
+                continue
+            if segment["kind"] == "graphics" and graphics_likely_decorative:
+                wrapped = [
+                    pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                    *instructions,
+                    pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
+                ]
+                rewritten_groups.append(wrapped)
+                continue
+            mcid = next_mcid
+            next_mcid += 1
+            tag_name = "/Span" if segment["kind"] == "text" else "/Figure"
+            props = pikepdf.Dictionary({"/MCID": mcid})
             wrapped = [
-                pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                pikepdf.ContentStreamInstruction([pikepdf.Name(tag_name), props], pikepdf.Operator("BDC")),
                 *instructions,
                 pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
             ]
             rewritten_groups.append(wrapped)
-            continue
-        mcid = next_mcid
-        next_mcid += 1
-        tag_name = "/Span" if segment["kind"] == "text" else "/Figure"
-        props = pikepdf.Dictionary({"/MCID": mcid})
-        wrapped = [
-            pikepdf.ContentStreamInstruction([pikepdf.Name(tag_name), props], pikepdf.Operator("BDC")),
-            *instructions,
-            pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
-        ]
-        rewritten_groups.append(wrapped)
-        if segment["kind"] == "text":
-            text_mcids.append(mcid)
-        else:
-            graphics_mcids.append(mcid)
+            if segment["kind"] == "text":
+                text_mcids.append(mcid)
+                target_text_mcids.append(mcid)
+            else:
+                graphics_mcids.append(mcid)
+        group_rewrites[group_index] = rewritten_groups
+        text_mcids_by_target[target_mcid] = target_text_mcids
 
     if not text_mcids:
         return False, [], [f"{risk['tag']} {risk['ref']} did not produce text segments during splitting."], []
@@ -2690,14 +2774,20 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
 
     rewritten = []
     for index, (is_marked, existing_group) in enumerate(groups):
-        if index != group_index:
+        if index not in group_rewrites:
             rewritten.extend(existing_group)
             continue
-        for wrapped in rewritten_groups:
+        for wrapped in group_rewrites[index]:
             rewritten.extend(wrapped)
     page_obj["/Contents"] = pdf.make_stream(pikepdf.unparse_content_stream(rewritten))
 
-    replace_struct_elem_mcids(source_obj, text_mcids)
+    replacements_by_target = {
+        int(target_mcid): list(text_mcids_by_target.get(int(target_mcid), []))
+        for target_mcid in target_mcids
+    }
+    for preserved_mcid in preserved_target_mcids:
+        replacements_by_target[int(preserved_mcid)] = [int(preserved_mcid)]
+    replace_target_mcids_preserving_children(source_obj, target_mcids, replacements_by_target)
     existing_alt = source_obj.get("/Alt")
     if existing_alt is not None:
         try:
@@ -2709,16 +2799,25 @@ def split_safe_mixed_mcid_owner(pdf, source_obj, risk):
     highest = max(text_mcids + graphics_mcids) if graphics_mcids else max(text_mcids)
     while len(current_entry) <= highest:
         current_entry.append(None)
-    current_entry[target_mcid] = None
+    for target_mcid in target_mcids:
+        if target_mcid < len(current_entry):
+            current_entry[target_mcid] = None
     for mcid in text_mcids:
         current_entry[mcid] = source_obj
 
     applied = [{
         "ref": risk["ref"],
-        "before": f"MCID {target_mcid}",
+        "before": ", ".join(f"MCID {mcid}" for mcid in target_mcids),
         "after": ", ".join(f"MCID {mcid}" for mcid in text_mcids),
-        "details": f"Split mixed text and graphics ownership for {risk['tag']} element {risk['ref']} into {len(text_mcids)} text MCID segment(s).",
+        "details": f"Split mixed text and graphics ownership for {risk['tag']} element {risk['ref']} across {len(target_mcids)} source MCID group(s) into {len(text_mcids)} text MCID segment(s).",
     }]
+    if preserved_target_mcids:
+        applied.append({
+            "ref": risk["ref"],
+            "before": ", ".join(f"MCID {mcid}" for mcid in preserved_target_mcids),
+            "after": ", ".join(f"MCID {mcid}" for mcid in preserved_target_mcids),
+            "details": f"Preserved {len(preserved_target_mcids)} already text-only direct MCID group(s) while splitting only the mixed ownership groups for {risk['ref']}.",
+        })
 
     if graphics_likely_decorative:
         # Graphics wrapped as /Artifact — no struct element needed, no parent tree entry
@@ -2768,12 +2867,14 @@ def contain_mixed_mcid_owner_with_children(pdf, source_obj, risk):
     if not isinstance(page_obj, pikepdf.Dictionary):
         return False, [], [f"{risk['tag']} {risk['ref']} is missing a concrete /Pg reference."], []
 
-    mcids = risk.get("mcids") or []
-    if len(mcids) != 1:
-        return False, [], [f"{risk['tag']} {risk['ref']} spans multiple MCIDs and is not eligible for deterministic containment."], []
+    target_mcids = resolve_target_mcids_for_risk(source_obj, risk)
+    if not target_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} does not expose any deterministic direct MCIDs for containment."], []
 
     direct_mcids = direct_struct_elem_mcids(source_obj)
-    if len(direct_mcids) != 1:
+    if not direct_mcids:
+        return False, [], [f"{risk['tag']} {risk['ref']} does not expose direct MCIDs for deterministic containment."], []
+    if set(direct_mcids) != set(target_mcids):
         return False, [], [f"{risk['tag']} {risk['ref']} already mixes direct and nested ownership; skipping deterministic containment."], []
 
     existing_kids = source_obj.get("/K")
@@ -2789,23 +2890,27 @@ def contain_mixed_mcid_owner_with_children(pdf, source_obj, risk):
         if has_struct_children:
             return False, [], [f"{risk['tag']} {risk['ref']} already contains nested structure children and was skipped for deterministic containment."], []
 
-    target_mcid = int(mcids[0])
-    groups, group_index = top_level_mcid_group_index(page_obj, target_mcid)
-    if group_index is None:
-        return False, [], [f"Could not locate the top-level marked-content group for MCID {target_mcid} on {risk['pageRef']}."], []
-
-    group = groups[group_index][1]
-    split_info = split_group_into_text_and_graphics_segments(group)
-    if not split_info:
-        return False, [], [f"No containment segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
-    if split_info.get("splitSafe"):
-        return False, [], [f"MCID {target_mcid} on {risk['pageRef']} is already split-safe and should use deterministic splitting."], []
-    if not split_info.get("containmentSafe"):
-        return False, [], [f"MCID {target_mcid} on {risk['pageRef']} still requires manual remediation because containment is not safe."], []
-
-    segments = split_info.get("segments") or []
-    if not segments:
-        return False, [], [f"No containment segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+    groups = parse_top_level_content_groups(page_obj)
+    group_rewrites = {}
+    per_target_segments = []
+    for target_mcid in target_mcids:
+        _, group_index = top_level_mcid_group_index(page_obj, target_mcid)
+        if group_index is None:
+            return False, [], [f"Could not locate the top-level marked-content group for MCID {target_mcid} on {risk['pageRef']}."], []
+        if group_index in group_rewrites:
+            continue
+        group = groups[group_index][1]
+        split_info = split_group_into_text_and_graphics_segments(group)
+        if not split_info:
+            return False, [], [f"No containment segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+        if split_info.get("splitSafe"):
+            return False, [], [f"MCID {target_mcid} on {risk['pageRef']} is already split-safe and should use deterministic splitting."], []
+        if not split_info.get("containmentSafe"):
+            return False, [], [f"MCID {target_mcid} on {risk['pageRef']} still requires manual remediation because containment is not safe."], []
+        segments = split_info.get("segments") or []
+        if not segments:
+            return False, [], [f"No containment segments were derived for MCID {target_mcid} on {risk['pageRef']}."], []
+        per_target_segments.append((target_mcid, group_index, segments))
 
     root = get_struct_tree_root(pdf)
     if not isinstance(root, pikepdf.Dictionary):
@@ -2823,45 +2928,47 @@ def contain_mixed_mcid_owner_with_children(pdf, source_obj, risk):
     next_mcid = (max(reserved_mcids) + 1) if reserved_mcids else 0
 
     graphics_likely_decorative = bool(risk.get("graphicsLikelyDecorative", False))
-    rewritten_groups = []
     child_specs = []
     text_mcids = []
     graphics_mcids = []
 
-    for segment in segments:
-        instructions = segment.get("instructions") or []
-        if not instructions:
-            continue
-        if segment["kind"] == "graphics" and not segment.get("hasVisibleGraphics"):
-            if rewritten_groups:
-                rewritten_groups[-1].extend(instructions)
-            else:
-                rewritten_groups.append(list(instructions))
-            continue
-        if segment["kind"] == "graphics" and graphics_likely_decorative:
+    for _, group_index, segments in per_target_segments:
+        rewritten_groups = []
+        for segment in segments:
+            instructions = segment.get("instructions") or []
+            if not instructions:
+                continue
+            if segment["kind"] == "graphics" and not segment.get("hasVisibleGraphics"):
+                if rewritten_groups:
+                    rewritten_groups[-1].extend(instructions)
+                else:
+                    rewritten_groups.append(list(instructions))
+                continue
+            if segment["kind"] == "graphics" and graphics_likely_decorative:
+                rewritten_groups.append([
+                    pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                    *instructions,
+                    pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
+                ])
+                continue
+            mcid = next_mcid
+            next_mcid += 1
+            tag_name = "/Span" if segment["kind"] == "text" else "/Figure"
+            props = pikepdf.Dictionary({"/MCID": mcid})
             rewritten_groups.append([
-                pikepdf.ContentStreamInstruction([pikepdf.Name("/Artifact")], pikepdf.Operator("BMC")),
+                pikepdf.ContentStreamInstruction([pikepdf.Name(tag_name), props], pikepdf.Operator("BDC")),
                 *instructions,
                 pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
             ])
-            continue
-        mcid = next_mcid
-        next_mcid += 1
-        tag_name = "/Span" if segment["kind"] == "text" else "/Figure"
-        props = pikepdf.Dictionary({"/MCID": mcid})
-        rewritten_groups.append([
-            pikepdf.ContentStreamInstruction([pikepdf.Name(tag_name), props], pikepdf.Operator("BDC")),
-            *instructions,
-            pikepdf.ContentStreamInstruction([], pikepdf.Operator("EMC")),
-        ])
-        child_specs.append({
-            "kind": segment["kind"],
-            "mcid": mcid,
-        })
-        if segment["kind"] == "text":
-            text_mcids.append(mcid)
-        else:
-            graphics_mcids.append(mcid)
+            child_specs.append({
+                "kind": segment["kind"],
+                "mcid": mcid,
+            })
+            if segment["kind"] == "text":
+                text_mcids.append(mcid)
+            else:
+                graphics_mcids.append(mcid)
+        group_rewrites[group_index] = rewritten_groups
 
     if not text_mcids:
         return False, [], [f"{risk['tag']} {risk['ref']} did not produce text segments during containment."], []
@@ -2870,27 +2977,29 @@ def contain_mixed_mcid_owner_with_children(pdf, source_obj, risk):
 
     rewritten = []
     for index, (_, existing_group) in enumerate(groups):
-        if index != group_index:
+        if index not in group_rewrites:
             rewritten.extend(existing_group)
             continue
-        for wrapped in rewritten_groups:
+        for wrapped in group_rewrites[index]:
             rewritten.extend(wrapped)
     page_obj["/Contents"] = pdf.make_stream(pikepdf.unparse_content_stream(rewritten))
 
     highest = max(text_mcids + graphics_mcids) if graphics_mcids else max(text_mcids)
     while len(current_entry) <= highest:
         current_entry.append(None)
-    current_entry[target_mcid] = None
+    for target_mcid in target_mcids:
+        if target_mcid < len(current_entry):
+            current_entry[target_mcid] = None
 
     actual_text = str(source_obj.get("/ActualText") or "").strip()
     child_refs = pikepdf.Array()
     applied = [{
         "ref": risk["ref"],
-        "before": f"MCID {target_mcid}",
+        "before": ", ".join(f"MCID {mcid}" for mcid in target_mcids),
         "after": "child /Span and /Figure containment",
         "details": (
             f"Contained mixed text and graphics ownership for {risk['tag']} element {risk['ref']} "
-            f"under child structure elements while preserving the original parent tag."
+            f"under child structure elements while preserving the original parent tag across {len(target_mcids)} source MCID group(s)."
         ),
     }]
 
@@ -3022,10 +3131,6 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                 unresolved.append(f"Cannot locate page {page_ref_str} to tag untagged image MCID {mcid}.")
                 continue
             try:
-                struct_root = get_struct_tree_root(pdf)
-                if not isinstance(struct_root, pikepdf.Dictionary):
-                    unresolved.append(f"No struct tree root for untagged image MCID {mcid}.")
-                    continue
                 if bool(risk.get("graphicsLikelyDecorative", False)):
                     groups, group_index = top_level_mcid_group_index(page_obj, int(mcid))
                     if group_index is None:
@@ -3056,6 +3161,10 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                             f"'Other elements alternate text' check."
                         ),
                     })
+                    continue
+                struct_root = get_struct_tree_root(pdf)
+                if not isinstance(struct_root, pikepdf.Dictionary):
+                    unresolved.append(f"No struct tree root for untagged image MCID {mcid}.")
                     continue
 
                 # Check whether this MCID is already owned by an existing struct element
@@ -3202,11 +3311,6 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                 unresolved.append(f"Cannot locate page {page_ref_str} for direct image {xobj_name}.")
                 continue
             try:
-                struct_root = get_struct_tree_root(pdf)
-                if not isinstance(struct_root, pikepdf.Dictionary):
-                    unresolved.append(f"No struct tree root for direct image {xobj_name}.")
-                    continue
-
                 # Determine the next available MCID for this page.
                 # Must account for MCIDs already claimed by struct elements in the struct
                 # tree (e.g. bootstrap creates heading struct elements with /K: N without
@@ -3306,6 +3410,10 @@ def mutate_repair_other_elements_alt_text(pdf, mutation):
                             f"Fixes Acrobat 'Other elements alternate text' without creating a new figure."
                         ),
                     })
+                    continue
+                struct_root = get_struct_tree_root(pdf)
+                if not isinstance(struct_root, pikepdf.Dictionary):
+                    unresolved.append(f"No struct tree root for direct image {xobj_name}.")
                     continue
 
                 # Create MCR and /Figure struct element.

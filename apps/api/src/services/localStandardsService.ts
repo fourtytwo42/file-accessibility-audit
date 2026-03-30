@@ -764,6 +764,53 @@ function altTextQualityFinding(
   }
 }
 
+function missingFigureAltFinding(
+  qpdf: QpdfResult,
+  structure?: Pick<StructureBackendMutationResult, 'figures'> | null,
+): LocalStandardsFinding | null {
+  const evidence: string[] = []
+  let count = 0
+
+  const informativeStructureFigures = (structure?.figures || []).filter(figure => {
+    if (!figure.ref) return false
+    if (figure.graphicsLikelyDecorative && !figure.hasText) return false
+    return !figure.hasAlt
+  })
+
+  if (informativeStructureFigures.length > 0) {
+    count += informativeStructureFigures.length
+    evidence.push(
+      ...informativeStructureFigures
+        .slice(0, 5)
+        .map(figure => `Figure ${figure.ref} is still missing alternate text or decorative artifact treatment.`),
+    )
+  } else {
+    const missingQpdfImages = qpdf.images.filter(image => !image.hasAlt)
+    if (missingQpdfImages.length > 0) {
+      count += missingQpdfImages.length
+      evidence.push(
+        ...missingQpdfImages
+          .slice(0, 5)
+          .map(image => `Image ${image.canonicalRef || image.ref} is still missing alternate text.`),
+      )
+    }
+  }
+
+  if (!count) return null
+  return {
+    key: 'pdfua.figure_alt_or_artifact',
+    label: 'Figure alternate text or artifact treatment',
+    severity: 'error',
+    blocking: true,
+    categoryIds: ['alt_text', 'pdf_ua_compliance'],
+    confidence: informativeStructureFigures.length > 0 ? 0.93 : 0.84,
+    evidence,
+    source: informativeStructureFigures.length > 0 ? 'structure_backend' : 'qpdf',
+    inferred: false,
+    count,
+  }
+}
+
 function linkTextQualityFinding(pdfjs: PdfjsResult): LocalStandardsFinding | null {
   const ambiguousLinks = pdfjs.links.filter(link => isAmbiguousLinkText(link.text))
   if (!ambiguousLinks.length) return null
@@ -894,6 +941,7 @@ export function buildLocalStandardsReport(
   pushFinding(findings, untaggedRenderedImagesFinding(options?.structure))
   pushFinding(findings, nonfigureWithAltFinding(options?.structure))
   pushFinding(findings, nestedAltTextFinding(options?.structure))
+  pushFinding(findings, missingFigureAltFinding(qpdf, options?.structure))
   pushFinding(findings, altTextQualityFinding(qpdf, options?.structure))
   pushFinding(findings, linkTextQualityFinding(pdfjs))
   pushFinding(findings, headingContentFinding(qpdf, options?.structure))

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { Router, type IRouter, type Response } from 'express'
 import multer from 'multer'
 import { BATCH_QUEUE } from '#config'
-import { bootstrapClientSession, ClientSessionRequest, requireClientSession } from '../middleware/clientSession.js'
+import { bootstrapClientSession, ClientSessionRequest, requireClientSession, requireClientSessionOrInternalWorker } from '../middleware/clientSession.js'
 import { streamQueueArchive } from '../services/archiveService.js'
 import { emitQueueItemDeleted, emitQueueItemUpsert, registerQueueSse } from '../services/queueEvents.js'
 import { cancelQueueItem, queueItemForProcessing, removeQueueItemFromStreams, requeueItem, scheduleClient } from '../services/queueManager.js'
@@ -37,13 +37,15 @@ import {
   serializeQueueItemSummary,
   updateQueueItem,
 } from '../services/queueStore.js'
+import { writeNeedsApiFixRecord } from '../services/needsApiFixService.js'
 import { promoteQueueItemToComplete, validateQueueItemForComplete } from '../services/queuePromotionService.js'
+import { appendRemediationLedgerEvent } from '../services/remediationLedgerService.js'
 import { beginClientUpload } from '../services/uploadActivity.js'
 
 const router: IRouter = Router()
 const { stagingRoot } = getQueueStorageRoots()
 const moduleDir = path.dirname(fileURLToPath(import.meta.url))
-const repoRoot = path.resolve(moduleDir, '..', '..', '..')
+const repoRoot = path.resolve(moduleDir, '..', '..', '..', '..')
 const downloadsRoot = path.join(repoRoot, 'Downloads')
 
 const upload = multer({
@@ -85,6 +87,46 @@ function readItemId(value: string | string[] | undefined): string {
 
 function readOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+function classifyPipelineStage(stage: string | null): string | null {
+  if (!stage) return null
+  const normalized = stage.toLowerCase()
+  if (normalized.includes('original analysis')) return 'original_analysis'
+  if (normalized.includes('analy')) return 'analysis'
+  if (normalized.includes('semantic')) return 'semantic_fixes'
+  if (normalized.includes('post-bootstrap')) return 'post_bootstrap_fixes'
+  if (normalized.includes('bookmark')) return 'bookmark_cleanup'
+  if (normalized.includes('validate')) return 'validation'
+  if (normalized.includes('promot')) return 'promotion'
+  if (normalized.includes('fix')) return 'remediation'
+  return 'other'
+}
+
+function classifyBlockerKind(blockerType: string, processingStage: string | null, topFailureModeKeys: string[], criticalManualReviewCount: number): string {
+  if (blockerType === 'stalled_processing' || blockerType === 'runtime_stall') return 'runtime_stall'
+  if (criticalManualReviewCount > 0) return 'manual_review_blocker'
+  if (processingStage && processingStage.toLowerCase().includes('semantic')) return 'semantic_pipeline_gap'
+  if (topFailureModeKeys.length > 0) return 'validation_failure'
+  return 'planner_gap'
+}
+
+function classifyBookmarkState(detail: ReturnType<typeof serializeQueueItemDetail>): 'ai_clean' | 'raw_or_noisy' | 'not_run' | 'unknown' {
+  const summaryText = detail.standardsDetail?.gradeBasis.summaryText?.toLowerCase() || ''
+  if (!summaryText) return 'unknown'
+  if (summaryText.includes('bookmark')) {
+    if (summaryText.includes('noisy') || summaryText.includes('raw') || summaryText.includes('ocr')) return 'raw_or_noisy'
+    if (summaryText.includes('ai')) return 'ai_clean'
+  }
+  return 'unknown'
+}
+
+function classifySemanticSidecarState(detail: ReturnType<typeof serializeQueueItemDetail>): 'unknown' | 'not_flagged' | 'semantic_sidecar_unavailable' {
+  return (detail.manualReviewFlags || []).some(flag => flag.code === 'semantic_sidecar_unavailable')
+    ? 'semantic_sidecar_unavailable'
+    : (detail.manualReviewFlags || []).length
+      ? 'not_flagged'
+      : 'unknown'
 }
 
 function internalSourcePdfPath(filename: string): string | null {
@@ -314,7 +356,7 @@ router.get('/queue/selectable-ids', requireClientSession, (req: ClientSessionReq
   res.json({ ids: listSelectableQueueItemIds(req.clientId!, scope) })
 })
 
-router.post('/queue/claim', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+router.post('/queue/claim', requireClientSessionOrInternalWorker, (req: ClientSessionRequest, res: Response) => {
   queueHousekeepingThrottled()
   const filename = readOptionalString(req.body?.filename)
   if (!filename) {
@@ -328,7 +370,7 @@ router.post('/queue/claim', requireClientSession, (req: ClientSessionRequest, re
   res.json({ item: serializeQueueItemSummary(item) })
 })
 
-router.post('/queue/start-or-reuse', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+router.post('/queue/start-or-reuse', requireClientSessionOrInternalWorker, async (req: ClientSessionRequest, res: Response) => {
   queueHousekeepingThrottled()
   const filename = readOptionalString(req.body?.filename)
   const ownerId = readOptionalString(req.body?.ownerId)
@@ -399,7 +441,7 @@ router.get('/queue/items/:id', requireClientSession, (req: ClientSessionRequest,
   res.json({ item: serializeQueueItemDetail(item) })
 })
 
-router.get('/queue/items/:id/freshness', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+router.get('/queue/items/:id/freshness', requireClientSessionOrInternalWorker, (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
   if (!item || item.client_id !== req.clientId || item.hidden) {
     res.status(404).json({ error: 'Queue item not found' })
@@ -420,7 +462,7 @@ router.get('/queue/items/:id/freshness', requireClientSession, (req: ClientSessi
   })
 })
 
-router.post('/queue/items/:id/validate-for-complete', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+router.post('/queue/items/:id/validate-for-complete', requireClientSessionOrInternalWorker, async (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
   if (!item || item.client_id !== req.clientId || item.hidden) {
     res.status(404).json({ error: 'Queue item not found' })
@@ -441,7 +483,7 @@ router.post('/queue/items/:id/validate-for-complete', requireClientSession, asyn
   }
 })
 
-router.post('/queue/items/:id/promote', requireClientSession, async (req: ClientSessionRequest, res: Response) => {
+router.post('/queue/items/:id/promote', requireClientSessionOrInternalWorker, async (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
   if (!item || item.client_id !== req.clientId || item.hidden) {
     res.status(404).json({ error: 'Queue item not found' })
@@ -449,6 +491,58 @@ router.post('/queue/items/:id/promote', requireClientSession, async (req: Client
   }
   try {
     const promoted = await promoteQueueItemToComplete(item)
+    try {
+      const latest = getQueueItemById(item.id) || item
+      const detail = serializeQueueItemDetail(latest)
+      await appendRemediationLedgerEvent({
+        recordedAt: nowIso(),
+        outcome: 'complete',
+        filename: latest.filename,
+        queueItemId: latest.id,
+        ownerId: latest.owner_id,
+        jobGroup: latest.job_group,
+        runtimeGeneration: latest.runtime_generation,
+        codeVersion: latest.code_version,
+        sourcePdfPath: internalSourcePdfPath(latest.filename),
+        summary: 'Promoted to Complete after fresh WCAG 2.1 AA-aligned validation.',
+        subsystem: null,
+        completeDestinationPath: promoted.destinationPath,
+        needsApiFixRecordPath: null,
+        artifactPaths: [
+          promoted.destinationPath,
+          promoted.artifacts.visualComparisonJsonPath,
+          promoted.artifacts.originalPage1PngPath,
+          promoted.artifacts.remediatedPage1PngPath,
+        ],
+        classification: {
+          fixFamily: null,
+          blockerKind: 'complete',
+          pipelineStage: 'promotion',
+          structuralClass: detail.documentModel?.classification?.structuralClass || detail.documentModel?.pipelineConfig?.structuralClass || null,
+          residualFamilyIds: [],
+          topFailureModeKeys: [],
+          visualFidelity: promoted.validation.visualComparison.passed ? 'passed' : 'failed',
+          bookmarkState: promoted.validation.bookmarkValidation.usedAiCleanup
+            ? 'ai_clean'
+            : promoted.validation.bookmarkValidation.flaggedTitles.length > 0
+              ? 'raw_or_noisy'
+              : 'unknown',
+          semanticSidecarState: classifySemanticSidecarState(detail),
+          likelyNextGenericFix: 'none_required',
+          generalizationConfidence: 'low',
+        },
+        validation: {
+          promotionEligible: promoted.validation.promotionEligible,
+          freshnessPassed: promoted.validation.freshnessPassed,
+          blockingFailureModesClear: promoted.validation.blockingFailureModesClear,
+          blockingResidualFamiliesClear: promoted.validation.blockingResidualFamiliesClear,
+          criticalManualReviewClear: promoted.validation.criticalManualReviewClear,
+          visualFidelityPassed: promoted.validation.visualComparison.passed,
+        },
+      })
+    } catch (ledgerErr) {
+      console.error('[queue/promote] Failed to write remediation ledger event:', ledgerErr)
+    }
     res.json({
       itemId: item.id,
       destinationPath: promoted.destinationPath,
@@ -461,7 +555,7 @@ router.post('/queue/items/:id/promote', requireClientSession, async (req: Client
   }
 })
 
-router.post('/queue/items/:id/emit-blocker', requireClientSession, (req: ClientSessionRequest, res: Response) => {
+router.post('/queue/items/:id/emit-blocker', requireClientSessionOrInternalWorker, async (req: ClientSessionRequest, res: Response) => {
   const item = getQueueItemById(readItemId(req.params.id))
   if (!item || item.client_id !== req.clientId || item.hidden) {
     res.status(404).json({ error: 'Queue item not found' })
@@ -484,14 +578,108 @@ router.post('/queue/items/:id/emit-blocker', requireClientSession, (req: ClientS
     reusable,
     artifactPaths,
   }
+  const detail = serializeQueueItemDetail(item)
+  const topFailureModes = (detail.standardsDetail?.failureModes || [])
+    .filter(mode => mode.blocking)
+    .slice(0, 5)
+    .map(mode => ({
+      key: mode.key,
+      label: mode.label,
+      blocking: mode.blocking,
+      count: mode.count,
+    }))
+  const criticalManualReviewFlags = (detail.manualReviewFlags || [])
+    .filter(flag => flag.severity === 'critical')
+    .slice(0, 5)
+    .map(flag => ({
+      code: flag.code,
+      label: flag.label,
+      details: flag.details,
+    }))
+  const likelyNextFixArea = topFailureModes[0]?.label
+    || criticalManualReviewFlags[0]?.label
+    || blockerReport.subsystem
+    || 'unknown'
+  const residualFamilyIds = detail.standardsDetail?.plannerEvidence?.topBlockingResidualFamilyIds
+    || detail.standardsDetail?.plannerEvidence?.topResidualFamilyIds
+    || []
+  const topFailureModeKeys = topFailureModes.map(mode => mode.key)
+  const pipelineStage = classifyPipelineStage(item.processing_stage)
+  const blockerKind = classifyBlockerKind(blockerReport.blockerType, item.processing_stage, topFailureModeKeys, criticalManualReviewFlags.length)
+  const structuralClass = detail.documentModel?.classification?.structuralClass
+    || detail.documentModel?.pipelineConfig?.structuralClass
+    || null
+  const semanticSidecarState = classifySemanticSidecarState(detail)
+  const fixFamily = residualFamilyIds[0]
+    || topFailureModeKeys[0]
+    || null
+  const generalizationConfidence: 'low' | 'medium' | 'high' =
+    blockerReport.reusable && (residualFamilyIds.length > 0 || topFailureModeKeys.length > 0)
+      ? 'high'
+      : blockerReport.reusable
+        ? 'medium'
+        : 'low'
 
-  const updated = updateQueueItem(item.id, {
-    blocker_report_json: JSON.stringify(blockerReport),
-    promotion_status: 'rejected',
-    promotion_rejection_reason: blockerReport.summary,
-  })
-  emitQueueItemUpsert(updated.id)
-  res.json({ item: serializeQueueItemSummary(updated), blockerReport })
+  try {
+    const needsApiFix = await writeNeedsApiFixRecord({
+      filename: item.filename,
+      queueItemId: item.id,
+      blockerType: blockerReport.blockerType,
+      subsystem: blockerReport.subsystem,
+      summary: blockerReport.summary,
+      classification: {
+        fixFamily,
+        blockerKind,
+        pipelineStage,
+        structuralClass,
+        residualFamilyIds,
+        topFailureModeKeys,
+        visualFidelity: 'not_run',
+        bookmarkState: classifyBookmarkState(detail),
+        semanticSidecarState,
+        likelyNextGenericFix: likelyNextFixArea,
+        generalizationConfidence,
+      },
+      explanation: {
+        queueState: item.state,
+        processingStage: item.processing_stage,
+        processingProgress: item.processing_progress,
+        overallScore: item.overall_score,
+        grade: item.grade,
+        promotionStatus: item.promotion_status,
+        likelyNextFixArea,
+        topFailureModes,
+        criticalManualReviewFlags,
+      },
+      reusable: blockerReport.reusable,
+      artifactPaths: blockerReport.artifactPaths,
+      ownerId: item.owner_id,
+      jobGroup: item.job_group,
+      runtimeGeneration: item.runtime_generation,
+      codeVersion: item.code_version,
+      sourcePdfPath: internalSourcePdfPath(item.filename),
+      recordedAt: blockerReport.generatedAt,
+    })
+
+    const updated = updateQueueItem(item.id, {
+      blocker_report_json: JSON.stringify({
+        ...blockerReport,
+        needsApiFixRecordPath: needsApiFix.recordPath,
+      }),
+      promotion_status: 'rejected',
+      promotion_rejection_reason: blockerReport.summary,
+    })
+    emitQueueItemUpsert(updated.id)
+    res.json({
+      item: serializeQueueItemSummary(updated),
+      blockerReport,
+      needsApiFix,
+    })
+  } catch (err) {
+    res.status(500).json({
+      error: err instanceof Error ? err.message : 'Failed to write NeedsApiFix record',
+    })
+  }
 })
 
 router.get('/queue/items/:id/versions', requireClientSession, (req: ClientSessionRequest, res: Response) => {

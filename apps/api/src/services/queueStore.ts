@@ -308,7 +308,7 @@ export const INTERNAL_QUEUE_MARKERS = {
 } as const
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url))
-const projectRoot = path.resolve(moduleDir, '..', '..')
+const projectRoot = path.resolve(moduleDir, '..', '..', '..', '..')
 const DATA_ROOT = path.join(projectRoot, 'data')
 const STORAGE_ROOT = process.env.QUEUE_STORAGE_DIR
   ? path.resolve(projectRoot, process.env.QUEUE_STORAGE_DIR)

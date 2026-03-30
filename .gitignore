@@ -55,6 +55,11 @@ Mitigated/
 Complete/
 MitigationAttempts/
 Processed/
+NeedsApiFix/*
+!NeedsApiFix/README.md
+data/queue-storage/
+data/remediation/*
+!data/remediation/README.md
 /*.pdf
 apps/api/data/
 apps/api/scripts/__pycache__/
@@ -62,3 +67,4 @@ apps/api/tmp-*.pdf
 apps/api/check_post_remediation.mts
 apps/api/check_split.mts
 Research/
+archive/

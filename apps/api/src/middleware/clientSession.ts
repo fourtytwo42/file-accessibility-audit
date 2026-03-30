@@ -42,6 +42,13 @@ function readClientId(req: Request): string | null {
   return candidate
 }
 
+function hasValidInternalWorkerToken(req: Request): boolean {
+  const internalWorkerToken = process.env.INTERNAL_QUEUE_WORKER_TOKEN || null
+  if (!internalWorkerToken) return false
+  const provided = req.get('x-internal-worker-token')
+  return !!provided && provided === internalWorkerToken
+}
+
 function signClientSession(clientId: string, sessionId: string, expiresAt: string): string {
   const expiresInSec = Math.max(60, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000))
   return jwt.sign({ clientId, sid: sessionId }, CLIENT_SESSION_SECRET, {
@@ -150,6 +157,39 @@ export function requireClientSession(req: ClientSessionRequest, res: Response, n
   const clientId = readClientId(req)
   if (!clientId) {
     res.status(401).json({ error: 'Client session required' })
+    return
+  }
+
+  const session = resolveSessionFromCookie(req, res)
+  if (!session) {
+    res.status(401).json({ error: 'Client session expired' })
+    return
+  }
+
+  if (session.clientId !== clientId) {
+    res.status(401).json({ error: 'Client session mismatch' })
+    return
+  }
+
+  req.clientId = clientId
+  req.clientSessionId = session.sessionId
+  next()
+}
+
+export function requireClientSessionOrInternalWorker(req: ClientSessionRequest, res: Response, next: NextFunction): void {
+  deleteExpiredSessions()
+  const clientId = readClientId(req)
+  if (!clientId) {
+    res.status(401).json({ error: 'Client session required' })
+    return
+  }
+
+  if (hasValidInternalWorkerToken(req)) {
+    createClient(clientId)
+    touchClient(clientId)
+    req.clientId = clientId
+    req.clientSessionId = 'internal-worker'
+    next()
     return
   }
 

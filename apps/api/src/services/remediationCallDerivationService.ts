@@ -73,7 +73,7 @@ export function heuristicFigureAltText(candidateId: string, context: PdfRemediat
   return draftFigureAltText({
     pageNumber: candidate.pageNumber,
     surroundingText: candidate.surroundingText,
-    decorative: candidate.splitGenerated || candidate.informativeHint === 'decorative',
+    decorative: candidate.informativeHint === 'decorative',
   })
 }
 
@@ -158,18 +158,18 @@ export function deriveDeterministicCall(input: {
       })
     }
     case 'replace_bookmarks_from_headings':
+      const headings = bookmarkTargets(context)
+        .map(candidate => ({
+          text: candidate.text,
+          level: candidate.pageNumber === 1 ? 'H1' : 'H2',
+          targetRef: candidate.targetRef || undefined,
+          pageNumber: candidate.pageNumber,
+        }))
+        .filter(entry => entry.text && (entry.targetRef || Number.isFinite(entry.pageNumber)))
+      if (!headings.length) return null
       return withFamilyMetadata({
         tool_name: 'replace_bookmarks_from_headings',
-        arguments: {
-          headings: bookmarkTargets(context)
-            .map(candidate => ({
-              text: candidate.text,
-              level: candidate.pageNumber === 1 ? 'H1' : 'H2',
-              targetRef: candidate.targetRef || undefined,
-              pageNumber: candidate.pageNumber,
-            }))
-            .filter(entry => entry.text && (entry.targetRef || Number.isFinite(entry.pageNumber))),
-        },
+        arguments: { headings },
         rationale: opportunity.reason,
         confidence: opportunity.confidence,
       })

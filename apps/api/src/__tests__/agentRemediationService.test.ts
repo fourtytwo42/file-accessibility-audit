@@ -950,11 +950,11 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'example.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(7)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(8)
     expect(planRemediationActions).toHaveBeenCalled()
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
-    expect(analyzePDF).toHaveBeenCalledTimes(5)
+    expect(analyzePDF).toHaveBeenCalledTimes(6)
     expect(analyzePDF.mock.calls[0]?.[2]).toMatchObject({
       analysisProfile: 'remediation_fast',
       skipAdobe: true,
@@ -1732,7 +1732,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(finalCleanupTools).toContain('set_tabs_all_annotated_pages')
     expect(result.buffer.equals(Buffer.from('pdf-cleanup-batch'))).toBe(true)
     expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(2)
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(6)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(7)
   })
 
   it('batches native-safe final cleanup into one analysis pass', async () => {
@@ -2280,7 +2280,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'scan.pdf', originalResult)
 
-    expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
+    expect(result.buffer.equals(Buffer.from('pdf-1'))).toBe(true)
     expect(result.model.processingPath).toBe('agent_patch')
     expect(result.model.pathFallbacks).toEqual([])
     expect(result.finalResult.grade).toBe('F')
@@ -2456,7 +2456,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'native.pdf', originalResult)
 
-    expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
+    expect(result.buffer.equals(Buffer.from('pdf-1'))).toBe(true)
     expect(result.model.processingPath).toBe('agent_patch')
     expect(result.model.pathFallbacks).toEqual([])
     expect(result.finalResult.grade).toBe('F')
@@ -4286,6 +4286,77 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(result.model.manualReviewFlags.some(flag => /semantic provider request timed out/i.test(flag.details))).toBe(true)
   })
 
+  it('treats semantic provider 5xx responses as recoverable and records a semantic sidecar warning', async () => {
+    const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
+    const pdfMetadata: PdfMetadata = {
+      creator: null,
+      producer: null,
+      creationDate: null,
+      modDate: null,
+      pdfVersion: '1.7',
+      isEncrypted: false,
+      keywords: null,
+      author: null,
+      subject: null,
+      pageCount: 1,
+    }
+
+    const originalResult: AnalysisResult = {
+      filename: 'semantic-5xx.pdf',
+      pageCount: 1,
+      fileType: 'pdf',
+      pdfMetadata,
+      routingSignals: { headingCount: 1, linkCount: 0, rawUrlLinkCount: 0, rawUrlLinkDensity: 0 },
+      overallScore: 60,
+      grade: 'D',
+      isScanned: false,
+      executiveSummary: '',
+      verapdf: makeVeraPdfResult({
+        status: 'failed',
+        isCompliant: false,
+        failedChecks: 1,
+        failures: [{ ruleId: 'headings', specification: null, clause: null, testNumber: null, location: null, message: 'Heading issue', categoryIds: ['heading_structure'] }],
+      }),
+      categories: [
+        { id: 'heading_structure', label: 'Heading Structure', weight: 0.15, score: 60, grade: 'D', severity: 'Moderate', findings: [], explanation: '', helpLinks: [] },
+      ],
+      warnings: [],
+    } as AnalysisResult
+
+    inspectPdfForRemediation.mockResolvedValue({
+      pdfjs: { title: 'Overview', lang: 'en' },
+      qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+      figureCandidates: [],
+      tableCandidates: [],
+      headingCandidates: [{
+        id: 'heading:1:1',
+        pageNumber: 1,
+        text: 'Overview',
+        bbox: { x: 0, y: 0, width: 0.3, height: 0.05 },
+        fontSize: 18,
+        fontWeight: 'bold',
+        nearbyContext: ['Nearby context'],
+        targetRef: 'obj:10 0 R',
+        existingTag: '/P',
+        repairMode: 'safe',
+      }],
+      pages: [],
+      linkCandidates: [],
+      readingOrderCandidates: [],
+      readingOrderParentCandidates: [],
+      structure: {},
+    })
+    planRemediationActions.mockResolvedValue({ done: true, unresolvedIssues: ['heading_structure'], actions: [] })
+    generateSemanticRepairBatches.mockRejectedValue(new Error('OpenAI-compatible semantic repair request failed: 502 <!DOCTYPE html>'))
+
+    const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'semantic-5xx.pdf', originalResult)
+
+    expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
+    expect(result.finalResult).toBe(originalResult)
+    expect(result.model.manualReviewFlags.some(flag => flag.code === 'semantic_sidecar_unavailable')).toBe(true)
+    expect(result.model.manualReviewFlags.some(flag => /provider request failed/i.test(flag.details))).toBe(true)
+  })
+
   it('uses heuristic alt-text fallback only after AI figure generation fails', async () => {
     const { remediatePdfWithAgent } = await import('../services/agentRemediationService.js')
     const pdfMetadata: PdfMetadata = {
@@ -5932,6 +6003,237 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     }] as any)
 
     expect(reason).toBeNull()
+  })
+
+  it('detects ownership progress only when risk debt actually drops', async () => {
+    const {
+      __test_buildPhaseProgressSnapshot,
+      __test_didLatePhaseProgressImprove,
+    } = await import('../services/agentRemediationService.js')
+    const before = makeAnalysisResult({
+      overallScore: 60,
+      grade: 'D',
+      categories: [
+        { id: 'alt_text', score: 40, grade: 'F' },
+        { id: 'pdf_ua_compliance', score: 20, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.untagged_rendered_images', blocking: true, message: 'ownership', count: 5 } as any,
+        ],
+      } as any,
+    })
+    const after = makeAnalysisResult({
+      overallScore: 60,
+      grade: 'D',
+      categories: [
+        { id: 'alt_text', score: 40, grade: 'F' },
+        { id: 'pdf_ua_compliance', score: 20, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [],
+      } as any,
+    })
+    const previousSnapshot = __test_buildPhaseProgressSnapshot('ownership_state', before, {
+      figureCandidates: [],
+      qpdf: { headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2, lang: 'en' },
+    } as any)
+    const nextSnapshot = __test_buildPhaseProgressSnapshot('ownership_state', after, {
+      figureCandidates: [],
+      qpdf: { headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2, lang: 'en' },
+    } as any)
+
+    expect(__test_didLatePhaseProgressImprove(previousSnapshot, nextSnapshot, true)).toBe(true)
+    expect(__test_didLatePhaseProgressImprove(previousSnapshot, previousSnapshot, true)).toBe(false)
+  })
+
+  it('skips stable light verification when no mutation changed the document', async () => {
+    const { __test_shouldShortCircuitStableLightVerification } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldShortCircuitStableLightVerification({
+      state: { lastSignature: 'same', lastMutationChangedDocument: false },
+      nextSignature: 'same',
+    })).toBe(true)
+    expect(__test_shouldShortCircuitStableLightVerification({
+      state: { lastSignature: 'same', lastMutationChangedDocument: true },
+      nextSignature: 'same',
+    })).toBe(false)
+  })
+
+  it('stops late figure sweeps after a stable no-progress pass', async () => {
+    const { __test_shouldRunLateFigureSweep } = await import('../services/agentRemediationService.js')
+    const analysis = makeAnalysisResult({
+      overallScore: 70,
+      grade: 'C',
+      categories: [
+        { id: 'alt_text', score: 60, grade: 'D' },
+        { id: 'pdf_ua_compliance', score: 20, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'missing alt', count: 3 } as any,
+        ],
+      } as any,
+    })
+    const snapshot: any = {
+      phase: 'figure_description_state',
+      signature: 'same-sig',
+      blockingKeys: ['pdfua.figure_alt_or_artifact'],
+      unresolvedIssueLabels: ['Alt Text on Images'],
+      categoryScores: { altText: 60, pdfUa: 20, headingStructure: null, readingOrder: null },
+      ownershipRiskCount: 0,
+      informativeFigureMissingAltCount: 3,
+      decorativeFigureCount: 0,
+    }
+
+    const decision = __test_shouldRunLateFigureSweep({
+      tracker: {
+        converged: false,
+        lastSnapshot: snapshot,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        noProgressPasses: 1,
+      },
+      analysis,
+      context: {
+        figureCandidates: [
+          { informativeHint: 'informative', graphicsLikelyDecorative: false, hasAlt: false },
+        ],
+      } as any,
+      candidateCount: 1,
+    })
+
+    expect(decision.allowed).toBe(false)
+    expect(decision.reason).toBe('stable_no_progress')
+  })
+
+  it('routes ownership-cleared figure-only residual debt through the figure-only rescue path', async () => {
+    const { __test_shouldUseFigureOnlyLateRescuePath } = await import('../services/agentRemediationService.js')
+    const analysis = makeAnalysisResult({
+      overallScore: 76,
+      grade: 'C',
+      categories: [
+        { id: 'alt_text', score: 40, grade: 'F' },
+        { id: 'pdf_ua_compliance', score: 40, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'missing alt', count: 32 } as any,
+        ],
+      } as any,
+    })
+
+    expect(__test_shouldUseFigureOnlyLateRescuePath({
+      analysis,
+      context: {
+        figureCandidates: new Array(32).fill(null).map(() => ({
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+      } as any,
+    })).toBe(true)
+
+    expect(__test_shouldUseFigureOnlyLateRescuePath({
+      analysis,
+      context: {
+        figureCandidates: new Array(32).fill(null).map(() => ({
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+        qpdf: { headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 2, lang: 'en' },
+      } as any,
+    })).toBe(true)
+
+    const withStructureDebt = makeAnalysisResult({
+      overallScore: 76,
+      grade: 'C',
+      categories: [
+        { id: 'alt_text', score: 40, grade: 'F' },
+        { id: 'pdf_ua_compliance', score: 40, grade: 'F' },
+        { id: 'reading_order', score: 40, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'missing alt', count: 32 } as any,
+          { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+        ],
+      } as any,
+    })
+    expect(__test_shouldUseFigureOnlyLateRescuePath({
+      analysis: withStructureDebt,
+      context: {
+        figureCandidates: [],
+      } as any,
+    })).toBe(false)
+  })
+
+  it('stops focused figure rescue when large residual debt does not improve', async () => {
+    const {
+      __test_shouldStopFocusedFigureRescue,
+    } = await import('../services/agentRemediationService.js')
+
+    const before: any = {
+      phase: 'figure_description_state',
+      signature: 'before',
+      blockingKeys: ['pdfua.figure_alt_or_artifact'],
+      unresolvedIssueLabels: ['Alt Text on Images'],
+      categoryScores: { altText: 20, pdfUa: 20, headingStructure: null, readingOrder: null },
+      ownershipRiskCount: 0,
+      informativeFigureMissingAltCount: 110,
+      decorativeFigureCount: 0,
+    } as const
+    const after: any = {
+      ...before,
+      signature: 'after',
+    }
+
+    expect(__test_shouldStopFocusedFigureRescue({
+      before,
+      after,
+      changedDocumentBytes: true,
+      noProgressMethods: new Set<never>(),
+      attemptedMethods: new Set(['authoritative_alt']),
+      largeResidualDebt: true,
+    })).toEqual({
+      stop: true,
+      reason: 'same_blocking_keys',
+    })
+  })
+
+  it('allows one more focused figure follow-up when debt genuinely improves', async () => {
+    const {
+      __test_shouldStopFocusedFigureRescue,
+    } = await import('../services/agentRemediationService.js')
+
+    const before: any = {
+      phase: 'figure_description_state',
+      signature: 'before',
+      blockingKeys: ['pdfua.figure_alt_or_artifact'],
+      unresolvedIssueLabels: ['Alt Text on Images'],
+      categoryScores: { altText: 20, pdfUa: 20, headingStructure: null, readingOrder: null },
+      ownershipRiskCount: 0,
+      informativeFigureMissingAltCount: 12,
+      decorativeFigureCount: 0,
+    } as const
+    const after: any = {
+      ...before,
+      signature: 'after',
+      informativeFigureMissingAltCount: 3,
+    }
+
+    expect(__test_shouldStopFocusedFigureRescue({
+      before,
+      after,
+      changedDocumentBytes: true,
+      noProgressMethods: new Set<never>(),
+      attemptedMethods: new Set(['heuristic_candidates']),
+      largeResidualDebt: false,
+    })).toEqual({
+      stop: false,
+      reason: null,
+    })
   })
 
   it('retries unresolved set_alt figure candidates during the late heuristic pass', async () => {
