@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T14:43:55.375Z",
+  "generatedAt": "2026-03-31T15:06:24.461Z",
   "cohorts": {
     "short_high_likelihood": {
       "totalRows": 23,
@@ -60,10 +60,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 287,
+        "remediated_fail": 285,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 5,
+        "staged_for_replacement": 7,
         "replaced_remote": 0
       },
       "samplePublicationIds": [

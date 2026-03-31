@@ -1,59 +1,65 @@
 {
-  "generatedAt": "2026-03-31T14:43:55.394Z",
+  "generatedAt": "2026-03-31T15:06:24.469Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
     "processed": 8,
     "readyToReplace": 0,
-    "remediatedPassCandidates": 6,
-    "failedAfterRemediation": 2,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 8,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
   },
   "currentWave": {
     "processedPublicationIds": [
-      "3597",
-      "3608",
-      "3610",
-      "3645",
-      "3656",
-      "3663",
-      "4037",
-      "4061"
+      "3665",
+      "3670",
+      "3683",
+      "3768",
+      "3769",
+      "3770",
+      "3784",
+      "3836"
     ],
     "remainingPublicationIds": [],
     "failedAfterRemediationPublicationIds": [
-      "3610",
-      "3663"
+      "3665",
+      "3670",
+      "3683",
+      "3768",
+      "3769",
+      "3770",
+      "3784",
+      "3836"
     ],
     "processingErrorPublicationIds": []
   },
   "cumulativeTotals": {
-    "processed": 25,
+    "processed": 33,
     "readyToReplace": 0,
     "remediatedPassCandidates": 7,
-    "failedAfterRemediation": 18,
+    "failedAfterRemediation": 26,
     "sourceMissing": 0,
     "processingError": 0
   },
   "latestProcessed": {
-    "publicationId": "3663",
-    "publicationTitle": "Juvenile Probation Programs Evaluated",
-    "priorityRank": 8,
+    "publicationId": "3683",
+    "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
+    "priorityRank": 3,
     "priorityTier": "highest",
     "passLikelihoodScore": 70,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvdayreport.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvdayreport.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvdayreport.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/abateOGA.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/abateOGA.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/abateOGA.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T14:43:34.877Z",
-    "durationMs": 71764,
+    "processedAt": "2026-03-31T15:06:22.817Z",
+    "durationMs": 78531,
     "original": {
       "overallScore": 21,
       "grade": "F",
@@ -61,31 +67,37 @@
       "isScanned": false
     },
     "final": {
-      "overallScore": 100,
-      "grade": "A",
+      "overallScore": 89,
+      "grade": "B",
       "pageCount": 4,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Categories still below 100: Reading Order"
+        "Final grade is B, not A.",
+        "Final overall score is 89, not 100.",
+        "Blocking local standards findings remain: pdfua.display_doc_title",
+        "Categories still below 100: Document Title & Language, PDF/UA Compliance"
       ],
-      "blockingLocalFindingKeys": [],
+      "blockingLocalFindingKeys": [
+        "pdfua.display_doc_title"
+      ],
       "unresolvedCategoryLabels": [
-        "Reading Order"
+        "Document Title & Language",
+        "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
-      "remediatedPdfSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
+      "gateEvaluatedBufferSha256": "89e4095018d8e612c4dcfd1fea4f81121f8cf6eded4cde5ebc3c0d16c79443ff",
+      "remediatedPdfSha256": "89e4095018d8e612c4dcfd1fea4f81121f8cf6eded4cde5ebc3c0d16c79443ff",
       "stagedReplacementSha256": null
     }
   }

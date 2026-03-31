@@ -1,35 +1,35 @@
 {
-  "generatedAt": "2026-03-31T14:43:55.391Z",
+  "generatedAt": "2026-03-31T15:06:24.466Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T14:43:55.366Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T15:06:24.443Z",
   "waveName": "stage4-structure-wave",
   "cohortLabel": "structure_heavy",
   "maxCandidates": 8,
   "totals": {
-    "eligibleRows": 275,
+    "eligibleRows": 267,
     "selectedRows": 8,
-    "skippedRows": 267,
+    "skippedRows": 259,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "3665",
-    "3670",
-    "3683",
-    "3768",
-    "3769",
-    "3770",
-    "3784",
-    "3836"
+    "3866",
+    "3871",
+    "3877",
+    "3898",
+    "3899",
+    "3903",
+    "3933",
+    "4039"
   ],
   "pendingPublicationIds": [
-    "3665",
-    "3670",
-    "3683",
-    "3768",
-    "3769",
-    "3770",
-    "3784",
-    "3836"
+    "3866",
+    "3871",
+    "3877",
+    "3898",
+    "3899",
+    "3903",
+    "3933",
+    "4039"
   ],
   "candidates": [
     {
@@ -37,12 +37,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3665",
-      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
+      "publicationId": "3866",
+      "publicationTitle": "Juvenile Sex Offender Treatment Program Provides Residential Aftercare Services",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CCH.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CCH.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CCH.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvenile.pdf.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvenile.pdf.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvenile.pdf.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -54,7 +54,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3866-Juvenile_Sex_Offender_Treatment_Program_Provides_Residential_Aftercare_Services.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -91,12 +91,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3670",
-      "publicationTitle": "Violent Crime Task Force Cracks Tough Homicide Cases in Kankakee County",
+      "publicationId": "3871",
+      "publicationTitle": "Community Mobilization Fuels Chicago Alternative Policing Strategy (CAPS)",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/VCTFOGA.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/VCTFOGA.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/VCTFOGA.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CAPS7.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CAPS7.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CAPS7.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -108,7 +108,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3871-Community_Mobilization_Fuels_Chicago_Alternative_Policing_Strategy_CAPS.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -145,12 +145,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3683",
-      "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
+      "publicationId": "3877",
+      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/abateOGA.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/abateOGA.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/abateOGA.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/family conf.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/family conf.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/family conf.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -162,7 +162,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -199,12 +199,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3768",
-      "publicationTitle": "Supervising sex offenders in DuPage Lake and Winnebago counties",
+      "publicationId": "3898",
+      "publicationTitle": "An Analysis of Gang Members and Nongang Members Discharged from Probation",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/sexoffogaPDF.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/sexoffogaPDF.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/sexoffogaPDF.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/gang_oga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/gang_oga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/gang_oga.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -216,11 +216,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3898-An_Analysis_of_Gang_Members_and_Nongang_Members_Discharged_from_Probation.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
+      "blockingFindingCount": 8,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -231,10 +231,8 @@
         "category.heading_structure",
         "category.pdf_ua_compliance",
         "category.reading_order",
-        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
-        "pdfua.font_embedding",
         "pdfua.font_unicode",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
@@ -253,12 +251,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3769",
-      "publicationTitle": "Supervising Sex Offenders in Coles Madison and Vermilion Counties",
+      "publicationId": "3899",
+      "publicationTitle": "Domestic Violence Probation in Lake Winnebago and Kankakee Counties",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CMVoga.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CMVoga.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CMVoga.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/DVprobOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/DVprobOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/DVprobOGA.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -270,7 +268,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3899-Domestic_Violence_Probation_in_Lake_Winnebago_and_Kankakee_Counties.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -307,12 +305,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3770",
-      "publicationTitle": "Specialized Unit Takes a Problemsolving Approachto Crime in Kankakee",
+      "publicationId": "3903",
+      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmegoga.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/kmegoga.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmegoga.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/SPTDVoga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/SPTDVoga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/SPTDVoga.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -324,11 +322,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
+      "blockingFindingCount": 9,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -339,7 +337,6 @@
         "category.heading_structure",
         "category.pdf_ua_compliance",
         "category.reading_order",
-        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
         "pdfua.font_embedding",
@@ -361,12 +358,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3784",
-      "publicationTitle": "Probation Research Results of the 2000 Illinois Probation Outcome Study",
+      "publicationId": "3933",
+      "publicationTitle": "A comparison of local and multijurisdictional drug enforcement efforts in Illinois",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/probation.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/probation.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/probation.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/MEGTF2.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/MEGTF2.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/MEGTF2.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -378,7 +375,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3933-A_comparison_of_local_and_multijurisdictional_drug_enforcement_efforts_in_Illinois.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -415,12 +412,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3836",
-      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
+      "publicationId": "4039",
+      "publicationTitle": "Decade of trends shows continual decrease in Illinois crime",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/treatment.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/treatment.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/treatment.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Crimetrends.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Crimetrends.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Crimetrends.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -432,11 +429,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4039-Decade_of_trends_shows_continual_decrease_in_Illinois_crime.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 9,
+      "blockingFindingCount": 10,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -452,7 +449,8 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.logical_structure"
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -1225,17 +1223,6 @@
       ]
     },
     {
-      "publicationId": "3866",
-      "publicationTitle": "Juvenile Sex Offender Treatment Program Provides Residential Aftercare Services",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3867",
       "publicationTitle": "Community Policing Accountability in Management in the Chicago Police Department",
       "currentCorpusStatus": "remediated_fail",
@@ -1280,17 +1267,6 @@
       ]
     },
     {
-      "publicationId": "3871",
-      "publicationTitle": "Community Mobilization Fuels Chicago Alternative Policing Strategy (CAPS)",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3874",
       "publicationTitle": "Fulton County Juvenile Profile",
       "currentCorpusStatus": "remediated_fail",
@@ -1298,17 +1274,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3877",
-      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -1456,39 +1421,6 @@
       ]
     },
     {
-      "publicationId": "3898",
-      "publicationTitle": "An Analysis of Gang Members and Nongang Members Discharged from Probation",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3899",
-      "publicationTitle": "Domestic Violence Probation in Lake Winnebago and Kankakee Counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3903",
-      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3904",
       "publicationTitle": "A Process and Impact Evaluation of the Specialized Domestic Violence Probation Projects In Peoria Sangamon and Tazewell Counties",
       "currentCorpusStatus": "remediated_fail",
@@ -1584,17 +1516,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3933",
-      "publicationTitle": "A comparison of local and multijurisdictional drug enforcement efforts in Illinois",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -2167,17 +2088,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "4039",
-      "publicationTitle": "Decade of trends shows continual decrease in Illinois crime",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },

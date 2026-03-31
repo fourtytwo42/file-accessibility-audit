@@ -28,6 +28,7 @@
   - `3767` or `3981` for font/text extractability
   - `3964` for reading-order-only
   - keep `3671` as figure spillover
+- Stage 4.6 reconciliation rule: when a Stage 4 row is a `staged_pass_candidate_survivor`, Stage 4 routing must preserve `currentCorpusStatus: staged_for_replacement` instead of flattening it back to `remediated_fail`.
 
 This file stores durable project facts, proven workflows, known exceptions, and anything we should not forget across chats.
 
@@ -2497,3 +2498,4 @@ First confirmed in-flight files:
   - near-pass grade-only representative: `4023`
   - font/text-extractability representative: `3465`
   - figure-spillover representative: `3671`
+- 2026-03-31: Stage 4 follow-up wave `3665/3670/3683/3768/3769/3770/3784/3836` completed after truthful fallback rebuild with `8` processed, `8` `failed_after_remediation`, `0` `processing_error`, `0` remaining. The next active Stage 4 wave rebuilt to `3866/3871/3877/3898/3899/3903/3933/4039`.

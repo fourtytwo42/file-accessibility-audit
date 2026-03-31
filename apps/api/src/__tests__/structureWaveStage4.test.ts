@@ -545,6 +545,24 @@ describe('structure wave Stage 4', () => {
     })
   })
 
+
+  it('keeps staged pass-candidate survivors in staged_for_replacement status after Stage 4 routing', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'staged',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        statusEvidence: { sourceManifestPath: '/tmp/replacement-map.json', sourceStatus: 'replacement_map_present', verificationManifestPath: '/tmp/verification.json', verificationClassification: null, verificationTimestamp: null, verificationReportPath: null, outcomeManifestPath: '/tmp/stage4-structure-wave.outcomes.json', outcomeStatus: 'remediated_pass_candidate', latestReportPath: '/tmp/staged.json', candidateManifestPath: null },
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'staged_pass_candidate_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+      }),
+    ])
+
+    const next = applyStage4StructureWaveReclassification(artifacts)
+    const row = next.document.rows.find(candidate => candidate.publicationId === 'staged')
+    expect(row?.currentCorpusStatus).toBe('staged_for_replacement')
+    expect(row?.reasonCodes).toContain('stage4.5:staged_pass_candidate_survivor')
+  })
+
   it('reports throughput routing buckets and builds structure canaries', () => {
     const artifacts = makeArtifacts([
       makeRow({ publicationId: 'staged', currentCorpusStatus: 'staged_for_replacement', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: 'staged_pass_candidate_survivor' } }),

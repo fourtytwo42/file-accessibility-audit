@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T14:43:55.397Z",
+  "generatedAt": "2026-03-31T15:06:24.471Z",
   "summary": {
     "totalCanaries": 9,
     "bySource": {
@@ -97,8 +97,8 @@
       ]
     },
     {
-      "publicationId": "3465",
-      "publicationTitle": "Are you a Victim of Domestic Violence",
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage4RepresentativeKind": "font_text_extractability_survivor",
@@ -109,12 +109,12 @@
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json"
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json"
       ]
     },
     {
-      "publicationId": "3610",
-      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "publicationId": "3550",
+      "publicationTitle": "McGruff Will Your Familys Car be Stolen This Year",
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage4RepresentativeKind": "reading_order_only_survivor",
@@ -125,7 +125,7 @@
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json"
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json"
       ]
     },
     {

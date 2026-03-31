@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T14:43:55.354Z",
+  "generatedAt": "2026-03-31T15:06:24.444Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,10 +7,10 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 845,
+      "remediated_fail": 843,
       "processing_error": 113,
       "deferred_manual": 0,
-      "staged_for_replacement": 5,
+      "staged_for_replacement": 7,
       "replaced_remote": 0
     },
     "byCohortLabel": {
@@ -54,10 +54,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 287,
+        "remediated_fail": 285,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 5,
+        "staged_for_replacement": 7,
         "replaced_remote": 0
       },
       "font_heavy": {
@@ -26916,15 +26916,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -26998,6 +26998,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -27484,15 +27485,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -27566,6 +27567,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -29028,15 +29030,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -29110,6 +29112,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -38787,15 +38790,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 88,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -38869,6 +38872,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -38906,15 +38910,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -38988,6 +38992,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -39025,15 +39030,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -39107,6 +39112,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -40765,15 +40771,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
+        "overallScore": 89,
         "grade": "B",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
@@ -40847,6 +40853,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -47059,15 +47066,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 75,
+        "overallScore": 78,
         "grade": "C",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 9,
@@ -47140,6 +47147,8 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.4:font_text_extractability_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -70988,7 +70997,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -74214,7 +74223,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",

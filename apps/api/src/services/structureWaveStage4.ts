@@ -973,6 +973,7 @@ function applyStage4RoutingToRow(
       nextReasonCodes.push('stage4.4:figure_spillover_survivor', 'stage4:reclassified_from_structure_heavy', 'stage4:figure_dominant_after_structure_wave')
       nextNotes.push('Stage 4.4 reclassified this terminal Stage 4 survivor back to figure_heavy because the latest truthful blocker is figure debt.')
     } else if (nextDiagnostics.terminalSurvivorClass === 'staged_pass_candidate_survivor') {
+      nextStatus = 'staged_for_replacement'
       nextReasonCodes.push('stage4.5:staged_pass_candidate_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'near_pass_grade_only') {
       nextReasonCodes.push('stage4.4:near_pass_grade_only')

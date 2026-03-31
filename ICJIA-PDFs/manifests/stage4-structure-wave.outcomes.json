@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-31T14:43:34.878Z",
+  "generatedAt": "2026-03-31T15:06:22.818Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 25,
+    "processed": 33,
     "readyToReplace": 7,
     "remediatedPassCandidates": 7,
-    "failedAfterRemediation": 18,
+    "failedAfterRemediation": 26,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
@@ -1293,6 +1293,464 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
         "remediatedPdfSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/treatment.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/treatment.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/treatment.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:05.152Z",
+      "durationMs": 60866,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 78,
+        "grade": "C",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 78, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c1fc54d70543485288b741416251162876f96bf3ce6af1ea674a1bc6cdcddb39",
+        "remediatedPdfSha256": "c1fc54d70543485288b741416251162876f96bf3ce6af1ea674a1bc6cdcddb39",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3768",
+      "publicationTitle": "Supervising sex offenders in DuPage Lake and Winnebago counties",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/sexoffogaPDF.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/sexoffogaPDF.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/sexoffogaPDF.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:07.751Z",
+      "durationMs": 63465,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "920e9b37e6e74eea34ba8f8581391c71eb74035d2ed17ef25205d13c4420ceb5",
+        "remediatedPdfSha256": "920e9b37e6e74eea34ba8f8581391c71eb74035d2ed17ef25205d13c4420ceb5",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3770",
+      "publicationTitle": "Specialized Unit Takes a Problemsolving Approachto Crime in Kankakee",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmegoga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/kmegoga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmegoga.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:12.313Z",
+      "durationMs": 68027,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f7747f712a0b9de84f06cfecce931b2094fb67879a966b17c754837963ef54d1",
+        "remediatedPdfSha256": "f7747f712a0b9de84f06cfecce931b2094fb67879a966b17c754837963ef54d1",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3670",
+      "publicationTitle": "Violent Crime Task Force Cracks Tough Homicide Cases in Kankakee County",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/VCTFOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/VCTFOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/VCTFOGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:15.171Z",
+      "durationMs": 70885,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a79b37c9e72dbd3bac9ec32e82ebee862fd311bb75d2596912ea6e965cf4affa",
+        "remediatedPdfSha256": "a79b37c9e72dbd3bac9ec32e82ebee862fd311bb75d2596912ea6e965cf4affa",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3665",
+      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CCH.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CCH.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CCH.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:18.724Z",
+      "durationMs": 74439,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8b54089e024ecc1e932f7a3b2ac9cd0cb032ed4c5665c4a121369c9e9733649f",
+        "remediatedPdfSha256": "8b54089e024ecc1e932f7a3b2ac9cd0cb032ed4c5665c4a121369c9e9733649f",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3784",
+      "publicationTitle": "Probation Research Results of the 2000 Illinois Probation Outcome Study",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/probation.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/probation.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/probation.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:21.348Z",
+      "durationMs": 77062,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "87882fb2ac50d2f07f3d71adc364c747a840b6569329c5b6fc5865d7bd097be8",
+        "remediatedPdfSha256": "87882fb2ac50d2f07f3d71adc364c747a840b6569329c5b6fc5865d7bd097be8",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3769",
+      "publicationTitle": "Supervising Sex Offenders in Coles Madison and Vermilion Counties",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CMVoga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CMVoga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CMVoga.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:22.550Z",
+      "durationMs": 78264,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ddfa5115818f720fba5a84750406f381a72601d7615c02fceab32b7e63c95ae3",
+        "remediatedPdfSha256": "ddfa5115818f720fba5a84750406f381a72601d7615c02fceab32b7e63c95ae3",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3683",
+      "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/abateOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/abateOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/abateOGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T15:06:22.817Z",
+      "durationMs": 78531,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.display_doc_title",
+          "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.display_doc_title"
+        ],
+        "unresolvedCategoryLabels": [
+          "Document Title & Language",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "89e4095018d8e612c4dcfd1fea4f81121f8cf6eded4cde5ebc3c0d16c79443ff",
+        "remediatedPdfSha256": "89e4095018d8e612c4dcfd1fea4f81121f8cf6eded4cde5ebc3c0d16c79443ff",
         "stagedReplacementSha256": null
       }
     }
