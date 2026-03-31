@@ -1,5 +1,33 @@
 # Project Memory
 
+## 2026-03-31 Stage 4.12
+
+- Stage 4.11 was committed and pushed as `5581aa8` (Implement Stage 4.11 homogeneous survivor routing).
+- A real Stage 4.12 wave was run on:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4162`
+  - `4436`
+  - `4153`
+  - `4167`
+- The Stage 4.12 run wrote `0` new terminal outcomes before falling back into inspection churn.
+- The truthful fallback rebuild was completed with:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+- After the fallback rebuild, the active Stage 4 wave remained unchanged:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4162`
+  - `4436`
+  - `4153`
+  - `4167`
+- Next step should be a narrow Stage 4.12 forensic follow-up on that exact 8-row set, not another blind rerun.
+
 ## 2026-03-31 Stage 4.11
 
 - Stage 4.11 added a new Stage 4 terminal survivor class: `metadata_font_structure_survivor`.
