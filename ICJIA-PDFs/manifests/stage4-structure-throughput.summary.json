@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T16:20:33.216Z",
+  "generatedAt": "2026-03-31T16:36:26.761Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T16:20:33.190Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T16:36:26.713Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
@@ -12,7 +12,7 @@
     "remainingStructureHeavyRows": 296,
     "processingErrorsInWave": 0,
     "hardFailsInWave": 8,
-    "metadataNavigationResidualRows": 20,
+    "metadataNavigationResidualRows": 18,
     "structureOnlyResidualRows": 5,
     "mixedStructureFigureResidualRows": 191,
     "structureProcessingErrorRetryRows": 4,
@@ -355,28 +355,25 @@
     ],
     "activeWaveSelectedPublicationIds": [
       "3483",
-      "3877",
-      "3903",
       "3936",
+      "4076",
       "4094",
       "4145",
+      "4209",
       "4677",
       "4723"
     ],
     "activeWavePendingPublicationIds": [
       "3483",
-      "3877",
-      "3903",
       "3936",
+      "4076",
       "4094",
       "4145",
+      "4209",
       "4677",
       "4723"
     ],
-    "activeWaveAttemptedButUnterminalizedPublicationIds": [
-      "3877",
-      "3903"
-    ],
+    "activeWaveAttemptedButUnterminalizedPublicationIds": [],
     "processingErrorPublicationIds": [],
     "hardFailPublicationIds": [
       "3665",
@@ -394,6 +391,8 @@
       "3610",
       "3663",
       "3685",
+      "3877",
+      "3903",
       "3964",
       "4032",
       "4048",
@@ -408,8 +407,6 @@
       "3785",
       "3793",
       "3870",
-      "3877",
-      "3903",
       "3919",
       "3924",
       "3936",
@@ -629,11 +626,11 @@
     ],
     "pendingPublicationIds": [
       "3483",
-      "3877",
-      "3903",
       "3936",
+      "4076",
       "4094",
       "4145",
+      "4209",
       "4677",
       "4723"
     ],
@@ -646,8 +643,6 @@
       "3785",
       "3793",
       "3870",
-      "3877",
-      "3903",
       "3919",
       "3924",
       "3936",
@@ -876,18 +871,20 @@
     "stillUnclassifiedPendingPublicationIds": [
       "3483",
       "3936",
+      "4076",
       "4094",
       "4145",
+      "4209",
       "4677",
       "4723"
     ],
     "activeUnresolvedPublicationIds": [
       "3483",
-      "3877",
-      "3903",
       "3936",
+      "4076",
       "4094",
       "4145",
+      "4209",
       "4677",
       "4723"
     ],
@@ -919,6 +916,7 @@
       "mixed_structure_figure_residuals": [],
       "structure_processing_error_retry": []
     },
+    "overlapAnalysisPublicationIds": [],
     "nearPassGradeOnlyPublicationIds": [
       "3468",
       "3640",

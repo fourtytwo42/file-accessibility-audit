@@ -1,148 +1,39 @@
 {
-  "generatedAt": "2026-03-31T16:20:33.213Z",
+  "generatedAt": "2026-03-31T16:36:26.756Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T16:20:33.190Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T16:36:26.713Z",
   "waveName": "stage4-structure-wave",
   "cohortLabel": "structure_heavy",
   "maxCandidates": 8,
   "totals": {
-    "eligibleRows": 218,
+    "eligibleRows": 216,
     "selectedRows": 8,
-    "skippedRows": 210,
+    "skippedRows": 208,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "pendingPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "candidates": [
     {
       "priorityRank": 1,
-      "passLikelihoodScore": 70,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "3877",
-      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
-      "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/family conf.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/family conf.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/family conf.pdf",
-      "storageKind": "legacy_archive",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "outcome:failed_after_remediation",
-        "stage4.8:metadata_navigation_residuals",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json",
-      "pageCount": 4,
-      "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
-      "topBlockingResidualFamilyIds": [
-        "font_embedding_and_unicode",
-        "logical_structure_marked_content",
-        "metadata_normalization",
-        "post_bootstrap_heading_convergence"
-      ],
-      "blockingFindingKeys": [
-        "category.heading_structure",
-        "category.pdf_ua_compliance",
-        "category.reading_order",
-        "category.title_language",
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
-        "pdfua.font_embedding",
-        "pdfua.font_unicode",
-        "pdfua.logical_structure",
-        "pdfua.metadata_identification"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": true,
-      "hasReadingOrderDebt": true,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 2,
-      "passLikelihoodScore": 70,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "3903",
-      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
-      "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/SPTDVoga.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/SPTDVoga.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/SPTDVoga.pdf",
-      "storageKind": "legacy_archive",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "outcome:failed_after_remediation",
-        "stage4.8:metadata_navigation_residuals",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json",
-      "pageCount": 4,
-      "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 9,
-      "topBlockingResidualFamilyIds": [
-        "font_embedding_and_unicode",
-        "logical_structure_marked_content",
-        "metadata_normalization",
-        "post_bootstrap_heading_convergence"
-      ],
-      "blockingFindingKeys": [
-        "category.heading_structure",
-        "category.pdf_ua_compliance",
-        "category.reading_order",
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
-        "pdfua.font_embedding",
-        "pdfua.font_unicode",
-        "pdfua.logical_structure",
-        "pdfua.metadata_identification"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": true,
-      "hasReadingOrderDebt": true,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 3,
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -193,7 +84,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 4,
+      "priorityRank": 2,
       "passLikelihoodScore": 68,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -244,7 +135,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 5,
+      "priorityRank": 3,
       "passLikelihoodScore": 67,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -297,7 +188,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 6,
+      "priorityRank": 4,
       "passLikelihoodScore": 52,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -350,7 +241,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 7,
+      "priorityRank": 5,
       "passLikelihoodScore": 62,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -404,7 +295,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 8,
+      "priorityRank": 6,
       "passLikelihoodScore": 57,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -446,6 +337,118 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs",
+        "pdfua.table_regularity"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 7,
+      "passLikelihoodScore": 57,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4209",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20System%20and%20Risk%20Factor%20Data%202006%20Appendix%20H%20Data%20Tables.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
+      "pageCount": 97,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "link_tabs_and_annotation_cleanup",
+        "metadata_normalization",
+        "table_structure_recovery"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "context.table_candidates_blocked",
+        "pdfua.bookmark_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs",
+        "pdfua.table_regularity"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 8,
+      "passLikelihoodScore": 57,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4076",
+      "publicationTitle": "Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202004%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+      "pageCount": 99,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "link_tabs_and_annotation_cleanup",
+        "metadata_normalization",
+        "table_structure_recovery"
+      ],
+      "blockingFindingKeys": [
+        "category.pdf_ua_compliance",
+        "context.table_candidates_blocked",
+        "pdfua.bookmark_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.heading_content_quality",
         "pdfua.logical_structure",
         "pdfua.page_tabs",
         "pdfua.table_regularity"
@@ -1804,17 +1807,6 @@
       ]
     },
     {
-      "publicationId": "4076",
-      "publicationTitle": "Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "4077",
       "publicationTitle": "Minorities Overrepresented in Illinois Juvenile Correctional Facilities",
       "currentCorpusStatus": "remediated_fail",
@@ -2240,17 +2232,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "4209",
-      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },

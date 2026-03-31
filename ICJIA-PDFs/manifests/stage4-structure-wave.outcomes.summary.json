@@ -1,103 +1,74 @@
 {
-  "generatedAt": "2026-03-31T16:20:33.216Z",
+  "generatedAt": "2026-03-31T16:38:44.308Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 8,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 8,
+    "processed": 34,
+    "readyToReplace": 7,
+    "remediatedPassCandidates": 7,
+    "failedAfterRemediation": 27,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
   },
-  "currentWave": {
-    "processedPublicationIds": [
-      "3665",
-      "3670",
-      "3683",
-      "3768",
-      "3769",
-      "3770",
-      "3784",
-      "3836"
-    ],
-    "remainingPublicationIds": [],
-    "failedAfterRemediationPublicationIds": [
-      "3665",
-      "3670",
-      "3683",
-      "3768",
-      "3769",
-      "3770",
-      "3784",
-      "3836"
-    ],
-    "processingErrorPublicationIds": []
-  },
-  "cumulativeTotals": {
-    "processed": 33,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 7,
-    "failedAfterRemediation": 26,
-    "sourceMissing": 0,
-    "processingError": 0
-  },
   "latestProcessed": {
-    "publicationId": "3683",
-    "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
-    "priorityRank": 3,
+    "publicationId": "4677",
+    "publicationTitle": "Parole and Mandatory Supervised Release in Illinois",
+    "priorityRank": 2,
     "priorityTier": "highest",
-    "passLikelihoodScore": 70,
-    "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/abateOGA.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/abateOGA.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/abateOGA.pdf",
-    "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+    "passLikelihoodScore": 68,
+    "serverHost": "157.230.3.215",
+    "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Parole and Mandatory Supervised Release in Illinois-220602T20211891.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Parole and Mandatory Supervised Release in Illinois-220602T20211891.pdf",
+    "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Parole%20and%20Mandatory%20Supervised%20Release%20in%20Illinois-220602T20211891.pdf",
+    "storageKind": "researchhub_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T15:06:22.817Z",
-    "durationMs": 78531,
+    "processedAt": "2026-03-31T16:38:44.307Z",
+    "durationMs": 226697,
     "original": {
-      "overallScore": 21,
+      "overallScore": 28,
       "grade": "F",
-      "pageCount": 4,
+      "pageCount": 21,
       "isScanned": false
     },
     "final": {
-      "overallScore": 89,
-      "grade": "B",
-      "pageCount": 4,
+      "overallScore": 61,
+      "grade": "D",
+      "pageCount": 21,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Final grade is B, not A.",
-        "Final overall score is 89, not 100.",
-        "Blocking local standards findings remain: pdfua.display_doc_title",
-        "Categories still below 100: Document Title & Language, PDF/UA Compliance"
+        "Final grade is D, not A.",
+        "Final overall score is 61, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
       ],
       "blockingLocalFindingKeys": [
-        "pdfua.display_doc_title"
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
       ],
       "unresolvedCategoryLabels": [
-        "Document Title & Language",
+        "Text Extractability",
+        "Heading Structure",
+        "Reading Order",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "89e4095018d8e612c4dcfd1fea4f81121f8cf6eded4cde5ebc3c0d16c79443ff",
-      "remediatedPdfSha256": "89e4095018d8e612c4dcfd1fea4f81121f8cf6eded4cde5ebc3c0d16c79443ff",
+      "gateEvaluatedBufferSha256": "d93b2c2c6b132deb823bf4caf0d1b3f9ec988799dfec21f5d22974d4971cbd6e",
+      "remediatedPdfSha256": "d93b2c2c6b132deb823bf4caf0d1b3f9ec988799dfec21f5d22974d4971cbd6e",
       "stagedReplacementSha256": null
     }
   }

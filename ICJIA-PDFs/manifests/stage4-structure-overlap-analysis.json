@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-03-31T16:34:46.482Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T16:34:46.463Z",
+  "sourceWaveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
+  "sourceWaveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+  "rows": [
+    {
+      "publicationId": "3877",
+      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "overlapDisposition": "reading_order_only_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.failure.json",
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_navigation_residuals",
+        "stage4.9:reading_order_only_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate.",
+        "Stage 4.9 terminalized this overlap row as a reading-order-only survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3903",
+      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "overlapDisposition": "reading_order_only_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.failure.json",
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_navigation_residuals",
+        "stage4.9:reading_order_only_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate.",
+        "Stage 4.9 terminalized this overlap row as a reading-order-only survivor from prior remediation evidence."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-03-31T16:34:46.482Z",
+  "analysisManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-overlap-analysis.json",
+  "totals": {
+    "analyzedRows": 2,
+    "byDisposition": {
+      "metadata_navigation_residuals": 0,
+      "reading_order_only_survivor": 2
+    },
+    "byEvidenceStrength": {
+      "terminal_report": 2,
+      "failure_report": 0,
+      "attempt_artifact_only": 0,
+      "control_plane_only": 0
+    }
+  },
+  "publicationIdsByDisposition": {
+    "metadata_navigation_residuals": [],
+    "reading_order_only_survivor": [
+      "3877",
+      "3903"
+    ]
+  }
+}

@@ -9,7 +9,7 @@ import { applyStage2ShortCohortReclassification } from '../apps/api/src/services
 import { applyStage3FigureWaveReclassification } from '../apps/api/src/services/figureWaveStage3.ts'
 import {
   applyStage4StructureWaveReclassification,
-  buildStage4StructureActiveAnalysis,
+  buildStage4StructureOverlapAnalysis,
 } from '../apps/api/src/services/structureWaveStage4.ts'
 
 function writeJson(filePath: string, value: unknown): void {
@@ -19,20 +19,30 @@ function writeJson(filePath: string, value: unknown): void {
 
 export async function main(): Promise<void> {
   const sources = loadCorpusControlPlaneSources()
+  const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_OVERLAP_INCLUDE_IDS || '3877,3903')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const stage4Artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, [], sources.stage4StalledAnalysisRows, sources.stage4OverlapAnalysisRows)
+  const stage4Artifacts = applyStage4StructureWaveReclassification(
+    stage3Artifacts,
+    sources.stage4PendingAnalysisRows,
+    sources.stage4ActiveAnalysisRows,
+    sources.stage4StalledAnalysisRows,
+  )
 
-  const analysisArtifacts = buildStage4StructureActiveAnalysis({
+  const analysisArtifacts = buildStage4StructureOverlapAnalysis({
     artifacts: stage4Artifacts,
     sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
     sourceControlPlaneGeneratedAt: stage4Artifacts.document.generatedAt,
     manifestsRoot: sources.manifestsRoot,
+    includePublicationIds,
   })
 
-  const analysisPath = path.join(sources.manifestsRoot, 'stage4-structure-active-analysis.json')
-  const summaryPath = path.join(sources.manifestsRoot, 'stage4-structure-active-analysis.summary.json')
+  const analysisPath = path.join(sources.manifestsRoot, 'stage4-structure-overlap-analysis.json')
+  const summaryPath = path.join(sources.manifestsRoot, 'stage4-structure-overlap-analysis.summary.json')
 
   writeJson(analysisPath, analysisArtifacts.analysis)
   writeJson(summaryPath, analysisArtifacts.summary)
@@ -40,6 +50,7 @@ export async function main(): Promise<void> {
   console.log(JSON.stringify({
     analysisPath,
     summaryPath,
+    includePublicationIds,
     totals: analysisArtifacts.summary.totals,
     publicationIdsByDisposition: analysisArtifacts.summary.publicationIdsByDisposition,
   }, null, 2))

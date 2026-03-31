@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applyStage4StructureWaveReclassification,
   buildStage4StructureCanaries,
+  buildStage4StructureOverlapAnalysis,
   buildStage4StructureStalledAnalysis,
   buildStage4StructureThroughputSummary,
   buildStage4StructureWaveArtifacts,
@@ -565,6 +566,40 @@ describe('structure wave Stage 4', () => {
     const row = next.document.rows.find(candidate => candidate.publicationId === 'staged')
     expect(row?.currentCorpusStatus).toBe('staged_for_replacement')
     expect(row?.reasonCodes).toContain('stage4.5:staged_pass_candidate_survivor')
+  })
+
+  it('builds overlap analysis for 3877 and 3903 and terminalizes them as reading-order survivors', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-overlap-analysis-'))
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: '3877', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', statusEvidence: { sourceManifestPath: '/tmp/replacement-map.json', sourceStatus: 'replacement_map_present', verificationManifestPath: '/tmp/verification.json', verificationClassification: null, verificationTimestamp: null, verificationReportPath: null, outcomeManifestPath: null, outcomeStatus: null, latestReportPath: pathLocal.join(manifestsRoot, '../reports/test-runs/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json'), candidateManifestPath: null }, stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' }, classificationEvidence: { pageCount: 4, isScanned: false, overallScore: 99, grade: 'B', blockerFamilyCount: 1, blockingFindingCount: 0, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: ['metadata_normalization','font_embedding_and_unicode','logical_structure_marked_content'], blockingFindingKeys: ['category.reading_order','category.title_language','pdfua.display_doc_title','pdfua.document_language','pdfua.font_embedding','pdfua.font_unicode','pdfua.logical_structure','pdfua.metadata_identification'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
+      makeRow({ publicationId: '3903', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', statusEvidence: { sourceManifestPath: '/tmp/replacement-map.json', sourceStatus: 'replacement_map_present', verificationManifestPath: '/tmp/verification.json', verificationClassification: null, verificationTimestamp: null, verificationReportPath: null, outcomeManifestPath: null, outcomeStatus: null, latestReportPath: pathLocal.join(manifestsRoot, '../reports/test-runs/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json'), candidateManifestPath: null }, stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' }, classificationEvidence: { pageCount: 4, isScanned: false, overallScore: 100, grade: 'A', blockerFamilyCount: 1, blockingFindingCount: 0, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: ['metadata_normalization','font_embedding_and_unicode','logical_structure_marked_content'], blockingFindingKeys: ['category.reading_order','pdfua.display_doc_title','pdfua.document_language','pdfua.font_embedding','pdfua.font_unicode','pdfua.logical_structure','pdfua.metadata_identification'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
+    ])
+    const mk = (_id: string, _name: string) => ({
+      gate: { unresolvedCategoryLabels: ['Reading Order'], reasons: ['Categories still below 100: Reading Order'] },
+      finalGate: { unresolvedCategoryLabels: ['Reading Order'], reasons: ['Categories still below 100: Reading Order'] },
+    })
+    fsLocal.mkdirSync(pathLocal.join(manifestsRoot, '../reports/test-runs/remediation-batch/143.244.146.43'), { recursive: true })
+    fsLocal.mkdirSync(pathLocal.join(manifestsRoot, '../reports/failures/remediation-batch/143.244.146.43'), { recursive: true })
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, '../reports/test-runs/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json'), JSON.stringify(mk('3877','x')))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, '../reports/failures/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.failure.json'), JSON.stringify(mk('3877','x')))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, '../reports/test-runs/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json'), JSON.stringify(mk('3903','x')))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, '../reports/failures/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.failure.json'), JSON.stringify(mk('3903','x')))
+
+    const overlap = buildStage4StructureOverlapAnalysis({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T07:30:00.000Z',
+      manifestsRoot,
+      includePublicationIds: ['3877','3903'],
+    })
+    expect(overlap.summary.publicationIdsByDisposition.reading_order_only_survivor).toEqual(['3877','3903'])
+
+    const next = applyStage4StructureWaveReclassification(artifacts, [], [], [], overlap.analysis.rows)
+    expect(next.document.rows.find(row => row.publicationId === '3877')?.stage4StructureDiagnostics.terminalSurvivorClass).toBe('reading_order_only_survivor')
+    expect(next.document.rows.find(row => row.publicationId === '3903')?.stage4StructureDiagnostics.terminalSurvivorClass).toBe('reading_order_only_survivor')
   })
 
   it('builds stalled-wave forensics and separates active-wave truth from completed-wave truth', () => {

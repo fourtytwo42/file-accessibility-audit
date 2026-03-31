@@ -57,6 +57,10 @@ export type Stage4StalledAnalysisDisposition =
   | 'mixed_structure_figure_residuals'
   | 'structure_processing_error_retry'
 
+export type Stage4OverlapAnalysisDisposition =
+  | 'metadata_navigation_residuals'
+  | 'reading_order_only_survivor'
+
 export interface PublicationReplacementMapRow {
   publicationId: string
   title: string | null
@@ -278,6 +282,7 @@ export interface CorpusControlPlaneSources {
   stage4PendingAnalysisPath: string | null
   stage4ActiveAnalysisPath: string | null
   stage4StalledAnalysisPath: string | null
+  stage4OverlapAnalysisPath: string | null
   replacementMap: PublicationReplacementMapRow[]
   verificationResults: VerificationResult[]
   verificationRows: PublicationVerificationRow[]
@@ -326,6 +331,21 @@ export interface CorpusControlPlaneSources {
     publicationTitle: string | null
     priorStructureWaveBucket: StructureWaveBucket | null
     stalledDisposition: Stage4StalledAnalysisDisposition
+    evidenceStrength: Stage4PendingAnalysisEvidenceStrength
+    evidencePaths: {
+      latestStage4ReportPath: string | null
+      latestStage4FailurePath: string | null
+      latestStage4AttemptPath: string | null
+      controlPlanePath: string
+    }
+    reasonCodes: string[]
+    notes: string[]
+  }>
+  stage4OverlapAnalysisRows: Array<{
+    publicationId: string
+    publicationTitle: string | null
+    priorStructureWaveBucket: StructureWaveBucket | null
+    overlapDisposition: Stage4OverlapAnalysisDisposition
     evidenceStrength: Stage4PendingAnalysisEvidenceStrength
     evidencePaths: {
       latestStage4ReportPath: string | null
@@ -1321,6 +1341,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
   const stage4PendingAnalysisPath = path.join(manifestsRoot, 'stage4-structure-pending-analysis.json')
   const stage4ActiveAnalysisPath = path.join(manifestsRoot, 'stage4-structure-active-analysis.json')
   const stage4StalledAnalysisPath = path.join(manifestsRoot, 'stage4-structure-stalled-analysis.json')
+  const stage4OverlapAnalysisPath = path.join(manifestsRoot, 'stage4-structure-overlap-analysis.json')
 
   const outcomeManifests = fs.readdirSync(manifestsRoot)
     .filter(name => name.endsWith('-outcomes.json') || name.endsWith('.outcomes.json'))
@@ -1349,6 +1370,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     stage4PendingAnalysisPath: fs.existsSync(stage4PendingAnalysisPath) ? stage4PendingAnalysisPath : null,
     stage4ActiveAnalysisPath: fs.existsSync(stage4ActiveAnalysisPath) ? stage4ActiveAnalysisPath : null,
     stage4StalledAnalysisPath: fs.existsSync(stage4StalledAnalysisPath) ? stage4StalledAnalysisPath : null,
+    stage4OverlapAnalysisPath: fs.existsSync(stage4OverlapAnalysisPath) ? stage4OverlapAnalysisPath : null,
     replacementMap: readManifestArray<PublicationReplacementMapRow>(replacementMapPath, 'rows'),
     verificationResults: fs.existsSync(verificationPath) ? readJson<any>(verificationPath).verificationResults || [] : [],
     verificationRows: fs.existsSync(verificationPath) ? readJson<any>(verificationPath).publicationRows || [] : [],
@@ -1360,5 +1382,6 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     stage4PendingAnalysisRows: fs.existsSync(stage4PendingAnalysisPath) ? readJson<any>(stage4PendingAnalysisPath).rows || [] : [],
     stage4ActiveAnalysisRows: fs.existsSync(stage4ActiveAnalysisPath) ? readJson<any>(stage4ActiveAnalysisPath).rows || [] : [],
     stage4StalledAnalysisRows: fs.existsSync(stage4StalledAnalysisPath) ? readJson<any>(stage4StalledAnalysisPath).rows || [] : [],
+    stage4OverlapAnalysisRows: fs.existsSync(stage4OverlapAnalysisPath) ? readJson<any>(stage4OverlapAnalysisPath).rows || [] : [],
   }
 }

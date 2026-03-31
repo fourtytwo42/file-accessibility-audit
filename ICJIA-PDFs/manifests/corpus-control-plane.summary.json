@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T16:20:33.180Z",
+  "generatedAt": "2026-03-31T16:36:25.684Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -111,6 +111,7 @@
     "stage4PendingAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-pending-analysis.json",
     "stage4ActiveAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-active-analysis.json",
     "stage4StalledAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-stalled-analysis.json",
+    "stage4OverlapAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-overlap-analysis.json",
     "outcomeManifestCount": 16,
     "candidateManifestCount": 17
   }

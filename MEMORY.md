@@ -2529,3 +2529,21 @@ First confirmed in-flight files:
     - `activeWaveAttemptedButUnterminalizedPublicationIds` currently highlights `3877` and `3903` because they are the only rows shared between the active wave and the stalled forensic set
   - `genericTimeoutRows` remains `0`.
   - Stage 4 remains the active lane; the next likely move after Stage 4.8 is a targeted Stage 4 live wave on the rebuilt active set or a narrower routing pass if `3877` and `3903` should also be terminalized out of metadata-first selection.
+- 2026-03-31: Stage 4.9 is now implemented as a narrow overlap-analysis pass for the two rows shared between Stage 4.8 stalled forensics and the active metadata wave.
+  - New script and package command:
+    - `scripts/analyze-stage4-structure-overlap.ts`
+    - `pnpm agency:analyze-stage4-structure-overlap`
+  - New forensic artifacts:
+    - `ICJIA-PDFs/manifests/stage4-structure-overlap-analysis.json`
+    - `ICJIA-PDFs/manifests/stage4-structure-overlap-analysis.summary.json`
+  - Stage 4.9 overlap decision:
+    - `3877` -> `reading_order_only_survivor`
+    - `3903` -> `reading_order_only_survivor`
+  - Reasoning: both rows' latest prior remediation evidence ended with `Reading Order` as the only unresolved category, so Stage 4.9 terminalized them out of `metadata_navigation_residuals`.
+  - After Stage 4.9 rebuild, the next active Stage 4 wave advanced from `3877/3903/3936/4677/4723/3483/4145/4094` to:
+    - `3936`, `4677`, `4723`, `3483`, `4145`, `4094`, `4209`, `4076`
+  - Then a targeted live Stage 4 run was attempted on that rebuilt active set, but it returned to long inspection churn and wrote `0` terminal outcomes before truthful fallback rebuild.
+  - After fallback rebuild, the active Stage 4 wave remained unchanged:
+    - `3936`, `4677`, `4723`, `3483`, `4145`, `4094`, `4209`, `4076`
+  - `genericTimeoutRows` remains `0`.
+  - Stage 4 remains the active lane; the next likely move after Stage 4.9 is a Stage 4.10 routing/forensics pass on `3936/4677/4723/3483/4145/4094/4209/4076`, not another blind rerun.

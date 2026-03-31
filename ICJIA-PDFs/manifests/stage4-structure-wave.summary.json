@@ -1,63 +1,63 @@
 {
-  "generatedAt": "2026-03-31T16:20:33.213Z",
+  "generatedAt": "2026-03-31T16:36:26.756Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T16:20:33.190Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T16:36:26.713Z",
   "totals": {
-    "eligibleRows": 218,
+    "eligibleRows": 216,
     "selectedRows": 8,
-    "skippedRows": 210,
+    "skippedRows": 208,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "pendingPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "activeWaveSelectedPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "activeWavePendingPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "activeWaveAttemptedButUnterminalizedPublicationIds": [
-    "3877",
-    "3903",
     "3936",
     "4677",
     "4723",
     "3483",
     "4145",
-    "4094"
+    "4094",
+    "4209",
+    "4076"
   ],
   "selectedByTier": {
     "highest": 8,

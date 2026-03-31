@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T16:20:33.180Z",
+  "generatedAt": "2026-03-31T16:36:25.684Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -51995,8 +51995,8 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "structureWaveBucket": "structure_only_residuals",
+        "terminalSurvivorClass": "reading_order_only_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -52010,11 +52010,14 @@
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
         "stage4.8:metadata_navigation_residuals",
-        "stage4:metadata_navigation_after_wave"
+        "stage4.9:reading_order_only_survivor",
+        "stage4:metadata_navigation_after_wave",
+        "stage4:structure_only_after_wave"
       ],
       "notes": [
         "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate."
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate.",
+        "Stage 4.9 terminalized this overlap row as a reading-order-only survivor from prior remediation evidence."
       ]
     },
     {
@@ -54952,8 +54955,8 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "structureWaveBucket": "structure_only_residuals",
+        "terminalSurvivorClass": "reading_order_only_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -54967,11 +54970,14 @@
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
         "stage4.8:metadata_navigation_residuals",
-        "stage4:metadata_navigation_after_wave"
+        "stage4.9:reading_order_only_survivor",
+        "stage4:metadata_navigation_after_wave",
+        "stage4:structure_only_after_wave"
       ],
       "notes": [
         "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate."
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate.",
+        "Stage 4.9 terminalized this overlap row as a reading-order-only survivor from prior remediation evidence."
       ]
     },
     {
