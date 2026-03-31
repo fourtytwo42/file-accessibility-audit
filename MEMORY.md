@@ -2441,6 +2441,14 @@ First confirmed in-flight files:
   - The next practical move after Stage 4.3 is another targeted Stage 4 execution step or a Stage 4.4 routing pass if those five metadata/navigation survivors continue to churn without writing terminal outcomes.
 
 ## Stage 4 Active Lane
+- 2026-03-31 partial follow-up Stage 4 wave after Stage 4.4:
+  - selected wave initially: `3767`, `3771`, `3964`, `3981`, `4046`, `4047`, `4050`, `4135`
+  - before interrupt, only `3767` wrote a fresh truthful terminal outcome:
+    - `failed_after_remediation`
+    - failure report path: `ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.failure.json`
+  - the remaining seven did not write terminal outcomes before the run was stopped and manifests were rebuilt from written evidence only
+  - after the fallback rebuild, the next Stage 4 wave advanced to:
+    - `3964`, `4046`, `4047`, `4050`, `4135`, `4037`, `4061`, `3597`
 - 2026-03-31 Stage 4.4 is now implemented as a routing/reporting correction pass over the five-row metadata/navigation wave.
 - The latest five-row Stage 4 wave is now terminalized truthfully in manifest space:
   - processed rows: `3465`, `3671`, `4023`, `4054`, `4067`

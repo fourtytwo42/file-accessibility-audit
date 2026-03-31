@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-03-31T00:54:41.474Z",
+  "generatedAt": "2026-03-31T06:56:07.959Z",
   "summary": {
-    "verifiedPassRows": 87,
+    "verifiedPassRows": 90,
     "byPromotionStatus": {
-      "verified_pass": 87
+      "verified_pass": 90
     }
   },
   "rows": [
@@ -18,7 +18,7 @@
       "currentSourceChecksumSha256": "df16759c6e5322205dd287ab4bbd4167b7c1fc8714960bf01c598e31d265380b",
       "replacementChecksumSha256": "9a768dcb13634d0d4187834de1a1d22b8a7cfc9a1dc1b943b351426b6f3ab578",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/A_Study_Gun_Addendum_.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:07.088Z",
+      "verificationTimestamp": "2026-03-31T06:04:30.575Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -43,7 +43,7 @@
       "currentSourceChecksumSha256": "8fb3b5ee0c61560cf6da0088817f3268a9d51b1717a0116c140d83c3d01f0688",
       "replacementChecksumSha256": "340ae0eb44417cac5fb2e0b0ca6c8087e39874fe4a9ce87a73bba2612b3fec6c",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/1993-1994_Biennial_Report.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:39.970Z",
+      "verificationTimestamp": "2026-03-31T06:05:08.027Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -68,7 +68,7 @@
       "currentSourceChecksumSha256": "df16759c6e5322205dd287ab4bbd4167b7c1fc8714960bf01c598e31d265380b",
       "replacementChecksumSha256": "9a768dcb13634d0d4187834de1a1d22b8a7cfc9a1dc1b943b351426b6f3ab578",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/A_Study_Gun_Addendum_.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:07.088Z",
+      "verificationTimestamp": "2026-03-31T06:04:30.575Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -93,7 +93,7 @@
       "currentSourceChecksumSha256": "ceef77cdf6943071da43a828249d8b387273f46ed4dc20c6c1de2b4835c1bd5c",
       "replacementChecksumSha256": "ce7e5616d2dd861078750316d806a0103345f761001758124ad79fd4c7dbfdf7",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/An_Evaluation_of_the_IDOC_Juvenile_Sex_Offender_Treatment_Program.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:19.395Z",
+      "verificationTimestamp": "2026-03-31T06:04:44.240Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -118,7 +118,7 @@
       "currentSourceChecksumSha256": "58ac7a14f6cfb294305beb1efa24c825ed1ec36dd0ceaf659153ecc834eac2fa",
       "replacementChecksumSha256": "0f386629d503b0e2d40b6e756723d0fc4aa85ae2c5a01c664d70d7aff94105cb",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/chdv.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:01.821Z",
+      "verificationTimestamp": "2026-03-31T06:04:24.636Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -143,7 +143,7 @@
       "currentSourceChecksumSha256": "4a8d5f78856a5ffff78a509a387e4dad91e7510a1e00237cdff1455440d3bec0",
       "replacementChecksumSha256": "04f17f23e62e68ec6e4fd05f8b6a981cad922effe016db171ff291a7cf88d202",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/EvaluationKank.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:03.878Z",
+      "verificationTimestamp": "2026-03-31T06:04:26.984Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -168,7 +168,7 @@
       "currentSourceChecksumSha256": "7462fae575ebe6646d0ec4223b27fb21844017ebc5879b512f10e34fc3e2dc1a",
       "replacementChecksumSha256": "6c9ceb803c8252e9e09b2b4d6237700f3c638f667c39b14deef7654281d9fbb2",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ogav3n1.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:23.188Z",
+      "verificationTimestamp": "2026-03-31T06:04:48.071Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -193,7 +193,7 @@
       "currentSourceChecksumSha256": "ecf57939b108a2336b649d856adbfdd9a21118d9ab0f7999a7fa60707a22b7c5",
       "replacementChecksumSha256": "28f27225d01e0e643b088d51f265ee44f33418e8e2eb5d7dd3ea68ef08af9156",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ogav2n9.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:27.942Z",
+      "verificationTimestamp": "2026-03-31T06:04:52.925Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -218,7 +218,7 @@
       "currentSourceChecksumSha256": "cbb3c8c706e0823febcd51e7359205224eefe6412ee187429658788076b24e33",
       "replacementChecksumSha256": "0c2cb71a50f1673dde4420d12359561b791566b9ca52ed802ade5975cc75004f",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/compwin99.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:39.666Z",
+      "verificationTimestamp": "2026-03-31T06:05:06.728Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -243,7 +243,7 @@
       "currentSourceChecksumSha256": "d3826179f1b941bc5bd82eba7023880f620b2cef1db07f77534fb1a6bf982e75",
       "replacementChecksumSha256": "06da74bd71ed2eb0336875591185088d3104165629c1d4e1d2684443bd73e56b",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/perception.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:44.146Z",
+      "verificationTimestamp": "2026-03-31T06:05:12.595Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -268,7 +268,7 @@
       "currentSourceChecksumSha256": "ceef77cdf6943071da43a828249d8b387273f46ed4dc20c6c1de2b4835c1bd5c",
       "replacementChecksumSha256": "f0f5616073de8e0aa4f4af94b3d6bbaaba41a5ec34009fc886560f8602be06e1",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/An_Evaluation_of_the_IDOC.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:53.427Z",
+      "verificationTimestamp": "2026-03-31T06:05:21.421Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -293,7 +293,7 @@
       "currentSourceChecksumSha256": "96744f84359da51b5ca5d85cbd0af22c555a6907caa6cf2cbf02b4f0acbd017e",
       "replacementChecksumSha256": "3cb53b8b7475cac4ee1319feef0eb271ef61020311e9f6ff0118944c8452d379",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/crimet_i.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:29.881Z",
+      "verificationTimestamp": "2026-03-31T06:07:09.270Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -318,7 +318,7 @@
       "currentSourceChecksumSha256": "d4fda11a860ac108ce5f7a9ba1ff2d7ddfa0326a5bad18d265b4f61dd6950301",
       "replacementChecksumSha256": "de5b7bb5a0685cd2b609459c67d48954de6b755c6a252a5843fa2ed3236fcc23",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ticorrections.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:31.356Z",
+      "verificationTimestamp": "2026-03-31T06:07:09.190Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -343,7 +343,7 @@
       "currentSourceChecksumSha256": "d2cacd9e03a82bb81a2b7b4c94353e05a5f786baba7c10e2253434aa4f19156e",
       "replacementChecksumSha256": "55f3389394d764f0f6bd608110c2002597e5848145244bb4046783ef50306b3c",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/dv.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:33.686Z",
+      "verificationTimestamp": "2026-03-31T06:07:14.239Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -368,7 +368,7 @@
       "currentSourceChecksumSha256": "35fc300f75eb026c5d23c72d0d47f9e1d3c462898d83d3172525a2c5c6e8fccc",
       "replacementChecksumSha256": "75f1cddd780b8d671e740a1944564bdb51ddc6f82157a3e5b1c53b8a537e4173",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/caps2pdf.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:38.881Z",
+      "verificationTimestamp": "2026-03-31T06:07:15.295Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -393,7 +393,7 @@
       "currentSourceChecksumSha256": "4ccf2806ad81d61e4acc9a58d0e66ecde02ecd0a01ce69acbbfc6471b1ef6e91",
       "replacementChecksumSha256": "a12541bc5502ffcd1a0eda6427890f7b438cba804108357abe6a2758ef6e7cfa",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/SHR_CHD_9_13_19991.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:43.679Z",
+      "verificationTimestamp": "2026-03-31T06:07:22.713Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -418,7 +418,7 @@
       "currentSourceChecksumSha256": "83072b4760ad91f984a967dd14ca186e4d5138ac19a636b280c13bdebb5fdf76",
       "replacementChecksumSha256": "0518877991da04d29fc83399775d0027aa05b7217c2328d8b4b0c857935254f8",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ADAM2.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:42.145Z",
+      "verificationTimestamp": "2026-03-31T06:07:19.697Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -443,7 +443,7 @@
       "currentSourceChecksumSha256": "7d4e710c4bce69717c007681c839f2c5e6e65d23563c42f248e03990bd811ea3",
       "replacementChecksumSha256": "d296ed74b96414a134334835f3698a58811620a54fd5c7bdf6bad335ebc4b270",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/adam3.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:49.858Z",
+      "verificationTimestamp": "2026-03-31T06:07:26.735Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -468,7 +468,7 @@
       "currentSourceChecksumSha256": "2c6191794ef8159d40d1feaed8d549e8faecba430277b2db67f58e30df96f589",
       "replacementChecksumSha256": "e1c58faa0b0fb30f5ec8db38621d97bde126d86c560f09ae7b767df0624c6fe5",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ADAM1.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:07:51.671Z",
+      "verificationTimestamp": "2026-03-31T06:07:28.018Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -493,7 +493,7 @@
       "currentSourceChecksumSha256": "b055b2a24731e703b05ba420cdcf775df68e6669bd3bc5f0e7df5cf7a94a8bae",
       "replacementChecksumSha256": "ab73b49c3d9f79ff9474d7abea72e617dd6619257e389ac77c1df0da65a40b00",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/drugprobation.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:08:32.589Z",
+      "verificationTimestamp": "2026-03-31T06:08:14.616Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -518,7 +518,7 @@
       "currentSourceChecksumSha256": "9376a28f5bade191a9d2e3b0277d00df375432646f4293c3ae9deb588a065875",
       "replacementChecksumSha256": "55ea6041898f655110943e56ec80ce13df623569ea739ee6949990851d3a5437",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Chicago_Alley_Lighting_Project.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:08:47.765Z",
+      "verificationTimestamp": "2026-03-31T06:08:32.773Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -543,7 +543,7 @@
       "currentSourceChecksumSha256": "12dceb68738dcdf186550160c836fb1b3666daf036c5de9d27ed6435d6d72ef7",
       "replacementChecksumSha256": "a7041a7f7e15e3f9c769bf2d92a895451da205e7707928fd48d346d5d145f6c9",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ImplementationKank.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:15:48.355Z",
+      "verificationTimestamp": "2026-03-31T06:15:58.415Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -568,7 +568,7 @@
       "currentSourceChecksumSha256": "3b71f265976a68d61a43e8fc812704136a36d6b2d7b27c07592e706dc08b65c3",
       "replacementChecksumSha256": "88b2eb6d2a4d6202de87ea76225145743f40639f79637f92e5fc573bf14f5f26",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/station_adjust.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:15:52.233Z",
+      "verificationTimestamp": "2026-03-31T06:16:03.569Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -593,7 +593,7 @@
       "currentSourceChecksumSha256": "02b0774449b6da38c450b5f30dbcea0d2699a779de4c60066d0ac6efefcb2f39",
       "replacementChecksumSha256": "679d395acafb5bf0853cc7e712e015a170c3fa3ee96833f611b75edbd9329077",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/compilerfall2002.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:16:13.052Z",
+      "verificationTimestamp": "2026-03-31T06:16:25.895Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -618,7 +618,7 @@
       "currentSourceChecksumSha256": "f3f114784034fcd68877e44fe035d95a694863e6ce5bdd7a0012ea4164044afe",
       "replacementChecksumSha256": "b7ac52f1323456a33cf2a947257def8bccbf5bd8ba10a1f0dcf01d60fc27db94",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2003CHRIAudit.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:16:38.302Z",
+      "verificationTimestamp": "2026-03-31T06:16:53.673Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -643,7 +643,7 @@
       "currentSourceChecksumSha256": "e202f42edc11aa62dd19128996a16594189e4be6a22dcb06a838acf010e0c52b",
       "replacementChecksumSha256": "c13c21f6e16facb36284f0e497b28a3e5bbc26924ec7e0018b62bf4b74a0799f",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/FemaleDel_IDOC.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:17:03.426Z",
+      "verificationTimestamp": "2026-03-31T06:17:21.882Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -668,7 +668,7 @@
       "currentSourceChecksumSha256": "540001d2ce8311917e8609e667eac8aeba3338642b014af5b5deb23b6c73ab05",
       "replacementChecksumSha256": "b66fab05c3624554bed075a2322aeaf5194352969290accfb724b96330ab955f",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Coles_Vermilion_and_Madison.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:16:58.346Z",
+      "verificationTimestamp": "2026-03-31T06:17:17.166Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -693,7 +693,7 @@
       "currentSourceChecksumSha256": "ceef77cdf6943071da43a828249d8b387273f46ed4dc20c6c1de2b4835c1bd5c",
       "replacementChecksumSha256": "ce7e5616d2dd861078750316d806a0103345f761001758124ad79fd4c7dbfdf7",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/An_Evaluation_of_the_IDOC_Juvenile_Sex_Offender_Treatment_Program.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:05:19.395Z",
+      "verificationTimestamp": "2026-03-31T06:04:44.240Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -718,7 +718,7 @@
       "currentSourceChecksumSha256": "b25bcf458a02dbbd0193fabfc25717ffed56156449488ec5fbd88d8d33ed3799",
       "replacementChecksumSha256": "e2ea3e2942b5b5b4f147ad90cac5d8ec4609c0ef841588f6d77c41af78603780",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2000AnnualReport.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:18:16.975Z",
+      "verificationTimestamp": "2026-03-31T06:18:40.724Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -743,7 +743,7 @@
       "currentSourceChecksumSha256": "bb56c9230a95eaa3a7f9d91e5e4db27496ed6879ab18b38b34a1b2f7ac735cc3",
       "replacementChecksumSha256": "1714310c27bd2ce9dd6fa436330b907067f0904b2d05fa9876ef5cc5fe4a047a",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/campus.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:18:24.643Z",
+      "verificationTimestamp": "2026-03-31T06:18:46.672Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -768,7 +768,7 @@
       "currentSourceChecksumSha256": "6ebb0514cd9592961b392efcf550467376c9e12b6ab4676922e65c9ba60624cd",
       "replacementChecksumSha256": "a0e3e718ad33d82b7e2c1c35be47850dcde859e0fd24dfb220dae0e543c0445c",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2000Probation_Outcome_Study.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:18:58.282Z",
+      "verificationTimestamp": "2026-03-31T06:19:21.072Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -793,7 +793,7 @@
       "currentSourceChecksumSha256": "3d1a74788cb5e04c74a6aee52178e16c4a7702ac487ccb749638181c797cbf1a",
       "replacementChecksumSha256": "2209c344fc710b058f6784175c3dbb0f85e93f98899e9442648c427881692942",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2001_MV_Annual_Report.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:19:11.067Z",
+      "verificationTimestamp": "2026-03-31T06:19:35.070Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -818,7 +818,7 @@
       "currentSourceChecksumSha256": "e67b80bfb919996b96fab024eef95034e01a56bde218c296fd8fb8f5efc1076c",
       "replacementChecksumSha256": "b89230c6361546317d6d7422bd41a23208d039e0dbb3fadfcfa676e4d3399557",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/CHRI.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:19:47.902Z",
+      "verificationTimestamp": "2026-03-31T06:20:14.569Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -843,7 +843,7 @@
       "currentSourceChecksumSha256": "cc4e00b5bbc447e47ae39ef0b5c4a1dd5c4752c331c7715d006f73ba7b670f1b",
       "replacementChecksumSha256": "b5c5f575cf04ca583b13553ba8dd9b9358c14cfd4132eedf2742005d0c6dd98e",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/NewApproaches.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:19:53.552Z",
+      "verificationTimestamp": "2026-03-31T06:20:21.929Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -868,7 +868,7 @@
       "currentSourceChecksumSha256": "1e77a0fd4af5824d68b1fdde02fcb2edc42ecf5aab76ba75d314ccc2abfd5796",
       "replacementChecksumSha256": "b9fbeb54762e95e676b0a836e6739a04146e4f049213026eac2b709baf5a7079",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/subabuse_vol2no1.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:20:53.888Z",
+      "verificationTimestamp": "2026-03-31T06:21:30.030Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -893,7 +893,7 @@
       "currentSourceChecksumSha256": "4e5d4d36ebfc8a5d0a3657a3a587773de605a8206ce194c4900871d499ef8818",
       "replacementChecksumSha256": "e6a99429ad4023e15231932dd82bccd13c2b1d93b33c749ae38238821ec4d562",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/summer04.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:21:25.824Z",
+      "verificationTimestamp": "2026-03-31T06:22:06.907Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -918,7 +918,7 @@
       "currentSourceChecksumSha256": "0af92eca87422edb930209e38c15128774fb977c01c39721c0fa9f2c2807cd98",
       "replacementChecksumSha256": "fe0ed276c1d46acceac1ce5b27278ce2f2474b821ba0c8d38066d5633d729692",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/duifinal.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:21:33.558Z",
+      "verificationTimestamp": "2026-03-31T06:22:14.666Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -943,7 +943,7 @@
       "currentSourceChecksumSha256": "3e0da109eb56fc9d9dc29f46502af09a6007022b563cc3309be4eab9bed5c796",
       "replacementChecksumSha256": "c4cd620d444e77221802752ab05785ebc55e5607c18649105bae94bd709bb8f3",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/04-07MVStrategy.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:21:52.880Z",
+      "verificationTimestamp": "2026-03-31T06:22:36.947Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -968,7 +968,7 @@
       "currentSourceChecksumSha256": "7fb6813ed7f5d46b198860005753ccd34a0cb6c333f3f073d07b96d9a1dd1c71",
       "replacementChecksumSha256": "f68ab3b9a54945ab9506cd8ecb0be9e7e91662a352e0d1907f5e2c403c1b9712",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Developing_recidivism.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:01.949Z",
+      "verificationTimestamp": "2026-03-31T06:22:45.718Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -993,7 +993,7 @@
       "currentSourceChecksumSha256": "dedd00cdc692c4fc268138b655aab73197a79347a3fba6e9845aed17cde1e718",
       "replacementChecksumSha256": "257d7f38e95c2392f2a476d2f039bb73b510483cb172e67b54aa7f6b50f3c816",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/SLATE03.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:15.606Z",
+      "verificationTimestamp": "2026-03-31T06:23:01.524Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1018,7 +1018,7 @@
       "currentSourceChecksumSha256": "397dab550dfbea9a763eb62a191b378e045c30ad5009039c2e1344fc2ef373b3",
       "replacementChecksumSha256": "e2280f7ca55723205ffd73baa185eb286097a8fdd09adb4c5b99f4a7a50f0edb",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/PrivacySchmrivacy_FINAL.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:13.811Z",
+      "verificationTimestamp": "2026-03-31T06:22:59.286Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1043,7 +1043,7 @@
       "currentSourceChecksumSha256": "7b5f7d8b3dbeffc17f86ae796552ee020209ee94bea095e905417071113da4bc",
       "replacementChecksumSha256": "46a8b97ba465f5cb7a02432b0841712b0b85ebc62db420c61882171bd6e8af24",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/at_a_glance2004.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:17.646Z",
+      "verificationTimestamp": "2026-03-31T06:23:03.563Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1068,7 +1068,7 @@
       "currentSourceChecksumSha256": "1ea84cbd7d5c2801cdc8aa4c2aaf5408287e66d840c5397e8743dee0d6c92c70",
       "replacementChecksumSha256": "64b1a14cf9354e0596cdce73cf3cf58c5e0f70560a04bbc18bdd2a3d2142f74c",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Clearinghouse03.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:23.162Z",
+      "verificationTimestamp": "2026-03-31T06:23:09.557Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1093,7 +1093,7 @@
       "currentSourceChecksumSha256": "6be20a528e36bb374b2640971687f39ef7bb3d68d97b2827061b56635510d077",
       "replacementChecksumSha256": "0d813ab87b0a821659664714cde1056077ea7d4eb35acb3925a6cd47e6be731f",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/employment.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:28.616Z",
+      "verificationTimestamp": "2026-03-31T06:23:14.416Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1118,7 +1118,7 @@
       "currentSourceChecksumSha256": "c5b4397cb2f13b87dd975af357fca90c6749e1e8dbe07e5af94d630d1e005704",
       "replacementChecksumSha256": "35fd587ddfe739486b27d761ca08e4749273f6eb742bb2a115dbb00e85745c1b",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/AR2005.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:40.852Z",
+      "verificationTimestamp": "2026-03-31T06:23:28.737Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1143,7 +1143,7 @@
       "currentSourceChecksumSha256": "ce19d8b97303495186fa1e6d09e324f50c2b733e7175ea949d094a247d27e1d1",
       "replacementChecksumSha256": "f3e43264fac5ed291bc4d3418b0f8afc921cf77b1e89d54237ddf800683ecfb6",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/elderabuseRAAG.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:37.174Z",
+      "verificationTimestamp": "2026-03-31T06:23:23.506Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1168,7 +1168,7 @@
       "currentSourceChecksumSha256": "25c8249d6d0e70a876ff18030ff06d6d8910325d6f4cb3f0fa7b9d595d9e1d37",
       "replacementChecksumSha256": "a01ec7f09fa8398e56a3a2ebde3a2f91e9dc90c3b15aeada89a91d4b247ed6d7",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/treatment_matching.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:45.941Z",
+      "verificationTimestamp": "2026-03-31T06:23:32.517Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1193,7 +1193,7 @@
       "currentSourceChecksumSha256": "84375c7128ca74e138ec0cc5c5e1502871c930a3fbc0e6b5397e5bec3d303997",
       "replacementChecksumSha256": "06528b4754fac09320fb3183cc380ebb45d746805536ba8daa02b5e333fb08a4",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/GDRAAG.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:49.513Z",
+      "verificationTimestamp": "2026-03-31T06:23:37.434Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1218,7 +1218,7 @@
       "currentSourceChecksumSha256": "cf81227f5f228b53c9af66a606b3b55108652f2f9ff11f6f6d9193b672645bc3",
       "replacementChecksumSha256": "b4298fec699637dc13b5df5e945c5a942512b20bded846159ef3341e90fe42e5",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BARJjudges.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:22:59.553Z",
+      "verificationTimestamp": "2026-03-31T06:23:46.042Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1243,7 +1243,7 @@
       "currentSourceChecksumSha256": "11812f34399f56a1e355f4fcbff04aae8f3df379f1489af1dabeb75a034cf9e4",
       "replacementChecksumSha256": "08079a4190a0e2ad5d8e6338d7f9ca6fd53eb98a8f734c4a10f3dc825ec4f828",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BARJPROBATION.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:08.648Z",
+      "verificationTimestamp": "2026-03-31T06:23:58.275Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1268,7 +1268,7 @@
       "currentSourceChecksumSha256": "2511abe1dc3aecf122d7127ea25e8400554daf744872102e3c3bca08ac441f38",
       "replacementChecksumSha256": "eabc388e0617a713d8b22652c5225219f3a53f07dc409695573b1752e7be4368",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BIPRAAG.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:16.514Z",
+      "verificationTimestamp": "2026-03-31T06:24:05.861Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1293,7 +1293,7 @@
       "currentSourceChecksumSha256": "f71568c6160315d8226d12c51cbdebadcb8f66ad9dfe31d1ab3fca817bdb219e",
       "replacementChecksumSha256": "5a4240c388a86b08afcbe12b396c803d0b9143813a3d451c6b27bb922e86ceb9",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/moralreconation.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:12.893Z",
+      "verificationTimestamp": "2026-03-31T06:24:01.725Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1318,7 +1318,7 @@
       "currentSourceChecksumSha256": "e977638dba0f3dc4b8302dc5962b4cc90d1079b32d2ce418cd5b6d631c85f10e",
       "replacementChecksumSha256": "4da68433941e74848774b058a8e40f2873d3284eabfe9afefe03c5a031b9a71f",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/detention.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:24.962Z",
+      "verificationTimestamp": "2026-03-31T06:24:13.090Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1343,7 +1343,7 @@
       "currentSourceChecksumSha256": "5e128054793557070903d1bc5bacd9122f01dd010b8896bda31478f90aebcd20",
       "replacementChecksumSha256": "45557e5fac048b36ee7a404bbb722b7ef72396876c41ade0b1882c71cf9fb064",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BARJprosecutors.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:30.117Z",
+      "verificationTimestamp": "2026-03-31T06:24:21.233Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1368,7 +1368,7 @@
       "currentSourceChecksumSha256": "6705e4dc56ace11de132a1005ec10ddf0a98c3acad065b0f1945fd4b9481e503",
       "replacementChecksumSha256": "2bc6c08449fac2bd773414040671f997061ce79a7254e27713b9d0a29384c247",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BARJ_law_enforcement.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:29.891Z",
+      "verificationTimestamp": "2026-03-31T06:24:20.421Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1393,7 +1393,7 @@
       "currentSourceChecksumSha256": "26098acdb852f85053db6bf3fd144c8f0cd96ead5d47481cdf0a140a336ddc24",
       "replacementChecksumSha256": "1af1f26253ed1daeb7ca47a18464ba6992944bd92c4a1f865f61430ce6cf7342",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/juvenile_justice_trends.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:26.041Z",
+      "verificationTimestamp": "2026-03-31T06:24:10.031Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1418,7 +1418,7 @@
       "currentSourceChecksumSha256": "f1f5f16e4309d6099fa2d12f5acaa55ba61f6109d9b75758072e0d4af596050c",
       "replacementChecksumSha256": "cc6a875de2a0c59db4c61363244a03abd2e23feec93438b1f9900f865b73b5ff",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BARJDefense.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:38.915Z",
+      "verificationTimestamp": "2026-03-31T06:24:25.563Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1443,7 +1443,7 @@
       "currentSourceChecksumSha256": "a91e98f9b000b5771adb79e9ef626974433f2ef89420ae2fc7ecc87f17d020fe",
       "replacementChecksumSha256": "ab69bbb0f6d237f398fd1afb5290ea1675469b615ac28fb66c8befa7269c5287",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Summer_2006.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:23:45.945Z",
+      "verificationTimestamp": "2026-03-31T06:24:36.525Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1468,7 +1468,7 @@
       "currentSourceChecksumSha256": "593169fd2931c5a5215d27ebb396383dd7d0f2de0b92ea535bdbe06535ee81ac",
       "replacementChecksumSha256": "20ee372cd6b699cb5d2a9f32a3d5b4e043799dfe1ecda5c066d774b0408f1951",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/AnnualReportFY06.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:24:21.492Z",
+      "verificationTimestamp": "2026-03-31T06:25:13.615Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1493,7 +1493,7 @@
       "currentSourceChecksumSha256": "4c82df5395981a2e22beedea2436ade527a4517fd32158e2f5076f4bf059e129",
       "replacementChecksumSha256": "2892d4f90116eb1a5490db2fc57b5ae27b8e0b9ee2f392e80a69fbaddb809a81",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Juvenile_Reentry_Experience_as_Characterized_by_Multiple_Systems_Involvement.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:24:19.966Z",
+      "verificationTimestamp": "2026-03-31T06:25:11.798Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1518,7 +1518,7 @@
       "currentSourceChecksumSha256": "0bcd7fd69328278ef1ba1d8a31485a3eaec3e20b0fe54bd6f46b722130a71b5b",
       "replacementChecksumSha256": "33dcdf936b835c75615b2f845ca4e73ac644dbffb45fb12bf280df80bcf3f0e1",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/methethnography.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:24:29.513Z",
+      "verificationTimestamp": "2026-03-31T06:25:22.351Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1543,7 +1543,7 @@
       "currentSourceChecksumSha256": "0747c7430a0a4f659d1918d91c775af1f40e32eac30f664bdfd31700b58377a3",
       "replacementChecksumSha256": "c62d84d7fe5fad7ff778c3fafa7da3af7ee2f48b1674b1d8498f3ba10ac01ef2",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Juvenile_Justice_System_and_Risk_Factor_Data_2007_Appendix_H_Data_Tables.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:25:01.565Z",
+      "verificationTimestamp": "2026-03-31T06:26:01.475Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1568,7 +1568,7 @@
       "currentSourceChecksumSha256": "471c06c2f98b45c3f495df3e8e224a05cf1d4c6b8f27c1d8eb6f4c8729a7b8c6",
       "replacementChecksumSha256": "f3c8028ff9888aaeb7578201e12d2d84fcfaa74efa14559860c502489a673cc1",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_Sentencing_Report.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:25:23.152Z",
+      "verificationTimestamp": "2026-03-31T06:26:16.117Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1593,7 +1593,7 @@
       "currentSourceChecksumSha256": "52a84c072cee4851394330d1160f01c3fe29e913069df060f80c6bb296611458",
       "replacementChecksumSha256": "897765977de7332b5469a420937ffa3030914389c8251a7bffb9e9369f12e8e5",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/NIATTF03.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:25:32.372Z",
+      "verificationTimestamp": "2026-03-31T06:26:22.999Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1618,7 +1618,7 @@
       "currentSourceChecksumSha256": "a26fdd019e451d86893d0e22ffc23baf077de4ce263b4ef053626c2077881018",
       "replacementChecksumSha256": "4d333ca98f5dbec3aea4e837d2f9896f43b21898a4618760b49afa681e2fd149",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Redeploy_Illinois_Macon_County.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:26:00.250Z",
+      "verificationTimestamp": "2026-03-31T06:26:49.622Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1643,7 +1643,7 @@
       "currentSourceChecksumSha256": "f3e98ed36b722ed9c00f8e4ad1e7ed1ef6661f2360a55fc34adb845f0bbe48cf",
       "replacementChecksumSha256": "eab27dcd646cf31e02d36db2afe679f23b518746b88f70576775aae863cc4fe8",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Redeploy_Illinois_2nd_Judicial_Circuit.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:26:10.079Z",
+      "verificationTimestamp": "2026-03-31T06:26:59.685Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1668,7 +1668,7 @@
       "currentSourceChecksumSha256": "14294c238f226f4da757a417c737dde74f99302bcce02e1a45758707495315b2",
       "replacementChecksumSha256": "0e5f0e05a31c36b8914cd0f76b0e1c55ef1fabe3a37d6cb3d5c38074f64b5727",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Drug_Abuse_Treatment_and_Probationer_Recidivism.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:26:10.827Z",
+      "verificationTimestamp": "2026-03-31T06:27:00.570Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1693,7 +1693,7 @@
       "currentSourceChecksumSha256": "b6aa23694abf7e0625041407925852c4073c528ff33de352bc3a30a977600301",
       "replacementChecksumSha256": "f2672074508e477017e10be86b75db5e7d621ba27b13baf08c37f5d45d80314f",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_Incarceration_of_African_Americans_for_Drug_Crimes.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:26:13.437Z",
+      "verificationTimestamp": "2026-03-31T06:27:05.088Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1718,7 +1718,7 @@
       "currentSourceChecksumSha256": "d758e10da3ae21ac23cfd432f91db63a0e12b0a51340eccbdd07a22f5424ea88",
       "replacementChecksumSha256": "54cb474a73d3caa1a11ea34db470057bfcbbceb7197c642f44bf9b5a24ac7fec",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Violent_Crime_and_Victims_Gender_2002.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:26:19.581Z",
+      "verificationTimestamp": "2026-03-31T06:27:11.042Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1743,7 +1743,7 @@
       "currentSourceChecksumSha256": "e7c96b23da4aeb9a4cb4ea361c05dd7ddb7dba1382faed93ff7bd2b4a0902005",
       "replacementChecksumSha256": "9ea7f92cc8dbf424b3fc97015ba70600201a36b2f65ef39df36bb413aa99c829",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/1total_offenses_1999-2008.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:27:19.359Z",
+      "verificationTimestamp": "2026-03-31T06:28:22.185Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1768,7 +1768,7 @@
       "currentSourceChecksumSha256": "4344920889186fb0cb3ab58bbd91c0b14e600e3e80b256ea536d10770d69a80c",
       "replacementChecksumSha256": "9e49553946e3deb66588be15ba0e689a91ba0cd981b9abf6ec602c2759f59e97",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/10drug_arrests_1999-2008.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:28:13.786Z",
+      "verificationTimestamp": "2026-03-31T06:29:12.826Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1793,12 +1793,37 @@
       "currentSourceChecksumSha256": "51d019bff094ab84f4270675b045cbb60eb8bc59e107a34ac50ad3611a0c8a8b",
       "replacementChecksumSha256": "50cae2c0df4ea02b9cd0d1ded3b9021b0ebc58e699e5d3d8a887613278163a43",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/PeoriaPullingLeversDrugMarketIntervention_Report_March_2011.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:29:47.653Z",
+      "verificationTimestamp": "2026-03-31T06:30:54.369Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
         "grade": "A",
         "pageCount": 73,
+        "isScanned": false,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "promotionStatus": "verified_pass"
+    },
+    {
+      "publicationId": "4180",
+      "publicationTitle": "2010 Annual Report Motor Vehicle Theft Prevention Council",
+      "sourceKind": "batch_ready",
+      "sourcePathOrUrl": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/2010 MV Annual Report.pdf",
+      "sourceFileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/2010%20MV%20Annual%20Report.pdf",
+      "localFinalArtifactPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4180-2010_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/mvtpc/2010 MV Annual Report.pdf",
+      "currentSourceChecksumSha256": "349aec3e17653a30e4658aa80e13b9eb9c2a0a9385f92f4a51455725693feb8d",
+      "replacementChecksumSha256": "bc5e7321459bc7ce2a195098be2072d2e0806173724753ca3777c85b25836a82",
+      "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2010_MV_Annual_Report.pdf.json",
+      "verificationTimestamp": "2026-03-31T06:33:46.790Z",
+      "verificationSummary": {
+        "passed": true,
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 25,
         "isScanned": false,
         "reasons": [],
         "blockingLocalFindingKeys": [],
@@ -1818,7 +1843,7 @@
       "currentSourceChecksumSha256": "0d01e76b843649dccaad78abcf977c7571c6d9247979aeebbd0fd8bf324eef71",
       "replacementChecksumSha256": "9b4d8add115060a3f33186a936bb42a94e7af7dda1341ee3eda81e9911967537",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Evaluation_of_the_Lake_County_Adult_Probation.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:32:09.789Z",
+      "verificationTimestamp": "2026-03-31T06:33:24.235Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1843,7 +1868,7 @@
       "currentSourceChecksumSha256": "a0cc2dce6c7a91d953949621f7c732c09c68c115b2543f52793ed59102706c22",
       "replacementChecksumSha256": "89fb9f1552747fc48d492d2b37b353d715c6d2d85e7400a779e654af67b6fa40",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/residential_mobility.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:31:26.510Z",
+      "verificationTimestamp": "2026-03-31T06:32:35.584Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1868,7 +1893,7 @@
       "currentSourceChecksumSha256": "27d55954661a5f73efb2eb43848127228dc69f45fc689c210b3c921bfdfbbcc3",
       "replacementChecksumSha256": "0801a147e87a0f2551736846f76de6c0b1d4495f433e7332394485431baf0cee",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/36612_Cmplr_WNTR_SPRNG_07.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:31:39.158Z",
+      "verificationTimestamp": "2026-03-31T06:32:50.440Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1893,7 +1918,7 @@
       "currentSourceChecksumSha256": "55a0e7b6eb98918a0e8e0e888357f460d6ce4928caaf12820984d208b0437be2",
       "replacementChecksumSha256": "5b7ef8d359b2da5f23636216922785e4d5da165bf2dfb533232ca3db4d78d556",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2011_MV_Annual_Report.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:34:20.119Z",
+      "verificationTimestamp": "2026-03-31T06:35:29.594Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1918,12 +1943,37 @@
       "currentSourceChecksumSha256": "519e833f1ea15a44f6a36dcbcdef9d073376a770ed193c8e837a9336e471ac2d",
       "replacementChecksumSha256": "9d38d71200e6d9d85e676576da546688635cae779bfcffa297094472423f91f4",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Entrepreneurship_for_the_Formerly_Incarcerated-191011T20093815.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:36:12.812Z",
+      "verificationTimestamp": "2026-03-31T06:37:28.848Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
         "grade": "A",
         "pageCount": 80,
+        "isScanned": false,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "promotionStatus": "verified_pass"
+    },
+    {
+      "publicationId": "4483",
+      "publicationTitle": "Prior Criminal Justice Involvement of Persons Experiencing Violent Deaths in Illinois",
+      "sourceKind": "batch_ready",
+      "sourcePathOrUrl": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Violent Death FINAL PDF to Post-200810T22415305.pdf",
+      "sourceFileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Violent Death FINAL PDF to Post-200810T22415305.pdf",
+      "localFinalArtifactPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4483-Prior_Criminal_Justice_Involvement_of_Persons_Experiencing_Violent_Deaths_in_Illinois.pdf",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Violent Death FINAL PDF to Post-200810T22415305.pdf",
+      "currentSourceChecksumSha256": "b3bd373561cf2a1f5244d96dd55402d8ed613f2899f596097aba79e0aa384a35",
+      "replacementChecksumSha256": "50db695a14b640eb4573b8b9e3f3712cf6f47afecd84a00f0f56a0b7a05f5f94",
+      "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Violent_Death_FINAL_PDF_to_Post-200810T22415305.pdf.json",
+      "verificationTimestamp": "2026-03-31T06:38:14.279Z",
+      "verificationSummary": {
+        "passed": true,
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 34,
         "isScanned": false,
         "reasons": [],
         "blockingLocalFindingKeys": [],
@@ -1943,7 +1993,7 @@
       "currentSourceChecksumSha256": "519e833f1ea15a44f6a36dcbcdef9d073376a770ed193c8e837a9336e471ac2d",
       "replacementChecksumSha256": "b8ea83f2a488d47bbab4e1278700cbcf37c3caee2f8699093101e9f504b4945c",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Entrepreneurship_for_the_Formerly_Incarcerated_-_A_Process_Evaluation_of_PERC.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:37:15.416Z",
+      "verificationTimestamp": "2026-03-31T06:38:41.738Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1968,7 +2018,7 @@
       "currentSourceChecksumSha256": "9601e9ec09c23ef85acbe7e45e75e1f6e412741eeb8cb607c96d9ee7256b60fe",
       "replacementChecksumSha256": "972da63ac53544346708e5da86cce9382c7aff54c86b48eb69f987e6b55e6de4",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2013_MV_Annual_Report.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:38:14.032Z",
+      "verificationTimestamp": "2026-03-31T06:39:53.848Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -1993,12 +2043,37 @@
       "currentSourceChecksumSha256": "37980716f8466593ac09971f496fc1b82a204cec6112ce8334a76c993d5a1319",
       "replacementChecksumSha256": "3c9084c3963b750607880d92cb178c0cebf5e5f81725c0a12045a6a508c340bc",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:39:30.619Z",
+      "verificationTimestamp": "2026-03-31T06:41:01.734Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
         "grade": "A",
         "pageCount": 139,
+        "isScanned": false,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "promotionStatus": "verified_pass"
+    },
+    {
+      "publicationId": "4598",
+      "publicationTitle": "Addressing Opioid Use Disorders in Corrections: A Survey of Illinois Jails",
+      "sourceKind": "complete_seed",
+      "sourcePathOrUrl": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf",
+      "sourceFileUrl": "https://researchhub.icjia-api.cloud/uploads/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf",
+      "localFinalArtifactPath": "/home/hendo420/pdfaf/Complete/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf",
+      "currentSourceChecksumSha256": "666cdffefb9a725b059071500efaa00574517215a8148714f82759a94e11e347",
+      "replacementChecksumSha256": "3ff6c355adece40f42d90d7d0a690e2ed23b0cdcc29086e1fa77dd8311429c80",
+      "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Addressing_Opioid_Use_Disorders_in_Corrections_2018-191011T20091010.pdf.json",
+      "verificationTimestamp": "2026-03-31T06:42:59.537Z",
+      "verificationSummary": {
+        "passed": true,
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 17,
         "isScanned": false,
         "reasons": [],
         "blockingLocalFindingKeys": [],
@@ -2018,7 +2093,7 @@
       "currentSourceChecksumSha256": "d9f519011a8e81232aff3a2693aa5892b22dd04bcffa7e647d1b937b81fdd545",
       "replacementChecksumSha256": "f8e7225ac9c0979c8333d1010af57d6ae02fbc092ccca991d26dfa5ba490b3ef",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/COVID_arrests_PDF_to_post_on_web-210305T17262965.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:44:10.823Z",
+      "verificationTimestamp": "2026-03-31T06:45:54.318Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -2043,7 +2118,7 @@
       "currentSourceChecksumSha256": "50946194ae76bdf5513feab58cfa778e8c3d0f39a49ceb233e9a0aa52c39c2e9",
       "replacementChecksumSha256": "0092be69fb4aba2aec99e8d376ca20c41499be4b8156f337db5f38792971d522",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Drug_Testing_Survey_Results-200130T22230265.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:41:56.790Z",
+      "verificationTimestamp": "2026-03-31T06:43:43.053Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -2068,7 +2143,7 @@
       "currentSourceChecksumSha256": "f068a171183d2f7fd3e950350fe34cf98508e9a0f51894086abeb77e467ad464",
       "replacementChecksumSha256": "d67ff586e59e8964b261536b69046c391e53994a17e186d78416e1ffd8d12ca4",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Drug_Testing_Lit_Review-200203T22022729.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:43:08.424Z",
+      "verificationTimestamp": "2026-03-31T06:44:57.506Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -2093,7 +2168,7 @@
       "currentSourceChecksumSha256": "92f9f99b96d564edf9dc8447a257005ab3f94d26eee500558ee1aa93917390ef",
       "replacementChecksumSha256": "b8c137d71661bc5bd86509db31487f1e2d61ee20c9325e20933e192fb730d582",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Budget_impasse_article_final_PDF_for_posting-210121T15283297.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:46:06.692Z",
+      "verificationTimestamp": "2026-03-31T06:47:52.714Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -2118,7 +2193,7 @@
       "currentSourceChecksumSha256": "ea66790d7449c593587067809f04a8b7d18e33cde7d14acf3da8b6fa2985889b",
       "replacementChecksumSha256": "262d2a5c73867963beeb9c740d7e4cc3975307e582b8f629af1f243f53e374c9",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Suicide_and_Justice_Involvement_-_Final_PDF_for_Publication-210901T17314728.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:47:07.816Z",
+      "verificationTimestamp": "2026-03-31T06:48:46.550Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -2143,7 +2218,7 @@
       "currentSourceChecksumSha256": "2a5290246a50f096d93314ddebad959c85cfb4347331d380e3f05232bed5d17c",
       "replacementChecksumSha256": "f8454244d60083b4e9f4f3379c1bfb4729bab27f2bf7ef27fdb4bb38842fb9fe",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Stigma_PDF_for_posting-230627T13295515.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:52:43.606Z",
+      "verificationTimestamp": "2026-03-31T06:54:02.059Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,
@@ -2168,7 +2243,7 @@
       "currentSourceChecksumSha256": "be1e1387ffff1cf6e39278f2c6777f3ae486287c8939281090897414ae0b7a15",
       "replacementChecksumSha256": "3190c0c1df36fb215af020bb77a68459205ea57a429cce8a6f0b56449a0e161d",
       "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/IJJC_Data_Trends_article-250331T16235728.pdf.json",
-      "verificationTimestamp": "2026-03-31T00:51:28.427Z",
+      "verificationTimestamp": "2026-03-31T06:52:48.595Z",
       "verificationSummary": {
         "passed": true,
         "overallScore": 100,

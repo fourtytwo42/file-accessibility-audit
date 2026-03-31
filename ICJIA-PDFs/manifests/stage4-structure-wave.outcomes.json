@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-31T04:08:40.492Z",
+  "generatedAt": "2026-03-31T05:05:26.227Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 5,
-    "processed": 9,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 9,
+    "targetCandidates": 8,
+    "processed": 17,
+    "readyToReplace": 1,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 16,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
@@ -486,6 +486,429 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
         "remediatedPdfSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3767",
+      "publicationTitle": "Safety Plan for Domestic Violence Victims",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/SafetyPlan.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/SafetyPlan.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/SafetyPlan.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:04:46.651Z",
+      "durationMs": 43470,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 78,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 78, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.font_unicode",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.font_unicode"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b2f28f26c324254d152355686d217910a982ab685e2ffd69c2e16392e8b0cbc3",
+        "remediatedPdfSha256": "b2f28f26c324254d152355686d217910a982ab685e2ffd69c2e16392e8b0cbc3",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3981",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Polish)",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_polish.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_polish.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_polish.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:05.569Z",
+      "durationMs": 62387,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "fb9ca2360c6dccb260ae65774c75687e92df6024d948d1f807914061de4d5dfb",
+        "remediatedPdfSha256": "fb9ca2360c6dccb260ae65774c75687e92df6024d948d1f807914061de4d5dfb",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3771",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Spanish)",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_spanish.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_spanish.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_spanish.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:10.924Z",
+      "durationMs": 67742,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.font_unicode",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_unicode"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "37c98a715a7ad6a810dad87900cf2ac4885cf7aa766f7388b04d1e90f901882b",
+        "remediatedPdfSha256": "37c98a715a7ad6a810dad87900cf2ac4885cf7aa766f7388b04d1e90f901882b",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3964",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (English)",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_english.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_english.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_english.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:16.271Z",
+      "durationMs": 73089,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Categories still below 100: Reading Order"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Reading Order"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "108e0d76d1c6db77670a2e45c9450cb11c479443262d68874792dcaa3b6141c2",
+        "remediatedPdfSha256": "108e0d76d1c6db77670a2e45c9450cb11c479443262d68874792dcaa3b6141c2",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4046",
+      "publicationTitle": "Chicago Homicide Dataset Series Childrens risk of homicide victimization records 31year increase",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:20.464Z",
+      "durationMs": 77282,
+      "original": {
+        "overallScore": 19,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 97,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 97, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "2b42139ddb067b6ba26db4afd72c60a7c106ab30ed38c6815c108f42ec7c73ac",
+        "remediatedPdfSha256": "2b42139ddb067b6ba26db4afd72c60a7c106ab30ed38c6815c108f42ec7c73ac",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4047",
+      "publicationTitle": "Lengthy criminal histories shown among incarcerated lowlevel felony offenders",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf//AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:20.619Z",
+      "durationMs": 77437,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "acba9bbb7d86d93e15830fc7c8f7b0116030cd7a5345a2a96dd155da51bde401",
+        "remediatedPdfSha256": "acba9bbb7d86d93e15830fc7c8f7b0116030cd7a5345a2a96dd155da51bde401",
+        "stagedReplacementSha256": "acba9bbb7d86d93e15830fc7c8f7b0116030cd7a5345a2a96dd155da51bde401"
+      }
+    },
+    {
+      "publicationId": "4135",
+      "publicationTitle": "Juvenile arrest rates reveal significant racial disparity",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Arrests.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Arrests.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Arrests.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:25.311Z",
+      "durationMs": 82129,
+      "original": {
+        "overallScore": 19,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 97,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 97, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "2a0367a943d0ebfaa10125689cfc93d17419a1245d6bb9ae3f3dcf7864f21797",
+        "remediatedPdfSha256": "2a0367a943d0ebfaa10125689cfc93d17419a1245d6bb9ae3f3dcf7864f21797",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4050",
+      "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/MRT.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/MRT.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/MRT.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T05:05:26.226Z",
+      "durationMs": 83044,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 97,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 97, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
+        "remediatedPdfSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
         "stagedReplacementSha256": null
       }
     }

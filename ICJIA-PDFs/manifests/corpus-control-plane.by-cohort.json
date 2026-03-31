@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-03-31T04:32:10.160Z",
+  "generatedAt": "2026-03-31T06:56:09.270Z",
   "cohorts": {
     "short_high_likelihood": {
-      "totalRows": 22,
+      "totalRows": 23,
       "byCurrentCorpusStatus": {
-        "verified_pass": 19,
+        "verified_pass": 20,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
@@ -28,16 +28,16 @@
       ]
     },
     "figure_heavy": {
-      "totalRows": 492,
+      "totalRows": 491,
       "byCurrentCorpusStatus": {
-        "verified_pass": 17,
+        "verified_pass": 19,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 421,
+        "remediated_fail": 419,
         "processing_error": 53,
         "deferred_manual": 0,
-        "staged_for_replacement": 1,
+        "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
@@ -60,10 +60,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 292,
+        "remediated_fail": 291,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 0,
+        "staged_for_replacement": 1,
         "replaced_remote": 0
       },
       "samplePublicationIds": [

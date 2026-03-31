@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T04:34:25.613Z",
+  "generatedAt": "2026-03-31T06:56:10.582Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
@@ -31,10 +31,10 @@
     "processingErrorPublicationIds": []
   },
   "cumulativeTotals": {
-    "processed": 9,
+    "processed": 17,
     "readyToReplace": 0,
-    "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 9,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 16,
     "sourceMissing": 0,
     "processingError": 0
   },

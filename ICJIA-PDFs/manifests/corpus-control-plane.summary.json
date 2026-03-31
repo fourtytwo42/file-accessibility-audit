@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-03-31T04:32:10.145Z",
+  "generatedAt": "2026-03-31T06:56:09.255Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
-      "verified_pass": 87,
+      "verified_pass": 90,
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 852,
+      "remediated_fail": 849,
       "processing_error": 113,
       "deferred_manual": 0,
       "staged_for_replacement": 1,
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 22,
-      "figure_heavy": 492,
+      "short_high_likelihood": 23,
+      "figure_heavy": 491,
       "structure_heavy": 338,
       "font_heavy": 14,
       "long_report": 15,
@@ -28,7 +28,7 @@
     },
     "statusByCohort": {
       "short_high_likelihood": {
-        "verified_pass": 19,
+        "verified_pass": 20,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
@@ -39,14 +39,14 @@
         "replaced_remote": 0
       },
       "figure_heavy": {
-        "verified_pass": 17,
+        "verified_pass": 19,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 421,
+        "remediated_fail": 419,
         "processing_error": 53,
         "deferred_manual": 0,
-        "staged_for_replacement": 1,
+        "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "structure_heavy": {
@@ -54,10 +54,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 292,
+        "remediated_fail": 291,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 0,
+        "staged_for_replacement": 1,
         "replaced_remote": 0
       },
       "font_heavy": {
@@ -94,8 +94,8 @@
         "replaced_remote": 0
       }
     },
-    "verifiedPassRowsFromLedger": 87,
-    "remainingRowsExcludingVerifiedPass": 969
+    "verifiedPassRowsFromLedger": 90,
+    "remainingRowsExcludingVerifiedPass": 966
   },
   "validation": {
     "ok": true,

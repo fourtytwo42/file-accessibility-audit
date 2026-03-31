@@ -1,35 +1,35 @@
 {
-  "generatedAt": "2026-03-31T04:34:25.610Z",
+  "generatedAt": "2026-03-31T06:56:10.580Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T04:34:25.587Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T06:56:10.559Z",
   "waveName": "stage4-structure-wave",
   "cohortLabel": "structure_heavy",
   "maxCandidates": 8,
   "totals": {
-    "eligibleRows": 291,
+    "eligibleRows": 283,
     "selectedRows": 8,
-    "skippedRows": 283,
+    "skippedRows": 275,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "3767",
-    "3771",
-    "3964",
-    "3981",
-    "4046",
-    "4047",
-    "4050",
-    "4135"
+    "4037",
+    "4061",
+    "3597",
+    "3608",
+    "3610",
+    "3645",
+    "3656",
+    "3663"
   ],
   "pendingPublicationIds": [
-    "3767",
-    "3771",
-    "3964",
-    "3981",
-    "4046",
-    "4047",
-    "4050",
-    "4135"
+    "4037",
+    "4061",
+    "3597",
+    "3608",
+    "3610",
+    "3645",
+    "3656",
+    "3663"
   ],
   "candidates": [
     {
@@ -37,12 +37,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3767",
-      "publicationTitle": "Safety Plan for Domestic Violence Victims",
+      "publicationId": "4037",
+      "publicationTitle": "Jackson County SchoolBasedProbation Program Lessons learned",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/SafetyPlan.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/SafetyPlan.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/SafetyPlan.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Vol%204_No_1_Jackson%20County%20Schoolbased%20Probation.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -50,15 +50,15 @@
         "cohort:structure_heavy",
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
-        "outcome:failed_after_remediation",
         "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals"
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_hard_fail"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 9,
+      "blockingFindingCount": 7,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -71,10 +71,8 @@
         "category.reading_order",
         "pdfua.display_doc_title",
         "pdfua.document_language",
-        "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.logical_structure",
-        "pdfua.metadata_identification"
+        "pdfua.logical_structure"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -90,12 +88,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3771",
-      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Spanish)",
+      "publicationId": "4061",
+      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 2",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_spanish.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_spanish.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_spanish.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -103,15 +101,15 @@
         "cohort:structure_heavy",
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
-        "outcome:failed_after_remediation",
         "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals"
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_hard_fail"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
+      "blockingFindingCount": 7,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -122,13 +120,10 @@
         "category.heading_structure",
         "category.pdf_ua_compliance",
         "category.reading_order",
-        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
-        "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.logical_structure",
-        "pdfua.metadata_identification"
+        "pdfua.logical_structure"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -144,12 +139,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3964",
-      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (English)",
+      "publicationId": "3597",
+      "publicationTitle": "Evaluation of the Cook County Juvenile Sheriffs Work Alternative Program",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_english.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_english.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_english.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/ogav3n1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/ogav3n1.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -161,11 +156,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
+      "blockingFindingCount": 11,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -181,6 +176,7 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
+        "pdfua.font_widths",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -198,12 +194,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3981",
-      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Polish)",
+      "publicationId": "3608",
+      "publicationTitle": "Champaign County Enhanced Domestic Violence Probation Program Evaluated",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_polish.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_polish.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_polish.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/chdv.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/chdv.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/chdv.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -215,11 +211,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
+      "blockingFindingCount": 11,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -235,6 +231,7 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
+        "pdfua.font_widths",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -252,12 +249,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4046",
-      "publicationTitle": "Chicago Homicide Dataset Series Childrens risk of homicide victimization records 31year increase",
+      "publicationId": "3610",
+      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Child homicide final.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Child homicide final.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -269,8 +266,8 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
       "blockingFindingCount": 10,
@@ -306,12 +303,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4047",
-      "publicationTitle": "Lengthy criminal histories shown among incarcerated lowlevel felony offenders",
+      "publicationId": "3645",
+      "publicationTitle": "The Juvenile Justice Reform Act",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf//AtAGlance/vol1_no3_Class4felonyoffenders.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/juvreform.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/juvreform.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/juvreform.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -323,11 +320,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4047-Lengthy_criminal_histories_shown_among_incarcerated_lowlevel_felony_offenders.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 9,
+      "blockingFindingCount": 11,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -343,7 +340,9 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.logical_structure"
+        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -359,12 +358,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4050",
-      "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+      "publicationId": "3656",
+      "publicationTitle": "Evaluation of the Kankakee Metropolitan Enforcement Group",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/MRT.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/MRT.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/MRT.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmeg-oga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/kmeg-oga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmeg-oga.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -376,11 +375,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 8,
+      "blockingFindingCount": 10,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -391,11 +390,13 @@
         "category.heading_structure",
         "category.pdf_ua_compliance",
         "category.reading_order",
+        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.logical_structure"
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -411,12 +412,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4135",
-      "publicationTitle": "Juvenile arrest rates reveal significant racial disparity",
+      "publicationId": "3663",
+      "publicationTitle": "Juvenile Probation Programs Evaluated",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Arrests.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Arrests.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Arrests.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvdayreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvdayreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvdayreport.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -428,8 +429,8 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.remediation.json",
-      "pageCount": 2,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+      "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
       "blockingFindingCount": 10,
@@ -507,17 +508,6 @@
       ]
     },
     {
-      "publicationId": "3597",
-      "publicationTitle": "Evaluation of the Cook County Juvenile Sheriffs Work Alternative Program",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3599",
       "publicationTitle": "Probation Trends in Illinois",
       "currentCorpusStatus": "remediated_fail",
@@ -547,28 +537,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3608",
-      "publicationTitle": "Champaign County Enhanced Domestic Violence Probation Program Evaluated",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3610",
-      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -628,17 +596,6 @@
       ]
     },
     {
-      "publicationId": "3645",
-      "publicationTitle": "The Juvenile Justice Reform Act",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3653",
       "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
       "currentCorpusStatus": "processing_error",
@@ -652,28 +609,6 @@
     {
       "publicationId": "3655",
       "publicationTitle": "An Evaluation of the Violent Offender Prosecution Program in Kankakee Sangamon and Winnebago Counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3656",
-      "publicationTitle": "Evaluation of the Kankakee Metropolitan Enforcement Group",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3663",
-      "publicationTitle": "Juvenile Probation Programs Evaluated",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
       "skipReasons": [
@@ -2311,17 +2246,6 @@
       ]
     },
     {
-      "publicationId": "4037",
-      "publicationTitle": "Jackson County SchoolBasedProbation Program Lessons learned",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:ready_to_replace"
-      ]
-    },
-    {
       "publicationId": "4038",
       "publicationTitle": "Juvenile Justice System and Risk Factor Data for Illinois 2003 Annual Report",
       "currentCorpusStatus": "remediated_fail",
@@ -2407,17 +2331,6 @@
         "not_in_current_wave_capacity",
         "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "4061",
-      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 2",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:ready_to_replace"
       ]
     },
     {
