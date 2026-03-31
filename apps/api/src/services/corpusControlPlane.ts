@@ -26,6 +26,7 @@ export type VerificationClassification = 'verified_pass' | 'soft_fail_advisory' 
 export type FigureWaveBucket = 'ownership_cleared_figure_debt_remains' | 'mixed_figure_structure_debt' | 'mass_unresolved_figure_debt' | 'figure_processing_error_retry'
 export type StructureWaveBucket = 'structure_only_residuals' | 'mixed_structure_figure_residuals' | 'metadata_navigation_residuals' | 'structure_processing_error_retry'
 export type Stage4TerminalSurvivorClass =
+  | 'staged_pass_candidate_survivor'
   | 'near_pass_grade_only'
   | 'font_text_extractability_survivor'
   | 'figure_spillover_survivor'
@@ -736,7 +737,9 @@ function deriveStage4StructureDiagnostics(input: {
     || FIGURE_FAMILY_PATTERN.test(decisiveJoinedText)
 
   let terminalSurvivorClass: Stage4TerminalSurvivorClass | null = null
-  if (input.latestOutcome?.outcome.status === 'failed_after_remediation') {
+  if (input.latestOutcome?.outcome.status === 'remediated_pass_candidate') {
+    terminalSurvivorClass = 'staged_pass_candidate_survivor'
+  } else if (input.latestOutcome?.outcome.status === 'failed_after_remediation') {
     const finalGrade = input.latestOutcome.outcome.final?.grade || null
     const finalScore = input.latestOutcome.outcome.final?.overallScore ?? null
     if (
@@ -747,7 +750,8 @@ function deriveStage4StructureDiagnostics(input: {
     ) {
       terminalSurvivorClass = 'near_pass_grade_only'
     } else if (
-      latestOutcomeBlockingKeys.includes('pdfua.font_embedding')
+      (latestOutcomeBlockingKeys.includes('pdfua.font_embedding')
+        || latestOutcomeBlockingKeys.includes('pdfua.font_unicode'))
       && latestOutcomeUnresolvedCategories.some(label => /text extractability/i.test(label))
     ) {
       terminalSurvivorClass = 'font_text_extractability_survivor'

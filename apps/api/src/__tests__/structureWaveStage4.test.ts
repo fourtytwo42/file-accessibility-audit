@@ -400,7 +400,7 @@ describe('structure wave Stage 4', () => {
           { publicationId: '4023', status: 'failed_after_remediation' },
           { publicationId: '4067', status: 'failed_after_remediation' },
           { publicationId: '3671', status: 'failed_after_remediation' },
-        ],
+        ] as any[],
       },
     })
 
@@ -491,8 +491,63 @@ describe('structure wave Stage 4', () => {
     expect(row?.reasonCodes).toContain('stage4:reclassified_from_structure_heavy')
   })
 
+
+  it('reports the latest completed eight-row wave separately from cumulative append history', () => {
+    const wave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T06:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T06:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 8, selectedRows: 8, skippedRows: 0, pendingRows: 0 },
+      selectedPublicationIds: ['3767', '3771', '3964', '3981', '4046', '4047', '4050', '4135'],
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
+    }
+
+    const summary = buildStage4StructureWaveOutcomesSummary({
+      wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: {
+        outcomes: [
+          { publicationId: '3465', status: 'failed_after_remediation', processedAt: '2026-03-31T04:07:48.539Z' },
+          { publicationId: '4054', status: 'failed_after_remediation', processedAt: '2026-03-31T04:07:55.513Z' },
+          { publicationId: '4023', status: 'failed_after_remediation', processedAt: '2026-03-31T04:08:00.270Z' },
+          { publicationId: '4067', status: 'failed_after_remediation', processedAt: '2026-03-31T04:08:12.611Z' },
+          { publicationId: '3671', status: 'failed_after_remediation', processedAt: '2026-03-31T04:08:40.491Z' },
+          { publicationId: '3767', status: 'failed_after_remediation', processedAt: '2026-03-31T05:04:46.651Z' },
+          { publicationId: '3981', status: 'failed_after_remediation', processedAt: '2026-03-31T05:05:05.569Z' },
+          { publicationId: '3771', status: 'failed_after_remediation', processedAt: '2026-03-31T05:05:10.924Z' },
+          { publicationId: '3964', status: 'failed_after_remediation', processedAt: '2026-03-31T05:05:16.271Z' },
+          { publicationId: '4046', status: 'failed_after_remediation', processedAt: '2026-03-31T05:05:20.464Z' },
+          { publicationId: '4047', status: 'remediated_pass_candidate', processedAt: '2026-03-31T05:05:20.619Z' },
+          { publicationId: '4135', status: 'failed_after_remediation', processedAt: '2026-03-31T05:05:25.311Z' },
+          { publicationId: '4050', status: 'failed_after_remediation', processedAt: '2026-03-31T05:05:26.226Z' },
+        ],
+      },
+    })
+
+    expect(summary?.totals).toMatchObject({
+      targetCandidates: 8,
+      processed: 8,
+      remediatedPassCandidates: 1,
+      failedAfterRemediation: 7,
+      processingError: 0,
+      remaining: 0,
+    })
+    expect((summary as any)?.currentWave.processedPublicationIds).toEqual(['3767', '3771', '3964', '3981', '4046', '4047', '4050', '4135'])
+    expect(summary?.cumulativeTotals).toMatchObject({
+      processed: 13,
+      remediatedPassCandidates: 1,
+      failedAfterRemediation: 12,
+    })
+  })
+
   it('reports throughput routing buckets and builds structure canaries', () => {
     const artifacts = makeArtifacts([
+      makeRow({ publicationId: 'staged', currentCorpusStatus: 'staged_for_replacement', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: 'staged_pass_candidate_survivor' } }),
       makeRow({ publicationId: 'verified', currentCorpusStatus: 'verified_pass', cohortLabel: 'structure_heavy', title: 'Verified Structure', promotionTruth: { promotionStatus: 'verified_pass', ledgerRowPresent: true, stagedReplacementPath: '/staged/verified.pdf', replacementChecksumSha256: 'x', verificationPassed: true }, stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
       makeRow({ publicationId: 'meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
       makeRow({ publicationId: 'structure', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
@@ -518,12 +573,14 @@ describe('structure wave Stage 4', () => {
     }
     const summary = buildStage4StructureThroughputSummary({ artifacts, sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json', sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z', waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json', wave, outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json', outcomes: { outcomes: [{ publicationId: 'mixed', status: 'failed_after_remediation' }, { publicationId: 'retry', status: 'processing_error' }] } })
     expect(summary.rows.nextWaveStructureOnlyPublicationIds).toEqual(['4436', 'meta', 'structure'])
+    expect(summary.rows.stagedPassCandidatePublicationIds).toEqual(['staged'])
     expect(summary.rows.readingOrderOnlyResidualPublicationIds).toEqual([])
     expect(summary.rows.mixedFollowupPublicationIds).toEqual(['mixed'])
     expect(summary.rows.boundedRuntimeRetryPublicationIds).toEqual(['retry'])
     expect(summary.totals.genericTimeoutRows).toBe(0)
 
     const canaries = buildStage4StructureCanaries({ artifacts, sources: makeSources() })
+    expect(canaries.rows.some(row => row.publicationId === 'staged' && row.stage4RepresentativeKind === 'staged_pass_candidate_survivor')).toBe(true)
     expect(canaries.rows.some(row => row.publicationId === 'verified' && row.stage4RepresentativeKind === 'verified_pass')).toBe(true)
     expect(canaries.rows.some(row => row.publicationId === '4023' && row.stage4RepresentativeKind === 'near_pass_grade_only')).toBe(true)
     expect(canaries.rows.some(row => row.publicationId === '3465' && row.stage4RepresentativeKind === 'font_text_extractability_survivor')).toBe(true)

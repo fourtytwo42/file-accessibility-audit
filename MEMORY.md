@@ -1,5 +1,34 @@
 # Project Memory
 
+## 2026-03-31 Stage 4.5
+
+- Stage 4 remains the active lane.
+- Stage 4.5 corrected reporting drift so the Stage 4 reporting wave can advance to the latest fully terminal eight-row cohort instead of staying pinned to the older Stage 4.4 five-row fallback.
+- Latest completed eight-row Stage 4 reporting wave:
+  - `3767`
+  - `3771`
+  - `3964`
+  - `3981`
+  - `4046`
+  - `4047`
+  - `4050`
+  - `4135`
+- Truth for that wave:
+  - `4047` is a `remediated_pass_candidate` / staged local replacement and is tracked as `staged_pass_candidate_survivor`
+  - `4046`, `4050`, `4135` are `near_pass_grade_only`
+  - `3767`, `3981`, and `3771` are `font_text_extractability_survivor`
+  - `3964` is `reading_order_only_survivor`
+- `3771` should no longer be treated as a generic metadata/navigation hard fail:
+  - latest blocker includes `pdfua.font_unicode`
+  - unresolved categories include `Text Extractability`
+  - so it belongs with the font/text-extractability survivor class
+- Stage 4 canaries should prefer the latest terminal shapes:
+  - `4047` for staged pass candidate
+  - one of `4046` / `4050` / `4135` for near-pass
+  - `3767` or `3981` for font/text extractability
+  - `3964` for reading-order-only
+  - keep `3671` as figure spillover
+
 This file stores durable project facts, proven workflows, known exceptions, and anything we should not forget across chats.
 
 ## Important Verification Finding

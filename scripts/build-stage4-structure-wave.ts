@@ -36,20 +36,95 @@ function terminalPublicationIdsFromOutcomes(outcomesDoc: { outcomes?: Array<{ pu
   )
 }
 
+function latestProcessedAtMillis(outcome: { processedAt?: string | null }): number | null {
+  if (!outcome.processedAt) return null
+  const parsed = Date.parse(outcome.processedAt)
+  return Number.isFinite(parsed) ? parsed : null
+}
+
+function deriveLatestCompletedWavePublicationIds(input: {
+  existingOutcomes: { outcomes?: Array<{ publicationId?: string | null; status?: string | null; processedAt?: string | null }> } | null
+  excludedPublicationIds: string[]
+  minRows: number
+  maxGapMs?: number
+}): string[] {
+  const { existingOutcomes, excludedPublicationIds, minRows, maxGapMs = 15 * 60 * 1000 } = input
+  const terminalStatuses = new Set(['failed_after_remediation', 'processing_error', 'ready_to_replace', 'remediated_pass_candidate', 'source_missing'])
+  const excluded = new Set(excludedPublicationIds)
+  const outcomes = (existingOutcomes?.outcomes || []).filter(outcome => {
+    return Boolean(outcome.publicationId) && terminalStatuses.has(outcome.status || '') && !excluded.has(String(outcome.publicationId))
+  })
+  if (!outcomes.length) return []
+
+  const selected: Array<{ publicationId: string; processedAtMs: number | null }> = []
+  const seen = new Set<string>()
+  let anchorProcessedAt: number | null = null
+  for (let index = outcomes.length - 1; index >= 0; index -= 1) {
+    const outcome = outcomes[index]
+    const publicationId = String(outcome.publicationId)
+    const processedAtMs = latestProcessedAtMillis(outcome)
+    if (seen.has(publicationId)) continue
+    if (anchorProcessedAt !== null && processedAtMs !== null && anchorProcessedAt - processedAtMs > maxGapMs) {
+      break
+    }
+    if (anchorProcessedAt === null && processedAtMs !== null) anchorProcessedAt = processedAtMs
+    seen.add(publicationId)
+    selected.push({ publicationId, processedAtMs })
+  }
+
+  if (selected.length < minRows) return []
+  return selected
+    .sort((left, right) => {
+      const leftTs = left.processedAtMs ?? 0
+      const rightTs = right.processedAtMs ?? 0
+      if (leftTs !== rightTs) return leftTs - rightTs
+      return left.publicationId.localeCompare(right.publicationId)
+    })
+    .map(row => row.publicationId)
+}
+
 function chooseReportingWave(input: {
   existingWave: Stage4StructureWaveDocument | null
-  existingOutcomes: { outcomes?: Array<{ publicationId?: string | null; status?: string | null }> } | null
+  existingOutcomes: { outcomes?: Array<{ publicationId?: string | null; status?: string | null; processedAt?: string | null }> } | null
+  existingOutcomesSummary: { totals?: { targetCandidates?: number | null } | null } | null
   nextWave: Stage4StructureWaveDocument
   sourceControlPlanePath: string
   sourceControlPlaneGeneratedAt: string
   fallbackPublicationIds?: string[]
 }): Stage4StructureWaveDocument {
-  const { existingWave, existingOutcomes, nextWave, sourceControlPlanePath, sourceControlPlaneGeneratedAt, fallbackPublicationIds = [] } = input
+  const { existingWave, existingOutcomes, existingOutcomesSummary, nextWave, sourceControlPlanePath, sourceControlPlaneGeneratedAt, fallbackPublicationIds = [] } = input
   const terminalIds = terminalPublicationIdsFromOutcomes(existingOutcomes)
   if (existingWave) {
     const selectedIds = existingWave.selectedPublicationIds || []
     if (selectedIds.length > 0 && selectedIds.every(publicationId => terminalIds.has(publicationId))) {
       return existingWave
+    }
+  }
+
+  const minRows = Number(existingOutcomesSummary?.totals?.targetCandidates || 0)
+  const latestCompletedWavePublicationIds = deriveLatestCompletedWavePublicationIds({
+    existingOutcomes,
+    excludedPublicationIds: nextWave.selectedPublicationIds || [],
+    minRows: minRows > 0 ? minRows : 1,
+  })
+  if (latestCompletedWavePublicationIds.length > 0) {
+    return {
+      generatedAt: new Date().toISOString(),
+      sourceControlPlanePath,
+      sourceControlPlaneGeneratedAt,
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: latestCompletedWavePublicationIds.length,
+      totals: {
+        eligibleRows: latestCompletedWavePublicationIds.length,
+        selectedRows: latestCompletedWavePublicationIds.length,
+        skippedRows: 0,
+        pendingRows: 0,
+      },
+      selectedPublicationIds: latestCompletedWavePublicationIds,
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
     }
   }
 
@@ -101,7 +176,8 @@ export async function main(): Promise<void> {
   const outcomesSummaryPath = path.join(sources.manifestsRoot, 'stage4-structure-wave.outcomes.summary.json')
 
   const existingWave = readJsonIfExists(wavePath) as Stage4StructureWaveDocument | null
-  const existingOutcomes = readJsonIfExists(outcomesPath) as { outcomes?: Array<{ publicationId?: string | null; status?: string | null }> } | null
+  const existingOutcomes = readJsonIfExists(outcomesPath) as { outcomes?: Array<{ publicationId?: string | null; status?: string | null; processedAt?: string | null }> } | null
+  const existingOutcomesSummary = readJsonIfExists(outcomesSummaryPath) as { totals?: { targetCandidates?: number | null } | null } | null
 
   const maxCandidates = Number(process.env.ICJIA_STAGE4_STRUCTURE_WAVE_LIMIT || 8)
   const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS || '')
@@ -122,6 +198,7 @@ export async function main(): Promise<void> {
   const reportingWave = chooseReportingWave({
     existingWave,
     existingOutcomes,
+    existingOutcomesSummary,
     nextWave: waveArtifacts.wave,
     sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
     sourceControlPlaneGeneratedAt: artifacts.document.generatedAt,
@@ -145,7 +222,7 @@ export async function main(): Promise<void> {
     outcomesPath,
     outcomes: existingOutcomes,
   })
-  const canaries = buildStage4StructureCanaries({ artifacts, sources })
+  const canaries = buildStage4StructureCanaries({ artifacts, sources, reportingWavePublicationIds: reportingWave.selectedPublicationIds })
 
   writeJson(wavePath, waveArtifacts.wave)
   writeJson(waveSummaryPath, waveArtifacts.summary)

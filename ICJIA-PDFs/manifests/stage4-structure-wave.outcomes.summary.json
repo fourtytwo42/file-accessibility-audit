@@ -1,32 +1,37 @@
 {
-  "generatedAt": "2026-03-31T06:56:10.582Z",
+  "generatedAt": "2026-03-31T14:36:12.095Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 5,
-    "processed": 5,
+    "targetCandidates": 8,
+    "processed": 8,
     "readyToReplace": 0,
-    "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 5,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 7,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
   },
   "currentWave": {
     "processedPublicationIds": [
-      "3465",
-      "3671",
-      "4023",
-      "4054",
-      "4067"
+      "3767",
+      "3771",
+      "3964",
+      "3981",
+      "4046",
+      "4047",
+      "4050",
+      "4135"
     ],
     "remainingPublicationIds": [],
     "failedAfterRemediationPublicationIds": [
-      "3465",
-      "3671",
-      "4023",
-      "4054",
-      "4067"
+      "3767",
+      "3771",
+      "3964",
+      "3981",
+      "4046",
+      "4050",
+      "4135"
     ],
     "processingErrorPublicationIds": []
   },
@@ -39,59 +44,52 @@
     "processingError": 0
   },
   "latestProcessed": {
-    "publicationId": "3671",
-    "publicationTitle": "ICJIA 1997 Annual Report",
-    "priorityRank": 4,
+    "publicationId": "4050",
+    "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+    "priorityRank": 7,
     "priorityTier": "highest",
-    "passLikelihoodScore": 83,
+    "passLikelihoodScore": 70,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/97anreport.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/97anreport.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/97anreport.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/MRT.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/MRT.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/MRT.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/97anreport.pdf.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T04:08:40.491Z",
-    "durationMs": 118627,
+    "processedAt": "2026-03-31T05:05:26.226Z",
+    "durationMs": 83044,
     "original": {
-      "overallScore": 24,
+      "overallScore": 29,
       "grade": "F",
-      "pageCount": 36,
+      "pageCount": 2,
       "isScanned": false
     },
     "final": {
-      "overallScore": 87,
+      "overallScore": 97,
       "grade": "B",
-      "pageCount": 36,
+      "pageCount": 2,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
         "Final grade is B, not A.",
-        "Final overall score is 87, not 100.",
-        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
-        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        "Final overall score is 97, not 100."
       ],
-      "blockingLocalFindingKeys": [
-        "pdfua.figure_alt_or_artifact"
-      ],
-      "unresolvedCategoryLabels": [
-        "Alt Text on Images",
-        "PDF/UA Compliance"
-      ],
+      "blockingLocalFindingKeys": [],
+      "unresolvedCategoryLabels": [],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
-      "remediatedPdfSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
+      "gateEvaluatedBufferSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
+      "remediatedPdfSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
       "stagedReplacementSha256": null
     }
   }

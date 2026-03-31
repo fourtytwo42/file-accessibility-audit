@@ -111,6 +111,7 @@ export interface Stage4StructureThroughputSummaryDocument {
   }
   rows: {
     newlyVerifiedPassPublicationIds: string[]
+    stagedPassCandidatePublicationIds: string[]
     remainingPublicationIds: string[]
     processingErrorPublicationIds: string[]
     hardFailPublicationIds: string[]
@@ -214,6 +215,7 @@ export interface Stage4StructureCanaryRow {
   benchmarkName: string | null
   stage4RepresentativeKind:
     | 'verified_pass'
+    | 'staged_pass_candidate_survivor'
     | 'metadata_navigation_residuals'
     | 'structure_only_residuals'
     | 'mixed_structure_figure_residuals'
@@ -247,6 +249,7 @@ export interface Stage4StructureCanariesDocument {
 type OutcomeLike = {
   publicationId: string | null
   status: string | null
+  processedAt?: string | null
   gate?: {
     blockingLocalFindingKeys?: string[]
     unresolvedCategoryLabels?: string[]
@@ -588,6 +591,7 @@ function unresolvedActivePublicationIdsFromExistingArtifacts(
 function terminalSurvivorClassFromRow(row: CorpusControlPlaneRow): Stage4TerminalSurvivorClass | null {
   return row.stage4StructureDiagnostics.terminalSurvivorClass || null
 }
+
 
 function countOutcomeStatuses(outcomes: OutcomeLike[] = []): Record<string, number> {
   const counts: Record<string, number> = {}
@@ -968,6 +972,8 @@ function applyStage4RoutingToRow(
       nextCohortLabel = 'figure_heavy'
       nextReasonCodes.push('stage4.4:figure_spillover_survivor', 'stage4:reclassified_from_structure_heavy', 'stage4:figure_dominant_after_structure_wave')
       nextNotes.push('Stage 4.4 reclassified this terminal Stage 4 survivor back to figure_heavy because the latest truthful blocker is figure debt.')
+    } else if (nextDiagnostics.terminalSurvivorClass === 'staged_pass_candidate_survivor') {
+      nextReasonCodes.push('stage4.5:staged_pass_candidate_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'near_pass_grade_only') {
       nextReasonCodes.push('stage4.4:near_pass_grade_only')
     } else if (nextDiagnostics.terminalSurvivorClass === 'font_text_extractability_survivor') {
@@ -1057,19 +1063,23 @@ export function applyStage4StructureWaveReclassification(
   }
 }
 
-function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts): Stage4StructureCanaryRow[] {
+function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts, reportingWavePublicationIds: string[] = []): Stage4StructureCanaryRow[] {
   const structureRows = artifacts.document.rows.filter(row => row.cohortLabel === 'structure_heavy')
   const allRows = artifacts.document.rows
-  const preferStage44 = (rows: CorpusControlPlaneRow[], terminalClass: Stage4TerminalSurvivorClass): CorpusControlPlaneRow | undefined => {
-    return rows.find(row => row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass && row.reasonCodes.includes('stage4.4:' + terminalClass))
+  const reportingWaveIds = new Set(reportingWavePublicationIds)
+  const preferTerminalClass = (rows: CorpusControlPlaneRow[], terminalClass: Stage4TerminalSurvivorClass): CorpusControlPlaneRow | undefined => {
+    return rows.find(row => reportingWaveIds.has(row.publicationId) && row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass)
+      || rows.find(row => row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass && row.reasonCodes.includes('stage4.5:' + terminalClass))
+      || rows.find(row => row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass && row.reasonCodes.includes('stage4.4:' + terminalClass))
       || rows.find(row => row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass)
   }
   const picks: Array<{ kind: Stage4StructureCanaryRow['stage4RepresentativeKind']; row: CorpusControlPlaneRow | undefined }> = [
+    { kind: 'staged_pass_candidate_survivor', row: preferTerminalClass(allRows, 'staged_pass_candidate_survivor') },
     { kind: 'verified_pass', row: structureRows.find(row => row.currentCorpusStatus === 'verified_pass') },
-    { kind: 'near_pass_grade_only', row: preferStage44(allRows, 'near_pass_grade_only') },
-    { kind: 'font_text_extractability_survivor', row: preferStage44(allRows, 'font_text_extractability_survivor') },
-    { kind: 'reading_order_only_survivor', row: preferStage44(allRows, 'reading_order_only_survivor') || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && (row.classificationEvidence.pageCount || 0) >= 40) || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals') },
-    { kind: 'figure_spillover_survivor', row: preferStage44(allRows, 'figure_spillover_survivor') },
+    { kind: 'near_pass_grade_only', row: preferTerminalClass(allRows, 'near_pass_grade_only') },
+    { kind: 'font_text_extractability_survivor', row: preferTerminalClass(allRows, 'font_text_extractability_survivor') },
+    { kind: 'reading_order_only_survivor', row: preferTerminalClass(allRows, 'reading_order_only_survivor') || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && (row.classificationEvidence.pageCount || 0) >= 40) || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals') },
+    { kind: 'figure_spillover_survivor', row: preferTerminalClass(allRows, 'figure_spillover_survivor') },
     { kind: 'structure_processing_error_retry', row: structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry') },
   ]
 
@@ -1105,6 +1115,7 @@ function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts): Stage
 export function buildStage4StructureCanaries(input: {
   artifacts: CorpusControlPlaneArtifacts
   sources: CorpusControlPlaneSources
+  reportingWavePublicationIds?: string[]
 }): Stage4StructureCanariesDocument {
   const rowByPublicationId = new Map(input.artifacts.document.rows.map(row => [row.publicationId, row]))
   const publicationIdByLocalPath = new Map<string, string>()
@@ -1138,7 +1149,7 @@ export function buildStage4StructureCanaries(input: {
       }
     })
 
-  const rows = [...benchmarkRows, ...representativeCanaryRows(input.artifacts)]
+  const rows = [...benchmarkRows, ...representativeCanaryRows(input.artifacts, input.reportingWavePublicationIds || [])]
   const deduped: Stage4StructureCanaryRow[] = []
   const seen = new Set<string>()
   for (const row of rows) {
@@ -1370,6 +1381,9 @@ export function buildStage4StructureThroughputSummary(input: {
   const readingOrderOnlyResidualPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'reading_order_only_survivor')
     .map(row => row.publicationId))
+  const stagedPassCandidatePublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'staged_pass_candidate_survivor')
+    .map(row => row.publicationId))
   const nearPassGradeOnlyPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'near_pass_grade_only')
     .map(row => row.publicationId))
@@ -1422,6 +1436,7 @@ export function buildStage4StructureThroughputSummary(input: {
     },
     rows: {
       newlyVerifiedPassPublicationIds,
+      stagedPassCandidatePublicationIds,
       remainingPublicationIds,
       processingErrorPublicationIds,
       hardFailPublicationIds,

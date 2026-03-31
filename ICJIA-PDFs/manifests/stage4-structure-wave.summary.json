@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-03-31T06:56:10.580Z",
+  "generatedAt": "2026-03-31T14:36:12.091Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T06:56:10.559Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T14:36:12.068Z",
   "totals": {
     "eligibleRows": 283,
     "selectedRows": 8,
