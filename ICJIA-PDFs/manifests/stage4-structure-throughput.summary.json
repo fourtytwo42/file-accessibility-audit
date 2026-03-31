@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T15:15:06.850Z",
+  "generatedAt": "2026-03-31T15:18:06.704Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T15:15:06.825Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T15:18:06.677Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",

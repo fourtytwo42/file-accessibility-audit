@@ -2500,3 +2500,4 @@ First confirmed in-flight files:
   - figure-spillover representative: `3671`
 - 2026-03-31: Stage 4 follow-up wave `3665/3670/3683/3768/3769/3770/3784/3836` completed after truthful fallback rebuild with `8` processed, `8` `failed_after_remediation`, `0` `processing_error`, `0` remaining. The next active Stage 4 wave rebuilt to `3866/3871/3877/3898/3899/3903/3933/4039`.
 - 2026-03-31: Stage 4.7 routed `3665/3670/3683/3768/3769/3770/3784` as `metadata_title_survivor` terminal rows and kept `3836` as `font_text_extractability_survivor`, which dropped live `metadata_navigation_residuals` backlog from `28` to `18` without changing the next active wave `3866/3871/3877/3898/3899/3903/3933/4039`.
+- 2026-03-31: Attempted Stage 4 wave `3866/3871/3877/3898/3899/3903/3933/4039` but it returned to long inspection churn and wrote `0` terminal outcomes before truthful fallback rebuild. Active wave selection remained unchanged after rebuild.
