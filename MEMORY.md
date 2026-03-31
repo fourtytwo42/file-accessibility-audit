@@ -1864,3 +1864,281 @@ First confirmed in-flight files:
 - If a mistake is discovered and corrected, record it here.
 - If a workflow decision is proven in practice, record it here.
 - If a file or publication should be skipped later, record it here.
+
+- 2026-03-30 Stage 2 high-likelihood throughput closure implementation:
+  - new shared Stage 2 service:
+    - `apps/api/src/services/shortCohortStage2.ts`
+  - new Stage 2 scripts:
+    - `scripts/build-stage2-short-cohort-wave.ts`
+    - `scripts/run-stage2-short-cohort-wave.ts`
+  - new package scripts:
+    - `pnpm agency:build-stage2-short-wave`
+    - `pnpm agency:run-stage2-short-wave`
+  - Stage 2 now reuses the Stage 1 control plane and Stage 0 verification gate instead of introducing a second queue or API authority path.
+  - `pnpm agency:build-control-plane` now applies deterministic Stage 2 short-cohort reclassification before writing canonical control-plane artifacts.
+  - current deterministic short-cohort reclassification rules only affect non-`verified_pass` rows and currently move:
+    - benchmarked structure canaries such as `Court System` out of `short_high_likelihood`
+    - annual-report shaped residual rows into `long_report`
+  - refreshed control-plane baseline after Stage 2 reclassification:
+    - `short_high_likelihood: 23` rows total
+    - `18` `verified_pass`
+    - `1` `analyzed`
+    - `4` `remediated_fail`
+    - `0` `processing_error`
+    - `structure_heavy` increased to `145`
+    - `long_report` increased to `13`
+  - new Stage 2 authoritative artifacts:
+    - `ICJIA-PDFs/manifests/stage2-short-cohort-wave.json`
+    - `ICJIA-PDFs/manifests/stage2-short-cohort-wave.summary.json`
+    - `ICJIA-PDFs/manifests/stage2-short-cohort-throughput.summary.json`
+  - current Stage 2 wave baseline from `stage2-short-cohort-wave.summary.json` / throughput summary:
+    - `5` eligible short-cohort rows selected
+    - selected publication ids:
+      - `3513`
+      - `4054`
+      - `3685`
+      - `4023`
+      - `4067`
+    - `5` pending wave rows
+    - `0` newly verified-pass rows from the wave yet
+    - `5` remaining short-cohort rows
+  - `pnpm agency:run-stage2-short-wave --build-only` is now safe to use as a dry run:
+    - it preserves the current pending wave instead of clearing the selection when no outcomes exist yet
+  - first real Stage 2 short-cohort wave outcome on 2026-03-30:
+    - wave outcomes:
+      - `ICJIA-PDFs/manifests/stage2-short-cohort-wave.outcomes.json`
+      - `ICJIA-PDFs/manifests/stage2-short-cohort-wave.outcomes.summary.json`
+    - totals:
+      - `5` target candidates
+      - `0` ready-to-replace / pass-candidate results
+      - `4` `failed_after_remediation`
+      - `1` `processing_error`
+    - processed publication ids and terminal states:
+      - `3513`: `processing_error`
+      - `4054`: `failed_after_remediation`
+      - `3685`: `failed_after_remediation`
+      - `4023`: `failed_after_remediation`
+      - `4067`: `failed_after_remediation`
+    - `3513` failed for an operational reason rather than a semantic remediation result:
+      - the local project temp directory `.tmp/` had been deleted during disk cleanup
+      - OCR temp-dir creation failed with:
+        - `ENOENT: no such file or directory, mkdtemp '/home/hendo420/pdfaf/.tmp/pdf-ocr-*'`
+      - `.tmp/` was recreated after the wave so future OCR-capable runs are not blocked by the same issue
+    - practical Stage 2 outcome after the first wave refresh:
+      - no new verified passes were added
+      - no short-cohort rows were newly reclassified by this wave
+      - `stage2-short-cohort-throughput.summary.json` now shows:
+        - `23` total short-cohort rows
+        - `18` verified-pass rows
+        - `5` remaining short-cohort rows
+        - `4` hard fails in the wave
+        - `1` processing error in the wave
+        - `0` pending wave rows
+    - current short-cohort rows still unresolved after the first wave:
+      - `3513`
+      - `4054`
+      - `3685`
+      - `4023`
+      - `4067`
+
+- 2026-03-30 Stage 2 short-cohort closure follow-up:
+  - `3513` (`Trends and Issues 90 Criminal and Juvenile Justice in Illinois`) was retried once after restoring `.tmp/`.
+  - retry behavior:
+    - the remediation worker got past the old `mkdtemp ... .tmp/pdf-ocr-*` failure
+    - it created fresh Stage 2 attempt artifacts and ran for about `12` minutes on CPU
+    - it did not emit a new Stage 2 outcomes manifest or terminal row before being stopped
+  - practical conclusion:
+    - `3513` is not a real `short_high_likelihood` fit
+    - current truthful corpus status remains the previously recorded `processing_error`
+    - the cohort label is now reclassified to `long_report`
+    - supporting evidence:
+      - `pageCount: 143`
+      - `isScanned: true`
+      - prior Stage 2 operational retry exemption no longer pins obviously long/scanned rows in the short cohort
+  - Stage 2 logic update:
+    - `apps/api/src/services/shortCohortStage2.ts`
+      - operational-retry rows are now reclassified out of `short_high_likelihood` when the document is clearly not a short-profile fit
+      - stale pending Stage 2 wave rows are now dropped if they are no longer eligible in the rebuilt control plane
+  - refreshed Stage 2 endpoint state after rebuild:
+    - `short_high_likelihood: 18` rows total
+    - all `18` are `verified_pass`
+    - `0` remaining short-cohort rows
+    - `0` pending Stage 2 wave rows
+    - `stage2-short-cohort-wave.json` now selects no rows
+    - `stage2-short-cohort-throughput.summary.json` now shows the short cohort fully closed
+  - operational takeaway:
+    - Stage 2 is now effectively closed as a throughput-closure milestone
+    - the remaining non-pass work for `3513` has been escalated into the `long_report` lane rather than left as ambiguous short-cohort backlog
+
+- 2026-03-30 Stage 3 figure-and-ownership generalization implementation:
+  - new shared Stage 3 service:
+    - `apps/api/src/services/figureWaveStage3.ts`
+  - new Stage 3 scripts:
+    - `scripts/build-stage3-figure-wave.ts`
+    - `scripts/run-stage3-figure-wave.ts`
+  - new package scripts:
+    - `pnpm agency:build-stage3-figure-wave`
+    - `pnpm agency:run-stage3-figure-wave`
+  - canonical control-plane rows now expose `stage3FigureDiagnostics` with:
+    - `figureWaveBucket`
+    - ownership-risk known/initial/final counts when available
+    - missing-alt initial/final counts when available
+    - decorative-figure initial/final counts when available
+    - `dominantFigurePhase`
+    - `inspectionPattern`
+    - `hasGenericTimeoutWording`
+  - Stage 3 currently derives those diagnostics primarily from:
+    - remediation regression benchmark metrics when available
+    - current blocking finding keys / residual family ids
+    - latest outcome timeout/reason wording
+  - new Stage 3 authoritative artifacts:
+    - `ICJIA-PDFs/manifests/stage3-figure-wave.json`
+    - `ICJIA-PDFs/manifests/stage3-figure-wave.summary.json`
+    - `ICJIA-PDFs/manifests/stage3-figure-throughput.summary.json`
+    - `ICJIA-PDFs/manifests/stage3-figure-canaries.json`
+  - current Stage 3 baseline from the generated artifacts:
+    - `686` figure-heavy rows total
+    - `17` verified-pass rows in cohort
+    - `669` remaining figure-heavy rows
+    - bucket counts among non-verified figure-heavy rows:
+      - `ownership_cleared_figure_debt_remains: 3`
+      - `mixed_figure_structure_debt: 585`
+      - `mass_unresolved_figure_debt: 40`
+      - `figure_processing_error_retry: 41`
+      - `genericTimeoutRows: 0`
+    - first Stage 3 wave currently selects `8` rows:
+      - `3614`
+      - `4184`
+      - `3682`
+      - `4074`
+      - `4436`
+      - `4487`
+      - `4657`
+      - `4693`
+    - dry-run runner behavior:
+      - `pnpm agency:run-stage3-figure-wave --build-only` now succeeds
+      - it preserves the current pending figure wave without running remediation
+  - Stage 3 canary manifest now includes:
+    - benchmark canaries:
+      - `Kendall County Profile`
+      - `CSEC 2008 Research Bulletin`
+      - `Criminal Sentencing Layout`
+    - cohort representatives for:
+      - ownership-cleared remaining figure debt
+      - mixed figure+structure debt
+      - figure-processing-error retry
+      - short flyer / infographic style figure-heavy case
+  - operational rule:
+    - Stage 3 remains manifest-first and local-only
+    - raw Stage 3 wave outcomes are not promotion truth
+    - verified-promotion ledger remains the only authoritative promotion-ready source
+
+- 2026-03-31 first real Stage 3 figure wave outcome:
+  - wave artifacts:
+    - `ICJIA-PDFs/manifests/stage3-figure-wave.outcomes.json`
+    - `ICJIA-PDFs/manifests/stage3-figure-wave.outcomes.summary.json`
+  - selected publication ids:
+    - `3614`
+    - `4184`
+    - `3682`
+    - `4074`
+    - `4436`
+    - `4487`
+    - `4657`
+    - `4693`
+  - remediation totals:
+    - `8` target candidates
+    - `8` processed
+    - `0` ready-to-replace / pass-candidate results
+    - `5` `failed_after_remediation`
+    - `3` `processing_error`
+    - `0` remaining in the wave
+  - hard-fail rows and dominant blocking patterns:
+    - `3614`:
+      - final `87 / B`
+      - blocking `pdfua.figure_alt_or_artifact`
+    - `3682`:
+      - final `76 / C`
+      - blocking `pdfua.figure_alt_or_artifact`
+    - `4074`:
+      - final `62 / D`
+      - blocking `pdfua.logical_structure`, `pdfua.figure_alt_or_artifact`
+    - `4184`:
+      - final `69 / D`
+      - blocking `pdfua.logical_structure`, `pdfua.figure_alt_or_artifact`
+    - `4436`:
+      - final `72 / C`
+      - blocking `pdfua.logical_structure`
+  - processing-error rows:
+    - `4487`
+    - `4657`
+    - `4693`
+    - all three now use bounded-runtime / inspection-budget wording instead of generic timeout phrasing
+  - Stage 3 throughput summary after refresh:
+    - `686` figure-heavy rows total
+    - `17` verified-pass rows in cohort
+    - `669` remaining figure-heavy rows
+    - current wave results:
+      - `5` hard fails
+      - `3` processing errors
+      - `0` newly verified passes
+      - `0` pending rows after the refresh
+    - `genericTimeoutRows: 0`
+  - operational note:
+    - the Stage 3 runner again hung after remediation outcomes were written
+    - manual post-wave refresh was performed with:
+      - control-plane rebuild
+      - Stage 3 figure-wave rebuild
+      - control-plane validation
+    - because the wave produced `0` pass candidates, waiting for a full corpus-wide `agency:verify-ready` rerun was not necessary to truthfully update the Stage 3 lane
+
+
+- 2026-03-31 Stage 3.1 figure-wave rebucketing pass:
+  - `apps/api/src/services/corpusControlPlane.ts` now derives Stage 3 figure buckets from the latest Stage 3 wave outcomes before falling back to older benchmark/verification hints.
+  - Latest-wave-driven routing now behaves as follows:
+    - `3614` remains `ownership_cleared_figure_debt_remains`.
+    - `3682` moves to `mass_unresolved_figure_debt`.
+    - `4074` and `4184` remain `figure_heavy` but bucket as `mixed_figure_structure_debt`.
+    - `4436` is reclassified from `figure_heavy` to `structure_heavy` after a structure-only first-wave outcome.
+    - `4487`, `4657`, and `4693` remain `figure_heavy` but now surface as truthful `processing_error` rows with `figure_processing_error_retry` bucketing.
+  - New Stage 3 routing reason codes are now used:
+    - `stage3:reclassified_from_figure_heavy`
+    - `stage3:structure_dominant_after_figure_wave`
+    - `stage3:mixed_figure_structure_after_wave`
+    - `stage3:bounded_runtime_figure_retry`
+    - `stage3:mass_figure_debt_after_wave`
+  - `apps/api/src/services/figureWaveStage3.ts` now prioritizes the next Stage 3 wave in this order:
+    - `ownership_cleared_figure_debt_remains`
+    - `mass_unresolved_figure_debt`
+    - `figure_processing_error_retry`
+    - `mixed_figure_structure_debt`
+  - Stage 3 throughput summaries now expose routing views:
+    - `nextWaveFigureOnlyPublicationIds`
+    - `mixedFollowupPublicationIds`
+    - `boundedRuntimeRetryPublicationIds`
+    - `reclassifiedOutOfFigureHeavyPublicationIds`
+  - Current post-rebucket Stage 3 control-plane state from `ICJIA-PDFs/manifests/corpus-control-plane.summary.json`:
+    - `488` `figure_heavy` rows total
+    - `17` `verified_pass` in cohort
+    - `419` `remediated_fail` in cohort
+    - `52` `processing_error` in cohort
+    - `347` `structure_heavy` rows overall after spillover, including `4436`
+  - Current next Stage 3 wave from `ICJIA-PDFs/manifests/stage3-figure-wave.json` no longer front-loads the mixed first-wave cases `4074` / `4184` / `4436` / `4487` / `4657` / `4693`.
+    - selected publication ids are now:
+      - `3614`
+      - `3794`
+      - `4185`
+      - `4186`
+      - `4481`
+      - `4020`
+      - `4551`
+      - `3806`
+  - Stage 3 canary representatives now intentionally include:
+    - `3614` as ownership-cleared remaining figure debt
+    - `3682` as mass unresolved figure debt
+    - `4487` as bounded-runtime retry
+  - `pnpm --filter api test src/__tests__/figureWaveStage3.test.ts` passed.
+  - `pnpm --filter api build` passed.
+  - `pnpm agency:build-control-plane` passed.
+  - `pnpm agency:build-stage3-figure-wave` passed.
+  - `pnpm agency:validate-control-plane` passed.

@@ -1,0 +1,317 @@
+{
+  "generatedAt": "2026-03-30T23:00:57.216Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage2-short-cohort-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 5,
+    "processed": 5,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 4,
+    "sourceMissing": 0,
+    "processingError": 1,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3685",
+      "publicationTitle": "ADAM Arrestee Drug Abuse Monitoring Program in Cook County 4th Quarter",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 68,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ADAM/ADAM4.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ADAM/ADAM4.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ADAM/ADAM4.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ADAM4.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-30T23:00:17.332Z",
+      "durationMs": 30648,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 32, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "033edcc48c16d55a16a78302073e82364b0893546c0d786b61c4b0ca0a01445b",
+        "remediatedPdfSha256": "033edcc48c16d55a16a78302073e82364b0893546c0d786b61c4b0ca0a01445b",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4054",
+      "publicationTitle": "Juvenile commitment rates reveal significant racial disparity",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 68,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/DMCcommitments.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-30T23:00:17.566Z",
+      "durationMs": 30882,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 29, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage2-short-cohort-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b614267429a3c42022424e2d37a15fd1fad99cc0739fd4268913e5b2db989512",
+        "remediatedPdfSha256": "b614267429a3c42022424e2d37a15fd1fad99cc0739fd4268913e5b2db989512",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4023",
+      "publicationTitle": "A Profile of the KaneCook Auto Theft Task Force (KCAT)",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 66,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/KCAT03.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/KCAT03.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-30T23:00:34.368Z",
+      "durationMs": 47684,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 34,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 34, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.bookmark_language"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage2-short-cohort-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "50866e318c195b3bd340fc525c02eb7d0afc12ab5b6bfedcfd0638f85b8816e0",
+        "remediatedPdfSha256": "50866e318c195b3bd340fc525c02eb7d0afc12ab5b6bfedcfd0638f85b8816e0",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4067",
+      "publicationTitle": "A guide for juvenile corrections",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 64,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ICJIA_Corrections.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-30T23:00:48.250Z",
+      "durationMs": 61566,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 33, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.bookmark_language"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage2-short-cohort-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4bcdd896c598ee3df44d50afac3137cb9e55d9134b80e7100bce79f09a9356c4",
+        "remediatedPdfSha256": "4bcdd896c598ee3df44d50afac3137cb9e55d9134b80e7100bce79f09a9356c4",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3513",
+      "publicationTitle": "Trends and Issues 90 Criminal and Juvenile Justice in Illinois",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 96,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-30T23:00:57.215Z",
+      "durationMs": 70532,
+      "original": {
+        "overallScore": 9,
+        "grade": "F",
+        "pageCount": 143,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Error: ENOENT: no such file or directory, mkdtemp '/home/hendo420/pdfaf/.tmp/pdf-ocr-Yz2pr7'\n    at async Object.mkdtemp (node:internal/fs/promises:1175:10)\n    at async ocrPdfToSearchablePdf (/home/hendo420/pdfaf/apps/api/src/services/ocrService.ts:127:19)\n    at async remediatePdfWithAgent (/home/hendo420/pdfaf/apps/api/src/services/agentRemediationService.ts:4293:23)\n    at async processCandidate (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:466:25)\n    at async worker (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:677:23)\n    at async Promise.all (index 0)\n    at async main (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:684:3)"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/3513-Trends_and_Issues_90_Criminal_and_Juvenile_Justice_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

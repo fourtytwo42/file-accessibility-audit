@@ -6,6 +6,8 @@ import {
   loadCorpusControlPlaneSources,
   validateCorpusControlPlaneArtifacts,
 } from '../apps/api/src/services/corpusControlPlane.ts'
+import { applyStage2ShortCohortReclassification } from '../apps/api/src/services/shortCohortStage2.ts'
+import { applyStage3FigureWaveReclassification } from '../apps/api/src/services/figureWaveStage3.ts'
 
 function writeJson(filePath: string, value: unknown): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true })
@@ -14,7 +16,9 @@ function writeJson(filePath: string, value: unknown): void {
 
 export async function main(): Promise<void> {
   const sources = loadCorpusControlPlaneSources()
-  const artifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
+  const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
+  const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
+  const artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
   const validation = validateCorpusControlPlaneArtifacts(artifacts, {
     replacementMap: sources.replacementMap,
     promotionLedgerRows: sources.promotionLedgerRows,

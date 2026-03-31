@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-03-30T20:53:28.151Z",
+  "generatedAt": "2026-03-31T00:39:01.846Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
       "verified_pass": 86,
       "discovered": 3,
-      "analyzed": 1,
+      "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 866,
-      "processing_error": 100,
+      "remediated_fail": 855,
+      "processing_error": 112,
       "deferred_manual": 0,
       "staged_for_replacement": 0,
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 27,
-      "figure_heavy": 686,
-      "structure_heavy": 143,
+      "short_high_likelihood": 18,
+      "figure_heavy": 488,
+      "structure_heavy": 347,
       "font_heavy": 14,
-      "long_report": 11,
+      "long_report": 14,
       "manual_tail": 175
     },
     "byStorageKind": {
@@ -30,10 +30,10 @@
       "short_high_likelihood": {
         "verified_pass": 18,
         "discovered": 0,
-        "analyzed": 1,
+        "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 7,
-        "processing_error": 1,
+        "remediated_fail": 0,
+        "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
@@ -43,8 +43,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 628,
-        "processing_error": 41,
+        "remediated_fail": 419,
+        "processing_error": 52,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
@@ -54,8 +54,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 98,
-        "processing_error": 3,
+        "remediated_fail": 301,
+        "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
@@ -76,8 +76,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 2,
-        "processing_error": 0,
+        "remediated_fail": 4,
+        "processing_error": 1,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
@@ -108,7 +108,7 @@
     "verificationClassifiedPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/ready-to-replace-verification.classified.json",
     "promotionLedgerPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/verified-promotion-ledger.json",
     "regressionBenchmarkPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json",
-    "outcomeManifestCount": 13,
+    "outcomeManifestCount": 15,
     "candidateManifestCount": 17
   }
 }

@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-03-30T23:00:57.216Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage2-short-cohort-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 5,
+    "processed": 5,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 4,
+    "sourceMissing": 0,
+    "processingError": 1,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3513",
+    "publicationTitle": "Trends and Issues 90 Criminal and Juvenile Justice in Illinois",
+    "priorityRank": 1,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 96,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-30T23:00:57.215Z",
+    "durationMs": 70532,
+    "original": {
+      "overallScore": 9,
+      "grade": "F",
+      "pageCount": 143,
+      "isScanned": true
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Error: ENOENT: no such file or directory, mkdtemp '/home/hendo420/pdfaf/.tmp/pdf-ocr-Yz2pr7'\n    at async Object.mkdtemp (node:internal/fs/promises:1175:10)\n    at async ocrPdfToSearchablePdf (/home/hendo420/pdfaf/apps/api/src/services/ocrService.ts:127:19)\n    at async remediatePdfWithAgent (/home/hendo420/pdfaf/apps/api/src/services/agentRemediationService.ts:4293:23)\n    at async processCandidate (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:466:25)\n    at async worker (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:677:23)\n    at async Promise.all (index 0)\n    at async main (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:684:3)"
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/3513-Trends_and_Issues_90_Criminal_and_Juvenile_Justice_in_Illinois.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    }
+  }
+}

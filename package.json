@@ -50,7 +50,11 @@
     "agency:benchmark-remediation": "tsx scripts/run-remediation-regression-benchmark.ts",
     "start:all": "kill-port 6103 6102 && sleep 1 && echo '\\n[start:all] API → http://localhost:6103  |  WEB → http://localhost:6102\\n' && PORT=6103 pnpm --filter api start & PORT=6102 pnpm --filter web start & wait",
     "clean": "rm -rf apps/web/.nuxt apps/web/.output apps/web/node_modules/.vite apps/api/dist node_modules/.cache && echo 'Cleaned all caches'",
-    "rebrand": "tsx scripts/rebrand.ts"
+    "rebrand": "tsx scripts/rebrand.ts",
+    "agency:build-stage2-short-wave": "tsx scripts/build-stage2-short-cohort-wave.ts",
+    "agency:run-stage2-short-wave": "tsx scripts/run-stage2-short-cohort-wave.ts",
+    "agency:build-stage3-figure-wave": "tsx scripts/build-stage3-figure-wave.ts",
+    "agency:run-stage3-figure-wave": "tsx scripts/run-stage3-figure-wave.ts"
   },
   "engines": {
     "node": ">=22"

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-30T20:53:28.152Z",
+  "generatedAt": "2026-03-31T00:39:01.856Z",
   "summary": {
     "totalCanaries": 5,
     "matchedPublicationIds": 5,
     "unmatchedCanaries": 0,
     "byCohortLabel": {
-      "short_high_likelihood": 1,
+      "short_high_likelihood": 0,
       "figure_heavy": 3,
-      "structure_heavy": 1,
+      "structure_heavy": 2,
       "font_heavy": 0,
       "long_report": 0,
       "manual_tail": 0
@@ -41,7 +41,7 @@
       "benchmarkName": "Court System Get The Facts",
       "benchmarkCategory": "structure",
       "benchmarkTerminalState": "processing_error",
-      "cohortLabel": "short_high_likelihood",
+      "cohortLabel": "structure_heavy",
       "currentCorpusStatus": "processing_error"
     },
     {

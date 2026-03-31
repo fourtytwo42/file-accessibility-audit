@@ -1,82 +1,82 @@
 {
-  "generatedAt": "2026-03-30T20:53:28.151Z",
+  "generatedAt": "2026-03-31T00:39:01.856Z",
   "cohorts": {
     "short_high_likelihood": {
-      "totalRows": 27,
+      "totalRows": 18,
       "byCurrentCorpusStatus": {
         "verified_pass": 18,
         "discovered": 0,
-        "analyzed": 1,
+        "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 7,
-        "processing_error": 1,
+        "remediated_fail": 0,
+        "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
-        "3513",
         "3659",
         "3669",
-        "3671",
-        "3685",
-        "3755",
-        "3873",
         "3907",
-        "3912",
-        "3915"
+        "3915",
+        "4052",
+        "4053",
+        "4056",
+        "4062",
+        "4063",
+        "4065"
       ]
     },
     "figure_heavy": {
-      "totalRows": 686,
+      "totalRows": 488,
       "byCurrentCorpusStatus": {
         "verified_pass": 17,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 628,
-        "processing_error": 41,
+        "remediated_fail": 419,
+        "processing_error": 52,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
         "3460",
-        "3468",
         "3485",
         "3487",
         "3489",
         "3494",
         "3495",
         "3539",
-        "3567",
-        "3582"
+        "3582",
+        "3585",
+        "3594"
       ]
     },
     "structure_heavy": {
-      "totalRows": 143,
+      "totalRows": 347,
       "byCurrentCorpusStatus": {
         "verified_pass": 42,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 98,
-        "processing_error": 3,
+        "remediated_fail": 301,
+        "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
         "3465",
+        "3468",
         "3483",
         "3496",
         "3518",
         "3530",
         "3550",
         "3566",
-        "3569",
-        "3575",
-        "3577"
+        "3567",
+        "3569"
       ]
     },
     "font_heavy": {
@@ -106,29 +106,29 @@
       ]
     },
     "long_report": {
-      "totalRows": 11,
+      "totalRows": 14,
       "byCurrentCorpusStatus": {
         "verified_pass": 9,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 2,
-        "processing_error": 0,
+        "remediated_fail": 4,
+        "processing_error": 1,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
+        "3513",
         "3703",
         "3710",
+        "3755",
         "3829",
         "3840",
         "3865",
+        "3873",
         "3900",
-        "4010",
-        "4085",
-        "4091",
-        "4103"
+        "4010"
       ]
     },
     "manual_tail": {

@@ -23,6 +23,7 @@ export type CohortLabel =
 
 export type SourceKind = 'legacy_archive' | 'agency_upload' | 'researchhub_upload'
 export type VerificationClassification = 'verified_pass' | 'soft_fail_advisory' | 'hard_fail'
+export type FigureWaveBucket = 'ownership_cleared_figure_debt_remains' | 'mixed_figure_structure_debt' | 'mass_unresolved_figure_debt' | 'figure_processing_error_retry'
 
 export interface PublicationReplacementMapRow {
   publicationId: string
@@ -145,6 +146,7 @@ export interface OutcomeRecordLike {
   storageKind?: string | null
   originalReportPath?: string | null
   gate?: {
+    passed?: boolean | null
     blockingLocalFindingKeys?: string[]
     unresolvedCategoryLabels?: string[]
     criticalManualReviewFlagCodes?: string[]
@@ -205,6 +207,32 @@ export interface BenchmarkOutcomeLike {
   ok?: boolean
   durationMs?: number | null
   terminalState?: string | null
+  final?: {
+    blockingLocalFindingKeys?: string[] | null
+    inspectionProfile?: {
+      pattern?: string | null
+      dominantPhase?: string | null
+      deepDowngradedToLight?: boolean | null
+    } | null
+    remediationMetrics?: {
+      phases?: {
+        ownershipState?: {
+          initialRiskCount?: number | null
+          finalRiskCount?: number | null
+        } | null
+        figureDescriptionState?: {
+          initialMissingAltCount?: number | null
+          finalMissingAltCount?: number | null
+          initialDecorativeFigureCount?: number | null
+          finalDecorativeFigureCount?: number | null
+        } | null
+      } | null
+    } | null
+  } | null
+  error?: {
+    code?: string | null
+    message?: string | null
+  } | null
 }
 
 export interface CorpusControlPlaneSources {
@@ -287,6 +315,19 @@ export interface CorpusControlPlaneRow {
     stagedReplacementPath: string | null
     replacementChecksumSha256: string | null
     verificationPassed: boolean
+  }
+  stage3FigureDiagnostics: {
+    figureWaveBucket: FigureWaveBucket | null
+    ownershipRiskKnown: boolean
+    ownershipRiskCountInitial: number | null
+    ownershipRiskCountFinal: number | null
+    missingAltCountInitial: number | null
+    missingAltCountFinal: number | null
+    decorativeFigureCountInitial: number | null
+    decorativeFigureCountFinal: number | null
+    dominantFigurePhase: string | null
+    inspectionPattern: string | null
+    hasGenericTimeoutWording: boolean
   }
   reasonCodes: string[]
   notes: string[]
@@ -464,6 +505,124 @@ function chooseBestCandidate(candidates: Array<{ manifestPath: string; candidate
     if (rankDiff !== 0) return rankDiff
     return left.manifestPath.localeCompare(right.manifestPath)
   })[0]
+}
+
+function benchmarkOutcomeByPublicationId(sources: CorpusControlPlaneSources): Map<string, BenchmarkOutcomeLike> {
+  const publicationIdByLocalPath = new Map<string, string>()
+  for (const row of sources.replacementMap) {
+    const localPath = row.checksumState?.localCurrentFilePath
+    if (localPath) publicationIdByLocalPath.set(localPath, row.publicationId)
+  }
+
+  const outcomes = new Map<string, BenchmarkOutcomeLike>()
+  for (const outcome of sources.regressionBenchmarkOutcomes) {
+    const publicationId = publicationIdByLocalPath.get(outcome.filePath)
+    if (!publicationId) continue
+    outcomes.set(publicationId, outcome)
+  }
+  return outcomes
+}
+
+function safeNumberOrNull(value: number | null | undefined): number | null {
+  return Number.isFinite(value) ? Number(value) : null
+}
+
+function hasGenericTimeoutWording(input: {
+  benchmarkOutcome: BenchmarkOutcomeLike | null
+  latestOutcome: { manifestPath: string; outcome: OutcomeRecordLike } | null
+}): boolean {
+  const benchmarkMessage = input.benchmarkOutcome?.error?.message || null
+  const outcomeReasons = input.latestOutcome?.outcome.gate?.reasons || []
+  const text = [benchmarkMessage, ...outcomeReasons].filter((value): value is string => Boolean(value)).join(' | ')
+  if (!text) return false
+  return /timeout/i.test(text) && !/inspection budget exceeded/i.test(text) && !/excessive_runtime/i.test(text)
+}
+
+function isInspectionBudgetProcessingError(latestOutcome: { manifestPath: string; outcome: OutcomeRecordLike } | null): boolean {
+  if (!latestOutcome || latestOutcome.outcome.status !== 'processing_error') return false
+  const text = safeArray(latestOutcome.outcome.gate?.reasons).join(' | ')
+  return /inspection budget exceeded|excessive runtime|excessive_runtime/i.test(text)
+}
+
+function deriveStage3FigureDiagnostics(input: {
+  rowCohortLabel: CohortLabel
+  rowCurrentCorpusStatus: CorpusStatus
+  classificationEvidence: CorpusControlPlaneRow['classificationEvidence']
+  latestOutcome: { manifestPath: string; outcome: OutcomeRecordLike } | null
+  benchmarkOutcome: BenchmarkOutcomeLike | null
+}): CorpusControlPlaneRow['stage3FigureDiagnostics'] {
+  const ownershipInitial = safeNumberOrNull(input.benchmarkOutcome?.final?.remediationMetrics?.phases?.ownershipState?.initialRiskCount)
+  const ownershipFinal = safeNumberOrNull(input.benchmarkOutcome?.final?.remediationMetrics?.phases?.ownershipState?.finalRiskCount)
+  const missingAltInitial = safeNumberOrNull(input.benchmarkOutcome?.final?.remediationMetrics?.phases?.figureDescriptionState?.initialMissingAltCount)
+  const missingAltFinal = safeNumberOrNull(input.benchmarkOutcome?.final?.remediationMetrics?.phases?.figureDescriptionState?.finalMissingAltCount)
+  const decorativeInitial = safeNumberOrNull(input.benchmarkOutcome?.final?.remediationMetrics?.phases?.figureDescriptionState?.initialDecorativeFigureCount)
+  const decorativeFinal = safeNumberOrNull(input.benchmarkOutcome?.final?.remediationMetrics?.phases?.figureDescriptionState?.finalDecorativeFigureCount)
+  const latestOutcomeBlockingKeys = uniqueStrings(input.latestOutcome?.outcome.gate?.blockingLocalFindingKeys || [])
+  const blockingKeys = uniqueStrings([
+    ...input.classificationEvidence.blockingFindingKeys,
+    ...(input.benchmarkOutcome?.final?.blockingLocalFindingKeys || []),
+    ...latestOutcomeBlockingKeys,
+  ])
+  const decisiveBlockingKeys = latestOutcomeBlockingKeys.length > 0 ? latestOutcomeBlockingKeys : blockingKeys
+  const familyText = [
+    ...input.classificationEvidence.topBlockingResidualFamilyIds,
+    ...blockingKeys,
+  ].join(' ')
+  const hasFigureSignals = input.rowCohortLabel === 'figure_heavy' || /pdfua.figure_alt_or_artifact/i.test(familyText) || FIGURE_FAMILY_PATTERN.test(familyText)
+  const hasStructureSignals = STRUCTURE_FAMILY_PATTERN.test(familyText)
+  const ownershipRiskKnown = ownershipInitial !== null || ownershipFinal !== null
+  const ownershipCleared = ownershipRiskKnown && (ownershipInitial || 0) > 0 && ownershipFinal === 0
+  const missingAltRemains = (missingAltFinal || 0) > 0 || decisiveBlockingKeys.includes('pdfua.figure_alt_or_artifact')
+  const onlyFigureBlocking = decisiveBlockingKeys.length > 0 && decisiveBlockingKeys.every(key => key === 'pdfua.figure_alt_or_artifact')
+  const mixedFigureAndStructureBlocking = decisiveBlockingKeys.includes('pdfua.figure_alt_or_artifact') && decisiveBlockingKeys.includes('pdfua.logical_structure')
+  const structureOnlyBlocking = decisiveBlockingKeys.includes('pdfua.logical_structure') && !decisiveBlockingKeys.includes('pdfua.figure_alt_or_artifact')
+  const largeOrFlatFigureDebt = (missingAltFinal || 0) >= 25 || ((missingAltFinal || 0) > 0 && missingAltFinal === missingAltInitial)
+
+  let figureWaveBucket: FigureWaveBucket | null = null
+  if (hasFigureSignals) {
+    if (isInspectionBudgetProcessingError(input.latestOutcome)) {
+      figureWaveBucket = 'figure_processing_error_retry'
+    } else if (mixedFigureAndStructureBlocking) {
+      figureWaveBucket = 'mixed_figure_structure_debt'
+    } else if (structureOnlyBlocking) {
+      figureWaveBucket = null
+    } else if (ownershipCleared && decisiveBlockingKeys.includes('pdfua.figure_alt_or_artifact')) {
+      figureWaveBucket = largeOrFlatFigureDebt
+        ? 'mass_unresolved_figure_debt'
+        : 'ownership_cleared_figure_debt_remains'
+    } else if (onlyFigureBlocking) {
+      figureWaveBucket = ownershipCleared && !largeOrFlatFigureDebt
+        ? 'ownership_cleared_figure_debt_remains'
+        : 'mass_unresolved_figure_debt'
+    } else if (input.rowCurrentCorpusStatus === 'processing_error') {
+      figureWaveBucket = 'figure_processing_error_retry'
+    } else if (ownershipCleared && missingAltRemains) {
+      figureWaveBucket = largeOrFlatFigureDebt
+        ? 'mass_unresolved_figure_debt'
+        : 'ownership_cleared_figure_debt_remains'
+    } else if (hasStructureSignals) {
+      figureWaveBucket = 'mixed_figure_structure_debt'
+    } else {
+      figureWaveBucket = 'mass_unresolved_figure_debt'
+    }
+  }
+
+  return {
+    figureWaveBucket,
+    ownershipRiskKnown,
+    ownershipRiskCountInitial: ownershipInitial,
+    ownershipRiskCountFinal: ownershipFinal,
+    missingAltCountInitial: missingAltInitial,
+    missingAltCountFinal: missingAltFinal,
+    decorativeFigureCountInitial: decorativeInitial,
+    decorativeFigureCountFinal: decorativeFinal,
+    dominantFigurePhase: input.benchmarkOutcome?.final?.inspectionProfile?.dominantPhase || null,
+    inspectionPattern: input.benchmarkOutcome?.final?.inspectionProfile?.pattern || null,
+    hasGenericTimeoutWording: hasGenericTimeoutWording({
+      benchmarkOutcome: input.benchmarkOutcome,
+      latestOutcome: input.latestOutcome,
+    }),
+  }
 }
 
 function maybePush(values: string[], value: string | null | undefined): void {
@@ -721,6 +880,7 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
   const verificationResultByKey = new Map(sources.verificationResults.map(result => [result.key, result]))
   const classifiedRowByPublicationId = new Map(sources.classifiedRows.map(row => [row.publicationId, row]))
   const ledgerRowByPublicationId = new Map(sources.promotionLedgerRows.map(row => [row.publicationId, row]))
+  const benchmarkByPublicationId = benchmarkOutcomeByPublicationId(sources)
 
   const outcomesByPublicationId = new Map<string, Array<{ manifestPath: string; outcome: OutcomeRecordLike }>>()
   for (const manifest of sources.outcomeManifests) {
@@ -751,6 +911,7 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
     const latestOutcome = chooseLatestOutcome(outcomesByPublicationId.get(publicationId) || [])
     const bestCandidate = chooseBestCandidate(candidatesByPublicationId.get(publicationId) || [])
     const verificationResult = chooseVerificationResultForPublication(classifiedRow, verificationResultByKey)
+    const benchmarkOutcome = benchmarkByPublicationId.get(publicationId) || null
 
     const derived = chooseCorpusStatus({
       replacementRow,
@@ -810,7 +971,27 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
       manualOnlyFailureModeKeys,
     }
 
-    const cohortLabel = classifyCohort({
+    const stage2OperationalRetry = Boolean(
+      latestOutcome?.outcome.status === 'processing_error'
+      && (latestOutcome.outcome.gate?.reasons || []).some(reason => /mkdtemp/i.test(reason) && /\.tmp\/pdf-ocr/i.test(reason)),
+    )
+    const stage3FigureDiagnostics = deriveStage3FigureDiagnostics({
+      rowCohortLabel: replacementRow.expectedPresence === 'missing' ? 'manual_tail' : classifyCohort({
+        pageCount: classificationEvidence.pageCount,
+        isScanned: classificationEvidence.isScanned,
+        manualOnlyFailureModeCount: classificationEvidence.manualOnlyFailureModeCount,
+        blockerFamilyIds: classificationEvidence.topBlockingResidualFamilyIds,
+        blockingFindingKeys: classificationEvidence.blockingFindingKeys,
+        autoRunnableOpportunityCount: classificationEvidence.autoRunnableOpportunityCount,
+        expectedPresence: replacementRow.expectedPresence || null,
+      }),
+      rowCurrentCorpusStatus: derived.status,
+      classificationEvidence,
+      latestOutcome,
+      benchmarkOutcome,
+    })
+
+    const baseCohortLabel = classifyCohort({
       pageCount: classificationEvidence.pageCount,
       isScanned: classificationEvidence.isScanned,
       manualOnlyFailureModeCount: classificationEvidence.manualOnlyFailureModeCount,
@@ -819,8 +1000,10 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
       autoRunnableOpportunityCount: classificationEvidence.autoRunnableOpportunityCount,
       expectedPresence: replacementRow.expectedPresence || null,
     })
+    const cohortLabel = stage2OperationalRetry ? 'short_high_likelihood' : baseCohortLabel
 
     const reasonCodes = [...derived.reasonCodes]
+    if (stage2OperationalRetry) reasonCodes.push('stage2:operational_retry_after_tempdir_failure')
     if (cohortLabel === 'manual_tail') reasonCodes.push('cohort:manual_tail')
     if (cohortLabel === 'figure_heavy') reasonCodes.push('cohort:figure_heavy')
     if (cohortLabel === 'structure_heavy') reasonCodes.push('cohort:structure_heavy')
@@ -880,6 +1063,7 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
         replacementChecksumSha256: ledgerRow?.replacementChecksumSha256 || null,
         verificationPassed: Boolean(ledgerRow || verificationResult?.passed),
       },
+      stage3FigureDiagnostics,
       reasonCodes: uniqueStrings(reasonCodes),
       notes: uniqueStrings([
         replacementRow.notes || null,
@@ -917,7 +1101,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
   const regressionBenchmarkPath = path.join(manifestsRoot, 'remediation-regression-benchmark.summary.json')
 
   const outcomeManifests = fs.readdirSync(manifestsRoot)
-    .filter(name => name.endsWith('-outcomes.json'))
+    .filter(name => name.endsWith('-outcomes.json') || name.endsWith('.outcomes.json'))
     .sort()
     .map(name => ({
       path: path.join(manifestsRoot, name),
@@ -925,7 +1109,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     }))
 
   const candidateManifests = fs.readdirSync(manifestsRoot)
-    .filter(name => name.endsWith('-candidates.json'))
+    .filter(name => name.endsWith('-candidates.json') || name.endsWith('.candidates.json'))
     .sort()
     .map(name => ({
       path: path.join(manifestsRoot, name),

@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-03-31T00:02:26.287Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 8,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 5,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4487",
+    "publicationTitle": "Collaboration in Action: Overview and Lessons from “Data, Planning, and Impact: A Joint Adult Redeploy Illinois and Criminal Justice Coordinating Councils Summit”",
+    "priorityRank": 6,
+    "priorityTier": "high",
+    "passLikelihoodScore": 70,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ARI-CJCC_summit_report_050818.pdf.json",
+    "status": "processing_error",
+    "processedAt": "2026-03-31T00:02:26.286Z",
+    "durationMs": 488887,
+    "original": {
+      "overallScore": 29,
+      "grade": "F",
+      "pageCount": 9,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4487-Collaboration_in_Action_Overview_and_Lessons_from_Data_Planning_and_Impact_A_Joint_Adult_Redeploy_Illinois_and_Criminal_Justice_Coordinating_Councils_Summit.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Inspection budget exceeded (light=7, deep=8, total=15)."
+    }
+  }
+}

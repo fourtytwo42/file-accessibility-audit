@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-03-31T00:39:45.613Z",
+  "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T00:38:36.893Z",
+  "totals": {
+    "eligibleRows": 371,
+    "selectedRows": 8,
+    "skippedRows": 463,
+    "pendingRows": 7
+  },
+  "selectedPublicationIds": [
+    "3614",
+    "3794",
+    "4185",
+    "4186",
+    "4481",
+    "4020",
+    "4551",
+    "3806"
+  ],
+  "pendingPublicationIds": [
+    "3794",
+    "4185",
+    "4186",
+    "4481",
+    "4020",
+    "4551",
+    "3806"
+  ],
+  "selectedByTier": {
+    "highest": 1,
+    "high": 7,
+    "medium": 0,
+    "low": 0
+  },
+  "selectedByStatus": {
+    "verified_pass": 0,
+    "discovered": 0,
+    "analyzed": 0,
+    "queued_for_remediation": 0,
+    "remediated_fail": 8,
+    "processing_error": 0,
+    "deferred_manual": 0,
+    "staged_for_replacement": 0,
+    "replaced_remote": 0
+  },
+  "selectedByFigureWaveBucket": {
+    "ownership_cleared_figure_debt_remains": 1,
+    "mixed_figure_structure_debt": 0,
+    "mass_unresolved_figure_debt": 7,
+    "figure_processing_error_retry": 0
+  }
+}

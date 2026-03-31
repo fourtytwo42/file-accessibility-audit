@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-03-30T23:30:57.131Z",
+  "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage2-short-cohort-wave.json",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-30T23:30:57.125Z",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 0,
+    "pendingRows": 0
+  },
+  "selectedPublicationIds": [],
+  "pendingPublicationIds": [],
+  "selectedByTier": {
+    "highest": 0,
+    "high": 0,
+    "medium": 0
+  },
+  "selectedByStatus": {
+    "verified_pass": 0,
+    "discovered": 0,
+    "analyzed": 0,
+    "queued_for_remediation": 0,
+    "remediated_fail": 0,
+    "processing_error": 0,
+    "deferred_manual": 0,
+    "staged_for_replacement": 0,
+    "replaced_remote": 0
+  }
+}

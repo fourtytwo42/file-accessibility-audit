@@ -1,0 +1,459 @@
+{
+  "generatedAt": "2026-03-31T00:02:26.287Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 8,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 5,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "4074",
+      "publicationTitle": "Audit shows improvement in record accuracy timeliness completeness",
+      "priorityRank": 4,
+      "priorityTier": "high",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/CHRI RB.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CHRI RB.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/CHRI%20RB.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/CHRI_RB.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-30T23:58:25.492Z",
+      "durationMs": 248093,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 62,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 62, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4074-Audit_shows_improvement_in_record_accuracy_timeliness_completeness.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4074-Audit_shows_improvement_in_record_accuracy_timeliness_completeness.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4074-Audit_shows_improvement_in_record_accuracy_timeliness_completeness.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "5dc645ea5e8684e37911fcee38c4e30fed7678c40b310f2f70e79e022deff233",
+        "remediatedPdfSha256": "5dc645ea5e8684e37911fcee38c4e30fed7678c40b310f2f70e79e022deff233",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4184",
+      "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 76,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/CSEC 2008 Research Bulletin.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/CSEC%202008%20Research%20Bulletin.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-30T23:59:31.261Z",
+      "durationMs": 313862,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4184-Child_sex_exploitation_study_probes_extent_of_victimization_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "bf182019c6b4e6e388a58bbad182af3b7d703fa1df40195441dbb7bffcfc82bb",
+        "remediatedPdfSha256": "bf182019c6b4e6e388a58bbad182af3b7d703fa1df40195441dbb7bffcfc82bb",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4657",
+      "publicationTitle": "The 2021 SAFE-T Act: ICJIA Roles and Responsibilities",
+      "priorityRank": 7,
+      "priorityTier": "high",
+      "passLikelihoodScore": 69,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/FINAL SAFE-T Act article PDF for posting-210726T15283184.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/FINAL SAFE-T Act article PDF for posting-210726T15283184.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/FINAL%20SAFE-T%20Act%20article%20PDF%20for%20posting-210726T15283184.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/FINAL_SAFE-T_Act_article_PDF_for_posting-210726T15283184.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-30T23:59:52.567Z",
+      "durationMs": 335169,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 10,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/157.230.3.215/4657-The_2021_SAFE-T_Act_ICJIA_Roles_and_Responsibilities.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=9, deep=2, total=11)."
+      }
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 53,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T00:00:28.431Z",
+      "durationMs": 371032,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 76,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 76, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/3682-Criminal_Sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/3682-Criminal_Sentencing.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "406145c7b672b94488f2bb8755b3bffaf29c3a3c1897357c762ff2e1027988f3",
+        "remediatedPdfSha256": "406145c7b672b94488f2bb8755b3bffaf29c3a3c1897357c762ff2e1027988f3",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4436",
+      "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+      "priorityRank": 5,
+      "priorityTier": "high",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Annes House_022013.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Annes House_022013.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Annes%20House_022013.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Annes_House_022013.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T00:00:34.324Z",
+      "durationMs": 376925,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c6f58120de681877e15b63c1c4001b91476a96f457d1f90d76d67515a5dc9285",
+        "remediatedPdfSha256": "c6f58120de681877e15b63c1c4001b91476a96f457d1f90d76d67515a5dc9285",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4693",
+      "publicationTitle": "Criminal History Record Checks for Federally Assisted Housing: A Progress Report",
+      "priorityRank": 8,
+      "priorityTier": "high",
+      "passLikelihoodScore": 69,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/FINAL REPORT PDF FOR POSTING-230207T16344430.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/FINAL REPORT PDF FOR POSTING-230207T16344430.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/FINAL%20REPORT%20PDF%20FOR%20POSTING-230207T16344430.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/FINAL_REPORT_PDF_FOR_POSTING-230207T16344430.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-31T00:01:14.989Z",
+      "durationMs": 417589,
+      "original": {
+        "overallScore": 45,
+        "grade": "F",
+        "pageCount": 10,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/157.230.3.215/4693-Criminal_History_Record_Checks_for_Federally_Assisted_Housing_A_Progress_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=8, deep=7, total=15)."
+      }
+    },
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 77,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/3614-KENDALL_County_Profile.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T00:01:24.297Z",
+      "durationMs": 426898,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/3614-KENDALL_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3614-KENDALL_County_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/3614-KENDALL_County_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "fa2f76b712db391173d0609eca0aefd136c38cfefd2cbd0d86fe47a674ed2267",
+        "remediatedPdfSha256": "fa2f76b712db391173d0609eca0aefd136c38cfefd2cbd0d86fe47a674ed2267",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4487",
+      "publicationTitle": "Collaboration in Action: Overview and Lessons from “Data, Planning, and Impact: A Joint Adult Redeploy Illinois and Criminal Justice Coordinating Councils Summit”",
+      "priorityRank": 6,
+      "priorityTier": "high",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ARI-CJCC_summit_report_050818.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-31T00:02:26.286Z",
+      "durationMs": 488887,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 9,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4487-Collaboration_in_Action_Overview_and_Lessons_from_Data_Planning_and_Impact_A_Joint_Adult_Redeploy_Illinois_and_Criminal_Justice_Coordinating_Councils_Summit.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=7, deep=8, total=15)."
+      }
+    }
+  ]
+}

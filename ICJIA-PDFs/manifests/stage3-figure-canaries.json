@@ -1,0 +1,127 @@
+{
+  "generatedAt": "2026-03-31T00:39:45.638Z",
+  "summary": {
+    "totalCanaries": 7,
+    "bySource": {
+      "benchmark": 3,
+      "cohort_representative": 4
+    },
+    "byFigureWaveBucket": {
+      "ownership_cleared_figure_debt_remains": 2,
+      "mixed_figure_structure_debt": 1,
+      "mass_unresolved_figure_debt": 2,
+      "figure_processing_error_retry": 2
+    },
+    "withGenericTimeoutWording": 0
+  },
+  "rows": [
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "source": "benchmark",
+      "benchmarkName": "Kendall County Profile",
+      "stage3RepresentativeKind": null,
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "ownership_cleared_figure_debt_remains",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": "pass",
+      "notes": [
+        "benchmark_category:ownership"
+      ]
+    },
+    {
+      "publicationId": "4184",
+      "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "source": "benchmark",
+      "benchmarkName": "CSEC 2008 Research Bulletin",
+      "stage3RepresentativeKind": null,
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "mixed_figure_structure_debt",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": "hard_fail",
+      "notes": [
+        "benchmark_category:figure_description"
+      ]
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "source": "benchmark",
+      "benchmarkName": "Criminal Sentencing Layout",
+      "stage3RepresentativeKind": null,
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": "hard_fail",
+      "notes": [
+        "benchmark_category:structure"
+      ]
+    },
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage3RepresentativeKind": "ownership_cleared_figure_debt_remains",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "ownership_cleared_figure_debt_remains",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3614-KENDALL_County_Profile.remediation.json"
+      ]
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage3RepresentativeKind": "mass_unresolved_figure_debt",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+        "Mass unresolved figure-debt representative."
+      ]
+    },
+    {
+      "publicationId": "4487",
+      "publicationTitle": "Collaboration in Action: Overview and Lessons from “Data, Planning, and Impact: A Joint Adult Redeploy Illinois and Criminal Justice Coordinating Councils Summit”",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage3RepresentativeKind": "figure_processing_error_retry",
+      "currentCorpusStatus": "processing_error",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "figure_processing_error_retry",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4487-Collaboration_in_Action_Overview_and_Lessons_from_Data_Planning_and_Impact_A_Joint_Adult_Redeploy_Illinois_and_Criminal_Justice_Coordinating_Councils_Summit.failure.json",
+        "Bounded-runtime retry representative from the latest figure wave."
+      ]
+    },
+    {
+      "publicationId": "3585",
+      "publicationTitle": "Juvenile Justice",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage3RepresentativeKind": "short_flyer_or_infographic",
+      "currentCorpusStatus": "processing_error",
+      "currentCohortLabel": "figure_heavy",
+      "figureWaveBucket": "figure_processing_error_retry",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3585-Juvenile_Justice.failure.json",
+        "Short figure-heavy representative for flyers/infographics."
+      ]
+    }
+  ]
+}

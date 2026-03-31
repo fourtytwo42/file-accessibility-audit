@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-03-30T23:30:57.131Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-30T23:30:57.125Z",
+  "waveName": "stage2-short-cohort-wave",
+  "cohortLabel": "short_high_likelihood",
+  "maxCandidates": 8,
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 0,
+    "pendingRows": 0
+  },
+  "selectedPublicationIds": [],
+  "pendingPublicationIds": [],
+  "candidates": [],
+  "skippedRows": []
+}
