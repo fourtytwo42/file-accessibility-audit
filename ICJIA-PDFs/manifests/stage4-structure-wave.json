@@ -1,48 +1,48 @@
 {
-  "generatedAt": "2026-03-31T16:36:26.756Z",
+  "generatedAt": "2026-03-31T17:16:28.297Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T16:36:26.713Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T17:16:28.272Z",
   "waveName": "stage4-structure-wave",
   "cohortLabel": "structure_heavy",
   "maxCandidates": 8,
   "totals": {
-    "eligibleRows": 216,
+    "eligibleRows": 208,
     "selectedRows": 8,
-    "skippedRows": 208,
+    "skippedRows": 200,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "3936",
-    "4677",
-    "4723",
-    "3483",
-    "4145",
-    "4094",
-    "4209",
-    "4076"
+    "3870",
+    "3655",
+    "4045",
+    "3781",
+    "3785",
+    "3919",
+    "3793",
+    "3924"
   ],
   "pendingPublicationIds": [
-    "3936",
-    "4677",
-    "4723",
-    "3483",
-    "4145",
-    "4094",
-    "4209",
-    "4076"
+    "3870",
+    "3655",
+    "4045",
+    "3781",
+    "3785",
+    "3919",
+    "3793",
+    "3924"
   ],
   "candidates": [
     {
       "priorityRank": 1,
-      "passLikelihoodScore": 70,
+      "passLikelihoodScore": 48,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3936",
-      "publicationTitle": "Webbased Technology Paves the Way to Better Services for Victims of Crime",
+      "publicationId": "3870",
+      "publicationTitle": "An Implementation and Impact Evaluation of the Adult Sex Offender Probation Project in Cook County",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/winter2003.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/winter2003.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/winter2003.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/An Implementation_Project in Cook County.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/An Implementation_Project in Cook County.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/An%20Implementation_Project%20in%20Cook%20County.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -54,127 +54,29 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3936-Webbased_Technology_Paves_the_Way_to_Better_Services_for_Victims_of_Crime.remediation.json",
-      "pageCount": 8,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3870-An_Implementation_and_Impact_Evaluation_of_the_Adult_Sex_Offender_Probation_Project_in_Cook_County.remediation.json",
+      "pageCount": 214,
       "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 7,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 12,
       "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
         "font_embedding_and_unicode",
-        "link_tabs_and_annotation_cleanup",
+        "logical_structure_marked_content",
         "metadata_normalization",
         "post_bootstrap_heading_convergence"
       ],
       "blockingFindingKeys": [
+        "category.bookmarks",
         "category.heading_structure",
         "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
+        "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.metadata_identification",
-        "pdfua.page_tabs"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": true,
-      "hasReadingOrderDebt": true,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 2,
-      "passLikelihoodScore": 68,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "4677",
-      "publicationTitle": "Parole and Mandatory Supervised Release in Illinois",
-      "serverHost": "157.230.3.215",
-      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Parole and Mandatory Supervised Release in Illinois-220602T20211891.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Parole and Mandatory Supervised Release in Illinois-220602T20211891.pdf",
-      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Parole%20and%20Mandatory%20Supervised%20Release%20in%20Illinois-220602T20211891.pdf",
-      "storageKind": "researchhub_upload",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "outcome:failed_after_remediation",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
-      "pageCount": 21,
-      "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 7,
-      "topBlockingResidualFamilyIds": [
-        "bookmark_language_outline_cleanup",
-        "logical_structure_marked_content",
-        "metadata_normalization",
-        "post_bootstrap_heading_convergence"
-      ],
-      "blockingFindingKeys": [
-        "category.bookmarks",
-        "category.heading_structure",
-        "category.pdf_ua_compliance",
-        "category.reading_order",
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
-        "pdfua.logical_structure"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": true,
-      "hasReadingOrderDebt": true,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 3,
-      "passLikelihoodScore": 67,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "4723",
-      "publicationTitle": "ICJIA State Fiscal Year 2023 Annual Report",
-      "serverHost": "192.241.146.85",
-      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
-      "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
-      "storageKind": "agency_upload",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "outcome:failed_after_remediation",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
-      "pageCount": 34,
-      "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 8,
-      "topBlockingResidualFamilyIds": [
-        "bookmark_language_outline_cleanup",
-        "logical_structure_marked_content",
-        "metadata_normalization",
-        "post_bootstrap_heading_convergence"
-      ],
-      "blockingFindingKeys": [
-        "category.bookmarks",
-        "category.heading_structure",
-        "category.pdf_ua_compliance",
-        "category.reading_order",
-        "pdfua.bookmark_language",
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
+        "pdfua.font_widths",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -188,16 +90,16 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 4,
-      "passLikelihoodScore": 52,
+      "priorityRank": 2,
+      "passLikelihoodScore": 48,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3483",
-      "publicationTitle": "Trends and Issues 1997",
+      "publicationId": "3655",
+      "publicationTitle": "An Evaluation of the Violent Offender Prosecution Program in Kankakee Sangamon and Winnebago Counties",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/T&I 1997.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/T&I 1997.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/T&I%201997.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/An EvaluationSangWin.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/An EvaluationSangWin.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/An%20EvaluationSangWin.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -209,13 +111,124 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
-      "pageCount": 235,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3655-An_Evaluation_of_the_Violent_Offender_Prosecution_Program_in_Kankakee_Sangamon_and_Winnebago_Counties.remediation.json",
+      "pageCount": 221,
       "isScanned": false,
-      "blockerFamilyCount": 4,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 3,
+      "passLikelihoodScore": 48,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4045",
+      "publicationTitle": "Community Reintegration Trajectories A Qualitative Comparative Study of GangAffiliated and NonGangAffiliated ExOffenders",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Community Reintegration Trajectories.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Community Reintegration Trajectories.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Community%20Reintegration%20Trajectories.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4045-Community_Reintegration_Trajectories_A_Qualitative_Comparative_Study_of_GangAffiliated_and_NonGangAffiliated_ExOffenders.remediation.json",
+      "pageCount": 278,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
       "blockingFindingCount": 9,
       "topBlockingResidualFamilyIds": [
         "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 4,
+      "passLikelihoodScore": 48,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3781",
+      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part Two Case Studies of New or Changed Juvenile Justice System Proce",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Reform Provisions_Part 1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Reform Provisions_Part 1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Reform%20Provisions_Part%201.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3781-An_Implementation_Evaluation_of_the_Juvenile_Justice_Reform_Provisions_of_1998_Part_Two_Case_Studies_of_New_or_Changed_Juvenile_Justice_System_Proce.remediation.json",
+      "pageCount": 290,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
         "logical_structure_marked_content",
         "metadata_normalization",
         "post_bootstrap_heading_convergence"
@@ -228,6 +241,8 @@
         "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -242,15 +257,15 @@
     },
     {
       "priorityRank": 5,
-      "passLikelihoodScore": 62,
+      "passLikelihoodScore": 48,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4145",
-      "publicationTitle": "Justice Assistance Grant Planning Materials  Illinois crime and criminal justice trends 19972007",
+      "publicationId": "3785",
+      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part One Surveys of Juvenile Justice Professionals",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/Web Edition CRIME TRENDS 032509.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/Web Edition CRIME TRENDS 032509.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/Web%20Edition%20CRIME%20TRENDS%20032509.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Reform Provisions_Part 1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Reform Provisions_Part 1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Reform%20Provisions_Part%201.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -262,15 +277,15 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.remediation.json",
-      "pageCount": 40,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3785-An_Implementation_Evaluation_of_the_Juvenile_Justice_Reform_Provisions_of_1998_Part_One_Surveys_of_Juvenile_Justice_Professionals.remediation.json",
+      "pageCount": 290,
       "isScanned": false,
       "blockerFamilyCount": 5,
-      "blockingFindingCount": 9,
+      "blockingFindingCount": 11,
       "topBlockingResidualFamilyIds": [
         "bookmark_language_outline_cleanup",
         "font_embedding_and_unicode",
-        "link_tabs_and_annotation_cleanup",
+        "logical_structure_marked_content",
         "metadata_normalization",
         "post_bootstrap_heading_convergence"
       ],
@@ -278,12 +293,14 @@
         "category.bookmarks",
         "category.heading_structure",
         "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
         "pdfua.logical_structure",
-        "pdfua.page_tabs"
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -296,15 +313,15 @@
     },
     {
       "priorityRank": 6,
-      "passLikelihoodScore": 57,
+      "passLikelihoodScore": 48,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4094",
-      "publicationTitle": "Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables",
+      "publicationId": "3919",
+      "publicationTitle": "An Implementation Evaluation of the Specialized Sex Offender Projects in DuPage Lake and Winnebago Counties",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202005%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/ImplementationWinn.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/ImplementationWinn.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/ImplementationWinn.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -316,30 +333,30 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
-      "pageCount": 97,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3919-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Projects_in_DuPage_Lake_and_Winnebago_Counties.remediation.json",
+      "pageCount": 292,
       "isScanned": false,
       "blockerFamilyCount": 5,
       "blockingFindingCount": 11,
       "topBlockingResidualFamilyIds": [
         "bookmark_language_outline_cleanup",
         "font_embedding_and_unicode",
-        "link_tabs_and_annotation_cleanup",
+        "logical_structure_marked_content",
         "metadata_normalization",
-        "table_structure_recovery"
+        "post_bootstrap_heading_convergence"
       ],
       "blockingFindingKeys": [
+        "category.bookmarks",
         "category.heading_structure",
         "category.pdf_ua_compliance",
-        "context.table_candidates_blocked",
-        "pdfua.bookmark_language",
+        "category.reading_order",
         "pdfua.display_doc_title",
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
+        "pdfua.font_widths",
         "pdfua.logical_structure",
-        "pdfua.page_tabs",
-        "pdfua.table_regularity"
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -352,15 +369,15 @@
     },
     {
       "priorityRank": 7,
-      "passLikelihoodScore": 57,
+      "passLikelihoodScore": 48,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4209",
-      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables",
+      "publicationId": "3793",
+      "publicationTitle": "Longterm Impact Evaluation of Specialized Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20System%20and%20Risk%20Factor%20Data%202006%20Appendix%20H%20Data%20Tables.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Long-termDuPageWinnebago.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Long-termDuPageWinnebago.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Long-termDuPageWinnebago.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -372,30 +389,31 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
-      "pageCount": 97,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3793-Longterm_Impact_Evaluation_of_Specialized_Sex_Offender_Probation_Programs_in_Lake_DuPage_and_Winnebago_Counties.remediation.json",
+      "pageCount": 389,
       "isScanned": false,
       "blockerFamilyCount": 5,
-      "blockingFindingCount": 11,
+      "blockingFindingCount": 12,
       "topBlockingResidualFamilyIds": [
         "bookmark_language_outline_cleanup",
         "font_embedding_and_unicode",
-        "link_tabs_and_annotation_cleanup",
+        "logical_structure_marked_content",
         "metadata_normalization",
-        "table_structure_recovery"
+        "post_bootstrap_heading_convergence"
       ],
       "blockingFindingKeys": [
+        "category.bookmarks",
         "category.heading_structure",
         "category.pdf_ua_compliance",
-        "context.table_candidates_blocked",
-        "pdfua.bookmark_language",
+        "category.reading_order",
+        "category.title_language",
         "pdfua.display_doc_title",
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
+        "pdfua.font_widths",
         "pdfua.logical_structure",
-        "pdfua.page_tabs",
-        "pdfua.table_regularity"
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -408,15 +426,15 @@
     },
     {
       "priorityRank": 8,
-      "passLikelihoodScore": 57,
+      "passLikelihoodScore": 48,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4076",
-      "publicationTitle": "Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables",
+      "publicationId": "3924",
+      "publicationTitle": "A Process and Impact Evaluation of Cook Countys States Attorneys Office Victim Witness Assistance Program",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202004%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CCSAOVWAP.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CCSAOVWAP.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CCSAOVWAP.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -428,30 +446,30 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
-      "pageCount": 99,
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3924-A_Process_and_Impact_Evaluation_of_Cook_Countys_States_Attorneys_Office_Victim_Witness_Assistance_Program.remediation.json",
+      "pageCount": 418,
       "isScanned": false,
       "blockerFamilyCount": 5,
       "blockingFindingCount": 11,
       "topBlockingResidualFamilyIds": [
         "bookmark_language_outline_cleanup",
         "font_embedding_and_unicode",
-        "link_tabs_and_annotation_cleanup",
+        "logical_structure_marked_content",
         "metadata_normalization",
-        "table_structure_recovery"
+        "post_bootstrap_heading_convergence"
       ],
       "blockingFindingKeys": [
+        "category.bookmarks",
+        "category.heading_structure",
         "category.pdf_ua_compliance",
-        "context.table_candidates_blocked",
-        "pdfua.bookmark_language",
+        "category.reading_order",
         "pdfua.display_doc_title",
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.heading_content_quality",
+        "pdfua.font_widths",
         "pdfua.logical_structure",
-        "pdfua.page_tabs",
-        "pdfua.table_regularity"
+        "pdfua.metadata_identification"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -564,17 +582,6 @@
       ]
     },
     {
-      "publicationId": "3655",
-      "publicationTitle": "An Evaluation of the Violent Offender Prosecution Program in Kankakee Sangamon and Winnebago Counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3697",
       "publicationTitle": "Working Together The Case for Integration of Criminal Justice Information Systems",
       "currentCorpusStatus": "remediated_fail",
@@ -626,39 +633,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3781",
-      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part Two Case Studies of New or Changed Juvenile Justice System Proce",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3785",
-      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part One Surveys of Juvenile Justice Professionals",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3793",
-      "publicationTitle": "Longterm Impact Evaluation of Specialized Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -1037,17 +1011,6 @@
       ]
     },
     {
-      "publicationId": "3870",
-      "publicationTitle": "An Implementation and Impact Evaluation of the Adult Sex Offender Probation Project in Cook County",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3874",
       "publicationTitle": "Fulton County Juvenile Profile",
       "currentCorpusStatus": "remediated_fail",
@@ -1213,17 +1176,6 @@
       ]
     },
     {
-      "publicationId": "3919",
-      "publicationTitle": "An Implementation Evaluation of the Specialized Sex Offender Projects in DuPage Lake and Winnebago Counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3921",
       "publicationTitle": "Enhancing Local Juvenile Justice Systems in Illinois Evaluation Manual",
       "currentCorpusStatus": "remediated_fail",
@@ -1231,17 +1183,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3924",
-      "publicationTitle": "A Process and Impact Evaluation of Cook Countys States Attorneys Office Victim Witness Assistance Program",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -1759,17 +1700,6 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:mixed_structure_figure_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "4045",
-      "publicationTitle": "Community Reintegration Trajectories A Qualitative Comparative Study of GangAffiliated and NonGangAffiliated ExOffenders",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },

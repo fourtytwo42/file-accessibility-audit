@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T16:36:25.705Z",
+  "generatedAt": "2026-03-31T17:16:28.280Z",
   "cohorts": {
     "short_high_likelihood": {
       "totalRows": 23,
@@ -28,13 +28,13 @@
       ]
     },
     "figure_heavy": {
-      "totalRows": 491,
+      "totalRows": 492,
       "byCurrentCorpusStatus": {
         "verified_pass": 19,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 419,
+        "remediated_fail": 420,
         "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -42,6 +42,7 @@
       },
       "samplePublicationIds": [
         "3460",
+        "3483",
         "3485",
         "3487",
         "3489",
@@ -49,34 +50,33 @@
         "3495",
         "3539",
         "3569",
-        "3575",
-        "3577"
+        "3575"
       ]
     },
     "structure_heavy": {
-      "totalRows": 338,
+      "totalRows": 337,
       "byCurrentCorpusStatus": {
         "verified_pass": 42,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 285,
+        "remediated_fail": 283,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 7,
+        "staged_for_replacement": 8,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
         "3465",
         "3468",
-        "3483",
         "3496",
         "3550",
         "3566",
         "3567",
         "3579",
         "3584",
-        "3591"
+        "3591",
+        "3592"
       ]
     },
     "font_heavy": {

@@ -9,7 +9,7 @@ import { applyStage2ShortCohortReclassification } from '../apps/api/src/services
 import { applyStage3FigureWaveReclassification } from '../apps/api/src/services/figureWaveStage3.ts'
 import {
   applyStage4StructureWaveReclassification,
-  buildStage4StructurePendingAnalysis,
+  buildStage4StructureActiveForensics,
 } from '../apps/api/src/services/structureWaveStage4.ts'
 
 function writeJson(filePath: string, value: unknown): void {
@@ -19,20 +19,32 @@ function writeJson(filePath: string, value: unknown): void {
 
 export async function main(): Promise<void> {
   const sources = loadCorpusControlPlaneSources()
+  const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_ACTIVE_FORENSICS_INCLUDE_IDS || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const stage4Artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, [], [], sources.stage4StalledAnalysisRows, sources.stage4OverlapAnalysisRows, sources.stage4ActiveForensicsRows)
+  const stage4Artifacts = applyStage4StructureWaveReclassification(
+    stage3Artifacts,
+    sources.stage4PendingAnalysisRows,
+    sources.stage4ActiveAnalysisRows,
+    sources.stage4StalledAnalysisRows,
+    sources.stage4OverlapAnalysisRows,
+    [],
+  )
 
-  const analysisArtifacts = buildStage4StructurePendingAnalysis({
+  const analysisArtifacts = buildStage4StructureActiveForensics({
     artifacts: stage4Artifacts,
     sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
     sourceControlPlaneGeneratedAt: stage4Artifacts.document.generatedAt,
     manifestsRoot: sources.manifestsRoot,
+    includePublicationIds: includePublicationIds.length > 0 ? includePublicationIds : undefined,
   })
 
-  const analysisPath = path.join(sources.manifestsRoot, 'stage4-structure-pending-analysis.json')
-  const summaryPath = path.join(sources.manifestsRoot, 'stage4-structure-pending-analysis.summary.json')
+  const analysisPath = path.join(sources.manifestsRoot, 'stage4-structure-active-forensics.json')
+  const summaryPath = path.join(sources.manifestsRoot, 'stage4-structure-active-forensics.summary.json')
 
   writeJson(analysisPath, analysisArtifacts.analysis)
   writeJson(summaryPath, analysisArtifacts.summary)
@@ -40,6 +52,7 @@ export async function main(): Promise<void> {
   console.log(JSON.stringify({
     analysisPath,
     summaryPath,
+    includePublicationIds,
     totals: analysisArtifacts.summary.totals,
     publicationIdsByDisposition: analysisArtifacts.summary.publicationIdsByDisposition,
   }, null, 2))

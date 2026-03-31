@@ -31,6 +31,8 @@ export async function main(): Promise<void> {
     sources.stage4PendingAnalysisRows,
     sources.stage4ActiveAnalysisRows,
     sources.stage4StalledAnalysisRows,
+    [],
+    sources.stage4ActiveForensicsRows,
   )
 
   const analysisArtifacts = buildStage4StructureOverlapAnalysis({

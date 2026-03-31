@@ -1,0 +1,55 @@
+{
+  "generatedAt": "2026-03-31T17:14:32.208Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T17:14:32.186Z",
+  "sourceWaveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
+  "sourceWaveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+  "rows": [
+    {
+      "publicationId": "4076",
+      "publicationTitle": "Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "forensicsDisposition": "font_text_extractability_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.failure.json",
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.10:font_text_extractability_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "4209",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "forensicsDisposition": "font_text_extractability_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.failure.json",
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.10:font_text_extractability_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T16:36:25.684Z",
+  "generatedAt": "2026-03-31T17:16:28.263Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,16 +7,16 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 843,
+      "remediated_fail": 842,
       "processing_error": 113,
       "deferred_manual": 0,
-      "staged_for_replacement": 7,
+      "staged_for_replacement": 8,
       "replaced_remote": 0
     },
     "byCohortLabel": {
       "short_high_likelihood": 23,
-      "figure_heavy": 491,
-      "structure_heavy": 338,
+      "figure_heavy": 492,
+      "structure_heavy": 337,
       "font_heavy": 14,
       "long_report": 15,
       "manual_tail": 175
@@ -43,7 +43,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 419,
+        "remediated_fail": 420,
         "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -54,10 +54,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 285,
+        "remediated_fail": 283,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 7,
+        "staged_for_replacement": 8,
         "replaced_remote": 0
       },
       "font_heavy": {
@@ -112,6 +112,7 @@
     "stage4ActiveAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-active-analysis.json",
     "stage4StalledAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-stalled-analysis.json",
     "stage4OverlapAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-overlap-analysis.json",
+    "stage4ActiveForensicsPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-active-forensics.json",
     "outcomeManifestCount": 16,
     "candidateManifestCount": 17
   }

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-31T16:38:44.308Z",
+  "generatedAt": "2026-03-31T17:09:19.432Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 34,
-    "readyToReplace": 7,
-    "remediatedPassCandidates": 7,
-    "failedAfterRemediation": 27,
+    "processed": 39,
+    "readyToReplace": 8,
+    "remediatedPassCandidates": 8,
+    "failedAfterRemediation": 31,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
@@ -1811,6 +1811,287 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "d93b2c2c6b132deb823bf4caf0d1b3f9ec988799dfec21f5d22974d4971cbd6e",
         "remediatedPdfSha256": "d93b2c2c6b132deb823bf4caf0d1b3f9ec988799dfec21f5d22974d4971cbd6e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3936",
+      "publicationTitle": "Webbased Technology Paves the Way to Better Services for Victims of Crime",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/winter2003.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/winter2003.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/winter2003.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3936-Webbased_Technology_Paves_the_Way_to_Better_Services_for_Victims_of_Crime.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T16:56:05.850Z",
+      "durationMs": 1268240,
+      "original": {
+        "overallScore": 35,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3936-Webbased_Technology_Paves_the_Way_to_Better_Services_for_Victims_of_Crime.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/compiler/winter2003.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3936-Webbased_Technology_Paves_the_Way_to_Better_Services_for_Victims_of_Crime.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "7b3ba25573a983d3f187cfe02e4efef823bcaf122a08ce329c5d70c577f3fa24",
+        "remediatedPdfSha256": "7b3ba25573a983d3f187cfe02e4efef823bcaf122a08ce329c5d70c577f3fa24",
+        "stagedReplacementSha256": "7b3ba25573a983d3f187cfe02e4efef823bcaf122a08ce329c5d70c577f3fa24"
+      }
+    },
+    {
+      "publicationId": "4145",
+      "publicationTitle": "Justice Assistance Grant Planning Materials  Illinois crime and criminal justice trends 19972007",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/Web Edition CRIME TRENDS 032509.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/Web Edition CRIME TRENDS 032509.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/Web%20Edition%20CRIME%20TRENDS%20032509.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T16:59:39.278Z",
+      "durationMs": 1481667,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Categories still below 100: Heading Structure"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Heading Structure"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "61dfe94460fa0c25b56f987e6497b3fdd1206e429b8b5e4c41773bc76719a165",
+        "remediatedPdfSha256": "61dfe94460fa0c25b56f987e6497b3fdd1206e429b8b5e4c41773bc76719a165",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4723",
+      "publicationTitle": "ICJIA State Fiscal Year 2023 Annual Report",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 67,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T17:00:13.105Z",
+      "durationMs": 1515494,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 34,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 35,
+        "grade": "F",
+        "pageCount": 34,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 35, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.bookmark_language"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4ccebba97dd6e43da54b0de7236f3a8d5fcd45e3b983a340a378661c95ae86d4",
+        "remediatedPdfSha256": "4ccebba97dd6e43da54b0de7236f3a8d5fcd45e3b983a340a378661c95ae86d4",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3483",
+      "publicationTitle": "Trends and Issues 1997",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 52,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/T&I 1997.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/T&I 1997.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/T&I%201997.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T17:04:01.526Z",
+      "durationMs": 1743915,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 235,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 235,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, Bookmarks / Navigation, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3483-Trends_and_Issues_1997.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3483-Trends_and_Issues_1997.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "622de2c693d626f1b9621a6acfbfff470ff5f5c3b2bd7f1b317d35f3a3594964",
+        "remediatedPdfSha256": "622de2c693d626f1b9621a6acfbfff470ff5f5c3b2bd7f1b317d35f3a3594964",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4094",
+      "publicationTitle": "Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202005%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T17:09:19.432Z",
+      "durationMs": 2061821,
+      "original": {
+        "overallScore": 38,
+        "grade": "F",
+        "pageCount": 97,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 97,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.table_regularity",
+          "Categories still below 100: Heading Structure, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.table_regularity"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
+        "remediatedPdfSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
         "stagedReplacementSha256": null
       }
     }

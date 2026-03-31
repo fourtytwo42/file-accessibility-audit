@@ -1,74 +1,97 @@
 {
-  "generatedAt": "2026-03-31T16:38:44.308Z",
+  "generatedAt": "2026-03-31T17:16:28.300Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 8,
-    "processed": 34,
-    "readyToReplace": 7,
-    "remediatedPassCandidates": 7,
-    "failedAfterRemediation": 27,
+    "targetCandidates": 5,
+    "processed": 5,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 4,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
   },
+  "currentWave": {
+    "processedPublicationIds": [
+      "3483",
+      "3936",
+      "4094",
+      "4145",
+      "4723"
+    ],
+    "remainingPublicationIds": [],
+    "failedAfterRemediationPublicationIds": [
+      "3483",
+      "4094",
+      "4145",
+      "4723"
+    ],
+    "processingErrorPublicationIds": []
+  },
+  "cumulativeTotals": {
+    "processed": 39,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 8,
+    "failedAfterRemediation": 31,
+    "sourceMissing": 0,
+    "processingError": 0
+  },
   "latestProcessed": {
-    "publicationId": "4677",
-    "publicationTitle": "Parole and Mandatory Supervised Release in Illinois",
-    "priorityRank": 2,
+    "publicationId": "4094",
+    "publicationTitle": "Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables",
+    "priorityRank": 6,
     "priorityTier": "highest",
-    "passLikelihoodScore": 68,
-    "serverHost": "157.230.3.215",
-    "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Parole and Mandatory Supervised Release in Illinois-220602T20211891.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Parole and Mandatory Supervised Release in Illinois-220602T20211891.pdf",
-    "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Parole%20and%20Mandatory%20Supervised%20Release%20in%20Illinois-220602T20211891.pdf",
-    "storageKind": "researchhub_upload",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
+    "passLikelihoodScore": 57,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202005%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T16:38:44.307Z",
-    "durationMs": 226697,
+    "processedAt": "2026-03-31T17:09:19.432Z",
+    "durationMs": 2061821,
     "original": {
-      "overallScore": 28,
+      "overallScore": 38,
       "grade": "F",
-      "pageCount": 21,
+      "pageCount": 97,
       "isScanned": false
     },
     "final": {
-      "overallScore": 61,
+      "overallScore": 67,
       "grade": "D",
-      "pageCount": 21,
+      "pageCount": 97,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
         "Final grade is D, not A.",
-        "Final overall score is 61, not 100.",
-        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
-        "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        "Final overall score is 67, not 100.",
+        "Blocking local standards findings remain: pdfua.table_regularity",
+        "Categories still below 100: Heading Structure, Table Markup, PDF/UA Compliance"
       ],
       "blockingLocalFindingKeys": [
-        "pdfua.logical_structure",
-        "pdfua.figure_alt_or_artifact"
+        "pdfua.table_regularity"
       ],
       "unresolvedCategoryLabels": [
-        "Text Extractability",
         "Heading Structure",
-        "Reading Order",
+        "Table Markup",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "d93b2c2c6b132deb823bf4caf0d1b3f9ec988799dfec21f5d22974d4971cbd6e",
-      "remediatedPdfSha256": "d93b2c2c6b132deb823bf4caf0d1b3f9ec988799dfec21f5d22974d4971cbd6e",
+      "gateEvaluatedBufferSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
+      "remediatedPdfSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
       "stagedReplacementSha256": null
     }
   }

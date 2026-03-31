@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-03-31T16:36:26.761Z",
+  "generatedAt": "2026-03-31T17:16:28.300Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T16:36:26.713Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T17:16:28.272Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
   "totals": {
-    "totalStructureHeavyRows": 338,
+    "totalStructureHeavyRows": 337,
     "verifiedPassRowsInCohort": 42,
     "newlyVerifiedPassRowsFromWave": 0,
-    "remainingStructureHeavyRows": 296,
+    "remainingStructureHeavyRows": 295,
     "processingErrorsInWave": 0,
-    "hardFailsInWave": 8,
-    "metadataNavigationResidualRows": 18,
+    "hardFailsInWave": 4,
+    "metadataNavigationResidualRows": 13,
     "structureOnlyResidualRows": 5,
-    "mixedStructureFigureResidualRows": 191,
+    "mixedStructureFigureResidualRows": 192,
     "structureProcessingErrorRetryRows": 4,
     "pendingWaveRows": 8,
-    "reclassifiedOutOfStructureHeavyRows": 1,
+    "reclassifiedOutOfStructureHeavyRows": 2,
     "genericTimeoutRows": 0
   },
   "rows": {
@@ -27,6 +27,7 @@
       "3608",
       "3645",
       "3656",
+      "3936",
       "4037",
       "4047",
       "4061"
@@ -58,7 +59,6 @@
     "remainingPublicationIds": [
       "3465",
       "3468",
-      "3483",
       "3550",
       "3567",
       "3584",
@@ -354,36 +354,32 @@
       "4773"
     ],
     "activeWaveSelectedPublicationIds": [
-      "3483",
-      "3936",
-      "4076",
-      "4094",
-      "4145",
-      "4209",
-      "4677",
-      "4723"
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
     ],
     "activeWavePendingPublicationIds": [
-      "3483",
-      "3936",
-      "4076",
-      "4094",
-      "4145",
-      "4209",
-      "4677",
-      "4723"
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
     ],
     "activeWaveAttemptedButUnterminalizedPublicationIds": [],
     "processingErrorPublicationIds": [],
     "hardFailPublicationIds": [
-      "3665",
-      "3670",
-      "3683",
-      "3768",
-      "3769",
-      "3770",
-      "3784",
-      "3836"
+      "3483",
+      "4094",
+      "4145",
+      "4723"
     ],
     "readingOrderOnlyResidualPublicationIds": [
       "3550",
@@ -399,7 +395,6 @@
       "4059"
     ],
     "metadataNavigationResidualPublicationIds": [
-      "3483",
       "3655",
       "3769",
       "3781",
@@ -409,13 +404,9 @@
       "3870",
       "3919",
       "3924",
-      "3936",
       "4045",
-      "4076",
       "4094",
       "4145",
-      "4209",
-      "4677",
       "4723"
     ],
     "structureOnlyResidualPublicationIds": [
@@ -604,6 +595,7 @@
       "4631",
       "4638",
       "4676",
+      "4677",
       "4690",
       "4694",
       "4706",
@@ -625,17 +617,16 @@
       "4739"
     ],
     "pendingPublicationIds": [
-      "3483",
-      "3936",
-      "4076",
-      "4094",
-      "4145",
-      "4209",
-      "4677",
-      "4723"
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
     ],
     "nextWaveStructureOnlyPublicationIds": [
-      "3483",
       "3655",
       "3769",
       "3781",
@@ -645,16 +636,12 @@
       "3870",
       "3919",
       "3924",
-      "3936",
       "4045",
-      "4076",
       "4084",
       "4094",
       "4142",
       "4145",
       "4162",
-      "4209",
-      "4677",
       "4723",
       "4753",
       "4755"
@@ -838,6 +825,7 @@
       "4631",
       "4638",
       "4676",
+      "4677",
       "4690",
       "4694",
       "4706",
@@ -859,6 +847,7 @@
       "4739"
     ],
     "reclassifiedOutOfStructureHeavyPublicationIds": [
+      "3483",
       "3671"
     ],
     "forensicallyResolvedPendingPublicationIds": [
@@ -869,24 +858,24 @@
       "4067"
     ],
     "stillUnclassifiedPendingPublicationIds": [
-      "3483",
-      "3936",
-      "4076",
-      "4094",
-      "4145",
-      "4209",
-      "4677",
-      "4723"
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
     ],
     "activeUnresolvedPublicationIds": [
-      "3483",
-      "3936",
-      "4076",
-      "4094",
-      "4145",
-      "4209",
-      "4677",
-      "4723"
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
     ],
     "stalledForensicPublicationIds": [
       "3866",
@@ -916,7 +905,25 @@
       "mixed_structure_figure_residuals": [],
       "structure_processing_error_retry": []
     },
-    "overlapAnalysisPublicationIds": [],
+    "overlapAnalysisPublicationIds": [
+      "3877",
+      "3903"
+    ],
+    "activeForensicsPublicationIds": [
+      "4076",
+      "4209"
+    ],
+    "activeForensicsByDisposition": {
+      "metadata_title_survivor": [],
+      "metadata_navigation_residuals": [],
+      "font_text_extractability_survivor": [
+        "4076",
+        "4209"
+      ],
+      "reading_order_only_survivor": [],
+      "mixed_structure_figure_residuals": [],
+      "structure_processing_error_retry": []
+    },
     "nearPassGradeOnlyPublicationIds": [
       "3468",
       "3640",
@@ -982,6 +989,7 @@
       "4034",
       "4039",
       "4055",
+      "4076",
       "4116",
       "4117",
       "4126",
@@ -991,6 +999,7 @@
       "4170",
       "4194",
       "4196",
+      "4209",
       "4215",
       "4469",
       "4500",
@@ -1006,19 +1015,17 @@
       "4754"
     ],
     "figureSpilloverSurvivorPublicationIds": [
+      "3483",
       "3614",
       "3671",
       "3682"
     ],
     "currentWaveProcessedPublicationIds": [
-      "3665",
-      "3670",
-      "3683",
-      "3768",
-      "3769",
-      "3770",
-      "3784",
-      "3836"
+      "3483",
+      "3936",
+      "4094",
+      "4145",
+      "4723"
     ],
     "currentWaveRemainingPublicationIds": [],
     "genericTimeoutPublicationIds": []

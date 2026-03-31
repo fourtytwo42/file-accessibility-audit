@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T16:36:25.684Z",
+  "generatedAt": "2026-03-31T17:16:28.263Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,16 +7,16 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 843,
+      "remediated_fail": 842,
       "processing_error": 113,
       "deferred_manual": 0,
-      "staged_for_replacement": 7,
+      "staged_for_replacement": 8,
       "replaced_remote": 0
     },
     "byCohortLabel": {
       "short_high_likelihood": 23,
-      "figure_heavy": 491,
-      "structure_heavy": 338,
+      "figure_heavy": 492,
+      "structure_heavy": 337,
       "font_heavy": 14,
       "long_report": 15,
       "manual_tail": 175
@@ -43,7 +43,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 419,
+        "remediated_fail": 420,
         "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -54,10 +54,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 285,
+        "remediated_fail": 283,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 7,
+        "staged_for_replacement": 8,
         "replaced_remote": 0
       },
       "font_heavy": {
@@ -7336,7 +7336,7 @@
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate",
       "replaceVia": "sftp",
       "currentCorpusStatus": "remediated_fail",
-      "cohortLabel": "structure_heavy",
+      "cohortLabel": "figure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
         "sshTarget": "forge@143.244.146.43",
@@ -7355,16 +7355,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 235,
         "isScanned": false,
-        "overallScore": 25,
-        "grade": "F",
+        "overallScore": 65,
+        "grade": "D",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 9,
         "manualOnlyFailureModeCount": 0,
@@ -7383,6 +7383,7 @@
           "category.title_language",
           "pdfua.display_doc_title",
           "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
           "pdfua.logical_structure",
           "pdfua.metadata_identification"
         ],
@@ -7408,7 +7409,7 @@
         "verificationPassed": false
       },
       "stage3FigureDiagnostics": {
-        "figureWaveBucket": null,
+        "figureWaveBucket": "mass_unresolved_figure_debt",
         "ownershipRiskKnown": false,
         "ownershipRiskCountInitial": null,
         "ownershipRiskCountFinal": null,
@@ -7421,24 +7422,29 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "structureWaveBucket": "mixed_structure_figure_residuals",
+        "terminalSurvivorClass": "figure_spillover_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
         "hasReadingOrderDebt": true,
         "hasMetadataNavigationDebt": true,
-        "hasMixedFigureResiduals": null,
+        "hasMixedFigureResiduals": true,
         "hasBoundedRuntimeWording": false,
         "originLane": "native_structure_heavy"
       },
       "reasonCodes": [
-        "cohort:structure_heavy",
+        "cohort:figure_heavy",
         "outcome:failed_after_remediation",
-        "stage4:metadata_navigation_after_wave"
+        "stage3:mass_figure_debt_after_wave",
+        "stage4.4:figure_spillover_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
+        "stage4:figure_dominant_after_structure_wave",
+        "stage4:reclassified_from_structure_heavy"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.4 reclassified this terminal Stage 4 survivor back to figure_heavy because the latest truthful blocker is figure debt."
       ]
     },
     {
@@ -58840,7 +58846,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/winter2003.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -58860,9 +58866,9 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
-        "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3936-Webbased_Technology_Paves_the_Way_to_Better_Services_for_Victims_of_Crime.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3936-Webbased_Technology_Paves_the_Way_to_Better_Services_for_Victims_of_Crime.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
@@ -58938,7 +58944,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -58950,7 +58956,9 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
-        "outcome:failed_after_remediation",
+        "outcome:remediated_pass_candidate",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -76645,7 +76653,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "font_text_extractability_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -76658,10 +76666,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.10:font_text_extractability_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
       ]
     },
     {
@@ -79696,16 +79706,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 97,
         "isScanned": false,
-        "overallScore": 53,
-        "grade": "F",
+        "overallScore": 67,
+        "grade": "D",
         "blockerFamilyCount": 5,
         "blockingFindingCount": 11,
         "manualOnlyFailureModeCount": 0,
@@ -79783,6 +79793,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -88489,9 +88500,9 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4145-Justice_Assistance_Grant_Planning_Materials_Illinois_crime_and_criminal_justice_trends_19972007.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
@@ -88572,6 +88583,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -98344,7 +98356,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "font_text_extractability_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -98357,10 +98369,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.10:font_text_extractability_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
       ]
     },
     {
@@ -143554,15 +143568,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/157.230.3.215/4677-Parole_and_Mandatory_Supervised_Release_in_Illinois.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 21,
         "isScanned": false,
-        "overallScore": 62,
+        "overallScore": 61,
         "grade": "D",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 7,
@@ -143581,6 +143595,7 @@
           "category.reading_order",
           "pdfua.display_doc_title",
           "pdfua.document_language",
+          "pdfua.figure_alt_or_artifact",
           "pdfua.logical_structure"
         ],
         "autoRunnableOpportunityKeys": [
@@ -143604,7 +143619,7 @@
         "verificationPassed": false
       },
       "stage3FigureDiagnostics": {
-        "figureWaveBucket": null,
+        "figureWaveBucket": "mixed_figure_structure_debt",
         "ownershipRiskKnown": false,
         "ownershipRiskCountInitial": null,
         "ownershipRiskCountFinal": null,
@@ -143617,21 +143632,23 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "metadata_navigation_residuals",
+        "structureWaveBucket": "mixed_structure_figure_residuals",
         "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
         "hasReadingOrderDebt": true,
         "hasMetadataNavigationDebt": true,
-        "hasMixedFigureResiduals": null,
+        "hasMixedFigureResiduals": true,
         "hasBoundedRuntimeWording": false,
         "originLane": "native_structure_heavy"
       },
       "reasonCodes": [
-        "cohort:structure_heavy",
+        "cohort:figure_heavy",
         "outcome:failed_after_remediation",
-        "stage4:metadata_navigation_after_wave"
+        "stage3:mixed_figure_structure_after_wave",
+        "stage4:adopted_into_structure_lane_after_wave",
+        "stage4:mixed_structure_figure_after_wave"
       ],
       "notes": [
         "Strapi-managed upload served from the researchhub uploads store."
@@ -156327,15 +156344,15 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-wave-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 34,
         "isScanned": false,
-        "overallScore": 33,
+        "overallScore": 35,
         "grade": "F",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 8,
@@ -156852,6 +156869,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [

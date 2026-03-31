@@ -2547,3 +2547,28 @@ First confirmed in-flight files:
     - `3936`, `4677`, `4723`, `3483`, `4145`, `4094`, `4209`, `4076`
   - `genericTimeoutRows` remains `0`.
   - Stage 4 remains the active lane; the next likely move after Stage 4.9 is a Stage 4.10 routing/forensics pass on `3936/4677/4723/3483/4145/4094/4209/4076`, not another blind rerun.
+- 2026-03-31: Stage 4.10 is now implemented as an active-wave forensic pass for the post-overlap zero-outcome wave `3936/4677/4723/3483/4145/4094/4209/4076`.
+  - New script and package command:
+    - `scripts/analyze-stage4-structure-active-forensics.ts`
+    - `pnpm agency:analyze-stage4-structure-active-forensics`
+  - New forensic artifacts:
+    - `ICJIA-PDFs/manifests/stage4-structure-active-forensics.json`
+    - `ICJIA-PDFs/manifests/stage4-structure-active-forensics.summary.json`
+  - Stage 4.10 active-forensics result from current active-wave evidence:
+    - `font_text_extractability_survivor`: `4076`, `4209`
+    - no new `metadata_title_survivor`, `reading_order_only_survivor`, `mixed_structure_figure_residuals`, or `structure_processing_error_retry` rows from this pass
+  - After sequential rebuild from the new forensic artifact, `4076` and `4209` were terminalized out of the live metadata retry lane while preserving truthful status `remediated_fail`.
+  - Stage 4 reporting now exposes:
+    - `activeForensicsPublicationIds`
+    - `activeForensicsByDisposition`
+  - After Stage 4.10 rebuild, the active Stage 4 wave advanced from `3936/4677/4723/3483/4145/4094/4209/4076` to:
+    - `3870`, `3655`, `4045`, `3781`, `3785`, `3919`, `3793`, `3924`
+  - A targeted live Stage 4 run was attempted on that reduced 8-row set, but it wrote `0` new terminal outcomes before truthful fallback rebuild.
+  - After fallback rebuild, the active Stage 4 wave remained unchanged:
+    - `3870`, `3655`, `4045`, `3781`, `3785`, `3919`, `3793`, `3924`
+  - Current Stage 4.10 reporting state:
+    - `pendingWaveRows: 8`
+    - `activeWaveSelectedPublicationIds` and `activeWavePendingPublicationIds` both match the 8-row set above
+    - `reportingWaveSelectedPublicationIds` remains the last completed truthful reporting wave: `3936`, `4145`, `4723`, `3483`, `4094`
+  - `genericTimeoutRows` remains `0`.
+  - Stage 4 remains the active lane; the next likely move after Stage 4.10 is a Stage 4.11 forensics/routing pass on `3870/3655/4045/3781/3785/3919/3793/3924`, not another blind rerun.
