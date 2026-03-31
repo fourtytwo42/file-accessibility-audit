@@ -1,33 +1,33 @@
 {
-  "generatedAt": "2026-03-31T01:41:48.737Z",
+  "generatedAt": "2026-03-31T03:57:22.609Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 8,
-    "processed": 3,
+    "targetCandidates": 9,
+    "processed": 4,
     "readyToReplace": 0,
     "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 3,
+    "failedAfterRemediation": 4,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 5
   },
   "latestProcessed": {
-    "publicationId": "3606",
-    "publicationTitle": "Information for Crime Victims",
-    "priorityRank": 6,
+    "publicationId": "3651",
+    "publicationTitle": "McGruff You can fight crime in your neighborhood",
+    "priorityRank": 8,
     "priorityTier": "highest",
     "passLikelihoodScore": 70,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/infovictims03a.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/infovictims03a.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/infovictims03a.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgneigh.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgneigh.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgneigh.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T01:41:48.737Z",
-    "durationMs": 69048,
+    "processedAt": "2026-03-31T03:36:05.995Z",
+    "durationMs": 70476,
     "original": {
       "overallScore": 21,
       "grade": "F",
@@ -35,31 +35,38 @@
       "isScanned": false
     },
     "final": {
-      "overallScore": 100,
-      "grade": "A",
+      "overallScore": 84,
+      "grade": "B",
       "pageCount": 2,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Categories still below 100: Reading Order"
+        "Final grade is B, not A.",
+        "Final overall score is 84, not 100.",
+        "Blocking local standards findings remain: pdfua.font_embedding",
+        "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
       ],
-      "blockingLocalFindingKeys": [],
+      "blockingLocalFindingKeys": [
+        "pdfua.font_embedding"
+      ],
       "unresolvedCategoryLabels": [
-        "Reading Order"
+        "Text Extractability",
+        "Reading Order",
+        "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "c333f25d9860bc81533bc9a06452f6182a07642f52238285fda62c921d8dcdb8",
-      "remediatedPdfSha256": "c333f25d9860bc81533bc9a06452f6182a07642f52238285fda62c921d8dcdb8",
+      "gateEvaluatedBufferSha256": "773d02061b1c5d6daaf00ba7be4feb59144fb0c62c894fd2ee0f3daa4723f794",
+      "remediatedPdfSha256": "773d02061b1c5d6daaf00ba7be4feb59144fb0c62c894fd2ee0f3daa4723f794",
       "stagedReplacementSha256": null
     }
   }

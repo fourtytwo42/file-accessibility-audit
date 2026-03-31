@@ -1,27 +1,30 @@
 {
-  "generatedAt": "2026-03-31T03:21:40.333Z",
+  "generatedAt": "2026-03-31T03:57:22.607Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T03:21:40.307Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T03:57:22.586Z",
   "totals": {
-    "eligibleRows": 300,
-    "selectedRows": 8,
-    "skippedRows": 292,
-    "pendingRows": 0
+    "eligibleRows": 5,
+    "selectedRows": 5,
+    "skippedRows": 0,
+    "pendingRows": 5
   },
   "selectedPublicationIds": [
     "4054",
     "4023",
     "4067",
     "3671",
-    "3606",
-    "3465",
-    "3550",
-    "3651"
+    "3465"
   ],
-  "pendingPublicationIds": [],
+  "pendingPublicationIds": [
+    "4054",
+    "4023",
+    "4067",
+    "3671",
+    "3465"
+  ],
   "selectedByTier": {
-    "highest": 8,
+    "highest": 5,
     "high": 0,
     "medium": 0,
     "low": 0
@@ -31,14 +34,14 @@
     "discovered": 0,
     "analyzed": 0,
     "queued_for_remediation": 0,
-    "remediated_fail": 8,
+    "remediated_fail": 5,
     "processing_error": 0,
     "deferred_manual": 0,
     "staged_for_replacement": 0,
     "replaced_remote": 0
   },
   "selectedByStructureWaveBucket": {
-    "metadata_navigation_residuals": 8,
+    "metadata_navigation_residuals": 5,
     "structure_only_residuals": 0,
     "mixed_structure_figure_residuals": 0,
     "structure_processing_error_retry": 0

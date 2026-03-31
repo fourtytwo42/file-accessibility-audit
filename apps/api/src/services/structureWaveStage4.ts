@@ -8,6 +8,7 @@ import type {
   CorpusControlPlaneRow,
   CorpusControlPlaneSources,
   CorpusStatus,
+  Stage4ActiveAnalysisDisposition,
   Stage4PendingAnalysisDisposition,
   Stage4PendingAnalysisEvidenceStrength,
   StructureWaveBucket,
@@ -124,6 +125,7 @@ export interface Stage4StructureThroughputSummaryDocument {
     reclassifiedOutOfStructureHeavyPublicationIds: string[]
     forensicallyResolvedPendingPublicationIds: string[]
     stillUnclassifiedPendingPublicationIds: string[]
+    activeUnresolvedPublicationIds: string[]
     genericTimeoutPublicationIds: string[]
   }
 }
@@ -162,6 +164,41 @@ export interface Stage4StructurePendingAnalysisSummaryDocument {
     byEvidenceStrength: Record<Stage4PendingAnalysisEvidenceStrength, number>
   }
   publicationIdsByDisposition: Record<Stage4PendingAnalysisDisposition, string[]>
+}
+
+export interface Stage4StructureActiveAnalysisRow {
+  publicationId: string
+  publicationTitle: string | null
+  priorStructureWaveBucket: StructureWaveBucket | null
+  activeDisposition: Stage4ActiveAnalysisDisposition
+  evidenceStrength: Stage4PendingAnalysisEvidenceStrength
+  evidencePaths: {
+    latestStage4AttemptPath: string | null
+    latestStage4OutcomePath: string | null
+    controlPlanePath: string
+  }
+  reasonCodes: string[]
+  notes: string[]
+}
+
+export interface Stage4StructureActiveAnalysisDocument {
+  generatedAt: string
+  sourceControlPlanePath: string
+  sourceControlPlaneGeneratedAt: string
+  sourceWaveManifestPath: string
+  sourceWaveOutcomesPath: string | null
+  rows: Stage4StructureActiveAnalysisRow[]
+}
+
+export interface Stage4StructureActiveAnalysisSummaryDocument {
+  generatedAt: string
+  analysisManifestPath: string
+  totals: {
+    analyzedRows: number
+    byDisposition: Record<Stage4ActiveAnalysisDisposition, number>
+    byEvidenceStrength: Record<Stage4PendingAnalysisEvidenceStrength, number>
+  }
+  publicationIdsByDisposition: Record<Stage4ActiveAnalysisDisposition, string[]>
 }
 
 export interface Stage4StructureCanaryRow {
@@ -496,13 +533,230 @@ export function buildStage4StructurePendingAnalysis(input: {
   }
 }
 
+function isTerminalOutcomeStatus(status: string | null | undefined): boolean {
+  return [
+    'failed_after_remediation',
+    'processing_error',
+    'ready_to_replace',
+    'remediated_pass_candidate',
+    'source_missing',
+  ].includes(status || '')
+}
+
+function terminalPublicationIdsFromOutcomes(outcomesDoc: { outcomes?: OutcomeLike[] } | null): Set<string> {
+  return new Set(
+    (outcomesDoc?.outcomes || [])
+      .filter(outcome => isTerminalOutcomeStatus(outcome.status))
+      .map(outcome => outcome.publicationId)
+      .filter((value): value is string => Boolean(value)),
+  )
+}
+
 function pendingPublicationIdsFromExistingArtifacts(
   waveDoc: Stage4StructureWaveDocument | null,
   outcomesDoc: { outcomes?: OutcomeLike[] } | null,
 ): string[] {
   if (!waveDoc) return []
-  const completed = new Set((outcomesDoc?.outcomes || []).map(outcome => outcome.publicationId).filter((value): value is string => Boolean(value)))
+  const completed = terminalPublicationIdsFromOutcomes(outcomesDoc)
   return waveDoc.selectedPublicationIds.filter(publicationId => !completed.has(publicationId))
+}
+
+function unresolvedActivePublicationIdsFromExistingArtifacts(
+  waveDoc: Stage4StructureWaveDocument | null,
+  outcomesDoc: { outcomes?: OutcomeLike[] } | null,
+): string[] {
+  return pendingPublicationIdsFromExistingArtifacts(waveDoc, outcomesDoc)
+}
+
+function countOutcomeStatuses(outcomes: OutcomeLike[] = []): Record<string, number> {
+  const counts: Record<string, number> = {}
+  for (const outcome of outcomes) {
+    const status = outcome.status || 'unknown'
+    counts[status] = (counts[status] || 0) + 1
+  }
+  return counts
+}
+
+export function buildStage4StructureWaveOutcomesSummary(input: {
+  wave: Stage4StructureWaveDocument | null
+  outcomesPath: string
+  outcomes: { outcomes?: OutcomeLike[] } | null
+}): Record<string, unknown> | null {
+  if (!input.wave || !input.outcomes) return null
+  const outcomes = input.outcomes.outcomes || []
+  const counts = countOutcomeStatuses(outcomes)
+  const latestProcessed = outcomes.length ? outcomes[outcomes.length - 1] : null
+  const remaining = input.wave.pendingPublicationIds.length
+  return {
+    generatedAt: new Date().toISOString(),
+    sourcePriorityManifestPath: input.wave.sourceControlPlanePath ? input.wave.sourceControlPlanePath.replace('corpus-control-plane.json', 'stage4-structure-wave.json') : null,
+    concurrency: 8,
+    totals: {
+      targetCandidates: outcomes.length + remaining,
+      processed: outcomes.length,
+      readyToReplace: counts.ready_to_replace || 0,
+      remediatedPassCandidates: counts.remediated_pass_candidate || 0,
+      failedAfterRemediation: counts.failed_after_remediation || 0,
+      sourceMissing: counts.source_missing || 0,
+      processingError: counts.processing_error || 0,
+      remaining,
+    },
+    latestProcessed,
+  }
+}
+
+function emptyActiveDispositionCounts(): Record<Stage4ActiveAnalysisDisposition, number> {
+  return {
+    metadata_navigation_residuals: 0,
+    structure_only_residuals: 0,
+    mixed_structure_figure_residuals: 0,
+    structure_processing_error_retry: 0,
+  }
+}
+
+function classifyActiveRowFromEvidence(input: {
+  row: CorpusControlPlaneRow
+  attemptArtifactPath: string | null
+  latestStage4OutcomePath: string | null
+  controlPlanePath: string
+}): Stage4StructureActiveAnalysisRow {
+  const { row, attemptArtifactPath, latestStage4OutcomePath, controlPlanePath } = input
+  const blockingKeys = uniqueStrings(row.classificationEvidence.blockingFindingKeys)
+  const combinedText = [
+    ...blockingKeys,
+    ...row.classificationEvidence.topBlockingResidualFamilyIds,
+    ...row.reasonCodes,
+    ...row.notes,
+  ].join(' ')
+
+  const metadataDebt = row.stage4StructureDiagnostics.hasMetadataNavigationDebt
+    || blockingKeys.some(key => METADATA_PATTERN.test(key))
+    || METADATA_PATTERN.test(combinedText)
+  const figureDebt = row.stage4StructureDiagnostics.hasMixedFigureResiduals
+    || blockingKeys.some(key => FIGURE_PATTERN.test(key))
+    || FIGURE_PATTERN.test(combinedText)
+  const structureDebt = row.stage4StructureDiagnostics.hasLogicalStructureDebt
+    || row.stage4StructureDiagnostics.hasReadingOrderDebt
+    || blockingKeys.some(key => STRUCTURE_PATTERN.test(key))
+    || STRUCTURE_PATTERN.test(combinedText)
+  const boundedRuntime = row.stage4StructureDiagnostics.hasBoundedRuntimeWording || row.currentCorpusStatus === 'processing_error'
+  const readingOnly = row.stage4StructureDiagnostics.hasReadingOrderDebt
+    && !row.stage4StructureDiagnostics.hasMetadataNavigationDebt
+    && !row.stage4StructureDiagnostics.hasMixedFigureResiduals
+    && blockingKeys.every(key => !METADATA_PATTERN.test(key) && !FIGURE_PATTERN.test(key))
+
+  let activeDisposition: Stage4ActiveAnalysisDisposition
+  const reasonCodes = [...row.reasonCodes]
+  const notes = [...row.notes]
+
+  if (boundedRuntime) {
+    activeDisposition = 'structure_processing_error_retry'
+    reasonCodes.push('stage4.3:structure_processing_error_retry')
+    notes.push('Stage 4.3 classified this active unresolved row as a bounded runtime retry.')
+  } else if (structureDebt && figureDebt) {
+    activeDisposition = 'mixed_structure_figure_residuals'
+    reasonCodes.push('stage4.3:mixed_structure_figure_residuals')
+    notes.push('Stage 4.3 classified this active unresolved row as mixed structure+figure residual debt.')
+  } else if (readingOnly || (structureDebt && !metadataDebt && !figureDebt)) {
+    activeDisposition = 'structure_only_residuals'
+    reasonCodes.push('stage4.3:structure_only_residuals')
+    notes.push('Stage 4.3 classified this active unresolved row as structure-only residual debt.')
+  } else if (metadataDebt) {
+    activeDisposition = 'metadata_navigation_residuals'
+    reasonCodes.push('stage4.3:metadata_navigation_residuals')
+    notes.push('Stage 4.3 classified this active unresolved row as metadata/navigation residual debt.')
+  } else {
+    activeDisposition = 'structure_processing_error_retry'
+    reasonCodes.push('stage4.3:structure_processing_error_retry')
+    notes.push('Stage 4.3 defaulted this active unresolved row to bounded runtime retry because the evidence stayed ambiguous.')
+  }
+
+  const evidenceStrength: Stage4PendingAnalysisEvidenceStrength = latestStage4OutcomePath
+    ? 'terminal_report'
+    : attemptArtifactPath
+      ? 'attempt_artifact_only'
+      : 'control_plane_only'
+
+  return {
+    publicationId: row.publicationId,
+    publicationTitle: row.title,
+    priorStructureWaveBucket: row.stage4StructureDiagnostics.structureWaveBucket,
+    activeDisposition,
+    evidenceStrength,
+    evidencePaths: {
+      latestStage4AttemptPath: attemptArtifactPath,
+      latestStage4OutcomePath,
+      controlPlanePath,
+    },
+    reasonCodes: uniqueStrings(reasonCodes),
+    notes: uniqueStrings(notes),
+  }
+}
+
+export function buildStage4StructureActiveAnalysis(input: {
+  artifacts: CorpusControlPlaneArtifacts
+  sourceControlPlanePath: string
+  sourceControlPlaneGeneratedAt: string
+  manifestsRoot: string
+}): {
+  analysis: Stage4StructureActiveAnalysisDocument
+  summary: Stage4StructureActiveAnalysisSummaryDocument
+} {
+  const wavePath = path.join(input.manifestsRoot, 'stage4-structure-wave.json')
+  const outcomesPath = path.join(input.manifestsRoot, 'stage4-structure-wave.outcomes.json')
+  const existingWave = loadJsonIfExists(wavePath) as Stage4StructureWaveDocument | null
+  const existingOutcomes = loadJsonIfExists(outcomesPath) as { outcomes?: OutcomeLike[] } | null
+  const activePublicationIds = unresolvedActivePublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
+  const rowByPublicationId = new Map(input.artifacts.document.rows.map(row => [row.publicationId, row]))
+  const rows: Stage4StructureActiveAnalysisRow[] = activePublicationIds
+    .map(publicationId => rowByPublicationId.get(publicationId))
+    .filter((row): row is CorpusControlPlaneRow => Boolean(row))
+    .map(row => classifyActiveRowFromEvidence({
+      row,
+      attemptArtifactPath: findAttemptArtifactPath(input.manifestsRoot, row.publicationId),
+      latestStage4OutcomePath: row.statusEvidence.outcomeManifestPath && /stage4-structure-wave/.test(row.statusEvidence.outcomeManifestPath)
+        ? row.statusEvidence.latestReportPath || row.statusEvidence.outcomeManifestPath
+        : null,
+      controlPlanePath: input.sourceControlPlanePath,
+    }))
+    .sort((left, right) => left.publicationId.localeCompare(right.publicationId))
+
+  const byDisposition = emptyActiveDispositionCounts()
+  const byEvidenceStrength = emptyPendingEvidenceStrengthCounts()
+  const publicationIdsByDisposition = {
+    metadata_navigation_residuals: [] as string[],
+    structure_only_residuals: [] as string[],
+    mixed_structure_figure_residuals: [] as string[],
+    structure_processing_error_retry: [] as string[],
+  }
+  for (const row of rows) {
+    byDisposition[row.activeDisposition] += 1
+    byEvidenceStrength[row.evidenceStrength] += 1
+    publicationIdsByDisposition[row.activeDisposition].push(row.publicationId)
+  }
+
+  const analysis: Stage4StructureActiveAnalysisDocument = {
+    generatedAt: new Date().toISOString(),
+    sourceControlPlanePath: input.sourceControlPlanePath,
+    sourceControlPlaneGeneratedAt: input.sourceControlPlaneGeneratedAt,
+    sourceWaveManifestPath: wavePath,
+    sourceWaveOutcomesPath: fs.existsSync(outcomesPath) ? outcomesPath : null,
+    rows,
+  }
+
+  return {
+    analysis,
+    summary: {
+      generatedAt: analysis.generatedAt,
+      analysisManifestPath: path.join(input.manifestsRoot, 'stage4-structure-active-analysis.json'),
+      totals: {
+        analyzedRows: rows.length,
+        byDisposition,
+        byEvidenceStrength,
+      },
+      publicationIdsByDisposition,
+    },
+  }
 }
 
 function bucketRank(bucket: StructureWaveBucket): number {
@@ -646,14 +900,21 @@ function selectionReasonsForRow(row: CorpusControlPlaneRow): string[] {
 function applyStage4RoutingToRow(
   row: CorpusControlPlaneRow,
   pendingAnalysisByPublicationId: Map<string, Stage4StructurePendingAnalysisRow>,
+  activeAnalysisByPublicationId: Map<string, Stage4StructureActiveAnalysisRow>,
 ): CorpusControlPlaneRow {
   const pendingAnalysis = pendingAnalysisByPublicationId.get(row.publicationId) || null
+  const activeAnalysis = activeAnalysisByPublicationId.get(row.publicationId) || null
   const hasStage4OutcomeEvidence = Boolean(row.statusEvidence.outcomeManifestPath && /stage4-structure-wave/.test(row.statusEvidence.outcomeManifestPath))
   const nextReasonCodes = [...row.reasonCodes]
   const nextNotes = [...row.notes]
   let nextDiagnostics = deriveStructureDiagnosticsFromRow(row)
   let nextCohortLabel: CohortLabel = row.cohortLabel
   let nextStatus = row.currentCorpusStatus
+
+  if (hasStage4OutcomeEvidence && nextDiagnostics.structureWaveBucket && row.currentCorpusStatus !== 'verified_pass') {
+    nextCohortLabel = 'structure_heavy'
+    nextReasonCodes.push('stage4:adopted_into_structure_lane_after_wave')
+  }
 
   if (!hasStage4OutcomeEvidence && pendingAnalysis) {
     const forensicBucket = stage4DispositionBucket(pendingAnalysis.analysisDisposition)
@@ -676,9 +937,19 @@ function applyStage4RoutingToRow(
     }
   }
 
-  if (hasStage4OutcomeEvidence && nextDiagnostics.structureWaveBucket && row.currentCorpusStatus !== 'verified_pass') {
-    nextCohortLabel = 'structure_heavy'
-    nextReasonCodes.push('stage4:adopted_into_structure_lane_after_wave')
+  if (!hasStage4OutcomeEvidence && activeAnalysis) {
+    nextDiagnostics = {
+      ...nextDiagnostics,
+      structureWaveBucket: activeAnalysis.activeDisposition,
+      hasBoundedRuntimeWording: activeAnalysis.activeDisposition === 'structure_processing_error_retry'
+        ? true
+        : nextDiagnostics.hasBoundedRuntimeWording,
+    }
+    nextReasonCodes.push(...activeAnalysis.reasonCodes)
+    nextNotes.push(...activeAnalysis.notes)
+    if (activeAnalysis.activeDisposition === 'structure_processing_error_retry') {
+      nextStatus = 'processing_error'
+    }
   }
 
   if (nextCohortLabel === 'structure_heavy' && nextDiagnostics.structureWaveBucket === null && nextDiagnostics.hasMixedFigureResiduals && !nextDiagnostics.hasLogicalStructureDebt && !nextDiagnostics.hasMetadataNavigationDebt) {
@@ -709,9 +980,11 @@ function applyStage4RoutingToRow(
 export function applyStage4StructureWaveReclassification(
   artifacts: CorpusControlPlaneArtifacts,
   pendingAnalysisRows: Stage4StructurePendingAnalysisRow[] = [],
+  activeAnalysisRows: Stage4StructureActiveAnalysisRow[] = [],
 ): CorpusControlPlaneArtifacts {
   const pendingAnalysisByPublicationId = new Map(pendingAnalysisRows.map(row => [row.publicationId, row]))
-  const rows = artifacts.document.rows.map(row => applyStage4RoutingToRow(row, pendingAnalysisByPublicationId))
+  const activeAnalysisByPublicationId = new Map(activeAnalysisRows.map(row => [row.publicationId, row]))
+  const rows = artifacts.document.rows.map(row => applyStage4RoutingToRow(row, pendingAnalysisByPublicationId, activeAnalysisByPublicationId))
   return {
     document: {
       generatedAt: artifacts.document.generatedAt,
@@ -835,6 +1108,7 @@ export function buildStage4StructureWaveArtifacts(input: {
   maxCandidates?: number
   includePublicationIds?: string[]
   pendingAnalysisRows?: Stage4StructurePendingAnalysisRow[]
+  activeAnalysisRows?: Stage4StructureActiveAnalysisRow[]
 }): {
   wave: Stage4StructureWaveDocument
   summary: Stage4StructureWaveSummaryDocument
@@ -846,49 +1120,32 @@ export function buildStage4StructureWaveArtifacts(input: {
   const currentOutcomesPath = path.join(input.manifestsRoot, 'stage4-structure-wave.outcomes.json')
   const existingWave = loadJsonIfExists(currentWavePath) as Stage4StructureWaveDocument | null
   const existingOutcomes = loadJsonIfExists(currentOutcomesPath) as { outcomes?: OutcomeLike[] } | null
+  const terminalOutcomeIds = terminalPublicationIdsFromOutcomes(existingOutcomes)
   const forensicallyResolvedPendingIds = new Set((input.pendingAnalysisRows || []).map(row => row.publicationId))
+  const activeAnalysisPublicationIds = uniqueStrings((input.activeAnalysisRows || []).map(row => row.publicationId))
+  const activeAnalysisIds = new Set(activeAnalysisPublicationIds)
   const activeEligiblePublicationIds = new Set(
     input.artifacts.document.rows
       .filter(row => row.cohortLabel === 'structure_heavy' && row.currentCorpusStatus !== 'verified_pass' && row.stage4StructureDiagnostics.structureWaveBucket)
       .map(row => row.publicationId),
   )
-  const pendingPublicationIds = pendingPublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
+  const existingUnresolvedPublicationIds = pendingPublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
     .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
-    .filter(publicationId => !forensicallyResolvedPendingIds.has(publicationId))
-
-  if (existingWave && pendingPublicationIds.length > 0 && includePublicationIds.length === 0) {
-    const selectedByTier = { highest: 0, high: 0, medium: 0, low: 0 }
-    const selectedByStatus = emptyStatusCounts()
-    const selectedByStructureWaveBucket = emptyBucketCounts()
-    for (const candidate of existingWave.candidates) {
-      selectedByTier[candidate.priorityTier] += 1
-      selectedByStatus[candidate.currentCorpusStatus] += 1
-      selectedByStructureWaveBucket[candidate.structureWaveBucket] += 1
-    }
-    return {
-      wave: {
-        ...existingWave,
-        pendingPublicationIds,
-        totals: { ...existingWave.totals, pendingRows: pendingPublicationIds.length },
-      },
-      summary: {
-        generatedAt: new Date().toISOString(),
-        waveManifestPath: currentWavePath,
-        sourceControlPlanePath: existingWave.sourceControlPlanePath,
-        sourceControlPlaneGeneratedAt: existingWave.sourceControlPlaneGeneratedAt,
-        totals: { ...existingWave.totals, pendingRows: pendingPublicationIds.length },
-        selectedPublicationIds: existingWave.selectedPublicationIds,
-        pendingPublicationIds,
-        selectedByTier,
-        selectedByStatus,
-        selectedByStructureWaveBucket,
-      },
-    }
-  }
+    .filter(publicationId => activeAnalysisIds.has(publicationId) || !forensicallyResolvedPendingIds.has(publicationId))
+  const continuationPublicationIds = activeAnalysisPublicationIds.length > 0
+    ? activeAnalysisPublicationIds.filter(publicationId => activeEligiblePublicationIds.has(publicationId) && !terminalOutcomeIds.has(publicationId))
+    : existingUnresolvedPublicationIds
+  const continueExistingActiveWave = includePublicationIds.length === 0 && continuationPublicationIds.length > 0
+  const allowedPublicationIds = continueExistingActiveWave
+    ? new Set(continuationPublicationIds)
+    : includePublicationIdSet
 
   const stage4Rows = input.artifacts.document.rows
     .filter(row => row.cohortLabel === 'structure_heavy' && row.currentCorpusStatus !== 'verified_pass')
-    .filter(row => includePublicationIds.length === 0 || includePublicationIdSet.has(row.publicationId))
+    .filter(row => !terminalOutcomeIds.has(row.publicationId))
+    .filter(row => continueExistingActiveWave
+      ? allowedPublicationIds.has(row.publicationId)
+      : includePublicationIds.length === 0 || allowedPublicationIds.has(row.publicationId))
     .sort(compareWaveRows)
 
   const skippedRows: Stage4StructureWaveSkippedRow[] = []
@@ -922,6 +1179,7 @@ export function buildStage4StructureWaveArtifacts(input: {
         'not_in_current_wave_capacity',
         row.stage4StructureDiagnostics.structureWaveBucket ? 'stage4_bucket:' + row.stage4StructureDiagnostics.structureWaveBucket : 'stage4_bucket:none',
         row.statusEvidence.outcomeStatus ? 'latest_outcome_status:' + row.statusEvidence.outcomeStatus : 'latest_outcome_status:none',
+        ...(activeAnalysisIds.has(row.publicationId) ? ['active_analysis_resolved'] : []),
       ],
     })
   }
@@ -969,10 +1227,10 @@ export function buildStage4StructureWaveArtifacts(input: {
       eligibleRows: eligibleRows.length,
       selectedRows: candidates.length,
       skippedRows: skippedRows.length,
-      pendingRows: pendingPublicationIds.length,
+      pendingRows: candidates.map(candidate => candidate.publicationId).filter((value): value is string => Boolean(value)).length,
     },
     selectedPublicationIds: candidates.map(candidate => candidate.publicationId).filter((value): value is string => Boolean(value)),
-    pendingPublicationIds,
+    pendingPublicationIds: candidates.map(candidate => candidate.publicationId).filter((value): value is string => Boolean(value)),
     candidates,
     skippedRows: skippedRows.sort((left, right) => left.publicationId.localeCompare(right.publicationId)),
   }
@@ -995,7 +1253,7 @@ export function buildStage4StructureWaveArtifacts(input: {
       sourceControlPlaneGeneratedAt: input.sourceControlPlaneGeneratedAt,
       totals: wave.totals,
       selectedPublicationIds: wave.selectedPublicationIds,
-      pendingPublicationIds,
+      pendingPublicationIds: candidates.map(candidate => candidate.publicationId).filter((value): value is string => Boolean(value)),
       selectedByTier,
       selectedByStatus,
       selectedByStructureWaveBucket,
@@ -1012,6 +1270,7 @@ export function buildStage4StructureThroughputSummary(input: {
   outcomesPath: string | null
   outcomes: { outcomes?: OutcomeLike[] } | null
   pendingAnalysisRows?: Stage4StructurePendingAnalysisRow[]
+  activeAnalysisRows?: Stage4StructureActiveAnalysisRow[]
 }): Stage4StructureThroughputSummaryDocument {
   const structureRows = input.artifacts.document.rows.filter(row => row.cohortLabel === 'structure_heavy')
   const waveIds = new Set(input.wave?.selectedPublicationIds || [])
@@ -1033,8 +1292,11 @@ export function buildStage4StructureThroughputSummary(input: {
   const hardFailPublicationIds = uniqueStrings((input.outcomes?.outcomes || []).filter(outcome => outcome.status === 'failed_after_remediation').map(outcome => outcome.publicationId))
   const forensicResolvedPublicationIds = uniqueStrings((input.pendingAnalysisRows || []).map(row => row.publicationId))
   const forensicResolvedSet = new Set(forensicResolvedPublicationIds)
-  const pendingPublicationIds = (input.wave?.pendingPublicationIds || []).slice().sort().filter(publicationId => !forensicResolvedSet.has(publicationId))
-  const stillUnclassifiedPendingPublicationIds = (input.wave?.pendingPublicationIds || []).slice().sort().filter(publicationId => !forensicResolvedSet.has(publicationId))
+  const activeAnalysisPublicationIds = uniqueStrings((input.activeAnalysisRows || []).map(row => row.publicationId))
+  const activeAnalysisSet = new Set(activeAnalysisPublicationIds)
+  const pendingPublicationIds = (input.wave?.pendingPublicationIds || []).slice().sort()
+  const stillUnclassifiedPendingPublicationIds = pendingPublicationIds.filter(publicationId => !forensicResolvedSet.has(publicationId) && !activeAnalysisSet.has(publicationId))
+  const activeUnresolvedPublicationIds = activeAnalysisPublicationIds.length ? activeAnalysisPublicationIds : pendingPublicationIds
 
   const readingOrderOnlyResidualPublicationIds = uniqueStrings([
     ...structureRows
@@ -1042,6 +1304,7 @@ export function buildStage4StructureThroughputSummary(input: {
       .filter(row => row.stage4StructureDiagnostics.hasReadingOrderDebt)
       .filter(row => !row.stage4StructureDiagnostics.hasMetadataNavigationDebt)
       .filter(row => !row.stage4StructureDiagnostics.hasMixedFigureResiduals)
+      .filter(row => row.classificationEvidence.blockingFindingKeys.every(key => /reading_order|page_tabs/i.test(key)))
       .map(row => row.publicationId),
     ...(input.outcomes?.outcomes || [])
       .filter(outcome => outcome.status === 'failed_after_remediation')
@@ -1108,6 +1371,7 @@ export function buildStage4StructureThroughputSummary(input: {
       reclassifiedOutOfStructureHeavyPublicationIds,
       forensicallyResolvedPendingPublicationIds: forensicResolvedPublicationIds,
       stillUnclassifiedPendingPublicationIds,
+      activeUnresolvedPublicationIds,
       genericTimeoutPublicationIds: [],
     },
   }

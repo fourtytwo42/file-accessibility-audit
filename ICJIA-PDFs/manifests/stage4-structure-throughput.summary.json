@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T03:21:40.335Z",
+  "generatedAt": "2026-03-31T03:57:22.609Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T03:21:40.307Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T03:57:22.586Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
@@ -11,12 +11,12 @@
     "newlyVerifiedPassRowsFromWave": 0,
     "remainingStructureHeavyRows": 300,
     "processingErrorsInWave": 0,
-    "hardFailsInWave": 3,
+    "hardFailsInWave": 4,
     "metadataNavigationResidualRows": 83,
     "structureOnlyResidualRows": 6,
     "mixedStructureFigureResidualRows": 207,
     "structureProcessingErrorRetryRows": 4,
-    "pendingWaveRows": 0,
+    "pendingWaveRows": 5,
     "reclassifiedOutOfStructureHeavyRows": 0,
     "genericTimeoutRows": 0
   },
@@ -328,6 +328,7 @@
     "hardFailPublicationIds": [
       "3550",
       "3606",
+      "3651",
       "3685"
     ],
     "readingOrderOnlyResidualPublicationIds": [
@@ -643,7 +644,13 @@
       "3965",
       "4739"
     ],
-    "pendingPublicationIds": [],
+    "pendingPublicationIds": [
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
+    ],
     "nextWaveStructureOnlyPublicationIds": [
       "3465",
       "3483",
@@ -959,6 +966,13 @@
       "4067"
     ],
     "stillUnclassifiedPendingPublicationIds": [],
+    "activeUnresolvedPublicationIds": [
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
+    ],
     "genericTimeoutPublicationIds": []
   }
 }

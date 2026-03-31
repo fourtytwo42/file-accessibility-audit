@@ -2391,3 +2391,51 @@ First confirmed in-flight files:
   - the first Stage 4 wave is now decision-complete at the routing layer even though only `3` rows have terminal Stage 4 remediation outcomes
   - the stale pending state from the interrupted first wave has been eliminated without inventing any passes or terminal failures
   - Stage 4 remains active and not complete, but it no longer has unresolved “pending because interrupted” rows blocking the next planning step
+
+## 2026-03-31 Stage 4.3 Truth-D drift fix
+
+- Stage 4 remains the active lane.
+- Stage 4.3 fixed a truth drift where `stage4-structure-wave.json` could show stale `pendingPublicationIds` that no longer matched written Stage 4 outcomes.
+- Implementation changes:
+  - `apps/api/src/services/structureWaveStage4.ts`
+    - terminal Stage 4 outcomes now always win over stale pending-wave state
+    - Stage 4 wave continuation now prefers the explicit Stage 4.3 active-analysis artifact when present
+    - Stage 4 throughput reporting now exposes `activeUnresolvedPublicationIds`
+    - Stage 4 build now refreshes `stage4-structure-wave.outcomes.summary.json` so wave manifest, outcomes summary, and throughput summary stay aligned after interrupted runs
+  - new script:
+    - `scripts/analyze-stage4-structure-active.ts`
+    - package script: `pnpm agency:analyze-stage4-structure-active`
+- New Stage 4.3 forensic artifact roots:
+  - `ICJIA-PDFs/manifests/stage4-structure-active-analysis.json`
+  - `ICJIA-PDFs/manifests/stage4-structure-active-analysis.summary.json`
+- Current Stage 4.3 active unresolved set is exactly:
+  - `3465`
+  - `3671`
+  - `4023`
+  - `4054`
+  - `4067`
+- Stage 4.3 classified all five active unresolved rows as:
+  - `metadata_navigation_residuals`
+  - evidence strength: `attempt_artifact_only`
+- Current aligned Stage 4 truth after Stage 4.3 rebuild:
+  - `stage4-structure-wave.json`
+    - `selectedRows: 5`
+    - `pendingRows: 5`
+    - selected/pending ids match the five-row active unresolved set above
+  - `stage4-structure-wave.outcomes.summary.json`
+    - `processed: 4`
+    - `failedAfterRemediation: 4`
+    - `remaining: 5`
+  - `stage4-structure-throughput.summary.json`
+    - `pendingWaveRows: 5`
+    - `activeUnresolvedPublicationIds` matches the same five ids
+    - `stillUnclassifiedPendingPublicationIds: []`
+    - `readingOrderOnlyResidualPublicationIds` remains:
+      - `3550`
+      - `3606`
+      - `3685`
+- `3651` is now correctly treated as a terminal Stage 4 hard fail, not a pending row.
+  - it is not part of `readingOrderOnlyResidualPublicationIds`
+  - its terminal blocker shape includes `pdfua.font_embedding` plus unresolved `Text Extractability`, `Reading Order`, and `PDF/UA Compliance`
+- Stage 4 is still not complete.
+  - The next practical move after Stage 4.3 is another targeted Stage 4 execution step or a Stage 4.4 routing pass if those five metadata/navigation survivors continue to churn without writing terminal outcomes.

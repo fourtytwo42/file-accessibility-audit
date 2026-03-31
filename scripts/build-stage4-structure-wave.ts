@@ -13,6 +13,7 @@ import {
   buildStage4StructureCanaries,
   buildStage4StructureThroughputSummary,
   buildStage4StructureWaveArtifacts,
+  buildStage4StructureWaveOutcomesSummary,
 } from '../apps/api/src/services/structureWaveStage4.ts'
 
 function writeJson(filePath: string, value: unknown): void {
@@ -30,7 +31,7 @@ export async function main(): Promise<void> {
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows)
+  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows)
   const validation = validateCorpusControlPlaneArtifacts(artifacts, {
     replacementMap: sources.replacementMap,
     promotionLedgerRows: sources.promotionLedgerRows,
@@ -45,6 +46,7 @@ export async function main(): Promise<void> {
   const throughputSummaryPath = path.join(sources.manifestsRoot, 'stage4-structure-throughput.summary.json')
   const canariesPath = path.join(sources.manifestsRoot, 'stage4-structure-canaries.json')
   const outcomesPath = path.join(sources.manifestsRoot, 'stage4-structure-wave.outcomes.json')
+  const outcomesSummaryPath = path.join(sources.manifestsRoot, 'stage4-structure-wave.outcomes.summary.json')
 
   const maxCandidates = Number(process.env.ICJIA_STAGE4_STRUCTURE_WAVE_LIMIT || 8)
   const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS || '')
@@ -59,6 +61,7 @@ export async function main(): Promise<void> {
     maxCandidates,
     includePublicationIds,
     pendingAnalysisRows: sources.stage4PendingAnalysisRows,
+    activeAnalysisRows: sources.stage4ActiveAnalysisRows,
   })
 
   const throughputSummary = buildStage4StructureThroughputSummary({
@@ -70,13 +73,20 @@ export async function main(): Promise<void> {
     outcomesPath: fs.existsSync(outcomesPath) ? outcomesPath : null,
     outcomes: readJsonIfExists(outcomesPath),
     pendingAnalysisRows: sources.stage4PendingAnalysisRows,
+    activeAnalysisRows: sources.stage4ActiveAnalysisRows,
   })
 
+  const refreshedOutcomesSummary = buildStage4StructureWaveOutcomesSummary({
+    wave: waveArtifacts.wave,
+    outcomesPath,
+    outcomes: readJsonIfExists(outcomesPath),
+  })
   const canaries = buildStage4StructureCanaries({ artifacts, sources })
 
   writeJson(wavePath, waveArtifacts.wave)
   writeJson(waveSummaryPath, waveArtifacts.summary)
   writeJson(throughputSummaryPath, throughputSummary)
+  if (refreshedOutcomesSummary) writeJson(outcomesSummaryPath, refreshedOutcomesSummary)
   writeJson(canariesPath, canaries)
 
   console.log(JSON.stringify({
@@ -84,6 +94,7 @@ export async function main(): Promise<void> {
     waveSummaryPath,
     throughputSummaryPath,
     canariesPath,
+    outcomesSummaryPath: refreshedOutcomesSummary ? outcomesSummaryPath : null,
     totals: waveArtifacts.wave.totals,
     selectedPublicationIds: waveArtifacts.wave.selectedPublicationIds,
     throughput: throughputSummary.totals,

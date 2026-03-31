@@ -19,6 +19,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     promotionLedgerPath: '/tmp/repo/ICJIA-PDFs/manifests/verified-promotion-ledger.json',
     regressionBenchmarkPath: '/tmp/repo/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json',
     stage4PendingAnalysisPath: null,
+    stage4ActiveAnalysisPath: null,
     replacementMap: [],
     verificationResults: [],
     verificationRows: [],
@@ -28,6 +29,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     candidateManifests: [],
     regressionBenchmarkOutcomes: [],
     stage4PendingAnalysisRows: [],
+    stage4ActiveAnalysisRows: [],
     ...overrides,
   }
 }
