@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-31T05:05:26.227Z",
+  "generatedAt": "2026-03-31T14:43:34.878Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 17,
-    "readyToReplace": 1,
-    "remediatedPassCandidates": 1,
-    "failedAfterRemediation": 16,
+    "processed": 25,
+    "readyToReplace": 7,
+    "remediatedPassCandidates": 7,
+    "failedAfterRemediation": 18,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
@@ -909,6 +909,390 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
         "remediatedPdfSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4037",
+      "publicationTitle": "Jackson County SchoolBasedProbation Program Lessons learned",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Vol%204_No_1_Jackson%20County%20Schoolbased%20Probation.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:03.400Z",
+      "durationMs": 40288,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d32be68e18e85507d5a502f1cd504713f44e5c4685626d0450cd363a22779e93",
+        "remediatedPdfSha256": "d32be68e18e85507d5a502f1cd504713f44e5c4685626d0450cd363a22779e93",
+        "stagedReplacementSha256": "d32be68e18e85507d5a502f1cd504713f44e5c4685626d0450cd363a22779e93"
+      }
+    },
+    {
+      "publicationId": "4061",
+      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 2",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:03.717Z",
+      "durationMs": 40605,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "34e2dd0122cd23ec36841806bfa1a2e7791e518970bfedb7141d813fa84cea7e",
+        "remediatedPdfSha256": "34e2dd0122cd23ec36841806bfa1a2e7791e518970bfedb7141d813fa84cea7e",
+        "stagedReplacementSha256": "34e2dd0122cd23ec36841806bfa1a2e7791e518970bfedb7141d813fa84cea7e"
+      }
+    },
+    {
+      "publicationId": "3645",
+      "publicationTitle": "The Juvenile Justice Reform Act",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/juvreform.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/juvreform.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/juvreform.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:14.990Z",
+      "durationMs": 51878,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/TIUpdate/juvreform.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ad59569fa85d5bb04e3526b7d304dfd8a2fc75ce0c70122d1303a44e91189d0a",
+        "remediatedPdfSha256": "ad59569fa85d5bb04e3526b7d304dfd8a2fc75ce0c70122d1303a44e91189d0a",
+        "stagedReplacementSha256": "ad59569fa85d5bb04e3526b7d304dfd8a2fc75ce0c70122d1303a44e91189d0a"
+      }
+    },
+    {
+      "publicationId": "3608",
+      "publicationTitle": "Champaign County Enhanced Domestic Violence Probation Program Evaluated",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/chdv.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/chdv.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/chdv.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:24.926Z",
+      "durationMs": 61814,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/chdv.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "dd0eca90fb25fc30627e3549ef96db5689ac4ec41e27cecb823d106697797405",
+        "remediatedPdfSha256": "dd0eca90fb25fc30627e3549ef96db5689ac4ec41e27cecb823d106697797405",
+        "stagedReplacementSha256": "dd0eca90fb25fc30627e3549ef96db5689ac4ec41e27cecb823d106697797405"
+      }
+    },
+    {
+      "publicationId": "3597",
+      "publicationTitle": "Evaluation of the Cook County Juvenile Sheriffs Work Alternative Program",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/ogav3n1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/ogav3n1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:25.965Z",
+      "durationMs": 62853,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d41c7a5eb984db0feeb9b8d24c3e0360fac8e2aab57ab304b4d43402ed7ece0d",
+        "remediatedPdfSha256": "d41c7a5eb984db0feeb9b8d24c3e0360fac8e2aab57ab304b4d43402ed7ece0d",
+        "stagedReplacementSha256": "d41c7a5eb984db0feeb9b8d24c3e0360fac8e2aab57ab304b4d43402ed7ece0d"
+      }
+    },
+    {
+      "publicationId": "3656",
+      "publicationTitle": "Evaluation of the Kankakee Metropolitan Enforcement Group",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmeg-oga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/kmeg-oga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmeg-oga.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:30.882Z",
+      "durationMs": 67769,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/kmeg-oga.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0da8c68544ab92ca32f60d33f820ddba3f5ccd8c49092874d1e3d3544877e09a",
+        "remediatedPdfSha256": "0da8c68544ab92ca32f60d33f820ddba3f5ccd8c49092874d1e3d3544877e09a",
+        "stagedReplacementSha256": "0da8c68544ab92ca32f60d33f820ddba3f5ccd8c49092874d1e3d3544877e09a"
+      }
+    },
+    {
+      "publicationId": "3610",
+      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:31.792Z",
+      "durationMs": 68680,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Categories still below 100: Reading Order"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Reading Order"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8c772a1dd51fb9355d6a12b39c14b21bfc7a7e6af98ed11a8f98106e9db0d519",
+        "remediatedPdfSha256": "8c772a1dd51fb9355d6a12b39c14b21bfc7a7e6af98ed11a8f98106e9db0d519",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3663",
+      "publicationTitle": "Juvenile Probation Programs Evaluated",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvdayreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvdayreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvdayreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T14:43:34.877Z",
+      "durationMs": 71764,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Categories still below 100: Reading Order"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Reading Order"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
+        "remediatedPdfSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
         "stagedReplacementSha256": null
       }
     }

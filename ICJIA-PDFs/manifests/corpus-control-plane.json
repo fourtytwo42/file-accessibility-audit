@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T14:33:22.433Z",
+  "generatedAt": "2026-03-31T14:43:55.354Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,10 +7,10 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 849,
+      "remediated_fail": 845,
       "processing_error": 113,
       "deferred_manual": 0,
-      "staged_for_replacement": 1,
+      "staged_for_replacement": 5,
       "replaced_remote": 0
     },
     "byCohortLabel": {
@@ -54,10 +54,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 291,
+        "remediated_fail": 287,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 1,
+        "staged_for_replacement": 5,
         "replaced_remote": 0
       },
       "font_heavy": {
@@ -19195,7 +19195,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/ogav3n1.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -19215,16 +19215,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-outcomes.json",
-        "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 88,
-        "grade": "B",
+        "overallScore": 100,
+        "grade": "A",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 11,
         "manualOnlyFailureModeCount": 0,
@@ -19266,7 +19266,7 @@
       "promotionTruth": {
         "promotionStatus": null,
         "ledgerRowPresent": false,
-        "stagedReplacementPath": null,
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
         "replacementChecksumSha256": null,
         "verificationPassed": false
       },
@@ -19285,7 +19285,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -19297,7 +19297,9 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
-        "outcome:failed_after_remediation",
+        "outcome:remediated_pass_candidate",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -20531,7 +20533,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/chdv.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -20551,16 +20553,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-outcomes.json",
-        "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-remaining-all-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 88,
-        "grade": "B",
+        "overallScore": 100,
+        "grade": "A",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 11,
         "manualOnlyFailureModeCount": 0,
@@ -20602,7 +20604,7 @@
       "promotionTruth": {
         "promotionStatus": null,
         "ledgerRowPresent": false,
-        "stagedReplacementPath": null,
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/chdv.pdf",
         "replacementChecksumSha256": null,
         "verificationPassed": false
       },
@@ -20621,7 +20623,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -20633,7 +20635,9 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
-        "outcome:failed_after_remediation",
+        "outcome:remediated_pass_candidate",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -20791,16 +20795,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 88,
-        "grade": "B",
+        "overallScore": 100,
+        "grade": "A",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
         "manualOnlyFailureModeCount": 0,
@@ -20860,7 +20864,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "reading_order_only_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -20873,6 +20877,8 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.4:reading_order_only_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -24622,7 +24628,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/juvreform.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -24642,16 +24648,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-outcomes.json",
-        "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
-        "grade": "B",
+        "overallScore": 100,
+        "grade": "A",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 11,
         "manualOnlyFailureModeCount": 0,
@@ -24693,7 +24699,7 @@
       "promotionTruth": {
         "promotionStatus": null,
         "ledgerRowPresent": false,
-        "stagedReplacementPath": null,
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/TIUpdate/juvreform.pdf",
         "replacementChecksumSha256": null,
         "verificationPassed": false
       },
@@ -24712,7 +24718,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -24724,7 +24730,9 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
-        "outcome:failed_after_remediation",
+        "outcome:remediated_pass_candidate",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -25826,7 +25834,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmeg-oga.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "staged_for_replacement",
       "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -25846,16 +25854,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
-        "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
-        "grade": "B",
+        "overallScore": 100,
+        "grade": "A",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
         "manualOnlyFailureModeCount": 0,
@@ -25896,7 +25904,7 @@
       "promotionTruth": {
         "promotionStatus": null,
         "ledgerRowPresent": false,
-        "stagedReplacementPath": null,
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/kmeg-oga.pdf",
         "replacementChecksumSha256": null,
         "verificationPassed": false
       },
@@ -25915,7 +25923,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -25927,7 +25935,9 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
-        "outcome:failed_after_remediation",
+        "outcome:remediated_pass_candidate",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -26664,16 +26674,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 4,
         "isScanned": false,
-        "overallScore": 85,
-        "grade": "B",
+        "overallScore": 100,
+        "grade": "A",
         "blockerFamilyCount": 4,
         "blockingFindingCount": 10,
         "manualOnlyFailureModeCount": 0,
@@ -26733,7 +26743,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "reading_order_only_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -26746,6 +26756,8 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.4:reading_order_only_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
@@ -70996,9 +71008,9 @@
         "verificationClassification": "hard_fail",
         "verificationTimestamp": "2026-03-31T06:23:13.061Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Vol_4_No_1_Jackson_County_Schoolbased_Probation.pdf.json",
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
-        "outcomeStatus": "ready_to_replace",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
@@ -71061,7 +71073,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -71073,6 +71085,8 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave",
         "verification_hard_fail"
       ],
@@ -74220,9 +74234,9 @@
         "verificationClassification": "hard_fail",
         "verificationTimestamp": "2026-03-31T06:24:05.950Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Sheridan.pdf.json",
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
-        "outcomeStatus": "ready_to_replace",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "remediated_pass_candidate",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
@@ -74285,7 +74299,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "staged_pass_candidate_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -74297,6 +74311,8 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
+        "stage4.5:staged_pass_candidate_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave",
         "verification_hard_fail"
       ],

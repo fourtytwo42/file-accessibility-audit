@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T14:33:22.433Z",
+  "generatedAt": "2026-03-31T14:43:55.354Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,10 +7,10 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 849,
+      "remediated_fail": 845,
       "processing_error": 113,
       "deferred_manual": 0,
-      "staged_for_replacement": 1,
+      "staged_for_replacement": 5,
       "replaced_remote": 0
     },
     "byCohortLabel": {
@@ -54,10 +54,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 291,
+        "remediated_fail": 287,
         "processing_error": 4,
         "deferred_manual": 0,
-        "staged_for_replacement": 1,
+        "staged_for_replacement": 5,
         "replaced_remote": 0
       },
       "font_heavy": {

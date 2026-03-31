@@ -1,95 +1,91 @@
 {
-  "generatedAt": "2026-03-31T14:36:12.095Z",
+  "generatedAt": "2026-03-31T14:43:55.394Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
     "processed": 8,
     "readyToReplace": 0,
-    "remediatedPassCandidates": 1,
-    "failedAfterRemediation": 7,
+    "remediatedPassCandidates": 6,
+    "failedAfterRemediation": 2,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
   },
   "currentWave": {
     "processedPublicationIds": [
-      "3767",
-      "3771",
-      "3964",
-      "3981",
-      "4046",
-      "4047",
-      "4050",
-      "4135"
+      "3597",
+      "3608",
+      "3610",
+      "3645",
+      "3656",
+      "3663",
+      "4037",
+      "4061"
     ],
     "remainingPublicationIds": [],
     "failedAfterRemediationPublicationIds": [
-      "3767",
-      "3771",
-      "3964",
-      "3981",
-      "4046",
-      "4050",
-      "4135"
+      "3610",
+      "3663"
     ],
     "processingErrorPublicationIds": []
   },
   "cumulativeTotals": {
-    "processed": 17,
+    "processed": 25,
     "readyToReplace": 0,
-    "remediatedPassCandidates": 1,
-    "failedAfterRemediation": 16,
+    "remediatedPassCandidates": 7,
+    "failedAfterRemediation": 18,
     "sourceMissing": 0,
     "processingError": 0
   },
   "latestProcessed": {
-    "publicationId": "4050",
-    "publicationTitle": "Meth response teams easing burden on localized drug task forces",
-    "priorityRank": 7,
+    "publicationId": "3663",
+    "publicationTitle": "Juvenile Probation Programs Evaluated",
+    "priorityRank": 8,
     "priorityTier": "highest",
     "passLikelihoodScore": 70,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/MRT.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/MRT.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/MRT.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvdayreport.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvdayreport.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvdayreport.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T05:05:26.226Z",
-    "durationMs": 83044,
+    "processedAt": "2026-03-31T14:43:34.877Z",
+    "durationMs": 71764,
     "original": {
-      "overallScore": 29,
+      "overallScore": 21,
       "grade": "F",
-      "pageCount": 2,
+      "pageCount": 4,
       "isScanned": false
     },
     "final": {
-      "overallScore": 97,
-      "grade": "B",
-      "pageCount": 2,
+      "overallScore": 100,
+      "grade": "A",
+      "pageCount": 4,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Final grade is B, not A.",
-        "Final overall score is 97, not 100."
+        "Categories still below 100: Reading Order"
       ],
       "blockingLocalFindingKeys": [],
-      "unresolvedCategoryLabels": [],
+      "unresolvedCategoryLabels": [
+        "Reading Order"
+      ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
-      "remediatedPdfSha256": "5d05c3cf2f405805ee6cb0b7b35b3cd9fd720ce8d1c87673a3b2685e2795275e",
+      "gateEvaluatedBufferSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
+      "remediatedPdfSha256": "e5ccf68e2cce32a4b839c27fa3be7caa394095fd73eab0f81994378b51810777",
       "stagedReplacementSha256": null
     }
   }

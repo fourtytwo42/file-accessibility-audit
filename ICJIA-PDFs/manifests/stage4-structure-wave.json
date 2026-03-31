@@ -1,35 +1,35 @@
 {
-  "generatedAt": "2026-03-31T14:36:12.091Z",
+  "generatedAt": "2026-03-31T14:43:55.391Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T14:36:12.068Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T14:43:55.366Z",
   "waveName": "stage4-structure-wave",
   "cohortLabel": "structure_heavy",
   "maxCandidates": 8,
   "totals": {
-    "eligibleRows": 283,
+    "eligibleRows": 275,
     "selectedRows": 8,
-    "skippedRows": 275,
+    "skippedRows": 267,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "4037",
-    "4061",
-    "3597",
-    "3608",
-    "3610",
-    "3645",
-    "3656",
-    "3663"
+    "3665",
+    "3670",
+    "3683",
+    "3768",
+    "3769",
+    "3770",
+    "3784",
+    "3836"
   ],
   "pendingPublicationIds": [
-    "4037",
-    "4061",
-    "3597",
-    "3608",
-    "3610",
-    "3645",
-    "3656",
-    "3663"
+    "3665",
+    "3670",
+    "3683",
+    "3768",
+    "3769",
+    "3770",
+    "3784",
+    "3836"
   ],
   "candidates": [
     {
@@ -37,114 +37,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "4037",
-      "publicationTitle": "Jackson County SchoolBasedProbation Program Lessons learned",
+      "publicationId": "3665",
+      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Vol 4_No_1_Jackson County Schoolbased Probation.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Vol%204_No_1_Jackson%20County%20Schoolbased%20Probation.pdf",
-      "storageKind": "legacy_archive",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals",
-        "verification_hard_fail"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4037-Jackson_County_SchoolBasedProbation_Program_Lessons_learned.remediation.json",
-      "pageCount": 4,
-      "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 7,
-      "topBlockingResidualFamilyIds": [
-        "font_embedding_and_unicode",
-        "logical_structure_marked_content",
-        "metadata_normalization",
-        "post_bootstrap_heading_convergence"
-      ],
-      "blockingFindingKeys": [
-        "category.heading_structure",
-        "category.pdf_ua_compliance",
-        "category.reading_order",
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
-        "pdfua.font_unicode",
-        "pdfua.logical_structure"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": true,
-      "hasReadingOrderDebt": true,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 2,
-      "passLikelihoodScore": 70,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "4061",
-      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 2",
-      "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Sheridan.pdf",
-      "storageKind": "legacy_archive",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals",
-        "verification_hard_fail"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4061-Sheridan_Correctional_Center_Therapeutic_Community_Year_2.remediation.json",
-      "pageCount": 4,
-      "isScanned": false,
-      "blockerFamilyCount": 4,
-      "blockingFindingCount": 7,
-      "topBlockingResidualFamilyIds": [
-        "font_embedding_and_unicode",
-        "logical_structure_marked_content",
-        "metadata_normalization",
-        "post_bootstrap_heading_convergence"
-      ],
-      "blockingFindingKeys": [
-        "category.heading_structure",
-        "category.pdf_ua_compliance",
-        "category.reading_order",
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
-        "pdfua.font_unicode",
-        "pdfua.logical_structure"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": true,
-      "hasReadingOrderDebt": true,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 3,
-      "passLikelihoodScore": 70,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "3597",
-      "publicationTitle": "Evaluation of the Cook County Juvenile Sheriffs Work Alternative Program",
-      "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/ogav3n1.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/ogav3n1.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CCH.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CCH.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CCH.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -156,11 +54,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3597-Evaluation_of_the_Cook_County_Juvenile_Sheriffs_Work_Alternative_Program.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 11,
+      "blockingFindingCount": 10,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -176,7 +74,114 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 2,
+      "passLikelihoodScore": 70,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3670",
+      "publicationTitle": "Violent Crime Task Force Cracks Tough Homicide Cases in Kankakee County",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/VCTFOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/VCTFOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/VCTFOGA.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
+      "pageCount": 4,
+      "isScanned": false,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "topBlockingResidualFamilyIds": [
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 3,
+      "passLikelihoodScore": 70,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3683",
+      "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/abateOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/abateOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/abateOGA.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
+      "pageCount": 4,
+      "isScanned": false,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "topBlockingResidualFamilyIds": [
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -194,12 +199,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3608",
-      "publicationTitle": "Champaign County Enhanced Domestic Violence Probation Program Evaluated",
+      "publicationId": "3768",
+      "publicationTitle": "Supervising sex offenders in DuPage Lake and Winnebago counties",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/chdv.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/chdv.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/chdv.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/sexoffogaPDF.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/sexoffogaPDF.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/sexoffogaPDF.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -211,11 +216,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3608-Champaign_County_Enhanced_Domestic_Violence_Probation_Program_Evaluated.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 11,
+      "blockingFindingCount": 10,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -231,7 +236,6 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.font_widths",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -249,12 +253,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3610",
-      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "publicationId": "3769",
+      "publicationTitle": "Supervising Sex Offenders in Coles Madison and Vermilion Counties",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/cwhrs/collaboration-3a.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CMVoga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CMVoga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CMVoga.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -266,7 +270,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -303,12 +307,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3645",
-      "publicationTitle": "The Juvenile Justice Reform Act",
+      "publicationId": "3770",
+      "publicationTitle": "Specialized Unit Takes a Problemsolving Approachto Crime in Kankakee",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/juvreform.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/juvreform.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/juvreform.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmegoga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/kmegoga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmegoga.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -320,11 +324,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3645-The_Juvenile_Justice_Reform_Act.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 11,
+      "blockingFindingCount": 10,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -340,7 +344,6 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.font_widths",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -358,12 +361,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3656",
-      "publicationTitle": "Evaluation of the Kankakee Metropolitan Enforcement Group",
+      "publicationId": "3784",
+      "publicationTitle": "Probation Research Results of the 2000 Illinois Probation Outcome Study",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/kmeg-oga.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/kmeg-oga.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmeg-oga.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/probation.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/probation.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/probation.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -375,7 +378,7 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3656-Evaluation_of_the_Kankakee_Metropolitan_Enforcement_Group.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -412,12 +415,12 @@
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
-      "publicationId": "3663",
-      "publicationTitle": "Juvenile Probation Programs Evaluated",
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvdayreport.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvdayreport.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvdayreport.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/treatment.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/treatment.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/treatment.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -429,11 +432,11 @@
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 4,
-      "blockingFindingCount": 10,
+      "blockingFindingCount": 9,
       "topBlockingResidualFamilyIds": [
         "font_embedding_and_unicode",
         "logical_structure_marked_content",
@@ -449,8 +452,7 @@
         "pdfua.document_language",
         "pdfua.font_embedding",
         "pdfua.font_unicode",
-        "pdfua.logical_structure",
-        "pdfua.metadata_identification"
+        "pdfua.logical_structure"
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
@@ -618,39 +620,6 @@
       ]
     },
     {
-      "publicationId": "3665",
-      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3670",
-      "publicationTitle": "Violent Crime Task Force Cracks Tough Homicide Cases in Kankakee County",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3683",
-      "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3697",
       "publicationTitle": "Working Together The Case for Integration of Criminal Justice Information Systems",
       "currentCorpusStatus": "remediated_fail",
@@ -686,39 +655,6 @@
     {
       "publicationId": "3765",
       "publicationTitle": "An Evaluation of the Cook County Sheriffs Day Reporting Center Program Rearrest and Reincarceration After Discharge",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3768",
-      "publicationTitle": "Supervising sex offenders in DuPage Lake and Winnebago counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3769",
-      "publicationTitle": "Supervising Sex Offenders in Coles Madison and Vermilion Counties",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3770",
-      "publicationTitle": "Specialized Unit Takes a Problemsolving Approachto Crime in Kankakee",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
       "skipReasons": [
@@ -774,17 +710,6 @@
     {
       "publicationId": "3783",
       "publicationTitle": "Three Years After Sweeping Reform Whats Different in the Juvenile Justice System",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3784",
-      "publicationTitle": "Probation Research Results of the 2000 Illinois Probation Outcome Study",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
       "skipReasons": [
@@ -1203,17 +1128,6 @@
     {
       "publicationId": "3835",
       "publicationTitle": "Sharing criminal history record informationthe Interstate Identification Index",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
-      "publicationId": "3836",
-      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
       "currentCorpusStatus": "remediated_fail",
       "structureWaveBucket": "metadata_navigation_residuals",
       "skipReasons": [
