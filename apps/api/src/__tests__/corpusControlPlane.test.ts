@@ -18,6 +18,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     verificationClassifiedPath: '/tmp/repo/ICJIA-PDFs/manifests/ready-to-replace-verification.classified.json',
     promotionLedgerPath: '/tmp/repo/ICJIA-PDFs/manifests/verified-promotion-ledger.json',
     regressionBenchmarkPath: '/tmp/repo/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json',
+    stage4PendingAnalysisPath: null,
     replacementMap: [],
     verificationResults: [],
     verificationRows: [],
@@ -26,6 +27,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     outcomeManifests: [],
     candidateManifests: [],
     regressionBenchmarkOutcomes: [],
+    stage4PendingAnalysisRows: [],
     ...overrides,
   }
 }
@@ -259,8 +261,8 @@ describe('corpus control plane regression', () => {
     expect(validation.ok).toBe(true)
     expect(artifacts.document.rows).toHaveLength(sources.replacementMap.length)
     expect(artifacts.document.summary.totalRows).toBe(1056)
-    expect(artifacts.document.summary.verifiedPassRowsFromLedger).toBe(86)
-    expect(sources.promotionLedgerRows).toHaveLength(86)
+    expect(artifacts.document.summary.verifiedPassRowsFromLedger).toBe(87)
+    expect(sources.promotionLedgerRows).toHaveLength(87)
     expect(sources.classifiedRows.filter(row => row.classification === 'verified_pass')).toHaveLength(86)
     expect(sources.classifiedRows.filter(row => row.classification === 'soft_fail_advisory')).toHaveLength(2)
     expect(sources.classifiedRows.filter(row => row.classification === 'hard_fail')).toHaveLength(304)

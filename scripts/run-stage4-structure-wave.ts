@@ -20,11 +20,29 @@ function readWaveSelectedCount(): number {
   return Number(doc?.totals?.selectedRows || 0)
 }
 
+function readPendingPublicationIds(): string[] {
+  if (!fs.existsSync(waveManifestPath)) return []
+  const doc = JSON.parse(fs.readFileSync(waveManifestPath, 'utf8')) as { pendingPublicationIds?: string[] }
+  return Array.isArray(doc?.pendingPublicationIds) ? doc.pendingPublicationIds.filter(Boolean) : []
+}
+
 export async function main(): Promise<void> {
   const buildOnly = process.argv.includes('--build-only') || process.argv.includes('--skip-remediation')
+  const pendingOnly = process.argv.includes('--pending-only')
 
-  run('pnpm', ['agency:build-stage4-structure-wave'])
+  const buildEnv = pendingOnly
+    ? {
+        ...process.env,
+        ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS: readPendingPublicationIds().join(','),
+      }
+    : process.env
+
+  run('pnpm', ['agency:build-stage4-structure-wave'], buildEnv)
   const selectedRows = readWaveSelectedCount()
+  if (pendingOnly && !readPendingPublicationIds().length) {
+    console.log(JSON.stringify({ skipped: true, reason: 'No pending Stage 4 rows remain.' }, null, 2))
+    return
+  }
   if (!selectedRows) {
     console.log(JSON.stringify({ skipped: true, reason: 'No Stage 4 structure-wave candidates selected.' }, null, 2))
     return
@@ -32,7 +50,7 @@ export async function main(): Promise<void> {
 
   if (!buildOnly) {
     run('pnpm', ['agency:run-priority-remediation'], {
-      ...process.env,
+      ...buildEnv,
       ICJIA_PRIORITY_MANIFEST_PATH: waveManifestPath,
       ICJIA_REMEDIATION_OUTCOMES_PATH: waveOutcomesPath,
       ICJIA_REMEDIATION_OUTCOMES_SUMMARY_PATH: waveOutcomesSummaryPath,

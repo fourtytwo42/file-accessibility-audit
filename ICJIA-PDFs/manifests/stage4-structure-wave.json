@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T01:25:33.329Z",
+  "generatedAt": "2026-03-31T03:21:40.333Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T01:25:33.307Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T03:21:40.307Z",
   "waveName": "stage4-structure-wave",
   "cohortLabel": "structure_heavy",
   "maxCandidates": 8,
@@ -9,25 +9,19 @@
     "eligibleRows": 300,
     "selectedRows": 8,
     "skippedRows": 292,
-    "pendingRows": 5
+    "pendingRows": 0
   },
   "selectedPublicationIds": [
     "4054",
-    "3685",
     "4023",
     "4067",
     "3671",
     "3606",
     "3465",
-    "3550"
+    "3550",
+    "3651"
   ],
-  "pendingPublicationIds": [
-    "4054",
-    "4023",
-    "4067",
-    "3671",
-    "3465"
-  ],
+  "pendingPublicationIds": [],
   "candidates": [
     {
       "priorityRank": 1,
@@ -47,6 +41,7 @@
         "cohort:structure_heavy",
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
+        "stage4.2:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals",
         "verification_hard_fail"
@@ -65,8 +60,8 @@
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": null,
-      "hasReadingOrderDebt": null,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
       "hasMetadataNavigationDebt": true,
       "hasMixedFigureResiduals": null,
       "hasBoundedRuntimeWording": false,
@@ -74,49 +69,6 @@
     },
     {
       "priorityRank": 2,
-      "passLikelihoodScore": 86,
-      "priorityTier": "highest",
-      "recommendedAction": "fix_first",
-      "publicationId": "3685",
-      "publicationTitle": "ADAM Arrestee Drug Abuse Monitoring Program in Cook County 4th Quarter",
-      "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ADAM/ADAM4.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ADAM/ADAM4.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ADAM/ADAM4.pdf",
-      "storageKind": "legacy_archive",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "selectionReasons": [
-        "cohort:structure_heavy",
-        "metadata_navigation_cleanup_candidate",
-        "origin_lane:native_structure_heavy",
-        "stage4:metadata_navigation_after_wave",
-        "stage4_bucket:metadata_navigation_residuals",
-        "verification_soft_fail"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
-      "pageCount": 4,
-      "isScanned": false,
-      "blockerFamilyCount": 0,
-      "blockingFindingCount": 4,
-      "topBlockingResidualFamilyIds": [],
-      "blockingFindingKeys": [
-        "pdfua.display_doc_title",
-        "pdfua.document_language",
-        "pdfua.logical_structure",
-        "pdfua.metadata_identification"
-      ],
-      "dominantStructurePhase": null,
-      "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": null,
-      "hasReadingOrderDebt": null,
-      "hasMetadataNavigationDebt": true,
-      "hasMixedFigureResiduals": null,
-      "hasBoundedRuntimeWording": false,
-      "originLane": "native_structure_heavy"
-    },
-    {
-      "priorityRank": 3,
       "passLikelihoodScore": 85,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -133,6 +85,7 @@
         "cohort:structure_heavy",
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
+        "stage4.2:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals",
         "verification_hard_fail"
@@ -152,15 +105,15 @@
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": null,
-      "hasReadingOrderDebt": null,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
       "hasMetadataNavigationDebt": true,
       "hasMixedFigureResiduals": null,
       "hasBoundedRuntimeWording": false,
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 4,
+      "priorityRank": 3,
       "passLikelihoodScore": 84,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -177,6 +130,7 @@
         "cohort:structure_heavy",
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
+        "stage4.2:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals",
         "verification_hard_fail"
@@ -196,15 +150,15 @@
       ],
       "dominantStructurePhase": null,
       "hasLogicalStructureDebt": true,
-      "hasHeadingDebt": null,
-      "hasReadingOrderDebt": null,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
       "hasMetadataNavigationDebt": true,
       "hasMixedFigureResiduals": null,
       "hasBoundedRuntimeWording": false,
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 5,
+      "priorityRank": 4,
       "passLikelihoodScore": 83,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -223,6 +177,7 @@
         "origin_lane:reclassified_from_short_high_likelihood",
         "stage2:reclassified_from_short_high_likelihood",
         "stage2:structure_residuals",
+        "stage4.2:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals",
         "verification_hard_fail"
@@ -246,7 +201,7 @@
       "originLane": "reclassified_from_short_high_likelihood"
     },
     {
-      "priorityRank": 6,
+      "priorityRank": 5,
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -263,11 +218,12 @@
         "cohort:structure_heavy",
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals",
         "verification_soft_fail"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
       "pageCount": 2,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -300,7 +256,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 7,
+      "priorityRank": 6,
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -318,6 +274,7 @@
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.2:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
@@ -354,7 +311,7 @@
       "originLane": "native_structure_heavy"
     },
     {
-      "priorityRank": 8,
+      "priorityRank": 7,
       "passLikelihoodScore": 70,
       "priorityTier": "highest",
       "recommendedAction": "fix_first",
@@ -372,10 +329,11 @@
         "metadata_navigation_cleanup_candidate",
         "origin_lane:native_structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave",
         "stage4_bucket:metadata_navigation_residuals"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
       "pageCount": 2,
       "isScanned": false,
       "blockerFamilyCount": 4,
@@ -396,6 +354,60 @@
         "pdfua.font_embedding",
         "pdfua.font_unicode",
         "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 8,
+      "passLikelihoodScore": 70,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3651",
+      "publicationTitle": "McGruff You can fight crime in your neighborhood",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgneigh.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgneigh.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgneigh.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.remediation.json",
+      "pageCount": 2,
+      "isScanned": false,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "topBlockingResidualFamilyIds": [
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
         "pdfua.logical_structure",
         "pdfua.metadata_identification"
       ],
@@ -587,17 +599,6 @@
       ]
     },
     {
-      "publicationId": "3651",
-      "publicationTitle": "McGruff You can fight crime in your neighborhood",
-      "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
-        "latest_outcome_status:failed_after_remediation"
-      ]
-    },
-    {
       "publicationId": "3653",
       "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
       "currentCorpusStatus": "processing_error",
@@ -671,6 +672,17 @@
       "skipReasons": [
         "not_in_current_wave_capacity",
         "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3685",
+      "publicationTitle": "ADAM Arrestee Drug Abuse Monitoring Program in Cook County 4th Quarter",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "structure_only_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_only_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -854,10 +866,10 @@
       "publicationId": "3787",
       "publicationTitle": "Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -876,10 +888,10 @@
       "publicationId": "3790",
       "publicationTitle": "Methamphetamine in Illinois An Examination of an Emerging Drug",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -1206,10 +1218,10 @@
       "publicationId": "3828",
       "publicationTitle": "Results of the 2003 Criminal History Record Information Audit",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -1217,10 +1229,10 @@
       "publicationId": "3831",
       "publicationTitle": "Chicago Homicide Dataset SeriesWhy is age discrepancy a risk factor for intimate partner homicide Examining the influence of offender criminal history",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -1690,10 +1702,10 @@
       "publicationId": "3927",
       "publicationTitle": "Chicago Homicide Dataset Series Is age discrepancy a risk factor for intimate partner homicide",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -2273,10 +2285,10 @@
       "publicationId": "4024",
       "publicationTitle": "Examining pretrial juvenile detention screening practices in Illinois",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -3296,10 +3308,10 @@
       "publicationId": "4506",
       "publicationTitle": "Issues in Policing Rural Areas: A Review of the Literature",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -3307,10 +3319,10 @@
       "publicationId": "4509",
       "publicationTitle": "Criminal Justice System Utilization in Rural Areas",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },
@@ -3329,10 +3341,10 @@
       "publicationId": "4531",
       "publicationTitle": "S.T.O.P. Violence Against Women In Illinois A Multi-Year Plan: FFY14-16",
       "currentCorpusStatus": "remediated_fail",
-      "structureWaveBucket": "metadata_navigation_residuals",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
       "skipReasons": [
         "not_in_current_wave_capacity",
-        "stage4_bucket:metadata_navigation_residuals",
+        "stage4_bucket:mixed_structure_figure_residuals",
         "latest_outcome_status:failed_after_remediation"
       ]
     },

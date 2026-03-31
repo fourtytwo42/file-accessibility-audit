@@ -25,6 +25,17 @@ export type SourceKind = 'legacy_archive' | 'agency_upload' | 'researchhub_uploa
 export type VerificationClassification = 'verified_pass' | 'soft_fail_advisory' | 'hard_fail'
 export type FigureWaveBucket = 'ownership_cleared_figure_debt_remains' | 'mixed_figure_structure_debt' | 'mass_unresolved_figure_debt' | 'figure_processing_error_retry'
 export type StructureWaveBucket = 'structure_only_residuals' | 'mixed_structure_figure_residuals' | 'metadata_navigation_residuals' | 'structure_processing_error_retry'
+export type Stage4PendingAnalysisDisposition =
+  | 'metadata_navigation_residuals'
+  | 'structure_only_residuals'
+  | 'mixed_structure_figure_residuals'
+  | 'structure_processing_error_retry'
+  | 'reclassify_to_figure_heavy'
+export type Stage4PendingAnalysisEvidenceStrength =
+  | 'terminal_report'
+  | 'failure_report'
+  | 'attempt_artifact_only'
+  | 'control_plane_only'
 
 export interface PublicationReplacementMapRow {
   publicationId: string
@@ -244,6 +255,7 @@ export interface CorpusControlPlaneSources {
   verificationClassifiedPath: string | null
   promotionLedgerPath: string | null
   regressionBenchmarkPath: string | null
+  stage4PendingAnalysisPath: string | null
   replacementMap: PublicationReplacementMapRow[]
   verificationResults: VerificationResult[]
   verificationRows: PublicationVerificationRow[]
@@ -258,6 +270,21 @@ export interface CorpusControlPlaneSources {
     candidates: CandidateRecordLike[]
   }>
   regressionBenchmarkOutcomes: BenchmarkOutcomeLike[]
+  stage4PendingAnalysisRows: Array<{
+    publicationId: string
+    publicationTitle: string | null
+    priorStructureWaveBucket: StructureWaveBucket | null
+    analysisDisposition: Stage4PendingAnalysisDisposition
+    evidenceStrength: Stage4PendingAnalysisEvidenceStrength
+    evidencePaths: {
+      terminalReportPath: string | null
+      failureReportPath: string | null
+      attemptArtifactPath: string | null
+      controlPlanePath: string
+    }
+    reasonCodes: string[]
+    notes: string[]
+  }>
 }
 
 export interface CorpusControlPlaneRow {
@@ -647,37 +674,51 @@ function deriveStage4StructureDiagnostics(input: {
   reasonCodes: string[]
 }): CorpusControlPlaneRow['stage4StructureDiagnostics'] {
   const latestOutcomeBlockingKeys = uniqueStrings(input.latestOutcome?.outcome.gate?.blockingLocalFindingKeys || [])
+  const latestOutcomeUnresolvedCategories = uniqueStrings(input.latestOutcome?.outcome.gate?.unresolvedCategoryLabels || [])
+  const latestOutcomeReasons = uniqueStrings(input.latestOutcome?.outcome.gate?.reasons || [])
   const blockingKeys = uniqueStrings([
     ...input.classificationEvidence.blockingFindingKeys,
     ...(input.benchmarkOutcome?.final?.blockingLocalFindingKeys || []),
     ...latestOutcomeBlockingKeys,
   ])
-  const decisiveBlockingKeys = latestOutcomeBlockingKeys.length > 0 ? latestOutcomeBlockingKeys : blockingKeys
-  const joinedText = [
-    ...input.classificationEvidence.topBlockingResidualFamilyIds,
-    ...blockingKeys,
-    ...input.reasonCodes,
-  ].join(' ')
+  const latestOutcomeHasGateSignals = latestOutcomeBlockingKeys.length > 0 || latestOutcomeUnresolvedCategories.length > 0 || latestOutcomeReasons.length > 0
+  const decisiveBlockingKeys = latestOutcomeHasGateSignals ? latestOutcomeBlockingKeys : blockingKeys
+  const decisiveJoinedText = latestOutcomeHasGateSignals
+    ? [
+        ...latestOutcomeBlockingKeys,
+        ...latestOutcomeUnresolvedCategories,
+        ...latestOutcomeReasons,
+      ].join(' ')
+    : [
+        ...input.classificationEvidence.topBlockingResidualFamilyIds,
+        ...blockingKeys,
+        ...input.reasonCodes,
+      ].join(' ')
 
   const hasLogicalStructureDebt = decisiveBlockingKeys.includes('pdfua.logical_structure')
     || decisiveBlockingKeys.includes('pdfua.heading_content_quality')
-    || STRUCTURE_FAMILY_PATTERN.test(joinedText)
+    || STRUCTURE_FAMILY_PATTERN.test(decisiveJoinedText)
   const hasHeadingDebt = decisiveBlockingKeys.some(key => /heading/i.test(key))
+    || /heading/i.test(decisiveJoinedText)
   const hasReadingOrderDebt = decisiveBlockingKeys.some(key => /reading_order|page_tabs/i.test(key))
+    || latestOutcomeUnresolvedCategories.some(label => /reading order/i.test(label))
+    || latestOutcomeReasons.some(reason => /reading order/i.test(reason))
   const hasMetadataNavigationDebt = decisiveBlockingKeys.some(key => /document_language|display_doc_title|metadata_identification|bookmark_language|page_tabs/i.test(key))
-    || STRUCTURE_METADATA_PATTERN.test(joinedText)
+    || STRUCTURE_METADATA_PATTERN.test(decisiveJoinedText)
   const hasMixedFigureResiduals = decisiveBlockingKeys.some(key => /figure|artifact|image|untagged_rendered_images/i.test(key))
-    || FIGURE_FAMILY_PATTERN.test(joinedText)
+    || FIGURE_FAMILY_PATTERN.test(decisiveJoinedText)
 
   let structureWaveBucket: StructureWaveBucket | null = null
-  if (input.rowCohortLabel === 'structure_heavy' || hasLogicalStructureDebt || hasMetadataNavigationDebt) {
+  if (input.rowCohortLabel === 'structure_heavy' || hasLogicalStructureDebt || hasMetadataNavigationDebt || hasReadingOrderDebt) {
     if (isInspectionBudgetProcessingError(input.latestOutcome) || input.rowCurrentCorpusStatus === 'processing_error') {
       structureWaveBucket = 'structure_processing_error_retry'
+    } else if (hasReadingOrderDebt && !hasMetadataNavigationDebt && !hasMixedFigureResiduals) {
+      structureWaveBucket = 'structure_only_residuals'
     } else if (hasMetadataNavigationDebt && !hasMixedFigureResiduals) {
       structureWaveBucket = 'metadata_navigation_residuals'
     } else if ((hasLogicalStructureDebt || hasMetadataNavigationDebt) && hasMixedFigureResiduals) {
       structureWaveBucket = 'mixed_structure_figure_residuals'
-    } else if (hasLogicalStructureDebt || hasMetadataNavigationDebt) {
+    } else if (hasLogicalStructureDebt || hasMetadataNavigationDebt || hasReadingOrderDebt) {
       structureWaveBucket = 'structure_only_residuals'
     }
   }
@@ -1185,6 +1226,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
   const verificationClassifiedPath = path.join(manifestsRoot, 'ready-to-replace-verification.classified.json')
   const promotionLedgerPath = path.join(manifestsRoot, 'verified-promotion-ledger.json')
   const regressionBenchmarkPath = path.join(manifestsRoot, 'remediation-regression-benchmark.summary.json')
+  const stage4PendingAnalysisPath = path.join(manifestsRoot, 'stage4-structure-pending-analysis.json')
 
   const outcomeManifests = fs.readdirSync(manifestsRoot)
     .filter(name => name.endsWith('-outcomes.json') || name.endsWith('.outcomes.json'))
@@ -1210,6 +1252,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     verificationClassifiedPath: fs.existsSync(verificationClassifiedPath) ? verificationClassifiedPath : null,
     promotionLedgerPath: fs.existsSync(promotionLedgerPath) ? promotionLedgerPath : null,
     regressionBenchmarkPath: fs.existsSync(regressionBenchmarkPath) ? regressionBenchmarkPath : null,
+    stage4PendingAnalysisPath: fs.existsSync(stage4PendingAnalysisPath) ? stage4PendingAnalysisPath : null,
     replacementMap: readManifestArray<PublicationReplacementMapRow>(replacementMapPath, 'rows'),
     verificationResults: fs.existsSync(verificationPath) ? readJson<any>(verificationPath).verificationResults || [] : [],
     verificationRows: fs.existsSync(verificationPath) ? readJson<any>(verificationPath).publicationRows || [] : [],
@@ -1218,5 +1261,6 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     outcomeManifests,
     candidateManifests,
     regressionBenchmarkOutcomes: fs.existsSync(regressionBenchmarkPath) ? readJson<any>(regressionBenchmarkPath).outcomes || [] : [],
+    stage4PendingAnalysisRows: fs.existsSync(stage4PendingAnalysisPath) ? readJson<any>(stage4PendingAnalysisPath).rows || [] : [],
   }
 }

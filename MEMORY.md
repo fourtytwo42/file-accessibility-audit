@@ -2312,3 +2312,82 @@ First confirmed in-flight files:
     - No new ledger-backed passes were produced before interruption.
     - The completed rows reinforce metadata/navigation structure debt rather than generic runtime churn.
     - The next Stage 4 decision should start from the refreshed manifests, not the interrupted process state.
+
+- 2026-03-31 Stage 4.1 follow-up slice and reporting refinement implemented:
+  - Added Stage 4 follow-up execution support so `scripts/run-stage4-structure-wave.ts` can run `--pending-only` and rebuild the Stage 4 wave for only the unresolved pending publication ids.
+  - `scripts/build-stage4-structure-wave.ts` now accepts `ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS` and passes the filtered ids into the Stage 4 wave builder, keeping the same Stage 4 artifact family while allowing a narrow follow-up slice.
+  - `apps/api/src/services/structureWaveStage4.ts` now:
+    - preserves latest outcome-driven structure diagnostics when reclassifying rows
+    - can adopt rows with Stage 4 outcome evidence into the `structure_heavy` lane
+    - exposes `readingOrderOnlyResidualPublicationIds` in `stage4-structure-throughput.summary.json`
+  - Current Stage 4 follow-up slice after rebuild:
+    - selected pending ids: `4054`, `4023`, `4067`, `3671`, `3465`
+    - `pendingWaveRows: 5`
+  - The Stage 4.1 follow-up run was attempted with:
+    - `pnpm agency:run-stage4-structure-wave --pending-only`
+  - It did not write any new terminal outcomes before being interrupted, so the truthful Stage 4 outcomes set remains:
+    - `3` hard fails: `3550`, `3606`, `3685`
+    - `0` processing errors
+    - `0` new pass candidates
+    - `5` still pending without written terminal outcomes: `3465`, `3671`, `4023`, `4054`, `4067`
+  - Stage 4 throughput after the Stage 4.1 rebuild now explicitly surfaces the first-wave structure-only survivors via `readingOrderOnlyResidualPublicationIds`:
+    - `3550`
+    - `3606`
+    - `3685`
+  - Refreshed Stage 4 structure totals now read:
+    - `342` total `structure_heavy`
+    - `42` `verified_pass`
+    - `300` remaining `structure_heavy`
+    - `83` `metadata_navigation_residuals`
+    - `6` `structure_only_residuals`
+    - `207` `mixed_structure_figure_residuals`
+    - `4` `structure_processing_error_retry`
+    - `0` generic timeout rows
+  - Verified commands:
+    - `pnpm --filter api build`
+    - `pnpm --filter api test src/__tests__/structureWaveStage4.test.ts src/__tests__/figureWaveStage3.test.ts src/__tests__/shortCohortStage2.test.ts`
+    - `pnpm agency:build-control-plane`
+    - `pnpm agency:build-stage4-structure-wave`
+    - `pnpm agency:validate-control-plane`
+  - Current interpretation:
+    - Stage 4 remains active and is still not complete.
+    - The first real Stage 4 wave is still unfinished operationally because the same `5` rows remain without written terminal outcomes.
+    - The Stage 4 decision surface is now clearer: the completed first-wave rows are explicit `Reading Order`-only structure survivors, and the pending five can be retried later without re-running the already-written rows.
+
+## 2026-03-31 Stage 4.2 Pending-Row Forensics
+
+- Stage 4.2 is now implemented as a manifest-first forensic routing pass for unresolved Stage 4 pending rows.
+- New artifact/script surface:
+  - `ICJIA-PDFs/manifests/stage4-structure-pending-analysis.json`
+  - `ICJIA-PDFs/manifests/stage4-structure-pending-analysis.summary.json`
+  - `scripts/analyze-stage4-structure-pending.ts`
+  - package script: `pnpm agency:analyze-stage4-structure-pending`
+- The control plane and Stage 4 wave builders now consume Stage 4.2 analysis rows when a row has no terminal Stage 4 outcome.
+- Current Stage 4.2 forensic result:
+  - analyzed pending ids: `3465`, `3671`, `4023`, `4054`, `4067`
+  - all `5` were classified as `metadata_navigation_residuals`
+  - evidence strength for all `5`: `attempt_artifact_only`
+  - no rows were reclassified to `figure_heavy`
+  - no rows were forced into `structure_processing_error_retry`
+- Stage 4 throughput after Stage 4.2 rebuild:
+  - `342` total `structure_heavy`
+  - `42` `verified_pass`
+  - `300` remaining
+  - `83` `metadata_navigation_residuals`
+  - `6` `structure_only_residuals`
+  - `207` `mixed_structure_figure_residuals`
+  - `4` `structure_processing_error_retry`
+  - `0` `pendingWaveRows`
+  - `0` generic timeout rows
+- Stage 4 reporting now distinguishes:
+  - `forensicallyResolvedPendingPublicationIds`
+  - `stillUnclassifiedPendingPublicationIds`
+  - `readingOrderOnlyResidualPublicationIds`
+- Current Stage 4.2 reporting state in `stage4-structure-throughput.summary.json`:
+  - `forensicallyResolvedPendingPublicationIds`: `3465`, `3671`, `4023`, `4054`, `4067`
+  - `stillUnclassifiedPendingPublicationIds`: empty
+  - `readingOrderOnlyResidualPublicationIds`: `3550`, `3606`, `3685`
+- Practical outcome:
+  - the first Stage 4 wave is now decision-complete at the routing layer even though only `3` rows have terminal Stage 4 remediation outcomes
+  - the stale pending state from the interrupted first wave has been eliminated without inventing any passes or terminal failures
+  - Stage 4 remains active and not complete, but it no longer has unresolved “pending because interrupted” rows blocking the next planning step

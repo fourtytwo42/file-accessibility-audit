@@ -4,6 +4,7 @@ import {
   buildStage4StructureCanaries,
   buildStage4StructureThroughputSummary,
   buildStage4StructureWaveArtifacts,
+  type Stage4StructurePendingAnalysisRow,
   type Stage4StructureWaveDocument,
 } from '../services/structureWaveStage4.js'
 import type { CorpusControlPlaneArtifacts, CorpusControlPlaneRow, CorpusControlPlaneSources } from '../services/corpusControlPlane.js'
@@ -121,6 +122,182 @@ describe('structure wave Stage 4', () => {
     expect(wave.selectedPublicationIds).toEqual(['meta', 'structure', 'mixed', 'retry'])
   })
 
+  it('keeps reading-order-only outcomes in structure_only_residuals and exposes them in reporting', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'reading-order',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+      }),
+    ])
+    const next = applyStage4StructureWaveReclassification(artifacts)
+    expect(next.document.rows.find(row => row.publicationId === 'reading-order')?.stage4StructureDiagnostics.structureWaveBucket).toBe('structure_only_residuals')
+
+    const wave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 1, selectedRows: 1, skippedRows: 0, pendingRows: 0 },
+      selectedPublicationIds: ['reading-order'],
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
+    }
+
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts: next,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [{ publicationId: 'reading-order', status: 'failed_after_remediation' }] },
+    })
+    expect(summary.rows.readingOrderOnlyResidualPublicationIds).toEqual(['reading-order'])
+  })
+
+  it('can rebuild a follow-up slice for only unresolved Stage 4 rows', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-follow-up-'))
+
+    const priorWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 3, selectedRows: 3, skippedRows: 0, pendingRows: 2 },
+      selectedPublicationIds: ['done-a', 'done-b', 'pending-a'],
+      pendingPublicationIds: ['pending-a', 'pending-b'],
+      candidates: [],
+      skippedRows: [],
+    }
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.json'), JSON.stringify(priorWave, null, 2))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.outcomes.json'), JSON.stringify({ outcomes: [
+      { publicationId: 'done-a', status: 'failed_after_remediation' },
+      { publicationId: 'done-b', status: 'failed_after_remediation' },
+    ] }, null, 2))
+
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: 'pending-a', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: 'pending-b', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: 'other', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy' } }),
+    ])
+
+    const { wave } = buildStage4StructureWaveArtifacts({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      manifestsRoot,
+      maxCandidates: 8,
+      includePublicationIds: ['pending-a', 'pending-b'],
+    })
+
+    expect(wave.selectedPublicationIds).toEqual(['pending-a', 'pending-b'])
+  })
+
+  it('uses Stage 4.2 pending analysis to clear stale pending rows and preserve forensic routing', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-analysis-'))
+
+    const priorWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 2, selectedRows: 2, skippedRows: 0, pendingRows: 1 },
+      selectedPublicationIds: ['pending-meta', 'other'],
+      pendingPublicationIds: ['pending-meta'],
+      candidates: [],
+      skippedRows: [],
+    }
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.json'), JSON.stringify(priorWave, null, 2))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.outcomes.json'), JSON.stringify({ outcomes: [] }, null, 2))
+
+    const pendingAnalysisRows: Stage4StructurePendingAnalysisRow[] = [{
+      publicationId: 'pending-meta',
+      publicationTitle: 'pending-meta',
+      priorStructureWaveBucket: 'metadata_navigation_residuals',
+      analysisDisposition: 'metadata_navigation_residuals',
+      evidenceStrength: 'attempt_artifact_only',
+      evidencePaths: {
+        terminalReportPath: null,
+        failureReportPath: null,
+        attemptArtifactPath: '/tmp/repo/attempt.json',
+        controlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      },
+      reasonCodes: ['stage4.2:metadata_navigation_residuals'],
+      notes: ['forensic resolution'],
+    }]
+
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: 'pending-meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: 'other', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+    ])
+
+    const next = applyStage4StructureWaveReclassification(artifacts, pendingAnalysisRows)
+    const { wave } = buildStage4StructureWaveArtifacts({
+      artifacts: next,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      manifestsRoot,
+      maxCandidates: 8,
+      pendingAnalysisRows,
+    })
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts: next,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [] },
+      pendingAnalysisRows,
+    })
+
+    expect(next.document.rows.find(row => row.publicationId === 'pending-meta')?.reasonCodes).toContain('stage4.2:metadata_navigation_residuals')
+    expect(wave.pendingPublicationIds).toEqual(['other'])
+    expect(summary.rows.forensicallyResolvedPendingPublicationIds).toEqual(['pending-meta'])
+    expect(summary.rows.stillUnclassifiedPendingPublicationIds).toEqual(['other'])
+  })
+
+  it('uses Stage 4.2 pending analysis to mark bounded runtime retries as processing_error', () => {
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: 'retry', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+    ])
+    const pendingAnalysisRows: Stage4StructurePendingAnalysisRow[] = [{
+      publicationId: 'retry',
+      publicationTitle: 'retry',
+      priorStructureWaveBucket: 'metadata_navigation_residuals',
+      analysisDisposition: 'structure_processing_error_retry',
+      evidenceStrength: 'attempt_artifact_only',
+      evidencePaths: {
+        terminalReportPath: null,
+        failureReportPath: null,
+        attemptArtifactPath: '/tmp/repo/attempt.json',
+        controlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      },
+      reasonCodes: ['stage4.2:structure_processing_error_retry'],
+      notes: ['bounded runtime'],
+    }]
+
+    const next = applyStage4StructureWaveReclassification(artifacts, pendingAnalysisRows)
+    const retryRow = next.document.rows.find(row => row.publicationId === 'retry')
+    expect(retryRow?.currentCorpusStatus).toBe('processing_error')
+    expect(retryRow?.stage4StructureDiagnostics.structureWaveBucket).toBe('structure_processing_error_retry')
+  })
+
   it('reports throughput routing buckets and builds structure canaries', () => {
     const artifacts = makeArtifacts([
       makeRow({ publicationId: 'verified', currentCorpusStatus: 'verified_pass', cohortLabel: 'structure_heavy', title: 'Verified Structure', promotionTruth: { promotionStatus: 'verified_pass', ledgerRowPresent: true, stagedReplacementPath: '/staged/verified.pdf', replacementChecksumSha256: 'x', verificationPassed: true }, stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
@@ -145,6 +322,7 @@ describe('structure wave Stage 4', () => {
     }
     const summary = buildStage4StructureThroughputSummary({ artifacts, sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json', sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z', waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json', wave, outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json', outcomes: { outcomes: [{ publicationId: 'mixed', status: 'failed_after_remediation' }, { publicationId: 'retry', status: 'processing_error' }] } })
     expect(summary.rows.nextWaveStructureOnlyPublicationIds).toEqual(['4436', 'meta', 'structure'])
+    expect(summary.rows.readingOrderOnlyResidualPublicationIds).toEqual([])
     expect(summary.rows.mixedFollowupPublicationIds).toEqual(['mixed'])
     expect(summary.rows.boundedRuntimeRetryPublicationIds).toEqual(['retry'])
     expect(summary.totals.genericTimeoutRows).toBe(0)

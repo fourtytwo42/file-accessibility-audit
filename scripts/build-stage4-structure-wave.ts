@@ -30,7 +30,7 @@ export async function main(): Promise<void> {
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts)
+  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows)
   const validation = validateCorpusControlPlaneArtifacts(artifacts, {
     replacementMap: sources.replacementMap,
     promotionLedgerRows: sources.promotionLedgerRows,
@@ -47,12 +47,18 @@ export async function main(): Promise<void> {
   const outcomesPath = path.join(sources.manifestsRoot, 'stage4-structure-wave.outcomes.json')
 
   const maxCandidates = Number(process.env.ICJIA_STAGE4_STRUCTURE_WAVE_LIMIT || 8)
+  const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean)
   const waveArtifacts = buildStage4StructureWaveArtifacts({
     artifacts,
     sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
     sourceControlPlaneGeneratedAt: artifacts.document.generatedAt,
     manifestsRoot: sources.manifestsRoot,
     maxCandidates,
+    includePublicationIds,
+    pendingAnalysisRows: sources.stage4PendingAnalysisRows,
   })
 
   const throughputSummary = buildStage4StructureThroughputSummary({
@@ -63,6 +69,7 @@ export async function main(): Promise<void> {
     wave: waveArtifacts.wave,
     outcomesPath: fs.existsSync(outcomesPath) ? outcomesPath : null,
     outcomes: readJsonIfExists(outcomesPath),
+    pendingAnalysisRows: sources.stage4PendingAnalysisRows,
   })
 
   const canaries = buildStage4StructureCanaries({ artifacts, sources })

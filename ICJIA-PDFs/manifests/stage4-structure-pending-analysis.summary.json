@@ -1,0 +1,33 @@
+{
+  "generatedAt": "2026-03-31T03:21:22.218Z",
+  "analysisManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-pending-analysis.json",
+  "totals": {
+    "analyzedRows": 5,
+    "byDisposition": {
+      "metadata_navigation_residuals": 5,
+      "structure_only_residuals": 0,
+      "mixed_structure_figure_residuals": 0,
+      "structure_processing_error_retry": 0,
+      "reclassify_to_figure_heavy": 0
+    },
+    "byEvidenceStrength": {
+      "terminal_report": 0,
+      "failure_report": 0,
+      "attempt_artifact_only": 5,
+      "control_plane_only": 0
+    }
+  },
+  "publicationIdsByDisposition": {
+    "metadata_navigation_residuals": [
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
+    ],
+    "structure_only_residuals": [],
+    "mixed_structure_figure_residuals": [],
+    "structure_processing_error_retry": [],
+    "reclassify_to_figure_heavy": []
+  }
+}

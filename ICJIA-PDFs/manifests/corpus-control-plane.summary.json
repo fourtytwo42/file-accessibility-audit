@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T01:43:04.529Z",
+  "generatedAt": "2026-03-31T03:21:40.291Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -14,9 +14,9 @@
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 20,
+      "short_high_likelihood": 19,
       "figure_heavy": 491,
-      "structure_heavy": 341,
+      "structure_heavy": 342,
       "font_heavy": 14,
       "long_report": 15,
       "manual_tail": 175
@@ -32,7 +32,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 1,
+        "remediated_fail": 0,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -54,7 +54,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 295,
+        "remediated_fail": 296,
         "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -108,6 +108,7 @@
     "verificationClassifiedPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/ready-to-replace-verification.classified.json",
     "promotionLedgerPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/verified-promotion-ledger.json",
     "regressionBenchmarkPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json",
+    "stage4PendingAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-pending-analysis.json",
     "outcomeManifestCount": 16,
     "candidateManifestCount": 17
   }
