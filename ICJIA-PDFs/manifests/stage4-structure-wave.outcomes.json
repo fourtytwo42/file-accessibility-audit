@@ -1,0 +1,170 @@
+{
+  "generatedAt": "2026-03-31T01:41:48.737Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 3,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 3,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 5
+  },
+  "outcomes": [
+    {
+      "publicationId": "3685",
+      "publicationTitle": "ADAM Arrestee Drug Abuse Monitoring Program in Cook County 4th Quarter",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 86,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ADAM/ADAM4.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ADAM/ADAM4.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ADAM/ADAM4.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T01:41:26.420Z",
+      "durationMs": 46731,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Categories still below 100: Reading Order"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Reading Order"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f740ca9919e49da2485e44af8bf1f3bb0cdf136952b1d08b68b4bb1cbcc4d73d",
+        "remediatedPdfSha256": "f740ca9919e49da2485e44af8bf1f3bb0cdf136952b1d08b68b4bb1cbcc4d73d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3550",
+      "publicationTitle": "McGruff Will Your Familys Car be Stolen This Year",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgmotor.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgmotor.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgmotor.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T01:41:35.012Z",
+      "durationMs": 55323,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Categories still below 100: Reading Order"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Reading Order"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0e719b60555d50d203c1ac211d3ccf176eb9aa1d1c034041e216ea1c678124c4",
+        "remediatedPdfSha256": "0e719b60555d50d203c1ac211d3ccf176eb9aa1d1c034041e216ea1c678124c4",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3606",
+      "publicationTitle": "Information for Crime Victims",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/infovictims03a.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/infovictims03a.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/infovictims03a.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T01:41:48.737Z",
+      "durationMs": 69048,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Categories still below 100: Reading Order"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Reading Order"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c333f25d9860bc81533bc9a06452f6182a07642f52238285fda62c921d8dcdb8",
+        "remediatedPdfSha256": "c333f25d9860bc81533bc9a06452f6182a07642f52238285fda62c921d8dcdb8",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

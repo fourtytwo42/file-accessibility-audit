@@ -1,22 +1,22 @@
 {
-  "generatedAt": "2026-03-31T01:25:53.552Z",
+  "generatedAt": "2026-03-31T01:43:04.551Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T01:25:53.533Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T01:43:04.530Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
-  "waveOutcomesPath": null,
+  "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
   "totals": {
-    "totalStructureHeavyRows": 342,
+    "totalStructureHeavyRows": 341,
     "verifiedPassRowsInCohort": 42,
     "newlyVerifiedPassRowsFromWave": 0,
-    "remainingStructureHeavyRows": 300,
+    "remainingStructureHeavyRows": 299,
     "processingErrorsInWave": 0,
-    "hardFailsInWave": 0,
-    "metadataNavigationResidualRows": 93,
+    "hardFailsInWave": 3,
+    "metadataNavigationResidualRows": 92,
     "structureOnlyResidualRows": 5,
     "mixedStructureFigureResidualRows": 198,
     "structureProcessingErrorRetryRows": 4,
-    "pendingWaveRows": 8,
+    "pendingWaveRows": 5,
     "reclassifiedOutOfStructureHeavyRows": 0,
     "genericTimeoutRows": 0
   },
@@ -51,7 +51,6 @@
       "3670",
       "3671",
       "3683",
-      "3685",
       "3697",
       "3759",
       "3763",
@@ -325,7 +324,11 @@
       "4773"
     ],
     "processingErrorPublicationIds": [],
-    "hardFailPublicationIds": [],
+    "hardFailPublicationIds": [
+      "3550",
+      "3606",
+      "3685"
+    ],
     "metadataNavigationResidualPublicationIds": [
       "3465",
       "3483",
@@ -344,7 +347,6 @@
       "3670",
       "3671",
       "3683",
-      "3685",
       "3765",
       "3767",
       "3768",
@@ -636,10 +638,7 @@
     ],
     "pendingPublicationIds": [
       "3465",
-      "3550",
-      "3606",
       "3671",
-      "3685",
       "4023",
       "4054",
       "4067"
@@ -662,7 +661,6 @@
       "3670",
       "3671",
       "3683",
-      "3685",
       "3765",
       "3767",
       "3768",

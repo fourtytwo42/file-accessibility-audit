@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T01:25:33.304Z",
+  "generatedAt": "2026-03-31T01:43:04.529Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -14,9 +14,9 @@
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 19,
+      "short_high_likelihood": 20,
       "figure_heavy": 491,
-      "structure_heavy": 342,
+      "structure_heavy": 341,
       "font_heavy": 14,
       "long_report": 15,
       "manual_tail": 175
@@ -32,7 +32,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 0,
+        "remediated_fail": 1,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -54,7 +54,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 296,
+        "remediated_fail": 295,
         "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -13854,9 +13854,9 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-next-relaxed-batch-candidates.json"
       },
       "classificationEvidence": {
@@ -20138,9 +20138,9 @@
         "verificationClassification": "soft_fail_advisory",
         "verificationTimestamp": "2026-03-31T00:05:44.060Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/infovictims03a.pdf.json",
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-outcomes.json",
-        "outcomeStatus": "ready_to_replace",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+        "outcomeStatus": "failed_after_remediation",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-50-batch-candidates.json"
       },
       "classificationEvidence": {
@@ -28983,7 +28983,7 @@
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ADAM",
       "replaceVia": "sftp",
       "currentCorpusStatus": "remediated_fail",
-      "cohortLabel": "structure_heavy",
+      "cohortLabel": "short_high_likelihood",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
         "sshTarget": "forge@143.244.146.43",
@@ -29002,9 +29002,9 @@
         "verificationClassification": "soft_fail_advisory",
         "verificationTimestamp": "2026-03-31T00:08:36.676Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ADAM4.pdf.json",
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage2-short-cohort-wave.attempt-1.outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
         "candidateManifestPath": null
       },
       "classificationEvidence": {
@@ -29013,16 +29013,11 @@
         "overallScore": 100,
         "grade": "A",
         "blockerFamilyCount": null,
-        "blockingFindingCount": 4,
+        "blockingFindingCount": null,
         "manualOnlyFailureModeCount": null,
         "autoRunnableOpportunityCount": null,
         "topBlockingResidualFamilyIds": [],
-        "blockingFindingKeys": [
-          "pdfua.display_doc_title",
-          "pdfua.document_language",
-          "pdfua.logical_structure",
-          "pdfua.metadata_identification"
-        ],
+        "blockingFindingKeys": [],
         "autoRunnableOpportunityKeys": [],
         "manualOnlyFailureModeKeys": []
       },
@@ -29047,19 +29042,18 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "metadata_navigation_residuals",
+        "structureWaveBucket": null,
         "dominantStructurePhase": null,
-        "hasLogicalStructureDebt": true,
+        "hasLogicalStructureDebt": null,
         "hasHeadingDebt": null,
         "hasReadingOrderDebt": null,
-        "hasMetadataNavigationDebt": true,
+        "hasMetadataNavigationDebt": null,
         "hasMixedFigureResiduals": null,
         "hasBoundedRuntimeWording": false,
         "originLane": "native_structure_heavy"
       },
       "reasonCodes": [
-        "cohort:structure_heavy",
-        "stage4:metadata_navigation_after_wave",
+        "cohort:short_high_likelihood",
         "verification_soft_fail"
       ],
       "notes": [

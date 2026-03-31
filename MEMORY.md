@@ -2260,3 +2260,55 @@ First confirmed in-flight files:
     - `pnpm agency:run-stage4-structure-wave --build-only`
   - Important operational note:
     - running `pnpm agency:run-stage4-structure-wave --build-only` immediately after building the wave reuses the selected Stage 4 rows as the active pending wave, so `pendingWaveRows` becomes `8` in the throughput summary until real outcomes are written.
+
+- 2026-03-31 Stage 4 first real structure wave started, partially completed, and was truthfully refreshed after interruption:
+  - Started the first real Stage 4 wave with:
+    - `pnpm agency:run-stage4-structure-wave`
+  - The live run wrote truthful partial outcomes to:
+    - `ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json`
+    - `ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.summary.json`
+  - After the run was interrupted to avoid waiting indefinitely on the remaining in-flight items, the truthful fallback refresh was completed with:
+    - `pnpm agency:build-control-plane`
+    - `pnpm agency:build-stage4-structure-wave`
+    - `pnpm agency:validate-control-plane`
+  - Current truthful partial wave state from `stage4-structure-wave.outcomes.summary.json`:
+    - `8` target candidates
+    - `3` processed
+    - `0` ready-to-replace / remediated pass-candidates
+    - `3` `failed_after_remediation`
+    - `0` `processing_error`
+    - `5` remaining without written terminal outcomes
+  - Processed publication ids so far:
+    - `3685` (`ADAM 4`)
+      - truthful terminal state: `failed_after_remediation`
+      - gate failed only because `Categories still below 100: Reading Order`
+      - no blocking local finding keys remained
+    - `3550` (`Motor Vehicle Theft: A Message from McGruff`)
+      - truthful terminal state: `failed_after_remediation`
+      - improved from original `21 / F` to final `100 / A`
+      - gate still failed only because `Categories still below 100: Reading Order`
+      - no blocking local finding keys remained
+    - `3606` (`Information for Crime Victims`)
+      - truthful terminal state: `failed_after_remediation`
+      - improved from original `21 / F` to final `100 / A`
+      - gate still failed only because `Categories still below 100: Reading Order`
+      - no blocking local finding keys remained
+  - Remaining selected Stage 4 ids without written terminal outcomes when the run was stopped:
+    - `3465`
+    - `3671`
+    - `4023`
+    - `4054`
+    - `4067`
+  - Refreshed Stage 4 throughput from `ICJIA-PDFs/manifests/stage4-structure-throughput.summary.json` after the truthful fallback rebuild:
+    - `341` total `structure_heavy` rows
+    - `42` `verified_pass`
+    - `299` remaining `structure_heavy` rows
+    - `3` hard-fail rows in the current wave outcomes set
+    - `0` processing-error rows in the current wave outcomes set
+    - `5` pending wave rows: `3465`, `3671`, `4023`, `4054`, `4067`
+    - `0` generic timeout rows
+  - Interpretation:
+    - The first real Stage 4 wave has begun and is producing truthful structure-lane evidence.
+    - No new ledger-backed passes were produced before interruption.
+    - The completed rows reinforce metadata/navigation structure debt rather than generic runtime churn.
+    - The next Stage 4 decision should start from the refreshed manifests, not the interrupted process state.
