@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-03-31T00:48:53.992Z",
+  "generatedAt": "2026-03-31T01:25:33.304Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
-      "verified_pass": 86,
+      "verified_pass": 87,
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 854,
+      "remediated_fail": 852,
       "processing_error": 113,
       "deferred_manual": 0,
-      "staged_for_replacement": 0,
+      "staged_for_replacement": 1,
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 18,
-      "figure_heavy": 488,
-      "structure_heavy": 347,
+      "short_high_likelihood": 19,
+      "figure_heavy": 491,
+      "structure_heavy": 342,
       "font_heavy": 14,
-      "long_report": 14,
+      "long_report": 15,
       "manual_tail": 175
     },
     "byStorageKind": {
@@ -28,7 +28,7 @@
     },
     "statusByCohort": {
       "short_high_likelihood": {
-        "verified_pass": 18,
+        "verified_pass": 19,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
@@ -43,10 +43,10 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 418,
+        "remediated_fail": 420,
         "processing_error": 53,
         "deferred_manual": 0,
-        "staged_for_replacement": 0,
+        "staged_for_replacement": 1,
         "replaced_remote": 0
       },
       "structure_heavy": {
@@ -54,7 +54,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 301,
+        "remediated_fail": 296,
         "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -76,7 +76,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 4,
+        "remediated_fail": 5,
         "processing_error": 1,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -94,8 +94,8 @@
         "replaced_remote": 0
       }
     },
-    "verifiedPassRowsFromLedger": 86,
-    "remainingRowsExcludingVerifiedPass": 970
+    "verifiedPassRowsFromLedger": 87,
+    "remainingRowsExcludingVerifiedPass": 969
   },
   "validation": {
     "ok": true,

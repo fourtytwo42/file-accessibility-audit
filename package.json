@@ -54,7 +54,9 @@
     "agency:build-stage2-short-wave": "tsx scripts/build-stage2-short-cohort-wave.ts",
     "agency:run-stage2-short-wave": "tsx scripts/run-stage2-short-cohort-wave.ts",
     "agency:build-stage3-figure-wave": "tsx scripts/build-stage3-figure-wave.ts",
-    "agency:run-stage3-figure-wave": "tsx scripts/run-stage3-figure-wave.ts"
+    "agency:run-stage3-figure-wave": "tsx scripts/run-stage3-figure-wave.ts",
+    "agency:build-stage4-structure-wave": "tsx scripts/build-stage4-structure-wave.ts",
+    "agency:run-stage4-structure-wave": "tsx scripts/run-stage4-structure-wave.ts"
   },
   "engines": {
     "node": ">=22"

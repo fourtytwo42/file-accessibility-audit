@@ -2220,3 +2220,43 @@ First confirmed in-flight files:
     - Stage 4 should become the primary active lane
     - Stage 4 should focus on structure-heavy spillover from Stage 3
     - Stage 3 can remain open for occasional figure-only wins, but should not be the main expected conversion engine
+
+- 2026-03-31 Stage 4 structure-heavy spillover lane implemented:
+  - Added manifest-first Stage 4 structure-lane service and scripts:
+    - `apps/api/src/services/structureWaveStage4.ts`
+    - `scripts/build-stage4-structure-wave.ts`
+    - `scripts/run-stage4-structure-wave.ts`
+  - Extended the canonical control-plane row model with `stage4StructureDiagnostics` and updated `scripts/build-corpus-control-plane.ts` so the Stage 4 structure reclassification pass now runs after Stage 3.
+  - Added package scripts:
+    - `pnpm agency:build-stage4-structure-wave`
+    - `pnpm agency:run-stage4-structure-wave`
+  - Added test coverage in `apps/api/src/__tests__/structureWaveStage4.test.ts` and updated the Stage 2/3 test fixtures for the new control-plane field.
+  - Current refreshed Stage 4 baseline from `ICJIA-PDFs/manifests/stage4-structure-throughput.summary.json`:
+    - `342` total `structure_heavy` rows
+    - `42` `verified_pass`
+    - `300` remaining `structure_heavy` rows
+    - bucketed as:
+      - `93` `metadata_navigation_residuals`
+      - `5` `structure_only_residuals`
+      - `198` `mixed_structure_figure_residuals`
+      - `4` `structure_processing_error_retry`
+    - `0` generic timeout rows
+  - First Stage 4 wave now exists at `ICJIA-PDFs/manifests/stage4-structure-wave.json` and currently selects:
+    - `4054`
+    - `3685`
+    - `4023`
+    - `4067`
+    - `3671`
+    - `3606`
+    - `3465`
+    - `3550`
+  - Stage 4 canaries now exist at `ICJIA-PDFs/manifests/stage4-structure-canaries.json` and include benchmark plus spillover representatives, including `4436`.
+  - Verified implementation commands:
+    - `pnpm --filter api build`
+    - `pnpm --filter api test src/__tests__/structureWaveStage4.test.ts src/__tests__/figureWaveStage3.test.ts src/__tests__/shortCohortStage2.test.ts`
+    - `pnpm agency:build-control-plane`
+    - `pnpm agency:build-stage4-structure-wave`
+    - `pnpm agency:validate-control-plane`
+    - `pnpm agency:run-stage4-structure-wave --build-only`
+  - Important operational note:
+    - running `pnpm agency:run-stage4-structure-wave --build-only` immediately after building the wave reuses the selected Stage 4 rows as the active pending wave, so `pendingWaveRows` becomes `8` in the throughput summary until real outcomes are written.

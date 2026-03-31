@@ -24,6 +24,7 @@ export type CohortLabel =
 export type SourceKind = 'legacy_archive' | 'agency_upload' | 'researchhub_upload'
 export type VerificationClassification = 'verified_pass' | 'soft_fail_advisory' | 'hard_fail'
 export type FigureWaveBucket = 'ownership_cleared_figure_debt_remains' | 'mixed_figure_structure_debt' | 'mass_unresolved_figure_debt' | 'figure_processing_error_retry'
+export type StructureWaveBucket = 'structure_only_residuals' | 'mixed_structure_figure_residuals' | 'metadata_navigation_residuals' | 'structure_processing_error_retry'
 
 export interface PublicationReplacementMapRow {
   publicationId: string
@@ -329,6 +330,17 @@ export interface CorpusControlPlaneRow {
     inspectionPattern: string | null
     hasGenericTimeoutWording: boolean
   }
+  stage4StructureDiagnostics: {
+    structureWaveBucket: StructureWaveBucket | null
+    dominantStructurePhase: string | null
+    hasLogicalStructureDebt: boolean | null
+    hasHeadingDebt: boolean | null
+    hasReadingOrderDebt: boolean | null
+    hasMetadataNavigationDebt: boolean | null
+    hasMixedFigureResiduals: boolean | null
+    hasBoundedRuntimeWording: boolean
+    originLane: 'native_structure_heavy' | 'reclassified_from_figure_heavy' | 'reclassified_from_short_high_likelihood'
+  }
   reasonCodes: string[]
   notes: string[]
 }
@@ -419,6 +431,7 @@ const ALL_COHORTS: CohortLabel[] = [
 const LONG_REPORT_PAGE_THRESHOLD = 40
 const FIGURE_FAMILY_PATTERN = /(figure|alt|ownership|artifact|image)/i
 const STRUCTURE_FAMILY_PATTERN = /(logical_structure|heading|reading_order|marked_content|page_tabs|structure)/i
+const STRUCTURE_METADATA_PATTERN = /(document_language|display_doc_title|metadata_identification|bookmark_language|page_tabs|language|bookmark|metadata|title)/i
 const FONT_FAMILY_PATTERN = /(font|unicode|charenc)/i
 
 function readJson<T>(filePath: string): T {
@@ -622,6 +635,70 @@ function deriveStage3FigureDiagnostics(input: {
       benchmarkOutcome: input.benchmarkOutcome,
       latestOutcome: input.latestOutcome,
     }),
+  }
+}
+
+function deriveStage4StructureDiagnostics(input: {
+  rowCohortLabel: CohortLabel
+  rowCurrentCorpusStatus: CorpusStatus
+  classificationEvidence: CorpusControlPlaneRow['classificationEvidence']
+  latestOutcome: { manifestPath: string; outcome: OutcomeRecordLike } | null
+  benchmarkOutcome: BenchmarkOutcomeLike | null
+  reasonCodes: string[]
+}): CorpusControlPlaneRow['stage4StructureDiagnostics'] {
+  const latestOutcomeBlockingKeys = uniqueStrings(input.latestOutcome?.outcome.gate?.blockingLocalFindingKeys || [])
+  const blockingKeys = uniqueStrings([
+    ...input.classificationEvidence.blockingFindingKeys,
+    ...(input.benchmarkOutcome?.final?.blockingLocalFindingKeys || []),
+    ...latestOutcomeBlockingKeys,
+  ])
+  const decisiveBlockingKeys = latestOutcomeBlockingKeys.length > 0 ? latestOutcomeBlockingKeys : blockingKeys
+  const joinedText = [
+    ...input.classificationEvidence.topBlockingResidualFamilyIds,
+    ...blockingKeys,
+    ...input.reasonCodes,
+  ].join(' ')
+
+  const hasLogicalStructureDebt = decisiveBlockingKeys.includes('pdfua.logical_structure')
+    || decisiveBlockingKeys.includes('pdfua.heading_content_quality')
+    || STRUCTURE_FAMILY_PATTERN.test(joinedText)
+  const hasHeadingDebt = decisiveBlockingKeys.some(key => /heading/i.test(key))
+  const hasReadingOrderDebt = decisiveBlockingKeys.some(key => /reading_order|page_tabs/i.test(key))
+  const hasMetadataNavigationDebt = decisiveBlockingKeys.some(key => /document_language|display_doc_title|metadata_identification|bookmark_language|page_tabs/i.test(key))
+    || STRUCTURE_METADATA_PATTERN.test(joinedText)
+  const hasMixedFigureResiduals = decisiveBlockingKeys.some(key => /figure|artifact|image|untagged_rendered_images/i.test(key))
+    || FIGURE_FAMILY_PATTERN.test(joinedText)
+
+  let structureWaveBucket: StructureWaveBucket | null = null
+  if (input.rowCohortLabel === 'structure_heavy' || hasLogicalStructureDebt || hasMetadataNavigationDebt) {
+    if (isInspectionBudgetProcessingError(input.latestOutcome) || input.rowCurrentCorpusStatus === 'processing_error') {
+      structureWaveBucket = 'structure_processing_error_retry'
+    } else if (hasMetadataNavigationDebt && !hasMixedFigureResiduals) {
+      structureWaveBucket = 'metadata_navigation_residuals'
+    } else if ((hasLogicalStructureDebt || hasMetadataNavigationDebt) && hasMixedFigureResiduals) {
+      structureWaveBucket = 'mixed_structure_figure_residuals'
+    } else if (hasLogicalStructureDebt || hasMetadataNavigationDebt) {
+      structureWaveBucket = 'structure_only_residuals'
+    }
+  }
+
+  let originLane: CorpusControlPlaneRow['stage4StructureDiagnostics']['originLane'] = 'native_structure_heavy'
+  if (input.reasonCodes.includes('stage3:reclassified_from_figure_heavy')) {
+    originLane = 'reclassified_from_figure_heavy'
+  } else if (input.reasonCodes.includes('stage2:reclassified_from_short_high_likelihood')) {
+    originLane = 'reclassified_from_short_high_likelihood'
+  }
+
+  return {
+    structureWaveBucket,
+    dominantStructurePhase: input.benchmarkOutcome?.final?.inspectionProfile?.dominantPhase || null,
+    hasLogicalStructureDebt: hasLogicalStructureDebt || null,
+    hasHeadingDebt: hasHeadingDebt || null,
+    hasReadingOrderDebt: hasReadingOrderDebt || null,
+    hasMetadataNavigationDebt: hasMetadataNavigationDebt || null,
+    hasMixedFigureResiduals: hasMixedFigureResiduals || null,
+    hasBoundedRuntimeWording: isInspectionBudgetProcessingError(input.latestOutcome),
+    originLane,
   }
 }
 
@@ -1010,6 +1087,14 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
     if (cohortLabel === 'font_heavy') reasonCodes.push('cohort:font_heavy')
     if (cohortLabel === 'long_report') reasonCodes.push('cohort:long_report')
     if (cohortLabel === 'short_high_likelihood') reasonCodes.push('cohort:short_high_likelihood')
+    const stage4StructureDiagnostics = deriveStage4StructureDiagnostics({
+      rowCohortLabel: cohortLabel,
+      rowCurrentCorpusStatus: derived.status,
+      classificationEvidence,
+      latestOutcome,
+      benchmarkOutcome,
+      reasonCodes,
+    })
 
     return {
       publicationId,
@@ -1064,6 +1149,7 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
         verificationPassed: Boolean(ledgerRow || verificationResult?.passed),
       },
       stage3FigureDiagnostics,
+      stage4StructureDiagnostics,
       reasonCodes: uniqueStrings(reasonCodes),
       notes: uniqueStrings([
         replacementRow.notes || null,

@@ -1,0 +1,134 @@
+{
+  "generatedAt": "2026-03-31T01:25:53.553Z",
+  "summary": {
+    "totalCanaries": 7,
+    "bySource": {
+      "benchmark": 2,
+      "cohort_representative": 5
+    },
+    "byStructureWaveBucket": {
+      "metadata_navigation_residuals": 2,
+      "structure_only_residuals": 1,
+      "mixed_structure_figure_residuals": 2,
+      "structure_processing_error_retry": 2
+    },
+    "withGenericTimeoutWording": 0
+  },
+  "rows": [
+    {
+      "publicationId": "3912",
+      "publicationTitle": "Court System",
+      "source": "benchmark",
+      "benchmarkName": "Court System Get The Facts",
+      "stage4RepresentativeKind": null,
+      "currentCorpusStatus": "processing_error",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "structure_processing_error_retry",
+      "originLane": "reclassified_from_short_high_likelihood",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": "processing_error",
+      "notes": [
+        "Inspection budget exceeded (light=4, deep=9, total=13).",
+        "benchmark_category:structure"
+      ]
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "source": "benchmark",
+      "benchmarkName": "Criminal Sentencing Layout",
+      "stage4RepresentativeKind": null,
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "figure_heavy",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": "hard_fail",
+      "notes": [
+        "benchmark_category:structure"
+      ]
+    },
+    {
+      "publicationId": "3496",
+      "publicationTitle": "Gun Ownership and Use By Chicago Adult Male Arrestees (Final Report)",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "verified_pass",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3496-Gun_Ownership_and_Use_By_Chicago_Adult_Male_Arrestees_Final_Report.remediation.json"
+      ]
+    },
+    {
+      "publicationId": "3465",
+      "publicationTitle": "Are you a Victim of Domestic Violence",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "metadata_navigation_residuals",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json"
+      ]
+    },
+    {
+      "publicationId": "4084",
+      "publicationTitle": "Analysis of InfoNet Data from Domestic Violence Agencies Executive Summary",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "structure_only_residuals",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "structure_only_residuals",
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_ES.pdf.json"
+      ]
+    },
+    {
+      "publicationId": "4436",
+      "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "spillover_from_stage3",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "originLane": "reclassified_from_figure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
+        "Confirmed Stage 3 spillover representative."
+      ]
+    },
+    {
+      "publicationId": "3653",
+      "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "structure_processing_error_retry",
+      "currentCorpusStatus": "processing_error",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "structure_processing_error_retry",
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.failure.json",
+        "Bounded-runtime structure retry representative."
+      ]
+    }
+  ]
+}

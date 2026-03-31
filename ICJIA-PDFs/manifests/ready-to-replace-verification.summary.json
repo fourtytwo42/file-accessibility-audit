@@ -1,25 +1,25 @@
 {
-  "generatedAt": "2026-03-30T16:06:01.533Z",
+  "generatedAt": "2026-03-31T00:54:41.474Z",
   "totals": {
     "publicationRows": 392,
     "uniqueTargets": 383,
-    "passedTargets": 84,
-    "failedTargets": 299,
+    "passedTargets": 85,
+    "failedTargets": 298,
     "erroredTargets": 0,
     "missingTargets": 0,
-    "passedPublicationRows": 86,
-    "failedPublicationRows": 306,
+    "passedPublicationRows": 87,
+    "failedPublicationRows": 305,
     "erroredPublicationRows": 0,
     "missingPublicationRows": 0,
-    "verifiedPromotionLedgerRows": 86
+    "verifiedPromotionLedgerRows": 87
   },
   "latestVerifiedTarget": {
     "key": "local:/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
     "mode": "local_staged",
     "sourcePathOrUrl": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
     "filename": "PPRS-251003T13340815.pdf",
-    "verifiedAt": "2026-03-30T16:05:55.808Z",
-    "durationMs": 177591,
+    "verifiedAt": "2026-03-31T00:54:35.131Z",
+    "durationMs": 186631,
     "passed": false,
     "missing": false,
     "error": null,

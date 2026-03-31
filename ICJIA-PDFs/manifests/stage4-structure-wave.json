@@ -1,0 +1,3629 @@
+{
+  "generatedAt": "2026-03-31T01:25:33.329Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T01:25:33.307Z",
+  "waveName": "stage4-structure-wave",
+  "cohortLabel": "structure_heavy",
+  "maxCandidates": 8,
+  "totals": {
+    "eligibleRows": 300,
+    "selectedRows": 8,
+    "skippedRows": 292,
+    "pendingRows": 8
+  },
+  "selectedPublicationIds": [
+    "4054",
+    "3685",
+    "4023",
+    "4067",
+    "3671",
+    "3606",
+    "3465",
+    "3550"
+  ],
+  "pendingPublicationIds": [
+    "4054",
+    "3685",
+    "4023",
+    "4067",
+    "3671",
+    "3606",
+    "3465",
+    "3550"
+  ],
+  "candidates": [
+    {
+      "priorityRank": 1,
+      "passLikelihoodScore": 86,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4054",
+      "publicationTitle": "Juvenile commitment rates reveal significant racial disparity",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_hard_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.remediation.json",
+      "pageCount": 2,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 4,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": null,
+      "hasReadingOrderDebt": null,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 2,
+      "passLikelihoodScore": 86,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3685",
+      "publicationTitle": "ADAM Arrestee Drug Abuse Monitoring Program in Cook County 4th Quarter",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ADAM/ADAM4.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ADAM/ADAM4.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ADAM/ADAM4.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_soft_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/3685-ADAM_Arrestee_Drug_Abuse_Monitoring_Program_in_Cook_County_4th_Quarter.remediation.json",
+      "pageCount": 4,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 4,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": null,
+      "hasReadingOrderDebt": null,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 3,
+      "passLikelihoodScore": 85,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4023",
+      "publicationTitle": "A Profile of the KaneCook Auto Theft Task Force (KCAT)",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/KCAT03.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_hard_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json",
+      "pageCount": 12,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 5,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.bookmark_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": null,
+      "hasReadingOrderDebt": null,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 4,
+      "passLikelihoodScore": 84,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4067",
+      "publicationTitle": "A guide for juvenile corrections",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_hard_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.remediation.json",
+      "pageCount": 24,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 5,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.bookmark_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": null,
+      "hasReadingOrderDebt": null,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 5,
+      "passLikelihoodScore": 83,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3671",
+      "publicationTitle": "ICJIA 1997 Annual Report",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/97anreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/97anreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/97anreport.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:short_high_likelihood",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:reclassified_from_short_high_likelihood",
+        "stage2:reclassified_from_short_high_likelihood",
+        "stage2:structure_residuals",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_hard_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/97anreport.pdf.json",
+      "pageCount": 36,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.bookmark_language"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": null,
+      "hasReadingOrderDebt": null,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "reclassified_from_short_high_likelihood"
+    },
+    {
+      "priorityRank": 6,
+      "passLikelihoodScore": 70,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3606",
+      "publicationTitle": "Information for Crime Victims",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/infovictims03a.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/infovictims03a.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/infovictims03a.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals",
+        "verification_soft_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3606-Information_for_Crime_Victims.remediation.json",
+      "pageCount": 2,
+      "isScanned": false,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "topBlockingResidualFamilyIds": [
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 7,
+      "passLikelihoodScore": 70,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3465",
+      "publicationTitle": "Are you a Victim of Domestic Violence",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/ruvictim.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/ruvictim.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/ruvictim.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json",
+      "pageCount": 2,
+      "isScanned": false,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 10,
+      "topBlockingResidualFamilyIds": [
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    },
+    {
+      "priorityRank": 8,
+      "passLikelihoodScore": 70,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "3550",
+      "publicationTitle": "McGruff Will Your Familys Car be Stolen This Year",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgmotor.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgmotor.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgmotor.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "selectionReasons": [
+        "cohort:structure_heavy",
+        "metadata_navigation_cleanup_candidate",
+        "origin_lane:native_structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4:metadata_navigation_after_wave",
+        "stage4_bucket:metadata_navigation_residuals"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+      "pageCount": 2,
+      "isScanned": false,
+      "blockerFamilyCount": 4,
+      "blockingFindingCount": 11,
+      "topBlockingResidualFamilyIds": [
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "dominantStructurePhase": null,
+      "hasLogicalStructureDebt": true,
+      "hasHeadingDebt": true,
+      "hasReadingOrderDebt": true,
+      "hasMetadataNavigationDebt": true,
+      "hasMixedFigureResiduals": null,
+      "hasBoundedRuntimeWording": false,
+      "originLane": "native_structure_heavy"
+    }
+  ],
+  "skippedRows": [
+    {
+      "publicationId": "3468",
+      "publicationTitle": "Chicago Homicide Codebook Coding Instructions Coders Guide to the Chicago Homicide Dataset",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3483",
+      "publicationTitle": "Trends and Issues 1997",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3567",
+      "publicationTitle": "McGruff Rural Residents Protect Yourself from Crime!",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3584",
+      "publicationTitle": "Rural Crime and Justice",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3597",
+      "publicationTitle": "Evaluation of the Cook County Juvenile Sheriffs Work Alternative Program",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3599",
+      "publicationTitle": "Probation Trends in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3604",
+      "publicationTitle": "Evaluation of Illinois Multijurisdictional Drug Prosecution Program and Local Drug Prosecution Support Program",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3605",
+      "publicationTitle": "Evaluation of Illinois Multijurisdictional Drug Prosecution Programsand Local Drug Prosecution Support Programs",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3608",
+      "publicationTitle": "Champaign County Enhanced Domestic Violence Probation Program Evaluated",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3610",
+      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3635",
+      "publicationTitle": "Victims Rights",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3640",
+      "publicationTitle": "The Rising Number of Female Offenders in the Criminal Justice System",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3641",
+      "publicationTitle": "Community Policing in Chicago Years Five and Six An Interim Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3643",
+      "publicationTitle": "Law Enforcement",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3644",
+      "publicationTitle": "Firearms",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3645",
+      "publicationTitle": "The Juvenile Justice Reform Act",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3651",
+      "publicationTitle": "McGruff You can fight crime in your neighborhood",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3653",
+      "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
+      "currentCorpusStatus": "processing_error",
+      "structureWaveBucket": "structure_processing_error_retry",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_processing_error_retry",
+        "latest_outcome_status:processing_error"
+      ]
+    },
+    {
+      "publicationId": "3655",
+      "publicationTitle": "An Evaluation of the Violent Offender Prosecution Program in Kankakee Sangamon and Winnebago Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3656",
+      "publicationTitle": "Evaluation of the Kankakee Metropolitan Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3663",
+      "publicationTitle": "Juvenile Probation Programs Evaluated",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3665",
+      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3670",
+      "publicationTitle": "Violent Crime Task Force Cracks Tough Homicide Cases in Kankakee County",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3683",
+      "publicationTitle": "Controlling Gang and Drug House Nuisances in Chicago",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3697",
+      "publicationTitle": "Working Together The Case for Integration of Criminal Justice Information Systems",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3759",
+      "publicationTitle": "Authority Hosts Criminal Justice Planning Assembly",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3763",
+      "publicationTitle": "Trends in violent crime and the justice systems response",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3765",
+      "publicationTitle": "An Evaluation of the Cook County Sheriffs Day Reporting Center Program Rearrest and Reincarceration After Discharge",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3767",
+      "publicationTitle": "Safety Plan for Domestic Violence Victims",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3768",
+      "publicationTitle": "Supervising sex offenders in DuPage Lake and Winnebago counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3769",
+      "publicationTitle": "Supervising Sex Offenders in Coles Madison and Vermilion Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3770",
+      "publicationTitle": "Specialized Unit Takes a Problemsolving Approachto Crime in Kankakee",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3771",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Spanish)",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3774",
+      "publicationTitle": "Illinois Motor Vehicle Theft Prevention Council 2000 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3778",
+      "publicationTitle": "REPORT TO THE GOVERNORS COMMISSION ON CAPITAL PUNISHMENTVictim and Survivor Issues in Homicide Cases Focus Group Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3780",
+      "publicationTitle": "REPORT TO THE GOVERNORS COMMISSION ON CAPITAL PUNISHMENT The Needs of the Wrongfully Convicted A Report on a Panel Discussion",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3781",
+      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part Two Case Studies of New or Changed Juvenile Justice System Proce",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3783",
+      "publicationTitle": "Three Years After Sweeping Reform Whats Different in the Juvenile Justice System",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3784",
+      "publicationTitle": "Probation Research Results of the 2000 Illinois Probation Outcome Study",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3785",
+      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part One Surveys of Juvenile Justice Professionals",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3787",
+      "publicationTitle": "Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3788",
+      "publicationTitle": "Understanding and addressing female delinquency in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3790",
+      "publicationTitle": "Methamphetamine in Illinois An Examination of an Emerging Drug",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3793",
+      "publicationTitle": "Longterm Impact Evaluation of Specialized Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3795",
+      "publicationTitle": "Coles County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3796",
+      "publicationTitle": "Jackson County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3797",
+      "publicationTitle": "Morgan County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3798",
+      "publicationTitle": "Cumberland County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3800",
+      "publicationTitle": "The Chicago Womens Health Risk Study",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3802",
+      "publicationTitle": "Kendall County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3803",
+      "publicationTitle": "Tazewell County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3805",
+      "publicationTitle": "Mercer County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3807",
+      "publicationTitle": "Piatt County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3808",
+      "publicationTitle": "Clay County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3809",
+      "publicationTitle": "Henry County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3810",
+      "publicationTitle": "Livingston County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3811",
+      "publicationTitle": "Henderson County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3812",
+      "publicationTitle": "Gallatin County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3813",
+      "publicationTitle": "Menard County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3814",
+      "publicationTitle": "Hardin County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3815",
+      "publicationTitle": "Edwards County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3816",
+      "publicationTitle": "Monroe County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3817",
+      "publicationTitle": "Edgar County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3818",
+      "publicationTitle": "Hancock County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3820",
+      "publicationTitle": "Ford County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3821",
+      "publicationTitle": "Integrated Justice Information System Survey Findings",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3822",
+      "publicationTitle": "Mason County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3823",
+      "publicationTitle": "Putnam County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3824",
+      "publicationTitle": "Randolph County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3825",
+      "publicationTitle": "The Efficacy of Illinois Sexual Assault Nurse Examiner (SANE) Pilot Program",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3826",
+      "publicationTitle": "Sangamon County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3827",
+      "publicationTitle": "Richland County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3828",
+      "publicationTitle": "Results of the 2003 Criminal History Record Information Audit",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3831",
+      "publicationTitle": "Chicago Homicide Dataset SeriesWhy is age discrepancy a risk factor for intimate partner homicide Examining the influence of offender criminal history",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3833",
+      "publicationTitle": "Disproportionate incarceration of African Americans for drug offenses in the US",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3834",
+      "publicationTitle": "Illinois Integrated Justice Information System Strategic Plan 20032004",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3835",
+      "publicationTitle": "Sharing criminal history record informationthe Interstate Identification Index",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3837",
+      "publicationTitle": "The Little Village Gang Violence Reduction Project in Chicago",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3841",
+      "publicationTitle": "Profile of the MultiCounty Narcotics Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3843",
+      "publicationTitle": "Profile of Task Force X",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3848",
+      "publicationTitle": "Profile of the Southern Illinois Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3849",
+      "publicationTitle": "Profile of the Central Illinois Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3850",
+      "publicationTitle": "Profile of the State Line Area Narcotics Team",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3852",
+      "publicationTitle": "Profile of the Southern Illinois Drug Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3864",
+      "publicationTitle": "Examining Restorative Justice",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3866",
+      "publicationTitle": "Juvenile Sex Offender Treatment Program Provides Residential Aftercare Services",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3867",
+      "publicationTitle": "Community Policing Accountability in Management in the Chicago Police Department",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3868",
+      "publicationTitle": "State crime labs struggle to keep up with demand",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3869",
+      "publicationTitle": "Community Policing Police and community problem solving in Chicago",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3870",
+      "publicationTitle": "An Implementation and Impact Evaluation of the Adult Sex Offender Probation Project in Cook County",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3871",
+      "publicationTitle": "Community Mobilization Fuels Chicago Alternative Policing Strategy (CAPS)",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3874",
+      "publicationTitle": "Fulton County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3877",
+      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3879",
+      "publicationTitle": "Christian County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3880",
+      "publicationTitle": "Vermilion County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3881",
+      "publicationTitle": "Ogle County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3882",
+      "publicationTitle": "Winnebago County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3883",
+      "publicationTitle": "McLean County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3884",
+      "publicationTitle": "Peoria County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3885",
+      "publicationTitle": "Lee County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3887",
+      "publicationTitle": "Jersey County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3888",
+      "publicationTitle": "DeKalb County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3890",
+      "publicationTitle": "Franklin County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3892",
+      "publicationTitle": "Crawford County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3893",
+      "publicationTitle": "Lawrence County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3894",
+      "publicationTitle": "Clark County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3898",
+      "publicationTitle": "An Analysis of Gang Members and Nongang Members Discharged from Probation",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3899",
+      "publicationTitle": "Domestic Violence Probation in Lake Winnebago and Kankakee Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3903",
+      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3904",
+      "publicationTitle": "A Process and Impact Evaluation of the Specialized Domestic Violence Probation Projects In Peoria Sangamon and Tazewell Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3912",
+      "publicationTitle": "Court System",
+      "currentCorpusStatus": "processing_error",
+      "structureWaveBucket": "structure_processing_error_retry",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_processing_error_retry",
+        "latest_outcome_status:processing_error"
+      ]
+    },
+    {
+      "publicationId": "3919",
+      "publicationTitle": "An Implementation Evaluation of the Specialized Sex Offender Projects in DuPage Lake and Winnebago Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3921",
+      "publicationTitle": "Enhancing Local Juvenile Justice Systems in Illinois Evaluation Manual",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3924",
+      "publicationTitle": "A Process and Impact Evaluation of Cook Countys States Attorneys Office Victim Witness Assistance Program",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3925",
+      "publicationTitle": "Grundy County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3927",
+      "publicationTitle": "Chicago Homicide Dataset Series Is age discrepancy a risk factor for intimate partner homicide",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3929",
+      "publicationTitle": "Sex Offender Probation Programs in DuPage Lake and Winnebago Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3930",
+      "publicationTitle": "Stephenson County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3933",
+      "publicationTitle": "A comparison of local and multijurisdictional drug enforcement efforts in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3935",
+      "publicationTitle": "Madison County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3936",
+      "publicationTitle": "Webbased Technology Paves the Way to Better Services for Victims of Crime",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3937",
+      "publicationTitle": "Whiteside County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3938",
+      "publicationTitle": "Kane County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3940",
+      "publicationTitle": "St Clair County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3941",
+      "publicationTitle": "DuPage County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3942",
+      "publicationTitle": "Lake County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3943",
+      "publicationTitle": "Knox County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3945",
+      "publicationTitle": "Jo Daviess County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3946",
+      "publicationTitle": "Will County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3949",
+      "publicationTitle": "Macoupin County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3950",
+      "publicationTitle": "Shelby County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3951",
+      "publicationTitle": "Fayette County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3954",
+      "publicationTitle": "Kankakee County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3955",
+      "publicationTitle": "Hamilton County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3956",
+      "publicationTitle": "Marion County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3957",
+      "publicationTitle": "Greene County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3958",
+      "publicationTitle": "Massac County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3959",
+      "publicationTitle": "Adams County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3961",
+      "publicationTitle": "Rock Island County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3962",
+      "publicationTitle": "Montgomery County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3963",
+      "publicationTitle": "Effingham County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3964",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (English)",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3965",
+      "publicationTitle": "A Study of Disproportionate Minority Representation in the Cook County Juvenile Justice System Part II Assessment of Disproportionate Minority Representation Through IndividualLevel Analyses and Surveys of Juvenile Justice Professionals",
+      "currentCorpusStatus": "processing_error",
+      "structureWaveBucket": "structure_processing_error_retry",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_processing_error_retry",
+        "latest_outcome_status:processing_error"
+      ]
+    },
+    {
+      "publicationId": "3966",
+      "publicationTitle": "Perry County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3968",
+      "publicationTitle": "Johnson County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3969",
+      "publicationTitle": "McHenry County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3971",
+      "publicationTitle": "Williamson County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3972",
+      "publicationTitle": "Minority overrepresentation in the criminal and juvenile justice systems",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3975",
+      "publicationTitle": "Stark County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3976",
+      "publicationTitle": "McDonough County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3978",
+      "publicationTitle": "Saline County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3980",
+      "publicationTitle": "White County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3981",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Polish)",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3983",
+      "publicationTitle": "Washington County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3984",
+      "publicationTitle": "Moultrie County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3986",
+      "publicationTitle": "Wayne County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3987",
+      "publicationTitle": "Pike County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3989",
+      "publicationTitle": "DeWitt County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3991",
+      "publicationTitle": "Macon County Juvenile Profile",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3992",
+      "publicationTitle": "Evaluation of the Gang Violence Reduction Project in Little Village",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3995",
+      "publicationTitle": "Profile of the South Central Illinois Drug Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3997",
+      "publicationTitle": "Profile of the QuadCities Metropolitan Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3998",
+      "publicationTitle": "The Festering Problem of Methamphetamine in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4003",
+      "publicationTitle": "2003 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4007",
+      "publicationTitle": "Profile of the Lake County Metropolitan Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4009",
+      "publicationTitle": "Profile of the DuPage County Metropolitan Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4011",
+      "publicationTitle": "Profile of the Metropolitan Enforcement Group of Southwestern Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4012",
+      "publicationTitle": "Profile of the Joliet Metropolitan Area Narcotics Squad",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4024",
+      "publicationTitle": "Examining pretrial juvenile detention screening practices in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4028",
+      "publicationTitle": "Illinois Integrated Justice Information System (IIJIS) 2005 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4032",
+      "publicationTitle": "Returning Home Illinois Policy Brief Health and Prisoner Reentry",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4034",
+      "publicationTitle": "The Rise in Reported Elder Abuse A Review of State and National Data",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4037",
+      "publicationTitle": "Jackson County SchoolBasedProbation Program Lessons learned",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:ready_to_replace"
+      ]
+    },
+    {
+      "publicationId": "4038",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data for Illinois 2003 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4039",
+      "publicationTitle": "Decade of trends shows continual decrease in Illinois crime",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4043",
+      "publicationTitle": "Returning Home Illinois Policy Brief Chicago Communities and Prisoner Reentry",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4045",
+      "publicationTitle": "Community Reintegration Trajectories A Qualitative Comparative Study of GangAffiliated and NonGangAffiliated ExOffenders",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4046",
+      "publicationTitle": "Chicago Homicide Dataset Series Childrens risk of homicide victimization records 31year increase",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4047",
+      "publicationTitle": "Lengthy criminal histories shown among incarcerated lowlevel felony offenders",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4048",
+      "publicationTitle": "Illinois making strides in quest for an integrated justice information system",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4050",
+      "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4051",
+      "publicationTitle": "2005 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4055",
+      "publicationTitle": "CLEAR offers enhanced police efficiencies increased accountability",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4059",
+      "publicationTitle": "The evolution of meth in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4061",
+      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 2",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:ready_to_replace"
+      ]
+    },
+    {
+      "publicationId": "4066",
+      "publicationTitle": "Technological innovation fuels identity theft fraud epidemic",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4068",
+      "publicationTitle": "Examining incarceration trends among minority youth in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4075",
+      "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey Final Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4076",
+      "publicationTitle": "Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4077",
+      "publicationTitle": "Minorities Overrepresented in Illinois Juvenile Correctional Facilities",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4080",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2004 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4084",
+      "publicationTitle": "Analysis of InfoNet Data from Domestic Violence Agencies Executive Summary",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "structure_only_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_only_residuals",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "4087",
+      "publicationTitle": "A Primer on Drug Addiction Crime and Treatment",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4094",
+      "publicationTitle": "Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4095",
+      "publicationTitle": "A Profile of the Northeast Metro Auto Theft Task Force (NEMAT)",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4101",
+      "publicationTitle": "Implementing restorative justice A guide for schools",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4104",
+      "publicationTitle": "METHAMPHETAMINE AND VIOLENCE IN ILLINOIS",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4107",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2007 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4108",
+      "publicationTitle": "Juvenile pretrial process",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4109",
+      "publicationTitle": "Community reentry after prison drug treatment Learning from Sheridan Therapeutic Community Program participants",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4111",
+      "publicationTitle": "Results from the 2000 Illinois Juvenile Probation Outcome Study",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4113",
+      "publicationTitle": "A Profile of the TriCounty Auto Theft Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4115",
+      "publicationTitle": "2004 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4116",
+      "publicationTitle": "Impetus and implementation of the Sheridan Correctional Center Therapeutic Community",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4118",
+      "publicationTitle": "Methamphetamine Quick Facts Trends in Measures of Methamphetamine Activities in Illinois First Judicial Circuit",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4122",
+      "publicationTitle": "Criminal justice system The pretrial process",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4123",
+      "publicationTitle": "Illinois Sentencing Policy Advisory Council Illinois Felony Sentencing  A Retrospective",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4124",
+      "publicationTitle": "Criminal justice system The courts",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4125",
+      "publicationTitle": "Juvenile criminal records",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4127",
+      "publicationTitle": "Examining Illinois probationer characteristics and outcomes",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4128",
+      "publicationTitle": "Criminal justice system Criminal sentencing",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4129",
+      "publicationTitle": "Sheridan Correctional Center Therapeutic Community Year 6",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4135",
+      "publicationTitle": "Juvenile arrest rates reveal significant racial disparity",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4138",
+      "publicationTitle": "Criminal justice system Corrections",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4139",
+      "publicationTitle": "Examining at-risk and delinquent girls in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4140",
+      "publicationTitle": "Assessing disproportionate minority contact with the Illinois juvenile justice system",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4141",
+      "publicationTitle": "Criminal justice system Criminal records",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4142",
+      "publicationTitle": "2008 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "structure_only_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_only_residuals",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "4145",
+      "publicationTitle": "Justice Assistance Grant Planning Materials  Illinois crime and criminal justice trends 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4147",
+      "publicationTitle": "Critical Incident Preparedness and Response on Campus Examining the Relationship Between Local Law Enforcement and PostSecondary Institutions in Illinois and the United States",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4148",
+      "publicationTitle": "Policies and Procedures of the Illinois Juvenile Justice System",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4152",
+      "publicationTitle": "Criminal justice system Arrests",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4153",
+      "publicationTitle": "Juvenile corrections and parole",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4157",
+      "publicationTitle": "A Study of Cooccurring Health Conditions and Treatment Coordination for Adult Jail Detainees in Residential Psychiatric Treatment",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4159",
+      "publicationTitle": "Criminal justice system Victims rights",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4161",
+      "publicationTitle": "Victimization and helpseeking behaviors among female prisoners in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4162",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2010 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "structure_only_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_only_residuals",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "4167",
+      "publicationTitle": "Juvenile court",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4169",
+      "publicationTitle": "Juvenile sentencing",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4171",
+      "publicationTitle": "Issues in Illinois College Campus Safety History and Development of Campus Safety Planning",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4181",
+      "publicationTitle": "CLEAR and ICLEAR A Report on New Information Technology in Chicago and Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4188",
+      "publicationTitle": "Corrections data illustrate juvenile incarceration trends in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4191",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2005 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4194",
+      "publicationTitle": "Childrens risk of homicide Victimization from birth to age 14 1965 to 1995",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4196",
+      "publicationTitle": "Screening for serious mental illness among offenders",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4201",
+      "publicationTitle": "2007 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4203",
+      "publicationTitle": "Examining multijurisdictional drug task force operations in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4208",
+      "publicationTitle": "Juvenile arrests",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4209",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4213",
+      "publicationTitle": "A Process and Impact Evaluation of the Southwestern Illinois Correctional Center Therapeutic Community Program During Fiscal Years 2007 through 2010",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4215",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2008 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4423",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the MultiCounty Narcotics Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4424",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the State Line Area Narcotics Team",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4425",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Quad Cities Metropolitan Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4426",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Blackhawk Area Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4428",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the East Central Illinois Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4429",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Kankakee Area  Metropolitan Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4430",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Metropolitan Enforcement Group of Southwestern Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4432",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the North Central Narcotics Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4433",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Southeastern Illinois Drug Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4435",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Joliet Metropolitan Area Narcotics Squad",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4436",
+      "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4437",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Southern Illinois Enforcement Group",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4457",
+      "publicationTitle": "Drug trends and distribution in Illinois: A survey of drug task forces",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4466",
+      "publicationTitle": "Victim Need Report: Service Providers’ Perspectives on the Needs of Crime Victims and Service Gaps",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4477",
+      "publicationTitle": "A State and National Overview of Methamphetamine Trends",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4489",
+      "publicationTitle": "Collaborating to fight drug crime Profile of Task Force 6",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4490",
+      "publicationTitle": "A Survey of Law Enforcement in Central Illinois to Guide Violence Reduction Strategies and Project Safe Neighborhoods",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4491",
+      "publicationTitle": "A State and National Overview of Methamphetamine Trends",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4494",
+      "publicationTitle": "An Evaluation of Transitional Housing Programs in Illinois for Victims of Domestic Violence and/or Human Trafficking",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4501",
+      "publicationTitle": "Justice-Involved Girls",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4506",
+      "publicationTitle": "Issues in Policing Rural Areas: A Review of the Literature",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4509",
+      "publicationTitle": "Criminal Justice System Utilization in Rural Areas",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4510",
+      "publicationTitle": "The Criminal Justice System and Pandemic Preparedness and Response: Operating in the Age of Coronavirus",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4531",
+      "publicationTitle": "S.T.O.P. Violence Against Women In Illinois A Multi-Year Plan: FFY14-16",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4567",
+      "publicationTitle": "Police-Led Referrals to Treatment for Substance Use Disorders in Rural Illinois: An Examination of the Safe Passage   Initiative",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4594",
+      "publicationTitle": "Collaborating to fight drug crime Profile of the Southern Illinois Drug Task Force",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4611",
+      "publicationTitle": "Introduction: Deflection: Police-Led Responses to Behavioral Health Challenges",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4615",
+      "publicationTitle": "Illinois Helping Everyone Access Linked Systems Action Plan",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4627",
+      "publicationTitle": "FY2015 Freedom from Drones Annual report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4631",
+      "publicationTitle": "Introduction: Deflection: Police-Led Responses to Behavioral Health Challenges",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4638",
+      "publicationTitle": "Violence Prevention: Basic Ideas for Approaches and Coordination",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4676",
+      "publicationTitle": "2020-2021 Illinois Traffic and Pedestrian Stop Data Use and Collection Task Force Findings",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4677",
+      "publicationTitle": "Parole and Mandatory Supervised Release in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4690",
+      "publicationTitle": "Evaluation of the Development of a Multijurisdictional Police-Led Deflection Program to Assist Victims of Violent Crime",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4694",
+      "publicationTitle": "Evaluation of the Development of a Multijurisdictional Police-Based Deflection Program in Southern Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4706",
+      "publicationTitle": "Illinois Helping Everyone Access Linked Systems: Interim Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4720",
+      "publicationTitle": "SEED: A Diversion Program for Young Adults, An Alternative to Incarceration",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4721",
+      "publicationTitle": "A Study of Housing Options for Probationers with Substance Use Disorders",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4722",
+      "publicationTitle": "Police Use of Discretion in Encounters with People with Opioid Use Disorder: A Study of Illinois Police Officers",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4723",
+      "publicationTitle": "ICJIA State Fiscal Year 2023 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:metadata_navigation_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4724",
+      "publicationTitle": "Evaluation of the Development of Little Egypt Alternative Pathways (LEAP), a Multijurisdictional Police-Led Deflection Program in Three Southern Illinois Counties",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4726",
+      "publicationTitle": "InfoNet: State Fiscal Year 2023 Highlights",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4731",
+      "publicationTitle": "State Fiscal Year 2024 Illinois Freedom from Drone Surveillance Act Report (without Appendices)",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4739",
+      "publicationTitle": "SFY24 ICJIA Annual Report",
+      "currentCorpusStatus": "processing_error",
+      "structureWaveBucket": "structure_processing_error_retry",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_processing_error_retry",
+        "latest_outcome_status:processing_error"
+      ]
+    },
+    {
+      "publicationId": "4740",
+      "publicationTitle": "2024 Task Force on Missing and Murdered Chicago Women Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4745",
+      "publicationTitle": "Research & Analysis Update, Winter 2025 Edition",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4753",
+      "publicationTitle": "2022 Domestic Violence Fatality Review Committee Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "structure_only_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_only_residuals",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "4755",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Committee Biennial Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "structure_only_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:structure_only_residuals",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "4771",
+      "publicationTitle": "Lewd Sexual Display in a Penal Institution: State Fiscal Year 2025 Report",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4773",
+      "publicationTitle": "2025 ILLINOIS DEATH IN CUSTODY ANNUAL REPORT",
+      "currentCorpusStatus": "remediated_fail",
+      "structureWaveBucket": "mixed_structure_figure_residuals",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage4_bucket:mixed_structure_figure_residuals",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    }
+  ]
+}
