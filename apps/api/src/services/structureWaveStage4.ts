@@ -112,6 +112,7 @@ export interface Stage4StructureThroughputSummaryDocument {
   rows: {
     newlyVerifiedPassPublicationIds: string[]
     stagedPassCandidatePublicationIds: string[]
+    metadataTitleSurvivorPublicationIds: string[]
     remainingPublicationIds: string[]
     processingErrorPublicationIds: string[]
     hardFailPublicationIds: string[]
@@ -222,6 +223,7 @@ export interface Stage4StructureCanaryRow {
     | 'structure_processing_error_retry'
     | 'spillover_from_stage3'
     | 'near_pass_grade_only'
+    | 'metadata_title_survivor'
     | 'font_text_extractability_survivor'
     | 'figure_spillover_survivor'
     | 'reading_order_only_survivor'
@@ -977,6 +979,8 @@ function applyStage4RoutingToRow(
       nextReasonCodes.push('stage4.5:staged_pass_candidate_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'near_pass_grade_only') {
       nextReasonCodes.push('stage4.4:near_pass_grade_only')
+    } else if (nextDiagnostics.terminalSurvivorClass === 'metadata_title_survivor') {
+      nextReasonCodes.push('stage4.7:metadata_title_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'font_text_extractability_survivor') {
       nextReasonCodes.push('stage4.4:font_text_extractability_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'reading_order_only_survivor') {
@@ -1078,6 +1082,7 @@ function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts, report
     { kind: 'staged_pass_candidate_survivor', row: preferTerminalClass(allRows, 'staged_pass_candidate_survivor') },
     { kind: 'verified_pass', row: structureRows.find(row => row.currentCorpusStatus === 'verified_pass') },
     { kind: 'near_pass_grade_only', row: preferTerminalClass(allRows, 'near_pass_grade_only') },
+    { kind: 'metadata_title_survivor', row: preferTerminalClass(allRows, 'metadata_title_survivor') },
     { kind: 'font_text_extractability_survivor', row: preferTerminalClass(allRows, 'font_text_extractability_survivor') },
     { kind: 'reading_order_only_survivor', row: preferTerminalClass(allRows, 'reading_order_only_survivor') || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && (row.classificationEvidence.pageCount || 0) >= 40) || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals') },
     { kind: 'figure_spillover_survivor', row: preferTerminalClass(allRows, 'figure_spillover_survivor') },
@@ -1388,6 +1393,9 @@ export function buildStage4StructureThroughputSummary(input: {
   const nearPassGradeOnlyPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'near_pass_grade_only')
     .map(row => row.publicationId))
+  const metadataTitleSurvivorPublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'metadata_title_survivor')
+    .map(row => row.publicationId))
   const fontTextExtractabilitySurvivorPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'font_text_extractability_survivor')
     .map(row => row.publicationId))
@@ -1438,6 +1446,7 @@ export function buildStage4StructureThroughputSummary(input: {
     rows: {
       newlyVerifiedPassPublicationIds,
       stagedPassCandidatePublicationIds,
+      metadataTitleSurvivorPublicationIds,
       remainingPublicationIds,
       processingErrorPublicationIds,
       hardFailPublicationIds,

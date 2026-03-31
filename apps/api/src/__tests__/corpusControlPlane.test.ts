@@ -252,6 +252,68 @@ describe('buildCorpusControlPlaneArtifactsFromSources', () => {
 })
 
 describe('corpus control plane regression', () => {
+  it('classifies title-only Stage 4 hard fails as metadata title survivors', () => {
+    const sources = makeSources({
+      replacementMap: [{
+        publicationId: '3665',
+        title: 'Title Survivor',
+        slug: 'title-survivor',
+        fileUrl: 'https://example.test/title.pdf',
+        fileHost: 'example.test',
+        storageKind: 'legacy_archive',
+        replaceVia: 'sftp',
+        serverHost: 'host-1',
+        sshTarget: 'forge@host-1',
+        remotePath: '/remote/title.pdf',
+        remoteDir: '/remote',
+        localWorkingPath: null,
+        localBackupPath: null,
+        localServerMirrorPath: null,
+        expectedPresence: 'present',
+        notes: null,
+        checksumState: {
+          checksumRecordedAt: '2026-03-31T00:00:00.000Z',
+          localCurrentFilePath: '/cache/title.pdf',
+          localCurrentFileMd5: 'abc',
+        },
+      }],
+      outcomeManifests: [{
+        path: '/tmp/stage4-structure-wave.outcomes.json',
+        outcomes: [{
+          publicationId: '3665',
+          status: 'failed_after_remediation',
+          processedAt: '2026-03-31T15:06:18.720Z',
+          gate: {
+            passed: false,
+            reasons: [
+              'Final grade is B, not A.',
+              'Final overall score is 89, not 100.',
+              'Blocking local standards findings remain: pdfua.display_doc_title',
+              'Categories still below 100: Document Title & Language, PDF/UA Compliance',
+            ],
+            blockingLocalFindingKeys: ['pdfua.display_doc_title'],
+            unresolvedCategoryLabels: ['Document Title & Language', 'PDF/UA Compliance'],
+            criticalManualReviewFlagCodes: [],
+          },
+          final: { overallScore: 89, grade: 'B', pageCount: 4, isScanned: false },
+          original: { overallScore: 21, grade: 'F', pageCount: 4, isScanned: false },
+          artifacts: {
+            detailedReportPath: '/reports/3665.remediation.json',
+            failureReportPath: '/reports/3665.failure.json',
+            stagedReplacementPath: null,
+            remediatedPdfPath: '/artifacts/3665.pdf',
+          },
+        }],
+      }],
+    })
+
+    const artifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
+    const row = artifacts.document.rows[0]
+    expect(row.currentCorpusStatus).toBe('remediated_fail')
+    expect(row.stage4StructureDiagnostics.terminalSurvivorClass).toBe('metadata_title_survivor')
+    expect(row.stage4StructureDiagnostics.structureWaveBucket).toBe('metadata_navigation_residuals')
+  })
+
   it('matches the refreshed Stage 0 baseline and validates current artifacts', () => {
     const sources = loadCorpusControlPlaneSources(path.resolve(process.cwd(), '..', '..'))
     const artifacts = buildCorpusControlPlaneArtifactsFromSources(sources)

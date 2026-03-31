@@ -28,6 +28,7 @@ export type StructureWaveBucket = 'structure_only_residuals' | 'mixed_structure_
 export type Stage4TerminalSurvivorClass =
   | 'staged_pass_candidate_survivor'
   | 'near_pass_grade_only'
+  | 'metadata_title_survivor'
   | 'font_text_extractability_survivor'
   | 'figure_spillover_survivor'
   | 'reading_order_only_survivor'
@@ -749,6 +750,12 @@ function deriveStage4StructureDiagnostics(input: {
       && latestOutcomeUnresolvedCategories.length === 0
     ) {
       terminalSurvivorClass = 'near_pass_grade_only'
+    } else if (
+      latestOutcomeBlockingKeys.length === 1
+      && latestOutcomeBlockingKeys[0] === 'pdfua.display_doc_title'
+      && latestOutcomeUnresolvedCategories.every(label => /document title|pdf\/ua compliance/i.test(label))
+    ) {
+      terminalSurvivorClass = 'metadata_title_survivor'
     } else if (
       (latestOutcomeBlockingKeys.includes('pdfua.font_embedding')
         || latestOutcomeBlockingKeys.includes('pdfua.font_unicode'))

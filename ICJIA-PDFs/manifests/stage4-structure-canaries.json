@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-31T15:06:24.471Z",
+  "generatedAt": "2026-03-31T15:15:06.852Z",
   "summary": {
-    "totalCanaries": 9,
+    "totalCanaries": 10,
     "bySource": {
       "benchmark": 2,
-      "cohort_representative": 7
+      "cohort_representative": 8
     },
     "byStructureWaveBucket": {
-      "metadata_navigation_residuals": 4,
+      "metadata_navigation_residuals": 5,
       "structure_only_residuals": 0,
       "mixed_structure_figure_residuals": 2,
       "structure_processing_error_retry": 2
@@ -94,6 +94,22 @@
       "benchmarkTerminalState": null,
       "notes": [
         "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json"
+      ]
+    },
+    {
+      "publicationId": "3665",
+      "publicationTitle": "Only Half of Reportable Cook County Court Dispositions on Rap Sheets",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "metadata_title_survivor",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "metadata_navigation_residuals",
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json"
       ]
     },
     {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T15:06:24.444Z",
+  "generatedAt": "2026-03-31T15:15:06.806Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -19410,7 +19410,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -19530,7 +19530,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -25684,7 +25684,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -26049,7 +26049,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -26624,7 +26624,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -26985,7 +26985,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -26998,6 +26998,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.7:metadata_title_survivor",
         "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
@@ -27554,7 +27555,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -27567,6 +27568,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.7:metadata_title_survivor",
         "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
@@ -29099,7 +29101,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -29112,6 +29114,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.7:metadata_title_survivor",
         "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
@@ -29558,7 +29561,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -30476,7 +30479,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -38859,7 +38862,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -38872,6 +38875,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.7:metadata_title_survivor",
         "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
@@ -39099,7 +39103,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -39112,6 +39116,7 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.7:metadata_title_survivor",
         "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
@@ -39345,7 +39350,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -50648,7 +50653,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -51287,7 +51292,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -54487,7 +54492,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -54821,7 +54826,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -56590,7 +56595,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -58567,7 +58572,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -70108,7 +70113,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -131265,7 +131270,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -165219,7 +165224,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_title_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
