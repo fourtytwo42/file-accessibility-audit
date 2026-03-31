@@ -2439,3 +2439,24 @@ First confirmed in-flight files:
   - its terminal blocker shape includes `pdfua.font_embedding` plus unresolved `Text Extractability`, `Reading Order`, and `PDF/UA Compliance`
 - Stage 4 is still not complete.
   - The next practical move after Stage 4.3 is another targeted Stage 4 execution step or a Stage 4.4 routing pass if those five metadata/navigation survivors continue to churn without writing terminal outcomes.
+
+## Stage 4 Active Lane
+- 2026-03-31 Stage 4.4 is now implemented as a routing/reporting correction pass over the five-row metadata/navigation wave.
+- The latest five-row Stage 4 wave is now terminalized truthfully in manifest space:
+  - processed rows: `3465`, `3671`, `4023`, `4054`, `4067`
+  - outcomes summary now reports current-wave truth separately from cumulative append history:
+    - current wave: `targetCandidates 5`, `processed 5`, `failedAfterRemediation 5`, `remaining 0`
+    - cumulative Stage 4 history remains preserved separately
+- Stage 4.4 terminal survivor routing now treats these rows as:
+  - `4023`, `4054`, `4067` -> `near_pass_grade_only`
+  - `3465` -> `font_text_extractability_survivor`
+  - `3671` -> `figure_spillover_survivor` and reclassified back to `figure_heavy`
+  - `3550`, `3606`, `3685` remain `reading_order_only_survivor` representatives
+- Stage 4 throughput/reporting after Stage 4.4:
+  - `pendingWaveRows: 0` for the completed five-row reporting wave
+  - `activeUnresolvedPublicationIds: []` for that completed wave
+  - the next Stage 4 wave has been rebuilt from fresh unresolved candidates instead of stale carryover
+- Stage 4 canaries now intentionally prefer current Stage 4.4 representatives:
+  - near-pass grade-only representative: `4023`
+  - font/text-extractability representative: `3465`
+  - figure-spillover representative: `3671`

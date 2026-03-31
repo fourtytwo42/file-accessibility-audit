@@ -10,6 +10,7 @@ import type {
   CorpusStatus,
   Stage4ActiveAnalysisDisposition,
   Stage4PendingAnalysisDisposition,
+  Stage4TerminalSurvivorClass,
   Stage4PendingAnalysisEvidenceStrength,
   StructureWaveBucket,
 } from './corpusControlPlane.ts'
@@ -126,6 +127,11 @@ export interface Stage4StructureThroughputSummaryDocument {
     forensicallyResolvedPendingPublicationIds: string[]
     stillUnclassifiedPendingPublicationIds: string[]
     activeUnresolvedPublicationIds: string[]
+    nearPassGradeOnlyPublicationIds: string[]
+    fontTextExtractabilitySurvivorPublicationIds: string[]
+    figureSpilloverSurvivorPublicationIds: string[]
+    currentWaveProcessedPublicationIds: string[]
+    currentWaveRemainingPublicationIds: string[]
     genericTimeoutPublicationIds: string[]
   }
 }
@@ -206,7 +212,18 @@ export interface Stage4StructureCanaryRow {
   publicationTitle: string | null
   source: 'benchmark' | 'cohort_representative'
   benchmarkName: string | null
-  stage4RepresentativeKind: 'verified_pass' | 'metadata_navigation_residuals' | 'structure_only_residuals' | 'mixed_structure_figure_residuals' | 'structure_processing_error_retry' | 'spillover_from_stage3' | null
+  stage4RepresentativeKind:
+    | 'verified_pass'
+    | 'metadata_navigation_residuals'
+    | 'structure_only_residuals'
+    | 'mixed_structure_figure_residuals'
+    | 'structure_processing_error_retry'
+    | 'spillover_from_stage3'
+    | 'near_pass_grade_only'
+    | 'font_text_extractability_survivor'
+    | 'figure_spillover_survivor'
+    | 'reading_order_only_survivor'
+    | null
   currentCorpusStatus: CorpusStatus | null
   currentCohortLabel: string | null
   structureWaveBucket: StructureWaveBucket | null
@@ -568,6 +585,10 @@ function unresolvedActivePublicationIdsFromExistingArtifacts(
   return pendingPublicationIdsFromExistingArtifacts(waveDoc, outcomesDoc)
 }
 
+function terminalSurvivorClassFromRow(row: CorpusControlPlaneRow): Stage4TerminalSurvivorClass | null {
+  return row.stage4StructureDiagnostics.terminalSurvivorClass || null
+}
+
 function countOutcomeStatuses(outcomes: OutcomeLike[] = []): Record<string, number> {
   const counts: Record<string, number> = {}
   for (const outcome of outcomes) {
@@ -584,22 +605,47 @@ export function buildStage4StructureWaveOutcomesSummary(input: {
 }): Record<string, unknown> | null {
   if (!input.wave || !input.outcomes) return null
   const outcomes = input.outcomes.outcomes || []
-  const counts = countOutcomeStatuses(outcomes)
-  const latestProcessed = outcomes.length ? outcomes[outcomes.length - 1] : null
-  const remaining = input.wave.pendingPublicationIds.length
+  const selectedIds = new Set(input.wave.selectedPublicationIds)
+  const currentWaveOutcomes = outcomes.filter(outcome => outcome.publicationId && selectedIds.has(outcome.publicationId))
+  const currentWaveCounts = countOutcomeStatuses(currentWaveOutcomes)
+  const cumulativeCounts = countOutcomeStatuses(outcomes)
+  const currentWaveTerminalIds = terminalPublicationIdsFromOutcomes({ outcomes: currentWaveOutcomes })
+  const currentWaveProcessedPublicationIds = currentWaveOutcomes
+    .map(outcome => outcome.publicationId)
+    .filter((value): value is string => Boolean(value))
+  const currentWaveRemainingPublicationIds = input.wave.selectedPublicationIds.filter(publicationId => !currentWaveTerminalIds.has(publicationId))
+  const latestProcessed = currentWaveOutcomes.length
+    ? currentWaveOutcomes[currentWaveOutcomes.length - 1]
+    : outcomes.length
+      ? outcomes[outcomes.length - 1]
+      : null
   return {
     generatedAt: new Date().toISOString(),
     sourcePriorityManifestPath: input.wave.sourceControlPlanePath ? input.wave.sourceControlPlanePath.replace('corpus-control-plane.json', 'stage4-structure-wave.json') : null,
     concurrency: 8,
     totals: {
-      targetCandidates: outcomes.length + remaining,
+      targetCandidates: input.wave.selectedPublicationIds.length,
+      processed: currentWaveOutcomes.length,
+      readyToReplace: currentWaveCounts.ready_to_replace || 0,
+      remediatedPassCandidates: currentWaveCounts.remediated_pass_candidate || 0,
+      failedAfterRemediation: currentWaveCounts.failed_after_remediation || 0,
+      sourceMissing: currentWaveCounts.source_missing || 0,
+      processingError: currentWaveCounts.processing_error || 0,
+      remaining: currentWaveRemainingPublicationIds.length,
+    },
+    currentWave: {
+      processedPublicationIds: uniqueStrings(currentWaveProcessedPublicationIds),
+      remainingPublicationIds: uniqueStrings(currentWaveRemainingPublicationIds),
+      failedAfterRemediationPublicationIds: uniqueStrings(currentWaveOutcomes.filter(outcome => outcome.status === 'failed_after_remediation').map(outcome => outcome.publicationId)),
+      processingErrorPublicationIds: uniqueStrings(currentWaveOutcomes.filter(outcome => outcome.status === 'processing_error').map(outcome => outcome.publicationId)),
+    },
+    cumulativeTotals: {
       processed: outcomes.length,
-      readyToReplace: counts.ready_to_replace || 0,
-      remediatedPassCandidates: counts.remediated_pass_candidate || 0,
-      failedAfterRemediation: counts.failed_after_remediation || 0,
-      sourceMissing: counts.source_missing || 0,
-      processingError: counts.processing_error || 0,
-      remaining,
+      readyToReplace: cumulativeCounts.ready_to_replace || 0,
+      remediatedPassCandidates: cumulativeCounts.remediated_pass_candidate || 0,
+      failedAfterRemediation: cumulativeCounts.failed_after_remediation || 0,
+      sourceMissing: cumulativeCounts.source_missing || 0,
+      processingError: cumulativeCounts.processing_error || 0,
     },
     latestProcessed,
   }
@@ -835,6 +881,7 @@ function deriveStructureDiagnosticsFromRow(row: CorpusControlPlaneRow): CorpusCo
 
   return {
     structureWaveBucket,
+    terminalSurvivorClass: row.stage4StructureDiagnostics.terminalSurvivorClass || null,
     dominantStructurePhase: row.stage4StructureDiagnostics.dominantStructurePhase,
     hasLogicalStructureDebt: hasLogicalStructureDebt || null,
     hasHeadingDebt: hasHeadingDebt || null,
@@ -914,6 +961,20 @@ function applyStage4RoutingToRow(
   if (hasStage4OutcomeEvidence && nextDiagnostics.structureWaveBucket && row.currentCorpusStatus !== 'verified_pass') {
     nextCohortLabel = 'structure_heavy'
     nextReasonCodes.push('stage4:adopted_into_structure_lane_after_wave')
+  }
+
+  if (hasStage4OutcomeEvidence && nextDiagnostics.terminalSurvivorClass) {
+    if (nextDiagnostics.terminalSurvivorClass === 'figure_spillover_survivor') {
+      nextCohortLabel = 'figure_heavy'
+      nextReasonCodes.push('stage4.4:figure_spillover_survivor', 'stage4:reclassified_from_structure_heavy', 'stage4:figure_dominant_after_structure_wave')
+      nextNotes.push('Stage 4.4 reclassified this terminal Stage 4 survivor back to figure_heavy because the latest truthful blocker is figure debt.')
+    } else if (nextDiagnostics.terminalSurvivorClass === 'near_pass_grade_only') {
+      nextReasonCodes.push('stage4.4:near_pass_grade_only')
+    } else if (nextDiagnostics.terminalSurvivorClass === 'font_text_extractability_survivor') {
+      nextReasonCodes.push('stage4.4:font_text_extractability_survivor')
+    } else if (nextDiagnostics.terminalSurvivorClass === 'reading_order_only_survivor') {
+      nextReasonCodes.push('stage4.4:reading_order_only_survivor')
+    }
   }
 
   if (!hasStage4OutcomeEvidence && pendingAnalysis) {
@@ -997,13 +1058,19 @@ export function applyStage4StructureWaveReclassification(
 }
 
 function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts): Stage4StructureCanaryRow[] {
-  const rows = artifacts.document.rows.filter(row => row.cohortLabel === 'structure_heavy')
+  const structureRows = artifacts.document.rows.filter(row => row.cohortLabel === 'structure_heavy')
+  const allRows = artifacts.document.rows
+  const preferStage44 = (rows: CorpusControlPlaneRow[], terminalClass: Stage4TerminalSurvivorClass): CorpusControlPlaneRow | undefined => {
+    return rows.find(row => row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass && row.reasonCodes.includes('stage4.4:' + terminalClass))
+      || rows.find(row => row.stage4StructureDiagnostics.terminalSurvivorClass === terminalClass)
+  }
   const picks: Array<{ kind: Stage4StructureCanaryRow['stage4RepresentativeKind']; row: CorpusControlPlaneRow | undefined }> = [
-    { kind: 'verified_pass', row: rows.find(row => row.currentCorpusStatus === 'verified_pass') },
-    { kind: 'metadata_navigation_residuals', row: rows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'metadata_navigation_residuals' && (row.classificationEvidence.pageCount || 0) <= 8) },
-    { kind: 'structure_only_residuals', row: rows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && (row.classificationEvidence.pageCount || 0) >= 40) || rows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals') },
-    { kind: 'spillover_from_stage3', row: rows.find(row => row.publicationId === '4436') || rows.find(row => row.stage4StructureDiagnostics.originLane === 'reclassified_from_figure_heavy') },
-    { kind: 'structure_processing_error_retry', row: rows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry') },
+    { kind: 'verified_pass', row: structureRows.find(row => row.currentCorpusStatus === 'verified_pass') },
+    { kind: 'near_pass_grade_only', row: preferStage44(allRows, 'near_pass_grade_only') },
+    { kind: 'font_text_extractability_survivor', row: preferStage44(allRows, 'font_text_extractability_survivor') },
+    { kind: 'reading_order_only_survivor', row: preferStage44(allRows, 'reading_order_only_survivor') || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && (row.classificationEvidence.pageCount || 0) >= 40) || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals') },
+    { kind: 'figure_spillover_survivor', row: preferStage44(allRows, 'figure_spillover_survivor') },
+    { kind: 'structure_processing_error_retry', row: structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry') },
   ]
 
   const deduped: Stage4StructureCanaryRow[] = []
@@ -1026,7 +1093,7 @@ function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts): Stage
       hasGenericTimeoutWording: false,
       benchmarkTerminalState: null,
       notes: uniqueStrings([
-        pick.kind === 'spillover_from_stage3' ? 'Confirmed Stage 3 spillover representative.' : null,
+        pick.kind === 'figure_spillover_survivor' ? 'Figure spillover survivor representative.' : null,
         pick.kind === 'structure_processing_error_retry' ? 'Bounded-runtime structure retry representative.' : null,
         pick.row.statusEvidence.latestReportPath || null,
       ]),
@@ -1273,8 +1340,12 @@ export function buildStage4StructureThroughputSummary(input: {
   activeAnalysisRows?: Stage4StructureActiveAnalysisRow[]
 }): Stage4StructureThroughputSummaryDocument {
   const structureRows = input.artifacts.document.rows.filter(row => row.cohortLabel === 'structure_heavy')
+  const allRows = input.artifacts.document.rows
   const waveIds = new Set(input.wave?.selectedPublicationIds || [])
-  const rowsById = new Map(input.artifacts.document.rows.map(row => [row.publicationId, row]))
+  const rowsById = new Map(allRows.map(row => [row.publicationId, row]))
+  const currentWaveOutcomes = (input.outcomes?.outcomes || []).filter(outcome => outcome.publicationId && waveIds.has(outcome.publicationId))
+  const currentWaveProcessedPublicationIds = uniqueStrings(currentWaveOutcomes.map(outcome => outcome.publicationId))
+  const currentWaveRemainingPublicationIds = uniqueStrings((input.wave?.selectedPublicationIds || []).filter(publicationId => !terminalPublicationIdsFromOutcomes({ outcomes: currentWaveOutcomes }).has(publicationId)))
 
   const newlyVerifiedPassPublicationIds = Array.from(waveIds)
     .filter(publicationId => {
@@ -1288,37 +1359,32 @@ export function buildStage4StructureThroughputSummary(input: {
     .map(row => row.publicationId)
     .sort()
 
-  const processingErrorPublicationIds = uniqueStrings((input.outcomes?.outcomes || []).filter(outcome => outcome.status === 'processing_error').map(outcome => outcome.publicationId))
-  const hardFailPublicationIds = uniqueStrings((input.outcomes?.outcomes || []).filter(outcome => outcome.status === 'failed_after_remediation').map(outcome => outcome.publicationId))
+  const processingErrorPublicationIds = uniqueStrings(currentWaveOutcomes.filter(outcome => outcome.status === 'processing_error').map(outcome => outcome.publicationId))
+  const hardFailPublicationIds = uniqueStrings(currentWaveOutcomes.filter(outcome => outcome.status === 'failed_after_remediation').map(outcome => outcome.publicationId))
   const forensicResolvedPublicationIds = uniqueStrings((input.pendingAnalysisRows || []).map(row => row.publicationId))
-  const forensicResolvedSet = new Set(forensicResolvedPublicationIds)
   const activeAnalysisPublicationIds = uniqueStrings((input.activeAnalysisRows || []).map(row => row.publicationId))
-  const activeAnalysisSet = new Set(activeAnalysisPublicationIds)
-  const pendingPublicationIds = (input.wave?.pendingPublicationIds || []).slice().sort()
-  const stillUnclassifiedPendingPublicationIds = pendingPublicationIds.filter(publicationId => !forensicResolvedSet.has(publicationId) && !activeAnalysisSet.has(publicationId))
-  const activeUnresolvedPublicationIds = activeAnalysisPublicationIds.length ? activeAnalysisPublicationIds : pendingPublicationIds
+  const pendingPublicationIds = currentWaveRemainingPublicationIds
+  const activeUnresolvedPublicationIds = currentWaveRemainingPublicationIds
+  const stillUnclassifiedPendingPublicationIds = currentWaveRemainingPublicationIds.filter(publicationId => !activeAnalysisPublicationIds.includes(publicationId))
 
-  const readingOrderOnlyResidualPublicationIds = uniqueStrings([
-    ...structureRows
-      .filter(row => row.currentCorpusStatus !== 'verified_pass')
-      .filter(row => row.stage4StructureDiagnostics.hasReadingOrderDebt)
-      .filter(row => !row.stage4StructureDiagnostics.hasMetadataNavigationDebt)
-      .filter(row => !row.stage4StructureDiagnostics.hasMixedFigureResiduals)
-      .filter(row => row.classificationEvidence.blockingFindingKeys.every(key => /reading_order|page_tabs/i.test(key)))
-      .map(row => row.publicationId),
-    ...(input.outcomes?.outcomes || [])
-      .filter(outcome => outcome.status === 'failed_after_remediation')
-      .filter(outcome => (outcome.gate?.blockingLocalFindingKeys || []).length === 0)
-      .filter(outcome => (outcome.gate?.unresolvedCategoryLabels || []).length === 1)
-      .filter(outcome => (outcome.gate?.unresolvedCategoryLabels || [])[0] === 'Reading Order')
-      .map(outcome => outcome.publicationId),
-  ])
+  const readingOrderOnlyResidualPublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'reading_order_only_survivor')
+    .map(row => row.publicationId))
+  const nearPassGradeOnlyPublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'near_pass_grade_only')
+    .map(row => row.publicationId))
+  const fontTextExtractabilitySurvivorPublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'font_text_extractability_survivor')
+    .map(row => row.publicationId))
+  const figureSpilloverSurvivorPublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'figure_spillover_survivor')
+    .map(row => row.publicationId))
 
   const bucketIds = {
-    metadata_navigation_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'metadata_navigation_residuals' && row.currentCorpusStatus !== 'verified_pass').map(row => row.publicationId).sort(),
-    structure_only_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && row.currentCorpusStatus !== 'verified_pass').map(row => row.publicationId).sort(),
-    mixed_structure_figure_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'mixed_structure_figure_residuals' && row.currentCorpusStatus !== 'verified_pass').map(row => row.publicationId).sort(),
-    structure_processing_error_retry: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry' && row.currentCorpusStatus !== 'verified_pass').map(row => row.publicationId).sort(),
+    metadata_navigation_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'metadata_navigation_residuals' && row.currentCorpusStatus !== 'verified_pass' && !terminalSurvivorClassFromRow(row)).map(row => row.publicationId).sort(),
+    structure_only_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && row.currentCorpusStatus !== 'verified_pass' && !terminalSurvivorClassFromRow(row)).map(row => row.publicationId).sort(),
+    mixed_structure_figure_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'mixed_structure_figure_residuals' && row.currentCorpusStatus !== 'verified_pass' && !terminalSurvivorClassFromRow(row)).map(row => row.publicationId).sort(),
+    structure_processing_error_retry: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry' && row.currentCorpusStatus !== 'verified_pass' && !terminalSurvivorClassFromRow(row)).map(row => row.publicationId).sort(),
   }
 
   const nextWaveStructureOnlyPublicationIds = uniqueStrings([
@@ -1327,7 +1393,7 @@ export function buildStage4StructureThroughputSummary(input: {
   ])
   const mixedFollowupPublicationIds = bucketIds.mixed_structure_figure_residuals
   const boundedRuntimeRetryPublicationIds = bucketIds.structure_processing_error_retry
-  const reclassifiedOutOfStructureHeavyPublicationIds = input.artifacts.document.rows
+  const reclassifiedOutOfStructureHeavyPublicationIds = allRows
     .filter(row => row.reasonCodes.includes('stage4:reclassified_from_structure_heavy'))
     .map(row => row.publicationId)
     .sort()
@@ -1372,6 +1438,11 @@ export function buildStage4StructureThroughputSummary(input: {
       forensicallyResolvedPendingPublicationIds: forensicResolvedPublicationIds,
       stillUnclassifiedPendingPublicationIds,
       activeUnresolvedPublicationIds,
+      nearPassGradeOnlyPublicationIds,
+      fontTextExtractabilitySurvivorPublicationIds,
+      figureSpilloverSurvivorPublicationIds,
+      currentWaveProcessedPublicationIds,
+      currentWaveRemainingPublicationIds,
       genericTimeoutPublicationIds: [],
     },
   }

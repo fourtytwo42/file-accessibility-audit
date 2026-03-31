@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-03-31T03:57:40.161Z",
+  "generatedAt": "2026-03-31T04:32:10.160Z",
   "cohorts": {
     "short_high_likelihood": {
-      "totalRows": 19,
+      "totalRows": 22,
       "byCurrentCorpusStatus": {
         "verified_pass": 19,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 0,
+        "remediated_fail": 3,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -20,21 +20,21 @@
         "3669",
         "3907",
         "3915",
+        "4023",
         "4052",
         "4053",
-        "4056",
-        "4062",
-        "4063"
+        "4054",
+        "4056"
       ]
     },
     "figure_heavy": {
-      "totalRows": 491,
+      "totalRows": 492,
       "byCurrentCorpusStatus": {
         "verified_pass": 17,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 420,
+        "remediated_fail": 421,
         "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 1,
@@ -54,13 +54,13 @@
       ]
     },
     "structure_heavy": {
-      "totalRows": 342,
+      "totalRows": 338,
       "byCurrentCorpusStatus": {
         "verified_pass": 42,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 296,
+        "remediated_fail": 292,
         "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 0,

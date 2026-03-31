@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-03-31T03:57:22.610Z",
+  "generatedAt": "2026-03-31T04:34:25.614Z",
   "summary": {
-    "totalCanaries": 7,
+    "totalCanaries": 8,
     "bySource": {
       "benchmark": 2,
-      "cohort_representative": 5
+      "cohort_representative": 6
     },
     "byStructureWaveBucket": {
-      "metadata_navigation_residuals": 2,
-      "structure_only_residuals": 1,
+      "metadata_navigation_residuals": 3,
+      "structure_only_residuals": 0,
       "mixed_structure_figure_residuals": 2,
       "structure_processing_error_retry": 2
     },
@@ -65,11 +65,27 @@
       ]
     },
     {
+      "publicationId": "4023",
+      "publicationTitle": "A Profile of the KaneCook Auto Theft Task Force (KCAT)",
+      "source": "cohort_representative",
+      "benchmarkName": null,
+      "stage4RepresentativeKind": "near_pass_grade_only",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "short_high_likelihood",
+      "structureWaveBucket": null,
+      "originLane": "native_structure_heavy",
+      "hasGenericTimeoutWording": false,
+      "benchmarkTerminalState": null,
+      "notes": [
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json"
+      ]
+    },
+    {
       "publicationId": "3465",
       "publicationTitle": "Are you a Victim of Domestic Violence",
       "source": "cohort_representative",
       "benchmarkName": null,
-      "stage4RepresentativeKind": "metadata_navigation_residuals",
+      "stage4RepresentativeKind": "font_text_extractability_survivor",
       "currentCorpusStatus": "remediated_fail",
       "currentCohortLabel": "structure_heavy",
       "structureWaveBucket": "metadata_navigation_residuals",
@@ -77,40 +93,40 @@
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json"
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json"
       ]
     },
     {
-      "publicationId": "4084",
-      "publicationTitle": "Analysis of InfoNet Data from Domestic Violence Agencies Executive Summary",
+      "publicationId": "3550",
+      "publicationTitle": "McGruff Will Your Familys Car be Stolen This Year",
       "source": "cohort_representative",
       "benchmarkName": null,
-      "stage4RepresentativeKind": "structure_only_residuals",
+      "stage4RepresentativeKind": "reading_order_only_survivor",
       "currentCorpusStatus": "remediated_fail",
       "currentCohortLabel": "structure_heavy",
-      "structureWaveBucket": "structure_only_residuals",
+      "structureWaveBucket": "metadata_navigation_residuals",
       "originLane": "native_structure_heavy",
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_ES.pdf.json"
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json"
       ]
     },
     {
-      "publicationId": "4436",
-      "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+      "publicationId": "3671",
+      "publicationTitle": "ICJIA 1997 Annual Report",
       "source": "cohort_representative",
       "benchmarkName": null,
-      "stage4RepresentativeKind": "spillover_from_stage3",
+      "stage4RepresentativeKind": "figure_spillover_survivor",
       "currentCorpusStatus": "remediated_fail",
-      "currentCohortLabel": "structure_heavy",
+      "currentCohortLabel": "figure_heavy",
       "structureWaveBucket": "mixed_structure_figure_residuals",
-      "originLane": "reclassified_from_figure_heavy",
+      "originLane": "native_structure_heavy",
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
-        "Confirmed Stage 3 spillover representative."
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.remediation.json",
+        "Figure spillover survivor representative."
       ]
     },
     {

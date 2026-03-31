@@ -25,6 +25,11 @@ export type SourceKind = 'legacy_archive' | 'agency_upload' | 'researchhub_uploa
 export type VerificationClassification = 'verified_pass' | 'soft_fail_advisory' | 'hard_fail'
 export type FigureWaveBucket = 'ownership_cleared_figure_debt_remains' | 'mixed_figure_structure_debt' | 'mass_unresolved_figure_debt' | 'figure_processing_error_retry'
 export type StructureWaveBucket = 'structure_only_residuals' | 'mixed_structure_figure_residuals' | 'metadata_navigation_residuals' | 'structure_processing_error_retry'
+export type Stage4TerminalSurvivorClass =
+  | 'near_pass_grade_only'
+  | 'font_text_extractability_survivor'
+  | 'figure_spillover_survivor'
+  | 'reading_order_only_survivor'
 export type Stage4PendingAnalysisDisposition =
   | 'metadata_navigation_residuals'
   | 'structure_only_residuals'
@@ -380,6 +385,7 @@ export interface CorpusControlPlaneRow {
   }
   stage4StructureDiagnostics: {
     structureWaveBucket: StructureWaveBucket | null
+    terminalSurvivorClass: Stage4TerminalSurvivorClass | null
     dominantStructurePhase: string | null
     hasLogicalStructureDebt: boolean | null
     hasHeadingDebt: boolean | null
@@ -729,6 +735,36 @@ function deriveStage4StructureDiagnostics(input: {
   const hasMixedFigureResiduals = decisiveBlockingKeys.some(key => /figure|artifact|image|untagged_rendered_images/i.test(key))
     || FIGURE_FAMILY_PATTERN.test(decisiveJoinedText)
 
+  let terminalSurvivorClass: Stage4TerminalSurvivorClass | null = null
+  if (input.latestOutcome?.outcome.status === 'failed_after_remediation') {
+    const finalGrade = input.latestOutcome.outcome.final?.grade || null
+    const finalScore = input.latestOutcome.outcome.final?.overallScore ?? null
+    if (
+      finalGrade === 'B'
+      && typeof finalScore === 'number'
+      && latestOutcomeBlockingKeys.length === 0
+      && latestOutcomeUnresolvedCategories.length === 0
+    ) {
+      terminalSurvivorClass = 'near_pass_grade_only'
+    } else if (
+      latestOutcomeBlockingKeys.includes('pdfua.font_embedding')
+      && latestOutcomeUnresolvedCategories.some(label => /text extractability/i.test(label))
+    ) {
+      terminalSurvivorClass = 'font_text_extractability_survivor'
+    } else if (
+      latestOutcomeBlockingKeys.includes('pdfua.figure_alt_or_artifact')
+      && latestOutcomeBlockingKeys.length === 1
+    ) {
+      terminalSurvivorClass = 'figure_spillover_survivor'
+    } else if (
+      latestOutcomeBlockingKeys.length === 0
+      && latestOutcomeUnresolvedCategories.length === 1
+      && /reading order/i.test(latestOutcomeUnresolvedCategories[0] || '')
+    ) {
+      terminalSurvivorClass = 'reading_order_only_survivor'
+    }
+  }
+
   let structureWaveBucket: StructureWaveBucket | null = null
   if (input.rowCohortLabel === 'structure_heavy' || hasLogicalStructureDebt || hasMetadataNavigationDebt || hasReadingOrderDebt) {
     if (isInspectionBudgetProcessingError(input.latestOutcome) || input.rowCurrentCorpusStatus === 'processing_error') {
@@ -753,6 +789,7 @@ function deriveStage4StructureDiagnostics(input: {
 
   return {
     structureWaveBucket,
+    terminalSurvivorClass,
     dominantStructurePhase: input.benchmarkOutcome?.final?.inspectionProfile?.dominantPhase || null,
     hasLogicalStructureDebt: hasLogicalStructureDebt || null,
     hasHeadingDebt: hasHeadingDebt || null,

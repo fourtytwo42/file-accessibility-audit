@@ -14,6 +14,7 @@ import {
   buildStage4StructureThroughputSummary,
   buildStage4StructureWaveArtifacts,
   buildStage4StructureWaveOutcomesSummary,
+  type Stage4StructureWaveDocument,
 } from '../apps/api/src/services/structureWaveStage4.ts'
 
 function writeJson(filePath: string, value: unknown): void {
@@ -24,6 +25,57 @@ function writeJson(filePath: string, value: unknown): void {
 function readJsonIfExists(filePath: string) {
   if (!fs.existsSync(filePath)) return null
   return JSON.parse(fs.readFileSync(filePath, 'utf8'))
+}
+
+function terminalPublicationIdsFromOutcomes(outcomesDoc: { outcomes?: Array<{ publicationId?: string | null; status?: string | null }> } | null): Set<string> {
+  return new Set(
+    (outcomesDoc?.outcomes || [])
+      .filter(outcome => ['failed_after_remediation', 'processing_error', 'ready_to_replace', 'remediated_pass_candidate', 'source_missing'].includes(outcome.status || ''))
+      .map(outcome => outcome.publicationId)
+      .filter((value): value is string => Boolean(value)),
+  )
+}
+
+function chooseReportingWave(input: {
+  existingWave: Stage4StructureWaveDocument | null
+  existingOutcomes: { outcomes?: Array<{ publicationId?: string | null; status?: string | null }> } | null
+  nextWave: Stage4StructureWaveDocument
+  sourceControlPlanePath: string
+  sourceControlPlaneGeneratedAt: string
+  fallbackPublicationIds?: string[]
+}): Stage4StructureWaveDocument {
+  const { existingWave, existingOutcomes, nextWave, sourceControlPlanePath, sourceControlPlaneGeneratedAt, fallbackPublicationIds = [] } = input
+  const terminalIds = terminalPublicationIdsFromOutcomes(existingOutcomes)
+  if (existingWave) {
+    const selectedIds = existingWave.selectedPublicationIds || []
+    if (selectedIds.length > 0 && selectedIds.every(publicationId => terminalIds.has(publicationId))) {
+      return existingWave
+    }
+  }
+
+  const fallbackIds = Array.from(new Set(fallbackPublicationIds.filter(Boolean))).sort()
+  if (fallbackIds.length > 0 && fallbackIds.every(publicationId => terminalIds.has(publicationId))) {
+    return {
+      generatedAt: new Date().toISOString(),
+      sourceControlPlanePath,
+      sourceControlPlaneGeneratedAt,
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: fallbackIds.length,
+      totals: {
+        eligibleRows: fallbackIds.length,
+        selectedRows: fallbackIds.length,
+        skippedRows: 0,
+        pendingRows: 0,
+      },
+      selectedPublicationIds: fallbackIds,
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
+    }
+  }
+
+  return nextWave
 }
 
 export async function main(): Promise<void> {
@@ -48,6 +100,9 @@ export async function main(): Promise<void> {
   const outcomesPath = path.join(sources.manifestsRoot, 'stage4-structure-wave.outcomes.json')
   const outcomesSummaryPath = path.join(sources.manifestsRoot, 'stage4-structure-wave.outcomes.summary.json')
 
+  const existingWave = readJsonIfExists(wavePath) as Stage4StructureWaveDocument | null
+  const existingOutcomes = readJsonIfExists(outcomesPath) as { outcomes?: Array<{ publicationId?: string | null; status?: string | null }> } | null
+
   const maxCandidates = Number(process.env.ICJIA_STAGE4_STRUCTURE_WAVE_LIMIT || 8)
   const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS || '')
     .split(',')
@@ -64,22 +119,31 @@ export async function main(): Promise<void> {
     activeAnalysisRows: sources.stage4ActiveAnalysisRows,
   })
 
+  const reportingWave = chooseReportingWave({
+    existingWave,
+    existingOutcomes,
+    nextWave: waveArtifacts.wave,
+    sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
+    sourceControlPlaneGeneratedAt: artifacts.document.generatedAt,
+    fallbackPublicationIds: (sources.stage4ActiveAnalysisRows || []).map(row => row.publicationId),
+  })
+
   const throughputSummary = buildStage4StructureThroughputSummary({
     artifacts,
     sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
     sourceControlPlaneGeneratedAt: artifacts.document.generatedAt,
     waveManifestPath: wavePath,
-    wave: waveArtifacts.wave,
+    wave: reportingWave,
     outcomesPath: fs.existsSync(outcomesPath) ? outcomesPath : null,
-    outcomes: readJsonIfExists(outcomesPath),
+    outcomes: existingOutcomes,
     pendingAnalysisRows: sources.stage4PendingAnalysisRows,
     activeAnalysisRows: sources.stage4ActiveAnalysisRows,
   })
 
   const refreshedOutcomesSummary = buildStage4StructureWaveOutcomesSummary({
-    wave: waveArtifacts.wave,
+    wave: reportingWave,
     outcomesPath,
-    outcomes: readJsonIfExists(outcomesPath),
+    outcomes: existingOutcomes,
   })
   const canaries = buildStage4StructureCanaries({ artifacts, sources })
 
@@ -97,6 +161,7 @@ export async function main(): Promise<void> {
     outcomesSummaryPath: refreshedOutcomesSummary ? outcomesSummaryPath : null,
     totals: waveArtifacts.wave.totals,
     selectedPublicationIds: waveArtifacts.wave.selectedPublicationIds,
+    reportingWaveSelectedPublicationIds: reportingWave.selectedPublicationIds,
     throughput: throughputSummary.totals,
     canaries: canaries.summary,
   }, null, 2))

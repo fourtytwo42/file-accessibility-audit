@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-03-31T03:36:05.995Z",
+  "generatedAt": "2026-03-31T04:08:40.492Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 8,
-    "processed": 4,
+    "targetCandidates": 5,
+    "processed": 9,
     "readyToReplace": 0,
     "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 4,
+    "failedAfterRemediation": 9,
     "sourceMissing": 0,
     "processingError": 0,
-    "remaining": 4
+    "remaining": 0
   },
   "outcomes": [
     {
@@ -221,6 +221,271 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "773d02061b1c5d6daaf00ba7be4feb59144fb0c62c894fd2ee0f3daa4723f794",
         "remediatedPdfSha256": "773d02061b1c5d6daaf00ba7be4feb59144fb0c62c894fd2ee0f3daa4723f794",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3465",
+      "publicationTitle": "Are you a Victim of Domestic Violence",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 70,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/ruvictim.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/ruvictim.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/ruvictim.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T04:07:48.539Z",
+      "durationMs": 66675,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "370d559d675f755009d44f75c7292e57e0d272a342861cd6010b3098ad8f920b",
+        "remediatedPdfSha256": "370d559d675f755009d44f75c7292e57e0d272a342861cd6010b3098ad8f920b",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4054",
+      "publicationTitle": "Juvenile commitment rates reveal significant racial disparity",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 86,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T04:07:55.513Z",
+      "durationMs": 73649,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 97,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 97, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f7e1a7ba23e97141e22e5b59ab548f6c0964bb02160bd3d1f0418195168b0e54",
+        "remediatedPdfSha256": "f7e1a7ba23e97141e22e5b59ab548f6c0964bb02160bd3d1f0418195168b0e54",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4023",
+      "publicationTitle": "A Profile of the KaneCook Auto Theft Task Force (KCAT)",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 85,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/KCAT03.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T04:08:00.270Z",
+      "durationMs": 78406,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 99,
+        "grade": "B",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 99, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "053e0f561eda6c4300429ed0f7f274728d82b771affe5dc1f6ded541f422f1ff",
+        "remediatedPdfSha256": "053e0f561eda6c4300429ed0f7f274728d82b771affe5dc1f6ded541f422f1ff",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4067",
+      "publicationTitle": "A guide for juvenile corrections",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 84,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage2-short-cohort-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T04:08:12.611Z",
+      "durationMs": 90747,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 97,
+        "grade": "B",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 97, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "61ef7c4d525c0b4dd5c51b76b366a97400ff1fc4cc73f554f89714e8f5ca0657",
+        "remediatedPdfSha256": "61ef7c4d525c0b4dd5c51b76b366a97400ff1fc4cc73f554f89714e8f5ca0657",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3671",
+      "publicationTitle": "ICJIA 1997 Annual Report",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 83,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/97anreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/97anreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/97anreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/97anreport.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T04:08:40.491Z",
+      "durationMs": 118627,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
+        "remediatedPdfSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
         "stagedReplacementSha256": null
       }
     }

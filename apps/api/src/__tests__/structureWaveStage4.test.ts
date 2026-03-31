@@ -4,6 +4,7 @@ import {
   buildStage4StructureCanaries,
   buildStage4StructureThroughputSummary,
   buildStage4StructureWaveArtifacts,
+  buildStage4StructureWaveOutcomesSummary,
   type Stage4StructureActiveAnalysisRow,
   type Stage4StructurePendingAnalysisRow,
   type Stage4StructureWaveDocument,
@@ -34,7 +35,7 @@ function makeRow(input: Partial<CorpusControlPlaneRow> & Pick<CorpusControlPlane
     classificationEvidence: { pageCount: 4, isScanned: false, overallScore: 90, grade: 'B', blockerFamilyCount: 1, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 2, topBlockingResidualFamilyIds: [], blockingFindingKeys: [], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] },
     promotionTruth: { promotionStatus: null, ledgerRowPresent: false, stagedReplacementPath: null, replacementChecksumSha256: null, verificationPassed: false },
     stage3FigureDiagnostics: { figureWaveBucket: null, ownershipRiskKnown: false, ownershipRiskCountInitial: null, ownershipRiskCountFinal: null, missingAltCountInitial: null, missingAltCountFinal: null, decorativeFigureCountInitial: null, decorativeFigureCountFinal: null, dominantFigurePhase: null, inspectionPattern: null, hasGenericTimeoutWording: false },
-    stage4StructureDiagnostics: { structureWaveBucket: null, dominantStructurePhase: null, hasLogicalStructureDebt: null, hasHeadingDebt: null, hasReadingOrderDebt: null, hasMetadataNavigationDebt: null, hasMixedFigureResiduals: null, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+    stage4StructureDiagnostics: { structureWaveBucket: null, terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: null, hasHeadingDebt: null, hasReadingOrderDebt: null, hasMetadataNavigationDebt: null, hasMixedFigureResiduals: null, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
     reasonCodes: [],
     notes: [],
     ...overrides,
@@ -96,7 +97,7 @@ describe('structure wave Stage 4', () => {
       makeRow({ publicationId: 'meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', classificationEvidence: { pageCount: 4, isScanned: false, overallScore: 80, grade: 'B', blockerFamilyCount: 1, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.document_language'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
       makeRow({ publicationId: 'structure', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', classificationEvidence: { pageCount: 12, isScanned: false, overallScore: 70, grade: 'C', blockerFamilyCount: 1, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.logical_structure'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
       makeRow({ publicationId: 'mixed', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', classificationEvidence: { pageCount: 8, isScanned: false, overallScore: 60, grade: 'D', blockerFamilyCount: 2, blockingFindingCount: 2, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.logical_structure', 'pdfua.figure_alt_or_artifact'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
-      makeRow({ publicationId: 'retry', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: null, dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: null, hasReadingOrderDebt: null, hasMetadataNavigationDebt: null, hasMixedFigureResiduals: null, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy' }, reasonCodes: ['outcome:processing_error'] }),
+      makeRow({ publicationId: 'retry', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: null, dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: null, hasReadingOrderDebt: null, hasMetadataNavigationDebt: null, hasMixedFigureResiduals: null, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy', terminalSurvivorClass: null }, reasonCodes: ['outcome:processing_error'] }),
       makeRow({ publicationId: 'spillover', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', reasonCodes: ['stage3:reclassified_from_figure_heavy'], classificationEvidence: { pageCount: 6, isScanned: false, overallScore: 72, grade: 'C', blockerFamilyCount: 1, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.logical_structure'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
     ])
     const next = applyStage4StructureWaveReclassification(artifacts)
@@ -113,10 +114,10 @@ describe('structure wave Stage 4', () => {
     const pathLocal = require('path')
     const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-'))
     const artifacts = makeArtifacts([
-      makeRow({ publicationId: 'meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'structure', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'mixed', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy' } }),
-      makeRow({ publicationId: 'retry', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_processing_error_retry', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy' }, reasonCodes: ['outcome:processing_error'] }),
+      makeRow({ publicationId: 'meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'structure', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'mixed', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'retry', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_processing_error_retry', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy', terminalSurvivorClass: null }, reasonCodes: ['outcome:processing_error'] }),
       makeRow({ publicationId: 'verified', currentCorpusStatus: 'verified_pass', cohortLabel: 'structure_heavy', promotionTruth: { promotionStatus: 'verified_pass', ledgerRowPresent: true, stagedReplacementPath: '/staged/verified.pdf', replacementChecksumSha256: 'x', verificationPassed: true } }),
     ])
     const { wave } = buildStage4StructureWaveArtifacts({ artifacts, sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json', sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z', manifestsRoot, maxCandidates: 8 })
@@ -129,7 +130,7 @@ describe('structure wave Stage 4', () => {
         publicationId: 'reading-order',
         currentCorpusStatus: 'remediated_fail',
         cohortLabel: 'structure_heavy',
-        stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+        stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: 'reading_order_only_survivor' },
       }),
     ])
     const next = applyStage4StructureWaveReclassification(artifacts)
@@ -187,9 +188,9 @@ describe('structure wave Stage 4', () => {
     ] }, null, 2))
 
     const artifacts = makeArtifacts([
-      makeRow({ publicationId: 'pending-a', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'pending-b', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'other', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy' } }),
+      makeRow({ publicationId: 'pending-a', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'pending-b', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'other', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy', terminalSurvivorClass: null } }),
     ])
 
     const { wave } = buildStage4StructureWaveArtifacts({
@@ -243,8 +244,8 @@ describe('structure wave Stage 4', () => {
     }]
 
     const artifacts = makeArtifacts([
-      makeRow({ publicationId: 'pending-meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'other', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: 'pending-meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'other', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
     ])
 
     const next = applyStage4StructureWaveReclassification(artifacts, pendingAnalysisRows)
@@ -275,7 +276,7 @@ describe('structure wave Stage 4', () => {
 
   it('uses Stage 4.2 pending analysis to mark bounded runtime retries as processing_error', () => {
     const artifacts = makeArtifacts([
-      makeRow({ publicationId: 'retry', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: 'retry', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
     ])
     const pendingAnalysisRows: Stage4StructurePendingAnalysisRow[] = [{
       publicationId: 'retry',
@@ -339,8 +340,8 @@ describe('structure wave Stage 4', () => {
     }))
 
     const artifacts = makeArtifacts([
-      makeRow({ publicationId: '3651', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', classificationEvidence: { pageCount: 2, isScanned: false, overallScore: 84, grade: 'B', blockerFamilyCount: 2, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.font_embedding'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] }, stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      ...['4054', '4023', '4067', '3671', '3465'].map(publicationId => makeRow({ publicationId, currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } })),
+      makeRow({ publicationId: '3651', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', classificationEvidence: { pageCount: 2, isScanned: false, overallScore: 84, grade: 'B', blockerFamilyCount: 2, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.font_embedding'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] }, stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      ...['4054', '4023', '4067', '3671', '3465'].map(publicationId => makeRow({ publicationId, currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } })),
     ])
 
     const next = applyStage4StructureWaveReclassification(artifacts, [], activeAnalysisRows)
@@ -370,14 +371,137 @@ describe('structure wave Stage 4', () => {
     expect(summary.rows.readingOrderOnlyResidualPublicationIds).not.toContain('3651')
   })
 
+  it('reports current-wave totals separately from cumulative Stage 4 history', () => {
+    const wave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 5, selectedRows: 5, skippedRows: 0, pendingRows: 0 },
+      selectedPublicationIds: ['3465', '3671', '4023', '4054', '4067'],
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
+    }
+
+    const summary = buildStage4StructureWaveOutcomesSummary({
+      wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: {
+        outcomes: [
+          { publicationId: '3685', status: 'failed_after_remediation' },
+          { publicationId: '3550', status: 'failed_after_remediation' },
+          { publicationId: '3606', status: 'failed_after_remediation' },
+          { publicationId: '3651', status: 'failed_after_remediation' },
+          { publicationId: '3465', status: 'failed_after_remediation' },
+          { publicationId: '4054', status: 'failed_after_remediation' },
+          { publicationId: '4023', status: 'failed_after_remediation' },
+          { publicationId: '4067', status: 'failed_after_remediation' },
+          { publicationId: '3671', status: 'failed_after_remediation' },
+        ],
+      },
+    })
+
+    expect(summary?.totals).toMatchObject({
+      targetCandidates: 5,
+      processed: 5,
+      failedAfterRemediation: 5,
+      processingError: 0,
+      remaining: 0,
+    })
+    expect(summary?.cumulativeTotals).toMatchObject({
+      processed: 9,
+      failedAfterRemediation: 9,
+    })
+    expect(summary?.currentWave).toMatchObject({
+      processedPublicationIds: ['3465', '3671', '4023', '4054', '4067'],
+      remainingPublicationIds: [],
+    })
+  })
+
+  it('routes Stage 4.4 terminal survivors into explicit reporting buckets', () => {
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: '4023', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'near_pass_grade_only', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '4054', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'near_pass_grade_only', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '4067', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'near_pass_grade_only', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '3465', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'font_text_extractability_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '3671', currentCorpusStatus: 'remediated_fail', cohortLabel: 'figure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'figure_spillover_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_short_high_likelihood' } }),
+      makeRow({ publicationId: '3550', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', terminalSurvivorClass: 'reading_order_only_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '3606', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', terminalSurvivorClass: 'reading_order_only_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '3685', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', terminalSurvivorClass: 'reading_order_only_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+    ])
+
+    const wave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 5, selectedRows: 5, skippedRows: 0, pendingRows: 0 },
+      selectedPublicationIds: ['3465', '3671', '4023', '4054', '4067'],
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
+    }
+
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [
+        { publicationId: '3465', status: 'failed_after_remediation' },
+        { publicationId: '3671', status: 'failed_after_remediation' },
+        { publicationId: '4023', status: 'failed_after_remediation' },
+        { publicationId: '4054', status: 'failed_after_remediation' },
+        { publicationId: '4067', status: 'failed_after_remediation' },
+      ] },
+    })
+
+    expect(summary.rows.nearPassGradeOnlyPublicationIds).toEqual(['4023', '4054', '4067'])
+    expect(summary.rows.fontTextExtractabilitySurvivorPublicationIds).toEqual(['3465'])
+    expect(summary.rows.figureSpilloverSurvivorPublicationIds).toEqual(['3671'])
+    expect(summary.rows.readingOrderOnlyResidualPublicationIds).toEqual(['3550', '3606', '3685'])
+    expect(summary.rows.currentWaveProcessedPublicationIds).toEqual(['3465', '3671', '4023', '4054', '4067'])
+    expect(summary.rows.currentWaveRemainingPublicationIds).toEqual([])
+    expect(summary.rows.activeUnresolvedPublicationIds).toEqual([])
+    expect(summary.totals.pendingWaveRows).toBe(0)
+  })
+
+  it('reclassifies figure spillover terminal survivors out of the Stage 4 active lane', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: '3671',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        statusEvidence: { sourceManifestPath: '/tmp/replacement-map.json', sourceStatus: 'replacement_map_present', verificationManifestPath: '/tmp/verification.json', verificationClassification: null, verificationTimestamp: null, verificationReportPath: null, outcomeManifestPath: '/tmp/stage4-structure-wave.outcomes.json', outcomeStatus: 'failed_after_remediation', latestReportPath: '/tmp/3671.json', candidateManifestPath: null },
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'figure_spillover_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_short_high_likelihood' },
+      }),
+    ])
+
+    const next = applyStage4StructureWaveReclassification(artifacts)
+    const row = next.document.rows.find(candidate => candidate.publicationId === '3671')
+    expect(row?.cohortLabel).toBe('figure_heavy')
+    expect(row?.reasonCodes).toContain('stage4.4:figure_spillover_survivor')
+    expect(row?.reasonCodes).toContain('stage4:reclassified_from_structure_heavy')
+  })
+
   it('reports throughput routing buckets and builds structure canaries', () => {
     const artifacts = makeArtifacts([
-      makeRow({ publicationId: 'verified', currentCorpusStatus: 'verified_pass', cohortLabel: 'structure_heavy', title: 'Verified Structure', promotionTruth: { promotionStatus: 'verified_pass', ledgerRowPresent: true, stagedReplacementPath: '/staged/verified.pdf', replacementChecksumSha256: 'x', verificationPassed: true }, stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'structure', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: 'mixed', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', reasonCodes: ['stage4:mixed_structure_figure_after_wave'], stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy' } }),
-      makeRow({ publicationId: 'retry', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_processing_error_retry', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy' } }),
-      makeRow({ publicationId: '4436', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', title: 'Spillover Structure', reasonCodes: ['stage3:reclassified_from_figure_heavy'], stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy' } }),
+      makeRow({ publicationId: 'verified', currentCorpusStatus: 'verified_pass', cohortLabel: 'structure_heavy', title: 'Verified Structure', promotionTruth: { promotionStatus: 'verified_pass', ledgerRowPresent: true, stagedReplacementPath: '/staged/verified.pdf', replacementChecksumSha256: 'x', verificationPassed: true }, stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'meta', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'structure', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'mixed', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', reasonCodes: ['stage4:mixed_structure_figure_after_wave'], stage4StructureDiagnostics: { structureWaveBucket: 'mixed_structure_figure_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: 'retry', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'structure_processing_error_retry', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: '4436', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', title: 'Spillover Structure', reasonCodes: ['stage3:reclassified_from_figure_heavy'], stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_figure_heavy', terminalSurvivorClass: null } }),
+      makeRow({ publicationId: '4023', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: 'near_pass_grade_only' } }),
+      makeRow({ publicationId: '3465', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: 'font_text_extractability_survivor' } }),
+      makeRow({ publicationId: '3671', currentCorpusStatus: 'remediated_fail', cohortLabel: 'figure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'reclassified_from_short_high_likelihood', terminalSurvivorClass: 'figure_spillover_survivor' } }),
     ])
     const wave: Stage4StructureWaveDocument = {
       generatedAt: '2026-03-31T00:00:00.000Z',
@@ -400,7 +524,9 @@ describe('structure wave Stage 4', () => {
     expect(summary.totals.genericTimeoutRows).toBe(0)
 
     const canaries = buildStage4StructureCanaries({ artifacts, sources: makeSources() })
-    expect(canaries.rows.some(row => row.publicationId === '4436' && row.stage4RepresentativeKind === 'spillover_from_stage3')).toBe(true)
     expect(canaries.rows.some(row => row.publicationId === 'verified' && row.stage4RepresentativeKind === 'verified_pass')).toBe(true)
+    expect(canaries.rows.some(row => row.publicationId === '4023' && row.stage4RepresentativeKind === 'near_pass_grade_only')).toBe(true)
+    expect(canaries.rows.some(row => row.publicationId === '3465' && row.stage4RepresentativeKind === 'font_text_extractability_survivor')).toBe(true)
+    expect(canaries.rows.some(row => row.publicationId === '3671' && row.stage4RepresentativeKind === 'figure_spillover_survivor')).toBe(true)
   })
 })
