@@ -20,7 +20,7 @@ export async function main(): Promise<void> {
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows)
+  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows, sources.stage4StalledAnalysisRows)
   const validation = validateCorpusControlPlaneArtifacts(artifacts, {
     replacementMap: sources.replacementMap,
     promotionLedgerRows: sources.promotionLedgerRows,
@@ -44,6 +44,7 @@ export async function main(): Promise<void> {
       regressionBenchmarkPath: sources.regressionBenchmarkPath,
       stage4PendingAnalysisPath: sources.stage4PendingAnalysisPath,
       stage4ActiveAnalysisPath: sources.stage4ActiveAnalysisPath,
+      stage4StalledAnalysisPath: sources.stage4StalledAnalysisPath,
       outcomeManifestCount: sources.outcomeManifests.length,
       candidateManifestCount: sources.candidateManifests.length,
     },

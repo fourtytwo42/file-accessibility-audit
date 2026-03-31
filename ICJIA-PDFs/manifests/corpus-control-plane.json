@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T15:18:06.682Z",
+  "generatedAt": "2026-03-31T16:20:33.180Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -50666,10 +50666,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
       ]
     },
     {
@@ -51305,10 +51307,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
       ]
     },
     {
@@ -51992,7 +51996,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": "reading_order_only_survivor",
+        "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -52005,10 +52009,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate."
       ]
     },
     {
@@ -54386,10 +54392,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:font_text_extractability_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a font/text-extractability survivor from existing evidence."
       ]
     },
     {
@@ -54505,10 +54513,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
       ]
     },
     {
@@ -54943,7 +54953,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": "reading_order_only_survivor",
+        "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -54956,10 +54966,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:metadata_navigation_residuals",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate."
       ]
     },
     {
@@ -58585,10 +58597,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
       ]
     },
     {
@@ -71427,10 +71441,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.8:font_text_extractability_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a font/text-extractability survivor from existing evidence."
       ]
     },
     {

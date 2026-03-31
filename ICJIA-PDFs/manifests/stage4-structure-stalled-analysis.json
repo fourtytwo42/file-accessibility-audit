@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-03-31T16:20:22.249Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T16:20:22.225Z",
+  "sourceWaveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
+  "sourceWaveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+  "rows": [
+    {
+      "publicationId": "3866",
+      "publicationTitle": "Juvenile Sex Offender Treatment Program Provides Residential Aftercare Services",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "metadata_title_survivor",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3866-Juvenile_Sex_Offender_Treatment_Program_Provides_Residential_Aftercare_Services/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
+      ]
+    },
+    {
+      "publicationId": "3871",
+      "publicationTitle": "Community Mobilization Fuels Chicago Alternative Policing Strategy (CAPS)",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "metadata_title_survivor",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3871-Community_Mobilization_Fuels_Chicago_Alternative_Policing_Strategy_CAPS/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
+      ]
+    },
+    {
+      "publicationId": "3877",
+      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "metadata_navigation_residuals",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_navigation_residuals",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate."
+      ]
+    },
+    {
+      "publicationId": "3898",
+      "publicationTitle": "An Analysis of Gang Members and Nongang Members Discharged from Probation",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "font_text_extractability_survivor",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3898-An_Analysis_of_Gang_Members_and_Nongang_Members_Discharged_from_Probation/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:font_text_extractability_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a font/text-extractability survivor from existing evidence."
+      ]
+    },
+    {
+      "publicationId": "3899",
+      "publicationTitle": "Domestic Violence Probation in Lake Winnebago and Kankakee Counties",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "metadata_title_survivor",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3899-Domestic_Violence_Probation_in_Lake_Winnebago_and_Kankakee_Counties/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
+      ]
+    },
+    {
+      "publicationId": "3903",
+      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "metadata_navigation_residuals",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_navigation_residuals",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as an unresolved metadata/navigation candidate."
+      ]
+    },
+    {
+      "publicationId": "3933",
+      "publicationTitle": "A comparison of local and multijurisdictional drug enforcement efforts in Illinois",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "metadata_title_survivor",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/3933-A_comparison_of_local_and_multijurisdictional_drug_enforcement_efforts_in_Illinois/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:metadata_title_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a title-metadata survivor from existing evidence."
+      ]
+    },
+    {
+      "publicationId": "4039",
+      "publicationTitle": "Decade of trends shows continual decrease in Illinois crime",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "stalledDisposition": "font_text_extractability_survivor",
+      "evidenceStrength": "attempt_artifact_only",
+      "evidencePaths": {
+        "latestStage4ReportPath": null,
+        "latestStage4FailurePath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/143.244.146.43/4039-Decade_of_trends_shows_continual_decrease_in_Illinois_crime/alt-text-sidecar.json",
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.8:font_text_extractability_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.8 classified this stalled row as a font/text-extractability survivor from existing evidence."
+      ]
+    }
+  ]
+}

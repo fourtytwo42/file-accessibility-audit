@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 import {
   applyStage4StructureWaveReclassification,
   buildStage4StructureCanaries,
+  buildStage4StructureStalledAnalysis,
   buildStage4StructureThroughputSummary,
   buildStage4StructureWaveArtifacts,
   buildStage4StructureWaveOutcomesSummary,
   type Stage4StructureActiveAnalysisRow,
   type Stage4StructurePendingAnalysisRow,
+  type Stage4StructureStalledAnalysisRow,
   type Stage4StructureWaveDocument,
 } from '../services/structureWaveStage4.js'
 import type { CorpusControlPlaneArtifacts, CorpusControlPlaneRow, CorpusControlPlaneSources } from '../services/corpusControlPlane.js'
@@ -563,6 +565,88 @@ describe('structure wave Stage 4', () => {
     const row = next.document.rows.find(candidate => candidate.publicationId === 'staged')
     expect(row?.currentCorpusStatus).toBe('staged_for_replacement')
     expect(row?.reasonCodes).toContain('stage4.5:staged_pass_candidate_survivor')
+  })
+
+  it('builds stalled-wave forensics and separates active-wave truth from completed-wave truth', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-stalled-analysis-'))
+
+    const existingWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T07:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T07:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 4, selectedRows: 4, skippedRows: 0, pendingRows: 4 },
+      selectedPublicationIds: ['3866', '3871', '3898', '4039'],
+      pendingPublicationIds: ['3866', '3871', '3898', '4039'],
+      candidates: [],
+      skippedRows: [],
+    }
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.json'), JSON.stringify(existingWave, null, 2))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.outcomes.json'), JSON.stringify({ outcomes: [] }, null, 2))
+
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: '3866', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'metadata_title_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '3871', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' }, classificationEvidence: { pageCount: 4, isScanned: false, overallScore: 88, grade: 'B', blockerFamilyCount: 1, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: ['pdfua.display_doc_title'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
+      makeRow({ publicationId: '3898', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'font_text_extractability_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
+      makeRow({ publicationId: '4039', currentCorpusStatus: 'processing_error', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy' }, classificationEvidence: { pageCount: 4, isScanned: false, overallScore: 77, grade: 'C', blockerFamilyCount: 1, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: [], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] } }),
+    ])
+
+    const stalledArtifacts = buildStage4StructureStalledAnalysis({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T07:00:00.000Z',
+      manifestsRoot,
+    })
+
+    expect(stalledArtifacts.summary.publicationIdsByDisposition.metadata_title_survivor).toEqual(['3866'])
+    expect(stalledArtifacts.summary.publicationIdsByDisposition.metadata_navigation_residuals).toEqual(['3871'])
+    expect(stalledArtifacts.summary.publicationIdsByDisposition.font_text_extractability_survivor).toEqual(['3898'])
+    expect(stalledArtifacts.summary.publicationIdsByDisposition.structure_processing_error_retry).toEqual(['4039'])
+
+    const next = applyStage4StructureWaveReclassification(artifacts, [], [], stalledArtifacts.analysis.rows)
+    expect(next.document.rows.find(row => row.publicationId === '3866')?.stage4StructureDiagnostics.terminalSurvivorClass).toBe('metadata_title_survivor')
+    expect(next.document.rows.find(row => row.publicationId === '3898')?.stage4StructureDiagnostics.terminalSurvivorClass).toBe('font_text_extractability_survivor')
+    expect(next.document.rows.find(row => row.publicationId === '4039')?.currentCorpusStatus).toBe('processing_error')
+
+    const nextWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T07:30:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T07:30:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 1, selectedRows: 1, skippedRows: 0, pendingRows: 1 },
+      selectedPublicationIds: ['4039'],
+      pendingPublicationIds: ['4039'],
+      candidates: [],
+      skippedRows: [],
+    }
+
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts: next,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T07:30:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave: existingWave,
+      activeWave: nextWave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [] },
+      stalledAnalysisRows: stalledArtifacts.analysis.rows,
+    })
+
+    expect(summary.rows.currentWaveProcessedPublicationIds).toEqual([])
+    expect(summary.rows.activeWaveSelectedPublicationIds).toEqual(['4039'])
+    expect(summary.rows.activeWavePendingPublicationIds).toEqual(['4039'])
+    expect(summary.rows.activeWaveAttemptedButUnterminalizedPublicationIds).toEqual(['4039'])
+    expect(summary.rows.stalledForensicPublicationIds).toEqual(['3866', '3871', '3898', '4039'])
+    expect(summary.rows.stalledForensicByDisposition.metadata_title_survivor).toEqual(['3866'])
+    expect(summary.rows.stalledForensicByDisposition.font_text_extractability_survivor).toEqual(['3898'])
+    expect(summary.totals.pendingWaveRows).toBe(1)
   })
 
   it('reports throughput routing buckets and builds structure canaries', () => {

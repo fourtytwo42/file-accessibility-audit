@@ -58,6 +58,7 @@
     "agency:build-stage4-structure-wave": "tsx scripts/build-stage4-structure-wave.ts",
     "agency:analyze-stage4-structure-pending": "tsx scripts/analyze-stage4-structure-pending.ts",
     "agency:analyze-stage4-structure-active": "tsx scripts/analyze-stage4-structure-active.ts",
+    "agency:analyze-stage4-structure-stalled": "tsx scripts/analyze-stage4-structure-stalled.ts",
     "agency:run-stage4-structure-wave": "tsx scripts/run-stage4-structure-wave.ts"
   },
   "engines": {

@@ -2501,3 +2501,31 @@ First confirmed in-flight files:
 - 2026-03-31: Stage 4 follow-up wave `3665/3670/3683/3768/3769/3770/3784/3836` completed after truthful fallback rebuild with `8` processed, `8` `failed_after_remediation`, `0` `processing_error`, `0` remaining. The next active Stage 4 wave rebuilt to `3866/3871/3877/3898/3899/3903/3933/4039`.
 - 2026-03-31: Stage 4.7 routed `3665/3670/3683/3768/3769/3770/3784` as `metadata_title_survivor` terminal rows and kept `3836` as `font_text_extractability_survivor`, which dropped live `metadata_navigation_residuals` backlog from `28` to `18` without changing the next active wave `3866/3871/3877/3898/3899/3903/3933/4039`.
 - 2026-03-31: Attempted Stage 4 wave `3866/3871/3877/3898/3899/3903/3933/4039` but it returned to long inspection churn and wrote `0` terminal outcomes before truthful fallback rebuild. Active wave selection remained unchanged after rebuild.
+- 2026-03-31: Stage 4.8 is now implemented as a non-remediation stalled-wave forensic pass for the zero-outcome attempted wave `3866/3871/3877/3898/3899/3903/3933/4039`.
+  - New script and package command:
+    - `scripts/analyze-stage4-structure-stalled.ts`
+    - `pnpm agency:analyze-stage4-structure-stalled`
+  - New forensic artifacts:
+    - `ICJIA-PDFs/manifests/stage4-structure-stalled-analysis.json`
+    - `ICJIA-PDFs/manifests/stage4-structure-stalled-analysis.summary.json`
+  - Stage 4.8 stalled-analysis disposition for that 8-row wave:
+    - `metadata_title_survivor`: `3866`, `3871`, `3899`, `3933`
+    - `metadata_navigation_residuals`: `3877`, `3903`
+    - `font_text_extractability_survivor`: `3898`, `4039`
+    - `mixed_structure_figure_residuals`: none
+    - `structure_processing_error_retry`: none
+  - Evidence strength for all 8 stalled rows was `attempt_artifact_only`.
+  - Stage 4 throughput reporting now separates completed reporting-wave truth from active-wave truth with:
+    - `activeWaveSelectedPublicationIds`
+    - `activeWavePendingPublicationIds`
+    - `activeWaveAttemptedButUnterminalizedPublicationIds`
+    - `stalledForensicPublicationIds`
+    - `stalledForensicByDisposition`
+  - After Stage 4.8 rebuild, the old stalled 8-row wave is no longer front-of-wave retry state; the next active Stage 4 wave advanced to:
+    - `3877`, `3903`, `3936`, `4677`, `4723`, `3483`, `4145`, `4094`
+  - Current Stage 4 active-wave reporting after Stage 4.8:
+    - `pendingWaveRows: 8`
+    - `activeWaveSelectedPublicationIds` and `activeWavePendingPublicationIds` both match the 8-row set above
+    - `activeWaveAttemptedButUnterminalizedPublicationIds` currently highlights `3877` and `3903` because they are the only rows shared between the active wave and the stalled forensic set
+  - `genericTimeoutRows` remains `0`.
+  - Stage 4 remains the active lane; the next likely move after Stage 4.8 is a targeted Stage 4 live wave on the rebuilt active set or a narrower routing pass if `3877` and `3903` should also be terminalized out of metadata-first selection.

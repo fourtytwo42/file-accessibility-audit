@@ -22,7 +22,7 @@ export async function main(): Promise<void> {
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const stage4Artifacts = applyStage4StructureWaveReclassification(stage3Artifacts)
+  const stage4Artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, [], [], sources.stage4StalledAnalysisRows)
 
   const analysisArtifacts = buildStage4StructurePendingAnalysis({
     artifacts: stage4Artifacts,

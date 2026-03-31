@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T15:18:06.682Z",
+  "generatedAt": "2026-03-31T16:20:33.180Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -110,6 +110,7 @@
     "regressionBenchmarkPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json",
     "stage4PendingAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-pending-analysis.json",
     "stage4ActiveAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-active-analysis.json",
+    "stage4StalledAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-stalled-analysis.json",
     "outcomeManifestCount": 16,
     "candidateManifestCount": 17
   }

@@ -158,7 +158,7 @@ export async function main(): Promise<void> {
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows)
+  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows, sources.stage4StalledAnalysisRows)
   const validation = validateCorpusControlPlaneArtifacts(artifacts, {
     replacementMap: sources.replacementMap,
     promotionLedgerRows: sources.promotionLedgerRows,
@@ -193,6 +193,7 @@ export async function main(): Promise<void> {
     includePublicationIds,
     pendingAnalysisRows: sources.stage4PendingAnalysisRows,
     activeAnalysisRows: sources.stage4ActiveAnalysisRows,
+    stalledAnalysisRows: sources.stage4StalledAnalysisRows,
   })
 
   const reportingWave = chooseReportingWave({
@@ -211,10 +212,12 @@ export async function main(): Promise<void> {
     sourceControlPlaneGeneratedAt: artifacts.document.generatedAt,
     waveManifestPath: wavePath,
     wave: reportingWave,
+    activeWave: waveArtifacts.wave,
     outcomesPath: fs.existsSync(outcomesPath) ? outcomesPath : null,
     outcomes: existingOutcomes,
     pendingAnalysisRows: sources.stage4PendingAnalysisRows,
     activeAnalysisRows: sources.stage4ActiveAnalysisRows,
+    stalledAnalysisRows: sources.stage4StalledAnalysisRows,
   })
 
   const refreshedOutcomesSummary = buildStage4StructureWaveOutcomesSummary({

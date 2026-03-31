@@ -20,6 +20,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     regressionBenchmarkPath: '/tmp/repo/ICJIA-PDFs/manifests/remediation-regression-benchmark.summary.json',
     stage4PendingAnalysisPath: null,
     stage4ActiveAnalysisPath: null,
+    stage4StalledAnalysisPath: null,
     replacementMap: [],
     verificationResults: [],
     verificationRows: [],
@@ -30,6 +31,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     regressionBenchmarkOutcomes: [],
     stage4PendingAnalysisRows: [],
     stage4ActiveAnalysisRows: [],
+    stage4StalledAnalysisRows: [],
     ...overrides,
   }
 }

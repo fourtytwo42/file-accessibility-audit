@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T15:18:06.704Z",
+  "generatedAt": "2026-03-31T16:20:33.216Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T15:18:06.677Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T16:20:33.190Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
@@ -12,11 +12,11 @@
     "remainingStructureHeavyRows": 296,
     "processingErrorsInWave": 0,
     "hardFailsInWave": 8,
-    "metadataNavigationResidualRows": 18,
+    "metadataNavigationResidualRows": 20,
     "structureOnlyResidualRows": 5,
     "mixedStructureFigureResidualRows": 191,
     "structureProcessingErrorRetryRows": 4,
-    "pendingWaveRows": 0,
+    "pendingWaveRows": 8,
     "reclassifiedOutOfStructureHeavyRows": 1,
     "genericTimeoutRows": 0
   },
@@ -353,6 +353,30 @@
       "4771",
       "4773"
     ],
+    "activeWaveSelectedPublicationIds": [
+      "3483",
+      "3877",
+      "3903",
+      "3936",
+      "4094",
+      "4145",
+      "4677",
+      "4723"
+    ],
+    "activeWavePendingPublicationIds": [
+      "3483",
+      "3877",
+      "3903",
+      "3936",
+      "4094",
+      "4145",
+      "4677",
+      "4723"
+    ],
+    "activeWaveAttemptedButUnterminalizedPublicationIds": [
+      "3877",
+      "3903"
+    ],
     "processingErrorPublicationIds": [],
     "hardFailPublicationIds": [
       "3665",
@@ -370,8 +394,6 @@
       "3610",
       "3663",
       "3685",
-      "3877",
-      "3903",
       "3964",
       "4032",
       "4048",
@@ -386,6 +408,8 @@
       "3785",
       "3793",
       "3870",
+      "3877",
+      "3903",
       "3919",
       "3924",
       "3936",
@@ -603,7 +627,16 @@
       "3965",
       "4739"
     ],
-    "pendingPublicationIds": [],
+    "pendingPublicationIds": [
+      "3483",
+      "3877",
+      "3903",
+      "3936",
+      "4094",
+      "4145",
+      "4677",
+      "4723"
+    ],
     "nextWaveStructureOnlyPublicationIds": [
       "3483",
       "3655",
@@ -613,6 +646,8 @@
       "3785",
       "3793",
       "3870",
+      "3877",
+      "3903",
       "3919",
       "3924",
       "3936",
@@ -838,8 +873,52 @@
       "4054",
       "4067"
     ],
-    "stillUnclassifiedPendingPublicationIds": [],
-    "activeUnresolvedPublicationIds": [],
+    "stillUnclassifiedPendingPublicationIds": [
+      "3483",
+      "3936",
+      "4094",
+      "4145",
+      "4677",
+      "4723"
+    ],
+    "activeUnresolvedPublicationIds": [
+      "3483",
+      "3877",
+      "3903",
+      "3936",
+      "4094",
+      "4145",
+      "4677",
+      "4723"
+    ],
+    "stalledForensicPublicationIds": [
+      "3866",
+      "3871",
+      "3877",
+      "3898",
+      "3899",
+      "3903",
+      "3933",
+      "4039"
+    ],
+    "stalledForensicByDisposition": {
+      "metadata_title_survivor": [
+        "3866",
+        "3871",
+        "3899",
+        "3933"
+      ],
+      "metadata_navigation_residuals": [
+        "3877",
+        "3903"
+      ],
+      "font_text_extractability_survivor": [
+        "3898",
+        "4039"
+      ],
+      "mixed_structure_figure_residuals": [],
+      "structure_processing_error_retry": []
+    },
     "nearPassGradeOnlyPublicationIds": [
       "3468",
       "3640",
