@@ -23,6 +23,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     stage4StalledAnalysisPath: null,
     stage4OverlapAnalysisPath: null,
     stage4ActiveForensicsPath: null,
+    stage4HomogeneousAnalysisPath: null,
     replacementMap: [],
     verificationResults: [],
     verificationRows: [],
@@ -36,6 +37,7 @@ function makeSources(overrides: Partial<CorpusControlPlaneSources> = {}): Corpus
     stage4StalledAnalysisRows: [],
     stage4OverlapAnalysisRows: [],
     stage4ActiveForensicsRows: [],
+    stage4HomogeneousAnalysisRows: [],
     ...overrides,
   }
 }

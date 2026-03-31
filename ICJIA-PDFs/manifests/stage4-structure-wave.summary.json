@@ -1,68 +1,68 @@
 {
-  "generatedAt": "2026-03-31T17:16:28.297Z",
+  "generatedAt": "2026-03-31T17:34:05.360Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T17:16:28.272Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T17:34:05.336Z",
   "totals": {
-    "eligibleRows": 208,
+    "eligibleRows": 200,
     "selectedRows": 8,
-    "skippedRows": 200,
+    "skippedRows": 192,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "3870",
-    "3655",
-    "4045",
-    "3781",
-    "3785",
-    "3919",
-    "3793",
-    "3924"
+    "4755",
+    "4142",
+    "4753",
+    "4084",
+    "4162",
+    "4436",
+    "4153",
+    "4167"
   ],
   "pendingPublicationIds": [
-    "3870",
-    "3655",
-    "4045",
-    "3781",
-    "3785",
-    "3919",
-    "3793",
-    "3924"
+    "4755",
+    "4142",
+    "4753",
+    "4084",
+    "4162",
+    "4436",
+    "4153",
+    "4167"
   ],
   "activeWaveSelectedPublicationIds": [
-    "3870",
-    "3655",
-    "4045",
-    "3781",
-    "3785",
-    "3919",
-    "3793",
-    "3924"
+    "4755",
+    "4142",
+    "4753",
+    "4084",
+    "4162",
+    "4436",
+    "4153",
+    "4167"
   ],
   "activeWavePendingPublicationIds": [
-    "3870",
-    "3655",
-    "4045",
-    "3781",
-    "3785",
-    "3919",
-    "3793",
-    "3924"
+    "4755",
+    "4142",
+    "4753",
+    "4084",
+    "4162",
+    "4436",
+    "4153",
+    "4167"
   ],
   "activeWaveAttemptedButUnterminalizedPublicationIds": [
-    "3870",
-    "3655",
-    "4045",
-    "3781",
-    "3785",
-    "3919",
-    "3793",
-    "3924"
+    "4755",
+    "4142",
+    "4753",
+    "4084",
+    "4162",
+    "4436",
+    "4153",
+    "4167"
   ],
   "selectedByTier": {
-    "highest": 8,
-    "high": 0,
-    "medium": 0,
+    "highest": 0,
+    "high": 5,
+    "medium": 3,
     "low": 0
   },
   "selectedByStatus": {
@@ -77,9 +77,9 @@
     "replaced_remote": 0
   },
   "selectedByStructureWaveBucket": {
-    "metadata_navigation_residuals": 8,
-    "structure_only_residuals": 0,
-    "mixed_structure_figure_residuals": 0,
+    "metadata_navigation_residuals": 0,
+    "structure_only_residuals": 5,
+    "mixed_structure_figure_residuals": 3,
     "structure_processing_error_retry": 0
   }
 }

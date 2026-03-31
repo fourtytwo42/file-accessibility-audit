@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-03-31T17:34:05.158Z",
+  "analysisManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-homogeneous-analysis.json",
+  "totals": {
+    "analyzedRows": 8,
+    "byDisposition": {
+      "metadata_font_structure_survivor": 8,
+      "mixed_structure_figure_residuals": 0,
+      "structure_processing_error_retry": 0
+    },
+    "byEvidenceStrength": {
+      "terminal_report": 8,
+      "failure_report": 0,
+      "attempt_artifact_only": 0,
+      "control_plane_only": 0
+    }
+  },
+  "publicationIdsByDisposition": {
+    "metadata_font_structure_survivor": [
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
+    ],
+    "mixed_structure_figure_residuals": [],
+    "structure_processing_error_retry": []
+  }
+}

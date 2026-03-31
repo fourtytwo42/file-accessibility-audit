@@ -9,7 +9,7 @@ import { applyStage2ShortCohortReclassification } from '../apps/api/src/services
 import { applyStage3FigureWaveReclassification } from '../apps/api/src/services/figureWaveStage3.ts'
 import {
   applyStage4StructureWaveReclassification,
-  buildStage4StructureStalledAnalysis,
+  buildStage4StructureHomogeneousAnalysis,
 } from '../apps/api/src/services/structureWaveStage4.ts'
 
 function writeJson(filePath: string, value: unknown): void {
@@ -19,7 +19,7 @@ function writeJson(filePath: string, value: unknown): void {
 
 export async function main(): Promise<void> {
   const sources = loadCorpusControlPlaneSources()
-  const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_STALLED_INCLUDE_IDS || '')
+  const includePublicationIds = (process.env.ICJIA_STAGE4_STRUCTURE_HOMOGENEOUS_INCLUDE_IDS || '')
     .split(',')
     .map(value => value.trim())
     .filter(Boolean)
@@ -30,22 +30,22 @@ export async function main(): Promise<void> {
     stage3Artifacts,
     sources.stage4PendingAnalysisRows,
     sources.stage4ActiveAnalysisRows,
-    [],
-    [],
+    sources.stage4StalledAnalysisRows,
+    sources.stage4OverlapAnalysisRows,
     sources.stage4ActiveForensicsRows,
-    sources.stage4HomogeneousAnalysisRows,
+    [],
   )
 
-  const analysisArtifacts = buildStage4StructureStalledAnalysis({
+  const analysisArtifacts = buildStage4StructureHomogeneousAnalysis({
     artifacts: stage4Artifacts,
     sourceControlPlanePath: path.join(sources.manifestsRoot, 'corpus-control-plane.json'),
     sourceControlPlaneGeneratedAt: stage4Artifacts.document.generatedAt,
     manifestsRoot: sources.manifestsRoot,
-    includePublicationIds,
+    includePublicationIds: includePublicationIds.length > 0 ? includePublicationIds : undefined,
   })
 
-  const analysisPath = path.join(sources.manifestsRoot, 'stage4-structure-stalled-analysis.json')
-  const summaryPath = path.join(sources.manifestsRoot, 'stage4-structure-stalled-analysis.summary.json')
+  const analysisPath = path.join(sources.manifestsRoot, 'stage4-structure-homogeneous-analysis.json')
+  const summaryPath = path.join(sources.manifestsRoot, 'stage4-structure-homogeneous-analysis.summary.json')
 
   writeJson(analysisPath, analysisArtifacts.analysis)
   writeJson(summaryPath, analysisArtifacts.summary)

@@ -158,7 +158,7 @@ export async function main(): Promise<void> {
   const baseArtifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
   const stage2Artifacts = applyStage2ShortCohortReclassification(baseArtifacts, sources)
   const stage3Artifacts = applyStage3FigureWaveReclassification(stage2Artifacts)
-  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows, sources.stage4StalledAnalysisRows, sources.stage4OverlapAnalysisRows, sources.stage4ActiveForensicsRows)
+  const artifacts = applyStage4StructureWaveReclassification(stage3Artifacts, sources.stage4PendingAnalysisRows, sources.stage4ActiveAnalysisRows, sources.stage4StalledAnalysisRows, sources.stage4OverlapAnalysisRows, sources.stage4ActiveForensicsRows, sources.stage4HomogeneousAnalysisRows)
   const validation = validateCorpusControlPlaneArtifacts(artifacts, {
     replacementMap: sources.replacementMap,
     promotionLedgerRows: sources.promotionLedgerRows,
@@ -196,6 +196,7 @@ export async function main(): Promise<void> {
     stalledAnalysisRows: sources.stage4StalledAnalysisRows,
     overlapAnalysisRows: sources.stage4OverlapAnalysisRows,
     activeForensicsRows: sources.stage4ActiveForensicsRows,
+    homogeneousAnalysisRows: sources.stage4HomogeneousAnalysisRows,
   })
 
   const reportingWave = chooseReportingWave({
@@ -222,6 +223,7 @@ export async function main(): Promise<void> {
     stalledAnalysisRows: sources.stage4StalledAnalysisRows,
     overlapAnalysisRows: sources.stage4OverlapAnalysisRows,
     activeForensicsRows: sources.stage4ActiveForensicsRows,
+    homogeneousAnalysisRows: sources.stage4HomogeneousAnalysisRows,
   })
 
   const refreshedOutcomesSummary = buildStage4StructureWaveOutcomesSummary({

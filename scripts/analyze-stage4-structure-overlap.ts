@@ -33,6 +33,7 @@ export async function main(): Promise<void> {
     sources.stage4StalledAnalysisRows,
     [],
     sources.stage4ActiveForensicsRows,
+    sources.stage4HomogeneousAnalysisRows,
   )
 
   const analysisArtifacts = buildStage4StructureOverlapAnalysis({

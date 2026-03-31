@@ -1,5 +1,28 @@
 # Project Memory
 
+## 2026-03-31 Stage 4.11
+
+- Stage 4.11 added a new Stage 4 terminal survivor class: `metadata_font_structure_survivor`.
+- A homogeneous-wave forensic pass now writes:
+  - `ICJIA-PDFs/manifests/stage4-structure-homogeneous-analysis.json`
+  - `ICJIA-PDFs/manifests/stage4-structure-homogeneous-analysis.summary.json`
+- The homogeneous Stage 4 wave `3655/3781/3785/3793/3870/3919/3924/4045` was terminalized as `metadata_font_structure_survivor` from terminal-report evidence, not rerun live.
+- Those rows should be excluded from metadata-first Stage 4 retry selection unless a later Stage 4.x pass explicitly targets metadata+font+structure survivors.
+- Stage 4 reporting now exposes:
+  - `metadataFontStructureSurvivorPublicationIds`
+  - `homogeneousAnalysisPublicationIds`
+  - `homogeneousAnalysisByDisposition`
+- After Stage 4.11, the rebuilt active Stage 4 wave is:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4162`
+  - `4436`
+  - `4153`
+  - `4167`
+- Stage 4 canaries now include `3655` as the representative `metadata_font_structure_survivor`.
+
 ## 2026-03-31 Stage 4.5
 
 - Stage 4 remains the active lane.

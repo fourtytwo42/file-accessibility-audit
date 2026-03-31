@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-31T17:09:19.432Z",
+  "generatedAt": "2026-03-31T17:24:34.523Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 39,
+    "processed": 41,
     "readyToReplace": 8,
     "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 31,
+    "failedAfterRemediation": 33,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
@@ -2092,6 +2092,121 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
         "remediatedPdfSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4076",
+      "publicationTitle": "Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2004 Annual Report APPENDIX H Data Tables.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202004%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T17:20:31.239Z",
+      "durationMs": 2733628,
+      "original": {
+        "overallScore": 48,
+        "grade": "F",
+        "pageCount": 99,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 84,
+        "grade": "B",
+        "pageCount": 99,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 84, not 100.",
+          "Blocking local standards findings remain: pdfua.table_regularity",
+          "Categories still below 100: Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.table_regularity"
+        ],
+        "unresolvedCategoryLabels": [
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "85bc6af778cfca9f22055d0ed25828481eeef7ca140a5ce5a67abccf3c770b2e",
+        "remediatedPdfSha256": "85bc6af778cfca9f22055d0ed25828481eeef7ca140a5ce5a67abccf3c770b2e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4209",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice System and Risk Factor Data 2006 Appendix H Data Tables.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20System%20and%20Risk%20Factor%20Data%202006%20Appendix%20H%20Data%20Tables.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T17:24:34.522Z",
+      "durationMs": 2976911,
+      "original": {
+        "overallScore": 38,
+        "grade": "F",
+        "pageCount": 97,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 82,
+        "grade": "B",
+        "pageCount": 97,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 82, not 100.",
+          "Blocking local standards findings remain: pdfua.table_regularity",
+          "Categories still below 100: Table Markup, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.table_regularity"
+        ],
+        "unresolvedCategoryLabels": [
+          "Table Markup",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a046d0f2f0edbe79430fa536ea506b88dedb36efd60ffa83ef742002595f8b09",
+        "remediatedPdfSha256": "a046d0f2f0edbe79430fa536ea506b88dedb36efd60ffa83ef742002595f8b09",
         "stagedReplacementSha256": null
       }
     }

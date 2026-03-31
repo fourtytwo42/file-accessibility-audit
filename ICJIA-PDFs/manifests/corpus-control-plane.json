@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T17:16:28.263Z",
+  "generatedAt": "2026-03-31T17:34:05.332Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -25810,7 +25810,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -25823,10 +25823,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -40493,7 +40495,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -40506,10 +40508,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -40973,7 +40977,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -40986,10 +40990,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -41933,7 +41939,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -41946,10 +41952,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -51181,7 +51189,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -51194,10 +51202,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -56860,7 +56870,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -56873,10 +56883,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -57511,7 +57523,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -57524,10 +57536,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -72497,7 +72511,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": null,
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -72510,10 +72524,12 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
       ]
     },
     {
@@ -76578,16 +76594,16 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4076-Juvenile_Justice_Data_2004_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
         "pageCount": 99,
         "isScanned": false,
-        "overallScore": 64,
-        "grade": "D",
+        "overallScore": 84,
+        "grade": "B",
         "blockerFamilyCount": 5,
         "blockingFindingCount": 11,
         "manualOnlyFailureModeCount": 0,
@@ -76653,7 +76669,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": "font_text_extractability_survivor",
+        "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -76666,12 +76682,11 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
-        "stage4.10:font_text_extractability_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
       ]
     },
     {
@@ -98282,9 +98297,9 @@
         "verificationClassification": null,
         "verificationTimestamp": null,
         "verificationReportPath": null,
-        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
         "outcomeStatus": "failed_after_remediation",
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4209-Juvenile_Justice_System_and_Risk_Factor_Data_2006_Appendix_H_Data_Tables.remediation.json",
         "candidateManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json"
       },
       "classificationEvidence": {
@@ -98356,7 +98371,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "metadata_navigation_residuals",
-        "terminalSurvivorClass": "font_text_extractability_survivor",
+        "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": true,
@@ -98369,12 +98384,11 @@
       "reasonCodes": [
         "cohort:structure_heavy",
         "outcome:failed_after_remediation",
-        "stage4.10:font_text_extractability_survivor",
+        "stage4:adopted_into_structure_lane_after_wave",
         "stage4:metadata_navigation_after_wave"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
       ]
     },
     {
@@ -99149,7 +99163,7 @@
       },
       "stage4StructureDiagnostics": {
         "structureWaveBucket": "mixed_structure_figure_residuals",
-        "terminalSurvivorClass": "font_text_extractability_survivor",
+        "terminalSurvivorClass": "metadata_font_structure_survivor",
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
         "hasHeadingDebt": null,

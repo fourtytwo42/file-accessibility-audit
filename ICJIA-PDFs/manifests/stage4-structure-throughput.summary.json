@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-03-31T17:16:28.300Z",
+  "generatedAt": "2026-03-31T17:34:05.363Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T17:16:28.272Z",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T17:34:05.336Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
@@ -11,8 +11,8 @@
     "newlyVerifiedPassRowsFromWave": 0,
     "remainingStructureHeavyRows": 295,
     "processingErrorsInWave": 0,
-    "hardFailsInWave": 4,
-    "metadataNavigationResidualRows": 13,
+    "hardFailsInWave": 5,
+    "metadataNavigationResidualRows": 7,
     "structureOnlyResidualRows": 5,
     "mixedStructureFigureResidualRows": 192,
     "structureProcessingErrorRetryRows": 4,
@@ -354,32 +354,33 @@
       "4773"
     ],
     "activeWaveSelectedPublicationIds": [
-      "3655",
-      "3781",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045"
+      "4084",
+      "4142",
+      "4153",
+      "4162",
+      "4167",
+      "4436",
+      "4753",
+      "4755"
     ],
     "activeWavePendingPublicationIds": [
-      "3655",
-      "3781",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045"
+      "4084",
+      "4142",
+      "4153",
+      "4162",
+      "4167",
+      "4436",
+      "4753",
+      "4755"
     ],
     "activeWaveAttemptedButUnterminalizedPublicationIds": [],
     "processingErrorPublicationIds": [],
     "hardFailPublicationIds": [
-      "3483",
-      "4094",
-      "4145",
-      "4723"
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
     ],
     "readingOrderOnlyResidualPublicationIds": [
       "3550",
@@ -395,18 +396,12 @@
       "4059"
     ],
     "metadataNavigationResidualPublicationIds": [
-      "3655",
       "3769",
-      "3781",
       "3784",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045",
+      "4076",
       "4094",
       "4145",
+      "4209",
       "4723"
     ],
     "structureOnlyResidualPublicationIds": [
@@ -617,31 +612,25 @@
       "4739"
     ],
     "pendingPublicationIds": [
-      "3655",
-      "3781",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045"
+      "4084",
+      "4142",
+      "4153",
+      "4162",
+      "4167",
+      "4436",
+      "4753",
+      "4755"
     ],
     "nextWaveStructureOnlyPublicationIds": [
-      "3655",
       "3769",
-      "3781",
       "3784",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045",
+      "4076",
       "4084",
       "4094",
       "4142",
       "4145",
       "4162",
+      "4209",
       "4723",
       "4753",
       "4755"
@@ -858,24 +847,24 @@
       "4067"
     ],
     "stillUnclassifiedPendingPublicationIds": [
-      "3655",
-      "3781",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045"
+      "4084",
+      "4142",
+      "4153",
+      "4162",
+      "4167",
+      "4436",
+      "4753",
+      "4755"
     ],
     "activeUnresolvedPublicationIds": [
-      "3655",
-      "3781",
-      "3785",
-      "3793",
-      "3870",
-      "3919",
-      "3924",
-      "4045"
+      "4084",
+      "4142",
+      "4153",
+      "4162",
+      "4167",
+      "4436",
+      "4753",
+      "4755"
     ],
     "stalledForensicPublicationIds": [
       "3866",
@@ -924,6 +913,30 @@
       "mixed_structure_figure_residuals": [],
       "structure_processing_error_retry": []
     },
+    "homogeneousAnalysisPublicationIds": [
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045"
+    ],
+    "homogeneousAnalysisByDisposition": {
+      "metadata_font_structure_survivor": [
+        "3655",
+        "3781",
+        "3785",
+        "3793",
+        "3870",
+        "3919",
+        "3924",
+        "4045"
+      ],
+      "mixed_structure_figure_residuals": [],
+      "structure_processing_error_retry": []
+    },
     "nearPassGradeOnlyPublicationIds": [
       "3468",
       "3640",
@@ -941,6 +954,17 @@
       "4101",
       "4113",
       "4135"
+    ],
+    "metadataFontStructureSurvivorPublicationIds": [
+      "3655",
+      "3781",
+      "3785",
+      "3793",
+      "3870",
+      "3919",
+      "3924",
+      "4045",
+      "4215"
     ],
     "fontTextExtractabilitySurvivorPublicationIds": [
       "3465",
@@ -989,7 +1013,6 @@
       "4034",
       "4039",
       "4055",
-      "4076",
       "4116",
       "4117",
       "4126",
@@ -999,8 +1022,6 @@
       "4170",
       "4194",
       "4196",
-      "4209",
-      "4215",
       "4469",
       "4500",
       "4509",
@@ -1021,11 +1042,11 @@
       "3682"
     ],
     "currentWaveProcessedPublicationIds": [
-      "3483",
-      "3936",
-      "4094",
-      "4145",
-      "4723"
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
     ],
     "currentWaveRemainingPublicationIds": [],
     "genericTimeoutPublicationIds": []

@@ -61,7 +61,8 @@
     "agency:analyze-stage4-structure-stalled": "tsx scripts/analyze-stage4-structure-stalled.ts",
     "agency:analyze-stage4-structure-overlap": "tsx scripts/analyze-stage4-structure-overlap.ts",
     "agency:run-stage4-structure-wave": "tsx scripts/run-stage4-structure-wave.ts",
-    "agency:analyze-stage4-structure-active-forensics": "tsx scripts/analyze-stage4-structure-active-forensics.ts"
+    "agency:analyze-stage4-structure-active-forensics": "tsx scripts/analyze-stage4-structure-active-forensics.ts",
+    "agency:analyze-stage4-structure-homogeneous": "tsx scripts/analyze-stage4-structure-homogeneous.ts"
   },
   "engines": {
     "node": ">=22"

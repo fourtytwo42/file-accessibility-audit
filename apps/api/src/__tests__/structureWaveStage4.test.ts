@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applyStage4StructureWaveReclassification,
   buildStage4StructureCanaries,
+  buildStage4StructureHomogeneousAnalysis,
   buildStage4StructureOverlapAnalysis,
   buildStage4StructureStalledAnalysis,
   buildStage4StructureThroughputSummary,
@@ -682,6 +683,100 @@ describe('structure wave Stage 4', () => {
     expect(summary.rows.stalledForensicByDisposition.metadata_title_survivor).toEqual(['3866'])
     expect(summary.rows.stalledForensicByDisposition.font_text_extractability_survivor).toEqual(['3898'])
     expect(summary.totals.pendingWaveRows).toBe(1)
+  })
+
+  it('builds Stage 4.11 homogeneous analysis and removes homogeneous survivors from the live wave', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-homogeneous-analysis-'))
+
+    const existingWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T08:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T08:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 3, selectedRows: 3, skippedRows: 0, pendingRows: 3 },
+      selectedPublicationIds: ['homogeneous', 'figurey', 'runtime'],
+      pendingPublicationIds: ['homogeneous', 'figurey', 'runtime'],
+      candidates: [],
+      skippedRows: [],
+    }
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.json'), JSON.stringify(existingWave, null, 2))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.outcomes.json'), JSON.stringify({ outcomes: [] }, null, 2))
+
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'homogeneous',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        classificationEvidence: { pageCount: 12, isScanned: false, overallScore: 61, grade: 'D', blockerFamilyCount: 5, blockingFindingCount: 10, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: ['bookmark_language_outline_cleanup', 'font_embedding_and_unicode', 'logical_structure_marked_content', 'metadata_normalization', 'post_bootstrap_heading_convergence'], blockingFindingKeys: ['pdfua.display_doc_title', 'pdfua.document_language', 'pdfua.font_embedding', 'pdfua.font_unicode', 'pdfua.logical_structure', 'category.bookmarks', 'category.heading_structure', 'category.reading_order'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] },
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: true, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null },
+      }),
+      makeRow({
+        publicationId: 'figurey',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        classificationEvidence: { pageCount: 12, isScanned: false, overallScore: 40, grade: 'F', blockerFamilyCount: 6, blockingFindingCount: 12, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: ['bookmark_language_outline_cleanup', 'font_embedding_and_unicode', 'logical_structure_marked_content', 'metadata_normalization'], blockingFindingKeys: ['pdfua.display_doc_title', 'pdfua.document_language', 'pdfua.font_embedding', 'pdfua.font_unicode', 'pdfua.logical_structure', 'pdfua.figure_alt_or_artifact'], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] },
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: true, hasReadingOrderDebt: true, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: true, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null },
+      }),
+      makeRow({
+        publicationId: 'runtime',
+        currentCorpusStatus: 'processing_error',
+        cohortLabel: 'structure_heavy',
+        classificationEvidence: { pageCount: 12, isScanned: false, overallScore: 0, grade: 'F', blockerFamilyCount: 0, blockingFindingCount: 0, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 0, topBlockingResidualFamilyIds: [], blockingFindingKeys: [], autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [] },
+        stage4StructureDiagnostics: { structureWaveBucket: 'structure_processing_error_retry', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: true, originLane: 'native_structure_heavy', terminalSurvivorClass: null },
+      }),
+      makeRow({
+        publicationId: 'fresh-meta',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy', terminalSurvivorClass: null },
+      }),
+    ])
+
+    const homogeneous = buildStage4StructureHomogeneousAnalysis({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T08:00:00.000Z',
+      manifestsRoot,
+    })
+
+    expect(homogeneous.summary.publicationIdsByDisposition.metadata_font_structure_survivor).toEqual(['homogeneous'])
+    expect(homogeneous.summary.publicationIdsByDisposition.mixed_structure_figure_residuals).toEqual(['figurey'])
+    expect(homogeneous.summary.publicationIdsByDisposition.structure_processing_error_retry).toEqual(['runtime'])
+
+    const next = applyStage4StructureWaveReclassification(artifacts, [], [], [], [], [], homogeneous.analysis.rows)
+    expect(next.document.rows.find(row => row.publicationId === 'homogeneous')?.stage4StructureDiagnostics.terminalSurvivorClass).toBe('metadata_font_structure_survivor')
+    expect(next.document.rows.find(row => row.publicationId === 'runtime')?.currentCorpusStatus).toBe('processing_error')
+
+    const { wave } = buildStage4StructureWaveArtifacts({
+      artifacts: next,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T08:00:00.000Z',
+      manifestsRoot,
+      homogeneousAnalysisRows: homogeneous.analysis.rows,
+    })
+
+    expect(wave.selectedPublicationIds).toEqual(['fresh-meta'])
+
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts: next,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T08:00:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave,
+      activeWave: wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [] },
+      homogeneousAnalysisRows: homogeneous.analysis.rows,
+    })
+
+    expect(summary.rows.metadataFontStructureSurvivorPublicationIds).toEqual(['homogeneous'])
+    expect(summary.rows.homogeneousAnalysisPublicationIds).toEqual(['figurey', 'homogeneous', 'runtime'])
+    expect(summary.rows.homogeneousAnalysisByDisposition.metadata_font_structure_survivor).toEqual(['homogeneous'])
   })
 
   it('reports throughput routing buckets and builds structure canaries', () => {

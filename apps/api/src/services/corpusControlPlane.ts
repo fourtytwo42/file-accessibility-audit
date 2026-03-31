@@ -30,6 +30,7 @@ export type Stage4TerminalSurvivorClass =
   | 'near_pass_grade_only'
   | 'metadata_title_survivor'
   | 'font_text_extractability_survivor'
+  | 'metadata_font_structure_survivor'
   | 'figure_spillover_survivor'
   | 'reading_order_only_survivor'
 export type Stage4PendingAnalysisDisposition =
@@ -66,6 +67,11 @@ export type Stage4ActiveForensicsDisposition =
   | 'metadata_navigation_residuals'
   | 'font_text_extractability_survivor'
   | 'reading_order_only_survivor'
+  | 'mixed_structure_figure_residuals'
+  | 'structure_processing_error_retry'
+
+export type Stage4HomogeneousAnalysisDisposition =
+  | 'metadata_font_structure_survivor'
   | 'mixed_structure_figure_residuals'
   | 'structure_processing_error_retry'
 
@@ -292,6 +298,7 @@ export interface CorpusControlPlaneSources {
   stage4StalledAnalysisPath: string | null
   stage4OverlapAnalysisPath: string | null
   stage4ActiveForensicsPath: string | null
+  stage4HomogeneousAnalysisPath: string | null
   replacementMap: PublicationReplacementMapRow[]
   verificationResults: VerificationResult[]
   verificationRows: PublicationVerificationRow[]
@@ -370,6 +377,21 @@ export interface CorpusControlPlaneSources {
     publicationTitle: string | null
     priorStructureWaveBucket: StructureWaveBucket | null
     forensicsDisposition: Stage4ActiveForensicsDisposition
+    evidenceStrength: Stage4PendingAnalysisEvidenceStrength
+    evidencePaths: {
+      latestStage4ReportPath: string | null
+      latestStage4FailurePath: string | null
+      latestStage4AttemptPath: string | null
+      controlPlanePath: string
+    }
+    reasonCodes: string[]
+    notes: string[]
+  }>
+  stage4HomogeneousAnalysisRows: Array<{
+    publicationId: string
+    publicationTitle: string | null
+    priorStructureWaveBucket: StructureWaveBucket | null
+    homogeneousDisposition: Stage4HomogeneousAnalysisDisposition
     evidenceStrength: Stage4PendingAnalysisEvidenceStrength
     evidencePaths: {
       latestStage4ReportPath: string | null
@@ -767,6 +789,7 @@ function deriveStage4StructureDiagnostics(input: {
   classificationEvidence: CorpusControlPlaneRow['classificationEvidence']
   latestOutcome: { manifestPath: string; outcome: OutcomeRecordLike } | null
   benchmarkOutcome: BenchmarkOutcomeLike | null
+  homogeneousAnalysisDisposition: Stage4HomogeneousAnalysisDisposition | null
   reasonCodes: string[]
 }): CorpusControlPlaneRow['stage4StructureDiagnostics'] {
   const latestOutcomeBlockingKeys = uniqueStrings(input.latestOutcome?.outcome.gate?.blockingLocalFindingKeys || [])
@@ -824,6 +847,13 @@ function deriveStage4StructureDiagnostics(input: {
     ) {
       terminalSurvivorClass = 'metadata_title_survivor'
     } else if (
+      latestOutcomeBlockingKeys.some(key => /display_doc_title|document_language|metadata_identification|bookmark_language|font_embedding|font_unicode|font_widths|logical_structure/i.test(key))
+      && latestOutcomeBlockingKeys.some(key => /font_embedding|font_unicode|font_widths/i.test(key))
+      && latestOutcomeBlockingKeys.some(key => /logical_structure|heading_content_quality/i.test(key))
+      && !latestOutcomeBlockingKeys.some(key => /figure|artifact|image/i.test(key))
+    ) {
+      terminalSurvivorClass = 'metadata_font_structure_survivor'
+    } else if (
       (latestOutcomeBlockingKeys.includes('pdfua.font_embedding')
         || latestOutcomeBlockingKeys.includes('pdfua.font_unicode'))
       && latestOutcomeUnresolvedCategories.some(label => /text extractability/i.test(label))
@@ -843,9 +873,15 @@ function deriveStage4StructureDiagnostics(input: {
     }
   }
 
+  if (!terminalSurvivorClass && input.homogeneousAnalysisDisposition === 'metadata_font_structure_survivor') {
+    terminalSurvivorClass = 'metadata_font_structure_survivor'
+  }
+
   let structureWaveBucket: StructureWaveBucket | null = null
   if (input.rowCohortLabel === 'structure_heavy' || hasLogicalStructureDebt || hasMetadataNavigationDebt || hasReadingOrderDebt) {
-    if (isInspectionBudgetProcessingError(input.latestOutcome) || input.rowCurrentCorpusStatus === 'processing_error') {
+    if (input.homogeneousAnalysisDisposition === 'metadata_font_structure_survivor') {
+      structureWaveBucket = 'metadata_navigation_residuals'
+    } else if (isInspectionBudgetProcessingError(input.latestOutcome) || input.rowCurrentCorpusStatus === 'processing_error') {
       structureWaveBucket = 'structure_processing_error_retry'
     } else if (hasReadingOrderDebt && !hasMetadataNavigationDebt && !hasMixedFigureResiduals) {
       structureWaveBucket = 'structure_only_residuals'
@@ -1264,12 +1300,14 @@ export function buildCorpusControlPlaneArtifactsFromSources(sources: CorpusContr
     if (cohortLabel === 'font_heavy') reasonCodes.push('cohort:font_heavy')
     if (cohortLabel === 'long_report') reasonCodes.push('cohort:long_report')
     if (cohortLabel === 'short_high_likelihood') reasonCodes.push('cohort:short_high_likelihood')
+    const homogeneousAnalysis = sources.stage4HomogeneousAnalysisRows.find(row => row.publicationId === publicationId) || null
     const stage4StructureDiagnostics = deriveStage4StructureDiagnostics({
       rowCohortLabel: cohortLabel,
       rowCurrentCorpusStatus: derived.status,
       classificationEvidence,
       latestOutcome,
       benchmarkOutcome,
+      homogeneousAnalysisDisposition: homogeneousAnalysis?.homogeneousDisposition || null,
       reasonCodes,
     })
 
@@ -1367,6 +1405,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
   const stage4StalledAnalysisPath = path.join(manifestsRoot, 'stage4-structure-stalled-analysis.json')
   const stage4OverlapAnalysisPath = path.join(manifestsRoot, 'stage4-structure-overlap-analysis.json')
   const stage4ActiveForensicsPath = path.join(manifestsRoot, 'stage4-structure-active-forensics.json')
+  const stage4HomogeneousAnalysisPath = path.join(manifestsRoot, 'stage4-structure-homogeneous-analysis.json')
 
   const outcomeManifests = fs.readdirSync(manifestsRoot)
     .filter(name => name.endsWith('-outcomes.json') || name.endsWith('.outcomes.json'))
@@ -1397,6 +1436,7 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     stage4StalledAnalysisPath: fs.existsSync(stage4StalledAnalysisPath) ? stage4StalledAnalysisPath : null,
     stage4OverlapAnalysisPath: fs.existsSync(stage4OverlapAnalysisPath) ? stage4OverlapAnalysisPath : null,
     stage4ActiveForensicsPath: fs.existsSync(stage4ActiveForensicsPath) ? stage4ActiveForensicsPath : null,
+    stage4HomogeneousAnalysisPath: fs.existsSync(stage4HomogeneousAnalysisPath) ? stage4HomogeneousAnalysisPath : null,
     replacementMap: readManifestArray<PublicationReplacementMapRow>(replacementMapPath, 'rows'),
     verificationResults: fs.existsSync(verificationPath) ? readJson<any>(verificationPath).verificationResults || [] : [],
     verificationRows: fs.existsSync(verificationPath) ? readJson<any>(verificationPath).publicationRows || [] : [],
@@ -1410,5 +1450,6 @@ export function loadCorpusControlPlaneSources(repoRoot = defaultRepoRoot): Corpu
     stage4StalledAnalysisRows: fs.existsSync(stage4StalledAnalysisPath) ? readJson<any>(stage4StalledAnalysisPath).rows || [] : [],
     stage4OverlapAnalysisRows: fs.existsSync(stage4OverlapAnalysisPath) ? readJson<any>(stage4OverlapAnalysisPath).rows || [] : [],
     stage4ActiveForensicsRows: fs.existsSync(stage4ActiveForensicsPath) ? readJson<any>(stage4ActiveForensicsPath).rows || [] : [],
+    stage4HomogeneousAnalysisRows: fs.existsSync(stage4HomogeneousAnalysisPath) ? readJson<any>(stage4HomogeneousAnalysisPath).rows || [] : [],
   }
 }

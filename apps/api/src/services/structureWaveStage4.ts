@@ -14,6 +14,7 @@ import type {
   Stage4StalledAnalysisDisposition,
   Stage4OverlapAnalysisDisposition,
   Stage4ActiveForensicsDisposition,
+  Stage4HomogeneousAnalysisDisposition,
   Stage4TerminalSurvivorClass,
   StructureWaveBucket,
 } from './corpusControlPlane.ts'
@@ -143,7 +144,10 @@ export interface Stage4StructureThroughputSummaryDocument {
     overlapAnalysisPublicationIds: string[]
     activeForensicsPublicationIds: string[]
     activeForensicsByDisposition: Record<Stage4ActiveForensicsDisposition, string[]>
+    homogeneousAnalysisPublicationIds: string[]
+    homogeneousAnalysisByDisposition: Record<Stage4HomogeneousAnalysisDisposition, string[]>
     nearPassGradeOnlyPublicationIds: string[]
+    metadataFontStructureSurvivorPublicationIds: string[]
     fontTextExtractabilitySurvivorPublicationIds: string[]
     figureSpilloverSurvivorPublicationIds: string[]
     currentWaveProcessedPublicationIds: string[]
@@ -331,6 +335,42 @@ export interface Stage4StructureActiveForensicsSummaryDocument {
   publicationIdsByDisposition: Record<Stage4ActiveForensicsDisposition, string[]>
 }
 
+export interface Stage4StructureHomogeneousAnalysisRow {
+  publicationId: string
+  publicationTitle: string | null
+  priorStructureWaveBucket: StructureWaveBucket | null
+  homogeneousDisposition: Stage4HomogeneousAnalysisDisposition
+  evidenceStrength: Stage4PendingAnalysisEvidenceStrength
+  evidencePaths: {
+    latestStage4ReportPath: string | null
+    latestStage4FailurePath: string | null
+    latestStage4AttemptPath: string | null
+    controlPlanePath: string
+  }
+  reasonCodes: string[]
+  notes: string[]
+}
+
+export interface Stage4StructureHomogeneousAnalysisDocument {
+  generatedAt: string
+  sourceControlPlanePath: string
+  sourceControlPlaneGeneratedAt: string
+  sourceWaveManifestPath: string
+  sourceWaveOutcomesPath: string | null
+  rows: Stage4StructureHomogeneousAnalysisRow[]
+}
+
+export interface Stage4StructureHomogeneousAnalysisSummaryDocument {
+  generatedAt: string
+  analysisManifestPath: string
+  totals: {
+    analyzedRows: number
+    byDisposition: Record<Stage4HomogeneousAnalysisDisposition, number>
+    byEvidenceStrength: Record<Stage4PendingAnalysisEvidenceStrength, number>
+  }
+  publicationIdsByDisposition: Record<Stage4HomogeneousAnalysisDisposition, string[]>
+}
+
 export interface Stage4StructureCanaryRow {
   publicationId: string | null
   publicationTitle: string | null
@@ -347,6 +387,7 @@ export interface Stage4StructureCanaryRow {
     | 'near_pass_grade_only'
     | 'metadata_title_survivor'
     | 'font_text_extractability_survivor'
+    | 'metadata_font_structure_survivor'
     | 'figure_spillover_survivor'
     | 'reading_order_only_survivor'
     | null
@@ -961,6 +1002,14 @@ function emptyActiveForensicsDispositionCounts(): Record<Stage4ActiveForensicsDi
   }
 }
 
+function emptyHomogeneousDispositionCounts(): Record<Stage4HomogeneousAnalysisDisposition, number> {
+  return {
+    metadata_font_structure_survivor: 0,
+    mixed_structure_figure_residuals: 0,
+    structure_processing_error_retry: 0,
+  }
+}
+
 function findStage4ReportPath(manifestsRoot: string, publicationId: string): string | null {
   const root = path.join(path.dirname(manifestsRoot), 'reports', 'test-runs', 'stage4-structure-wave')
   if (!fs.existsSync(root)) return null
@@ -1354,6 +1403,122 @@ export function buildStage4StructureActiveForensics(input: {
   }
 }
 
+export function buildStage4StructureHomogeneousAnalysis(input: {
+  artifacts: CorpusControlPlaneArtifacts
+  sourceControlPlanePath: string
+  sourceControlPlaneGeneratedAt: string
+  manifestsRoot: string
+  includePublicationIds?: string[]
+}): {
+  analysis: Stage4StructureHomogeneousAnalysisDocument
+  summary: Stage4StructureHomogeneousAnalysisSummaryDocument
+} {
+  const wavePath = path.join(input.manifestsRoot, 'stage4-structure-wave.json')
+  const outcomesPath = path.join(input.manifestsRoot, 'stage4-structure-wave.outcomes.json')
+  const existingWave = loadJsonIfExists(wavePath) as Stage4StructureWaveDocument | null
+  const existingOutcomes = loadJsonIfExists(outcomesPath) as { outcomes?: OutcomeLike[] } | null
+  const includePublicationIds = uniqueStrings(input.includePublicationIds || [])
+  const activePublicationIds = includePublicationIds.length > 0
+    ? includePublicationIds
+    : unresolvedActivePublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
+  const rowByPublicationId = new Map(input.artifacts.document.rows.map(row => [row.publicationId, row]))
+  const rows: Stage4StructureHomogeneousAnalysisRow[] = activePublicationIds
+    .map(publicationId => rowByPublicationId.get(publicationId))
+    .filter((row): row is CorpusControlPlaneRow => Boolean(row))
+    .map(row => {
+      const latestStage4ReportPath = row.statusEvidence.latestReportPath || findStage4ReportPath(input.manifestsRoot, row.publicationId)
+      const derivedFailurePath = row.statusEvidence.latestReportPath
+        ? row.statusEvidence.latestReportPath.replace('/reports/test-runs/', '/reports/failures/').replace(/.remediation.json$/, '.failure.json')
+        : null
+      const latestStage4FailurePath = (derivedFailurePath && fs.existsSync(derivedFailurePath) ? derivedFailurePath : null) || findStage4FailurePath(input.manifestsRoot, row.publicationId)
+      const latestStage4AttemptPath = findAttemptArtifactPath(input.manifestsRoot, row.publicationId)
+      const failureDoc = latestStage4FailurePath ? loadJsonIfExists(latestStage4FailurePath) as any : null
+      const remediationDoc = latestStage4ReportPath ? loadJsonIfExists(latestStage4ReportPath) as any : null
+      const gate = failureDoc?.gate || remediationDoc?.finalGate || remediationDoc?.gate || {}
+      const unresolved = uniqueStrings(gate.unresolvedCategoryLabels || [])
+      const blockingKeys = uniqueStrings(gate.blockingLocalFindingKeys || [])
+      const combined = [...unresolved, ...blockingKeys, ...row.classificationEvidence.blockingFindingKeys, ...row.classificationEvidence.topBlockingResidualFamilyIds, ...row.reasonCodes, ...row.notes].join(' ')
+      const hasFigure = blockingKeys.some(key => FIGURE_PATTERN.test(key)) || row.stage4StructureDiagnostics.hasMixedFigureResiduals || FIGURE_PATTERN.test(combined)
+      const hasRuntimeOnly = row.currentCorpusStatus === 'processing_error' || row.stage4StructureDiagnostics.hasBoundedRuntimeWording
+      const hasMetadata = /document title|title language|document language|bookmark|metadata|display_doc_title|document_language|metadata_identification|bookmark_language|category.bookmarks|category.title_language/i.test(combined)
+      const hasFont = /font embedding|font unicode|font widths|font_embedding|font_unicode|font_widths|text extractability|unicode/i.test(combined)
+      const hasStructure = /logical structure|logical_structure|heading|reading order|reading_order|marked content|marked_content/i.test(combined)
+      let homogeneousDisposition: Stage4HomogeneousAnalysisDisposition = 'structure_processing_error_retry'
+      if (hasFigure) {
+        homogeneousDisposition = 'mixed_structure_figure_residuals'
+      } else if (hasRuntimeOnly && !hasMetadata && !hasFont && !hasStructure) {
+        homogeneousDisposition = 'structure_processing_error_retry'
+      } else if (hasMetadata && hasFont && hasStructure && !hasFigure) {
+        homogeneousDisposition = 'metadata_font_structure_survivor'
+      }
+      const reasonCodes = uniqueStrings([
+        ...row.reasonCodes,
+        'stage4.11:' + homogeneousDisposition,
+      ])
+      const notes = uniqueStrings([
+        ...row.notes,
+        homogeneousDisposition === 'metadata_font_structure_survivor'
+          ? 'Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence.'
+          : homogeneousDisposition === 'mixed_structure_figure_residuals'
+            ? 'Stage 4.11 classified this active row as mixed structure+figure residual debt.'
+            : 'Stage 4.11 defaulted this active row to bounded runtime retry because the evidence stayed too weak for homogeneous terminalization.',
+      ])
+      const evidenceStrength: Stage4PendingAnalysisEvidenceStrength = latestStage4ReportPath
+        ? 'terminal_report'
+        : latestStage4FailurePath
+          ? 'failure_report'
+          : latestStage4AttemptPath
+            ? 'attempt_artifact_only'
+            : 'control_plane_only'
+      return {
+        publicationId: row.publicationId,
+        publicationTitle: row.title,
+        priorStructureWaveBucket: row.stage4StructureDiagnostics.structureWaveBucket,
+        homogeneousDisposition,
+        evidenceStrength,
+        evidencePaths: {
+          latestStage4ReportPath,
+          latestStage4FailurePath,
+          latestStage4AttemptPath,
+          controlPlanePath: input.sourceControlPlanePath,
+        },
+        reasonCodes,
+        notes,
+      }
+    })
+    .sort((a,b) => a.publicationId.localeCompare(b.publicationId))
+
+  const byDisposition = emptyHomogeneousDispositionCounts()
+  const byEvidenceStrength = emptyPendingEvidenceStrengthCounts()
+  const publicationIdsByDisposition = {
+    metadata_font_structure_survivor: [] as string[],
+    mixed_structure_figure_residuals: [] as string[],
+    structure_processing_error_retry: [] as string[],
+  }
+  for (const row of rows) {
+    byDisposition[row.homogeneousDisposition] += 1
+    byEvidenceStrength[row.evidenceStrength] += 1
+    publicationIdsByDisposition[row.homogeneousDisposition].push(row.publicationId)
+  }
+  const analysis: Stage4StructureHomogeneousAnalysisDocument = {
+    generatedAt: new Date().toISOString(),
+    sourceControlPlanePath: input.sourceControlPlanePath,
+    sourceControlPlaneGeneratedAt: input.sourceControlPlaneGeneratedAt,
+    sourceWaveManifestPath: wavePath,
+    sourceWaveOutcomesPath: fs.existsSync(outcomesPath) ? outcomesPath : null,
+    rows,
+  }
+  return {
+    analysis,
+    summary: {
+      generatedAt: analysis.generatedAt,
+      analysisManifestPath: path.join(input.manifestsRoot, 'stage4-structure-homogeneous-analysis.json'),
+      totals: { analyzedRows: rows.length, byDisposition, byEvidenceStrength },
+      publicationIdsByDisposition,
+    },
+  }
+}
+
 function bucketRank(bucket: StructureWaveBucket): number {
   return {
     metadata_navigation_residuals: 0,
@@ -1500,12 +1665,14 @@ function applyStage4RoutingToRow(
   stalledAnalysisByPublicationId: Map<string, Stage4StructureStalledAnalysisRow>,
   overlapAnalysisByPublicationId: Map<string, Stage4StructureOverlapAnalysisRow>,
   activeForensicsByPublicationId: Map<string, Stage4StructureActiveForensicsRow>,
+  homogeneousAnalysisByPublicationId: Map<string, Stage4StructureHomogeneousAnalysisRow>,
 ): CorpusControlPlaneRow {
   const pendingAnalysis = pendingAnalysisByPublicationId.get(row.publicationId) || null
   const activeAnalysis = activeAnalysisByPublicationId.get(row.publicationId) || null
   const stalledAnalysis = stalledAnalysisByPublicationId.get(row.publicationId) || null
   const overlapAnalysis = overlapAnalysisByPublicationId.get(row.publicationId) || null
   const activeForensics = activeForensicsByPublicationId.get(row.publicationId) || null
+  const homogeneousAnalysis = homogeneousAnalysisByPublicationId.get(row.publicationId) || null
   const hasStage4OutcomeEvidence = Boolean(row.statusEvidence.outcomeManifestPath && /stage4-structure-wave/.test(row.statusEvidence.outcomeManifestPath))
   const nextReasonCodes = [...row.reasonCodes]
   const nextNotes = [...row.notes]
@@ -1532,6 +1699,8 @@ function applyStage4RoutingToRow(
       nextReasonCodes.push('stage4.7:metadata_title_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'font_text_extractability_survivor') {
       nextReasonCodes.push('stage4.4:font_text_extractability_survivor')
+    } else if (nextDiagnostics.terminalSurvivorClass === 'metadata_font_structure_survivor') {
+      nextReasonCodes.push('stage4.11:metadata_font_structure_survivor')
     } else if (nextDiagnostics.terminalSurvivorClass === 'reading_order_only_survivor') {
       nextReasonCodes.push('stage4.4:reading_order_only_survivor')
     }
@@ -1611,7 +1780,33 @@ function applyStage4RoutingToRow(
     nextNotes.push(...overlapAnalysis.notes)
   }
 
-  if (!hasStage4OutcomeEvidence && !overlapAnalysis && stalledAnalysis) {
+  if (!hasStage4OutcomeEvidence && !overlapAnalysis && homogeneousAnalysis) {
+    if (homogeneousAnalysis.homogeneousDisposition === 'metadata_font_structure_survivor') {
+      nextDiagnostics = {
+        ...nextDiagnostics,
+        structureWaveBucket: 'metadata_navigation_residuals',
+        terminalSurvivorClass: 'metadata_font_structure_survivor',
+      }
+    } else if (homogeneousAnalysis.homogeneousDisposition === 'mixed_structure_figure_residuals') {
+      nextDiagnostics = {
+        ...nextDiagnostics,
+        structureWaveBucket: 'mixed_structure_figure_residuals',
+        terminalSurvivorClass: null,
+      }
+    } else {
+      nextDiagnostics = {
+        ...nextDiagnostics,
+        structureWaveBucket: 'structure_processing_error_retry',
+        terminalSurvivorClass: null,
+        hasBoundedRuntimeWording: true,
+      }
+      nextStatus = 'processing_error'
+    }
+    nextReasonCodes.push(...homogeneousAnalysis.reasonCodes)
+    nextNotes.push(...homogeneousAnalysis.notes)
+  }
+
+  if (!hasStage4OutcomeEvidence && !overlapAnalysis && !homogeneousAnalysis && stalledAnalysis) {
     if (stalledAnalysis.stalledDisposition === 'metadata_title_survivor') {
       nextDiagnostics = {
         ...nextDiagnostics,
@@ -1681,13 +1876,15 @@ export function applyStage4StructureWaveReclassification(
   stalledAnalysisRows: Stage4StructureStalledAnalysisRow[] = [],
   overlapAnalysisRows: Stage4StructureOverlapAnalysisRow[] = [],
   activeForensicsRows: Stage4StructureActiveForensicsRow[] = [],
+  homogeneousAnalysisRows: Stage4StructureHomogeneousAnalysisRow[] = [],
 ): CorpusControlPlaneArtifacts {
   const pendingAnalysisByPublicationId = new Map(pendingAnalysisRows.map(row => [row.publicationId, row]))
   const activeAnalysisByPublicationId = new Map(activeAnalysisRows.map(row => [row.publicationId, row]))
   const stalledAnalysisByPublicationId = new Map(stalledAnalysisRows.map(row => [row.publicationId, row]))
   const overlapAnalysisByPublicationId = new Map(overlapAnalysisRows.map(row => [row.publicationId, row]))
   const activeForensicsByPublicationId = new Map(activeForensicsRows.map(row => [row.publicationId, row]))
-  const rows = artifacts.document.rows.map(row => applyStage4RoutingToRow(row, pendingAnalysisByPublicationId, activeAnalysisByPublicationId, stalledAnalysisByPublicationId, overlapAnalysisByPublicationId, activeForensicsByPublicationId))
+  const homogeneousAnalysisByPublicationId = new Map(homogeneousAnalysisRows.map(row => [row.publicationId, row]))
+  const rows = artifacts.document.rows.map(row => applyStage4RoutingToRow(row, pendingAnalysisByPublicationId, activeAnalysisByPublicationId, stalledAnalysisByPublicationId, overlapAnalysisByPublicationId, activeForensicsByPublicationId, homogeneousAnalysisByPublicationId))
   return {
     document: {
       generatedAt: artifacts.document.generatedAt,
@@ -1715,6 +1912,7 @@ function representativeCanaryRows(artifacts: CorpusControlPlaneArtifacts, report
     { kind: 'near_pass_grade_only', row: preferTerminalClass(allRows, 'near_pass_grade_only') },
     { kind: 'metadata_title_survivor', row: preferTerminalClass(allRows, 'metadata_title_survivor') },
     { kind: 'font_text_extractability_survivor', row: preferTerminalClass(allRows, 'font_text_extractability_survivor') },
+    { kind: 'metadata_font_structure_survivor', row: preferTerminalClass(allRows, 'metadata_font_structure_survivor') },
     { kind: 'reading_order_only_survivor', row: preferTerminalClass(allRows, 'reading_order_only_survivor') || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals' && (row.classificationEvidence.pageCount || 0) >= 40) || structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_only_residuals') },
     { kind: 'figure_spillover_survivor', row: preferTerminalClass(allRows, 'figure_spillover_survivor') },
     { kind: 'structure_processing_error_retry', row: structureRows.find(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry') },
@@ -1827,6 +2025,7 @@ export function buildStage4StructureWaveArtifacts(input: {
   stalledAnalysisRows?: Stage4StructureStalledAnalysisRow[]
   overlapAnalysisRows?: Stage4StructureOverlapAnalysisRow[]
   activeForensicsRows?: Stage4StructureActiveForensicsRow[]
+  homogeneousAnalysisRows?: Stage4StructureHomogeneousAnalysisRow[]
 }): {
   wave: Stage4StructureWaveDocument
   summary: Stage4StructureWaveSummaryDocument
@@ -1844,6 +2043,7 @@ export function buildStage4StructureWaveArtifacts(input: {
   const stalledAnalysisPublicationIds = uniqueStrings((input.stalledAnalysisRows || []).map(row => row.publicationId))
   const overlapAnalysisPublicationIds = uniqueStrings((input.overlapAnalysisRows || []).map(row => row.publicationId))
   const activeForensicsPublicationIds = uniqueStrings((input.activeForensicsRows || []).map(row => row.publicationId))
+  const homogeneousAnalysisPublicationIds = uniqueStrings((input.homogeneousAnalysisRows || []).map(row => row.publicationId))
   const activeAnalysisIds = new Set(activeAnalysisPublicationIds)
   const activeEligiblePublicationIds = new Set(
     input.artifacts.document.rows
@@ -1853,6 +2053,7 @@ export function buildStage4StructureWaveArtifacts(input: {
   const existingUnresolvedPublicationIds = pendingPublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
     .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
     .filter(publicationId => activeAnalysisIds.has(publicationId) || !forensicallyResolvedPendingIds.has(publicationId))
+    .filter(publicationId => !homogeneousAnalysisPublicationIds.includes(publicationId))
   const continuationPublicationIds = activeAnalysisPublicationIds.length > 0
     ? activeAnalysisPublicationIds.filter(publicationId => activeEligiblePublicationIds.has(publicationId) && !terminalOutcomeIds.has(publicationId))
     : existingUnresolvedPublicationIds
@@ -1865,6 +2066,7 @@ export function buildStage4StructureWaveArtifacts(input: {
     .filter(row => row.cohortLabel === 'structure_heavy' && row.currentCorpusStatus !== 'verified_pass')
     .filter(row => !terminalOutcomeIds.has(row.publicationId))
     .filter(row => !terminalSurvivorClassFromRow(row))
+    .filter(row => !homogeneousAnalysisPublicationIds.includes(row.publicationId))
     .filter(row => continueExistingActiveWave
       ? allowedPublicationIds.has(row.publicationId)
       : includePublicationIds.length === 0 || allowedPublicationIds.has(row.publicationId))
@@ -1905,6 +2107,7 @@ export function buildStage4StructureWaveArtifacts(input: {
         ...(stalledAnalysisPublicationIds.includes(row.publicationId) ? ['stalled_analysis_resolved'] : []),
         ...(overlapAnalysisPublicationIds.includes(row.publicationId) ? ['overlap_analysis_resolved'] : []),
         ...(activeForensicsPublicationIds.includes(row.publicationId) ? ['active_forensics_resolved'] : []),
+        ...(homogeneousAnalysisPublicationIds.includes(row.publicationId) ? ['homogeneous_analysis_resolved'] : []),
       ],
     })
   }
@@ -2003,6 +2206,7 @@ export function buildStage4StructureThroughputSummary(input: {
   stalledAnalysisRows?: Stage4StructureStalledAnalysisRow[]
   overlapAnalysisRows?: Stage4StructureOverlapAnalysisRow[]
   activeForensicsRows?: Stage4StructureActiveForensicsRow[]
+  homogeneousAnalysisRows?: Stage4StructureHomogeneousAnalysisRow[]
 }): Stage4StructureThroughputSummaryDocument {
   const structureRows = input.artifacts.document.rows.filter(row => row.cohortLabel === 'structure_heavy')
   const allRows = input.artifacts.document.rows
@@ -2033,9 +2237,11 @@ export function buildStage4StructureThroughputSummary(input: {
   const stalledAnalysisRows = input.stalledAnalysisRows || []
   const overlapAnalysisRows = input.overlapAnalysisRows || []
   const activeForensicsRows = input.activeForensicsRows || []
+  const homogeneousAnalysisRows = input.homogeneousAnalysisRows || []
   const stalledForensicPublicationIds = uniqueStrings(stalledAnalysisRows.map(row => row.publicationId))
   const overlapAnalysisPublicationIds = uniqueStrings(overlapAnalysisRows.map(row => row.publicationId))
   const activeForensicsPublicationIds = uniqueStrings(activeForensicsRows.map(row => row.publicationId))
+  const homogeneousAnalysisPublicationIds = uniqueStrings(homogeneousAnalysisRows.map(row => row.publicationId))
   const activeWaveSelectedPublicationIds = uniqueStrings(activeWave?.selectedPublicationIds || [])
   const activeWavePendingPublicationIds = uniqueStrings((activeWave?.selectedPublicationIds || []).filter(publicationId => !terminalPublicationIdsFromOutcomes({ outcomes: (input.outcomes?.outcomes || []).filter(outcome => outcome.publicationId && activeWaveIds.has(outcome.publicationId)) }).has(publicationId)))
   const activeWaveAttemptedButUnterminalizedPublicationIds = uniqueStrings(activeWavePendingPublicationIds.filter(publicationId => stalledForensicPublicationIds.includes(publicationId)))
@@ -2054,9 +2260,14 @@ export function buildStage4StructureThroughputSummary(input: {
     mixed_structure_figure_residuals: uniqueStrings(activeForensicsRows.filter(row => row.forensicsDisposition === 'mixed_structure_figure_residuals').map(row => row.publicationId)),
     structure_processing_error_retry: uniqueStrings(activeForensicsRows.filter(row => row.forensicsDisposition === 'structure_processing_error_retry').map(row => row.publicationId)),
   }
+  const homogeneousAnalysisByDisposition = {
+    metadata_font_structure_survivor: uniqueStrings(homogeneousAnalysisRows.filter(row => row.homogeneousDisposition === 'metadata_font_structure_survivor').map(row => row.publicationId)),
+    mixed_structure_figure_residuals: uniqueStrings(homogeneousAnalysisRows.filter(row => row.homogeneousDisposition === 'mixed_structure_figure_residuals').map(row => row.publicationId)),
+    structure_processing_error_retry: uniqueStrings(homogeneousAnalysisRows.filter(row => row.homogeneousDisposition === 'structure_processing_error_retry').map(row => row.publicationId)),
+  }
   const pendingPublicationIds = activeWavePendingPublicationIds
   const activeUnresolvedPublicationIds = activeWavePendingPublicationIds
-  const stillUnclassifiedPendingPublicationIds = activeWavePendingPublicationIds.filter(publicationId => !activeAnalysisPublicationIds.includes(publicationId) && !stalledForensicPublicationIds.includes(publicationId) && !overlapAnalysisPublicationIds.includes(publicationId) && !activeForensicsPublicationIds.includes(publicationId))
+  const stillUnclassifiedPendingPublicationIds = activeWavePendingPublicationIds.filter(publicationId => !activeAnalysisPublicationIds.includes(publicationId) && !stalledForensicPublicationIds.includes(publicationId) && !overlapAnalysisPublicationIds.includes(publicationId) && !activeForensicsPublicationIds.includes(publicationId) && !homogeneousAnalysisPublicationIds.includes(publicationId))
 
   const readingOrderOnlyResidualPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'reading_order_only_survivor')
@@ -2072,6 +2283,9 @@ export function buildStage4StructureThroughputSummary(input: {
     .map(row => row.publicationId))
   const fontTextExtractabilitySurvivorPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'font_text_extractability_survivor')
+    .map(row => row.publicationId))
+  const metadataFontStructureSurvivorPublicationIds = uniqueStrings(allRows
+    .filter(row => terminalSurvivorClassFromRow(row) === 'metadata_font_structure_survivor')
     .map(row => row.publicationId))
   const figureSpilloverSurvivorPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'figure_spillover_survivor')
@@ -2145,7 +2359,10 @@ export function buildStage4StructureThroughputSummary(input: {
       overlapAnalysisPublicationIds,
       activeForensicsPublicationIds,
       activeForensicsByDisposition,
+      homogeneousAnalysisPublicationIds,
+      homogeneousAnalysisByDisposition,
       nearPassGradeOnlyPublicationIds,
+      metadataFontStructureSurvivorPublicationIds,
       fontTextExtractabilitySurvivorPublicationIds,
       figureSpilloverSurvivorPublicationIds,
       currentWaveProcessedPublicationIds,

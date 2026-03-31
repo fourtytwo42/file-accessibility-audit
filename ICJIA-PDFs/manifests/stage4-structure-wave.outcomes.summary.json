@@ -1,97 +1,97 @@
 {
-  "generatedAt": "2026-03-31T17:16:28.300Z",
+  "generatedAt": "2026-03-31T17:34:05.364Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 5,
     "processed": 5,
     "readyToReplace": 0,
-    "remediatedPassCandidates": 1,
-    "failedAfterRemediation": 4,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 5,
     "sourceMissing": 0,
     "processingError": 0,
     "remaining": 0
   },
   "currentWave": {
     "processedPublicationIds": [
-      "3483",
-      "3936",
-      "4094",
-      "4145",
-      "4723"
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
     ],
     "remainingPublicationIds": [],
     "failedAfterRemediationPublicationIds": [
-      "3483",
-      "4094",
-      "4145",
-      "4723"
+      "3465",
+      "3671",
+      "4023",
+      "4054",
+      "4067"
     ],
     "processingErrorPublicationIds": []
   },
   "cumulativeTotals": {
-    "processed": 39,
+    "processed": 41,
     "readyToReplace": 0,
     "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 31,
+    "failedAfterRemediation": 33,
     "sourceMissing": 0,
     "processingError": 0
   },
   "latestProcessed": {
-    "publicationId": "4094",
-    "publicationTitle": "Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables",
-    "priorityRank": 6,
+    "publicationId": "3671",
+    "publicationTitle": "ICJIA 1997 Annual Report",
+    "priorityRank": 4,
     "priorityTier": "highest",
-    "passLikelihoodScore": 57,
+    "passLikelihoodScore": 83,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Juvenile Justice Data 2005 Annual Report APPENDIX H Data Tables.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Juvenile%20Justice%20Data%202005%20Annual%20Report%20APPENDIX%20H%20Data%20Tables.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/97anreport.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/97anreport.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/97anreport.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/97anreport.pdf.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T17:09:19.432Z",
-    "durationMs": 2061821,
+    "processedAt": "2026-03-31T04:08:40.491Z",
+    "durationMs": 118627,
     "original": {
-      "overallScore": 38,
+      "overallScore": 24,
       "grade": "F",
-      "pageCount": 97,
+      "pageCount": 36,
       "isScanned": false
     },
     "final": {
-      "overallScore": 67,
-      "grade": "D",
-      "pageCount": 97,
+      "overallScore": 87,
+      "grade": "B",
+      "pageCount": 36,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Final grade is D, not A.",
-        "Final overall score is 67, not 100.",
-        "Blocking local standards findings remain: pdfua.table_regularity",
-        "Categories still below 100: Heading Structure, Table Markup, PDF/UA Compliance"
+        "Final grade is B, not A.",
+        "Final overall score is 87, not 100.",
+        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
       ],
       "blockingLocalFindingKeys": [
-        "pdfua.table_regularity"
+        "pdfua.figure_alt_or_artifact"
       ],
       "unresolvedCategoryLabels": [
-        "Heading Structure",
-        "Table Markup",
+        "Alt Text on Images",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4094-Juvenile_Justice_Data_2005_Annual_Report_APPENDIX_H_Data_Tables.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
-      "remediatedPdfSha256": "620e28a38b2b0a6c1887f30f6962df7fbe7fffdcccc40462dfa5a005ef1241d8",
+      "gateEvaluatedBufferSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
+      "remediatedPdfSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
       "stagedReplacementSha256": null
     }
   }

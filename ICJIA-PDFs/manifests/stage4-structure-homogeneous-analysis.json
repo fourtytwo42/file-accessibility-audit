@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-03-31T17:34:05.158Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-03-31T17:34:05.136Z",
+  "sourceWaveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
+  "sourceWaveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
+  "rows": [
+    {
+      "publicationId": "3655",
+      "publicationTitle": "An Evaluation of the Violent Offender Prosecution Program in Kankakee Sangamon and Winnebago Counties",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3655-An_Evaluation_of_the_Violent_Offender_Prosecution_Program_in_Kankakee_Sangamon_and_Winnebago_Counties.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3655-An_Evaluation_of_the_Violent_Offender_Prosecution_Program_in_Kankakee_Sangamon_and_Winnebago_Counties.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3781",
+      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part Two Case Studies of New or Changed Juvenile Justice System Proce",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3781-An_Implementation_Evaluation_of_the_Juvenile_Justice_Reform_Provisions_of_1998_Part_Two_Case_Studies_of_New_or_Changed_Juvenile_Justice_System_Proce.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3781-An_Implementation_Evaluation_of_the_Juvenile_Justice_Reform_Provisions_of_1998_Part_Two_Case_Studies_of_New_or_Changed_Juvenile_Justice_System_Proce.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3785",
+      "publicationTitle": "An Implementation Evaluation of the Juvenile Justice Reform Provisions of 1998 Part One Surveys of Juvenile Justice Professionals",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3785-An_Implementation_Evaluation_of_the_Juvenile_Justice_Reform_Provisions_of_1998_Part_One_Surveys_of_Juvenile_Justice_Professionals.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3785-An_Implementation_Evaluation_of_the_Juvenile_Justice_Reform_Provisions_of_1998_Part_One_Surveys_of_Juvenile_Justice_Professionals.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3793",
+      "publicationTitle": "Longterm Impact Evaluation of Specialized Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3793-Longterm_Impact_Evaluation_of_Specialized_Sex_Offender_Probation_Programs_in_Lake_DuPage_and_Winnebago_Counties.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3793-Longterm_Impact_Evaluation_of_Specialized_Sex_Offender_Probation_Programs_in_Lake_DuPage_and_Winnebago_Counties.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3870",
+      "publicationTitle": "An Implementation and Impact Evaluation of the Adult Sex Offender Probation Project in Cook County",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3870-An_Implementation_and_Impact_Evaluation_of_the_Adult_Sex_Offender_Probation_Project_in_Cook_County.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3870-An_Implementation_and_Impact_Evaluation_of_the_Adult_Sex_Offender_Probation_Project_in_Cook_County.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3919",
+      "publicationTitle": "An Implementation Evaluation of the Specialized Sex Offender Projects in DuPage Lake and Winnebago Counties",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3919-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Projects_in_DuPage_Lake_and_Winnebago_Counties.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3919-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Projects_in_DuPage_Lake_and_Winnebago_Counties.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "3924",
+      "publicationTitle": "A Process and Impact Evaluation of Cook Countys States Attorneys Office Victim Witness Assistance Program",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3924-A_Process_and_Impact_Evaluation_of_Cook_Countys_States_Attorneys_Office_Victim_Witness_Assistance_Program.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3924-A_Process_and_Impact_Evaluation_of_Cook_Countys_States_Attorneys_Office_Victim_Witness_Assistance_Program.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    },
+    {
+      "publicationId": "4045",
+      "publicationTitle": "Community Reintegration Trajectories A Qualitative Comparative Study of GangAffiliated and NonGangAffiliated ExOffenders",
+      "priorStructureWaveBucket": "metadata_navigation_residuals",
+      "homogeneousDisposition": "metadata_font_structure_survivor",
+      "evidenceStrength": "terminal_report",
+      "evidencePaths": {
+        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4045-Community_Reintegration_Trajectories_A_Qualitative_Comparative_Study_of_GangAffiliated_and_NonGangAffiliated_ExOffenders.remediation.json",
+        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4045-Community_Reintegration_Trajectories_A_Qualitative_Comparative_Study_of_GangAffiliated_and_NonGangAffiliated_ExOffenders.failure.json",
+        "latestStage4AttemptPath": null,
+        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
+      },
+      "reasonCodes": [
+        "cohort:structure_heavy",
+        "outcome:failed_after_remediation",
+        "stage4.11:metadata_font_structure_survivor",
+        "stage4:metadata_navigation_after_wave"
+      ],
+      "notes": [
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.11 terminalized this homogeneous active row as a metadata+font+structure survivor from prior remediation evidence."
+      ]
+    }
+  ]
+}
