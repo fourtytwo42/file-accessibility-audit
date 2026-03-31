@@ -9,7 +9,7 @@
     "eligibleRows": 371,
     "selectedRows": 8,
     "skippedRows": 463,
-    "pendingRows": 7
+    "pendingRows": 3
   },
   "selectedPublicationIds": [
     "3614",
@@ -22,13 +22,9 @@
     "3806"
   ],
   "pendingPublicationIds": [
-    "3794",
     "4185",
-    "4186",
     "4481",
-    "4020",
-    "4551",
-    "3806"
+    "4551"
   ],
   "candidates": [
     {

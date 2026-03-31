@@ -2142,3 +2142,81 @@ First confirmed in-flight files:
   - `pnpm agency:build-control-plane` passed.
   - `pnpm agency:build-stage3-figure-wave` passed.
   - `pnpm agency:validate-control-plane` passed.
+
+- 2026-03-31 second Stage 3 figure-wave execution against the corrected Stage 3.1 routing:
+  - Before the run, the two dirty files
+    - `ICJIA-PDFs/manifests/ready-to-replace-verification.classified.json`
+    - `ICJIA-PDFs/manifests/ready-to-replace-verification.classified.summary.json`
+    were restored because they only differed by regenerated timestamps and did not contain newer verification truth.
+  - The corrected Stage 3 wave was started from `ICJIA-PDFs/manifests/stage3-figure-wave.json` with selected ids:
+    - `3614`
+    - `3794`
+    - `4185`
+    - `4186`
+    - `4481`
+    - `4020`
+    - `4551`
+    - `3806`
+  - The live runner did not cleanly finish within the turn; it was interrupted after truthful partial outcomes had already been written for part of the wave.
+  - Manual post-run refresh was then completed with:
+    - `pnpm agency:build-control-plane`
+    - `pnpm agency:build-stage3-figure-wave`
+    - `pnpm agency:validate-control-plane`
+  - There were no new verified passes from this second wave.
+  - Truthful second-wave terminal outcomes written before interruption:
+    - `3794`:
+      - `failed_after_remediation`
+      - final `80 / B`
+      - blocking `pdfua.untagged_rendered_images`
+    - `3806`:
+      - `processing_error`
+      - deferred with `excessive_runtime_loop`
+      - notes: `Inspection budget exceeded (light=4, deep=9, total=13).`
+    - `4020`:
+      - `failed_after_remediation`
+      - final `99 / B`
+      - no local blocking keys remained, but still failed gate because score/grade were not perfect
+    - `4186`:
+      - `failed_after_remediation`
+      - final `54 / F`
+      - blocking:
+        - `pdfua.logical_structure`
+        - `pdfua.untagged_rendered_images`
+        - `pdfua.figure_alt_or_artifact`
+  - Previously written Stage 3 rows from the first figure wave remain in the same outcomes manifest, so the append-style file now mixes first-wave and second-wave rows; totals in `stage3-figure-wave.outcomes.summary.json` should not be read as a clean per-wave cohort total unless filtered by publication id.
+  - Current refreshed Stage 3 throughput from `ICJIA-PDFs/manifests/stage3-figure-throughput.summary.json` after the partial second-wave refresh:
+    - `488` total `figure_heavy` rows
+    - `17` verified-pass rows in cohort
+    - `0` newly verified-pass rows from this wave
+    - `471` remaining figure-heavy rows
+    - `4` processing-error rows in the combined current wave outcomes set
+    - `8` hard-fail rows in the combined current wave outcomes set
+    - `pendingWaveRows: 3`
+      - `4185`
+      - `4481`
+      - `4551`
+    - `genericTimeoutRows: 0`
+  - Post-refresh routing signal:
+    - Stage 3 is improving honesty, but not yet throughput.
+    - The corrected wave still did not produce new ledger-backed passes.
+    - The finished rows reinforce two buckets:
+      - mass unresolved figure debt
+      - mixed figure+structure debt
+    - This is evidence that Stage 3 may be approaching saturation and that Stage 4 should likely focus on structure-heavy spillover rather than expecting large additional figure-only conversion.
+
+- 2026-03-31 Stage 3 decision checkpoint after the corrected second wave:
+  - Stage 3 should not currently be treated as complete in the sense of throughput closure.
+  - Reason:
+    - the corrected second Stage 3 wave produced `0` new ledger-backed verified passes
+    - the finished rows reinforced:
+      - mass unresolved figure debt
+      - mixed figure+structure debt
+      - bounded-runtime processing-error survivors
+  - Current practical interpretation:
+    - Stage 3 improved routing honesty and cohort separation
+    - Stage 3 did not materially improve pass throughput in the latest wave
+    - Stage 3 should be treated as operationally saturated rather than fully closed
+  - Planning consequence:
+    - Stage 4 should become the primary active lane
+    - Stage 4 should focus on structure-heavy spillover from Stage 3
+    - Stage 3 can remain open for occasional figure-only wins, but should not be the main expected conversion engine

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T00:39:01.856Z",
+  "generatedAt": "2026-03-31T00:48:54.000Z",
   "cohorts": {
     "short_high_likelihood": {
       "totalRows": 18,
@@ -34,8 +34,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 419,
-        "processing_error": 52,
+        "remediated_fail": 418,
+        "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0

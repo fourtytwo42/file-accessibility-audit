@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T00:39:01.846Z",
+  "generatedAt": "2026-03-31T00:48:53.992Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,8 +7,8 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 855,
-      "processing_error": 112,
+      "remediated_fail": 854,
+      "processing_error": 113,
       "deferred_manual": 0,
       "staged_for_replacement": 0,
       "replaced_remote": 0
@@ -43,8 +43,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 419,
-        "processing_error": 52,
+        "remediated_fail": 418,
+        "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0

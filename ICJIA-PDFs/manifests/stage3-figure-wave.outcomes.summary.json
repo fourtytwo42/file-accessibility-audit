@@ -1,65 +1,77 @@
 {
-  "generatedAt": "2026-03-31T00:02:26.287Z",
+  "generatedAt": "2026-03-31T00:46:42.602Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 8,
+    "processed": 12,
     "readyToReplace": 0,
     "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 5,
+    "failedAfterRemediation": 8,
     "sourceMissing": 0,
-    "processingError": 3,
+    "processingError": 4,
     "remaining": 0
   },
   "latestProcessed": {
-    "publicationId": "4487",
-    "publicationTitle": "Collaboration in Action: Overview and Lessons from “Data, Planning, and Impact: A Joint Adult Redeploy Illinois and Criminal Justice Coordinating Councils Summit”",
-    "priorityRank": 6,
+    "publicationId": "4186",
+    "publicationTitle": "Underreporting of violent victimization impedes justice services",
+    "priorityRank": 4,
     "priorityTier": "high",
-    "passLikelihoodScore": 70,
+    "passLikelihoodScore": 72,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Summit_Reports/ARI-CJCC_summit_report_050818.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Disproportionate%20reporting%20March%202008.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ARI-CJCC_summit_report_050818.pdf.json",
-    "status": "processing_error",
-    "processedAt": "2026-03-31T00:02:26.286Z",
-    "durationMs": 488887,
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_reporting_March_2008.pdf.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-03-31T00:46:42.602Z",
+    "durationMs": 185818,
     "original": {
-      "overallScore": 29,
+      "overallScore": 20,
       "grade": "F",
-      "pageCount": 9,
+      "pageCount": 4,
       "isScanned": false
     },
-    "final": null,
+    "final": {
+      "overallScore": 54,
+      "grade": "F",
+      "pageCount": 4,
+      "isScanned": false
+    },
     "gate": {
       "passed": false,
       "reasons": [
-        "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
-        "Marked as excessive runtime and deferred so the batch can continue."
+        "Final grade is F, not A.",
+        "Final overall score is 54, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
       ],
-      "blockingLocalFindingKeys": [],
-      "criticalManualReviewFlagCodes": [],
-      "unresolvedCategoryLabels": []
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "Alt Text on Images",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
     },
-    "promotionStatus": null,
     "artifacts": {
-      "remediatedPdfPath": null,
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": null,
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4487-Collaboration_in_Action_Overview_and_Lessons_from_Data_Planning_and_Impact_A_Joint_Adult_Redeploy_Illinois_and_Criminal_Justice_Coordinating_Councils_Summit.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": null,
-      "remediatedPdfSha256": null,
+      "gateEvaluatedBufferSha256": "3a5959cbeb451eb266639edfeb800b961a7d0dfd4c65adc6d1f9630e656c333d",
+      "remediatedPdfSha256": "3a5959cbeb451eb266639edfeb800b961a7d0dfd4c65adc6d1f9630e656c333d",
       "stagedReplacementSha256": null
-    },
-    "deferred": {
-      "reasonCode": "excessive_runtime_loop",
-      "skipNextBatch": true,
-      "notes": "Inspection budget exceeded (light=7, deep=8, total=15)."
     }
   }
 }

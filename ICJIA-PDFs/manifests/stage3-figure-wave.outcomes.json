@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-03-31T00:02:26.287Z",
+  "generatedAt": "2026-03-31T00:46:42.602Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 8,
+    "processed": 12,
     "readyToReplace": 0,
     "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 5,
+    "failedAfterRemediation": 8,
     "sourceMissing": 0,
-    "processingError": 3,
+    "processingError": 4,
     "remaining": 0
   },
   "outcomes": [
@@ -453,6 +453,225 @@
         "reasonCode": "excessive_runtime_loop",
         "skipNextBatch": true,
         "notes": "Inspection budget exceeded (light=7, deep=8, total=15)."
+      }
+    },
+    {
+      "publicationId": "3794",
+      "publicationTitle": "Extended Jurisdiction Juvenile Prosecutions in Illinois",
+      "priorityRank": 2,
+      "priorityTier": "high",
+      "passLikelihoodScore": 72,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/EJJOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/EJJOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/EJJOGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/EJJOGA.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T00:44:56.194Z",
+      "durationMs": 79411,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 80,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 80, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cc9aab48ac528d74ca77aa62493d0620d5141c8bd1b31ebd9d3ceb833856e3fc",
+        "remediatedPdfSha256": "cc9aab48ac528d74ca77aa62493d0620d5141c8bd1b31ebd9d3ceb833856e3fc",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3806",
+      "publicationTitle": "Boone County Juvenile Profile",
+      "priorityRank": 8,
+      "priorityTier": "high",
+      "passLikelihoodScore": 69,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Boone.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-03-31T00:45:03.385Z",
+      "durationMs": 86601,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 117,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/3806-Boone_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=4, deep=9, total=13)."
+      }
+    },
+    {
+      "publicationId": "4020",
+      "publicationTitle": "A Profile of the DuPage County Auto Theft Task Force (BATTLE)",
+      "priorityRank": 6,
+      "priorityTier": "high",
+      "passLikelihoodScore": 71,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/BATTLE03.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/BATTLE03.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/BATTLE03.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BATTLE03.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T00:45:35.603Z",
+      "durationMs": 118820,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 99,
+        "grade": "B",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 99, not 100."
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d6719f45ffc30752d19571e92d972518a4ab664be8356ca5a343c4c87af4497e",
+        "remediatedPdfSha256": "d6719f45ffc30752d19571e92d972518a4ab664be8356ca5a343c4c87af4497e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4186",
+      "publicationTitle": "Underreporting of violent victimization impedes justice services",
+      "priorityRank": 4,
+      "priorityTier": "high",
+      "passLikelihoodScore": 72,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Disproportionate%20reporting%20March%202008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_reporting_March_2008.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-03-31T00:46:42.602Z",
+      "durationMs": 185818,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 54,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 54, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "3a5959cbeb451eb266639edfeb800b961a7d0dfd4c65adc6d1f9630e656c333d",
+        "remediatedPdfSha256": "3a5959cbeb451eb266639edfeb800b961a7d0dfd4c65adc6d1f9630e656c333d",
+        "stagedReplacementSha256": null
       }
     }
   ]

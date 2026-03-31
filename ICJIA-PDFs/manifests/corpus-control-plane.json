@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T00:39:01.846Z",
+  "generatedAt": "2026-03-31T00:48:53.992Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,8 +7,8 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 855,
-      "processing_error": 112,
+      "remediated_fail": 854,
+      "processing_error": 113,
       "deferred_manual": 0,
       "staged_for_replacement": 0,
       "replaced_remote": 0
@@ -43,8 +43,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 419,
-        "processing_error": 52,
+        "remediated_fail": 418,
+        "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
@@ -37683,9 +37683,9 @@
         "verificationClassification": "hard_fail",
         "verificationTimestamp": "2026-03-30T15:27:39.603Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/EJJOGA.pdf.json",
-        "outcomeManifestPath": null,
-        "outcomeStatus": null,
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/EJJOGA.pdf.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.outcomes.json",
+        "outcomeStatus": "failed_after_remediation",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
         "candidateManifestPath": null
       },
       "classificationEvidence": {
@@ -38964,7 +38964,7 @@
       "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Boone.pdf",
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty",
       "replaceVia": "sftp",
-      "currentCorpusStatus": "remediated_fail",
+      "currentCorpusStatus": "processing_error",
       "cohortLabel": "figure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
@@ -38984,9 +38984,9 @@
         "verificationClassification": "hard_fail",
         "verificationTimestamp": "2026-03-30T15:28:34.185Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Boone.pdf.json",
-        "outcomeManifestPath": null,
-        "outcomeStatus": null,
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Boone.pdf.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.outcomes.json",
+        "outcomeStatus": "processing_error",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/3806-Boone_County_Juvenile_Profile.failure.json",
         "candidateManifestPath": null
       },
       "classificationEvidence": {
@@ -39013,7 +39013,7 @@
         "verificationPassed": false
       },
       "stage3FigureDiagnostics": {
-        "figureWaveBucket": "mass_unresolved_figure_debt",
+        "figureWaveBucket": "figure_processing_error_retry",
         "ownershipRiskKnown": false,
         "ownershipRiskCountInitial": null,
         "ownershipRiskCountFinal": null,
@@ -39027,7 +39027,7 @@
       },
       "reasonCodes": [
         "cohort:figure_heavy",
-        "stage3:mass_figure_debt_after_wave",
+        "stage3:bounded_runtime_figure_retry",
         "verification_hard_fail"
       ],
       "notes": [
@@ -61739,9 +61739,9 @@
         "verificationClassification": "hard_fail",
         "verificationTimestamp": "2026-03-30T15:34:02.785Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BATTLE03.pdf.json",
-        "outcomeManifestPath": null,
-        "outcomeStatus": null,
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BATTLE03.pdf.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.outcomes.json",
+        "outcomeStatus": "failed_after_remediation",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.remediation.json",
         "candidateManifestPath": null
       },
       "classificationEvidence": {
@@ -85225,9 +85225,9 @@
         "verificationClassification": "hard_fail",
         "verificationTimestamp": "2026-03-30T15:42:47.172Z",
         "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_reporting_March_2008.pdf.json",
-        "outcomeManifestPath": null,
-        "outcomeStatus": null,
-        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_reporting_March_2008.pdf.json",
+        "outcomeManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.outcomes.json",
+        "outcomeStatus": "failed_after_remediation",
+        "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
         "candidateManifestPath": null
       },
       "classificationEvidence": {
@@ -85236,12 +85236,14 @@
         "overallScore": 87,
         "grade": "B",
         "blockerFamilyCount": null,
-        "blockingFindingCount": 1,
+        "blockingFindingCount": 3,
         "manualOnlyFailureModeCount": null,
         "autoRunnableOpportunityCount": null,
         "topBlockingResidualFamilyIds": [],
         "blockingFindingKeys": [
-          "pdfua.figure_alt_or_artifact"
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images"
         ],
         "autoRunnableOpportunityKeys": [],
         "manualOnlyFailureModeKeys": []
@@ -85254,7 +85256,7 @@
         "verificationPassed": false
       },
       "stage3FigureDiagnostics": {
-        "figureWaveBucket": "mass_unresolved_figure_debt",
+        "figureWaveBucket": "mixed_figure_structure_debt",
         "ownershipRiskKnown": false,
         "ownershipRiskCountInitial": null,
         "ownershipRiskCountFinal": null,
@@ -85268,7 +85270,7 @@
       },
       "reasonCodes": [
         "cohort:figure_heavy",
-        "stage3:mass_figure_debt_after_wave",
+        "stage3:mixed_figure_structure_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
