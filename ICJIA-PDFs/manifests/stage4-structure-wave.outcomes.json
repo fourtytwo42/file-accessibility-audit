@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-04-01T01:11:18.755Z",
+  "generatedAt": "2026-04-01T02:32:04.376Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 8,
-    "processed": 47,
+    "targetCandidates": 7,
+    "processed": 55,
     "readyToReplace": 8,
     "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 38,
+    "failedAfterRemediation": 46,
     "sourceMissing": 0,
     "processingError": 1,
     "remaining": 0
@@ -2549,6 +2549,488 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
         "remediatedPdfSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4753",
+      "publicationTitle": "2022 Domestic Violence Fatality Review Committee Annual Report",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 83,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/remote-live/2022_DVFR_Annual_Report_Final_a688e16b10_a00d65b63f.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:27:37.332Z",
+      "durationMs": 1398895,
+      "original": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/192.241.146.85/4753-2022_Domestic_Violence_Fatality_Review_Committee_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/192.241.146.85/4753-2022_Domestic_Violence_Fatality_Review_Committee_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/192.241.146.85/4753-2022_Domestic_Violence_Fatality_Review_Committee_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "05d0767b80f00470f475397e811e9dbc549090328a8394f2b4f5d8f3daea2dda",
+        "remediatedPdfSha256": "05d0767b80f00470f475397e811e9dbc549090328a8394f2b4f5d8f3daea2dda",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4142",
+      "publicationTitle": "2008 Annual Report Motor Vehicle Theft Prevention Council",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 84,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/2008 Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/2008 Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/2008%20Annual%20Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2008_Annual_Report.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:43:09.043Z",
+      "durationMs": 2330607,
+      "original": {
+        "overallScore": 42,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4142-2008_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4142-2008_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4142-2008_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "623956e0702f1e4e3511e010c15a06b420d927356e96a03f81b35eb7d8607b84",
+        "remediatedPdfSha256": "623956e0702f1e4e3511e010c15a06b420d927356e96a03f81b35eb7d8607b84",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4731",
+      "publicationTitle": "State Fiscal Year 2024 Illinois Freedom from Drone Surveillance Act Report (without Appendices)",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 42,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_24_Drone_Report_without_appendices_efe0ed21ae.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_24_Drone_Report_without_appendices_efe0ed21ae.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_24_Drone_Report_without_appendices_efe0ed21ae.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4731-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_without_Appendices.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T02:29:11.889Z",
+      "durationMs": 62754,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 5,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 37,
+        "grade": "F",
+        "pageCount": 5,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 37, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/192.241.146.85/4731-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_without_Appendices.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/192.241.146.85/4731-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_without_Appendices.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/192.241.146.85/4731-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_without_Appendices.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a093e2659b2094d21a44c802f7a221849f7193dc078dbb31a8767cc16a24589f",
+        "remediatedPdfSha256": "a093e2659b2094d21a44c802f7a221849f7193dc078dbb31a8767cc16a24589f",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4501",
+      "publicationTitle": "Justice-Involved Girls",
+      "priorityRank": 1,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 42,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Girls in Crisis Information Sheet_Final Version-191218T20335017.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Girls in Crisis Information Sheet_Final Version-191218T20335017.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Girls in Crisis Information Sheet_Final Version-191218T20335017.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4501-Justice-Involved_Girls.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T02:29:25.049Z",
+      "durationMs": 75915,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 44,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 44, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4501-Justice-Involved_Girls.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4501-Justice-Involved_Girls.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4501-Justice-Involved_Girls.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "609bcb4f4e82ddd49183fe6fddfbdcee0c3c681b4aed176d18270cfb8193c7e4",
+        "remediatedPdfSha256": "609bcb4f4e82ddd49183fe6fddfbdcee0c3c681b4aed176d18270cfb8193c7e4",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3567",
+      "publicationTitle": "McGruff Rural Residents Protect Yourself from Crime!",
+      "priorityRank": 7,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 38,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgrural.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgrural.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgrural.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3567-McGruff_Rural_Residents_Protect_Yourself_from_Crime.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T02:30:56.539Z",
+      "durationMs": 167403,
+      "original": {
+        "overallScore": 18,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 91,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 91, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3567-McGruff_Rural_Residents_Protect_Yourself_from_Crime.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3567-McGruff_Rural_Residents_Protect_Yourself_from_Crime.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3567-McGruff_Rural_Residents_Protect_Yourself_from_Crime.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8a27fcfe3ac3468ad8d47193d5b173c9cdaf268dc9b69230e8831d2e61e01e74",
+        "remediatedPdfSha256": "8a27fcfe3ac3468ad8d47193d5b173c9cdaf268dc9b69230e8831d2e61e01e74",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4720",
+      "publicationTitle": "SEED: A Diversion Program for Young Adults, An Alternative to Incarceration",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 42,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/PDF brief-231021T16005363.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/PDF brief-231021T16005363.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/PDF%20brief-231021T16005363.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4720-SEED_A_Diversion_Program_for_Young_Adults_An_Alternative_to_Incarceration.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T02:31:37.730Z",
+      "durationMs": 208595,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 30, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.tagged_annotations, pdfua.annotation_alt_contents, pdfua.link_tagging",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Link & URL Quality, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.tagged_annotations",
+          "pdfua.annotation_alt_contents",
+          "pdfua.link_tagging"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Link & URL Quality",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/157.230.3.215/4720-SEED_A_Diversion_Program_for_Young_Adults_An_Alternative_to_Incarceration.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/157.230.3.215/4720-SEED_A_Diversion_Program_for_Young_Adults_An_Alternative_to_Incarceration.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/157.230.3.215/4720-SEED_A_Diversion_Program_for_Young_Adults_An_Alternative_to_Incarceration.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1061072f12d51302890f3a62310aec5f3e8dcfd4ede9120d73defe176eb6c258",
+        "remediatedPdfSha256": "1061072f12d51302890f3a62310aec5f3e8dcfd4ede9120d73defe176eb6c258",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4506",
+      "publicationTitle": "Issues in Policing Rural Areas: A Review of the Literature",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 41,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Rural2CoverPage-200320T21095517.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Rural2CoverPage-200320T21095517.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Rural2CoverPage-200320T21095517.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4506-Issues_in_Policing_Rural_Areas_A_Review_of_the_Literature.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T02:31:45.633Z",
+      "durationMs": 216498,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4506-Issues_in_Policing_Rural_Areas_A_Review_of_the_Literature.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4506-Issues_in_Policing_Rural_Areas_A_Review_of_the_Literature.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4506-Issues_in_Policing_Rural_Areas_A_Review_of_the_Literature.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "e5c6aaa6112ae23f57443caf9fa9eff5be4385dc05c32b5471c3b53ed2159b0d",
+        "remediatedPdfSha256": "e5c6aaa6112ae23f57443caf9fa9eff5be4385dc05c32b5471c3b53ed2159b0d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4627",
+      "publicationTitle": "FY2015 Freedom from Drones Annual report",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 38,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/drone/Drone_Report_2015.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/drone/Drone_Report_2015.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/drone/Drone_Report_2015.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T02:32:04.376Z",
+      "durationMs": 235241,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "61fa1ed1c78b7437115ad3623f77d8cf2f87a3b288899373bf336362b9697240",
+        "remediatedPdfSha256": "61fa1ed1c78b7437115ad3623f77d8cf2f87a3b288899373bf336362b9697240",
         "stagedReplacementSha256": null
       }
     }

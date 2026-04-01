@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-04-01T01:03:57.304Z",
+  "generatedAt": "2026-04-01T02:26:24.493Z",
   "analysisManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-active-forensics.json",
   "totals": {
     "analyzedRows": 8,
     "byDisposition": {
       "metadata_title_survivor": 0,
-      "metadata_navigation_residuals": 4,
-      "font_text_extractability_survivor": 0,
+      "metadata_navigation_residuals": 0,
+      "font_text_extractability_survivor": 1,
       "reading_order_only_survivor": 0,
-      "mixed_structure_figure_residuals": 4,
+      "mixed_structure_figure_residuals": 7,
       "structure_processing_error_retry": 0
     },
     "byEvidenceStrength": {
@@ -20,19 +20,19 @@
   },
   "publicationIdsByDisposition": {
     "metadata_title_survivor": [],
-    "metadata_navigation_residuals": [
-      "4084",
-      "4142",
-      "4753",
-      "4755"
+    "metadata_navigation_residuals": [],
+    "font_text_extractability_survivor": [
+      "4162"
     ],
-    "font_text_extractability_survivor": [],
     "reading_order_only_survivor": [],
     "mixed_structure_figure_residuals": [
-      "4153",
-      "4167",
-      "4169",
-      "4436"
+      "3567",
+      "4501",
+      "4506",
+      "4627",
+      "4720",
+      "4726",
+      "4731"
     ],
     "structure_processing_error_retry": []
   }

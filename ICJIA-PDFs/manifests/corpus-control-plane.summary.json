@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-01T01:04:04.121Z",
+  "generatedAt": "2026-04-01T02:35:32.561Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -7,16 +7,16 @@
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 842,
-      "processing_error": 113,
+      "remediated_fail": 841,
+      "processing_error": 114,
       "deferred_manual": 0,
       "staged_for_replacement": 8,
       "replaced_remote": 0
     },
     "byCohortLabel": {
       "short_high_likelihood": 20,
-      "figure_heavy": 492,
-      "structure_heavy": 340,
+      "figure_heavy": 494,
+      "structure_heavy": 338,
       "font_heavy": 14,
       "long_report": 15,
       "manual_tail": 175
@@ -43,7 +43,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 420,
+        "remediated_fail": 422,
         "processing_error": 53,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -54,8 +54,8 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 286,
-        "processing_error": 4,
+        "remediated_fail": 283,
+        "processing_error": 5,
         "deferred_manual": 0,
         "staged_for_replacement": 8,
         "replaced_remote": 0

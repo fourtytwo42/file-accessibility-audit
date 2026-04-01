@@ -1,43 +1,59 @@
 {
-  "generatedAt": "2026-04-01T01:11:18.755Z",
+  "generatedAt": "2026-04-01T02:35:32.598Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 8,
-    "processed": 47,
-    "readyToReplace": 8,
-    "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 38,
+    "targetCandidates": 1,
+    "processed": 0,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 0,
     "sourceMissing": 0,
-    "processingError": 1,
-    "remaining": 0
+    "processingError": 0,
+    "remaining": 1
+  },
+  "currentWave": {
+    "processedPublicationIds": [],
+    "remainingPublicationIds": [
+      "4726"
+    ],
+    "failedAfterRemediationPublicationIds": [],
+    "processingErrorPublicationIds": []
+  },
+  "cumulativeTotals": {
+    "processed": 55,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 8,
+    "failedAfterRemediation": 46,
+    "sourceMissing": 0,
+    "processingError": 1
   },
   "latestProcessed": {
-    "publicationId": "4436",
-    "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+    "publicationId": "4627",
+    "publicationTitle": "FY2015 Freedom from Drones Annual report",
     "priorityRank": 5,
     "priorityTier": "medium",
-    "passLikelihoodScore": 58,
+    "passLikelihoodScore": 38,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Annes House_022013.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Annes House_022013.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Annes%20House_022013.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/drone/Drone_Report_2015.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/drone/Drone_Report_2015.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/drone/Drone_Report_2015.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-04-01T01:11:18.755Z",
-    "durationMs": 420318,
+    "processedAt": "2026-04-01T02:32:04.376Z",
+    "durationMs": 235241,
     "original": {
-      "overallScore": 20,
+      "overallScore": 30,
       "grade": "F",
-      "pageCount": 8,
+      "pageCount": 1,
       "isScanned": false
     },
     "final": {
       "overallScore": 72,
       "grade": "C",
-      "pageCount": 8,
+      "pageCount": 1,
       "isScanned": false
     },
     "gate": {
@@ -45,28 +61,29 @@
       "reasons": [
         "Final grade is C, not A.",
         "Final overall score is 72, not 100.",
-        "Blocking local standards findings remain: pdfua.logical_structure",
-        "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+        "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
       ],
       "blockingLocalFindingKeys": [
-        "pdfua.logical_structure"
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
       ],
       "unresolvedCategoryLabels": [
-        "Text Extractability",
-        "Reading Order",
+        "Heading Structure",
+        "Alt Text on Images",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
-      "remediatedPdfSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
+      "gateEvaluatedBufferSha256": "61fa1ed1c78b7437115ad3623f77d8cf2f87a3b288899373bf336362b9697240",
+      "remediatedPdfSha256": "61fa1ed1c78b7437115ad3623f77d8cf2f87a3b288899373bf336362b9697240",
       "stagedReplacementSha256": null
     }
   }

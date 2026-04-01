@@ -1,68 +1,33 @@
 {
-  "generatedAt": "2026-04-01T01:04:17.325Z",
+  "generatedAt": "2026-04-01T02:35:32.594Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-04-01T01:04:17.303Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T02:35:32.557Z",
   "totals": {
-    "eligibleRows": 8,
-    "selectedRows": 8,
+    "eligibleRows": 1,
+    "selectedRows": 1,
     "skippedRows": 0,
-    "pendingRows": 8
+    "pendingRows": 1
   },
   "selectedPublicationIds": [
-    "4755",
-    "4142",
-    "4753",
-    "4084",
-    "4436",
-    "4153",
-    "4167",
-    "4169"
+    "4726"
   ],
   "pendingPublicationIds": [
-    "4755",
-    "4142",
-    "4753",
-    "4084",
-    "4436",
-    "4153",
-    "4167",
-    "4169"
+    "4726"
   ],
   "activeWaveSelectedPublicationIds": [
-    "4755",
-    "4142",
-    "4753",
-    "4084",
-    "4436",
-    "4153",
-    "4167",
-    "4169"
+    "4726"
   ],
   "activeWavePendingPublicationIds": [
-    "4755",
-    "4142",
-    "4753",
-    "4084",
-    "4436",
-    "4153",
-    "4167",
-    "4169"
+    "4726"
   ],
   "activeWaveAttemptedButUnterminalizedPublicationIds": [
-    "4755",
-    "4142",
-    "4753",
-    "4084",
-    "4436",
-    "4153",
-    "4167",
-    "4169"
+    "4726"
   ],
   "selectedByTier": {
-    "highest": 4,
+    "highest": 0,
     "high": 0,
-    "medium": 4,
+    "medium": 1,
     "low": 0
   },
   "selectedByStatus": {
@@ -70,16 +35,16 @@
     "discovered": 0,
     "analyzed": 0,
     "queued_for_remediation": 0,
-    "remediated_fail": 8,
+    "remediated_fail": 1,
     "processing_error": 0,
     "deferred_manual": 0,
     "staged_for_replacement": 0,
     "replaced_remote": 0
   },
   "selectedByStructureWaveBucket": {
-    "metadata_navigation_residuals": 4,
+    "metadata_navigation_residuals": 0,
     "structure_only_residuals": 0,
-    "mixed_structure_figure_residuals": 4,
+    "mixed_structure_figure_residuals": 1,
     "structure_processing_error_retry": 0
   }
 }

@@ -1,5 +1,52 @@
 # Project Memory
 
+## 2026-04-01 Stage 4.14 New-Wave Forensics And Follow-Up
+
+- After the prior Stage 4 wave rolled off, the rebuilt active Stage 4 wave advanced to:
+  - `4162`
+  - `4501`
+  - `4731`
+  - `4720`
+  - `4506`
+  - `4627`
+  - `4726`
+  - `3567`
+- A narrow active-forensics refresh was run only on that new 8-row wave:
+  - `ICJIA_STAGE4_STRUCTURE_ACTIVE_FORENSICS_INCLUDE_IDS=4162,4501,4731,4720,4506,4627,4726,3567 pnpm agency:analyze-stage4-structure-active-forensics`
+- Stage 4.14 forensic dispositions:
+  - `4162` -> `font_text_extractability_survivor`
+  - `3567`, `4501`, `4506`, `4627`, `4720`, `4726`, `4731` -> `mixed_structure_figure_residuals`
+- After rebuild and validation:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- The forensic refresh immediately reduced the active Stage 4 wave from `8` rows to `7` rows:
+  - `4501`, `4731`, `4720`, `4506`, `4627`, `4726`, `3567`
+  - `stillUnclassifiedPendingPublicationIds` became `[]`
+- One bounded live Stage 4 follow-up was then run only on that rebuilt 7-row set:
+  - `ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS=4501,4731,4720,4506,4627,4726,3567 pnpm agency:run-stage4-structure-wave`
+- Written terminal outcomes from that bounded rerun:
+  - `4501`, `4731`, `3567`, `4720`, `4506`, `4627` -> `failed_after_remediation`
+  - dominant stop reason pattern: `same_family_no_progress`
+  - no generic timeout wording was introduced
+- The Stage 4 wrapper/batch hang reproduced after the candidate loop had effectively finished:
+  - `run-stage4-structure-wave.ts` and `run-priority-remediation-batch.ts` were both idle in `ep_poll`
+  - `lsof` showed only the SQLite audit DB open, not active PDF/report files
+  - `4726` never received a written terminal outcome before the wrapper was killed
+- After killing the stuck wrapper and rebuilding again, the truthful active Stage 4 wave is now:
+  - `4726`
+- Current post-Stage-4.14 truth:
+  - `stage4-structure-wave.summary.json` selects only `4726`
+  - `stage4-structure-throughput.summary.json` shows:
+    - `activeWaveSelectedPublicationIds: [4726]`
+    - `stillUnclassifiedPendingPublicationIds: []`
+    - `reclassifiedOutOfStructureHeavyRows: 4`
+  - cohort shift after the rerun/rebuild:
+    - `structure_heavy: 338`
+    - `figure_heavy: 494`
+- Next step after Stage 4.14 should start from the single-row truthful active wave `4726`, while treating the wrapper non-exit as a separate operational bug.
+
 ## 2026-04-01 Stage 4 Active-Wave Selection Truth Fix
 
 - The Stage 4 active-wave selection drift between `4162` and `4169` is now fixed.
