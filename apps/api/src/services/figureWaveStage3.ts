@@ -206,6 +206,36 @@ function pendingPublicationIdsFromExistingArtifacts(
   return waveDoc.selectedPublicationIds.filter(publicationId => !completed.has(publicationId))
 }
 
+function shouldCarryForwardPendingFigureWave(input: {
+  existingWave: Stage3FigureWaveDocument | null
+  existingOutcomes: { outcomes?: OutcomeLike[] } | null
+  pendingPublicationIds: string[]
+  rowsById: Map<string, CorpusControlPlaneRow>
+}): boolean {
+  const { existingWave, existingOutcomes, pendingPublicationIds, rowsById } = input
+  if (!existingWave || pendingPublicationIds.length === 0) return false
+
+  const selectedIds = existingWave.selectedPublicationIds || []
+  const currentWaveOutcomes = (existingOutcomes?.outcomes || []).filter(outcome => outcome.publicationId && selectedIds.includes(outcome.publicationId))
+  if (currentWaveOutcomes.length === 0) return true
+
+  const newlyVerifiedPassCount = selectedIds.filter(publicationId => {
+    const row = rowsById.get(publicationId)
+    return Boolean(row?.currentCorpusStatus === 'verified_pass' && row?.promotionTruth.ledgerRowPresent)
+  }).length
+
+  const pendingRowsAreBucketed = pendingPublicationIds.every(publicationId => {
+    const row = rowsById.get(publicationId)
+    return Boolean(row?.cohortLabel === 'figure_heavy' && row?.stage3FigureDiagnostics.figureWaveBucket)
+  })
+
+  if (newlyVerifiedPassCount === 0 && pendingRowsAreBucketed) {
+    return false
+  }
+
+  return true
+}
+
 function bucketRank(bucket: FigureWaveBucket): number {
   return {
     ownership_cleared_figure_debt_remains: 0,
@@ -558,6 +588,7 @@ export function buildStage3FigureWaveArtifacts(input: {
   const currentOutcomesPath = path.join(input.manifestsRoot, 'stage3-figure-wave.outcomes.json')
   const existingWave = loadJsonIfExists(currentWavePath) as Stage3FigureWaveDocument | null
   const existingOutcomes = loadJsonIfExists(currentOutcomesPath) as { outcomes?: OutcomeLike[] } | null
+  const rowsById = new Map(input.artifacts.document.rows.map(row => [row.publicationId, row]))
   const activeEligiblePublicationIds = new Set(
     input.artifacts.document.rows
       .filter(row => row.cohortLabel === 'figure_heavy' && row.currentCorpusStatus !== 'verified_pass' && row.stage3FigureDiagnostics.figureWaveBucket)
@@ -566,28 +597,33 @@ export function buildStage3FigureWaveArtifacts(input: {
   const pendingPublicationIds = pendingPublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
     .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
 
-  if (existingWave && pendingPublicationIds.length > 0) {
+  if (shouldCarryForwardPendingFigureWave({
+    existingWave,
+    existingOutcomes,
+    pendingPublicationIds,
+    rowsById,
+  })) {
     const selectedByTier = { highest: 0, high: 0, medium: 0, low: 0 }
     const selectedByStatus = emptyStatusCounts()
     const selectedByFigureWaveBucket = emptyBucketCounts()
-    for (const candidate of existingWave.candidates) {
+    for (const candidate of existingWave!.candidates) {
       selectedByTier[candidate.priorityTier] += 1
       selectedByStatus[candidate.currentCorpusStatus] += 1
       selectedByFigureWaveBucket[candidate.figureWaveBucket] += 1
     }
     return {
       wave: {
-        ...existingWave,
+        ...existingWave!,
         pendingPublicationIds,
-        totals: { ...existingWave.totals, pendingRows: pendingPublicationIds.length },
+        totals: { ...existingWave!.totals, pendingRows: pendingPublicationIds.length },
       },
       summary: {
         generatedAt: new Date().toISOString(),
         waveManifestPath: currentWavePath,
-        sourceControlPlanePath: existingWave.sourceControlPlanePath,
-        sourceControlPlaneGeneratedAt: existingWave.sourceControlPlaneGeneratedAt,
-        totals: { ...existingWave.totals, pendingRows: pendingPublicationIds.length },
-        selectedPublicationIds: existingWave.selectedPublicationIds,
+        sourceControlPlanePath: existingWave!.sourceControlPlanePath,
+        sourceControlPlaneGeneratedAt: existingWave!.sourceControlPlaneGeneratedAt,
+        totals: { ...existingWave!.totals, pendingRows: pendingPublicationIds.length },
+        selectedPublicationIds: existingWave!.selectedPublicationIds,
         pendingPublicationIds,
         selectedByTier,
         selectedByStatus,
@@ -669,6 +705,8 @@ export function buildStage3FigureWaveArtifacts(input: {
     hasGenericTimeoutWording: row.stage3FigureDiagnostics.hasGenericTimeoutWording,
   }))
 
+  const nextPendingPublicationIds: string[] = []
+
   const wave: Stage3FigureWaveDocument = {
     generatedAt: new Date().toISOString(),
     sourceControlPlanePath: input.sourceControlPlanePath,
@@ -680,10 +718,10 @@ export function buildStage3FigureWaveArtifacts(input: {
       eligibleRows: eligibleRows.length,
       selectedRows: candidates.length,
       skippedRows: skippedRows.length,
-      pendingRows: pendingPublicationIds.length,
+      pendingRows: nextPendingPublicationIds.length,
     },
     selectedPublicationIds: candidates.map(candidate => candidate.publicationId).filter((value): value is string => Boolean(value)),
-    pendingPublicationIds,
+    pendingPublicationIds: nextPendingPublicationIds,
     candidates,
     skippedRows: skippedRows.sort((left, right) => left.publicationId.localeCompare(right.publicationId)),
   }
@@ -706,7 +744,7 @@ export function buildStage3FigureWaveArtifacts(input: {
       sourceControlPlaneGeneratedAt: input.sourceControlPlaneGeneratedAt,
       totals: wave.totals,
       selectedPublicationIds: wave.selectedPublicationIds,
-      pendingPublicationIds,
+      pendingPublicationIds: nextPendingPublicationIds,
       selectedByTier,
       selectedByStatus,
       selectedByFigureWaveBucket,

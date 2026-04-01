@@ -94,17 +94,24 @@ function chooseReportingWave(input: {
 }): Stage4StructureWaveDocument {
   const { existingWave, existingOutcomes, existingOutcomesSummary, nextWave, sourceControlPlanePath, sourceControlPlaneGeneratedAt, fallbackPublicationIds = [] } = input
   const terminalIds = terminalPublicationIdsFromOutcomes(existingOutcomes)
+  const nextWaveSelectedIds = nextWave.selectedPublicationIds || []
   if (existingWave) {
     const selectedIds = existingWave.selectedPublicationIds || []
-    if (selectedIds.length > 0 && selectedIds.every(publicationId => terminalIds.has(publicationId))) {
+    const existingWaveIsFullyTerminal = selectedIds.length > 0 && selectedIds.every(publicationId => terminalIds.has(publicationId))
+    const activeWaveAdvanced = nextWaveSelectedIds.length > 0 && selectedIds.join(',') !== nextWaveSelectedIds.join(',')
+    if (existingWaveIsFullyTerminal && !activeWaveAdvanced) {
       return existingWave
     }
+  }
+
+  if (nextWaveSelectedIds.length > 0) {
+    return nextWave
   }
 
   const minRows = Number(existingOutcomesSummary?.totals?.targetCandidates || 0)
   const latestCompletedWavePublicationIds = deriveLatestCompletedWavePublicationIds({
     existingOutcomes,
-    excludedPublicationIds: nextWave.selectedPublicationIds || [],
+    excludedPublicationIds: nextWaveSelectedIds,
     minRows: minRows > 0 ? minRows : 1,
   })
   if (latestCompletedWavePublicationIds.length > 0) {

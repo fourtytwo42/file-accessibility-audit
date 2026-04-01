@@ -1555,6 +1555,26 @@ export const __test_residualCleanupDominantFamily = residualCleanupDominantFamil
 export const __test_didResidualCleanupProgressImprove = didResidualCleanupProgressImprove
 export const __test_shouldAllowResidualFamilyDeepFollowUp = shouldAllowResidualFamilyDeepFollowUp
 
+function shouldStopStructureChurnEarly(input: {
+  previousCoarseStableStateSignature: string
+  currentCoarseStableStateSignature: string
+  tracker: ResidualCleanupTracker
+  stageActions: RemediationActionRecord[]
+  currentResult: AnalysisResult
+  context: PdfRemediationContext | null | undefined
+  stageAppliedAcrobatAltRepair: boolean
+}): boolean {
+  if (input.stageAppliedAcrobatAltRepair) return false
+  if (input.currentCoarseStableStateSignature !== input.previousCoarseStableStateSignature) return false
+  if (input.tracker.lastBucket !== 'structure' && input.tracker.lastBucket !== 'mixed') return false
+  if (input.tracker.lastMutationChangedDocument !== true || input.tracker.lastProgressed !== false) return false
+  const dominantFamily = residualCleanupDominantFamily(input.currentResult, input.context)
+  if (dominantFamily !== 'structure' && dominantFamily !== 'mixed') return false
+  return requiresDeepStructureInspect(input.stageActions)
+}
+
+export const __test_shouldStopStructureChurnEarly = shouldStopStructureChurnEarly
+
 function shouldDeferLateFigureWorkUntilStructureConverges(input: {
   analysis: AnalysisResult
   context: PdfRemediationContext | null | undefined
@@ -5501,6 +5521,15 @@ export async function remediatePdfWithAgent(
       consecutiveNoProgressStages += 1
       const currentStableStateSignature = remediationStateSignature(currentResult)
       const currentCoarseStableStateSignature = remediationCoarseStateSignature(currentResult)
+      const structureChurnStop = shouldStopStructureChurnEarly({
+        previousCoarseStableStateSignature: lastCoarseStableStateSignature,
+        currentCoarseStableStateSignature,
+        tracker: residualCleanupTracker,
+        stageActions,
+        currentResult,
+        context: stageContext,
+        stageAppliedAcrobatAltRepair,
+      })
       if (currentStableStateSignature === lastStableStateSignature) {
         stableStateRepeats += 1
       } else {
@@ -5520,6 +5549,16 @@ export async function remediatePdfWithAgent(
           label: 'Stable remediation state loop detected',
           severity: 'warning',
           details: `Stopped after repeated no-progress remediation cycles where the analyzed accessibility state did not change ${stableStateRepeats + 1} times.`,
+        })
+      } else if (structureChurnStop) {
+        stopAfterRound = true
+        markLatePhaseConverged('structure_state')
+        setResidualCleanupStopReason('same_family_no_progress')
+        manualReviewFlags = addFlag(manualReviewFlags, {
+          code: `stage_${stageNum}_structure_same_family_no_progress`,
+          label: 'Structure churn stopped early',
+          severity: 'warning',
+          details: 'Stopped early because structure-heavy remediation repeated the same blocking families after a deep-structure stage without measurable progress.',
         })
       } else if (coarseStableStateRepeats >= MAX_COARSE_STABLE_STATE_REPEATS) {
         stopAfterRound = true

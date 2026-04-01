@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T18:00:49.852Z",
+  "generatedAt": "2026-04-01T01:04:04.121Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
@@ -14,9 +14,9 @@
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 23,
+      "short_high_likelihood": 20,
       "figure_heavy": 492,
-      "structure_heavy": 337,
+      "structure_heavy": 340,
       "font_heavy": 14,
       "long_report": 15,
       "manual_tail": 175
@@ -32,7 +32,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 3,
+        "remediated_fail": 0,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -54,7 +54,7 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 283,
+        "remediated_fail": 286,
         "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 8,
@@ -29325,23 +29325,26 @@
         "structureWaveBucket": "structure_only_residuals",
         "terminalSurvivorClass": "reading_order_only_survivor",
         "dominantStructurePhase": null,
-        "hasLogicalStructureDebt": null,
+        "hasLogicalStructureDebt": true,
         "hasHeadingDebt": null,
         "hasReadingOrderDebt": true,
         "hasMetadataNavigationDebt": null,
         "hasMixedFigureResiduals": null,
         "hasBoundedRuntimeWording": false,
-        "originLane": "native_structure_heavy"
+        "originLane": "reclassified_from_short_high_likelihood"
       },
       "reasonCodes": [
         "cohort:short_high_likelihood",
+        "stage2:reclassified_from_short_high_likelihood",
+        "stage2:stage4_terminal_survivor_reading_order_only_survivor",
         "stage4.4:reading_order_only_survivor",
         "stage4:adopted_into_structure_lane_after_wave",
         "stage4:structure_only_after_wave",
         "verification_soft_fail"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 2 reclassified this row from short_high_likelihood to structure_heavy."
       ]
     },
     {
@@ -69219,7 +69222,7 @@
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc",
       "replaceVia": "sftp",
       "currentCorpusStatus": "remediated_fail",
-      "cohortLabel": "short_high_likelihood",
+      "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
         "sshTarget": "forge@143.244.146.43",
@@ -69278,24 +69281,29 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": null,
+        "structureWaveBucket": "structure_only_residuals",
         "terminalSurvivorClass": "near_pass_grade_only",
         "dominantStructurePhase": null,
-        "hasLogicalStructureDebt": null,
+        "hasLogicalStructureDebt": true,
         "hasHeadingDebt": null,
         "hasReadingOrderDebt": null,
         "hasMetadataNavigationDebt": null,
         "hasMixedFigureResiduals": null,
         "hasBoundedRuntimeWording": false,
-        "originLane": "native_structure_heavy"
+        "originLane": "reclassified_from_short_high_likelihood"
       },
       "reasonCodes": [
         "cohort:short_high_likelihood",
+        "stage2:reclassified_from_short_high_likelihood",
+        "stage2:stage4_terminal_survivor_near_pass_grade_only",
         "stage4.4:near_pass_grade_only",
+        "stage4:adopted_into_structure_lane_after_wave",
+        "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 2 reclassified this row from short_high_likelihood to structure_heavy."
       ]
     },
     {
@@ -73437,7 +73445,7 @@
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance",
       "replaceVia": "sftp",
       "currentCorpusStatus": "remediated_fail",
-      "cohortLabel": "short_high_likelihood",
+      "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
         "sshTarget": "forge@143.244.146.43",
@@ -73496,24 +73504,29 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": null,
+        "structureWaveBucket": "structure_only_residuals",
         "terminalSurvivorClass": "near_pass_grade_only",
         "dominantStructurePhase": null,
-        "hasLogicalStructureDebt": null,
+        "hasLogicalStructureDebt": true,
         "hasHeadingDebt": null,
         "hasReadingOrderDebt": null,
         "hasMetadataNavigationDebt": null,
         "hasMixedFigureResiduals": null,
         "hasBoundedRuntimeWording": false,
-        "originLane": "native_structure_heavy"
+        "originLane": "reclassified_from_short_high_likelihood"
       },
       "reasonCodes": [
         "cohort:short_high_likelihood",
+        "stage2:reclassified_from_short_high_likelihood",
+        "stage2:stage4_terminal_survivor_near_pass_grade_only",
         "stage4.4:near_pass_grade_only",
+        "stage4:adopted_into_structure_lane_after_wave",
+        "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 2 reclassified this row from short_high_likelihood to structure_heavy."
       ]
     },
     {
@@ -74982,7 +74995,7 @@
       "remoteDir": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/BARJ",
       "replaceVia": "sftp",
       "currentCorpusStatus": "remediated_fail",
-      "cohortLabel": "short_high_likelihood",
+      "cohortLabel": "structure_heavy",
       "sourceMetadata": {
         "fileHost": "archive.icjia-api.cloud",
         "sshTarget": "forge@143.244.146.43",
@@ -75041,24 +75054,29 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": null,
+        "structureWaveBucket": "structure_only_residuals",
         "terminalSurvivorClass": "near_pass_grade_only",
         "dominantStructurePhase": null,
-        "hasLogicalStructureDebt": null,
+        "hasLogicalStructureDebt": true,
         "hasHeadingDebt": null,
         "hasReadingOrderDebt": null,
         "hasMetadataNavigationDebt": null,
         "hasMixedFigureResiduals": null,
         "hasBoundedRuntimeWording": false,
-        "originLane": "native_structure_heavy"
+        "originLane": "reclassified_from_short_high_likelihood"
       },
       "reasonCodes": [
         "cohort:short_high_likelihood",
+        "stage2:reclassified_from_short_high_likelihood",
+        "stage2:stage4_terminal_survivor_near_pass_grade_only",
         "stage4.4:near_pass_grade_only",
+        "stage4:adopted_into_structure_lane_after_wave",
+        "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 2 reclassified this row from short_high_likelihood to structure_heavy."
       ]
     },
     {
@@ -77929,7 +77947,7 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "structure_only_residuals",
+        "structureWaveBucket": "metadata_navigation_residuals",
         "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
@@ -77942,11 +77960,14 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
+        "stage4.10:metadata_navigation_residuals",
+        "stage4:metadata_navigation_after_wave",
         "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.10 kept this active row in metadata/navigation residuals after review of prior remediation evidence."
       ]
     },
     {
@@ -88054,7 +88075,7 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "structure_only_residuals",
+        "structureWaveBucket": "metadata_navigation_residuals",
         "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
@@ -88067,11 +88088,14 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
+        "stage4.10:metadata_navigation_residuals",
+        "stage4:metadata_navigation_after_wave",
         "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem."
+        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
+        "Stage 4.10 kept this active row in metadata/navigation residuals after review of prior remediation evidence."
       ]
     },
     {
@@ -89643,11 +89667,13 @@
         "outcome:failed_after_remediation",
         "stage3:reclassified_from_figure_heavy",
         "stage3:structure_dominant_after_figure_wave",
+        "stage4.10:mixed_structure_figure_residuals",
         "stage4:mixed_structure_figure_after_wave"
       ],
       "notes": [
         "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome."
+        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
+        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
       ]
     },
     {
@@ -91950,11 +91976,13 @@
         "outcome:failed_after_remediation",
         "stage3:reclassified_from_figure_heavy",
         "stage3:structure_dominant_after_figure_wave",
+        "stage4.10:mixed_structure_figure_residuals",
         "stage4:mixed_structure_figure_after_wave"
       ],
       "notes": [
         "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome."
+        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
+        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
       ]
     },
     {
@@ -92162,11 +92190,13 @@
         "outcome:failed_after_remediation",
         "stage3:reclassified_from_figure_heavy",
         "stage3:structure_dominant_after_figure_wave",
+        "stage4.10:mixed_structure_figure_residuals",
         "stage4:mixed_structure_figure_after_wave"
       ],
       "notes": [
         "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome."
+        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
+        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
       ]
     },
     {
@@ -102219,12 +102249,14 @@
         "cohort:figure_heavy",
         "stage3:reclassified_from_figure_heavy",
         "stage3:structure_dominant_after_figure_wave",
+        "stage4.10:mixed_structure_figure_residuals",
         "stage4:mixed_structure_figure_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
         "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome."
+        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
+        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
       ]
     },
     {
@@ -163003,7 +163035,7 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "structure_only_residuals",
+        "structureWaveBucket": "metadata_navigation_residuals",
         "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
@@ -163016,10 +163048,13 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
+        "stage4.10:metadata_navigation_residuals",
+        "stage4:metadata_navigation_after_wave",
         "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
+        "Stage 4.10 kept this active row in metadata/navigation residuals after review of prior remediation evidence.",
         "Strapi-managed upload served from the agency uploads store."
       ]
     },
@@ -163698,7 +163733,7 @@
         "hasGenericTimeoutWording": false
       },
       "stage4StructureDiagnostics": {
-        "structureWaveBucket": "structure_only_residuals",
+        "structureWaveBucket": "metadata_navigation_residuals",
         "terminalSurvivorClass": null,
         "dominantStructurePhase": null,
         "hasLogicalStructureDebt": true,
@@ -163711,10 +163746,13 @@
       },
       "reasonCodes": [
         "cohort:structure_heavy",
+        "stage4.10:metadata_navigation_residuals",
+        "stage4:metadata_navigation_after_wave",
         "stage4:structure_only_after_wave",
         "verification_hard_fail"
       ],
       "notes": [
+        "Stage 4.10 kept this active row in metadata/navigation residuals after review of prior remediation evidence.",
         "Strapi-managed upload served from the agency uploads store."
       ]
     },

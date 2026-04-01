@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-03-31T18:00:49.885Z",
+  "generatedAt": "2026-04-01T01:04:17.325Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T18:00:49.860Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T01:04:17.303Z",
   "totals": {
-    "eligibleRows": 200,
+    "eligibleRows": 8,
     "selectedRows": 8,
-    "skippedRows": 192,
+    "skippedRows": 0,
     "pendingRows": 8
   },
   "selectedPublicationIds": [
@@ -14,55 +14,55 @@
     "4142",
     "4753",
     "4084",
-    "4162",
     "4436",
     "4153",
-    "4167"
+    "4167",
+    "4169"
   ],
   "pendingPublicationIds": [
     "4755",
     "4142",
     "4753",
     "4084",
-    "4162",
     "4436",
     "4153",
-    "4167"
+    "4167",
+    "4169"
   ],
   "activeWaveSelectedPublicationIds": [
     "4755",
     "4142",
     "4753",
     "4084",
-    "4162",
     "4436",
     "4153",
-    "4167"
+    "4167",
+    "4169"
   ],
   "activeWavePendingPublicationIds": [
     "4755",
     "4142",
     "4753",
     "4084",
-    "4162",
     "4436",
     "4153",
-    "4167"
+    "4167",
+    "4169"
   ],
   "activeWaveAttemptedButUnterminalizedPublicationIds": [
     "4755",
     "4142",
     "4753",
     "4084",
-    "4162",
     "4436",
     "4153",
-    "4167"
+    "4167",
+    "4169"
   ],
   "selectedByTier": {
-    "highest": 0,
-    "high": 5,
-    "medium": 3,
+    "highest": 4,
+    "high": 0,
+    "medium": 4,
     "low": 0
   },
   "selectedByStatus": {
@@ -77,9 +77,9 @@
     "replaced_remote": 0
   },
   "selectedByStructureWaveBucket": {
-    "metadata_navigation_residuals": 0,
-    "structure_only_residuals": 5,
-    "mixed_structure_figure_residuals": 3,
+    "metadata_navigation_residuals": 4,
+    "structure_only_residuals": 0,
+    "mixed_structure_figure_residuals": 4,
     "structure_processing_error_retry": 0
   }
 }

@@ -753,6 +753,16 @@ function unresolvedActivePublicationIdsFromExistingArtifacts(
   return pendingPublicationIdsFromExistingArtifacts(waveDoc, outcomesDoc)
 }
 
+function unresolvedContinuationFromActiveForensics(
+  rows: Stage4StructureActiveForensicsRow[],
+): string[] {
+  return uniqueStrings(rows
+    .filter(row => row.forensicsDisposition === 'metadata_navigation_residuals'
+      || row.forensicsDisposition === 'mixed_structure_figure_residuals'
+      || row.forensicsDisposition === 'structure_processing_error_retry')
+    .map(row => row.publicationId))
+}
+
 function terminalSurvivorClassFromRow(row: CorpusControlPlaneRow): Stage4TerminalSurvivorClass | null {
   return row.stage4StructureDiagnostics.terminalSurvivorClass || null
 }
@@ -2043,6 +2053,7 @@ export function buildStage4StructureWaveArtifacts(input: {
   const stalledAnalysisPublicationIds = uniqueStrings((input.stalledAnalysisRows || []).map(row => row.publicationId))
   const overlapAnalysisPublicationIds = uniqueStrings((input.overlapAnalysisRows || []).map(row => row.publicationId))
   const activeForensicsPublicationIds = uniqueStrings((input.activeForensicsRows || []).map(row => row.publicationId))
+  const unresolvedActiveForensicsPublicationIds = unresolvedContinuationFromActiveForensics(input.activeForensicsRows || [])
   const homogeneousAnalysisPublicationIds = uniqueStrings((input.homogeneousAnalysisRows || []).map(row => row.publicationId))
   const activeAnalysisIds = new Set(activeAnalysisPublicationIds)
   const activeEligiblePublicationIds = new Set(
@@ -2054,7 +2065,12 @@ export function buildStage4StructureWaveArtifacts(input: {
     .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
     .filter(publicationId => activeAnalysisIds.has(publicationId) || !forensicallyResolvedPendingIds.has(publicationId))
     .filter(publicationId => !homogeneousAnalysisPublicationIds.includes(publicationId))
-  const continuationPublicationIds = activeAnalysisPublicationIds.length > 0
+  const continuationPublicationIds = unresolvedActiveForensicsPublicationIds.length > 0
+    ? unresolvedActiveForensicsPublicationIds
+      .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
+      .filter(publicationId => !terminalOutcomeIds.has(publicationId))
+      .filter(publicationId => !homogeneousAnalysisPublicationIds.includes(publicationId))
+    : activeAnalysisPublicationIds.length > 0
     ? activeAnalysisPublicationIds.filter(publicationId => activeEligiblePublicationIds.has(publicationId) && !terminalOutcomeIds.has(publicationId))
     : existingUnresolvedPublicationIds
   const continueExistingActiveWave = includePublicationIds.length === 0 && continuationPublicationIds.length > 0

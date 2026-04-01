@@ -120,6 +120,14 @@ const FIGURE_FAMILY_PATTERN = /(figure|alt|ownership|artifact|image)/i
 const STRUCTURE_FAMILY_PATTERN = /(logical_structure|heading|reading_order|marked_content|page_tabs|structure|bookmark|language)/i
 const FONT_FAMILY_PATTERN = /(font|unicode|charenc)/i
 const ANNUAL_REPORT_TITLE_PATTERN = /annual report/i
+const STAGE4_STRUCTURE_TERMINAL_SURVIVOR_TO_STAGE2_COHORT: Partial<Record<NonNullable<CorpusControlPlaneRow['stage4StructureDiagnostics']['terminalSurvivorClass']>, CohortLabel>> = {
+  near_pass_grade_only: 'structure_heavy',
+  font_text_extractability_survivor: 'font_heavy',
+  metadata_title_survivor: 'structure_heavy',
+  reading_order_only_survivor: 'structure_heavy',
+  metadata_font_structure_survivor: 'structure_heavy',
+  figure_spillover_survivor: 'structure_heavy',
+}
 
 function uniqueStrings(values: Array<string | null | undefined>): string[] {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value)))).sort()
@@ -282,6 +290,15 @@ function benchmarkCategoryByPublicationId(sources: CorpusControlPlaneSources): M
 function determineEscalatedCohort(row: CorpusControlPlaneRow, benchmarkCategory: BenchmarkCategory): { cohort: CohortLabel | null; reason: string | null } {
   if (row.cohortLabel !== 'short_high_likelihood' || row.currentCorpusStatus === 'verified_pass') {
     return { cohort: null, reason: null }
+  }
+
+  const stage4TerminalSurvivorClass = row.stage4StructureDiagnostics.terminalSurvivorClass
+  if (stage4TerminalSurvivorClass) {
+    const escalatedCohort = STAGE4_STRUCTURE_TERMINAL_SURVIVOR_TO_STAGE2_COHORT[stage4TerminalSurvivorClass] || 'structure_heavy'
+    return {
+      cohort: escalatedCohort,
+      reason: `stage2:stage4_terminal_survivor_${stage4TerminalSurvivorClass}`,
+    }
   }
 
   const isOperationalRetry = row.reasonCodes.includes('stage2:operational_retry_after_tempdir_failure')

@@ -207,7 +207,27 @@ Operational rule:
 
 ## Staged Roadmap
 
+## Roadmap Status
+
+Current planning status for the staged roadmap:
+
+| Stage | Title | Status |
+| --- | --- | --- |
+| 0 | Freeze the truth model | Done |
+| 1 | Build the corpus control plane | Done |
+| 2 | Finish the high-likelihood throughput cohorts | Done |
+| 3 | Generalize figure and ownership remediation | Done |
+| 4 | Generalize structure and residual-family convergence | In progress |
+| 5 | Font and text extractability closure | Not started as a dedicated closure phase |
+| 6 | Long-report stability | Not started as a dedicated closure phase |
+| 7 | General API extraction | Not started as a dedicated extraction phase |
+| 8 | Controlled source-system promotion | Not started as a dedicated promotion phase |
+
 ## Stage 0: Freeze The Truth Model
+
+Current status:
+
+- done
 
 Goal:
 
@@ -225,6 +245,10 @@ Endgate:
 - all benchmark and batch outputs classify terminal outcomes honestly
 
 ## Stage 1: Build The Corpus Control Plane
+
+Current status:
+
+- done
 
 Goal:
 
@@ -264,6 +288,12 @@ Endgate:
 
 ## Stage 2: Finish The High-Likelihood Throughput Cohorts
 
+Current status:
+
+- done
+- the short-throughput lane is now truthfully closed
+- no longer the primary active lane
+
 Goal:
 
 - maximize the number of passing ICJIA replacements while the harder engine work continues
@@ -288,6 +318,12 @@ Endgate:
   - or clearly classified into a harder cohort with specific failure reasons
 
 ## Stage 3: Generalize Figure And Ownership Remediation
+
+Current status:
+
+- done
+- generalized figure and ownership repair is implemented and truthfully closed as its own lane
+- residual mixed-family spillover and saturated hard cases now belong to later stages rather than keeping Stage 3 artificially open
 
 Goal:
 
@@ -319,6 +355,13 @@ Endgate:
 
 ## Stage 4: Generalize Structure And Residual-Family Convergence
 
+Current status:
+
+- in progress
+- this is the active lane
+- routing/reporting convergence is now aligned on the same truthful active wave
+- the remaining blocker is canary churn reduction plus active-wave convergence on the current 8-row structure-heavy set
+
 Goal:
 
 - stop structure-heavy PDFs from re-spending deep inspections on flat residual families
@@ -346,6 +389,11 @@ Endgate:
 
 ## Stage 5: Font And Text Extractability Closure
 
+Current status:
+
+- not started as a dedicated closure phase
+- some precursor work exists through `font_text_extractability_survivor` routing and font-heavy cohort classification
+
 Goal:
 
 - reduce the remaining font/unicode class from late failures to either pass or explicit manual classification
@@ -366,6 +414,11 @@ Endgate:
 - font-heavy cohort has a stable pass/fail envelope and no hidden runtime tail
 
 ## Stage 6: Long-Report Stability
+
+Current status:
+
+- not started as a dedicated closure phase
+- some bounded-runtime and diagnostic groundwork exists, but long reports are not yet a closed, stable lane
 
 Goal:
 
@@ -391,6 +444,11 @@ Endgate:
 - long-report benchmark can be rerun repeatedly without crashes, missing paths, or uncontrolled loops
 
 ## Stage 7: General API Extraction
+
+Current status:
+
+- not started as a dedicated extraction phase
+- reusable internal services exist, but the ICJIA workflow is still the primary operational shell around the engine
 
 Goal:
 
@@ -455,6 +513,11 @@ Endgate:
 - the API can process arbitrary PDFs without ICJIA-specific context
 
 ## Stage 8: Controlled Source-System Promotion
+
+Current status:
+
+- not started as a dedicated promotion phase
+- verification, staging, and replacement-gate groundwork exist, but live promotion is intentionally still gated behind stricter proof
 
 Goal:
 

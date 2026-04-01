@@ -107,4 +107,25 @@ describe('run-remediation-regression-benchmark', () => {
       finalStopReason: 'same_family_no_progress',
     })
   })
+
+  it('falls back to structure-state stop reasons when residual cleanup metrics are sparse', async () => {
+    const { deriveResidualCleanupDiagnostic } = await import('../../../../scripts/run-remediation-regression-benchmark.ts')
+
+    expect(deriveResidualCleanupDiagnostic({
+      remediationMetrics: {
+        phases: {
+          structureState: {
+            freshDeepAnalyses: 1,
+            downgradedDeepAnalyses: 0,
+            lateConverged: true,
+            finalStopReason: 'same_family_no_progress',
+            finalBlockingKeys: ['pdfua.logical_structure'],
+          },
+        },
+      } as any,
+    })).toEqual({
+      dominantFamily: 'structure',
+      finalStopReason: 'same_family_no_progress',
+    })
+  })
 })

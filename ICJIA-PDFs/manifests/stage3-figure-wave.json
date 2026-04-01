@@ -1,31 +1,27 @@
 {
-  "generatedAt": "2026-03-31T00:38:36.913Z",
+  "generatedAt": "2026-04-01T00:32:59.088Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T00:38:36.893Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T00:32:59.072Z",
   "waveName": "stage3-figure-wave",
   "cohortLabel": "figure_heavy",
   "maxCandidates": 8,
   "totals": {
-    "eligibleRows": 371,
+    "eligibleRows": 376,
     "selectedRows": 8,
-    "skippedRows": 463,
-    "pendingRows": 3
+    "skippedRows": 466,
+    "pendingRows": 0
   },
   "selectedPublicationIds": [
     "3614",
     "3794",
     "4185",
-    "4186",
     "4481",
     "4020",
     "4551",
-    "3806"
+    "3878",
+    "3886"
   ],
-  "pendingPublicationIds": [
-    "4185",
-    "4481",
-    "4551"
-  ],
+  "pendingPublicationIds": [],
   "candidates": [
     {
       "priorityRank": 1,
@@ -91,7 +87,7 @@
         "stage3_bucket:mass_unresolved_figure_debt",
         "verification_hard_fail"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/EJJOGA.pdf.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
       "pageCount": 4,
       "isScanned": false,
       "blockerFamilyCount": 0,
@@ -158,47 +154,6 @@
       "passLikelihoodScore": 72,
       "priorityTier": "high",
       "recommendedAction": "fix_first",
-      "publicationId": "4186",
-      "publicationTitle": "Underreporting of violent victimization impedes justice services",
-      "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Disproportionate%20reporting%20March%202008.pdf",
-      "storageKind": "legacy_archive",
-      "currentCorpusStatus": "remediated_fail",
-      "figureWaveBucket": "mass_unresolved_figure_debt",
-      "selectionReasons": [
-        "cohort:figure_heavy",
-        "mass_figure_debt_candidate",
-        "stage3:mass_figure_debt_after_wave",
-        "stage3_bucket:mass_unresolved_figure_debt",
-        "verification_hard_fail"
-      ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_reporting_March_2008.pdf.json",
-      "pageCount": 4,
-      "isScanned": false,
-      "blockerFamilyCount": 0,
-      "blockingFindingCount": 1,
-      "topBlockingResidualFamilyIds": [],
-      "blockingFindingKeys": [
-        "pdfua.figure_alt_or_artifact"
-      ],
-      "ownershipRiskKnown": false,
-      "ownershipRiskCountInitial": null,
-      "ownershipRiskCountFinal": null,
-      "missingAltCountInitial": null,
-      "missingAltCountFinal": null,
-      "decorativeFigureCountInitial": null,
-      "decorativeFigureCountFinal": null,
-      "dominantFigurePhase": null,
-      "inspectionPattern": null,
-      "hasGenericTimeoutWording": false
-    },
-    {
-      "priorityRank": 5,
-      "passLikelihoodScore": 72,
-      "priorityTier": "high",
-      "recommendedAction": "fix_first",
       "publicationId": "4481",
       "publicationTitle": "Addressing Child Exposure to Violence",
       "serverHost": "157.230.3.215",
@@ -236,7 +191,7 @@
       "hasGenericTimeoutWording": false
     },
     {
-      "priorityRank": 6,
+      "priorityRank": 5,
       "passLikelihoodScore": 71,
       "priorityTier": "high",
       "recommendedAction": "fix_first",
@@ -256,7 +211,7 @@
         "stage3_bucket:mass_unresolved_figure_debt",
         "verification_hard_fail"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/BATTLE03.pdf.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.remediation.json",
       "pageCount": 12,
       "isScanned": false,
       "blockerFamilyCount": 0,
@@ -277,7 +232,7 @@
       "hasGenericTimeoutWording": false
     },
     {
-      "priorityRank": 7,
+      "priorityRank": 6,
       "passLikelihoodScore": 71,
       "priorityTier": "high",
       "recommendedAction": "fix_first",
@@ -318,16 +273,16 @@
       "hasGenericTimeoutWording": false
     },
     {
-      "priorityRank": 8,
+      "priorityRank": 7,
       "passLikelihoodScore": 69,
       "priorityTier": "high",
       "recommendedAction": "fix_first",
-      "publicationId": "3806",
-      "publicationTitle": "Boone County Juvenile Profile",
+      "publicationId": "3878",
+      "publicationTitle": "Jefferson County Juvenile Profile",
       "serverHost": "143.244.146.43",
-      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Boone.pdf",
-      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Boone.pdf",
-      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Jefferson.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Jefferson.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Jefferson.pdf",
       "storageKind": "legacy_archive",
       "currentCorpusStatus": "remediated_fail",
       "figureWaveBucket": "mass_unresolved_figure_debt",
@@ -338,7 +293,7 @@
         "stage3_bucket:mass_unresolved_figure_debt",
         "verification_hard_fail"
       ],
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Boone.pdf.json",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Jefferson.pdf.json",
       "pageCount": 32,
       "isScanned": false,
       "blockerFamilyCount": 0,
@@ -346,6 +301,47 @@
       "topBlockingResidualFamilyIds": [],
       "blockingFindingKeys": [
         "pdfua.untagged_rendered_images"
+      ],
+      "ownershipRiskKnown": false,
+      "ownershipRiskCountInitial": null,
+      "ownershipRiskCountFinal": null,
+      "missingAltCountInitial": null,
+      "missingAltCountFinal": null,
+      "decorativeFigureCountInitial": null,
+      "decorativeFigureCountFinal": null,
+      "dominantFigurePhase": null,
+      "inspectionPattern": null,
+      "hasGenericTimeoutWording": false
+    },
+    {
+      "priorityRank": 8,
+      "passLikelihoodScore": 69,
+      "priorityTier": "high",
+      "recommendedAction": "fix_first",
+      "publicationId": "3886",
+      "publicationTitle": "Brown County Juvenile Profile",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Brown.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Brown.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Brown.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "selectionReasons": [
+        "cohort:figure_heavy",
+        "mass_figure_debt_candidate",
+        "stage3:mass_figure_debt_after_wave",
+        "stage3_bucket:mass_unresolved_figure_debt",
+        "verification_hard_fail"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Brown.pdf.json",
+      "pageCount": 32,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
       ],
       "ownershipRiskKnown": false,
       "ownershipRiskCountInitial": null,
@@ -369,6 +365,17 @@
         "not_in_current_wave_capacity",
         "stage3_bucket:figure_processing_error_retry",
         "latest_outcome_status:processing_error"
+      ]
+    },
+    {
+      "publicationId": "3483",
+      "publicationTitle": "Trends and Issues 1997",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mass_unresolved_figure_debt",
+        "latest_outcome_status:failed_after_remediation"
       ]
     },
     {
@@ -435,6 +442,39 @@
         "not_in_current_wave_capacity",
         "stage3_bucket:mixed_figure_structure_debt",
         "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "3569",
+      "publicationTitle": "1998 Statewide Motor Vehicle Theft Prevention Strategy",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mass_unresolved_figure_debt",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "3575",
+      "publicationTitle": "1998 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mass_unresolved_figure_debt",
+        "latest_outcome_status:none"
+      ]
+    },
+    {
+      "publicationId": "3577",
+      "publicationTitle": "An Evaluation of the Madison County Assessment and Treatment and Alternative Court",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mass_unresolved_figure_debt",
+        "latest_outcome_status:none"
       ]
     },
     {
@@ -684,6 +724,17 @@
         "not_in_current_wave_capacity",
         "stage3_bucket:mixed_figure_structure_debt",
         "latest_outcome_status:ready_to_replace"
+      ]
+    },
+    {
+      "publicationId": "3671",
+      "publicationTitle": "ICJIA 1997 Annual Report",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mass_unresolved_figure_debt",
+        "latest_outcome_status:failed_after_remediation"
       ]
     },
     {
@@ -1552,6 +1603,17 @@
       ]
     },
     {
+      "publicationId": "3806",
+      "publicationTitle": "Boone County Juvenile Profile",
+      "currentCorpusStatus": "processing_error",
+      "figureWaveBucket": "figure_processing_error_retry",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:figure_processing_error_retry",
+        "latest_outcome_status:processing_error"
+      ]
+    },
+    {
       "publicationId": "3819",
       "publicationTitle": "Iroquois County Juvenile Profile",
       "currentCorpusStatus": "remediated_fail",
@@ -1770,28 +1832,6 @@
         "not_in_current_wave_capacity",
         "stage3_bucket:mixed_figure_structure_debt",
         "latest_outcome_status:ready_to_replace"
-      ]
-    },
-    {
-      "publicationId": "3878",
-      "publicationTitle": "Jefferson County Juvenile Profile",
-      "currentCorpusStatus": "remediated_fail",
-      "figureWaveBucket": "mass_unresolved_figure_debt",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage3_bucket:mass_unresolved_figure_debt",
-        "latest_outcome_status:none"
-      ]
-    },
-    {
-      "publicationId": "3886",
-      "publicationTitle": "Brown County Juvenile Profile",
-      "currentCorpusStatus": "remediated_fail",
-      "figureWaveBucket": "mass_unresolved_figure_debt",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage3_bucket:mass_unresolved_figure_debt",
-        "latest_outcome_status:none"
       ]
     },
     {
@@ -2831,15 +2871,6 @@
       ]
     },
     {
-      "publicationId": "4180",
-      "publicationTitle": "2010 Annual Report Motor Vehicle Theft Prevention Council",
-      "currentCorpusStatus": "remediated_fail",
-      "figureWaveBucket": null,
-      "skipReasons": [
-        "missing_figure_wave_bucket"
-      ]
-    },
-    {
       "publicationId": "4182",
       "publicationTitle": "State criminal justice survey seeks methods to stem drug use violence",
       "currentCorpusStatus": "remediated_fail",
@@ -2864,6 +2895,17 @@
     {
       "publicationId": "4184",
       "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mixed_figure_structure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mixed_figure_structure_debt",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4186",
+      "publicationTitle": "Underreporting of violent victimization impedes justice services",
       "currentCorpusStatus": "remediated_fail",
       "figureWaveBucket": "mixed_figure_structure_debt",
       "skipReasons": [
@@ -3310,15 +3352,6 @@
         "not_in_current_wave_capacity",
         "stage3_bucket:mixed_figure_structure_debt",
         "latest_outcome_status:ready_to_replace"
-      ]
-    },
-    {
-      "publicationId": "4483",
-      "publicationTitle": "Prior Criminal Justice Involvement of Persons Experiencing Violent Deaths in Illinois",
-      "currentCorpusStatus": "remediated_fail",
-      "figureWaveBucket": null,
-      "skipReasons": [
-        "missing_figure_wave_bucket"
       ]
     },
     {
@@ -4432,17 +4465,6 @@
       ]
     },
     {
-      "publicationId": "4654",
-      "publicationTitle": "Weathering Fiscal Uncertainty: A Study of the Effects of the Illinois Budget Impasse on Rape Crisis Centers",
-      "currentCorpusStatus": "remediated_fail",
-      "figureWaveBucket": "mixed_figure_structure_debt",
-      "skipReasons": [
-        "not_in_current_wave_capacity",
-        "stage3_bucket:mixed_figure_structure_debt",
-        "latest_outcome_status:none"
-      ]
-    },
-    {
       "publicationId": "4655",
       "publicationTitle": "A Preliminary Outcome Evaluation of Lake County's Police Referral to Substance Use Disorder Treatment Program",
       "currentCorpusStatus": "processing_error",
@@ -4630,6 +4652,17 @@
     {
       "publicationId": "4675",
       "publicationTitle": "A Guide to Conducting Focus Groups",
+      "currentCorpusStatus": "remediated_fail",
+      "figureWaveBucket": "mixed_figure_structure_debt",
+      "skipReasons": [
+        "not_in_current_wave_capacity",
+        "stage3_bucket:mixed_figure_structure_debt",
+        "latest_outcome_status:failed_after_remediation"
+      ]
+    },
+    {
+      "publicationId": "4677",
+      "publicationTitle": "Parole and Mandatory Supervised Release in Illinois",
       "currentCorpusStatus": "remediated_fail",
       "figureWaveBucket": "mixed_figure_structure_debt",
       "skipReasons": [

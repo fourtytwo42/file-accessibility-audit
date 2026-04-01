@@ -6328,6 +6328,65 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })).toBe(true)
   })
 
+  it('stops structure churn early when a deep-structure stage repeats the same coarse state', async () => {
+    const { __test_shouldStopStructureChurnEarly } = await import('../services/agentRemediationService.js')
+
+    const currentResult = makeAnalysisResult({
+      overallScore: 62,
+      grade: 'D',
+      categories: [
+        { id: 'reading_order', score: 40, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+        ],
+      } as any,
+    })
+
+    expect(__test_shouldStopStructureChurnEarly({
+      previousCoarseStableStateSignature: 'same',
+      currentCoarseStableStateSignature: 'same',
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'structure',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      stageActions: [{ tool: 'repair_structure_conformance' }],
+      currentResult,
+      context: null,
+      stageAppliedAcrobatAltRepair: false,
+    })).toBe(true)
+
+    expect(__test_shouldStopStructureChurnEarly({
+      previousCoarseStableStateSignature: 'same',
+      currentCoarseStableStateSignature: 'same',
+      tracker: {
+        lastFamilyId: null,
+        lastBucket: 'unknown',
+        lastSnapshot: null,
+        lastMutationChangedDocument: false,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      stageActions: [{ tool: 'repair_other_elements_alt_text' }],
+      currentResult,
+      context: null,
+      stageAppliedAcrobatAltRepair: true,
+    })).toBe(false)
+  })
+
   it('defers late figure work while structure-led residual debt remains unconverged', async () => {
     const { __test_shouldDeferLateFigureWorkUntilStructureConverges } = await import('../services/agentRemediationService.js')
 

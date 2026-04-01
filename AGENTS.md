@@ -3,6 +3,7 @@
 This file is for operating instructions. Durable project facts and "don't forget this" state live in:
 
 - `/home/hendo420/pdfaf/MEMORY.md`
+- `/home/hendo420/pdfaf/docs/12-icjia-corpus-and-general-api-roadmap.md`
 
 ## Memory Rule
 
@@ -13,6 +14,19 @@ This file is for operating instructions. Durable project facts and "don't forget
   - you need current project state, counts, storage layout, prior decisions, or known exceptions
 - If the contents of `MEMORY.md` are not already known in-context, read it before making assumptions.
 - Any time a lasting fact changes, a mistake is corrected, a workflow decision is proven, or something should be remembered later, update `MEMORY.md`.
+
+## Roadmap Rule
+
+- Read `docs/12-icjia-corpus-and-general-api-roadmap.md` whenever:
+  - a task is about stage planning, sequencing, or “what’s next”
+  - the user asks about Stage `0` through Stage `8`
+  - you need the current stage goal, endgate, or roadmap status
+  - you need to know whether a stage is done, active, or not yet started
+- Treat the roadmap doc as the canonical staged-plan reference for:
+  - ICJIA corpus completion
+  - general PDF accessibility API extraction
+  - stage goals and endgates
+- If the staged roadmap changes, update `docs/12-icjia-corpus-and-general-api-roadmap.md` and record the durable outcome in `MEMORY.md`.
 
 ## Purpose
 
@@ -250,4 +264,4 @@ Operational rule:
 
 - Discovery is safe by default.
 - Replacement is never implicit.
-- Always verify auth, counts, backup state, and `MEMORY.md` before touching live content.
+- Always verify auth, counts, backup state, `MEMORY.md`, and the roadmap doc before touching live content or making stage-planning claims.

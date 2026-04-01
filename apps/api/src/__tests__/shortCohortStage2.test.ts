@@ -78,6 +78,85 @@ function makeSources(): CorpusControlPlaneSources {
 }
 
 describe('short cohort Stage 2 reclassification', () => {
+  it('reclassifies short-cohort near-pass Stage 4 survivors into structure-heavy', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'near-pass',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'short_high_likelihood',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: null,
+          terminalSurvivorClass: 'near_pass_grade_only',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: null,
+          hasHeadingDebt: null,
+          hasReadingOrderDebt: null,
+          hasMetadataNavigationDebt: null,
+          hasMixedFigureResiduals: null,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+        },
+      }),
+    ])
+    const nextArtifacts = applyStage2ShortCohortReclassification(artifacts, makeSources())
+    const row = nextArtifacts.document.rows.find(candidate => candidate.publicationId === 'near-pass')
+    expect(row?.cohortLabel).toBe('structure_heavy')
+    expect(row?.reasonCodes).toContain('stage2:stage4_terminal_survivor_near_pass_grade_only')
+  })
+
+  it('reclassifies short-cohort Stage 4 font-text survivors into font-heavy', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'font-text',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'short_high_likelihood',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: null,
+          terminalSurvivorClass: 'font_text_extractability_survivor',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: null,
+          hasHeadingDebt: null,
+          hasReadingOrderDebt: null,
+          hasMetadataNavigationDebt: null,
+          hasMixedFigureResiduals: null,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+        },
+      }),
+    ])
+    const nextArtifacts = applyStage2ShortCohortReclassification(artifacts, makeSources())
+    const row = nextArtifacts.document.rows.find(candidate => candidate.publicationId === 'font-text')
+    expect(row?.cohortLabel).toBe('font_heavy')
+    expect(row?.reasonCodes).toContain('stage2:stage4_terminal_survivor_font_text_extractability_survivor')
+  })
+
+  it('does not reclassify verified-pass short rows even if they carry later-stage survivor truth', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'verified-short',
+        currentCorpusStatus: 'verified_pass',
+        cohortLabel: 'short_high_likelihood',
+        promotionTruth: { promotionStatus: 'verified_pass', ledgerRowPresent: true, stagedReplacementPath: '/staged/verified-short.pdf', replacementChecksumSha256: 'x', verificationPassed: true },
+        stage4StructureDiagnostics: {
+          structureWaveBucket: null,
+          terminalSurvivorClass: 'near_pass_grade_only',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: null,
+          hasHeadingDebt: null,
+          hasReadingOrderDebt: null,
+          hasMetadataNavigationDebt: null,
+          hasMixedFigureResiduals: null,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+        },
+      }),
+    ])
+    const nextArtifacts = applyStage2ShortCohortReclassification(artifacts, makeSources())
+    const row = nextArtifacts.document.rows.find(candidate => candidate.publicationId === 'verified-short')
+    expect(row?.cohortLabel).toBe('short_high_likelihood')
+    expect(row?.reasonCodes).not.toContain('stage2:stage4_terminal_survivor_near_pass_grade_only')
+  })
+
   it('reclassifies operational retry rows when the document is clearly not a short-profile fit', () => {
     const artifacts = makeArtifacts([
       makeRow({

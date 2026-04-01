@@ -9,6 +9,7 @@ import {
   buildStage4StructureWaveArtifacts,
   buildStage4StructureWaveOutcomesSummary,
   type Stage4StructureActiveAnalysisRow,
+  type Stage4StructureActiveForensicsRow,
   type Stage4StructurePendingAnalysisRow,
   type Stage4StructureStalledAnalysisRow,
   type Stage4StructureWaveDocument,
@@ -373,6 +374,268 @@ describe('structure wave Stage 4', () => {
     expect(summary.rows.activeUnresolvedPublicationIds).toEqual(['3465', '3671', '4023', '4054', '4067'])
     expect(summary.rows.pendingPublicationIds).toEqual(['3465', '3671', '4023', '4054', '4067'])
     expect(summary.rows.readingOrderOnlyResidualPublicationIds).not.toContain('3651')
+  })
+
+  it('prefers active forensics truth over stale active analysis carryover for the active wave', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-active-forensics-preferred-'))
+
+    const priorWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T09:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T09:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 8, selectedRows: 8, skippedRows: 0, pendingRows: 8 },
+      selectedPublicationIds: ['4084', '4142', '4153', '4162', '4167', '4436', '4753', '4755'],
+      pendingPublicationIds: ['4084', '4142', '4153', '4162', '4167', '4436', '4753', '4755'],
+      candidates: [],
+      skippedRows: [],
+    }
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.json'), JSON.stringify(priorWave, null, 2))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.outcomes.json'), JSON.stringify({ outcomes: [] }, null, 2))
+
+    const activeAnalysisRows: Stage4StructureActiveAnalysisRow[] = ['4084', '4142', '4153', '4162', '4167', '4436', '4753', '4755'].map(publicationId => ({
+      publicationId,
+      publicationTitle: publicationId,
+      priorStructureWaveBucket: publicationId === '4162' ? 'structure_only_residuals' : 'metadata_navigation_residuals',
+      activeDisposition: publicationId === '4153' || publicationId === '4167' || publicationId === '4436'
+        ? 'mixed_structure_figure_residuals'
+        : publicationId === '4162'
+          ? 'structure_only_residuals'
+          : 'metadata_navigation_residuals',
+      evidenceStrength: 'attempt_artifact_only',
+      evidencePaths: {
+        latestStage4AttemptPath: '/tmp/repo/attempt.json',
+        latestStage4OutcomePath: null,
+        controlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      },
+      reasonCodes: ['stage4.3:active'],
+      notes: ['active unresolved'],
+    }))
+
+    const activeForensicsRows: Stage4StructureActiveForensicsRow[] = [
+      ['4084', 'metadata_navigation_residuals'],
+      ['4142', 'metadata_navigation_residuals'],
+      ['4153', 'mixed_structure_figure_residuals'],
+      ['4167', 'mixed_structure_figure_residuals'],
+      ['4169', 'mixed_structure_figure_residuals'],
+      ['4436', 'mixed_structure_figure_residuals'],
+      ['4753', 'metadata_navigation_residuals'],
+      ['4755', 'metadata_navigation_residuals'],
+    ].map(([publicationId, forensicsDisposition]) => ({
+      publicationId,
+      publicationTitle: publicationId,
+      priorStructureWaveBucket: forensicsDisposition === 'mixed_structure_figure_residuals'
+        ? 'mixed_structure_figure_residuals'
+        : 'metadata_navigation_residuals',
+      forensicsDisposition: forensicsDisposition as Stage4StructureActiveForensicsRow['forensicsDisposition'],
+      evidenceStrength: 'terminal_report',
+      evidencePaths: {
+        latestStage4ReportPath: '/tmp/repo/report.json',
+        latestStage4FailurePath: '/tmp/repo/failure.json',
+        latestStage4AttemptPath: '/tmp/repo/attempt.json',
+        controlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      },
+      reasonCodes: ['stage4.10:' + forensicsDisposition],
+      notes: ['active forensic truth'],
+    }))
+
+    const artifacts = makeArtifacts([
+      ...['4084', '4142', '4753', '4755'].map(publicationId => makeRow({
+        publicationId,
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: 'metadata_navigation_residuals',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: false,
+          hasHeadingDebt: false,
+          hasReadingOrderDebt: false,
+          hasMetadataNavigationDebt: true,
+          hasMixedFigureResiduals: false,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+          terminalSurvivorClass: null,
+        },
+      })),
+      ...['4153', '4167', '4169', '4436'].map(publicationId => makeRow({
+        publicationId,
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: 'mixed_structure_figure_residuals',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: true,
+          hasHeadingDebt: false,
+          hasReadingOrderDebt: false,
+          hasMetadataNavigationDebt: false,
+          hasMixedFigureResiduals: true,
+          hasBoundedRuntimeWording: false,
+          originLane: 'reclassified_from_figure_heavy',
+          terminalSurvivorClass: null,
+        },
+      })),
+      makeRow({
+        publicationId: '4162',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: 'structure_only_residuals',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: true,
+          hasHeadingDebt: false,
+          hasReadingOrderDebt: true,
+          hasMetadataNavigationDebt: false,
+          hasMixedFigureResiduals: false,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+          terminalSurvivorClass: null,
+        },
+      }),
+    ])
+
+    const { wave } = buildStage4StructureWaveArtifacts({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T09:00:00.000Z',
+      manifestsRoot,
+      maxCandidates: 8,
+      activeAnalysisRows,
+      activeForensicsRows,
+    })
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T09:00:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave,
+      activeWave: wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [] },
+      activeAnalysisRows,
+      activeForensicsRows,
+    })
+
+    expect(wave.selectedPublicationIds).toEqual(['4084', '4142', '4753', '4755', '4153', '4167', '4169', '4436'])
+    expect(wave.pendingPublicationIds).toEqual(['4084', '4142', '4753', '4755', '4153', '4167', '4169', '4436'])
+    expect(wave.selectedPublicationIds).not.toContain('4162')
+    expect(summary.rows.activeWaveSelectedPublicationIds).toEqual(['4084', '4142', '4153', '4167', '4169', '4436', '4753', '4755'])
+    expect(summary.rows.activeForensicsPublicationIds).toEqual(['4084', '4142', '4153', '4167', '4169', '4436', '4753', '4755'])
+    expect(summary.rows.stillUnclassifiedPendingPublicationIds).toEqual([])
+  })
+
+  it('excludes terminal survivor rows from active-forensics continuation', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage4-wave-active-forensics-terminal-'))
+
+    const priorWave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T09:30:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T09:30:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 3, selectedRows: 3, skippedRows: 0, pendingRows: 3 },
+      selectedPublicationIds: ['metadata', 'mixed', 'terminal-font'],
+      pendingPublicationIds: ['metadata', 'mixed', 'terminal-font'],
+      candidates: [],
+      skippedRows: [],
+    }
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.json'), JSON.stringify(priorWave, null, 2))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage4-structure-wave.outcomes.json'), JSON.stringify({ outcomes: [] }, null, 2))
+
+    const activeForensicsRows: Stage4StructureActiveForensicsRow[] = [
+      ['metadata', 'metadata_navigation_residuals'],
+      ['mixed', 'mixed_structure_figure_residuals'],
+      ['terminal-font', 'font_text_extractability_survivor'],
+    ].map(([publicationId, forensicsDisposition]) => ({
+      publicationId,
+      publicationTitle: publicationId,
+      priorStructureWaveBucket: forensicsDisposition === 'mixed_structure_figure_residuals'
+        ? 'mixed_structure_figure_residuals'
+        : 'metadata_navigation_residuals',
+      forensicsDisposition: forensicsDisposition as Stage4StructureActiveForensicsRow['forensicsDisposition'],
+      evidenceStrength: 'terminal_report',
+      evidencePaths: {
+        latestStage4ReportPath: '/tmp/repo/report.json',
+        latestStage4FailurePath: '/tmp/repo/failure.json',
+        latestStage4AttemptPath: '/tmp/repo/attempt.json',
+        controlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      },
+      reasonCodes: ['stage4.10:' + forensicsDisposition],
+      notes: ['active forensic truth'],
+    }))
+
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'metadata',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: 'metadata_navigation_residuals',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: false,
+          hasHeadingDebt: false,
+          hasReadingOrderDebt: false,
+          hasMetadataNavigationDebt: true,
+          hasMixedFigureResiduals: false,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+          terminalSurvivorClass: null,
+        },
+      }),
+      makeRow({
+        publicationId: 'mixed',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: 'mixed_structure_figure_residuals',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: true,
+          hasHeadingDebt: false,
+          hasReadingOrderDebt: false,
+          hasMetadataNavigationDebt: false,
+          hasMixedFigureResiduals: true,
+          hasBoundedRuntimeWording: false,
+          originLane: 'reclassified_from_figure_heavy',
+          terminalSurvivorClass: null,
+        },
+      }),
+      makeRow({
+        publicationId: 'terminal-font',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        stage4StructureDiagnostics: {
+          structureWaveBucket: 'metadata_navigation_residuals',
+          dominantStructurePhase: null,
+          hasLogicalStructureDebt: true,
+          hasHeadingDebt: false,
+          hasReadingOrderDebt: false,
+          hasMetadataNavigationDebt: true,
+          hasMixedFigureResiduals: false,
+          hasBoundedRuntimeWording: false,
+          originLane: 'native_structure_heavy',
+          terminalSurvivorClass: null,
+        },
+      }),
+    ])
+
+    const { wave } = buildStage4StructureWaveArtifacts({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T09:30:00.000Z',
+      manifestsRoot,
+      activeForensicsRows,
+    })
+
+    expect(wave.selectedPublicationIds).toEqual(['metadata', 'mixed'])
+    expect(wave.selectedPublicationIds).not.toContain('terminal-font')
   })
 
   it('reports current-wave totals separately from cumulative Stage 4 history', () => {

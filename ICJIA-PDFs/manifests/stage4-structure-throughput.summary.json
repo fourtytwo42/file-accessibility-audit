@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-03-31T18:00:49.890Z",
+  "generatedAt": "2026-04-01T01:04:17.328Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-31T18:00:49.860Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T01:04:17.303Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
   "totals": {
-    "totalStructureHeavyRows": 337,
+    "totalStructureHeavyRows": 340,
     "verifiedPassRowsInCohort": 42,
     "newlyVerifiedPassRowsFromWave": 0,
-    "remainingStructureHeavyRows": 295,
+    "remainingStructureHeavyRows": 298,
     "processingErrorsInWave": 0,
-    "hardFailsInWave": 5,
-    "metadataNavigationResidualRows": 7,
-    "structureOnlyResidualRows": 5,
+    "hardFailsInWave": 0,
+    "metadataNavigationResidualRows": 11,
+    "structureOnlyResidualRows": 1,
     "mixedStructureFigureResidualRows": 192,
     "structureProcessingErrorRetryRows": 4,
     "pendingWaveRows": 8,
@@ -229,6 +229,7 @@
       "4009",
       "4011",
       "4012",
+      "4023",
       "4024",
       "4028",
       "4032",
@@ -243,10 +244,12 @@
       "4048",
       "4050",
       "4051",
+      "4054",
       "4055",
       "4059",
       "4061",
       "4066",
+      "4067",
       "4068",
       "4075",
       "4076",
@@ -357,8 +360,8 @@
       "4084",
       "4142",
       "4153",
-      "4162",
       "4167",
+      "4169",
       "4436",
       "4753",
       "4755"
@@ -367,21 +370,15 @@
       "4084",
       "4142",
       "4153",
-      "4162",
       "4167",
+      "4169",
       "4436",
       "4753",
       "4755"
     ],
     "activeWaveAttemptedButUnterminalizedPublicationIds": [],
     "processingErrorPublicationIds": [],
-    "hardFailPublicationIds": [
-      "3465",
-      "3671",
-      "4023",
-      "4054",
-      "4067"
-    ],
+    "hardFailPublicationIds": [],
     "readingOrderOnlyResidualPublicationIds": [
       "3550",
       "3606",
@@ -399,17 +396,17 @@
       "3769",
       "3784",
       "4076",
+      "4084",
       "4094",
+      "4142",
       "4145",
       "4209",
-      "4723"
-    ],
-    "structureOnlyResidualPublicationIds": [
-      "4084",
-      "4142",
-      "4162",
+      "4723",
       "4753",
       "4755"
+    ],
+    "structureOnlyResidualPublicationIds": [
+      "4162"
     ],
     "mixedStructureFigureResidualPublicationIds": [
       "3567",
@@ -615,8 +612,8 @@
       "4084",
       "4142",
       "4153",
-      "4162",
       "4167",
+      "4169",
       "4436",
       "4753",
       "4755"
@@ -846,22 +843,13 @@
       "4054",
       "4067"
     ],
-    "stillUnclassifiedPendingPublicationIds": [
-      "4084",
-      "4142",
-      "4153",
-      "4162",
-      "4167",
-      "4436",
-      "4753",
-      "4755"
-    ],
+    "stillUnclassifiedPendingPublicationIds": [],
     "activeUnresolvedPublicationIds": [
       "4084",
       "4142",
       "4153",
-      "4162",
       "4167",
+      "4169",
       "4436",
       "4753",
       "4755"
@@ -899,18 +887,31 @@
       "3903"
     ],
     "activeForensicsPublicationIds": [
-      "4076",
-      "4209"
+      "4084",
+      "4142",
+      "4153",
+      "4167",
+      "4169",
+      "4436",
+      "4753",
+      "4755"
     ],
     "activeForensicsByDisposition": {
       "metadata_title_survivor": [],
-      "metadata_navigation_residuals": [],
-      "font_text_extractability_survivor": [
-        "4076",
-        "4209"
+      "metadata_navigation_residuals": [
+        "4084",
+        "4142",
+        "4753",
+        "4755"
       ],
+      "font_text_extractability_survivor": [],
       "reading_order_only_survivor": [],
-      "mixed_structure_figure_residuals": [],
+      "mixed_structure_figure_residuals": [
+        "4153",
+        "4167",
+        "4169",
+        "4436"
+      ],
       "structure_processing_error_retry": []
     },
     "homogeneousAnalysisPublicationIds": [
@@ -1041,14 +1042,17 @@
       "3671",
       "3682"
     ],
-    "currentWaveProcessedPublicationIds": [
-      "3465",
-      "3671",
-      "4023",
-      "4054",
-      "4067"
+    "currentWaveProcessedPublicationIds": [],
+    "currentWaveRemainingPublicationIds": [
+      "4084",
+      "4142",
+      "4153",
+      "4167",
+      "4169",
+      "4436",
+      "4753",
+      "4755"
     ],
-    "currentWaveRemainingPublicationIds": [],
     "genericTimeoutPublicationIds": []
   }
 }

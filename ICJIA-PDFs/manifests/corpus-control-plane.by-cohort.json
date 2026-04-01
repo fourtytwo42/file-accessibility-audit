@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-03-31T18:00:49.869Z",
+  "generatedAt": "2026-04-01T01:04:04.137Z",
   "cohorts": {
     "short_high_likelihood": {
-      "totalRows": 23,
+      "totalRows": 20,
       "byCurrentCorpusStatus": {
         "verified_pass": 20,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 3,
+        "remediated_fail": 0,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
@@ -20,11 +20,11 @@
         "3669",
         "3907",
         "3915",
-        "4023",
         "4052",
         "4053",
-        "4054",
-        "4056"
+        "4056",
+        "4062",
+        "4063"
       ]
     },
     "figure_heavy": {
@@ -54,13 +54,13 @@
       ]
     },
     "structure_heavy": {
-      "totalRows": 337,
+      "totalRows": 340,
       "byCurrentCorpusStatus": {
         "verified_pass": 42,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 283,
+        "remediated_fail": 286,
         "processing_error": 4,
         "deferred_manual": 0,
         "staged_for_replacement": 8,

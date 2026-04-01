@@ -148,6 +148,51 @@ describe('figure wave Stage 3 selection', () => {
     expect(wave.candidates.map(candidate => candidate.figureWaveBucket)).toEqual(['ownership_cleared_figure_debt_remains', 'mass_unresolved_figure_debt', 'figure_processing_error_retry', 'mixed_figure_structure_debt'])
   })
 
+  it('drops stale pending carryover when a prior wave wrote outcomes but produced no verified passes', () => {
+    const fsLocal = require('fs')
+    const os = require('os')
+    const pathLocal = require('path')
+    const manifestsRoot = fsLocal.mkdtempSync(pathLocal.join(os.tmpdir(), 'stage3-wave-closure-'))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage3-figure-wave.json'), JSON.stringify({
+      generatedAt: '2026-03-30T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-30T00:00:00.000Z',
+      waveName: 'stage3-figure-wave',
+      cohortLabel: 'figure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 4, selectedRows: 4, skippedRows: 0, pendingRows: 2 },
+      selectedPublicationIds: ['ownership', 'mass', 'pending-a', 'pending-b'],
+      pendingPublicationIds: ['pending-a', 'pending-b'],
+      candidates: [],
+      skippedRows: [],
+    }))
+    fsLocal.writeFileSync(pathLocal.join(manifestsRoot, 'stage3-figure-wave.outcomes.json'), JSON.stringify({
+      outcomes: [
+        { publicationId: 'ownership', status: 'failed_after_remediation' },
+        { publicationId: 'mass', status: 'processing_error' },
+      ],
+    }))
+
+    const artifacts = makeArtifacts([
+      makeRow({ publicationId: 'ownership', currentCorpusStatus: 'remediated_fail', cohortLabel: 'figure_heavy', stage3FigureDiagnostics: { figureWaveBucket: 'ownership_cleared_figure_debt_remains', ownershipRiskKnown: true, ownershipRiskCountInitial: 5, ownershipRiskCountFinal: 0, missingAltCountInitial: 3, missingAltCountFinal: 2, decorativeFigureCountInitial: 0, decorativeFigureCountFinal: 0, dominantFigurePhase: 'figure_description', inspectionPattern: 'mixed', hasGenericTimeoutWording: false } }),
+      makeRow({ publicationId: 'mass', currentCorpusStatus: 'processing_error', cohortLabel: 'figure_heavy', stage3FigureDiagnostics: { figureWaveBucket: 'mass_unresolved_figure_debt', ownershipRiskKnown: true, ownershipRiskCountInitial: 115, ownershipRiskCountFinal: 0, missingAltCountInitial: 110, missingAltCountFinal: 110, decorativeFigureCountInitial: 0, decorativeFigureCountFinal: 0, dominantFigurePhase: 'figure_description', inspectionPattern: 'mixed', hasGenericTimeoutWording: false } }),
+      makeRow({ publicationId: 'pending-a', currentCorpusStatus: 'remediated_fail', cohortLabel: 'figure_heavy', stage3FigureDiagnostics: { figureWaveBucket: 'mass_unresolved_figure_debt', ownershipRiskKnown: false, ownershipRiskCountInitial: null, ownershipRiskCountFinal: null, missingAltCountInitial: 1, missingAltCountFinal: 1, decorativeFigureCountInitial: 0, decorativeFigureCountFinal: 0, dominantFigurePhase: null, inspectionPattern: null, hasGenericTimeoutWording: false } }),
+      makeRow({ publicationId: 'pending-b', currentCorpusStatus: 'remediated_fail', cohortLabel: 'figure_heavy', stage3FigureDiagnostics: { figureWaveBucket: 'mass_unresolved_figure_debt', ownershipRiskKnown: false, ownershipRiskCountInitial: null, ownershipRiskCountFinal: null, missingAltCountInitial: 1, missingAltCountFinal: 1, decorativeFigureCountInitial: 0, decorativeFigureCountFinal: 0, dominantFigurePhase: null, inspectionPattern: null, hasGenericTimeoutWording: false } }),
+    ])
+
+    const { wave } = buildStage3FigureWaveArtifacts({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-30T00:00:00.000Z',
+      manifestsRoot,
+      maxCandidates: 8,
+    })
+
+    expect(wave.selectedPublicationIds).toEqual(['ownership', 'pending-a', 'pending-b', 'mass'])
+    expect(wave.pendingPublicationIds).toEqual([])
+    expect(wave.totals.pendingRows).toBe(0)
+  })
+
   it('reports Stage 3 routing buckets in the throughput summary', () => {
     const artifacts = makeArtifacts([
       makeRow({ publicationId: '3614', currentCorpusStatus: 'remediated_fail', cohortLabel: 'figure_heavy', stage3FigureDiagnostics: { figureWaveBucket: 'ownership_cleared_figure_debt_remains', ownershipRiskKnown: true, ownershipRiskCountInitial: 5, ownershipRiskCountFinal: 0, missingAltCountInitial: 2, missingAltCountFinal: 4, decorativeFigureCountInitial: 0, decorativeFigureCountFinal: 0, dominantFigurePhase: 'figure_description', inspectionPattern: 'mixed', hasGenericTimeoutWording: false } }),

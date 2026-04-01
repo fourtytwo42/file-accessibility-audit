@@ -1,97 +1,72 @@
 {
-  "generatedAt": "2026-03-31T18:00:49.890Z",
+  "generatedAt": "2026-04-01T01:11:18.755Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 5,
-    "processed": 5,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 5,
+    "targetCandidates": 8,
+    "processed": 47,
+    "readyToReplace": 8,
+    "remediatedPassCandidates": 8,
+    "failedAfterRemediation": 38,
     "sourceMissing": 0,
-    "processingError": 0,
+    "processingError": 1,
     "remaining": 0
   },
-  "currentWave": {
-    "processedPublicationIds": [
-      "3465",
-      "3671",
-      "4023",
-      "4054",
-      "4067"
-    ],
-    "remainingPublicationIds": [],
-    "failedAfterRemediationPublicationIds": [
-      "3465",
-      "3671",
-      "4023",
-      "4054",
-      "4067"
-    ],
-    "processingErrorPublicationIds": []
-  },
-  "cumulativeTotals": {
-    "processed": 41,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 33,
-    "sourceMissing": 0,
-    "processingError": 0
-  },
   "latestProcessed": {
-    "publicationId": "3671",
-    "publicationTitle": "ICJIA 1997 Annual Report",
-    "priorityRank": 4,
-    "priorityTier": "highest",
-    "passLikelihoodScore": 83,
+    "publicationId": "4436",
+    "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+    "priorityRank": 5,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 58,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/97anreport.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/97anreport.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/97anreport.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Annes House_022013.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Annes House_022013.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Annes%20House_022013.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/97anreport.pdf.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T04:08:40.491Z",
-    "durationMs": 118627,
+    "processedAt": "2026-04-01T01:11:18.755Z",
+    "durationMs": 420318,
     "original": {
-      "overallScore": 24,
+      "overallScore": 20,
       "grade": "F",
-      "pageCount": 36,
+      "pageCount": 8,
       "isScanned": false
     },
     "final": {
-      "overallScore": 87,
-      "grade": "B",
-      "pageCount": 36,
+      "overallScore": 72,
+      "grade": "C",
+      "pageCount": 8,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Final grade is B, not A.",
-        "Final overall score is 87, not 100.",
-        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
-        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        "Final grade is C, not A.",
+        "Final overall score is 72, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure",
+        "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
       ],
       "blockingLocalFindingKeys": [
-        "pdfua.figure_alt_or_artifact"
+        "pdfua.logical_structure"
       ],
       "unresolvedCategoryLabels": [
-        "Alt Text on Images",
+        "Text Extractability",
+        "Reading Order",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
-      "remediatedPdfSha256": "baca33596c62091d32171e98ba5f180dab1535d3bbcc1e1c7e187d6658f7ce37",
+      "gateEvaluatedBufferSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
+      "remediatedPdfSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
       "stagedReplacementSha256": null
     }
   }

@@ -1,5 +1,284 @@
 # Project Memory
 
+## 2026-04-01 Stage 4 Active-Wave Selection Truth Fix
+
+- The Stage 4 active-wave selection drift between `4162` and `4169` is now fixed.
+- The selection fix was implemented in:
+  - `apps/api/src/services/structureWaveStage4.ts`
+- New Stage 4 continuation rule:
+  - when `activeForensicsRows` are present, unresolved active-forensics dispositions now define the canonical active continuation set
+  - unresolved active-forensics rows are:
+    - `metadata_navigation_residuals`
+    - `mixed_structure_figure_residuals`
+    - `structure_processing_error_retry`
+  - terminal active-forensics survivor rows are excluded from active continuation
+  - the older `activeAnalysisRows` / carried pending-wave truth is now the fallback only when no active forensics rows exist
+- Focused regression coverage was added in:
+  - `apps/api/src/__tests__/structureWaveStage4.test.ts`
+- Verified commands:
+  - `pnpm exec vitest run src/__tests__/structureWaveStage4.test.ts`
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- New truthful Stage 4 state from the rebuilt manifests:
+  - `stage4-structure-wave.summary.json` now selects and reports:
+    - `4755`
+    - `4142`
+    - `4753`
+    - `4084`
+    - `4436`
+    - `4153`
+    - `4167`
+    - `4169`
+  - `4162` is no longer reintroduced into the active wave
+  - `stage4-structure-throughput.summary.json` now aligns active-wave selection with active forensics instead of showing split-brain selection truth
+  - `genericTimeoutRows` remains `0`
+- Stage 4 is still the active roadmap lane, but the remaining work is now convergence on the truthful active wave rather than repairing reporting or selection drift.
+
+## 2026-04-01 Stage 4 Closure Follow-Up
+
+- The remaining Stage 4 blocker is no longer manifest selection truth.
+- Current Stage 4 active-wave truth remains:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4436`
+  - `4153`
+  - `4167`
+  - `4169`
+- A narrow active-forensics refresh was rerun against those exact 8 ids:
+  - `ICJIA_STAGE4_STRUCTURE_ACTIVE_FORENSICS_INCLUDE_IDS=4755,4142,4753,4084,4436,4153,4167,4169 pnpm agency:analyze-stage4-structure-active-forensics`
+- The refreshed forensics did not change routing:
+  - `4084`, `4142`, `4753`, `4755` remain `metadata_navigation_residuals`
+  - `4153`, `4167`, `4169`, `4436` remain `mixed_structure_figure_residuals`
+- After rebuild:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- Roadmap/doc wording should now treat Stage 4 as:
+  - active-wave truth fixed
+  - remaining blocker is canary churn reduction plus active-wave convergence
+
+## 2026-04-01 Stage 3 Truthful Closure
+
+- Stage 3 is now truthfully closed as a roadmap stage.
+- The closure fix was implemented in:
+  - `apps/api/src/services/figureWaveStage3.ts`
+- New Stage 3 closure rule:
+  - stale pending figure-wave carryover is dropped when a prior Stage 3 wave has already written truthful outcomes, produced `0` newly verified passes, and the remaining pending ids are still fully represented by the stable Stage 3 bucket model
+  - in that situation, the rebuilt Stage 3 wave should represent the next truthful figure-only selection instead of preserving stale pending throughput state
+- Focused test coverage was added in:
+  - `apps/api/src/__tests__/figureWaveStage3.test.ts`
+- After rebuild:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage3-figure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- New truthful Stage 3 state from the rebuilt manifests:
+  - `stage3-figure-wave.summary.json` now shows:
+    - `pendingRows: 0`
+    - selected ids:
+      - `3614`
+      - `3794`
+      - `4185`
+      - `4481`
+      - `4020`
+      - `4551`
+      - `3878`
+      - `3886`
+  - `stage3-figure-throughput.summary.json` now shows:
+    - `totalFigureHeavyRows: 493`
+    - `verifiedPassRowsInCohort: 19`
+    - `newlyVerifiedPassRowsFromWave: 0`
+    - `remainingFigureHeavyRows: 474`
+    - `processingErrorsInWave: 4`
+    - `hardFailsInWave: 8`
+    - `ownershipClearedFigureDebtRows: 1`
+    - `mixedFigureStructureDebtRows: 279`
+    - `massUnresolvedFigureDebtRows: 43`
+    - `figureProcessingErrorRetryRows: 53`
+    - `genericTimeoutRows: 0`
+    - `pendingWaveRows: 0`
+- Stage 3 endgate interpretation:
+  - generalized figure/ownership remediation is complete as a lane
+  - benchmark and representative canaries remain stable
+  - generic timeout wording remains eliminated
+  - Stage 3 is not a meaningful expected conversion engine anymore
+  - residual mixed figure+structure spillover and saturated hard cases should be handled by Stage 4+ rather than keeping Stage 3 open
+- Roadmap status should now be treated as:
+  - Stage `0`: done
+  - Stage `1`: done
+  - Stage `2`: done
+  - Stage `3`: done
+  - Stage `4`: in progress / active lane
+
+## 2026-04-01 Stage 2 Truthful Closure
+
+- Stage 2 is now truthfully closed as a roadmap stage.
+- The closure fix was implemented in:
+  - `apps/api/src/services/shortCohortStage2.ts`
+- New Stage 2 closure rule:
+  - non-`verified_pass` `short_high_likelihood` rows are reclassified out of Stage 2 when they already carry a Stage 4 terminal survivor class
+  - `near_pass_grade_only` now escalates to `structure_heavy`
+  - `font_text_extractability_survivor` now escalates to `font_heavy`
+  - other Stage 4 structure survivor classes default to `structure_heavy` for Stage 2 handoff
+- Tests were added in:
+  - `apps/api/src/__tests__/shortCohortStage2.test.ts`
+- The specific stale Stage 2 backlog rows handed out of `short_high_likelihood` were:
+  - `4023`
+  - `4054`
+  - `4067`
+- Those rows were not real Stage 2 throughput backlog anymore:
+  - all three were already Stage 4 terminal survivors with `terminalSurvivorClass: near_pass_grade_only`
+  - after the fix they moved from `short_high_likelihood` to `structure_heavy`
+- After rebuild:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage2-short-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- New truthful Stage 2 state:
+  - `short_high_likelihood: 20` rows total
+  - all `20` are `verified_pass`
+  - `0` `remediated_fail`
+  - `0` `processing_error`
+  - `stage2-short-cohort-wave.json` selects `0` rows
+  - `stage2-short-cohort-throughput.summary.json` shows:
+    - `verifiedPassRowsInCohort: 20`
+    - `remainingRowsInCohort: 0`
+    - `pendingWaveRows: 0`
+- Roadmap status should now be treated as:
+  - Stage `0`: done
+  - Stage `1`: done
+  - Stage `2`: done
+  - Stage `3`: substantially done
+  - Stage `4`: in progress / active lane
+
+## 2026-03-31 Roadmap Doc Refresh
+
+- The staged ICJIA-to-general-API roadmap is now explicitly documented in:
+  - `docs/12-icjia-corpus-and-general-api-roadmap.md`
+- The roadmap now includes all stages `0` through `8` with:
+  - a clear title
+  - current status
+  - goal
+  - endgate
+- Current roadmap status snapshot:
+  - Stage `0`: done
+  - Stage `1`: done
+  - Stage `2`: substantially done
+  - Stage `3`: substantially done
+  - Stage `4`: in progress / active lane
+  - Stage `5`: not started as a dedicated closure phase
+  - Stage `6`: not started as a dedicated closure phase
+  - Stage `7`: not started as a dedicated extraction phase
+  - Stage `8`: not started as a dedicated promotion phase
+
+## 2026-03-31 Stage 4.13
+
+- A second narrow Stage 4 active-wave forensic pass was run against:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4436`
+  - `4153`
+  - `4167`
+  - `4169`
+- The targeted forensic pass again resolved all `8` rows from `terminal_report` evidence in:
+  - `ICJIA-PDFs/manifests/stage4-structure-active-forensics.json`
+  - `ICJIA-PDFs/manifests/stage4-structure-active-forensics.summary.json`
+- Stage 4.13 forensic dispositions:
+  - `metadata_navigation_residuals`:
+    - `4084`
+    - `4142`
+    - `4753`
+    - `4755`
+  - `mixed_structure_figure_residuals`:
+    - `4153`
+    - `4167`
+    - `4169`
+    - `4436`
+- Reporting-wave alignment was patched in:
+  - `scripts/build-stage4-structure-wave.ts`
+- New reporting-wave rule:
+  - do not preserve an older fully terminal reporting wave when the freshly built active wave has advanced to a different unresolved set
+  - prefer the freshly built `nextWave` when it has selected rows
+  - only fall back to the latest completed wave when there is no newer active unresolved wave to report
+- After the Stage 4.13 rebuild/validate sequence:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained clean with `ok: true`
+- Practical effect of the reporting fix:
+  - `stage4-structure-wave.summary.json` no longer stayed pinned to the older completed 5-row cohort `3465/3671/4023/4054/4067`
+  - reporting now reflects the current selected Stage 4 wave instead of that stale completed cohort
+- After rebuild, the selected/active Stage 4 wave settled to:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4162`
+  - `4436`
+  - `4153`
+  - `4167`
+- Important nuance:
+  - even though the Stage 4.13 forensic target included `4169`, the rebuilt active/selected wave reintroduced `4162` and excluded `4169`
+  - this indicates the current active-wave continuation/selection inputs still pull the prior unresolved structure-heavy set back into the rebuilt wave
+  - the stale reporting-wave pinning bug is fixed, but active-wave selection behavior itself was not changed in Stage 4.13
+- Next step should be a focused forensic/selection follow-up on why rebuild still prefers `4162` over `4169`, not another blind Stage 4 rerun.
+
+## 2026-03-31 Stage 4.12 Follow-Up
+
+- The narrow Stage 4.12 active-wave forensic follow-up was run against the exact 8-row set:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4162`
+  - `4436`
+  - `4153`
+  - `4167`
+- The targeted forensic pass resolved all `8` rows from `terminal_report` evidence in:
+  - `ICJIA-PDFs/manifests/stage4-structure-active-forensics.json`
+  - `ICJIA-PDFs/manifests/stage4-structure-active-forensics.summary.json`
+- Forensic dispositions for that 8-row set:
+  - `metadata_navigation_residuals`:
+    - `4084`
+    - `4142`
+    - `4753`
+    - `4755`
+  - `font_text_extractability_survivor`:
+    - `4162`
+  - `mixed_structure_figure_residuals`:
+    - `4153`
+    - `4167`
+    - `4436`
+- After the forensic refresh, the truthful rebuild/validate sequence was completed with:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+- Validation remained clean after rebuild:
+  - `pnpm agency:validate-control-plane` returned `ok: true`
+- The previous active Stage 4 wave no longer survived intact after rebuild:
+  - `4162` was reclassified out of the active Stage 4 wave as `font_text_extractability_survivor`
+  - `4169` entered as the next pending eligible Stage 4 row
+- The rebuilt active Stage 4 wave is now:
+  - `4755`
+  - `4142`
+  - `4753`
+  - `4084`
+  - `4436`
+  - `4153`
+  - `4167`
+  - `4169`
+- Important reporting nuance:
+  - `stage4-structure-wave.summary.json` still reports the older completed 5-row reporting wave `3465/3671/4023/4054/4067`
+  - this is expected from the current reporting-wave pinning logic and does not mean the active wave failed to advance
+- Next step after this follow-up should be another narrow Stage 4.x forensic/routing pass on the new active 8-row set, not a blind Stage 4 rerun.
+
 ## 2026-03-31 Stage 4.12
 
 - Stage 4.11 was committed and pushed as `5581aa8` (Implement Stage 4.11 homogeneous survivor routing).

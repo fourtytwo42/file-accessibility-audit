@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-03-31T17:24:34.523Z",
+  "generatedAt": "2026-04-01T01:11:18.755Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 41,
+    "processed": 47,
     "readyToReplace": 8,
     "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 33,
+    "failedAfterRemediation": 38,
     "sourceMissing": 0,
-    "processingError": 0,
+    "processingError": 1,
     "remaining": 0
   },
   "outcomes": [
@@ -2207,6 +2207,348 @@
       "checksums": {
         "gateEvaluatedBufferSha256": "a046d0f2f0edbe79430fa536ea506b88dedb36efd60ffa83ef742002595f8b09",
         "remediatedPdfSha256": "a046d0f2f0edbe79430fa536ea506b88dedb36efd60ffa83ef742002595f8b09",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4169",
+      "publicationTitle": "Juvenile sentencing",
+      "priorityRank": 8,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 42,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4169-Juvenile_sentencing.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:05:51.426Z",
+      "durationMs": 92989,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 61,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 61, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4169-Juvenile_sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4169-Juvenile_sentencing.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4169-Juvenile_sentencing.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "bc7263eb0bade8ea0c5924464a42c252759ace6b5e876610ec124812c3978602",
+        "remediatedPdfSha256": "bc7263eb0bade8ea0c5924464a42c252759ace6b5e876610ec124812c3978602",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4167",
+      "publicationTitle": "Juvenile court",
+      "priorityRank": 7,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 42,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/Get the Facts Juvenile court.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/Get the Facts Juvenile court.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/Get%20the%20Facts%20Juvenile%20court.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4167-Juvenile_court.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:06:42.194Z",
+      "durationMs": 143757,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 86,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 86, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4167-Juvenile_court.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4167-Juvenile_court.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4167-Juvenile_court.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d4f32b1664846bc5152b6718fe12670d5ff65eef83a2b932ae53dad32b2c2782",
+        "remediatedPdfSha256": "d4f32b1664846bc5152b6718fe12670d5ff65eef83a2b932ae53dad32b2c2782",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4153",
+      "publicationTitle": "Juvenile corrections and parole",
+      "priorityRank": 6,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 42,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF-juvenilecorrections.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF-juvenilecorrections.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF-juvenilecorrections.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4153-Juvenile_corrections_and_parole.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:06:43.506Z",
+      "durationMs": 145069,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 86,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 86, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4153-Juvenile_corrections_and_parole.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4153-Juvenile_corrections_and_parole.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4153-Juvenile_corrections_and_parole.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "da03e373cdb83a6da22495c977e6c92db6e49957c9df0c3588002f377a2ff6bc",
+        "remediatedPdfSha256": "da03e373cdb83a6da22495c977e6c92db6e49957c9df0c3588002f377a2ff6bc",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4755",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Committee Biennial Report",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 86,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T01:09:25.798Z",
+      "durationMs": 307362,
+      "original": {
+        "overallScore": 36,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=10, deep=8, total=18)."
+      }
+    },
+    {
+      "publicationId": "4084",
+      "publicationTitle": "Analysis of InfoNet Data from Domestic Violence Agencies Executive Summary",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 82,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies ES.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies ES.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Analysis%20of%20InfoNet%20Data%20from%20Domestic%20Violence%20Agencies%20ES.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_ES.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:10:26.166Z",
+      "durationMs": 367729,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 43,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 80,
+        "grade": "B",
+        "pageCount": 43,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 80, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Bookmarks / Navigation, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4084-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Executive_Summary.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4084-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Executive_Summary.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4084-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Executive_Summary.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "3781806f49fd72b8f7b589ab694253f64301b44bae7229f2fc47d443b16f90f7",
+        "remediatedPdfSha256": "3781806f49fd72b8f7b589ab694253f64301b44bae7229f2fc47d443b16f90f7",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4436",
+      "publicationTitle": "Annes House A Residential Program for Trafficking Victims",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 58,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Annes House_022013.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Annes House_022013.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Annes%20House_022013.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T01:11:18.755Z",
+      "durationMs": 420318,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4436-Annes_House_A_Residential_Program_for_Trafficking_Victims.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
+        "remediatedPdfSha256": "29264207cf288b4aa98e3a06e34a264ab4e7a2d68cbe5f85716b2c53809060fb",
         "stagedReplacementSha256": null
       }
     }

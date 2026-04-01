@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-03-30T23:30:57.131Z",
+  "generatedAt": "2026-04-01T00:23:29.027Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-03-30T23:30:57.125Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T00:23:29.018Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage2-short-cohort-wave.json",
   "waveOutcomesPath": null,
   "cohortLabel": "short_high_likelihood",
   "totals": {
-    "totalRowsInCohort": 18,
-    "verifiedPassRowsInCohort": 18,
+    "totalRowsInCohort": 20,
+    "verifiedPassRowsInCohort": 20,
     "newlyVerifiedPassRowsFromWave": 0,
     "remainingRowsInCohort": 0,
     "reclassifiedOutOfCohort": 0,

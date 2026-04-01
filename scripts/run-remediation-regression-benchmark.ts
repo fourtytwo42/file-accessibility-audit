@@ -78,6 +78,12 @@ type BenchmarkSummary = {
     mixed: number
     unknown: number
   }
+  stopReasonSignals: {
+    budgetExhausted: number
+    sameFamilyNoProgress: number
+    lateFigureDeferral: number
+    boundedRuntimeRetry: number
+  }
   latestCompletedCase: {
     name: string
     category: BenchmarkCase['category']
@@ -140,11 +146,12 @@ export function deriveResidualCleanupDiagnostic(input: {
   remediationMetrics: DocumentModel['remediationMetrics'] | null | undefined
   errorMessage?: string | null
 }): BenchmarkOutcome['residualCleanupDiagnostic'] {
+  const structureState = input.remediationMetrics?.phases.structureState
   const residualCleanup = input.remediationMetrics?.residualCleanup
-  if (residualCleanup) {
+  if (residualCleanup || structureState?.finalStopReason) {
     return {
-      dominantFamily: residualCleanup.dominantFamily || 'unknown',
-      finalStopReason: residualCleanup.finalStopReason || null,
+      dominantFamily: residualCleanup?.dominantFamily || (structureState?.finalBlockingKeys?.length ? 'structure' : 'unknown'),
+      finalStopReason: residualCleanup?.finalStopReason || structureState?.finalStopReason || null,
     }
   }
   if (input.errorMessage && /inspection budget exceeded/i.test(input.errorMessage)) {
@@ -154,6 +161,26 @@ export function deriveResidualCleanupDiagnostic(input: {
     }
   }
   return null
+}
+
+function stopReasonSignals(outcomes: BenchmarkOutcome[]): BenchmarkSummary['stopReasonSignals'] {
+  return {
+    budgetExhausted: outcomes.filter(entry =>
+      entry.figurePhaseDiagnostic?.finalStopReason === 'budget_exhausted'
+      || entry.residualCleanupDiagnostic?.finalStopReason === 'budget_exhausted',
+    ).length,
+    sameFamilyNoProgress: outcomes.filter(entry =>
+      entry.residualCleanupDiagnostic?.finalStopReason === 'same_family_no_progress',
+    ).length,
+    lateFigureDeferral: outcomes.filter(entry =>
+      !!entry.figurePhaseDiagnostic?.skippedBecauseLateConverged,
+    ).length,
+    boundedRuntimeRetry: outcomes.filter(entry =>
+      entry.terminalState === 'processing_error'
+      && entry.figurePhaseDiagnostic?.finalStopReason !== 'budget_exhausted'
+      && entry.residualCleanupDiagnostic?.finalStopReason !== 'budget_exhausted',
+    ).length,
+  }
 }
 
 const repoRoot = '/home/hendo420/pdfaf'
@@ -242,6 +269,7 @@ function buildSummary(input: {
       mixed: outcomes.filter(entry => entry.final?.inspectionProfile.dominantPhase === 'mixed').length,
       unknown: outcomes.filter(entry => entry.final?.inspectionProfile.dominantPhase === 'unknown').length,
     },
+    stopReasonSignals: stopReasonSignals(outcomes),
     latestCompletedCase: outcomes.length > 0
       ? {
           name: outcomes[outcomes.length - 1].name,

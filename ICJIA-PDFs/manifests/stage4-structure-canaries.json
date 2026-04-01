@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T18:00:49.892Z",
+  "generatedAt": "2026-04-01T01:04:17.330Z",
   "summary": {
     "totalCanaries": 11,
     "bySource": {
@@ -8,7 +8,7 @@
     },
     "byStructureWaveBucket": {
       "metadata_navigation_residuals": 5,
-      "structure_only_residuals": 0,
+      "structure_only_residuals": 1,
       "mixed_structure_figure_residuals": 3,
       "structure_processing_error_retry": 2
     },
@@ -87,9 +87,9 @@
       "benchmarkName": null,
       "stage4RepresentativeKind": "near_pass_grade_only",
       "currentCorpusStatus": "remediated_fail",
-      "currentCohortLabel": "short_high_likelihood",
-      "structureWaveBucket": null,
-      "originLane": "native_structure_heavy",
+      "currentCohortLabel": "structure_heavy",
+      "structureWaveBucket": "structure_only_residuals",
+      "originLane": "reclassified_from_short_high_likelihood",
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
@@ -161,8 +161,8 @@
       ]
     },
     {
-      "publicationId": "3671",
-      "publicationTitle": "ICJIA 1997 Annual Report",
+      "publicationId": "3483",
+      "publicationTitle": "Trends and Issues 1997",
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage4RepresentativeKind": "figure_spillover_survivor",
@@ -173,7 +173,7 @@
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.remediation.json",
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
         "Figure spillover survivor representative."
       ]
     },
