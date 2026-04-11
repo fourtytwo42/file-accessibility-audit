@@ -490,6 +490,12 @@ export interface PlannerEvidenceSummary {
   lastStableNoEffectTool?: RemediationToolName | null
   retryDisposition?: RetryDisposition
   mixedFamilyConvergencePath?: boolean
+  tailSignature?: string
+  tailFamilies?: string[]
+  nearPassTailEligible?: boolean
+  specializedTailMode?: 'figure_tail' | 'font_tail' | 'annotation_table_tail' | 'figure_structure_tail' | 'none'
+  specializedTailAttempted?: boolean
+  specializedTailImproved?: boolean
 }
 
 export interface FailureProfile {
@@ -515,6 +521,12 @@ export interface FailureProfile {
     lastStableNoEffectTool: RemediationToolName | null
     retryDisposition: RetryDisposition
     mixedFamilyConvergencePath: boolean
+    tailSignature: string
+    tailFamilies: string[]
+    nearPassTailEligible: boolean
+    specializedTailMode: 'figure_tail' | 'font_tail' | 'annotation_table_tail' | 'figure_structure_tail' | 'none'
+    specializedTailAttempted?: boolean
+    specializedTailImproved?: boolean
   }
 }
 
@@ -584,7 +596,13 @@ export interface DocumentModel {
         lateConverged?: boolean
         focusedRescueRan?: boolean
         focusedRescueSkippedBecauseLateConverged?: boolean
-        finalStopReason?: 'no_mutation' | 'no_debt_reduction' | 'same_blocking_keys' | 'budget_exhausted' | 'completed'
+        finalStopReason?:
+          | 'no_mutation'
+          | 'no_debt_reduction'
+          | 'same_blocking_keys'
+          | 'budget_exhausted'
+          | 'completed'
+          | 'figure_tail_plateau'
       }
       structureState: {
         freshDeepAnalyses: number
@@ -602,6 +620,9 @@ export interface DocumentModel {
           | 'mixed_figure_structure_separation_required'
           | 'mixed_runtime_churn_without_family_shrink'
           | 'mixed_large_runtime_profile_requires_serial_terminalization'
+          | 'tail_signature_plateau_after_specialized_rescue'
+          | 'figure_tail_plateau'
+          | 'annotation_table_tail_plateau'
       }
     }
     residualCleanup?: {
@@ -617,6 +638,10 @@ export interface DocumentModel {
         | 'mixed_figure_structure_separation_required'
         | 'mixed_runtime_churn_without_family_shrink'
         | 'mixed_large_runtime_profile_requires_serial_terminalization'
+        | 'tail_signature_plateau_after_specialized_rescue'
+        | 'font_tail_plateau'
+        | 'figure_tail_plateau'
+        | 'annotation_table_tail_plateau'
     }
     providerRouting?: {
       byEndpointLabel: Record<string, number>
@@ -636,6 +661,9 @@ export interface DocumentModel {
       dominantResidualFamily?: FailureProfileDominantResidualFamily
       lastStableNoEffectTool?: RemediationToolName | null
       retryDisposition?: RetryDisposition
+      specializedTailMode?: 'figure_tail' | 'font_tail' | 'annotation_table_tail' | 'figure_structure_tail' | 'none'
+      specializedTailAttempted?: boolean
+      specializedTailImproved?: boolean
     }
   } | null
   promotionGate?: PromotionGateResult | null

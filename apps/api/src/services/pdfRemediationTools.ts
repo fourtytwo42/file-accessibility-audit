@@ -996,6 +996,20 @@ function buildFigureCandidates(
         parentTagPath,
       }
     }
+    const hasNarrativeFigureCue = surroundingText.some(line => /\b(chart|graph|figure|photo|map|table)\b/i.test(line))
+    if (
+      !targetTag
+      && (imageEvidence === 'strong' || imageEvidence === 'vector')
+      && informativeHint === 'informative'
+      && !splitGenerated
+      && surroundingText.join(' ').length <= 320
+    ) {
+      return {
+        repairMode: 'retag_then_set_alt' as const,
+        targetTag,
+        parentTagPath,
+      }
+    }
     const isTableCellWrapCandidate = targetTag === '/TD'
       && imageEvidence === 'strong'
       && informativeHint !== 'decorative'
@@ -1008,6 +1022,19 @@ function buildFigureCandidates(
       }
     }
     if (targetTag === '/Sect' && (imageEvidence === 'strong' || imageEvidence === 'vector')) {
+      return {
+        repairMode: 'retag_then_set_alt' as const,
+        targetTag,
+        parentTagPath,
+      }
+    }
+    if (
+      (targetTag === '/P' || targetTag === '/Span' || targetTag === '/TextBox')
+      && (imageEvidence === 'strong' || imageEvidence === 'vector')
+      && informativeHint === 'informative'
+      && (hasNarrativeFigureCue || pageImageCount <= 3)
+      && surroundingText.join(' ').length <= 260
+    ) {
       return {
         repairMode: 'retag_then_set_alt' as const,
         targetTag,

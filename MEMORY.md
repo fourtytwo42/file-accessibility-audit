@@ -66,6 +66,35 @@
   - `repair_native_figure_semantics`
   - `repair_other_elements_alt_text`
   - bounded candidate-level figure repair
+- **Sub-79 tail final-mile engine upgrade (2026-04-11):** the remaining sub-79 tail now has a specialized near-pass branch inside `apps/api/src/services/agentRemediationService.ts` instead of relying only on the generic mixed-family loop.
+  - activation: current score `70-79`, blocker count `<= 2`, or repeated signatures such as:
+    - `pdfua.figure_alt_or_artifact`
+    - `pdfua.font_embedding`
+    - `pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact`
+    - `pdfua.figure_alt_or_artifact + pdfua.table_regularity`
+    - `pdfua.figure_alt_or_artifact + pdfua.logical_structure`
+  - specialized tail modes now exposed in planner/failure metadata and runtime summary:
+    - `figure_tail`
+    - `font_tail`
+    - `annotation_table_tail`
+    - `figure_structure_tail`
+  - metadata fields now carried on planner/failure summaries:
+    - `tailSignature`
+    - `tailFamilies`
+    - `nearPassTailEligible`
+    - `specializedTailMode`
+    - `specializedTailAttempted`
+    - `specializedTailImproved`
+  - behavior changes:
+    - stricter figure final-mile candidate ordering
+    - dedicated font finalization tail stage
+    - dedicated annotation/link/table tail cleanup before terminalization
+    - signature-aware plateau switching so a repeated generic signature escalates into one specialized tail pass before terminal stop
+  - canary lane commands:
+    - `pnpm agency:build-sub79-tail-canary`
+    - `pnpm agency:run-sub79-tail-canary`
+    - `pnpm agency:sub79-tail-canary-status`
+  - first canary build selected `34` current candidates (`20` plateaued) from the one-blocker/near-pass tail plus best-scoring `annotation+figure` and `figure+table` rows.
 - **Mixed-path gating/runtime changes (2026-04-11):**
   - failure-profile structure opportunities no longer get deferred solely because figure debt is dominant when the document is in mixed structure/figure convergence
   - mixed-path failure profiles keep heading, marked-content, and broad conformance opportunities visible as `auto_runnable`; the planner still enforces the action order

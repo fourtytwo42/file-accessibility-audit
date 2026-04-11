@@ -37,11 +37,26 @@ type BenchmarkOutcome = {
   figurePhaseDiagnostic: {
     focusedRescueRan: boolean
     skippedBecauseLateConverged: boolean
-    finalStopReason: 'no_mutation' | 'no_debt_reduction' | 'same_blocking_keys' | 'budget_exhausted' | 'completed' | null
+    finalStopReason: 'no_mutation' | 'no_debt_reduction' | 'same_blocking_keys' | 'budget_exhausted' | 'completed' | 'figure_tail_plateau' | null
   } | null
   residualCleanupDiagnostic: {
     dominantFamily: 'structure' | 'figure' | 'mixed' | 'unknown'
-    finalStopReason: 'same_family_no_progress' | 'no_mutation' | 'family_shifted' | 'budget_exhausted' | 'completed' | null
+    finalStopReason:
+      | 'same_family_no_progress'
+      | 'no_mutation'
+      | 'family_shifted'
+      | 'budget_exhausted'
+      | 'completed'
+      | 'structure_debt_cleared_figure_debt_remaining'
+      | 'figure_debt_cleared_structure_debt_remaining'
+      | 'mixed_figure_structure_separation_required'
+      | 'mixed_runtime_churn_without_family_shrink'
+      | 'mixed_large_runtime_profile_requires_serial_terminalization'
+      | 'tail_signature_plateau_after_specialized_rescue'
+      | 'font_tail_plateau'
+      | 'figure_tail_plateau'
+      | 'annotation_table_tail_plateau'
+      | null
   } | null
   error?: {
     code: string | null

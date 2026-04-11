@@ -122,4 +122,42 @@ describe('sub79RecoveryWave', () => {
     expect(plusManifest.candidates[0]?.plateaued).toBe(true)
     expect(fontManifest.candidates.map(candidate => candidate.publicationId)).toEqual(['font'])
   })
+
+  it('builds the sub79 tail canary from one-blocker, annotation+figure, and figure+table residue', () => {
+    const outcomes = [
+      makeOutcome({
+        publicationId: 'one-blocker',
+        final: { overallScore: 78, grade: 'C', pageCount: 8, isScanned: false },
+        gate: { blockingLocalFindingKeys: ['pdfua.figure_alt_or_artifact'] },
+      }),
+      makeOutcome({
+        publicationId: 'annotation-figure',
+        final: { overallScore: 76, grade: 'C', pageCount: 12, isScanned: false },
+        gate: { blockingLocalFindingKeys: ['pdfua.annotation_alt_contents', 'pdfua.figure_alt_or_artifact'] },
+      }),
+      makeOutcome({
+        publicationId: 'figure-table',
+        final: { overallScore: 74, grade: 'C', pageCount: 16, isScanned: false },
+        gate: { blockingLocalFindingKeys: ['pdfua.figure_alt_or_artifact', 'pdfua.table_regularity'] },
+      }),
+      makeOutcome({
+        publicationId: 'other',
+        final: { overallScore: 61, grade: 'D', pageCount: 20, isScanned: false },
+        gate: { blockingLocalFindingKeys: ['pdfua.logical_structure', 'pdfua.font_embedding', 'pdfua.table_regularity'] },
+      }),
+    ]
+
+    const manifest = buildRecoveryWaveManifest({
+      laneName: 'sub79-tail-canary',
+      sourceOutcomesPaths: ['/tmp/source.json'],
+      latestOutcomes: latestOutcomePerPublication(outcomes),
+      historyByPublicationId: buildRecoveryWaveHistory(outcomes),
+    })
+
+    expect(manifest.candidates.map(candidate => candidate.publicationId)).toEqual([
+      'one-blocker',
+      'annotation-figure',
+      'figure-table',
+    ])
+  })
 })

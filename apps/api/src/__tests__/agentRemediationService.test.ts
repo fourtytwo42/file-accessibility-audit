@@ -246,6 +246,97 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })
   })
 
+  it('classifies near-pass tail signatures into specialized tail modes', async () => {
+    const {
+      __test_specializedTailModeForResult,
+      __test_isNearPassTailEligible,
+    } = await import('../services/agentRemediationService.js')
+
+    const analysis = makeAnalysisResult({
+      overallScore: 76,
+      grade: 'C',
+      categories: [
+        { id: 'alt_text', score: 72, grade: 'C' },
+        { id: 'table_markup', score: 70, grade: 'C' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.annotation_alt_contents', blocking: true },
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true },
+        ],
+      } as any,
+    })
+
+    expect(__test_specializedTailModeForResult(analysis, null)).toBe('annotation_table_tail')
+    expect(__test_isNearPassTailEligible({ analysis, context: null })).toBe(true)
+  })
+
+  it('builds specialized font and annotation/table cleanup calls for the tail', async () => {
+    const {
+      __test_buildFontTailFinalMileCalls,
+      __test_buildAnnotationTableTailCalls,
+    } = await import('../services/agentRemediationService.js')
+
+    const context = {
+      qpdf: {
+        unembeddedFontCount: 1,
+      },
+      linkCandidates: [
+        {
+          id: 'link-1',
+          pageNumber: 1,
+          annotationIndex: 0,
+          annotationContents: '',
+          suggestedText: 'Example link',
+          text: 'Example link',
+          url: 'https://example.com',
+        },
+      ],
+      tableCandidates: [
+        {
+          id: 'table-1',
+          ref: 'table-ref-1',
+          repairMode: 'safe',
+          hasHeaders: false,
+        },
+      ],
+    } as any
+
+    const fontCalls = __test_buildFontTailFinalMileCalls({
+      context,
+      hasResidualFontDebt: true,
+    })
+    expect(fontCalls.map((call: any) => call.tool_name)).toContain('finalize_substituted_font_conformance')
+
+    const analysis = makeAnalysisResult({
+      overallScore: 74,
+      grade: 'C',
+      categories: [
+        { id: 'alt_text', score: 70, grade: 'C' },
+        { id: 'table_markup', score: 68, grade: 'D' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.annotation_alt_contents', blocking: true },
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true },
+          { key: 'pdfua.table_regularity', blocking: true },
+        ],
+      } as any,
+    })
+    const cleanupCalls = __test_buildAnnotationTableTailCalls({
+      context,
+      analysis,
+      compactMixedFinalRescue: false,
+    })
+    expect(cleanupCalls.map((call: any) => call.tool_name)).toEqual(expect.arrayContaining([
+      'repair_annotation_alt_text',
+      'repair_native_link_structure',
+      'repair_native_table_headers',
+      'set_link_annotation_contents',
+      'set_table_header_cells',
+    ]))
+  })
+
   it('does not treat a single blocking family with live preferred tools as converged', async () => {
     const { __test_needsFamilyCompleteConvergence } = await import('../services/agentRemediationService.js')
 
@@ -6731,8 +6822,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })
 
     expect(calls.map(call => call.tool_name)).toEqual([
-      'set_figure_alt_text',
       'retag_as_figure_and_set_alt',
+      'set_figure_alt_text',
       'mark_figure_decorative',
     ])
   })
@@ -6828,7 +6919,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       rescuePasses: 1,
       mixedNoShrinkPasses: 1,
       tracker: {
-        lastFamilyId: 'logical_structure_marked_content',
+        lastFamilyId: 'logical_structure_marked_content' as any,
         lastBucket: 'mixed',
         lastSnapshot: null,
         lastMutationChangedDocument: true,
@@ -7540,7 +7631,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         lastProgressed: false,
         convergedBuckets: { structure: false, figure: false, mixed: false },
       },
-    }
+    } as any
 
     expect(__test_shouldTripMixedRuntimeGovernor({
       ...input,

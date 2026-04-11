@@ -2037,6 +2037,10 @@ export function buildPlannerEvidenceSummary(input: {
     toolOpportunities: input.toolOpportunities,
   })
   const mixedFamilyConvergencePath = hasMixedStructureFigureConvergencePath(input.failureModes, input.residualFamilies || [])
+  const tailSignature = tailSignatureForFailureModes(input.failureModes)
+  const tailFamilies = tailFamiliesForFailureModes(input.failureModes)
+  const nearPassTailEligible = isNearPassTailEligible(input.failureModes)
+  const specializedTailMode = specializedTailModeForFailureModes(input.failureModes)
 
   return {
     topFailureModeKeys: input.failureModes.slice(0, 5).map(mode => mode.key),
@@ -2084,7 +2088,107 @@ export function buildPlannerEvidenceSummary(input: {
     lastStableNoEffectTool: lastStableNoEffectTool(input.actions),
     retryDisposition,
     mixedFamilyConvergencePath,
+    tailSignature,
+    tailFamilies,
+    nearPassTailEligible,
+    specializedTailMode,
+    specializedTailAttempted: input.actions.some(action => isSpecializedTailTool(action.tool)),
+    specializedTailImproved: false,
   }
+}
+
+function tailSignatureForFailureModes(failureModes: FailureMode[]): string {
+  const blockingKeys = failureModes
+    .filter(mode => mode.blocking)
+    .map(mode => mode.key)
+    .sort((left, right) => left.localeCompare(right))
+  return blockingKeys.length ? blockingKeys.join(' + ') : '(none)'
+}
+
+function tailFamiliesForFailureModes(failureModes: FailureMode[]): string[] {
+  const families = new Set<string>()
+  for (const mode of failureModes.filter(entry => entry.blocking)) {
+    if (
+      mode.key === 'pdfua.logical_structure'
+      || mode.key === 'pdfua.heading_content_quality'
+      || mode.key === 'category.heading_structure'
+    ) {
+      families.add('structure')
+    }
+    if (
+      mode.key === 'pdfua.figure_alt_or_artifact'
+      || mode.key === 'pdfua.nested_alt_text'
+      || mode.key === 'pdfua.untagged_rendered_images'
+      || mode.key === 'category.alt_text'
+    ) {
+      families.add('figure')
+    }
+    if (
+      mode.key === 'pdfua.font_embedding'
+      || mode.key === 'pdfua.font_unicode'
+      || mode.key === 'pdfua.type1_unicode'
+      || mode.key === 'pdfua.truetype_encoding_differences'
+      || mode.key === 'category.text_extractability'
+    ) {
+      families.add('font')
+    }
+    if (mode.key === 'pdfua.annotation_alt_contents' || mode.key === 'pdfua.link_tagging') {
+      families.add('annotation')
+    }
+    if (mode.key === 'pdfua.table_regularity' || mode.key === 'category.table_markup') {
+      families.add('table')
+    }
+  }
+  return [...families].sort((left, right) => left.localeCompare(right))
+}
+
+function isNearPassTailEligible(failureModes: FailureMode[]): boolean {
+  const blockingKeys = failureModes.filter(mode => mode.blocking).map(mode => mode.key)
+  if (blockingKeys.length <= 2) return true
+  const signature = tailSignatureForFailureModes(failureModes)
+  return signature === 'pdfua.figure_alt_or_artifact'
+    || signature === 'pdfua.font_embedding'
+    || signature === 'pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact'
+    || signature === 'pdfua.figure_alt_or_artifact + pdfua.logical_structure'
+    || signature === 'pdfua.figure_alt_or_artifact + pdfua.table_regularity'
+}
+
+function specializedTailModeForFailureModes(
+  failureModes: FailureMode[],
+): NonNullable<PlannerEvidenceSummary['specializedTailMode']> {
+  const families = tailFamiliesForFailureModes(failureModes)
+  const signature = tailSignatureForFailureModes(failureModes)
+  if (signature === 'pdfua.figure_alt_or_artifact + pdfua.logical_structure') return 'figure_structure_tail'
+  if (
+    signature === 'pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact'
+    || signature === 'pdfua.figure_alt_or_artifact + pdfua.table_regularity'
+    || families.includes('annotation')
+    || families.includes('table')
+  ) {
+    return 'annotation_table_tail'
+  }
+  if (families.includes('font') && !families.includes('structure')) return 'font_tail'
+  if (families.includes('figure')) return 'figure_tail'
+  return 'none'
+}
+
+function isSpecializedTailTool(toolName: RemediationToolName): boolean {
+  return toolName === 'normalize_nested_figure_containers'
+    || toolName === 'repair_native_figure_semantics'
+    || toolName === 'repair_other_elements_alt_text'
+    || toolName === 'set_figure_alt_text'
+    || toolName === 'retag_as_figure_and_set_alt'
+    || toolName === 'mark_figure_decorative'
+    || toolName === 'embed_missing_fonts_in_place'
+    || toolName === 'repair_font_unicode_maps'
+    || toolName === 'repair_type1_font_unicode_maps'
+    || toolName === 'substitute_legacy_fonts_in_place'
+    || toolName === 'finalize_substituted_font_conformance'
+    || toolName === 'repair_annotation_alt_text'
+    || toolName === 'repair_native_link_structure'
+    || toolName === 'repair_native_table_headers'
+    || toolName === 'set_link_annotation_contents'
+    || toolName === 'set_table_header_cells'
 }
 
 function hasMixedStructureFigureConvergencePath(
@@ -2190,6 +2294,10 @@ export function buildFailureProfile(input: BuildFailureProfileInput): FailurePro
     toolOpportunities,
   })
   const mixedFamilyConvergencePath = hasMixedStructureFigureConvergencePath(failureModes, residualFamilies)
+  const tailSignature = tailSignatureForFailureModes(failureModes)
+  const tailFamilies = tailFamiliesForFailureModes(failureModes)
+  const nearPassTailEligible = isNearPassTailEligible(failureModes)
+  const specializedTailMode = specializedTailModeForFailureModes(failureModes)
 
   return {
     version: '2',
@@ -2214,6 +2322,12 @@ export function buildFailureProfile(input: BuildFailureProfileInput): FailurePro
       lastStableNoEffectTool: lastStableNoEffectTool(input.actions),
       retryDisposition,
       mixedFamilyConvergencePath,
+      tailSignature,
+      tailFamilies,
+      nearPassTailEligible,
+      specializedTailMode,
+      specializedTailAttempted: input.actions.some(action => isSpecializedTailTool(action.tool)),
+      specializedTailImproved: false,
     },
   }
 }

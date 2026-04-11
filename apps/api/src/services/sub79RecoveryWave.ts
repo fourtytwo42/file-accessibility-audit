@@ -1,5 +1,7 @@
 export type RecoveryRuntimeWeight = 'light' | 'medium' | 'heavy'
 export type RecoveryLaneName =
+  | 'all-sub79-recovery'
+  | 'sub79-tail-canary'
   | 'mixed-structure-figure-core'
   | 'mixed-structure-figure-plus'
   | 'font-led-deterministic'
@@ -277,6 +279,10 @@ function matchesLane(keys: string[], laneName: RecoveryLaneName): boolean {
     .filter(key => keySet.has(key))
     .length
   switch (laneName) {
+    case 'all-sub79-recovery':
+      return true
+    case 'sub79-tail-canary':
+      return true
     case 'mixed-structure-figure-core':
       return exactCore
     case 'mixed-structure-figure-plus':
@@ -294,6 +300,10 @@ function matchesLane(keys: string[], laneName: RecoveryLaneName): boolean {
 
 function executionReasonForLane(laneName: RecoveryLaneName): string {
   switch (laneName) {
+    case 'all-sub79-recovery':
+      return 'target_all_remediated_sub79_outputs_with_mixed_convergence_strategy'
+    case 'sub79-tail-canary':
+      return 'target_tail_canary_one_blocker_near_pass_annotation_figure_and_figure_table_residue'
     case 'mixed-structure-figure-core':
       return 'target_exact_structure_plus_figure_core_residue'
     case 'mixed-structure-figure-plus':
@@ -301,6 +311,32 @@ function executionReasonForLane(laneName: RecoveryLaneName): string {
     case 'font-led-deterministic':
       return 'target_remaining_font_led_residue_without_structure_debt'
   }
+}
+
+function selectTailCanaryCandidates(candidates: RecoveryWaveCandidate[]): RecoveryWaveCandidate[] {
+  const ordered = [...candidates].sort((left, right) =>
+    runtimeRank(left.runtimeWeightBucket) - runtimeRank(right.runtimeWeightBucket)
+    || Number(right.blockerFamilyShrinkFromPrior) - Number(left.blockerFamilyShrinkFromPrior)
+    || (right.scoreDeltaFromPrior ?? Number.NEGATIVE_INFINITY) - (left.scoreDeltaFromPrior ?? Number.NEGATIVE_INFINITY)
+    || right.overallScore - left.overallScore
+    || String(left.publicationId || '').localeCompare(String(right.publicationId || '')),
+  )
+  const oneBlockerAndNearPass = ordered.filter(candidate =>
+    candidate.blockingFindingCount <= 1 || candidate.overallScore >= 70,
+  ).slice(0, 20)
+  const annotationFigure = ordered.filter(candidate =>
+    candidate.blockerFamilies.includes('annotation') && candidate.blockerFamilies.includes('figure'),
+  ).slice(0, 10)
+  const figureTable = ordered.filter(candidate =>
+    candidate.blockerFamilies.includes('figure') && candidate.blockerFamilies.includes('table'),
+  ).slice(0, 10)
+  const byId = new Map<string, RecoveryWaveCandidate>()
+  for (const candidate of [...oneBlockerAndNearPass, ...annotationFigure, ...figureTable]) {
+    const key = String(candidate.publicationId || '')
+    if (!key || byId.has(key)) continue
+    byId.set(key, candidate)
+  }
+  return [...byId.values()]
 }
 
 function toCandidate(
@@ -376,7 +412,7 @@ export function buildRecoveryWaveManifest(input: RecoveryWaveManifestInput): Rec
   let excludedMissingRemote = 0
   let excludedLaneMismatch = 0
 
-  const selected = input.latestOutcomes
+  const baseSelected = input.latestOutcomes
     .filter(outcome => {
       if (!isTerminalSub79Outcome(outcome)) {
         if (outcome.status === 'failed_after_remediation' && typeof outcome.final?.overallScore === 'number' && outcome.final.overallScore > 79) {
@@ -413,7 +449,10 @@ export function buildRecoveryWaveManifest(input: RecoveryWaveManifestInput): Rec
       || right.overallScore - left.overallScore
       || String(left.publicationId || '').localeCompare(String(right.publicationId || '')),
     )
-    .map((candidate, index) => ({ ...candidate, priorityRank: index + 1 }))
+  const selectedBaseForLane = input.laneName === 'sub79-tail-canary'
+    ? selectTailCanaryCandidates(baseSelected)
+    : baseSelected
+  const selected = selectedBaseForLane.map((candidate, index) => ({ ...candidate, priorityRank: index + 1 }))
 
   const byTier = selected.reduce<Record<string, number>>((acc, candidate) => {
     acc[candidate.priorityTier] = (acc[candidate.priorityTier] || 0) + 1

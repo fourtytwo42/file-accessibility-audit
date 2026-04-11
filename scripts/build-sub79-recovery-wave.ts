@@ -19,6 +19,7 @@ const repoRoot = '/home/hendo420/pdfaf'
 const manifestsRoot = path.join(repoRoot, 'ICJIA-PDFs', 'manifests')
 
 const sourceOutcomeFilenames = [
+  'all-sub79-recovery.outcomes.json',
   'all-remaining-automated.outcomes.json',
   'all-remaining-dropped-rerun.outcomes.json',
   'all-remaining-79-down-rerun.outcomes.json',

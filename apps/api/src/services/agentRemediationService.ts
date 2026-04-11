@@ -272,8 +272,10 @@ type FigureDescriptionStopReason =
   | 'same_blocking_keys'
   | 'budget_exhausted'
   | 'completed'
+  | 'figure_tail_plateau'
 
 type FigureRescueMethod = 'native_semantics' | 'authoritative_alt' | 'heuristic_candidates'
+type SpecializedTailMode = 'figure_tail' | 'font_tail' | 'annotation_table_tail' | 'figure_structure_tail' | 'none'
 
 type ResidualCleanupFamilyBucket = 'structure' | 'figure' | 'mixed' | 'unknown'
 
@@ -290,6 +292,10 @@ type ResidualCleanupStopReason =
   | 'mixed_figure_structure_separation_required'
   | 'mixed_runtime_churn_without_family_shrink'
   | 'mixed_large_runtime_profile_requires_serial_terminalization'
+  | 'tail_signature_plateau_after_specialized_rescue'
+  | 'font_tail_plateau'
+  | 'figure_tail_plateau'
+  | 'annotation_table_tail_plateau'
 
 type ResidualCleanupProgressSnapshot = {
   bucket: ResidualCleanupFamilyBucket
@@ -355,6 +361,9 @@ type RemediationMetricsState = {
     mixedRuntimeGovernorFired?: boolean
     compactFinalRescueFallback?: boolean
     authoritativeFinalScoringReached?: boolean
+    specializedTailMode?: SpecializedTailMode
+    specializedTailAttempted?: boolean
+    specializedTailImproved?: boolean
   }
 }
 
@@ -1122,6 +1131,82 @@ function remediationCoarseStateSignature(result: AnalysisResult): string {
   })
 }
 
+function residualBlockingSignature(result: AnalysisResult): string {
+  const blockingKeys = blockingLocalFindingKeys(result)
+  return blockingKeys.length ? [...blockingKeys].sort((left, right) => left.localeCompare(right)).join(' + ') : '(none)'
+}
+
+function residualBlockingFamilies(result: AnalysisResult): string[] {
+  const families = new Set<string>()
+  for (const key of blockingLocalFindingKeys(result)) {
+    if (
+      key === 'pdfua.logical_structure'
+      || key === 'pdfua.heading_content_quality'
+      || key === 'pdfua.reading_order'
+    ) {
+      families.add('structure')
+    }
+    if (
+      key === 'pdfua.figure_alt_or_artifact'
+      || key === 'pdfua.nested_alt_text'
+      || key === 'pdfua.untagged_rendered_images'
+    ) {
+      families.add('figure')
+    }
+    if (
+      key === 'pdfua.font_embedding'
+      || key === 'pdfua.font_unicode'
+      || key === 'pdfua.type1_unicode'
+      || key === 'pdfua.truetype_encoding_differences'
+      || key === 'pdfua.font_widths'
+    ) {
+      families.add('font')
+    }
+    if (key === 'pdfua.annotation_alt_contents' || key === 'pdfua.link_tagging') {
+      families.add('annotation')
+    }
+    if (key === 'pdfua.table_regularity') {
+      families.add('table')
+    }
+  }
+  return [...families].sort((left, right) => left.localeCompare(right))
+}
+
+function specializedTailModeForResult(
+  analysis: AnalysisResult,
+  context: PdfRemediationContext | null | undefined,
+): SpecializedTailMode {
+  const signature = residualBlockingSignature(analysis)
+  const families = residualBlockingFamilies(analysis)
+  if (signature === 'pdfua.figure_alt_or_artifact + pdfua.logical_structure') return 'figure_structure_tail'
+  if (
+    signature === 'pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact'
+    || signature === 'pdfua.figure_alt_or_artifact + pdfua.table_regularity'
+    || (families.includes('figure') && (families.includes('annotation') || families.includes('table')))
+  ) {
+    return 'annotation_table_tail'
+  }
+  if (families.includes('font') && !families.includes('structure')) return 'font_tail'
+  if (families.includes('figure')) return 'figure_tail'
+  if (residualCleanupDominantFamily(analysis, context) === 'mixed') return 'figure_structure_tail'
+  return 'none'
+}
+
+function isNearPassTailEligible(input: {
+  analysis: AnalysisResult
+  context: PdfRemediationContext | null | undefined
+}): boolean {
+  const blockingKeys = blockingLocalFindingKeys(input.analysis)
+  const signature = residualBlockingSignature(input.analysis)
+  if ((input.analysis.overallScore ?? 0) >= 70 && (input.analysis.overallScore ?? 0) <= 79) return true
+  if (blockingKeys.length <= 2) return true
+  return signature === 'pdfua.figure_alt_or_artifact'
+    || signature === 'pdfua.font_embedding'
+    || signature === 'pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact'
+    || signature === 'pdfua.figure_alt_or_artifact + pdfua.logical_structure'
+    || signature === 'pdfua.figure_alt_or_artifact + pdfua.table_regularity'
+}
+
 const MAX_STABLE_STATE_REPEATS = 2
 const MAX_COARSE_STABLE_STATE_REPEATS = 1
 const MAX_LIGHT_INSPECTIONS_PER_FILE = Number(process.env.ICJIA_MAX_LIGHT_INSPECTIONS || 8)
@@ -1737,6 +1822,8 @@ function shouldSkipRescueCallInCompactMixedRescue(input: {
 function buildFigureOnlyFinalMileCalls(input: {
   context: PdfRemediationContext
   previousActionNames: string[]
+  currentScore?: number
+  blockerCount?: number
   maxCandidates?: number
 }): RemediationToolCall[] {
   const candidates = [
@@ -1748,6 +1835,25 @@ function buildFigureOnlyFinalMileCalls(input: {
       && shouldRetryLateHeuristicFigureCandidate(candidate, input.previousActionNames),
     ),
   ]
+    .sort((left, right) => {
+      const strictPriority = (candidate: PdfRemediationContext['figureCandidates'][number]): number => {
+        const unresolvedInformative = candidate.informativeHint !== 'decorative' && !candidate.hasAlt
+        const needsRetag = !!candidate.targetTag && candidate.targetTag !== '/Figure'
+        if (unresolvedInformative && needsRetag) return 0
+        if (unresolvedInformative) return 1
+        if (needsRetag) return 2
+        if (candidate.hasLowQualityAlt) return 3
+        return 4
+      }
+      const boostedNearPass = (input.blockerCount ?? Number.POSITIVE_INFINITY) <= 1 || (input.currentScore ?? 0) >= 75
+      const priorityDelta = strictPriority(left) - strictPriority(right)
+      if (priorityDelta !== 0) return priorityDelta
+      if (boostedNearPass) {
+        const pageDelta = left.pageNumber - right.pageNumber
+        if (pageDelta !== 0) return pageDelta
+      }
+      return left.id.localeCompare(right.id)
+    })
     .slice(0, Math.max(1, input.maxCandidates ?? 4))
 
   return candidates.map(candidate => {
@@ -1801,6 +1907,111 @@ export const __test_shouldSerialTerminalizeLargeMixedProfile = shouldSerialTermi
 export const __test_shouldAllowLargeMixedDominantFamilyRescue = shouldAllowLargeMixedDominantFamilyRescue
 export const __test_shouldSkipRescueCallInCompactMixedRescue = shouldSkipRescueCallInCompactMixedRescue
 export const __test_buildFigureOnlyFinalMileCalls = buildFigureOnlyFinalMileCalls
+export const __test_specializedTailModeForResult = specializedTailModeForResult
+export const __test_isNearPassTailEligible = isNearPassTailEligible
+export const __test_buildFontTailFinalMileCalls = buildFontTailFinalMileCalls
+export const __test_buildAnnotationTableTailCalls = buildAnnotationTableTailCalls
+
+function buildFontTailFinalMileCalls(input: {
+  context: PdfRemediationContext
+  hasResidualFontDebt: boolean
+}): RemediationToolCall[] {
+  const calls: RemediationToolCall[] = []
+  if ((input.context.qpdf.unembeddedFontCount ?? 0) > 0) {
+    calls.push({
+      tool_name: 'embed_missing_fonts_in_place',
+      arguments: { target: 'document' },
+      rationale: 'Specialized font tail: embed any remaining unembedded fonts before final verification.',
+      confidence: 0.95,
+    })
+  }
+  if (input.hasResidualFontDebt) {
+    calls.push(
+      {
+        tool_name: 'repair_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Specialized font tail: rebuild missing ToUnicode maps on remaining font residue.',
+        confidence: 0.95,
+      },
+      {
+        tool_name: 'repair_type1_font_unicode_maps',
+        arguments: { target: 'document' },
+        rationale: 'Specialized font tail: repair remaining Type1 font Unicode maps.',
+        confidence: 0.92,
+      },
+      {
+        tool_name: 'substitute_legacy_fonts_in_place',
+        arguments: { target: 'document' },
+        rationale: 'Specialized font tail: substitute unresolved legacy fonts once embedding and Unicode repairs plateau.',
+        confidence: 0.88,
+      },
+      {
+        tool_name: 'finalize_substituted_font_conformance',
+        arguments: { target: 'document', reportedWidthFixes: [] },
+        rationale: 'Specialized font tail: finalize substituted font conformance after final deterministic font cleanup.',
+        confidence: 0.9,
+      },
+    )
+  }
+  return calls
+}
+
+function buildAnnotationTableTailCalls(input: {
+  context: PdfRemediationContext
+  analysis: AnalysisResult
+  compactMixedFinalRescue: boolean
+}): RemediationToolCall[] {
+  const calls: RemediationToolCall[] = []
+  if (
+    hasBlockingLocalFinding(input.analysis, 'pdfua.annotation_alt_contents')
+    || hasBlockingLocalFinding(input.analysis, 'pdfua.link_tagging')
+  ) {
+    calls.push(
+      {
+        tool_name: 'repair_annotation_alt_text',
+        arguments: { target: 'document' },
+        rationale: 'Specialized tail cleanup: repair remaining annotation alternate text before terminalization.',
+        confidence: 0.92,
+      },
+      {
+        tool_name: 'repair_native_link_structure',
+        arguments: { target: 'document' },
+        rationale: 'Specialized tail cleanup: repair native link structure before final scoring.',
+        confidence: 0.9,
+      },
+    )
+    for (const candidate of (input.context.linkCandidates || []).filter(entry => !(entry.annotationContents || '').trim()).slice(0, input.compactMixedFinalRescue ? 3 : 6)) {
+      calls.push({
+        tool_name: 'set_link_annotation_contents',
+        arguments: {
+          candidateId: candidate.id,
+          pageNumber: candidate.pageNumber,
+          annotationIndex: candidate.annotationIndex,
+          contents: candidate.suggestedText || candidate.text || candidate.url,
+        },
+        rationale: `Specialized tail cleanup: set /Contents for link annotation ${candidate.id} before terminalization.`,
+        confidence: 0.87,
+      })
+    }
+  }
+  if (hasBlockingLocalFinding(input.analysis, 'pdfua.table_regularity') || hasUnresolvedCategoryLabel(input.analysis, 'Table Markup')) {
+    calls.push({
+      tool_name: 'repair_native_table_headers',
+      arguments: { target: 'document' },
+      rationale: 'Specialized tail cleanup: repair native table headers in the remaining table residue.',
+      confidence: 0.9,
+    })
+    for (const candidate of (input.context.tableCandidates || []).filter(entry => entry.repairMode === 'safe' && !entry.hasHeaders && !!entry.ref).slice(0, input.compactMixedFinalRescue ? 2 : 4)) {
+      calls.push({
+        tool_name: 'set_table_header_cells',
+        arguments: { targets: [candidate.ref] },
+        rationale: `Specialized tail cleanup: set header cells for table ${candidate.ref}.`,
+        confidence: 0.87,
+      })
+    }
+  }
+  return calls
+}
 
 function residualFamilyBucketFromDecision(
   family: Pick<ResidualFamilyDecision, 'id'> | null | undefined,
@@ -4860,10 +5071,14 @@ export async function remediatePdfWithAgent(
     let mixedNoShrinkPasses = 0
     let mixedRuntimeGovernorFired = false
     let compactFinalRescueFallback = false
+    let forceSpecializedTailMode: SpecializedTailMode | null = null
+    let lastSpecializedTailModeUsed: SpecializedTailMode = 'none'
+    let specializedTailAttempted = false
+    let specializedTailImproved = false
     const figureMethodsWithNoProgress = new Set<FigureRescueMethod>()
     const figureMethodsAttempted = new Set<FigureRescueMethod>()
 
-    while (rescuePasses < 3) {
+    while (rescuePasses < 4) {
       const needsAltRescue =
         hasBlockingLocalFinding(currentResult, 'pdfua.untagged_rendered_images')
         || hasBlockingLocalFinding(currentResult, 'pdfua.nested_alt_text')
@@ -4893,6 +5108,11 @@ export async function remediatePdfWithAgent(
         (currentLightContext?.qpdf.unembeddedFontCount ?? 0) > 0
         || (currentLightContext?.qpdf.fontsMissingToUnicodeBlocking ?? currentLightContext?.qpdf.fontsMissingToUnicode ?? 0) > 0
         || (currentLightContext?.qpdf.type1FontsMissingToUnicode ?? 0) > 0
+      const nearPassTailEligible = isNearPassTailEligible({
+        analysis: currentResult,
+        context: currentLightContext,
+      })
+      const specializedTailMode: SpecializedTailMode = forceSpecializedTailMode || specializedTailModeForResult(currentResult, currentLightContext)
       const figureOnlyRescuePath = needsAltRescue && shouldUseFigureOnlyLateRescuePath({
         analysis: currentResult,
         context: currentLightContext,
@@ -4923,6 +5143,10 @@ export async function remediatePdfWithAgent(
         mixedNoShrinkPasses,
         tracker: residualCleanupTracker,
       })
+      const shouldPreferSpecializedTailPass =
+        specializedTailMode !== 'none'
+        && nearPassTailEligible
+        && (forceSpecializedTailMode !== null || rescuePasses > 0)
       if (serialLargeMixedTerminalization) {
         residualCleanupTracker.lastBucket = 'mixed'
         residualCleanupTracker.lastSnapshot = buildResidualCleanupProgressSnapshot('mixed', currentResult, currentLightContext)
@@ -5012,8 +5236,25 @@ export async function remediatePdfWithAgent(
       })
 
       const rescueCalls: RemediationToolCall[] = []
-      if (canAttemptAltRescue && !mixedRuntimeGovernorTripped && allowLargeMixedFigureRescue) {
+      const usingSpecializedFigureTail =
+        shouldPreferSpecializedTailPass
+        && (
+          specializedTailMode === 'figure_tail'
+          || specializedTailMode === 'annotation_table_tail'
+          || specializedTailMode === 'figure_structure_tail'
+        )
+      const usingSpecializedFontTail =
+        shouldPreferSpecializedTailPass && specializedTailMode === 'font_tail'
+      const usingSpecializedAnnotationTableTail =
+        shouldPreferSpecializedTailPass
+        && (specializedTailMode === 'annotation_table_tail' || specializedTailMode === 'figure_structure_tail')
+      if (shouldPreferSpecializedTailPass) {
+        lastSpecializedTailModeUsed = specializedTailMode
+      }
+
+      if ((canAttemptAltRescue || usingSpecializedFigureTail) && !mixedRuntimeGovernorTripped && allowLargeMixedFigureRescue) {
         remediationMetrics.phases.figure_description_state.focusedRescueRan = true
+        if (usingSpecializedFigureTail) specializedTailAttempted = true
         rescueCalls.push(
           {
             tool_name: 'normalize_nested_figure_containers',
@@ -5034,41 +5275,26 @@ export async function remediatePdfWithAgent(
             confidence: 0.97,
           },
         )
-        if (figureOnlyRescuePath || nearPassFigureFastLane) {
+        if (figureOnlyRescuePath || nearPassFigureFastLane || usingSpecializedFigureTail) {
           rescueCalls.push(...buildFigureOnlyFinalMileCalls({
             context,
             previousActionNames,
-            maxCandidates: nearPassFigureFastLane ? 3 : 4,
+            currentScore: currentResult.overallScore,
+            blockerCount: blockingLocalFindingKeys(currentResult).length,
+            maxCandidates: nearPassFigureFastLane ? 3 : usingSpecializedFigureTail ? 5 : 4,
           }))
         }
       }
 
-      if ((needsFontRescue || hasResidualFontDebt) && !figureOnlyRescuePath && !nearPassFigureFastLane) {
-        if ((context.qpdf.unembeddedFontCount ?? 0) > 0) {
-          rescueCalls.push({
-            tool_name: 'embed_missing_fonts_in_place',
-            arguments: { target: 'document' },
-            rationale: 'Focused final rescue: embed any remaining unembedded fonts before final verification.',
-            confidence: 0.94,
-          })
-        }
-        rescueCalls.push(
-          {
-            tool_name: 'repair_font_unicode_maps',
-            arguments: { target: 'document' },
-            rationale: 'Focused final rescue: rebuild missing ToUnicode maps for remaining fonts.',
-            confidence: 0.95,
-          },
-          {
-            tool_name: 'repair_type1_font_unicode_maps',
-            arguments: { target: 'document' },
-            rationale: 'Focused final rescue: repair Type1 font Unicode maps that remain unresolved.',
-            confidence: 0.92,
-          },
-        )
+      if (((needsFontRescue || hasResidualFontDebt) && !figureOnlyRescuePath && !nearPassFigureFastLane) || usingSpecializedFontTail) {
+        if (usingSpecializedFontTail) specializedTailAttempted = true
+        rescueCalls.push(...buildFontTailFinalMileCalls({
+          context,
+          hasResidualFontDebt: needsFontRescue || hasResidualFontDebt,
+        }))
       }
 
-      if ((needsStructureRescue || needsTableRescue) && !figureOnlyRescuePath && !nearPassFigureFastLane && allowLargeMixedStructureRescue) {
+      if ((needsStructureRescue || needsTableRescue || usingSpecializedAnnotationTableTail) && !figureOnlyRescuePath && !nearPassFigureFastLane && allowLargeMixedStructureRescue) {
         // If the logical_structure failure is driven by untagged text-bearing top-level
         // content groups, inject a targeted artifact_nonsemantic_page_elements call with
         // includeTextGroups=true BEFORE the standard conformance repair chain.
@@ -5118,7 +5344,7 @@ export async function remediatePdfWithAgent(
             })
           }
         }
-        if (context.linkCandidates.some(candidate => !(candidate.annotationContents || '').trim())) {
+        if (context.linkCandidates.some(candidate => !(candidate.annotationContents || '').trim()) && !usingSpecializedAnnotationTableTail) {
           for (const candidate of (context.linkCandidates || []).filter(entry => !(entry.annotationContents || '').trim()).slice(0, 6)) {
             rescueCalls.push({
               tool_name: 'set_link_annotation_contents',
@@ -5165,7 +5391,7 @@ export async function remediatePdfWithAgent(
             : 'Focused final rescue: run one last structure-conformance repair on the exact final document state.',
           confidence: 0.96,
         })
-        if (needsTableRescue) {
+        if (needsTableRescue && !usingSpecializedAnnotationTableTail) {
           rescueCalls.push({
             tool_name: 'repair_native_table_headers',
             arguments: { target: 'document' },
@@ -5201,6 +5427,15 @@ export async function remediatePdfWithAgent(
             confidence: 0.82,
           })
         }
+      }
+
+      if (usingSpecializedAnnotationTableTail) {
+        specializedTailAttempted = true
+        rescueCalls.push(...buildAnnotationTableTailCalls({
+          context,
+          analysis: currentResult,
+          compactMixedFinalRescue,
+        }))
       }
 
       const stageActions: RemediationActionRecord[] = []
@@ -5289,7 +5524,22 @@ export async function remediatePdfWithAgent(
       if (!changedDocument) {
         if (canAttemptAltRescue) {
           markLatePhaseConverged('figure_description_state')
-          setFigureDescriptionStopReason('no_mutation')
+          setFigureDescriptionStopReason(
+            shouldPreferSpecializedTailPass && specializedTailMode === 'figure_tail'
+              ? 'figure_tail_plateau'
+              : 'no_mutation',
+          )
+        }
+        if (shouldPreferSpecializedTailPass) {
+          setResidualCleanupStopReason(
+            specializedTailMode === 'font_tail'
+              ? 'font_tail_plateau'
+              : specializedTailMode === 'annotation_table_tail'
+                ? 'annotation_table_tail_plateau'
+                : specializedTailMode === 'figure_tail'
+                  ? 'figure_tail_plateau'
+                  : 'tail_signature_plateau_after_specialized_rescue',
+          )
         }
         break
       }
@@ -5387,6 +5637,13 @@ export async function remediatePdfWithAgent(
           afterResidualSnapshot,
           true,
         )
+        const specializedImprovedThisPass =
+          currentResult.overallScore > rescueStartResult.overallScore
+          || residualImproved
+          || residualBlockingSignature(currentResult) !== residualBlockingSignature(rescueStartResult)
+        if (shouldPreferSpecializedTailPass && specializedImprovedThisPass) {
+          specializedTailImproved = true
+        }
         if (beforeResidualBucket === 'mixed' && afterResidualBucket === 'mixed' && !residualImproved) {
           mixedNoShrinkPasses += 1
         } else {
@@ -5395,12 +5652,39 @@ export async function remediatePdfWithAgent(
       }
 
       const nextSignature = remediationStateSignature(currentResult)
+      const repeatedResidualSignature = residualBlockingSignature(currentResult) === residualBlockingSignature(rescueStartResult)
       if (nextSignature === lastSignature) {
+        if (!shouldPreferSpecializedTailPass && specializedTailMode !== 'none' && nearPassTailEligible) {
+          forceSpecializedTailMode = specializedTailMode
+          rescuePasses += 1
+          continue
+        }
         if (canAttemptAltRescue) {
           markLatePhaseConverged('figure_description_state')
-          setFigureDescriptionStopReason('same_blocking_keys')
+          setFigureDescriptionStopReason(
+            shouldPreferSpecializedTailPass && specializedTailMode === 'figure_tail'
+              ? 'figure_tail_plateau'
+              : 'same_blocking_keys',
+          )
+        }
+        if (shouldPreferSpecializedTailPass) {
+          setResidualCleanupStopReason(
+            specializedTailMode === 'font_tail'
+              ? 'font_tail_plateau'
+              : specializedTailMode === 'annotation_table_tail'
+                ? 'annotation_table_tail_plateau'
+                : specializedTailMode === 'figure_tail'
+                  ? 'figure_tail_plateau'
+                  : 'tail_signature_plateau_after_specialized_rescue',
+          )
         }
         break
+      }
+      if (repeatedResidualSignature && !shouldPreferSpecializedTailPass && specializedTailMode !== 'none' && nearPassTailEligible) {
+        forceSpecializedTailMode = specializedTailMode
+        lastSignature = nextSignature
+        rescuePasses += 1
+        continue
       }
       if (headingOnlyRescuePath || nearPassFigureFastLane || mixedRuntimeGovernorTripped) {
         if (mixedRuntimeGovernorTripped) {
@@ -5408,6 +5692,7 @@ export async function remediatePdfWithAgent(
         }
         break
       }
+      forceSpecializedTailMode = null
       lastSignature = nextSignature
       rescuePasses += 1
     }
@@ -5421,6 +5706,9 @@ export async function remediatePdfWithAgent(
       mixedRuntimeGovernorFired,
       compactFinalRescueFallback,
       authoritativeFinalScoringReached: false,
+      specializedTailMode: lastSpecializedTailModeUsed,
+      specializedTailAttempted,
+      specializedTailImproved,
     }
 
     if (
@@ -7597,9 +7885,22 @@ export async function remediatePdfWithAgent(
     rejectedActions,
     iterations,
   })
+  const specializedTailMode = remediationMetrics.runtimeSummary?.specializedTailMode || 'none'
+  const specializedTailAttempted = remediationMetrics.runtimeSummary?.specializedTailAttempted || false
+  const specializedTailImproved = remediationMetrics.runtimeSummary?.specializedTailImproved || false
+  finalProfileArtifacts.failureProfile.summary.specializedTailMode = specializedTailMode
+  finalProfileArtifacts.failureProfile.summary.specializedTailAttempted = specializedTailAttempted
+  finalProfileArtifacts.failureProfile.summary.specializedTailImproved = specializedTailImproved
+  finalProfileArtifacts.plannerEvidence.specializedTailMode = specializedTailMode
+  finalProfileArtifacts.plannerEvidence.specializedTailAttempted = specializedTailAttempted
+  finalProfileArtifacts.plannerEvidence.specializedTailImproved = specializedTailImproved
   const finalOwnershipRiskCount = acrobatOwnershipRiskCount(finalContext)
   const finalFigureMissingAltCount = informativeFigureMissingAltCount(finalContext)
   const finalDecorativeFigureCount = decorativeFigureCount(finalContext)
+  const structureFinalStopReason =
+    remediationMetrics.phases.structure_state.residualFinalStopReason === 'font_tail_plateau'
+      ? 'tail_signature_plateau_after_specialized_rescue'
+      : remediationMetrics.phases.structure_state.residualFinalStopReason
 
   const finalManualReviewFlags = collectCategoryFlags(currentResult, manualReviewFlags)
   const finalPromotionGate = evaluatePromotionGate({
@@ -7652,7 +7953,7 @@ export async function remediatePdfWithAgent(
           freshDeepAnalyses: remediationMetrics.structureDeepFreshAnalyses,
           downgradedDeepAnalyses: remediationMetrics.structureDeepAnalysesDowngraded,
           lateConverged: remediationMetrics.phases.structure_state.lateConverged,
-          finalStopReason: remediationMetrics.phases.structure_state.residualFinalStopReason,
+          finalStopReason: structureFinalStopReason,
           finalBlockingKeys: blockingLocalFindingKeys(currentResult).filter(key =>
             key === 'pdfua.logical_structure'
             || key === 'pdfua.heading_content_quality'
@@ -7681,6 +7982,9 @@ export async function remediatePdfWithAgent(
         mixedRuntimeGovernorFired: remediationMetrics.runtimeSummary?.mixedRuntimeGovernorFired,
         compactFinalRescueFallback: remediationMetrics.runtimeSummary?.compactFinalRescueFallback,
         authoritativeFinalScoringReached: true,
+        specializedTailMode,
+        specializedTailAttempted,
+        specializedTailImproved,
       },
     },
     finalAudit: {
