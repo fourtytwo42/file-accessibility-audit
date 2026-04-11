@@ -1,5 +1,1389 @@
 # Project Memory
 
+## ICJIA data disk (second volume)
+
+- When the root volume is nearly full, add a physical disk, then run **`sudo bash scripts/setup-icjia-data-disk.sh`** from the repo root (requires root for partition, mkfs, mount, fstab).
+- Defaults: device **`/dev/sdb`**, mount **`/mnt/icjia-work`**, **`ext4`**, fstab with **`nofail`**. Override with **`ICJIA_DATA_DEVICE`**, **`ICJIA_DATA_PARTITION`**, **`ICJIA_DATA_MOUNT`**, **`ICJIA_REPO_ROOT`** if needed.
+- The script **`rsync --remove-source-files`** into the mount, then replaces **`ICJIA-PDFs/artifacts`**, **`backups`**, **`staging`**, and **`reports`** with **symlinks** to the same names under the mount so existing absolute paths in manifests keep resolving.
+- If **`mount`** fails with **wrong fs type / bad superblock** after a fresh partition, **`blkid`** may have seen a non-ext4 signature on **`/dev/sdb1`** and the old script skipped **`mkfs`**. Current script formats unless **`blkid TYPE` is `ext4`**; re-run **`sudo bash scripts/setup-icjia-data-disk.sh`** (or run **`sudo mkfs.ext4 -F -L icjia-work /dev/sdb1`** once, then mount and re-run the script).
+- After symlinking **`ICJIA-PDFs/{artifacts,...}`** to **`/mnt/icjia-work`**, **`pdf-mcp`** allow-list includes **`fs.realpathSync`** of those subdirs so MCP can open files under the data volume. **`run-manual-mcp-batch`** resolves remediated PDFs by scanning the whole remediated tree, **drops 0-byte matches**, prefers wave dirs (**`stage3-figure-wave`**, **`priority-batch`**, etc.) over **`manual-mcp-batch`** (avoids ENOSPC-truncated leftovers).
+- **`run-manual-mcp-batch`** (verification-failure and other modes): for PDFs with structure/figure/**`pdfua.untagged_rendered_images`** blockers and **`pageCount` ≤ `MANUAL_MCP_STRUCTURE_MAX_PAGES`** (default **240**), it now runs **`bootstrap_struct_tree`**, **`repair_native_marked_content_refs`**, and **`repair_structure_conformance`** before native figure/alt passes (previously structure repairs only ran for **`pageCount` ≤ 8**, so large reports never got a tree and figures stayed **`repairMode: defer`**). Figure repairs iterate up to **`MANUAL_MCP_MAX_FIGURE_OPS`** (default **48**), skipping candidates that repeatedly return **`no_effect`**.
+- **Manual MCP promotion gate (default relaxed):** by default the batch treats **`overallScore` ≥ `MANUAL_MCP_MIN_OVERALL_SCORE`** (default **90**), not scanned, and no **critical** manual-review flags as **`manual_ready_to_replace`** (reason **`cleared_min_overall_score`** when strict gate would still fail). Blocking local-standard keys may remain on the outcome for transparency. Set **`MANUAL_MCP_STRICT_PROMOTION_GATE=1`** for the original grade **A** / score **100** / no-blocking-locals bar. **`scripts/verify-ready-to-replace.ts`** and the engine still use the **strict** gate unless changed separately.
+- **Priority remediation batch (`run-priority-remediation-batch.ts`):** optional **`ICJIA_REMEDIATION_MIN_PASS_SCORE`** (e.g. **90**) switches pass/staging to relaxed **`evaluatePromotionGate`** **`minOverallScore`** (overall **≥** that score passes, plus not scanned / no critical manual flags); optional **`ICJIA_REMEDIATION_MIN_KEEP_SCORE`** (e.g. **80**) deletes the remediated PDF when final score is below that threshold and the row did **not** pass the effective gate (overall **≥** threshold is kept on disk). Unset vars preserve strict pass and always-on-disk artifacts. Detailed JSON includes **`strictPromotionGate`** when the pass threshold overrides the engine strict gate.
+- **All-remaining automated lane (2026-04-08):** a dedicated active backlog snapshot now exists at **`ICJIA-PDFs/manifests/all-remaining-automated.json`** (plus `.summary.json`) and is built by **`pnpm agency:build-pass-rate-slices`**. It includes only active automatable rows (`discovered`, `analyzed`, `queued_for_remediation`, `remediated_fail`, `processing_error`) that still have a runnable local source path and remote path, and excludes verified/staged/replaced rows, manual-mitigated or deferred rows, scanned/manual-only rows, and missing-source rows.
+- **All-remaining run command:** **`pnpm agency:run-all-remaining-automated`** wraps the generic priority runner with fixed defaults:
+  - concurrency **`4`**
+  - timeout **`1800000`** ms per PDF
+  - analysis profile **`full_final`**
+  - pass/stage threshold **`>= 90`**
+  - keep-artifact threshold **`>= 80`**
+  - lane-specific outputs:
+    - outcomes: **`ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json`**
+    - summary: **`ICJIA-PDFs/manifests/all-remaining-automated.outcomes.summary.json`**
+    - progress: **`ICJIA-PDFs/manifests/all-remaining-automated.outcomes.progress.json`**
+  - the wrapper resumes the same manifest/outcomes/progress set while a campaign is `running` or `stale`; once completed, the next start rebuilds a fresh snapshot.
+- **Resumable progress tracking:** the generic remediation batch runner now writes a durable progress document with `runId`, `state`, `pid`, `firstStartedAt`, `currentSessionStartedAt`, accumulated active runtime, heartbeat, `processed/remaining`, active workers, score policy, counts by result band, and last-completed row. Result bands are explicit (`pass_ge_90`, `keep_fail_80_to_89`, `drop_fail_lt_80`, `processing_error`, `source_missing`) so status tooling does not have to re-infer policy from scores. ETA is based on active wall-clock runtime across resumed sessions, not summed worker durations. Single-owner lock enforcement is available with **`ICJIA_REMEDIATION_ENFORCE_SINGLE_OWNER=1`** and is enabled by the all-remaining wrapper.
+- **All-remaining status command:** **`pnpm agency:all-remaining-status`** reads the lane manifest, outcomes, and progress file and prints `processed/total`, remaining, counts by result band, throughput, ETA, and run state (`not_started`, `running`, `stale`, `completed`). `--json` emits the same snapshot as machine-readable JSON.
+- **All-remaining dropped rerun lane (2026-04-09):** a dedicated rerun manifest for prior **`drop_fail_lt_80`** rows now exists at **`ICJIA-PDFs/manifests/all-remaining-dropped-rerun.json`** (plus `.summary.json`) and is built by **`pnpm agency:build-all-remaining-dropped-rerun`** from **`all-remaining-automated.outcomes.json`**. It reuses the exact input `localCachePath` values from the previous all-remaining run, carries forward the prior score/grade/band as seed context, and excludes rows whose source path or remote path is missing.
+- **All-remaining dropped rerun command:** **`pnpm agency:run-all-remaining-dropped-rerun`** wraps the generic runner for that dropped-only manifest with:
+  - concurrency **`4`**
+  - timeout **`1800000`** ms
+  - analysis profile **`full_final`**
+  - pass/stage threshold **`>= 90`**
+  - keep-artifact threshold **unset** so every rerun output PDF is retained on disk even when the rerun still scores below **`80`**
+  - lane-specific outputs:
+    - outcomes: **`ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json`**
+    - summary: **`ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.summary.json`**
+    - progress: **`ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.progress.json`**
+- **Dropped rerun status command:** **`pnpm agency:all-remaining-dropped-rerun-status`** reports the same resumable progress/ETA view for the dropped-only rerun campaign.
+- **All-remaining 79-down rerun lane (2026-04-10):** a second rerun manifest for prior scored outcomes at **`<=79`** now exists at **`ICJIA-PDFs/manifests/all-remaining-79-down-rerun.json`** (plus `.summary.json`) and is built by **`pnpm agency:build-all-remaining-79-down-rerun`** from **`all-remaining-dropped-rerun.outcomes.json`**. It uses the kept remediated PDFs from the dropped-rerun lane as the new `localCachePath` inputs, carries forward the previous rerun score as seed context, and excludes the completed `80+` rows plus no-score processing errors.
+- **All-remaining 79-down rerun v2 lane (2026-04-10):** a third rerun manifest for the latest scored outcomes at **`<=79`** now exists at **`ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.json`** (plus `.summary.json`) and is built by **`pnpm agency:build-all-remaining-79-down-rerun-v2`** from **`all-remaining-79-down-rerun.outcomes.json`**. It uses the kept remediated PDFs from the completed `79-down` rerun as the next `localCachePath` inputs, keeps all outputs again, and runs under the same fixed defaults via:
+  - `pnpm agency:run-all-remaining-79-down-rerun-v2`
+  - status: `pnpm agency:all-remaining-79-down-rerun-v2-status`
+- **All-remaining 60-69 material wave (2026-04-11):** a targeted rerun manifest for the latest scored outcomes in the **`60-69`** band now exists at **`ICJIA-PDFs/manifests/all-remaining-60-69-material-wave.json`** (plus `.summary.json`) and is built by **`pnpm agency:build-all-remaining-60-69-material-wave`** from **`all-remaining-79-down-rerun-v2.outcomes.json`**. It uses the kept remediated PDFs from the completed `79-down` v2 rerun as inputs, keeps all outputs again, and changes the retry ordering materially by prioritizing lighter-runtime files with the strongest prior score deltas first. Run and track with:
+  - `pnpm agency:run-all-remaining-60-69-material-wave`
+  - `pnpm agency:all-remaining-60-69-material-wave-status`
+- **All-remaining 60-69 positive-delta wave (2026-04-11):** when the full `60-69` band proved mostly plateaued, a smaller momentum-only lane was added at **`ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.json`** (plus `.summary.json`) to rerun only the current `60-69` rows that still improved on the previous pass. It is built from **`all-remaining-79-down-rerun-v2.outcomes.json`**, keeps all outputs, runs at concurrency **`2`**, and is intended as the highest-confidence next retry:
+  - `pnpm agency:build-all-remaining-60-69-positive-delta-wave`
+  - `pnpm agency:run-all-remaining-60-69-positive-delta-wave`
+  - `pnpm agency:all-remaining-60-69-positive-delta-wave-status`
+- **Sub-79 recovery wave tooling (2026-04-11):** targeted rerun selection for the plateaued remediated sub-79 corpus now uses current residual blocker truth instead of historical `dominantSelectionFamily`. New service: **`apps/api/src/services/sub79RecoveryWave.ts`**. New build/run/status commands:
+  - `pnpm agency:build-mixed-structure-figure-core`
+  - `pnpm agency:run-mixed-structure-figure-core`
+  - `pnpm agency:mixed-structure-figure-core-status`
+  - `pnpm agency:build-mixed-structure-figure-plus`
+  - `pnpm agency:run-mixed-structure-figure-plus`
+  - `pnpm agency:mixed-structure-figure-plus-status`
+  - `pnpm agency:build-font-led-deterministic`
+  - `pnpm agency:run-font-led-deterministic`
+  - `pnpm agency:font-led-deterministic-status`
+  - latest builder smoke counts: `mixed-structure-figure-core: 279`, `mixed-structure-figure-plus: 14`, `font-led-deterministic: 15`
+- **Mixed structure/figure convergence policy (2026-04-11):** remediation planning/runtime now has a first-class mixed-family path for residual `pdfua.logical_structure + pdfua.figure_alt_or_artifact` debt. The deterministic order is:
+  - `normalize_heading_hierarchy`
+  - `repair_native_marked_content_refs`
+  - `repair_structure_conformance`
+  - `normalize_nested_figure_containers`
+  - `repair_native_figure_semantics`
+  - `repair_other_elements_alt_text`
+  - bounded candidate-level figure repair
+- **Mixed-path gating/runtime changes (2026-04-11):**
+  - failure-profile structure opportunities no longer get deferred solely because figure debt is dominant when the document is in mixed structure/figure convergence
+  - mixed-path failure profiles keep heading, marked-content, and broad conformance opportunities visible as `auto_runnable`; the planner still enforces the action order
+  - light/medium mixed rescue now gets one extra serialized pass before mixed-family terminalization; heavy documents keep tighter bounds
+  - final residual cleanup now includes bounded deterministic sweeps for `pdfua.annotation_alt_contents`, `pdfua.link_tagging`, and `pdfua.table_regularity`
+- **Visual approval holds (2026-04-10):** material visual-parity review exceptions now live in **`ICJIA-PDFs/manifests/visual-approval-holds.json`**. `scripts/verify-ready-to-replace.ts` reads this manifest and marks matching staged rows with `visualApproval.required`; those rows remain staged locally but are forced to `verificationPassed: false`, excluded from the verified-promotion ledger, and classified as **`held_visual_review`** by `scripts/classify-ready-verification.ts`. `apps/api/src/services/corpusControlPlane.ts` maps that classification to `staged_for_replacement` with reason code `verification_held_visual_review`, so they stay out of auto-upload flows until the hold is cleared. Current held ids: `3783`, `4641` (only `4641` is presently in the staged-ready set).
+- **Visual review hold status command:** run **`pnpm agency:visual-review-holds`** for a human-readable snapshot of active `held_visual_review` rows plus hold-manifest-only ids; add **`-- --json`** for machine-readable output. This is the fastest way to confirm whether a visually flagged PDF is actively blocking auto-promotion.
+- **All-remaining 79-down rerun command:** **`pnpm agency:run-all-remaining-79-down-rerun`** wraps the generic runner for that manifest with:
+  - concurrency **`4`**
+  - timeout **`1800000`** ms
+  - analysis profile **`full_final`**
+  - pass/stage threshold **`>= 90`**
+  - keep-artifact threshold **unset** so every second-rerun output PDF is retained on disk
+  - lane-specific outputs:
+    - outcomes: **`ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.json`**
+    - summary: **`ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.summary.json`**
+    - progress: **`ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.progress.json`**
+- **79-down rerun status command:** **`pnpm agency:all-remaining-79-down-rerun-status`** reports the same resumable progress/ETA view for the second rerun campaign.
+- **Forward verification policy (2026-04-08):** **`pnpm agency:verify-ready`** now defaults to the same forward-looking minimum overall score threshold of **`90`** (still not scanned / no critical manual-review flags) for staged outputs it verifies, and records `scorePolicy` in verification and promotion summaries. This is forward-looking only; historical manifests are not rewritten retroactively.
+- **`ICJIA-PDFs/manifests/`** is not moved by default (stays on the repo/root filesystem).
+
+## 2026-04-07 PDF MCP Manual Batch
+
+- The local PDF MCP server is now a proven manual-remediation path even though no MCP server is configured in the session resource list:
+  - `list_mcp_resources` and `list_mcp_resource_templates` returned empty
+  - the working path is to spawn the local stdio server directly with the SDK client:
+    - `pnpm --filter pdf-mcp exec tsx src/index.ts`
+- A reusable MCP batch runner now exists:
+  - script: `apps/pdf-mcp/scripts/run-manual-mcp-batch.ts`
+  - root wrapper: `scripts/run-manual-mcp-batch.ts`
+  - command:
+    - `pnpm agency:run-manual-mcp-batch` (no args: legacy four ids from `pass-rate-figure-canary.json`)
+    - `pnpm agency:run-manual-mcp-batch -- --manifest` (default path `ICJIA-PDFs/manifests/manual-mcp-next-batch.json`) merges that manifest with `publication-pdf-replacement-map.json` and prefers remediated PDFs under `ICJIA-PDFs/artifacts/remediated-pdfs/`; figure-canary is no longer the only lookup table for manifest runs.
+    - optional tranche: same command with numeric ids after `--manifest` to filter while preserving tranche order.
+    - `pnpm agency:run-manual-mcp-batch -- --manifest --dry-run` to resolve and prefilter without MCP.
+    - optional single-file rerun:
+      - `pnpm agency:run-manual-mcp-batch <publicationId>` (replacement-map-only resolution)
+  - following-wave manifest builder:
+    - `pnpm agency:build-manual-mcp-next-batch-v2` → `ICJIA-PDFs/manifests/manual-mcp-next-batch-v2.json` (+ `.summary.json`), excluding manual-terminal rows, current `manual-mcp-next-batch` ids, and locals that already pass `full_final`.
+  - Verified 2026-03-31: `pnpm --filter pdf-mcp typecheck` pass; `pnpm agency:run-manual-mcp-batch -- --manifest --dry-run 4192` resolves a non-canary id from the next-batch manifest + replacement map (remediated path preferred).
+- `manual-mcp-next-batch` twenty-file MCP wave (four tranches) completed; every id has a terminal manual outcome (`manual_ready_to_replace` or `manual_terminalized` with `manualResolutionReason`):
+  - `manual_ready_to_replace` (`cleared_final_blockers`): `4079`, `4100`, `4015`, `4019`, `4565`, `4072`, `4098`, `4121`
+  - `manual_terminalized` (`manual_object_level_repair_exhausted`): `4192`, `4726`, `3585`, `3778`, `4758`, `4639`, `4750`, `4651`, `4607`, `4634`, `4756`, `4688`
+  - After each tranche: `pnpm agency:build-pass-rate-slices`; final slice pass reported `manualMitigation.manualReadyCount: 10`, `manualTerminalizedCount: 26`, `manualInProgressCount: 0` (ledger includes prior MCP + manual-lane rows).
+- Following-wave manifest built with control plane + ledger + `full_final` preflight + exclusion of prior `manual-mcp-next-batch` ids:
+  - `pnpm agency:build-manual-mcp-next-batch-v2`
+  - `ICJIA-PDFs/manifests/manual-mcp-next-batch-v2.json` and `manual-mcp-next-batch-v2.summary.json` (`queueName: manual-mcp-next-batch-v2`, 20 selected ids starting with `4632`, `4492`, …; `poolSizeBeforePreflight: 48` at generation time).
+- The MCP batch writes durable artifacts to:
+  - `ICJIA-PDFs/manifests/manual-mcp-batch.json`
+  - `ICJIA-PDFs/manifests/manual-mcp-batch.summary.json`
+  - `ICJIA-PDFs/reports/manual-mcp-batch/`
+  - `ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/`
+  - `ICJIA-PDFs/staging/to-replace/manual-mcp-batch/`
+- The MCP batch records its final statuses in the shared manual outcome ledger:
+  - `ICJIA-PDFs/manifests/manual-worklist.outcomes.json`
+  - `ICJIA-PDFs/manifests/manual-worklist.outcomes.summary.json`
+  - this is enough for control-plane exclusion even when the publications are outside the original fixed 12-row manual worklist
+- First MCP manual batch selected:
+  - `4150` — `ICJIA 2009 Annual Report`
+  - `3671` — `ICJIA 1997 Annual Report`
+  - `4169` — `Juvenile sentencing`
+  - `4590` — `Research at a Glance Impacts of Probationer Screening and Services on Probation Success and Future Arrests`
+- Final MCP batch outcomes:
+  - `4150` -> `manual_terminalized`
+    - reason: `manual_object_level_repair_exhausted`
+    - final: `92/B`
+    - blocker remained: `pdfua.figure_alt_or_artifact`
+  - `3671` -> `manual_ready_to_replace`
+    - reason: `cleared_final_blockers`
+    - final: `100/A`
+    - staged replacement:
+      - `ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf`
+  - `4169` -> `manual_terminalized`
+    - reason: `manual_object_level_repair_exhausted`
+    - final: `83/B`
+  - `4590` -> `manual_ready_to_replace`
+    - reason: `cleared_final_blockers`
+    - final: `100/A`
+    - staged replacement:
+      - `ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf`
+- Practical workflow conclusion:
+  - using MCP for mutation/inspection plus `full_final` for the final decision works
+  - first implementation mistake: `4590` was already passing locally and should not have been sent into manual processing
+  - corrected rule: already-passing local artifacts must be excluded before MCP batch selection, not processed and reclassified afterward
+  - `apps/pdf-mcp/scripts/run-manual-mcp-batch.ts` now pre-checks candidate inputs with `full_final` and skips already-passing ids in the batch manifest
+  - next planned MCP manual batch now lives at:
+    - `ICJIA-PDFs/manifests/manual-mcp-next-batch.json`
+    - `ICJIA-PDFs/manifests/manual-mcp-next-batch.summary.json`
+  - the next batch is intentionally weighted toward failing, light-runtime, figure-dominant rows rather than heavy county-profile style PDFs
+  - after rebuilding pass-rate slices on 2026-04-07:
+    - `manualReadyCount: 2`
+    - `manualTerminalizedCount: 14`
+    - newly excluded publication ids include:
+      - `3671`
+      - `4150`
+      - `4169`
+      - `4590`
+  - current staged manual-ready MCP replacements are:
+    - `3671`
+    - `4590`
+
+## 2026-04-07 Manual Worklist And Tracking Loop
+
+- The manual figure-final-mile lane is now a durable tracked queue instead of an ad-hoc shortlist:
+  - service: `apps/api/src/services/manualWorklist.ts`
+  - queue builder: `scripts/build-manual-worklist.ts`
+  - manual runner: `apps/api/src/scripts/manualFigureFinalMile.ts`
+  - root commands:
+    - `pnpm agency:build-manual-worklist`
+    - `pnpm agency:build-manual-fix-candidates` (compatibility alias)
+    - `pnpm agency:manual-figure-final-mile <publicationId>`
+- The first manual wave is the fixed 12-row hardest-salvageable figure-final-mile queue:
+  - `4481`
+  - `4186`
+  - `4593`
+  - `3691`
+  - `3705`
+  - `3703`
+  - `3710`
+  - `3698`
+  - `3707`
+  - `3694`
+  - `3706`
+  - `3700`
+- Manual queue artifacts now live at:
+  - `ICJIA-PDFs/manifests/manual-worklist.json`
+  - `ICJIA-PDFs/manifests/manual-worklist.summary.json`
+  - `ICJIA-PDFs/manifests/manual-worklist.outcomes.json`
+  - `ICJIA-PDFs/manifests/manual-worklist.outcomes.summary.json`
+- The manual outcome ledger uses explicit statuses:
+  - `manual_ready_to_replace`
+  - `manual_terminalized`
+  - `manual_in_progress`
+  - `manual_deferred`
+- Control-plane/slice behavior now honors manual mitigation:
+  - manually mitigated rows are excluded from throughput lanes, runtime retry lanes, replacement-likelihood, and residual active cohorts
+  - `manual_ready_to_replace` maps to control-plane status `staged_for_replacement`
+  - `manual_terminalized`, `manual_in_progress`, and `manual_deferred` map to control-plane status `deferred_manual`
+  - residual-family reporting now exposes manual mitigation counts, reasons, and excluded publication ids
+- Manual reports must be judged by `full_final`, not `remediation_fast`
+- The manual lane starts from the best local remediated artifact it can find for the selected publication id (preferring `medium-figure-conversion`, then other prior remediated roots) and writes outputs to:
+  - `ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/`
+  - `ICJIA-PDFs/reports/manual-figure-final-mile/`
+  - `ICJIA-PDFs/staging/to-replace/manual-worklist/`
+- Verified on 2026-04-07:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/manualWorklist.test.ts src/__tests__/passRateWaveSlices.test.ts src/__tests__/residualFamilyClosureReport.test.ts` -> `18/18` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:build-manual-worklist` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+- Latest generated manual/control-plane truth after wiring:
+  - before manual outcomes were backfilled, `manualWorklistCount` was `12`
+  - after backfilling the first two manual outcomes and rebuilding slices:
+    - active manual worklist count is now `10`
+    - `4186` and `4481` are excluded from active automation cohorts and active manual queue selection
+    - residual-family summary now reports:
+      - `manualTerminalizedCount: 2`
+      - `excludedPublicationIds: 4186, 4481`
+    - manual outcomes summary now reports:
+      - `manualReadyToReplace: 0`
+      - `manualTerminalized: 2`
+      - reason frequency:
+        - `manual_object_level_repair_exhausted: 2`
+- Manual remainder wave completed on 2026-04-07:
+  - remaining queue processed in order:
+    - `4593`
+    - `3691`
+    - `3705`
+    - `3703`
+    - `3710`
+    - `3698`
+    - `3707`
+    - `3694`
+    - `3706`
+    - `3700`
+  - every remaining file ended as `manual_terminalized`
+  - final manual outcomes summary:
+    - `totalOutcomes: 12`
+    - `manualReadyToReplace: 0`
+    - `manualTerminalized: 12`
+    - `manualInProgress: 0`
+    - `manualDeferred: 0`
+    - `reasonsByFrequency.manual_object_level_repair_exhausted: 12`
+  - final active manual queue state:
+    - `manual-worklist.summary.json` now shows `selectedRows: 0`
+  - final residual/control-plane state:
+    - `manualTerminalizedCount: 12`
+    - all 12 manual ids are excluded from active automation cohorts
+    - `figureFinalMileClosureCount` dropped to `0` in the manual wave source queue
+  - county-profile wave pattern was consistent:
+    - baseline: `21/F`
+    - after manual figure/object-level pass: still blocked by the same broader family set
+    - final: `24/F`
+    - blockers remained:
+      - `pdfua.logical_structure`
+      - `pdfua.document_language`
+      - `pdfua.display_doc_title`
+      - `pdfua.font_embedding`
+      - `pdfua.font_unicode`
+      - `pdfua.figure_alt_or_artifact`
+    - practical conclusion: these were not true figure-final-mile-only salvage cases; manual figure-only surgery exhausted without exposing a replacement path
+  - `4593` also confirmed the same conclusion at smaller scale:
+    - figure work removed the initial figure-alt blocker mid-run, but `full_final` still ended at `24/F`
+    - final blockers remained broad and included:
+      - `pdfua.logical_structure`
+      - `pdfua.document_language`
+      - `pdfua.display_doc_title`
+      - `pdfua.bookmark_language`
+      - `pdfua.font_embedding`
+      - `pdfua.font_unicode`
+      - `pdfua.page_tabs`
+      - `pdfua.annotation_alt_contents`
+      - `pdfua.note_tag_id`
+      - `pdfua.untagged_rendered_images`
+      - `pdfua.nested_alt_text`
+    - practical conclusion: `4593` was not a figure-final-mile candidate either, and its manual result validated the decision to treat the rest of the wave as automation-relief terminalization rather than pass hunting
+- Live manual-run results on 2026-04-07:
+  - `4186` (`Underreporting of violent victimization impedes justice services`)
+    - input: `ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf`
+    - output/report written successfully
+    - final result improved to `91/B` but still failed on `pdfua.figure_alt_or_artifact`
+    - one figure (`obj:42 0 R`) still failed even after a decorative/manual alt attempt
+  - `4481` (`Addressing Child Exposure to Violence`)
+    - input: `ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.pdf`
+    - output/report written successfully
+    - `remediation_fast` baseline misleadingly looked clean (`100/A`), but `full_final` still ended at `89/B`
+    - final blockers remained:
+      - `pdfua.nested_alt_text`
+      - `pdfua.figure_alt_or_artifact`
+- Practical conclusion:
+  - a manual lane is viable and worth keeping
+  - the queue/tracking loop now lets manual work spare automation cleanly once outcomes are recorded
+  - but generic local figure-candidate replay is not enough by itself for the remaining hard cases
+  - for real manual wins, the next step should be direct object-level inspection/patching of the exact remaining figure refs reported in the manual reports
+
+## 2026-04-07 Large Mixed Runtime Reduction Slice
+
+- The next engine slice for `large_mixed_runtime_reduction` is now implemented in:
+  - `apps/api/src/services/agentRemediationService.ts`
+- Large mixed runtime behavior is now more aggressively cost-controlled before deep rescue:
+  - `isRuntimeHeavyMixedProfile(...)` treats mixed rows as runtime-heavy when page count is high (`>= 80`), deep inspections are already elevated, or repeated mixed no-progress history is present
+  - `shouldTripMixedRuntimeGovernor(...)` now requires the row to qualify as a runtime-heavy mixed profile before firing
+  - `shouldSerialTerminalizeLargeMixedProfile(...)` now uses the lower heavy threshold (`>= 80` pages) instead of the older very-large threshold (`>= 140`)
+  - new helper `shouldAllowLargeMixedDominantFamilyRescue(...)` limits figure/structure rescue on runtime-heavy mixed rows:
+    - first rescue pass only enters the dominant-family branch when a family-specific opportunity is exposed
+    - later rescue passes only re-enter that branch if the immediately prior residual snapshot actually shrank that family’s debt
+    - non-dominant-family rescue is blocked on runtime-heavy mixed rows
+- In the focused final rescue loop:
+  - figure rescue now checks `allowLargeMixedFigureRescue`
+  - structure/table rescue now checks `allowLargeMixedStructureRescue`
+  - this keeps large mixed docs from repeatedly re-entering expensive deep rescue branches just because both families remain present
+- Focused regression coverage was expanded in:
+  - `apps/api/src/__tests__/agentRemediationService.test.ts`
+  - new cases cover:
+    - blocking repeated large mixed structure rescue without fresh structure shrink
+    - allowing repeated large mixed figure rescue only after figure shrink
+    - allowing normal dominant-family rescue to continue on non-heavy mixed profiles
+- Verified on 2026-04-07:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/passRateWaveSlices.test.ts src/__tests__/residualFamilyClosureReport.test.ts src/__tests__/runtimeTailOvernight.test.ts` -> `122/122` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+- Latest rebuild truth after this runtime-heavy slice:
+  - recommended next engine slice still reports `mixed_figure_structure_separation`
+  - `mixed_figure_structure_separation`: `233`
+  - `figure_final_mile_closure`: `122`
+  - `large_mixed_runtime_reduction`: `48`
+  - `runtimeMixedTerminalizationCount`: `49`
+  - runtime mixed grouped counts:
+    - `mixed`: `48`
+    - `structure`: `1`
+- Practical conclusion:
+  - the runtime-heavy mixed controls are now tighter and validated, but the cohort counts did not move from a static rebuild alone
+  - the next meaningful decision depends on new live runtime truth or a direct figure-final-mile attempt, not another rebuild-only inference
+
+## 2026-04-07 Mixed Figure/Structure Separation Tightening Pass 2
+
+- A second mixed-family tightening pass is now implemented in:
+  - `apps/api/src/services/agentRemediationService.ts`
+- The residual cleanup follow-up gate is now stricter about when mixed rows may re-enter the wrong family:
+  - figure-primary mixed states no longer re-enter structure-family deep follow-up unless the immediately prior residual snapshot shows actual structure-debt shrink
+  - structure-primary mixed states no longer re-enter figure-family cleanup unless that figure family is newly exposed
+  - repeated irreducibly mixed states with no structure or figure shrink are blocked from reseeding another broad residual loop
+- Focused structure rescue now also stops earlier for:
+  - repeated irreducibly mixed no-progress states
+  - figure-primary mixed after-states
+- `selectResidualCleanupFamilyTarget` now accepts remediation context and uses mixed-family pressure to prefer:
+  - `native_figure_convergence` when a mixed row has become figure-primary
+  - structural cleanup only when a mixed row is still structure-primary
+- Focused regression coverage was expanded in:
+  - `apps/api/src/__tests__/agentRemediationService.test.ts`
+  - new cases cover:
+    - figure-primary mixed states only allowing structure follow-up after actual structure shrink
+    - blocking figure cleanup while a row is still structure-primary
+    - repeated irreducibly mixed rescue stopping early
+    - figure-family selection after a mixed row becomes figure-primary
+- Verified on 2026-04-07:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/passRateWaveSlices.test.ts src/__tests__/residualFamilyClosureReport.test.ts` -> `113/113` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+- Latest rebuild truth after this second tightening pass:
+  - recommended next engine slice remains `mixed_figure_structure_separation`
+  - `mixed_figure_structure_separation`: `233`
+  - `figure_final_mile_closure`: `122`
+  - `large_mixed_runtime_reduction`: `48`
+  - `runtimeMixedTerminalizationCount`: `49`
+  - `runtimeStructureRetryCount`: `2`
+- Practical conclusion:
+  - the mixed routing logic is now tighter and more explicit, but the rebuilt cohort counts did not materially move beyond the prior pass
+  - the next pivot should be chosen between:
+    - another stop-condition/runtime-cost reduction slice for large mixed docs, or
+    - figure-final-mile closure only if future live truth shifts more rows cleanly out of the mixed cohort
+
+## 2026-04-07 Mixed Figure/Structure Separation Tightening
+
+- The next engine slice for `mixed_figure_structure_separation` is now implemented in:
+  - `apps/api/src/services/agentRemediationService.ts`
+  - `apps/api/src/services/residualFamilyClosureReport.ts`
+- Residual cleanup now uses a mixed-family pressure model instead of raw family presence only:
+  - `single_family`
+  - `structure_primary`
+  - `figure_primary`
+  - `irreducibly_mixed`
+  - `unknown`
+- `ResidualCleanupProgressSnapshot` now carries `pressure`, and mixed residual progress can count as real improvement when the family pressure shifts even if blocker families still overlap.
+- Mixed-family routing behavior is now tighter:
+  - mixed rows whose figure debt materially outweighs structure debt are treated as figure-primary
+  - structure-family deep follow-up is blocked when a mixed state is already figure-primary
+  - focused structure rescue now stops earlier when the after-state is already figure-dominant
+  - residual cleanup family targeting is more likely to hand off toward figure cleanup instead of reseeding another structure loop
+- `residualFamilyClosureReport` now records `familyPressure` per row and uses that signal to identify cleaner figure-final-mile handoff candidates.
+- Latest rebuilt residual-family report truth after this slice:
+  - remaining non-pass rows: `912`
+  - rows with observed outcomes: `252`
+  - rows with observed blocking shrink: `53`
+  - recommended next engine slice remains: `mixed_figure_structure_separation`
+  - ranked cohort counts:
+    - `font_symbol_closure`: `336`
+    - `mixed_figure_structure_separation`: `233`
+    - `manual_scanned_deferred`: `173`
+    - `figure_final_mile_closure`: `122`
+    - `large_mixed_runtime_reduction`: `48`
+- Compared with the previous residual-family rebuild:
+  - `mixed_figure_structure_separation` shrank from `235` to `233`
+  - `figure_final_mile_closure` grew from `120` to `122`
+  - this is the current evidence of a slightly cleaner handoff from mixed survivors into figure-final-mile closure
+- Current operational slice truth after the rebuild:
+  - `runtimeFigureRetryCount: 0`
+  - `runtimeStructureRetryCount: 2`
+  - `runtimeMixedTerminalizationCount: 49`
+  - `smallFastPassCount: 1`
+  - `mediumFigureConversionCount: 32`
+  - `serialHeavyMixedTerminalizationCount: 111`
+  - `manualScannedDeferredCount: 168`
+  - `replacementLikelihoodCount: 0`
+  - `figureFinalMileClosureCount: 12`
+- Verified on 2026-04-07:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/passRateWaveSlices.test.ts src/__tests__/residualFamilyClosureReport.test.ts` -> `109/109` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+
+## 2026-04-07 Residual-Family Closure Loop And Broad Conversion Lane Freeze
+
+- The broad throughput conversion experiments are now treated as answered and operationally dormant:
+  - `small-fast-pass` -> `executionPolicy: dormant`
+  - `medium-figure-conversion` -> `executionPolicy: dormant`
+  - `replacement-likelihood` -> `executionPolicy: dormant`
+- Their dormant policy is enforced in both:
+  - `scripts/run-throughput-lane.ts`
+  - `scripts/run-priority-remediation-batch.ts`
+  unless `ICJIA_ALLOW_DORMANT_LANE=1` is explicitly set.
+- `serial-heavy-mixed-terminalization` remains the active throughput/control lane and is still measured as:
+  - terminal outcomes/hour
+  - `processing_error -> failed_after_remediation`
+  - retry-budget reduction
+  - blocker-family shrink
+- New residual-family closure reporting now exists:
+  - service: `apps/api/src/services/residualFamilyClosureReport.ts`
+  - generated artifacts:
+    - `ICJIA-PDFs/manifests/residual-family-closure-report.json`
+    - `ICJIA-PDFs/manifests/residual-family-closure-report.summary.json`
+    - `ICJIA-PDFs/manifests/figure-final-mile-closure.json`
+    - `ICJIA-PDFs/manifests/figure-final-mile-closure.summary.json`
+  - command path:
+    - `pnpm agency:build-pass-rate-slices`
+    - alias: `pnpm agency:build-residual-family-closure-report`
+- The residual-family report consumes real completed outcome manifests plus current control-plane truth and tags remaining non-pass rows into candidate engine slices:
+  - `figure_final_mile_closure`
+  - `mixed_figure_structure_separation`
+  - `font_symbol_closure`
+  - `manual_scanned_deferred`
+  - `large_mixed_runtime_reduction`
+- Current residual-family report truth from the latest rebuild:
+  - remaining non-pass rows: `912`
+  - rows with observed outcomes: `252`
+  - rows with observed blocking shrink: `53`
+  - recommended next engine slice: `mixed_figure_structure_separation`
+  - ranked cohort counts:
+    - `font_symbol_closure`: `336`
+    - `mixed_figure_structure_separation`: `235`
+    - `manual_scanned_deferred`: `173`
+    - `figure_final_mile_closure`: `120`
+    - `large_mixed_runtime_reduction`: `48`
+- The figure-final-mile closure cohort now exists as a dedicated manifest sourced from real outcome history:
+  - current selected count: `12`
+  - current selected ids:
+    - `4186, 4481, 3700, 3706, 3694, 3698, 3707, 3710, 3703, 3705, 3691, 4593`
+- Narrow engine slice implemented:
+  - `agentRemediationService` now prefers `native_figure_convergence` during final residual cleanup when the document is already high-scoring and the remaining blocking local findings are figure-final-mile only:
+    - `pdfua.figure_alt_or_artifact`
+    - `pdfua.nested_alt_text`
+    - `pdfua.figure_alt_quality`
+    - `category.alt_text`
+    - `context.long_report_figure_residue`
+    - `context.figure_candidates_blocked`
+- Verified on 2026-04-07:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/passRateWaveSlices.test.ts src/__tests__/residualFamilyClosureReport.test.ts src/__tests__/agentRemediationService.test.ts` -> `106/106` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:run-small-fast-pass` -> skipped because dormant
+  - `pnpm agency:run-replacement-likelihood` -> skipped because dormant
+
+## 2026-04-05 Claude Plan-Mode Tooling Failure Root Cause
+
+- Claude Code `2.1.92` can now reach the LAN Anthropic-compatible endpoint successfully when `ANTHROPIC_BASE_URL` is set to the host root (`http://192.168.50.238:51824`) instead of the versioned path.
+- Durable CLI config currently works for direct requests with:
+  - `ANTHROPIC_BASE_URL=http://192.168.50.238:51824`
+  - `ANTHROPIC_CUSTOM_MODEL_OPTION=gpt-5.4`
+- The reported plan-mode / explore-agent tool failure is not primarily an endpoint outage.
+- Claude’s own local session logs show repeated sub-agent/worktree failures on:
+  - `Failed to resolve base branch "origin/main": git rev-parse failed`
+- Repo truth at the time of failure:
+  - local branch: `feature/pdf-fixing`
+  - only remote branch present locally: `origin/feature/pdf-fixing`
+  - `origin/main` does not exist locally
+  - `origin/HEAD` is missing
+- This means plan-mode agent/worktree setup is defaulting to `origin/main` and failing before the intended read-only exploration can proceed.
+- Separate endpoint-compatibility observation from Claude debug logs:
+  - Claude reaches `/v1/messages` on the LAN hotspot
+  - the hotspot stream response does not emit Anthropic `message_start`, so Claude logs:
+    - `Stream completed without receiving message_start event`
+  - Claude then falls back to non-streaming mode
+- Practical consequence:
+  - direct Claude usage with the LAN endpoint can still work
+  - plan-mode/explore-agent flows may still fail in this repo until base-branch resolution is fixed or a compatible `origin/main` / `origin/HEAD` is provided
+
+## 2026-04-05 Stage 4 Canary Runtime And Final-Mile Recovery Slice
+
+- The next post-canary runtime-recovery slice is now implemented in `agentRemediationService`.
+- New late-phase behavior:
+  - mixed late rescue now has a bounded runtime governor that can trip before the global batch timeout once mixed debt has repeated without residual shrink
+  - compact mixed rescue now skips repeated no-effect candidate/target-ref retries instead of reissuing the same stable call surface
+  - near-pass figure survivors can enter a fast lane that keeps them in figure-only final-mile cleanup instead of re-entering mixed rescue
+  - heading-only survivors keep a bounded heading finisher and no longer branch back into broad mixed cleanup once that lane is detected
+- `remediationMetrics.runtimeSummary` now also carries:
+  - `focusedRescuePassCount`
+  - `mixedRuntimeGovernorFired`
+  - `compactFinalRescueFallback`
+  - `authoritativeFinalScoringReached`
+- Focused regression coverage added for:
+  - near-pass figure fast-lane eligibility
+  - mixed-runtime governor activation
+  - skipping repeated no-effect compact mixed rescue calls against the same stable target ref
+- Verified on 2026-04-05:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/agentRemediationService.test.ts` -> `84/84` pass
+  - `pnpm --dir apps/api exec vitest run src/__tests__/semanticEnrichmentService.test.ts src/__tests__/documentReconstructionService.test.ts src/__tests__/remediationPlanService.test.ts` -> pass
+- Scoped canary rerun V2 truth before this slice:
+  - `4755` -> `failed_after_remediation`, `36 -> 86`, still blocked only by `pdfua.heading_content_quality`
+  - `4078` -> `failed_after_remediation`, `20 -> 48`, still mixed structure/figure/heading hard fail
+  - `4188`, `4551`, `4162`, `4183` -> `processing_error`
+  - `4183` regressed from the V1 near-pass figure residual into timeout/error, so bulk Stage 3 / broad Stage 4 remain paused pending a V3 rerun
+
+## 2026-04-06 Engine Contract And Runtime-Tail Planning Sync
+
+- The public document-centric engine surface in `apps/api/src/engine/index.ts` is now treated as the canonical Stage 7 API boundary.
+- Engine operations now normalize and echo a reusable request policy with:
+  - `remediationPolicy.visualPreservation` defaulting to `strict`
+  - `artifactRetention`
+  - `benchmarkLabel`
+  - `canaryLabel`
+  - `maxRuntimeMs`
+- Engine responses now expose standardized diagnostics for:
+  - blocking finding keys
+  - unresolved categories
+  - residual-family summaries
+  - stop reasons
+  - runtime metrics
+  - retained artifact paths
+- A shared runtime/manual-tail classifier now exists in:
+  - `apps/api/src/services/runtimeTailClassifier.ts`
+- New runtime-tail analysis entrypoint:
+  - `pnpm agency:analyze-runtime-manual-tail`
+  - writes:
+    - `ICJIA-PDFs/manifests/runtime-manual-tail-analysis.json`
+    - `ICJIA-PDFs/manifests/runtime-manual-tail-analysis.summary.json`
+- Stage 4 wave selection is now stricter:
+  - unresolved rows from the active Stage 4 wave stay selected until they reach terminal outcomes
+  - forensic classification can refine routing, but it no longer clears an active Stage 4 row from the wave before terminalization
+- Roadmap truth was reconciled again:
+  - Stage 5 remains done
+  - Stage 6 remains done
+  - Stage 4 is functionally done at the engine level but still has an actively guarded pending-wave closure path
+
+## 2026-04-06 Failure-Profile And Figure-Family Contract Hardening
+
+- `apps/api/scripts/pdf_structure_helper.py` native figure repair now backfills empty `/Alt` placeholders onto existing leaf `/Figure` nodes that already own page-backed content but were missing alt entirely.
+- Focused regression coverage exists in:
+  - `apps/api/src/__tests__/pdfRemediationTools.test.ts`
+  - validates missing-`/Alt` backfill on an existing native `/Figure`
+- `apps/api/src/services/documentModel.ts` and `apps/api/src/services/failureProfileService.ts` now expose reusable retry/routing summary fields on both `failureProfile.summary` and `plannerEvidence`:
+  - `safeToRetry`
+  - `dominantResidualFamily`
+  - `lastStableNoEffectTool`
+  - `retryDisposition`
+- `apps/api/src/engine/index.ts` now surfaces those same Stage 7 diagnostics for non-ICJIA callers, plus family-oriented stop-reason fields for:
+  - figure family
+  - structure family
+  - font family
+  - runtime retry classification
+- Verified on 2026-04-06:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/failureProfileService.test.ts src/__tests__/engine.test.ts` -> `45/45` pass
+
+## 2026-04-06 Pass-Rate Slice Operationalization
+
+- Native figure repair in `apps/api/scripts/pdf_structure_helper.py` now also:
+  - normalizes whitespace/junk placeholder `/Alt` values on existing `/Figure` nodes back to empty placeholders
+  - artifacts decorative graphics-only native owners instead of promoting them to `/Figure`
+- `apps/api/src/services/failureProfileService.ts` now applies explicit planner policy for:
+  - smallest-lane font recovery after generic Unicode no-effect passes
+  - heading/reading-order/marked-content cleanup ahead of broad structure conformance on post-bootstrap/native survivors
+  - keeping figure-dominant residuals ahead of structure cleanup when figure debt is still active
+- New operational slice builder:
+  - `apps/api/src/services/passRateWaveSlices.ts`
+  - command: `pnpm agency:build-pass-rate-slices`
+  - writes:
+    - `ICJIA-PDFs/manifests/pass-rate-figure-canary.json`
+    - `ICJIA-PDFs/manifests/pass-rate-font-canary.json`
+    - `ICJIA-PDFs/manifests/runtime-tail-retry-wave.json`
+- Current generated slice truth from that command:
+  - figure canary selected `3567, 3640, 3763, 3864, 4043, 4068, 4095, 4113`
+  - font canary selected `3838, 4099, 4144, 4151, 4166, 4173, 4176, 4199`
+  - runtime retry wave currently contains `99` rows
+- Verified on 2026-04-06:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/failureProfileService.test.ts src/__tests__/passRateWaveSlices.test.ts src/__tests__/pdfRemediationTools.test.ts -t "normalizes junk or whitespace /Alt on existing native /Figure elements back to an empty placeholder|prefers the next smallest font lane after generic Unicode repair hits a no-effect ceiling|blocks broad structure conformance while only heading and marked-content cleanup remain|passRateWaveSlices"` -> pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+
+## 2026-04-06 Runtime Retry Pipeline Split Into Family-Targeted Lanes
+
+- The old monolithic overnight `runtime-tail-retry-wave` is no longer the intended default runtime retry strategy.
+- New runtime-targeted manifests now build from `pnpm agency:build-pass-rate-slices`:
+  - `ICJIA-PDFs/manifests/runtime-tail-figure-retry.json`
+  - `ICJIA-PDFs/manifests/runtime-tail-structure-retry.json`
+  - `ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.json`
+- New direct runners now exist:
+  - `pnpm agency:run-runtime-tail-figure-retry`
+  - `pnpm agency:run-runtime-tail-structure-retry`
+  - `pnpm agency:run-runtime-tail-mixed-terminalization`
+- The runtime slice builder now:
+  - excludes prior processed runtime-wave rows from future automatic retry manifests
+  - applies a winner-likelihood filter for figure/structure conversion lanes
+  - keeps mixed-dominant retryables in a separate truth-hardening terminalization lane
+- New chunk-aware overnight worker:
+  - `scripts/run-runtime-tail-overnight-pipeline.ts`
+  - detached launcher still uses `pnpm agency:start-runtime-tail-retry-wave-overnight`
+  - status command still uses `pnpm agency:runtime-tail-retry-wave-status`
+  - overnight summaries now write to `<slice>.overnight.summary.json`
+- New chunk recommendation rules are covered in:
+  - `apps/api/src/services/runtimeTailOvernight.ts`
+  - `apps/api/src/__tests__/runtimeTailOvernight.test.ts`
+- Verified on 2026-04-06:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/passRateWaveSlices.test.ts src/__tests__/passRateProofLoops.test.ts src/__tests__/runtimeTailOvernight.test.ts` -> `15/15` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:run-runtime-tail-figure-retry -- --build-only` -> pass, no selected rows
+  - `pnpm agency:run-runtime-tail-structure-retry -- --build-only` -> pass
+  - `pnpm agency:run-runtime-tail-mixed-terminalization -- --build-only` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+  - `ICJIA_RUNTIME_TAIL_OVERNIGHT_SLICE=runtime-tail-figure-retry pnpm exec tsx scripts/run-runtime-tail-overnight-pipeline.ts` -> smoke-test pass
+- Current runtime-lane truth after the split:
+  - monolithic retryable runtime rows still visible in the legacy manifest: `60`
+  - figure conversion lane: `0`
+  - structure conversion lane: `4` (`4162`, `4739`, `3912`, `3519`)
+  - mixed terminalization lane: `53`
+- Practical implication:
+  - the previous overnight evidence is now reflected in the manifests themselves
+  - current retry backlog is mostly a mixed terminalization problem, not a figure-conversion batch
+
+## 2026-04-06 Mixed Figure/Structure Separation Slice
+
+- Runtime conversion is now treated as dormant, not primary:
+  - `runtime-tail-figure-retry` remains empty
+  - partial live `runtime-tail-structure-retry` evidence plus refreshed proof showed no conversion / blocker shrink
+  - the refreshed structure runtime slice now stands at `3` remaining (`4162`, `3912`, `3519`)
+- `scripts/start-runtime-tail-retry-wave-overnight.ts` now defaults to:
+  - `runtime-tail-mixed-terminalization`
+  - not `runtime-tail-figure-retry`
+- Runtime retry slice manifests now carry explicit execution policy:
+  - `runtime-tail-mixed-terminalization` -> `active`
+  - `runtime-tail-figure-retry` -> `dormant`
+  - `runtime-tail-structure-retry` -> `dormant`
+- Mixed runtime candidates now carry chunk-shaping metadata:
+  - `runtimeWeightBucket`
+  - `runtimeProfileKey`
+- Mixed overnight chunking now:
+  - avoids stacking repeated heavyweight profile rows in the same first chunk
+  - isolates heavyweight mixed rows when needed
+  - uses concurrency `1` for heavyweight mixed chunks and `2` for lighter mixed truth-hardening chunks
+- Live proof-loop runners now refuse dormant runtime conversion slices unless explicitly overridden:
+  - `scripts/run-pass-rate-proof-loop-common.ts`
+  - `scripts/run-runtime-tail-overnight-pipeline.ts`
+- Runtime structure conversion selection now excludes rows already marked with:
+  - `structure_debt_cleared_figure_debt_remaining`
+  - `mixed_figure_structure_separation_required`
+  so structure-improved/figure-blocked survivors are not reintroduced as structure-conversion candidates
+- `agentRemediationService` now emits explicit residual stop reasons for mixed figure/structure separation:
+  - `structure_debt_cleared_figure_debt_remaining`
+  - `figure_debt_cleared_structure_debt_remaining`
+  - `mixed_figure_structure_separation_required`
+  - `mixed_runtime_churn_without_family_shrink`
+  - `mixed_large_runtime_profile_requires_serial_terminalization`
+- Those stop reasons now flow through the remediation metrics / Stage 7 diagnostics type surface in:
+  - `apps/api/src/services/documentModel.ts`
+  - `apps/api/src/services/agentRemediationService.ts`
+  - benchmark typing in `scripts/run-remediation-regression-benchmark.ts`
+- Focused regression coverage added/updated in:
+  - `apps/api/src/__tests__/agentRemediationService.test.ts`
+  - `apps/api/src/__tests__/passRateWaveSlices.test.ts`
+  - `apps/api/src/__tests__/runtimeTailOvernight.test.ts`
+- Verified on 2026-04-06:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/agentRemediationService.test.ts src/__tests__/passRateWaveSlices.test.ts src/__tests__/runtimeTailOvernight.test.ts` -> `104/104` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+- Current post-slice runtime truth remains:
+  - `runtimeFigureRetryCount: 0`
+  - `runtimeStructureRetryCount: 3`
+  - `runtimeMixedTerminalizationCount: 53`
+- The latest rebuilt dormant structure trio is:
+  - `4162`
+  - `3912`
+  - `3519`
+- A startup bug in the mixed overnight launcher was fixed on 2026-04-06:
+  - `scripts/start-runtime-tail-retry-wave-overnight.ts` now exports `ICJIA_RUNTIME_TAIL_OVERNIGHT_SLICE` into the child process
+  - `scripts/run-runtime-tail-overnight-pipeline.ts` now defaults internally to `runtime-tail-mixed-terminalization`
+  - after the fix, a live mixed-terminalization overnight run started successfully with:
+    - pid `1295297`
+    - log `ICJIA-PDFs/logs/runtime-tail-overnight-runtime-tail-mixed-terminalization-2026-04-06T18-42-48-273Z.log`
+    - chunk 001 manifest `ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.chunk-001.json`
+- After the first mixed chunk still failed with exit `137`, the heavy-mixed runtime slice was tightened on 2026-04-06:
+  - `runtime-tail-mixed-terminalization.chunk-001.json` is now shaped away from the old heavyweight `CAPS3` stack
+  - controlled rerun with `ICJIA_RUNTIME_TAIL_MAX_CHUNKS=1` started successfully:
+    - pid `1305624`
+    - log `ICJIA-PDFs/logs/runtime-tail-overnight-runtime-tail-mixed-terminalization-2026-04-06T19-36-32-864Z.log`
+  - the safer first chunk currently contains:
+    - `3556`
+    - `3590`
+    - `3421`
+    - `3424`
+  - these are medium-weight mixed/manual-tail rows, not repeated heavyweight `CAPS3` profiles
+- Practical implication:
+  - do not resume the structure retry remainder as a conversion wave
+  - mixed runtime is now the only active operational lane, and only for truth-hardening
+
+## 2026-04-05 Stage 4 Canary Follow-Up Slice
+
+- The next post-canary engine slice is now implemented in `agentRemediationService`.
+- New late-phase behavior:
+  - heading-only residual survivors are detected explicitly so focused final rescue can prefer bounded heading cleanup instead of falling straight back into generic structure churn
+  - figure-only residual survivors now get candidate-level final-mile calls (`set_figure_alt_text`, `retag_as_figure_and_set_alt`, `mark_figure_decorative`) in addition to document-level figure rescue
+  - mixed heavy canaries can prefer light rescue context after repeated deep inspection churn, which is intended to reduce runtime loops on files like `4188`, `4551`, and `4162`
+  - compact mixed final rescue now trims the late-stage call set on long/heavy mixed files
+- `remediationMetrics` now also emits a `runtimeSummary` with:
+  - `lightInspectionCount`
+  - `deepInspectionCount`
+  - `semanticCallCount`
+  - `providerCallCount`
+- Focused regression coverage added for:
+  - heading-only residual detection
+  - candidate-level figure final-mile calls
+  - mixed-runtime preference for light focused rescue context
+- Verified on 2026-04-05:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/agentRemediationService.test.ts` -> 81/81 pass
+  - `pnpm --dir apps/api exec vitest run src/__tests__/semanticEnrichmentService.test.ts src/__tests__/documentReconstructionService.test.ts src/__tests__/remediationPlanService.test.ts` -> pass
+- Scoped canary rerun V1 truth:
+  - `4755` -> `failed_after_remediation`, `36 -> 86`, now blocked only by `pdfua.heading_content_quality`
+  - `4183` -> `failed_after_remediation`, `22 -> 90`, now blocked only by `pdfua.figure_alt_or_artifact`
+  - `4078` -> `failed_after_remediation`, still mixed hard fail
+  - `4188`, `4551`, `4162` -> `processing_error`
+  - The first scoped rerun still did not meet the bulk-resume gate, so Stage 3 / broad Stage 4 remain paused pending a second isolated rerun
+
+## 2026-04-05 Stage 4 Truth-Hardening And Closure Stabilization
+
+- The Stage 4 closure-stabilization slice is now green.
+- `scripts/run-stage4-structure-wave.ts` now treats persisted manifests as the source of truth for post-wave completion:
+  - it requires pre-existing classified verification and a validated control-plane summary before starting a new Stage 4 wave
+  - it checks that `stage4-structure-wave.outcomes.json` is terminal for all selected publication IDs
+  - it treats fresh `ready-to-replace-verification.summary.json` plus `verified-promotion-ledger.summary.json` and terminal wave outcomes as sufficient truth to continue
+  - if `pnpm agency:verify-ready` is still alive after those artifacts are written, the runner now warns, terminates the child process, and continues with classify/build/validate
+- This hardens Stage 4 against the known “wrapper hangs after persisted truth is already written” failure mode.
+- `agentRemediationService` stabilization fixes landed:
+  - native-safe and replanning paths now use safe context inspection fallback instead of failing on inspection-budget exhaustion
+  - semantic regression rollback now clears inherited veraPDF reuse when reverting to the pre-semantic baseline
+  - final cleanup now preserves batch-first behavior for link annotation `/Contents` repairs in non-native mode while still allowing direct final cleanup for remaining unembedded-font and Unicode-map fixes
+  - final cleanup can run even when earlier deterministic stages did not mutate the document, so late hygiene/final-residual tools still get a chance to apply
+- Regression coverage is now fully green for the required closure slice:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/agentRemediationService.test.ts` -> 78/78 pass
+  - `pnpm --dir apps/api exec vitest run src/__tests__/semanticEnrichmentService.test.ts src/__tests__/documentReconstructionService.test.ts src/__tests__/remediationPlanService.test.ts` -> pass
+- Current validation truth rechecked on 2026-04-05:
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+
+## 2026-04-05 Stage 4 Canary Slice And Provider-Telemetry Follow-Up
+
+- A live Stage 4 canary wave completed terminal outcomes for:
+  - `4755`, `4162`, `4598`, `4551`, `4078`, `4188`, `4189`, `4183`
+- Terminal truth for that 8-row slice:
+  - `4598`, `4189` -> `remediated_pass_candidate`
+  - `4755`, `4551`, `4078`, `4188`, `4183` -> `failed_after_remediation`
+  - `4162` -> `processing_error`
+- Dominant blocker families in the canary slice:
+  - `pdfua.heading_content_quality`
+  - `pdfua.figure_alt_or_artifact`
+  - `pdfua.logical_structure`
+  - secondary: `pdfua.nested_alt_text`
+- `verify-ready` finished a 400-target pass on 2026-04-05:
+  - `109` passed targets
+  - `291` failed targets
+  - `123` verified promotion ledger rows
+- Manual refresh after that run:
+  - `pnpm exec tsx scripts/classify-ready-verification.ts`
+  - `pnpm agency:build-control-plane`
+  rebuilt the control plane to:
+  - `114` `verified_pass`
+  - `1` `staged_for_replacement`
+  - `942` remaining non-verified rows
+- Important truth-model note:
+  - a transient verified-ledger/control-plane mismatch was observed earlier in the day for:
+    - `3906`, `3921`, `3936`, `4156`, `4180`, `4185`, `4483`, `4598`, `4613`, `4658`
+  - current validation truth has since been rechecked and is back to:
+    - `pnpm agency:validate-control-plane` -> `ok: true`
+  - keep persisted manifests as the source of truth if wrapper processes disagree with them.
+- Engine/API changes landed on 2026-04-05:
+  - shared OpenAI-compatible provider helper now records routing attempts, success/failure, and liveness-check skips
+  - `agentRemediationService` now absorbs provider-routing telemetry into `remediationMetrics.providerRouting`
+  - structure-phase progress tracking now treats `table_markup` / `pdfua.table_regularity` as part of late-stage structural convergence
+  - focused figure rescue no longer stops solely because missing-alt counts are flat when figure category scores or issue-surface shrink still improved
+  - focused final rescue now adds:
+    - `repair_native_reading_order`
+    - candidate-group `reorder_structure_children`
+    - bounded `create_heading_from_candidate`
+    - bounded table-header cleanup via `repair_native_table_headers` and `set_table_header_cells`
+- Verified tests on 2026-04-05:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/semanticEnrichmentService.test.ts src/__tests__/documentReconstructionService.test.ts src/__tests__/remediationPlanService.test.ts` -> pass
+- Broader `src/__tests__/agentRemediationService.test.ts` still has the pre-existing 7-test failure cluster around:
+  - inspection-count expectations
+  - native-safe final cleanup tool coverage
+  - residual font cleanup
+  - semantic rollback accounting
+  - long-report inspection-budget exhaustion
+
+## 2026-04-04 AI Provider Chain Refresh
+
+- The API’s OpenAI-compatible provider routing now uses an ordered provider chain instead of a single primary plus one fallback.
+- New shared helper:
+  - `apps/api/src/services/openAiCompatService.ts`
+- Current ordered provider policy in `apps/api/.env`:
+  - primary: LAN-hosted LLM Hotspot `http://192.168.50.238:51824/v1`
+  - model: `gpt-5.1-codex-mini`
+  - fallback 1: OpenRouter `qwen/qwen3.6-plus:free`
+  - fallback 2: remote LLM Hotspot `https://hs-c48895c933.llmhotspot.com/v1`
+- The shared chain is now used by:
+  - `openRouterService`
+  - `semanticEnrichmentService`
+  - planner AI fallback in `remediationPlanService`
+- Test-safe behavior:
+  - when no provider env is configured under Vitest/test mode, the helper exposes a harmless dummy endpoint so service tests still exercise fetch-based logic without relying on real secrets
+- Verified on 2026-04-04:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/semanticEnrichmentService.test.ts src/__tests__/documentReconstructionService.test.ts src/__tests__/remediationPlanService.test.ts` -> pass
+
+## 2026-04-03 Stage 4 Survivor Convergence Upgrade
+
+- Stage 4 survivor-convergence work landed in the remediation engine for the current residual plateau families.
+- `agentRemediationService` now:
+  - treats measured structure-category gains (`reading_order`, `heading_structure`, `text_extractability`, `pdf_ua_compliance`) as residual progress
+  - only counts structure-opportunity shrink when structural surfaces were actually present in the inspected context
+  - allows mixed figure+structure survivors to reuse the figure-only late-rescue path when figure debt remains dominant and informative figure surface still exists
+  - stops repeated focused structure rescue loops when mixed residuals keep the same structure debt while figure debt remains dominant
+  - falls back to an empty remediation context instead of crashing final failure-profile generation when no final context is available
+- `remediationPlanService` now promotes `repair_native_reading_order` and `reorder_structure_children` for Stage 4-style logical-structure survivors, while preserving heading-family priority when planner evidence says heading convergence should lead.
+- `residualFamilyService` now prefers reading-order/group repairs inside:
+  - `post_bootstrap_heading_convergence`
+  - `logical_structure_marked_content`
+- Verified tests on 2026-04-03:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/remediationPlanService.test.ts` -> pass
+  - targeted survivor coverage in `src/__tests__/agentRemediationService.test.ts` and `src/__tests__/remediationPlanService.test.ts` -> pass
+- Broader `src/__tests__/agentRemediationService.test.ts` still has a separate unresolved failure cluster (9 failing tests) around batching, inspection-budget behavior, scan-path fallback, CIDSet replanning, semantic regression rollback, and long-report replanning.
+
+## 2026-04-01 Stage 6 Closure
+
+- Stage 6 (`long_report` cohort) is **DONE**.
+- `scripts/run-stage6-long-report-wave.ts` and `agency:run-stage6-long-report-wave` were added (mirror of Stage 5 run script pattern).
+- `3513` ("Trends and Issues 90") retry outcome:
+  - Status: `failed_after_remediation`, F→F (score 9→52)
+  - Blocking: `pdfua.logical_structure`, `pdfua.figure_alt_or_artifact`
+  - The PDF was scanned (143 pages); remediation improved it but couldn't pass the gate
+  - After remediation, `classify-ready-verification.ts` **reclassified `3513` from `long_report` to `figure_heavy`** — its true cohort became apparent once blocking keys were known
+  - `3513` is now `figure_heavy / remediated_fail` — it is no longer a Stage 6 row
+- Final Stage 6 cohort truth (14 rows after `3513` reclassification):
+  - `9` `long_report_verified_pass`: 3829, 3840, 3865, 3900, 4010, 4085, 4091, 4103, 4552
+  - `5` `long_report_stable_hard_fail`: 3518, 3703, 3710, 3755, 3873
+  - `0` `long_report_processing_retry`
+  - `0` `long_report_mixed_residual`
+  - `stillUnclassifiedRows: 0`
+- Final throughput: `pendingWaveRows: 0`, `stillUnclassifiedRows: 0`
+- Verified: `pnpm agency:validate-control-plane` → `ok: true`
+- Verified: `pnpm --dir apps/api exec vitest run src/__tests__/longReportStage6.test.ts` → 3/3 pass
+- Stable hard fail closure model: these 5 rows remain `remediated_fail` in corpus status; their forensics disposition `long_report_stable_hard_fail` is the terminal closure record (same pattern as Stage 5)
+- Note: `verify-ready` phase after the run takes ~30 minutes and hangs due to open HTTP connections from the Anthropic SDK. Safe to kill after outcomes are written and run classify/build-control-plane/validate manually.
+
+## 2026-04-01 Stage 6 Long-Report Lane Shell And First Truth Split
+
+- Stage 6 is now the active roadmap lane after truthful Stage 5 closure.
+- A first-class Stage 6 shell was added:
+  - `apps/api/src/services/longReportStage6.ts`
+  - `scripts/analyze-stage6-long-report-forensics.ts`
+  - `scripts/build-stage6-long-report-wave.ts`
+  - package commands:
+    - `pnpm agency:analyze-stage6-long-report-forensics`
+    - `pnpm agency:build-stage6-long-report-wave`
+- Stage 6 now writes dedicated artifacts:
+  - `ICJIA-PDFs/manifests/stage6-long-report-forensics.json`
+  - `ICJIA-PDFs/manifests/stage6-long-report-forensics.summary.json`
+  - `ICJIA-PDFs/manifests/stage6-long-report-wave.json`
+  - `ICJIA-PDFs/manifests/stage6-long-report-wave.summary.json`
+  - `ICJIA-PDFs/manifests/stage6-long-report-throughput.summary.json`
+- First Stage 6 cohort truth:
+  - `long_report` cohort size is `15`
+  - current cohort state is:
+    - `9` `verified_pass`
+    - `5` `remediated_fail`
+    - `1` `processing_error`
+- First Stage 6 forensics split:
+  - `long_report_verified_pass`:
+    - `3829`
+    - `3840`
+    - `3865`
+    - `3900`
+    - `4010`
+    - `4085`
+    - `4091`
+    - `4103`
+    - `4552`
+  - `long_report_stable_hard_fail`:
+    - `3518`
+    - `3703`
+    - `3710`
+    - `3755`
+    - `3873`
+  - `long_report_processing_retry`:
+    - `3513`
+  - `long_report_mixed_residual`:
+    - none
+  - `stillUnclassifiedRows: 0`
+- First rebuilt Stage 6 wave truth:
+  - `eligibleRows: 1`
+  - `selectedRows: 1`
+  - `pendingRows: 0`
+  - the current active Stage 6 wave is exactly:
+    - `3513`
+- Stage 6 throughput now carries the benchmark proof surface directly:
+  - benchmark lead case:
+    - `SFY24 ICJIA Annual Report`
+  - current benchmark lead-case truth:
+    - `terminalState: hard_fail`
+    - `dominantFamily: mixed`
+    - `finalStopReason: same_family_no_progress`
+    - `processingError: false`
+- Verified commands for the first Stage 6 slice:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/longReportStage6.test.ts`
+  - `pnpm agency:analyze-stage6-long-report-forensics`
+  - `pnpm agency:build-stage6-long-report-wave`
+  - `pnpm agency:validate-control-plane`
+- Validation result remained:
+  - `ok: true`
+- Net Stage 6 state after the first shell/build slice:
+  - all `15` long-report rows are represented in explicit Stage 6 truth
+  - the active long-report runtime surface is now only `3513`
+  - the other `5` non-verified rows are already treated as stable hard-fail closure, not active retries
+  - the benchmark proof surface is stable and lane-owned
+
+## 2026-04-01 Stage 5.3 Verification Truth And Retry-Bucket Closure
+
+- The Stage 5 attempt to carry `4156` forward as a verified pass candidate was completed through the repo’s verification/classification flow.
+- `scripts/verify-ready-to-replace.ts` now supports:
+  - `ICJIA_VERIFY_INCLUDE_PUBLICATION_IDS`
+- Important verification-script behavior fix:
+  - include-scoped verification runs now merge back into the existing:
+    - `ready-to-replace-verification.json`
+    - `ready-to-replace-verification.summary.json`
+    - `verified-promotion-ledger.json`
+    - `verified-promotion-ledger.summary.json`
+  - they no longer overwrite the repo-wide verification baseline with a tiny scoped manifest
+- A scoped verification run was executed for:
+  - `4156`
+- Current verification truth for `4156`:
+  - verification result: `hard_fail`
+  - verified score/grade: `84 / B`
+  - blocking local finding keys:
+    - `pdfua.font_unicode`
+  - so `4156` is not a truthful `verified_pass`
+  - the earlier `remediated_pass_candidate` outcome was optimistic and does not survive the repo’s normal verification gate
+- Stage 5 routing was tightened again in `apps/api/src/services/fontWaveStage5.ts`:
+  - repeated runtime-only unicode rows with:
+    - latest outcome `processing_error`
+    - deferred reason `excessive_runtime_loop`
+    - `skipNextBatch: true`
+    - no embedding/type1 signal
+    - unicode-only blocking keys
+    now route to:
+    - `font_unicode_manual_residual`
+  - failed Stage 5 pass-candidates with:
+    - `verificationClassification: hard_fail`
+    - latest outcome `remediated_pass_candidate`
+    - unicode-only blocking keys
+    now route to:
+    - `font_unicode_terminal_survivor`
+- Focused Stage 5 verification after the routing changes:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/fontWaveStage5.test.ts`
+  - `pnpm --dir apps/api exec vitest run src/__tests__/remediationPlanService.test.ts -t "does not repeat generic font unicode repair after a no-effect attempt"`
+  - `pnpm --dir apps/api exec vitest run src/__tests__/processedFontCapability.test.ts`
+- Rebuilt Stage 5 truth after:
+  - `pnpm exec tsx scripts/classify-ready-verification.ts`
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:analyze-stage5-font-forensics`
+  - `pnpm agency:build-stage5-font-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- Final Stage 5 forensics split:
+  - `font_unicode_terminal_survivor`:
+    - `4156`
+  - `font_unicode_manual_residual`:
+    - `3838`
+    - `4099`
+    - `4144`
+    - `4151`
+    - `4166`
+    - `4168`
+    - `4172`
+    - `4173`
+    - `4174`
+    - `4176`
+    - `4199`
+    - `4211`
+    - `4214`
+  - `embedded_font_repairable`: none
+  - `deterministic_unicode_map_repair_available`: none
+  - `type1_unicode_fallback_candidate`: none
+  - `font_processing_error_retry`: none
+  - `stillUnclassifiedRows: 0`
+- Final rebuilt Stage 5 wave truth:
+  - `eligibleRows: 0`
+  - `selectedRows: 0`
+  - `pendingRows: 0`
+  - no active Stage 5 wave remains
+- Stage 5 closure truth:
+  - the `font_heavy` cohort now has a stable explicit closure envelope
+  - there is no hidden runtime tail left in Stage 5 manifests
+  - the cohort closed with:
+    - `1` terminal survivor
+    - `13` manual residuals
+    - `0` active deterministic rows
+    - `0` active retry rows
+- Stage 5 status: **DONE truthfully**
+  - Stage 5 did not end with a verified pass gain
+  - it ended by proving the remaining font-heavy corpus belongs in explicit terminal/manual closure buckets rather than further active deterministic remediation
+
+## 2026-04-01 Stage 5.2 Deterministic-Only Font Wave And Retry Separation
+
+- Stage 5 wave selection now excludes `font_processing_error_retry` rows by default in:
+  - `apps/api/src/services/fontWaveStage5.ts`
+- New default Stage 5 selection rule:
+  - `font_processing_error_retry` remains visible in Stage 5 forensics/throughput truth
+  - but it is no longer part of the immediate active wave unless explicitly included later
+- Focused Stage 5 coverage now verifies:
+  - retry rows are not re-selected by default
+  - verified-pass rows stay out of the active wave
+  - deterministic rows still populate the active wave
+- Verified tests after the selector change:
+  - `pnpm --dir apps/api exec vitest run src/__tests__/fontWaveStage5.test.ts`
+  - `pnpm --dir apps/api exec vitest run src/__tests__/remediationPlanService.test.ts -t "does not repeat generic font unicode repair after a no-effect attempt"`
+  - `pnpm --dir apps/api exec vitest run src/__tests__/processedFontCapability.test.ts`
+- After rebuild and validation:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:analyze-stage5-font-forensics`
+  - `pnpm agency:build-stage5-font-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+- The rebuilt pre-run active Stage 5 wave became exactly the 6 fresh deterministic ids:
+  - `3838`
+  - `4099`
+  - `4156`
+  - `4173`
+  - `4176`
+  - `4211`
+- A second bounded Stage 5 wave was then run with:
+  - `ICJIA_REMEDIATION_TIMEOUT_MS=120000 pnpm agency:run-stage5-font-wave`
+- Useful Stage 5 execution truth was fully written before the wrapper rolled into the broad `verify-ready` tail:
+  - the wrapper was then interrupted after outcomes were persisted so the repo could be rebuilt from the actual Stage 5 results instead of waiting on unrelated staged-file verification
+- Deterministic-only wave results by publication id:
+  - `4156` -> `remediated_pass_candidate`
+    - final score/grade: `100 / A`
+    - staged replacement written
+    - gate passed cleanly
+  - `3838`, `4099`, `4173`, `4176`, `4211` -> `processing_error`
+    - deferred reason code: `excessive_runtime_loop`
+    - `skipNextBatch: true`
+- Important operational nuance:
+  - `stage5-font-wave.outcomes.summary.json` currently shows cumulative totals across both Stage 5 waves:
+    - `targetCandidates: 6`
+    - `processed: 14`
+    - `remediatedPassCandidates: 1`
+    - `processingError: 13`
+    - `remaining: 0`
+  - so per-publication truth should be read from the outcomes rows and rebuilt Stage 5 manifests, not from the raw cumulative processed count alone
+- Rebuilt Stage 5 post-run truth after the deterministic-only wave:
+  - `deterministic_unicode_map_repair_available`:
+    - `4156`
+  - `font_processing_error_retry`:
+    - `3838`, `4099`, `4144`, `4151`, `4166`, `4168`, `4172`, `4173`, `4174`, `4176`, `4199`, `4211`, `4214`
+  - `embedded_font_repairable`: none
+  - `type1_unicode_fallback_candidate`: none
+  - `font_unicode_terminal_survivor`: none
+  - `font_unicode_manual_residual`: none
+  - `stillUnclassifiedRows: 0`
+- Rebuilt Stage 5 wave truth:
+  - current selected active wave is now only:
+    - `4156`
+  - `processingRetryRows: 13`
+  - `deterministicUnicodeRepairRows: 1`
+  - `pendingWaveRows: 0`
+- Important current nuance:
+  - `4156` is a real `remediated_pass_candidate` with a staged replacement and clean gate
+  - but because the wrapper was interrupted during the broad `verify-ready` tail, Stage 5/control-plane truth has not yet promoted it into verified-pass ledger state
+  - so the rebuilt manifests still treat `4156` as the lone deterministic Stage 5 row until verification/promotion truth catches up
+- Net Stage 5 state after Stage 5.2:
+  - the retry bucket is now clearly separated from the active deterministic surface
+  - five additional rows moved from deterministic to bounded retry
+  - one row (`4156`) produced the first genuine Stage 5 pass candidate
+  - no font-heavy row is unclassified or unowned
+  - the next Stage 5 question is whether to verify/promote `4156` first or tighten terminal/manual routing for the now-13-row retry bucket
+
+## 2026-04-01 Stage 5.1 First Font-Wave Execution And Post-Run Routing
+
+- The first bounded live Stage 5 font wave was executed against the initial selected 8-row set:
+  - `4144`
+  - `4166`
+  - `4168`
+  - `4199`
+  - `4214`
+  - `4151`
+  - `4172`
+  - `4174`
+- To keep the first Stage 5 wave bounded and prevent hidden runtime tails, the live run was executed with:
+  - `ICJIA_REMEDIATION_TIMEOUT_MS=120000 pnpm agency:run-stage5-font-wave`
+- Wave execution truth from `stage5-font-wave.outcomes.summary.json`:
+  - `targetCandidates: 8`
+  - `processed: 8`
+  - `processingError: 8`
+  - `remaining: 0`
+- The dominant first-run Stage 5 stop reason is now explicit and bounded:
+  - outcome status: `processing_error`
+  - deferred reason code: `excessive_runtime_loop`
+  - gate wording:
+    - `Processing exceeded the 2-minute runtime limit.`
+    - `Marked as excessive runtime and deferred so the batch can continue.`
+- Stage 5 post-run forensics/routing was expanded in `apps/api/src/services/fontWaveStage5.ts`:
+  - new explicit Stage 5 dispositions:
+    - `font_unicode_terminal_survivor`
+    - `font_processing_error_retry`
+  - Stage 5 now inspects:
+    - latest outcome status
+    - latest remediation report planner evidence (`attemptedKeys`, `noEffectKeys`)
+    - current blocking finding keys
+  - rows that fail boundedly with processing errors no longer remain generic unowned failures
+- Rebuilt Stage 5 post-run truth after:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:analyze-stage5-font-forensics`
+  - `pnpm agency:build-stage5-font-wave`
+  - `pnpm agency:validate-control-plane`
+- Current `stage5-font-forensics.summary.json` truth:
+  - `deterministic_unicode_map_repair_available`:
+    - `3838`, `4099`, `4156`, `4173`, `4176`, `4211`
+  - `font_processing_error_retry`:
+    - `4144`, `4151`, `4166`, `4168`, `4172`, `4174`, `4199`, `4214`
+  - `embedded_font_repairable`: none
+  - `type1_unicode_fallback_candidate`: none
+  - `font_unicode_terminal_survivor`: none
+  - `font_unicode_manual_residual`: none
+  - `stillUnclassifiedRows: 0`
+- Current rebuilt Stage 5 throughput truth:
+  - `totalFontHeavyRows: 14`
+  - `verifiedPassRowsInCohort: 0`
+  - `remainingFontHeavyRows: 14`
+  - `newlyVerifiedPassRowsFromWave: 0`
+  - `processingErrorsInWave: 2`
+  - `pendingWaveRows: 6`
+  - `deterministicUnicodeRepairRows: 6`
+  - `processingRetryRows: 8`
+  - `stillUnclassifiedRows: 0`
+- Current rebuilt active Stage 5 wave is no longer the old initial 8-row set; it now mixes the 6 fresh deterministic candidates plus 2 bounded retry rows:
+  - `4173`
+  - `4176`
+  - `4211`
+  - `3838`
+  - `4099`
+  - `4156`
+  - `4144`
+  - `4151`
+- Focused Stage 5 verification that passed after the post-run routing changes:
+  - `pnpm exec vitest run src/__tests__/fontWaveStage5.test.ts`
+  - `pnpm exec vitest run src/__tests__/remediationPlanService.test.ts -t "does not repeat generic font unicode repair after a no-effect attempt"`
+  - `pnpm exec vitest run src/__tests__/processedFontCapability.test.ts`
+  - `pnpm agency:validate-control-plane`
+- Net Stage 5 state after the first live wave:
+  - Stage 5 is still active
+  - no font-heavy row remains an unclassified or unowned generic failure
+  - the lane now has a truthful split between:
+    - fresh deterministic unicode-map candidates
+    - bounded Stage 5 processing retries
+  - the next Stage 5 question is whether the retry bucket should be retried immediately, deprioritized behind the remaining deterministic rows, or further split into stricter terminal/manual font buckets
+
+## 2026-04-01 Stage 5 Font Lane Shell And First Forensics Split
+
+- Stage 5 is now the active roadmap lane after Stage 4 closure.
+- A first-class Stage 5 shell was added:
+  - `apps/api/src/services/fontWaveStage5.ts`
+  - `scripts/analyze-stage5-font-forensics.ts`
+  - `scripts/build-stage5-font-wave.ts`
+  - `scripts/run-stage5-font-wave.ts`
+  - package commands:
+    - `pnpm agency:analyze-stage5-font-forensics`
+    - `pnpm agency:build-stage5-font-wave`
+    - `pnpm agency:run-stage5-font-wave`
+- Stage 5 now writes dedicated artifacts:
+  - `ICJIA-PDFs/manifests/stage5-font-forensics.json`
+  - `ICJIA-PDFs/manifests/stage5-font-forensics.summary.json`
+  - `ICJIA-PDFs/manifests/stage5-font-wave.json`
+  - `ICJIA-PDFs/manifests/stage5-font-wave.summary.json`
+  - `ICJIA-PDFs/manifests/stage5-font-throughput.summary.json`
+- First Stage 5 forensic truth:
+  - `font_heavy` cohort size is `14`
+  - all `14` rows are currently `remediated_fail`
+  - all `14` are now explicitly classified as:
+    - `deterministic_unicode_map_repair_available`
+  - no rows are currently classified as:
+    - `embedded_font_repairable`
+    - `type1_unicode_fallback_candidate`
+    - `font_unicode_manual_residual`
+  - `stillUnclassifiedRows: 0`
+- First Stage 5 work surface is exactly:
+  - `3838`, `4099`, `4144`, `4151`, `4156`, `4166`, `4168`, `4172`, `4173`, `4174`, `4176`, `4199`, `4211`, `4214`
+- Initial Stage 5 bounded wave now selects `8` ids:
+  - `4144`, `4166`, `4168`, `4199`, `4214`, `4151`, `4172`, `4174`
+- Current Stage 5 throughput truth after the first build:
+  - `totalFontHeavyRows: 14`
+  - `verifiedPassRowsInCohort: 0`
+  - `remainingFontHeavyRows: 14`
+  - `pendingWaveRows: 8`
+  - `deterministicUnicodeRepairRows: 14`
+  - `stillUnclassifiedRows: 0`
+- Stage 5 remediation-planning guardrails were tightened:
+  - `repair_font_unicode_maps` is no longer replanned after a `no_effect` attempt
+  - `repair_type1_font_unicode_maps` now requires actual Type1 evidence or a prior generic Unicode no-effect path before it becomes selectable
+- Verified commands for the first Stage 5 slice:
+  - `pnpm agency:analyze-stage5-font-forensics`
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage5-font-wave`
+  - `pnpm agency:validate-control-plane`
+  - `pnpm exec vitest run src/__tests__/fontWaveStage5.test.ts`
+  - `pnpm exec vitest run src/__tests__/remediationPlanService.test.ts -t "does not repeat generic font unicode repair after a no-effect attempt"`
+  - `pnpm exec vitest run src/__tests__/processedFontCapability.test.ts`
+- Validation result remained:
+  - `ok: true`
+
+## 2026-04-01 Stage 4 Runtime Closure — Complete
+
+- All three Stage 4 blockers are resolved:
+  1. `4726` completed with status `failed_after_remediation` (grade F→C, 53→78) — no longer in active wave
+  2. Court System Get The Facts no longer crashes with `Inspection budget exceeded` — ends as `hard_fail` with `same_family_no_progress`
+  3. Kendall County focused rescue convergence gate relaxed — rescue now runs when `latePhaseConvergence.figure_description_state.converged` is true but remaining figure debt is ≤8 (`smallFigureDebtOverride`)
+- Key code changes in `agentRemediationService.ts`:
+  - `inspectRemediationContext` gracefully falls back to cached data when budget exceeded (instead of throwing)
+  - `isInspectionBudgetExhausted()` pre-flight guards at late alt passes (stages 92-94) and other unsafe inspection sites
+  - `smallFigureDebtOverride` in `runFocusedFinalRescue` (line ~4155): allows focused rescue to override late convergence when `informativeFigureMissingAltCount <= 8`
+- Benchmark truth (fresh run 2026-04-01, all 5 cases re-executed):
+  - `processingError: 0` across all 5 cases
+  - Kendall County Profile: `hard_fail` B (87) — focused rescue ran but couldn't resolve remaining 4 figures
+  - Court System Get The Facts: `hard_fail` C (74)
+  - SFY24 ICJIA Annual Report: `hard_fail` B (83)
+  - Criminal Sentencing Layout: `hard_fail` C (76)
+  - CSEC 2008 Research Bulletin: `hard_fail` D (69)
+- Control plane validates: `ok: true`
+- Stage 4 status: **DONE** — all blockers resolved, no processing errors, honest hard_fail outcomes
+
+## 2026-04-01 Stage 4 Helper Lifecycle And Single-Row Runtime Checkpoint
+
+- Stage 4 remains blocked by runtime behavior, not routing truth.
+- Current active Stage 4 wave is still the single row:
+  - `4726`
+- A helper-lifecycle supervision pass was implemented in:
+  - `apps/api/src/services/pdfStructureBackend.ts`
+  - `apps/api/src/services/readingOrderService.ts`
+- New helper-runner behavior:
+  - structure-helper-backed Python calls now run through a shared supervised runner instead of ad hoc `execFileAsync(...)`
+  - the Node caller now tracks helper child processes explicitly
+  - timeout and abort paths now attempt to kill the helper process tree
+  - focused helper-lifecycle coverage was added in:
+    - `apps/api/src/__tests__/pdfStructureBackend.test.ts`
+- A Stage 4 verified-pass preservation fix was also added in:
+  - `apps/api/src/services/structureWaveStage4.ts`
+- New Stage 4 routing rule:
+  - when a row has `terminalSurvivorClass === 'staged_pass_candidate_survivor'` and promotion truth shows a backing verified ledger row with `promotionStatus === 'verified_pass'`, Stage 4 must preserve `currentCorpusStatus: verified_pass`
+  - it must not demote that row back to `staged_for_replacement`
+- This fixed the temporary control-plane inconsistency around:
+  - `4037`
+  - `4061`
+- Verified commands after that fix:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation returned `ok: true`
+- A fresh single-row Stage 4 follow-up was rerun for `4726`:
+  - `ICJIA_STAGE4_STRUCTURE_ACTIVE_FORENSICS_INCLUDE_IDS=4726 pnpm agency:analyze-stage4-structure-active-forensics`
+  - `ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS=4726 pnpm agency:run-stage4-structure-wave`
+- Current truth from that rerun:
+  - `4726` still classifies as:
+    - `mixed_structure_figure_residuals`
+  - the bounded live rerun again cycled through:
+    - long `pdf_structure_helper.py` structure work
+    - repeated `alt_text_deep` inspection
+    - repeated light inspection / fast analysis follow-up
+  - no terminal outcome was written for `4726`
+  - after rebuild, Stage 4 still truthfully selects only `4726`
+- Helper lifecycle result from the bounded rerun:
+  - helper children are now cleanly attributable to the active Stage 4 batch instead of showing up only as stale background leftovers
+  - however, sending `TERM` to the Stage 4 process group still left one detached orphan `pdf_structure_helper.py`
+  - that orphan had to be killed manually
+  - so the helper-lifecycle bug is narrowed but not fully solved:
+    - normal/background confusion is improved
+    - forced-shutdown cleanup is still incomplete
+- Benchmark rerun was executed with:
+  - `pnpm agency:benchmark-remediation`
+- Current Stage 4 endgate truth remains unchanged:
+  - `Court System Get The Facts` still fails as:
+    - `processing_error`
+  - current benchmark error remains:
+    - `Inspection budget exceeded (light=4, deep=9, total=13).`
+  - `Criminal Sentencing Layout` remains a `hard_fail` with final figure debt, not a pass regression
+  - no `pdf_structure_helper.py` or `pdf_accessibility_extras.py` processes remained after the benchmark completed
+- Net result of this checkpoint:
+  - routing truth is still aligned
+  - `stillUnclassifiedPendingPublicationIds` remains empty
+  - Stage 4 is still open because both blockers remain:
+    - `4726` runtime/convergence
+    - `Court System` benchmark churn endgate
+  - the remaining helper-lifecycle defect is specifically:
+    - detached orphan cleanup on forced termination of structure-heavy runs
+
+## 2026-04-01 Stage 4 Single-Row Follow-Up
+
+- Stage 4 was narrowed to the single truthful active row:
+  - `4726`
+- A single-row active-forensics refresh was run:
+  - `ICJIA_STAGE4_STRUCTURE_ACTIVE_FORENSICS_INCLUDE_IDS=4726 pnpm agency:analyze-stage4-structure-active-forensics`
+- `4726` remained:
+  - `mixed_structure_figure_residuals`
+- After rebuild and validation:
+  - `pnpm agency:build-control-plane`
+  - `pnpm agency:build-stage4-structure-wave`
+  - `pnpm agency:validate-control-plane`
+  - validation remained `ok: true`
+  - the truthful active Stage 4 wave remained `4726`
+  - `stillUnclassifiedPendingPublicationIds` remained `[]`
+- A bounded single-row live follow-up was attempted:
+  - `ICJIA_STAGE4_STRUCTURE_WAVE_INCLUDE_IDS=4726 pnpm agency:run-stage4-structure-wave`
+- That live follow-up did not write a new terminal outcome for `4726` before being stopped.
+  - the row repeatedly cycled through long `pdf_structure_helper.py` structure work plus light-inspection churn
+  - evidence included `full_final` structure analysis around `74s` and repeated light inspections around `73s`, `26s`, and `29s`
+  - after interruption and rebuild, the truthful active wave still remained `4726`
+- Wrapper/teardown follow-up:
+  - added an explicit SQLite close path in `apps/api/src/db/sqlite.ts`
+  - `scripts/run-priority-remediation-batch.ts` now calls that close path in a `finally` block
+  - this did not fully eliminate the operational leak
+  - the more important remaining non-exit defect is orphaned `pdf_structure_helper.py` subprocesses during structure-heavy remediation, not just the SQLite handle
+- Stage 4 benchmark rerun was executed with:
+  - `pnpm agency:benchmark-remediation`
+- Current Stage 4 endgate truth after that benchmark:
+  - `Court System Get The Facts` still fails as `processing_error`
+  - current benchmark error remains:
+    - `Inspection budget exceeded (light=4, deep=9, total=13).`
+  - `Criminal Sentencing Layout` remains a hard fail, not a pass regression
+  - benchmark totals currently show:
+    - `pass: 1`
+    - `hardFail: 3`
+    - `processingError: 1`
+  - `stopReasonSignals.boundedRuntimeRetry` is `1`
+- Net Stage 4 state after the single-row follow-up:
+  - routing truth is still aligned
+  - the active wave is still the single row `4726`
+  - the remaining blockers are:
+    - `4726` structure-helper/runtime convergence
+    - orphaned `pdf_structure_helper.py` teardown
+    - `Court System` still missing the churn-reduction endgate
+
 ## 2026-04-01 Stage 4.14 New-Wave Forensics And Follow-Up
 
 - After the prior Stage 4 wave rolled off, the rebuilt active Stage 4 wave advanced to:
@@ -2949,3 +4333,223 @@ First confirmed in-flight files:
     - `reportingWaveSelectedPublicationIds` remains the last completed truthful reporting wave: `3936`, `4145`, `4723`, `3483`, `4094`
   - `genericTimeoutRows` remains `0`.
   - Stage 4 remains the active lane; the next likely move after Stage 4.10 is a Stage 4.11 forensics/routing pass on `3870/3655/4045/3781/3785/3919/3793/3924`, not another blind rerun.
+
+## 2026-04-06 Pass-Rate Proof-Loop Execution Layer
+
+- `apps/api/src/services/passRateWaveSlices.ts` now hardens pass-rate slice selection so:
+  - figure canaries prefer figure-dominant rows instead of rows where figure debt is only incidental
+  - font canaries exclude figure-dominant mixed rows
+  - non-verified `100/A` near-pass anomalies are excluded unless the target family is truly dominant
+  - slice manifests now include runner-ready candidate fields compatible with `scripts/run-priority-remediation-batch.ts`
+  - figure/font slice docs expose `totals` and `selectionSanity`
+  - runtime retry docs expose grouped per-family counts
+- New proof-loop service:
+  - `apps/api/src/services/passRateProofLoops.ts`
+  - writes before/after delta summaries for figure, font, and runtime retry slices
+- New operational runners:
+  - `pnpm agency:run-pass-rate-figure-canary`
+  - `pnpm agency:run-pass-rate-font-canary`
+  - `pnpm agency:run-runtime-tail-retry-wave`
+  - each runner:
+    - rebuilds pass-rate slices
+    - optionally runs remediation on only the selected IDs
+    - rebuilds/validates the control plane
+    - writes a proof summary JSON for the selected slice
+- New proof summary outputs:
+  - `ICJIA-PDFs/manifests/pass-rate-figure-canary.proof-summary.json`
+  - `ICJIA-PDFs/manifests/pass-rate-font-canary.proof-summary.json`
+  - `ICJIA-PDFs/manifests/runtime-tail-retry-wave.proof-summary.json`
+- Hardened real-manifest truth after selection tightening:
+  - figure canary selected `3614, 3755, 3873, 4700, 3839, 3844, 3996, 4020`
+  - font canary selected `3838, 4099, 4144, 4151, 4166, 4173, 4176, 4199`
+  - runtime retry wave still contains `99` rows
+  - suspicious prior figure-canary anomaly `3567` is no longer selected
+- Verified on 2026-04-06:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/passRateWaveSlices.test.ts src/__tests__/passRateProofLoops.test.ts` -> `7/7` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:run-pass-rate-figure-canary --build-only` -> pass and wrote baseline proof summary
+  - `pnpm agency:run-pass-rate-font-canary --build-only` -> pass and wrote baseline proof summary
+  - `pnpm agency:run-runtime-tail-retry-wave --build-only` -> pass and wrote baseline proof summary
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+
+## 2026-04-06 Live Figure And Font Proof-Loop Results
+
+- Live figure canary execution completed for the 8-row cohort selected at run start:
+  - `3614, 3755, 3873, 4700, 3839, 3844, 3996, 4020`
+- Figure canary truthful outcome:
+  - `1` `remediated_pass_candidate`
+  - `7` `failed_after_remediation`
+  - `0` `processing_error`
+- The figure winner was publication `4700` (`R3 2022 Annual Report`):
+  - improved from `75/C` to `100/A`
+  - staged to `/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/192.241.146.85/R3_Report_Final_c3f12abc60.pdf`
+- Figure canary operational note:
+  - the remediation batch completed, but the wrapper hung in the post-remediation phase
+  - truthful fallback was to kill the hung wrapper, then run:
+    - `pnpm exec tsx scripts/classify-ready-verification.ts`
+    - `pnpm agency:build-control-plane`
+    - `pnpm agency:validate-control-plane`
+- Live font canary execution completed for the 8-row cohort selected at run start:
+  - `3838, 4099, 4144, 4151, 4166, 4173, 4176, 4199`
+- Font canary truthful outcome:
+  - `0` `remediated_pass_candidate`
+  - `8` `failed_after_remediation`
+  - `0` `processing_error`
+- Font canary residual pattern:
+  - the lane did improve scores on some files, but survivors commonly ended at:
+    - `pdfua.heading_content_quality`
+    - remaining `Heading Structure` / `PDF/UA Compliance` deficits
+  - this is evidence that current planner-only font-lane selection is not enough by itself
+- Current evidence-led next lane after those two live proof loops:
+  - figure-family deepening is stronger than font as the immediate next engine investment
+- Runtime retry wave was started on 2026-04-06, but it was intentionally stopped before completion so the workspace would not be left running a 99-row unattended batch with no persisted summary yet.
+
+## 2026-04-06 Overnight Runtime Retry Runner
+
+- `scripts/run-pass-rate-proof-loop-common.ts` now uses a persisted-truth verify wrapper modeled on Stage 4:
+  - it can continue once verification artifacts are written and the selected outcomes are terminal, even if `verify-ready` itself is still hanging
+- New overnight runtime-tail helpers:
+  - `pnpm agency:start-runtime-tail-retry-wave-overnight`
+  - `pnpm agency:runtime-tail-retry-wave-status`
+- The overnight launcher writes:
+  - PID file: `ICJIA-PDFs/logs/runtime-tail-retry-wave-overnight.pid`
+  - metadata file: `ICJIA-PDFs/logs/runtime-tail-retry-wave-overnight.json`
+  - timestamped log file under `ICJIA-PDFs/logs/`
+- Current overnight runtime-tail batch was launched at `2026-04-06T05:36:02.992Z` with:
+  - PID `1110182`
+  - log file `/home/hendo420/pdfaf/ICJIA-PDFs/logs/runtime-tail-retry-wave-2026-04-06T05-36-02-992Z.log`
+- The launched batch is the full `99`-row `runtime-tail-retry-wave` cohort and is intended to run unattended overnight through the hardened proof-loop path.
+
+## 2026-04-06 Throughput Sprint Lanes
+
+- Throughput work is now routed through explicit operational lanes instead of one blended remediation queue.
+- New manifest builders in `apps/api/src/services/passRateWaveSlices.ts`:
+  - `small-fast-pass`
+  - `medium-figure-conversion`
+  - `serial-heavy-mixed-terminalization`
+  - `manual-scanned-deferred`
+- New lane manifest fields:
+  - `laneIntent`
+  - `executionPolicy`
+  - `recommendedConcurrency`
+  - `initialAnalysisProfile`
+  - `verificationPolicy`
+  - per-candidate `runtimeWeightBucket`
+  - per-candidate `runtimeProfileKey`
+- Lane intent values:
+  - `pass_rate_conversion`
+  - `truth_hardening_terminalization`
+  - `deferred_manual_review`
+- Current generated throughput-lane counts after `pnpm agency:build-pass-rate-slices`:
+  - `smallFastPassCount: 48`
+  - `mediumFigureConversionCount: 32`
+  - `serialHeavyMixedTerminalizationCount: 116`
+  - `manualScannedDeferredCount: 169`
+- Runtime retry lanes remain separate from the throughput sprint and still reflect:
+  - `runtimeFigureRetryCount: 0`
+  - `runtimeStructureRetryCount: 3`
+  - `runtimeMixedTerminalizationCount: 49`
+- New throughput runner:
+  - `scripts/run-throughput-lane.ts`
+- New package scripts:
+  - `pnpm agency:run-small-fast-pass`
+  - `pnpm agency:run-medium-figure-conversion`
+  - `pnpm agency:run-serial-heavy-mixed-terminalization`
+  - `pnpm agency:run-manual-scanned-deferred`
+- Throughput runner behavior:
+  - rebuilds throughput manifests first
+  - respects per-lane `executionPolicy`
+  - passes lane-specific concurrency into `scripts/run-priority-remediation-batch.ts`
+  - passes lane-specific initial analysis profile into `scripts/run-priority-remediation-batch.ts`
+  - keeps deferred manual/scanned lane non-runnable unless `ICJIA_ALLOW_DEFERRED_LANE=1`
+- `scripts/run-priority-remediation-batch.ts` now:
+  - carries lane metadata from the manifest into outcomes
+  - supports `ICJIA_REMEDIATION_INITIAL_ANALYSIS_PROFILE`
+  - can start fast lanes with `remediation_fast` instead of `full_final` for the initial analysis pass
+  - writes lane-aware summaries with:
+    - throughput metrics (`pdfsPerHour`, `terminalOutcomesPerHour`, `passCandidatesPerHour`)
+    - pass-rate quality metrics for conversion lanes
+    - truth-hardening quality metrics for terminalization lanes
+- Policy currently implemented:
+  - `small-fast-pass` -> active, `pass_rate_conversion`, concurrency `10`, `remediation_fast`
+  - `medium-figure-conversion` -> active, `pass_rate_conversion`, concurrency `5`, `remediation_fast`
+  - `serial-heavy-mixed-terminalization` -> active, `truth_hardening_terminalization`, concurrency `1`, `remediation_fast`
+  - `manual-scanned-deferred` -> deferred, `deferred_manual_review`, concurrency `1`, `remediation_fast`
+- Verified on 2026-04-06:
+  - `pnpm --filter api build` -> pass
+  - `pnpm --filter api exec vitest run src/__tests__/passRateWaveSlices.test.ts src/__tests__/runtimeTailOvernight.test.ts src/__tests__/agentRemediationService.test.ts` -> `108/108` pass
+  - `pnpm agency:build-pass-rate-slices` -> pass
+  - `pnpm agency:validate-control-plane` -> `ok: true`
+  - `ICJIA_THROUGHPUT_LANE_NAME=manual-scanned-deferred pnpm exec tsx scripts/run-throughput-lane.ts` -> skips correctly because the lane is deferred by policy
+- Live `small-fast-pass` run on 2026-04-06:
+  - manifest size at run start: `48`
+  - concurrency: `10`
+  - initial analysis profile: `remediation_fast`
+  - final result:
+    - `48` processed
+    - `0` pass candidates
+    - `48` failed after remediation
+    - `0` processing errors
+  - throughput summary from `ICJIA-PDFs/manifests/small-fast-pass.outcomes.summary.json`:
+    - `pdfsPerHour: 33.25`
+    - `terminalOutcomesPerHour: 33.25`
+    - `passCandidatesPerHour: 0`
+    - `rowsWithBlockingFindingShrink: 42`
+  - interpretation:
+    - the lane moved files quickly and honestly, but did not produce passes under the strict gate
+    - several “small” docs were still runtime-expensive outliers, including:
+      - `Focused Deterrence: A Policing Strategy to Combat Gun Violence`
+      - `2024 Domestic Violence Fatality Review Committee Biennial Report`
+      - `Addressing Child Exposure to Violence`
+      - `Civil Rights Policy 2019`
+  - after tightening `small-fast-pass` to exclude:
+    - font debt
+    - structure-only / non-figure quick-shape rows
+    - blocker-heavy rows
+    - known slow small-doc profiles
+  - rebuilt `smallFastPassCount` dropped to `0`
+- current conclusion:
+  - there is no real cheap-winner cohort left under the stricter selector
+  - the next practical throughput lane is `medium-figure-conversion`, not `small-fast-pass`
+
+## 2026-04-07 Replacement-Likelihood Lane
+
+- Added a new evidence-based throughput lane:
+  - `replacement-likelihood`
+- Purpose:
+  - only include rows that look plausibly replaceable under the current strict gate
+  - explicitly avoid broad blocker-shrink lanes that do not produce pass candidates
+- Implemented in:
+  - `apps/api/src/services/passRateWaveSlices.ts`
+  - `scripts/build-pass-rate-slices.ts`
+  - `package.json`
+- New command:
+  - `pnpm agency:run-replacement-likelihood`
+- Selection policy is intentionally strict:
+  - non-pass only
+  - light runtime weight only
+  - page count `<= 16`
+  - no scanned/manual-tail rows
+  - no known slow small-doc profiles
+  - no font debt
+  - no `pdfua.logical_structure`
+  - no table/link/note/context residuals
+  - blocker family count `<= 1`
+  - blocking finding count `<= 3`
+  - all blocking keys must be inside a narrow allowlist:
+    - `pdfua.figure_alt_or_artifact`
+    - `pdfua.nested_alt_text`
+    - `pdfua.heading_content_quality`
+    - `pdfua.display_doc_title`
+    - `pdfua.document_language`
+    - `pdfua.bookmark_language`
+  - requires auto-runnable opportunities
+- Verified on 2026-04-07:
+  - `pnpm --filter api exec vitest run src/__tests__/passRateWaveSlices.test.ts` -> pass (`12/12`)
+  - `pnpm agency:build-pass-rate-slices` -> pass
+- Current grounded result after rebuild:
+  - `replacementLikelihoodCount: 0`
+- Interpretation:
+  - the lane is implemented correctly, but current corpus truth does not contain any rows that meet a genuinely strict replacement-likelihood threshold
+  - this confirms the present bottleneck is not “we haven’t isolated the likely winners yet”; it is that the remaining backlog still carries too much residual debt for a clean pass-only lane

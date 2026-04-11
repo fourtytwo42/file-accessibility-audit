@@ -1011,6 +1011,109 @@ describe('failureProfileService', () => {
       && opportunity.status === 'auto_runnable')).toBe(true)
   })
 
+  it('keeps mixed structure cleanup auto-runnable even when figure debt is dominant', () => {
+    const analysis = makeAnalysisResult({
+      localStandards: {
+        status: 'issues_detected',
+        findings: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['ParentTree mismatch remains.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+          {
+            key: 'pdfua.figure_alt_or_artifact',
+            label: 'Figure alt or artifact',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Figure ownership remains unresolved.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          },
+        ],
+        knownGapKeys: [],
+      },
+    })
+
+    const result = buildFailureProfileArtifacts({
+      analysis,
+      context: makeContext({
+        analysis,
+        qpdf: {
+          ...makeContext().qpdf,
+          headings: [{ level: 'H1', tag: '/H1' }],
+          hasStructTree: true,
+          structTreeDepth: 4,
+        },
+        structure: {
+          structuralNodes: [],
+          acrobatAltRiskNodes: [{
+            ref: '90 0 R',
+            tag: '/P',
+            pageRef: '5 0 R',
+            mcids: [12],
+            hasText: false,
+            hasGraphics: true,
+            hasAlt: false,
+            splitSafe: false,
+            graphicsLikelyDecorative: false,
+            operatorPattern: 'graphics_then_text',
+            parentTagPath: [],
+            ownershipMode: 'graphics_only_nonfigure',
+          }],
+        } as any,
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'normalize_heading_hierarchy')?.status).toBe('auto_runnable')
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'repair_native_marked_content_refs')?.status).toBe('auto_runnable')
+    expect(result.failureProfile.toolOpportunities.find(opportunity => opportunity.toolName === 'repair_structure_conformance')?.status).toBe('auto_runnable')
+    expect(result.failureProfile.summary.mixedFamilyConvergencePath).toBe(true)
+    expect(result.plannerEvidence.mixedFamilyConvergencePath).toBe(true)
+  })
+
+  it('emits nested figure normalization as an auto-runnable mixed figure opportunity', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult({
+        localStandards: {
+          status: 'issues_detected',
+          findings: [{
+            key: 'pdfua.nested_alt_text',
+            label: 'Nested alt text',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            evidence: ['Nested figure container retains alternate text debt.'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          }],
+          knownGapKeys: [],
+        },
+      }),
+      context: makeContext(),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.toolOpportunities.some(opportunity =>
+      opportunity.toolName === 'normalize_nested_figure_containers'
+      && opportunity.status === 'auto_runnable')).toBe(true)
+  })
+
   it('emits post-bootstrap native structure debt after augmenting an existing structure tree', () => {
     const analysis = makeAnalysisResult({
       categories: makeAnalysisResult().categories.map(category =>
@@ -2192,8 +2295,14 @@ describe('failureProfileService', () => {
     const result = buildFailureProfileArtifacts({
       analysis: makeAnalysisResult({
         categories: [
-          ...makeAnalysisResult().categories,
-          { id: 'text_extractability', label: 'Text Extractability', weight: 0.225, score: 60, grade: 'D', severity: 'Critical', findings: ['Unicode maps missing'], explanation: '', helpLinks: [] },
+          ...makeAnalysisResult().categories.map(category => {
+            if (category.id === 'text_extractability') {
+              return { ...category, score: 60, grade: 'D', severity: 'Critical', findings: ['Unicode maps missing'] }
+            }
+            return category.id === 'pdf_ua_compliance'
+              ? { ...category, score: 60, grade: 'D', severity: 'Critical', findings: ['Unicode maps missing'] }
+              : { ...category, score: 100, grade: 'A', severity: 'None', findings: [] }
+          }),
         ] as any,
         localStandards: {
           status: 'issues_detected',
@@ -2217,6 +2326,7 @@ describe('failureProfileService', () => {
       context: makeContext({
         qpdf: {
           ...makeContext().qpdf,
+          annotationCount: 0,
           fontsMissingToUnicode: 2,
           fontsMissingToUnicodeBlocking: 2,
         },
@@ -2242,5 +2352,181 @@ describe('failureProfileService', () => {
     expect(opportunity?.familyId).toBe('font_embedding_and_unicode')
     expect(opportunity?.familyStep).toBe(2)
     expect(opportunity?.expectedPostconditions).toContain('font_counters_shrink')
+    expect(result.failureProfile.residualFamilies).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'font_embedding_and_unicode',
+          preferredTools: [
+            'embed_missing_fonts_in_place',
+            'repair_font_unicode_maps',
+            'repair_type1_font_unicode_maps',
+            'repair_truetype_encoding_differences',
+            'repair_cid_symbol_font_maps',
+            'repair_cidset_consistency',
+            'substitute_legacy_fonts_in_place',
+            'finalize_substituted_font_conformance',
+          ],
+        }),
+      ]),
+    )
+    expect(result.failureProfile.summary.safeToRetry).toBe(true)
+    expect(result.failureProfile.summary.dominantResidualFamily).toBeTruthy()
+    expect(result.failureProfile.summary.lastStableNoEffectTool).toBeNull()
+    expect(result.failureProfile.summary.retryDisposition).toBe('retryable_deterministic')
+    expect(result.plannerEvidence.safeToRetry).toBe(true)
+    expect(result.plannerEvidence.dominantResidualFamily).toBe(result.failureProfile.summary.dominantResidualFamily)
+    expect(result.plannerEvidence.lastStableNoEffectTool).toBeNull()
+    expect(result.plannerEvidence.retryDisposition).toBe('retryable_deterministic')
+  })
+
+  it('surfaces stable no-effect tools even when Acrobat-risk figure repair remains retryable', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult({
+        categories: [
+          ...makeAnalysisResult().categories.map(category => {
+            if (category.id === 'alt_text') {
+              return { ...category, score: 0, grade: 'F', severity: 'Critical', findings: ['Image missing alt text'] }
+            }
+            if (category.id === 'pdf_ua_compliance') {
+              return { ...category, score: 70, grade: 'C', severity: 'Moderate', findings: ['Figure alternate text missing'] }
+            }
+            return { ...category, score: 100, grade: 'A', severity: 'None', findings: [] }
+          }),
+        ] as any,
+        verapdf: { ...makeAnalysisResult().verapdf, failures: [], failedChecks: 0, isCompliant: false, message: 'figure-only debt' },
+        localStandards: { status: 'clear', findings: [], knownGapKeys: [] },
+      }),
+      context: makeContext({
+        structure: {
+          ...makeContext().structure,
+          acrobatAltRiskNodes: [{ ref: 'obj:38 0 R', tag: '/P', ownershipMode: 'graphics_only_nonfigure' }],
+        },
+      }),
+      actions: [{
+        tool: 'repair_other_elements_alt_text',
+        target: 'document',
+        details: 'No stable image targets were exposed.',
+        confidence: 0.7,
+        autoApplied: true,
+        changedVisibleContent: false,
+        changedDocumentBytes: false,
+        outcome: 'no_effect',
+        categoryTargets: ['alt_text'],
+      } satisfies RemediationActionRecord],
+      rejectedActions: [],
+    })
+
+    expect(result.failureProfile.summary.safeToRetry).toBe(true)
+    expect(result.failureProfile.summary.dominantResidualFamily).toBe('native_figure_convergence')
+    expect(result.failureProfile.summary.lastStableNoEffectTool).toBe('repair_other_elements_alt_text')
+    expect(result.failureProfile.summary.retryDisposition).toBe('retryable_deterministic')
+    expect(result.plannerEvidence.safeToRetry).toBe(true)
+    expect(result.plannerEvidence.dominantResidualFamily).toBe('native_figure_convergence')
+    expect(result.plannerEvidence.lastStableNoEffectTool).toBe('repair_other_elements_alt_text')
+    expect(result.plannerEvidence.retryDisposition).toBe('retryable_deterministic')
+  })
+
+  it('prefers the next smallest font lane after generic Unicode repair hits a no-effect ceiling', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult({
+        categories: makeAnalysisResult().categories.map(category =>
+          category.id === 'text_extractability'
+            ? { ...category, score: 30, grade: 'F', severity: 'Critical', findings: ['Unicode maps missing'] }
+            : category.id === 'pdf_ua_compliance'
+              ? { ...category, score: 55, grade: 'D', severity: 'Critical', findings: ['Unicode maps missing'] }
+              : { ...category, score: 100, grade: 'A', severity: 'None', findings: [] },
+        ) as any,
+        localStandards: {
+          status: 'issues_detected',
+          findings: [{
+            key: 'pdfua.font_unicode',
+            label: 'Font Unicode mapping',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['Missing ToUnicode maps'],
+            source: 'qpdf',
+            inferred: false,
+            count: 3,
+          }] as any,
+          knownGapKeys: [],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          ...makeContext().qpdf,
+          fontsMissingToUnicode: 3,
+          fontsMissingToUnicodeBlocking: 3,
+          type1FontsMissingToUnicode: 2,
+        },
+      }),
+      actions: [
+        {
+          tool: 'repair_font_unicode_maps',
+          target: 'document',
+          details: 'No measurable Unicode improvement.',
+          confidence: 0.9,
+          autoApplied: true,
+          changedVisibleContent: false,
+          changedDocumentBytes: false,
+          outcome: 'no_effect',
+        } satisfies RemediationActionRecord,
+      ],
+      rejectedActions: [],
+    })
+
+    const generic = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_font_unicode_maps')
+    const type1 = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_type1_font_unicode_maps')
+    expect(generic?.status).not.toBe('auto_runnable')
+    expect(generic?.status).toBe('no_effect')
+    expect(type1?.status).toBe('auto_runnable')
+  })
+
+  it('blocks broad structure conformance while only heading and marked-content cleanup remain', () => {
+    const result = buildFailureProfileArtifacts({
+      analysis: makeAnalysisResult({
+        categories: makeAnalysisResult().categories.map(category =>
+          category.id === 'heading_structure'
+            ? { ...category, score: 45, grade: 'F', severity: 'Critical', findings: ['Heading hierarchy skip'] }
+            : category.id === 'reading_order'
+              ? { ...category, score: 60, grade: 'D', severity: 'Moderate', findings: ['Marked-content residue'] }
+              : category.id === 'pdf_ua_compliance'
+                ? { ...category, score: 55, grade: 'D', severity: 'Critical', findings: ['Logical structure residue'] }
+                : { ...category, score: 100, grade: 'A', severity: 'None', findings: [] },
+        ) as any,
+        localStandards: {
+          status: 'issues_detected',
+          findings: [{
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure and marked content',
+            severity: 'error',
+            blocking: true,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.95,
+            evidence: ['Marked-content refs broken'],
+            source: 'qpdf',
+            inferred: false,
+            count: 1,
+          }] as any,
+          knownGapKeys: [],
+        },
+      }),
+      context: makeContext({
+        qpdf: {
+          ...makeContext().qpdf,
+          headings: [{ level: 'H1', tag: '/H1' }] as any,
+        },
+      }),
+      actions: [],
+      rejectedActions: [],
+    })
+
+    const heading = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'normalize_heading_hierarchy')
+    const marked = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_native_marked_content_refs')
+    const broad = result.failureProfile.toolOpportunities.find(entry => entry.toolName === 'repair_structure_conformance')
+    expect(heading?.status).toBe('auto_runnable')
+    expect(marked?.status).not.toBe('auto_runnable')
+    expect(broad?.status).not.toBe('auto_runnable')
   })
 })

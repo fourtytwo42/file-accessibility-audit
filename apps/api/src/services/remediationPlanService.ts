@@ -18,10 +18,7 @@ import { buildPipelineConfig, classifyPdfFull } from './pdfClassificationService
 import { classifyPdf, getToolReliabilityMap } from './toolReliabilityService.js'
 import { deriveDeterministicCall, hasMeaningfulMetadataTitle, heuristicFigureAltText } from './remediationCallDerivationService.js'
 import { needsLanguageTagNormalization } from './languageTags.js'
-
-const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
-const OPENAI_COMPAT_API_KEY = process.env.OPENAI_COMPAT_API_KEY || process.env.OPENROUTER_API_KEY || 'hs_a9a29d90a35c4b1c8a709e17c8c76dcf'
-const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENROUTER_MODEL || 'gpt-5.1-codex-mini'
+import { callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
 const PLAN_REMEDIATION_TOOL = 'plan_pdf_remediation'
 const MAX_ACTIONS = 32
 const RESERVED_HEADING_ACTIONS = 8
@@ -60,6 +57,7 @@ const FONT_STAGE = new Set<RemediationToolName>([
 const NATIVE_STRUCTURE_STAGE = new Set<RemediationToolName>([
   'adobe_auto_tag',
   'repair_note_tag_ids',
+  'normalize_nested_figure_containers',
   'repair_other_elements_alt_text',
   'repair_native_figure_semantics',
   'repair_native_table_headers',
@@ -111,6 +109,7 @@ export const TOOL_STAGE_ORDER = new Map<RemediationToolName, number>([
   ['substitute_legacy_fonts_in_place', 4],
   ['finalize_substituted_font_conformance', 4],
   ['repair_note_tag_ids', 5],
+  ['normalize_nested_figure_containers', 5],
   ['repair_other_elements_alt_text', 5],
   ['adobe_auto_tag', 5],
   ['repair_native_figure_semantics', 5],
@@ -146,17 +145,18 @@ const TOOL_PRIORITY = new Map<RemediationToolName, number>([
   ['repair_annotation_alt_text', 4],
   ['set_link_annotation_contents', 5],
   ['embed_missing_fonts_in_place', 0],
-  ['repair_cid_symbol_font_maps', 1],
-  ['repair_font_unicode_maps', 2],
-  ['repair_type1_font_unicode_maps', 3],
-  ['repair_truetype_encoding_differences', 4],
+  ['repair_font_unicode_maps', 1],
+  ['repair_type1_font_unicode_maps', 2],
+  ['repair_truetype_encoding_differences', 3],
+  ['repair_cid_symbol_font_maps', 4],
   ['repair_cidset_consistency', 5],
   ['substitute_legacy_fonts_in_place', 6],
   ['finalize_substituted_font_conformance', 7],
   ['repair_note_tag_ids', 0],
+  ['normalize_nested_figure_containers', 0],
   ['repair_other_elements_alt_text', 0],
   ['adobe_auto_tag', 0],
-  ['repair_native_figure_semantics', 0],
+  ['repair_native_figure_semantics', 1],
   ['repair_native_table_headers', 1],
   ['repair_native_reading_order', 2],
   ['artifact_nonsemantic_page_elements', 3],
@@ -261,6 +261,28 @@ function classAllowsNativeSafeRepair(structuralClass: PdfStructuralClass): boole
 
 function hasDirectStructureFailure(opportunity: ToolOpportunity): boolean {
   return opportunity.derivedFromFailureModeKeys.some(key => BROAD_STRUCTURE_FAILURE_KEYS.has(key))
+}
+
+function hasMixedStructureFigureConvergence(input: {
+  analysis: AnalysisResult
+  failureModeByKey: Map<string, FailureMode>
+  plannerEvidence: PlannerEvidenceSummary
+}): boolean {
+  if (input.analysis.isScanned) return false
+  const hasStructureDebt =
+    input.failureModeByKey.has('pdfua.logical_structure')
+    || input.failureModeByKey.has('pdfua.structure')
+    || input.failureModeByKey.has('pdfua.heading_content_quality')
+    || input.failureModeByKey.has('category.heading_structure')
+    || (input.plannerEvidence.topBlockingResidualFamilyIds || []).includes('logical_structure_marked_content')
+    || (input.plannerEvidence.topBlockingResidualFamilyIds || []).includes('post_bootstrap_heading_convergence')
+  const hasFigureDebt =
+    input.failureModeByKey.has('pdfua.figure_alt_or_artifact')
+    || input.failureModeByKey.has('pdfua.nested_alt_text')
+    || input.failureModeByKey.has('pdfua.untagged_rendered_images')
+    || input.failureModeByKey.has('category.alt_text')
+    || (input.plannerEvidence.topBlockingResidualFamilyIds || []).includes('native_figure_convergence')
+  return hasStructureDebt && hasFigureDebt
 }
 
 function hasNarrowerStructureAlternative(input: {
@@ -501,6 +523,22 @@ function opportunitySelectionDecision(input: {
   const postBootstrapStructuralResidue = failureModeByKey.has('context.post_bootstrap_structural_residue')
   const hasAutoNativeMarkedContent = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_marked_content_refs')
   const hasAutoNativeLinkRepair = !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_native_link_structure')
+  const mixedStructureFigureConvergence = hasMixedStructureFigureConvergence({
+    analysis,
+    failureModeByKey,
+    plannerEvidence: {
+      topBlockingResidualFamilyIds: [],
+      topResidualFamilyIds: [],
+      topFailureModeKeys: [],
+      topAutoRunnableOpportunityKeys: [],
+      topResidualFamilySummaries: [],
+      skippedReasonCounts: [],
+      attemptedKeys: [],
+      rejectedKeys: [],
+      noEffectKeys: [],
+      mixedFamilyConvergencePath: false,
+    },
+  })
   const repairFontUnicodeOutcome = actionAttemptOutcome('repair_font_unicode_maps', actions)
   const repairCidSetOutcome = actionAttemptOutcome('repair_cidset_consistency', actions)
   const persistentLegacyFontFailures = opportunity.derivedFromFailureModeKeys.some(key =>
@@ -571,22 +609,36 @@ function opportunitySelectionDecision(input: {
       if (useBootstrappedChartConformance && !!firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_bootstrapped_chart_content_refs')) {
         return { selectable: false, reason: 'superseded_by_bootstrapped_chart_conformance' }
       }
-      if (hasNarrowerStructureAlternative({
-        opportunity,
-        autoRunnableOpportunities,
-        pipelineConfig,
-        reliabilityByTool,
-        failureModeByKey,
-      })) {
+      const mixedMarkedContentReady =
+        !hasAutoNativeMarkedContent
+        || attemptedOrPlanned('repair_native_marked_content_refs', actions, selectedActions)
+      if (
+        !mixedStructureFigureConvergence
+        && hasNarrowerStructureAlternative({
+          opportunity,
+          autoRunnableOpportunities,
+          pipelineConfig,
+          reliabilityByTool,
+          failureModeByKey,
+        })
+      ) {
         return { selectable: false, reason: 'superseded_by_narrow_native_structure_repair' }
+      }
+      if (mixedStructureFigureConvergence && !mixedMarkedContentReady) {
+        return { selectable: false, reason: 'mixed_convergence_waits_for_marked_content_cleanup' }
       }
       if (structuralClass === 'untagged_digital' || structuralClass === 'scanned') {
         return { selectable: false, reason: `structural_class_blocks_broad_structure:${structuralClass}` }
       }
-      if (structuralClass === 'native_tagged' && (hasAutoNativeMarkedContent || hasAutoNativeLinkRepair)) {
+      if (!mixedStructureFigureConvergence && structuralClass === 'native_tagged' && (hasAutoNativeMarkedContent || hasAutoNativeLinkRepair)) {
         return { selectable: false, reason: 'native_tagged_prefers_narrow_repairs' }
       }
       return { selectable: true }
+    case 'normalize_nested_figure_containers':
+      return {
+        selectable: !analysis.isScanned,
+        reason: analysis.isScanned ? 'scanned_blocks_nested_figure_normalization' : undefined,
+      }
     case 'create_heading_from_candidate':
       if (
         analysis.pageCount >= 20
@@ -613,11 +665,22 @@ function opportunitySelectionDecision(input: {
         return { selectable: false, reason: 'long_report_figure_candidate_limit_reached' }
       }
       return { selectable: true }
-    case 'repair_type1_font_unicode_maps':
+    case 'repair_font_unicode_maps':
       return {
-        selectable: attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
-          || !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_font_unicode_maps'),
-        reason: 'font_unicode_prereq_missing',
+        selectable: repairFontUnicodeOutcome !== 'no_effect',
+        reason: 'font_unicode_already_no_effect',
+      }
+    case 'repair_type1_font_unicode_maps':
+      {
+        const hasType1Evidence = opportunity.derivedFromFailureModeKeys.includes('pdfua.type1_unicode')
+          || failureModeByKey.has('pdfua.type1_unicode')
+        const unicodeRepairNoEffect = repairFontUnicodeOutcome === 'no_effect'
+        const genericUnicodeAlreadyConsumed = attemptedOrPlanned('repair_font_unicode_maps', actions, selectedActions)
+          || !firstAutoRunnableOpportunity(autoRunnableOpportunities, 'repair_font_unicode_maps')
+        return {
+          selectable: hasType1Evidence || (unicodeRepairNoEffect && genericUnicodeAlreadyConsumed),
+          reason: 'font_unicode_prereq_missing',
+        }
       }
     case 'repair_cidset_consistency':
       return {
@@ -795,6 +858,16 @@ async function deterministicActions(input: {
   })
 
   const headingStructureUnresolved = issueCategoryIds(input.analysis).includes('heading_structure')
+  const readingOrderUnresolved = issueCategoryIds(input.analysis).includes('reading_order')
+  const altTextUnresolved = issueCategoryIds(input.analysis).includes('alt_text')
+  const topResidualFamilyId = baseArtifacts.plannerEvidence.topResidualFamilyIds?.[0] || null
+  const prioritizeHeadingConvergence = topResidualFamilyId === 'post_bootstrap_heading_convergence'
+  const prioritizeLogicalStructureConvergence = topResidualFamilyId === 'logical_structure_marked_content'
+  const hasMutableReadingOrderGroups = (input.context.readingOrderParentCandidates || []).some(candidate =>
+    candidate.mutableKids && candidate.suggestedChildCandidateIds.length > 1,
+  )
+  const logicalStructureBlocking =
+    failureModeByKey.has('pdfua.logical_structure') || failureModeByKey.has('pdfua.structure')
   const postBootstrapStructureDebt = failureModeByKey.has('context.post_bootstrap_native_structure_debt')
   const postBootstrapStructuralResidue = failureModeByKey.has('context.post_bootstrap_structural_residue')
   const postHeadingCreationStructureDebt = failureModeByKey.has('context.post_heading_creation_native_structure_debt')
@@ -806,11 +879,65 @@ async function deterministicActions(input: {
     || failureModeByKey.has('pdfua.document_language')
     || failureModeByKey.has('pdfua.display_doc_title')
   )
+  const mixedStructureFigureConvergence = hasMixedStructureFigureConvergence({
+    analysis: input.analysis,
+    failureModeByKey,
+    plannerEvidence: baseArtifacts.plannerEvidence,
+  })
   const headingSelectionLimit = longReportConvergence ? LONG_REPORT_RESERVED_HEADING_ACTIONS : RESERVED_HEADING_ACTIONS
   const selectionPasses: Array<{
     includeOpportunity: (opportunity: ToolOpportunity) => boolean
     maxSelections?: number
   }> = [
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'normalize_heading_hierarchy',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_native_marked_content_refs',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_structure_conformance',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'normalize_nested_figure_containers',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_native_figure_semantics',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_other_elements_alt_text',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        mixedStructureFigureConvergence
+        && opportunity.scope === 'candidate'
+        && ['set_figure_alt_text', 'retag_as_figure_and_set_alt', 'mark_figure_decorative'].includes(opportunity.toolName),
+      maxSelections: longReportConvergence ? LONG_REPORT_RESERVED_FIGURE_ACTIONS : 6,
+    },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         longReportMetadataDebt
@@ -824,6 +951,22 @@ async function deterministicActions(input: {
         && opportunity.scope === 'document'
         && ['artifact_nonsemantic_page_elements', 'repair_bootstrapped_chart_content_refs'].includes(opportunity.toolName),
       maxSelections: 2,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        (
+          postBootstrapStructuralResidue
+          || postBootstrapStructureDebt
+          || postHeadingCreationStructureDebt
+          || (logicalStructureBlocking && hasMutableReadingOrderGroups)
+          || (logicalStructureBlocking && prioritizeLogicalStructureConvergence && !prioritizeHeadingConvergence)
+        )
+        && readingOrderUnresolved
+        && (
+          (opportunity.scope === 'document' && opportunity.toolName === 'repair_native_reading_order')
+          || (opportunity.scope === 'candidate_group' && opportunity.toolName === 'reorder_structure_children')
+        ),
+      maxSelections: 3,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
@@ -843,16 +986,31 @@ async function deterministicActions(input: {
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         postHeadingCreationStructureDebt
-        && opportunity.scope === 'document'
-        && ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName),
-      maxSelections: 3,
+        && (
+          (opportunity.scope === 'document' && ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance', 'repair_native_reading_order'].includes(opportunity.toolName))
+          || (opportunity.scope === 'candidate_group' && opportunity.toolName === 'reorder_structure_children')
+        ),
+      maxSelections: 4,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
         postBootstrapStructureDebt
-        && opportunity.scope === 'document'
-        && ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName),
-      maxSelections: 3,
+        && (
+          (opportunity.scope === 'document' && ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance', 'repair_native_reading_order'].includes(opportunity.toolName))
+          || (opportunity.scope === 'candidate_group' && opportunity.toolName === 'reorder_structure_children')
+        ),
+      maxSelections: 4,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        logicalStructureBlocking
+        && readingOrderUnresolved
+        && !prioritizeHeadingConvergence
+        && (
+          (opportunity.scope === 'document' && ['repair_native_reading_order', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName))
+          || (opportunity.scope === 'candidate_group' && opportunity.toolName === 'reorder_structure_children')
+        ),
+      maxSelections: 4,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
@@ -867,6 +1025,20 @@ async function deterministicActions(input: {
         && opportunity.toolName === 'create_heading_from_candidate'
         && opportunity.scope === 'candidate',
       maxSelections: headingSelectionLimit,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        altTextUnresolved
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_native_figure_semantics',
+      maxSelections: 1,
+    },
+    {
+      includeOpportunity: (opportunity: ToolOpportunity) =>
+        altTextUnresolved
+        && opportunity.scope === 'document'
+        && opportunity.toolName === 'repair_other_elements_alt_text',
+      maxSelections: 1,
     },
     {
       includeOpportunity: (opportunity: ToolOpportunity) =>
@@ -982,59 +1154,66 @@ function buildPrompt(input: {
 }
 
 async function openAiPlan(messages: any[]): Promise<Pick<RemediationPlanResult, 'done' | 'actions' | 'unresolvedIssues'>> {
-  const response = await fetch(`${OPENAI_COMPAT_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENAI_COMPAT_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: OPENAI_COMPAT_MODEL,
-      temperature: 0.1,
-      tools: [{
-        type: 'function',
-        function: {
-          name: PLAN_REMEDIATION_TOOL,
-          description: 'Plan the next remediation actions for an in-place PDF accessibility patch loop.',
-          parameters: {
-            type: 'object',
-            additionalProperties: false,
-            required: ['done', 'actions', 'unresolvedIssues'],
-            properties: {
-              done: { type: 'boolean' },
-              unresolvedIssues: { type: 'array', items: { type: 'string' } },
-              actions: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  additionalProperties: false,
-                  required: ['tool_name', 'arguments', 'rationale', 'confidence'],
-                  properties: {
-                    tool_name: { type: 'string' },
-                    arguments: { type: 'object' },
-                    rationale: { type: 'string' },
-                    confidence: { type: 'number' },
+  const payload = await callWithOpenAiCompatFallbacks({
+    serviceName: 'remediationPlanService',
+    preflightPrimary: true,
+    invoke: async endpoint => {
+      const response = await fetch(`${endpoint.baseUrl.replace(/\/$/, '')}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${endpoint.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: endpoint.model,
+          temperature: 0.1,
+          tools: [{
+            type: 'function',
+            function: {
+              name: PLAN_REMEDIATION_TOOL,
+              description: 'Plan the next remediation actions for an in-place PDF accessibility patch loop.',
+              parameters: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['done', 'actions', 'unresolvedIssues'],
+                properties: {
+                  done: { type: 'boolean' },
+                  unresolvedIssues: { type: 'array', items: { type: 'string' } },
+                  actions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      additionalProperties: false,
+                      required: ['tool_name', 'arguments', 'rationale', 'confidence'],
+                      properties: {
+                        tool_name: { type: 'string' },
+                        arguments: { type: 'object' },
+                        rationale: { type: 'string' },
+                        confidence: { type: 'number' },
+                      },
+                    },
                   },
                 },
               },
             },
+          }],
+          tool_choice: {
+            type: 'function',
+            function: { name: PLAN_REMEDIATION_TOOL },
           },
-        },
-      }],
-      tool_choice: {
-        type: 'function',
-        function: { name: PLAN_REMEDIATION_TOOL },
-      },
-      messages,
-    }),
+          messages,
+        }),
+      })
+
+      if (!response.ok) {
+        const bodyText = await response.text().catch(() => '')
+        throw new Error(`OpenAI-compatible remediation planner failed: ${response.status}${bodyText ? ` ${bodyText}` : ''}`)
+      }
+
+      return await response.json() as any
+    },
   })
 
-  if (!response.ok) {
-    const bodyText = await response.text().catch(() => '')
-    throw new Error(`OpenAI-compatible remediation planner failed: ${response.status}${bodyText ? ` ${bodyText}` : ''}`)
-  }
-
-  const payload = await response.json() as any
   const toolCall = payload?.choices?.[0]?.message?.tool_calls?.find((entry: any) => entry?.function?.name === PLAN_REMEDIATION_TOOL)
   const rawArguments = toolCall?.function?.arguments
   if (!rawArguments || typeof rawArguments !== 'string') {
@@ -1072,7 +1251,7 @@ export async function planRemediationActions(input: {
     }
   }
 
-  if (!REMEDIATION.ENABLE_PLANNER_AI_FALLBACK || !OPENAI_COMPAT_API_KEY) {
+  if (!REMEDIATION.ENABLE_PLANNER_AI_FALLBACK || !hasOpenAiCompatConfig()) {
     return {
       done: false,
       actions: [],

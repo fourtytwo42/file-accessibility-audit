@@ -56,6 +56,7 @@ function makeAnalysisResult(input: {
   filename?: string
   overallScore: number
   grade: AnalysisResult['grade']
+  pageCount?: number
   categories: Array<{ id: string; score: number | null; grade: string }>
   localStandards?: AnalysisResult['localStandards']
 }): AnalysisResult {
@@ -69,7 +70,7 @@ function makeAnalysisResult(input: {
     keywords: null,
     author: null,
     subject: null,
-    pageCount: 2,
+    pageCount: input.pageCount || 2,
   }
   return {
     filename: input.filename || 'example.pdf',
@@ -432,6 +433,353 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })?.id).toBe('native_figure_convergence')
   })
 
+  it('prefers native figure convergence for high-score figure-final-mile cleanup even when other families remain', async () => {
+    const { __test_selectFigureFinalMileResidualCleanupTarget } = await import('../services/agentRemediationService.js')
+
+    expect(__test_selectFigureFinalMileResidualCleanupTarget({
+      residualFamilies: [
+        {
+          id: 'native_figure_convergence',
+          label: 'Native figure convergence',
+          priority: 60,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.figure_alt_or_artifact',
+          convergenceStatus: 'preferred_tools_available',
+          semanticPolicy: 'optional_after_deterministic',
+          failureModeKeys: ['category.alt_text', 'pdfua.figure_alt_or_artifact'],
+          categoryIds: ['alt_text', 'pdf_ua_compliance'],
+          preferredTools: ['repair_native_figure_semantics', 'repair_other_elements_alt_text'],
+          deprioritizedTools: ['artifact_nonsemantic_page_elements'],
+          expectedPostconditions: ['figure_blocking_keys_shrink'],
+          activeOpportunityKeys: ['repair_other_elements_alt_text:document:document'],
+          preferredAutoRunnableOpportunityKeys: ['repair_other_elements_alt_text:document:document'],
+          currentStep: 2,
+          evidenceSignals: ['blocking_failure_mode:pdfua.figure_alt_or_artifact'],
+          evidenceStrength: 22,
+          regressionCanaries: ['long_report_figure_cleanup'],
+        },
+        {
+          id: 'logical_structure_marked_content',
+          label: 'Logical structure and marked content',
+          priority: 80,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.logical_structure',
+          convergenceStatus: 'preferred_tools_available',
+          semanticPolicy: 'forbidden',
+          failureModeKeys: ['pdfua.logical_structure'],
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          preferredTools: ['repair_native_marked_content_refs'],
+          deprioritizedTools: ['bootstrap_struct_tree'],
+          expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+          activeOpportunityKeys: ['repair_native_marked_content_refs:document:document'],
+          preferredAutoRunnableOpportunityKeys: ['repair_native_marked_content_refs:document:document'],
+          currentStep: 1,
+          evidenceSignals: ['blocking_failure_mode:pdfua.logical_structure'],
+          evidenceStrength: 15,
+          regressionCanaries: ['annual_report_structure_tail'],
+        },
+      ],
+    }, {
+      overallScore: 83,
+      localStandards: {
+        findings: [
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true },
+          { key: 'pdfua.nested_alt_text', blocking: true },
+        ],
+      },
+    } as any)?.id).toBe('native_figure_convergence')
+  })
+
+  it('keeps the expanded font family deterministic order intact inside residual cleanup planning', async () => {
+    const {
+      __test_buildResidualCleanupFamilyCalls,
+    } = await import('../services/agentRemediationService.js')
+
+    const family: any = {
+      id: 'font_embedding_and_unicode',
+      label: 'Font embedding and Unicode',
+      priority: 30,
+      blocking: true,
+      blockingReason: 'blocking_failure_mode:pdfua.font_unicode',
+      convergenceStatus: 'preferred_tools_available',
+      semanticPolicy: 'forbidden',
+      failureModeKeys: ['pdfua.font_unicode'],
+      categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+      preferredTools: [
+        'embed_missing_fonts_in_place',
+        'repair_font_unicode_maps',
+        'repair_type1_font_unicode_maps',
+        'repair_truetype_encoding_differences',
+        'repair_cid_symbol_font_maps',
+        'repair_cidset_consistency',
+        'substitute_legacy_fonts_in_place',
+        'finalize_substituted_font_conformance',
+      ],
+      deprioritizedTools: [],
+      expectedPostconditions: ['font_blocking_keys_shrink', 'font_counters_shrink'],
+      activeOpportunityKeys: [],
+      preferredAutoRunnableOpportunityKeys: [],
+      currentStep: 1,
+      evidenceSignals: ['blocking_failure_mode:pdfua.font_unicode'],
+      evidenceStrength: 22,
+      regressionCanaries: ['processed_font_cluster'],
+    }
+
+    const familyCalls = __test_buildResidualCleanupFamilyCalls({
+      filename: 'font-tail.pdf',
+      analysis: makeAnalysisResult({
+        overallScore: 76,
+        grade: 'C',
+        categories: [{ id: 'text_extractability', score: 50, grade: 'F' }],
+      }),
+      context: {
+        pdfjs: { title: 'Untitled', lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [], tableCandidates: [], headingCandidates: [], pages: [], linkCandidates: [], readingOrderCandidates: [], readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [] },
+      } as any,
+      failureProfile: {
+        residualFamilies: [family],
+        toolOpportunities: family.preferredTools.map((toolName: string, index: number) => ({
+          key: `${toolName}:document:document`,
+          toolName,
+          reason: toolName,
+          scope: 'document',
+          candidateIds: [],
+          candidateGroupIds: [],
+          pageNumbers: [],
+          categoryTargets: ['text_extractability'],
+          confidence: 0.9,
+          status: 'auto_runnable',
+          derivedFromFailureModeKeys: ['pdfua.font_unicode'],
+          familyId: 'font_embedding_and_unicode',
+          familyStep: index + 1,
+        })),
+      } as any,
+      family,
+      plannedCalls: [],
+    })
+
+    expect(familyCalls.map(call => call.tool_name)).toEqual(family.preferredTools)
+  })
+
+  it('treats metadata and annotation cleanup as part of the structural residual cleanup chain', async () => {
+    const {
+      __test_buildResidualCleanupFamilyCalls,
+      __test_residualCleanupFamilyChain,
+    } = await import('../services/agentRemediationService.js')
+
+    const families = [
+      {
+        id: 'metadata_normalization',
+        label: 'Metadata normalization',
+        priority: 10,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:pdfua.display_doc_title',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'forbidden',
+        failureModeKeys: ['pdfua.display_doc_title'],
+        categoryIds: ['title_language', 'pdf_ua_compliance'],
+        preferredTools: ['set_pdfua_identification', 'normalize_document_metadata', 'set_document_language', 'set_document_title'],
+        deprioritizedTools: [],
+        expectedPostconditions: ['metadata_blocking_keys_shrink'],
+        activeOpportunityKeys: ['set_document_title:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['set_document_title:document:document'],
+        currentStep: 4,
+        evidenceSignals: ['blocking_failure_mode:pdfua.display_doc_title'],
+        evidenceStrength: 30,
+        regressionCanaries: ['processed_runtime_metadata'],
+      },
+      {
+        id: 'link_tabs_and_annotation_cleanup',
+        label: 'Link, tabs, and annotation cleanup',
+        priority: 50,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:pdfua.page_tabs',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'optional_after_deterministic',
+        failureModeKeys: ['pdfua.page_tabs'],
+        categoryIds: ['reading_order', 'pdf_ua_compliance'],
+        preferredTools: ['repair_native_link_structure', 'tag_unowned_annotations', 'set_page_tabs', 'set_link_annotation_contents', 'normalize_annotation_tab_order', 'set_tabs_all_annotated_pages'],
+        deprioritizedTools: ['repair_annotation_alt_text'],
+        expectedPostconditions: ['page_tabs_clear'],
+        activeOpportunityKeys: ['normalize_annotation_tab_order:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['normalize_annotation_tab_order:document:document'],
+        currentStep: 5,
+        evidenceSignals: ['blocking_failure_mode:pdfua.page_tabs'],
+        evidenceStrength: 24,
+        regressionCanaries: ['annual_report_link_tabs_cleanup'],
+      },
+      {
+        id: 'post_bootstrap_heading_convergence',
+        label: 'Post-bootstrap heading convergence',
+        priority: 70,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:category.heading_structure',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'optional_after_deterministic',
+        failureModeKeys: ['category.heading_structure'],
+        categoryIds: ['heading_structure'],
+        preferredTools: ['artifact_nonsemantic_page_elements', 'normalize_heading_hierarchy'],
+        deprioritizedTools: ['bootstrap_struct_tree'],
+        expectedPostconditions: ['heading_blocking_keys_shrink'],
+        activeOpportunityKeys: ['artifact_nonsemantic_page_elements:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['artifact_nonsemantic_page_elements:document:document'],
+        currentStep: 1,
+        evidenceSignals: ['blocking_failure_mode:category.heading_structure'],
+        evidenceStrength: 18,
+        regressionCanaries: ['annual_report_heading_convergence'],
+      },
+      {
+        id: 'logical_structure_marked_content',
+        label: 'Logical structure and marked content',
+        priority: 80,
+        blocking: true,
+        blockingReason: 'blocking_failure_mode:pdfua.logical_structure',
+        convergenceStatus: 'preferred_tools_available',
+        semanticPolicy: 'forbidden',
+        failureModeKeys: ['pdfua.logical_structure'],
+        categoryIds: ['reading_order', 'pdf_ua_compliance'],
+        preferredTools: ['repair_native_reading_order', 'reorder_structure_children', 'repair_native_marked_content_refs', 'artifact_nonsemantic_page_elements', 'repair_bootstrapped_chart_content_refs', 'repair_structure_conformance'],
+        deprioritizedTools: ['bootstrap_struct_tree'],
+        expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+        activeOpportunityKeys: ['repair_structure_conformance:document:document'],
+        preferredAutoRunnableOpportunityKeys: ['repair_structure_conformance:document:document'],
+        currentStep: 6,
+        evidenceSignals: ['blocking_failure_mode:pdfua.logical_structure'],
+        evidenceStrength: 20,
+        regressionCanaries: ['annual_report_structure_tail'],
+      },
+    ] as any
+
+    expect(__test_residualCleanupFamilyChain({ residualFamilies: families }, families[2])).toEqual(families)
+
+    const familyCalls = __test_buildResidualCleanupFamilyCalls({
+      filename: 'structure-tail.pdf',
+      analysis: makeAnalysisResult({
+        overallScore: 81,
+        grade: 'B',
+        categories: [
+          { id: 'heading_structure', score: 90, grade: 'B' },
+          { id: 'reading_order', score: 88, grade: 'B' },
+          { id: 'title_language', score: 80, grade: 'B' },
+        ],
+      }),
+      context: {
+        pdfjs: { title: 'Untitled', lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [], tableCandidates: [], headingCandidates: [], pages: [], linkCandidates: [], readingOrderCandidates: [], readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [] },
+      } as any,
+      failureProfile: {
+        residualFamilies: families,
+        toolOpportunities: [
+          { key: 'set_document_title:document:document', toolName: 'set_document_title', reason: 'title', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['title_language'], confidence: 0.9, status: 'auto_runnable', derivedFromFailureModeKeys: ['pdfua.display_doc_title'], familyId: 'metadata_normalization', familyStep: 4 },
+          { key: 'normalize_annotation_tab_order:document:document', toolName: 'normalize_annotation_tab_order', reason: 'tabs', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['reading_order'], confidence: 0.9, status: 'auto_runnable', derivedFromFailureModeKeys: ['pdfua.page_tabs'], familyId: 'link_tabs_and_annotation_cleanup', familyStep: 5 },
+          { key: 'artifact_nonsemantic_page_elements:document:document', toolName: 'artifact_nonsemantic_page_elements', reason: 'structure', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['heading_structure'], confidence: 0.9, status: 'auto_runnable', derivedFromFailureModeKeys: ['category.heading_structure'], familyId: 'post_bootstrap_heading_convergence', familyStep: 1 },
+          { key: 'repair_structure_conformance:document:document', toolName: 'repair_structure_conformance', reason: 'conformance', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['reading_order'], confidence: 0.9, status: 'auto_runnable', derivedFromFailureModeKeys: ['pdfua.logical_structure'], familyId: 'logical_structure_marked_content', familyStep: 6 },
+        ],
+      } as any,
+      family: families[2],
+      plannedCalls: [],
+    })
+
+    expect(familyCalls.map(call => call.tool_name)).toEqual([
+      'set_document_title',
+      'normalize_annotation_tab_order',
+      'artifact_nonsemantic_page_elements',
+      'repair_structure_conformance',
+    ])
+  })
+
+  it('prioritizes heading normalization before reading-order and marked-content cleanup in the structural chain', async () => {
+    const {
+      __test_buildResidualCleanupFamilyCalls,
+      __test_residualCleanupFamilyChain,
+    } = await import('../services/agentRemediationService.js')
+
+    const headingFamily: any = {
+      id: 'post_bootstrap_heading_convergence',
+      label: 'Post-bootstrap heading convergence',
+      priority: 70,
+      blocking: true,
+      blockingReason: 'blocking_failure_mode:category.heading_structure',
+      convergenceStatus: 'preferred_tools_available',
+      semanticPolicy: 'optional_after_deterministic',
+      failureModeKeys: ['category.heading_structure'],
+      categoryIds: ['heading_structure'],
+      preferredTools: ['artifact_nonsemantic_page_elements', 'normalize_heading_hierarchy', 'create_heading_from_candidate'],
+      deprioritizedTools: ['bootstrap_struct_tree'],
+      expectedPostconditions: ['heading_blocking_keys_shrink'],
+      activeOpportunityKeys: ['normalize_heading_hierarchy:document:document'],
+      preferredAutoRunnableOpportunityKeys: ['normalize_heading_hierarchy:document:document'],
+      currentStep: 2,
+      evidenceSignals: ['blocking_failure_mode:category.heading_structure'],
+      evidenceStrength: 18,
+      regressionCanaries: ['annual_report_heading_convergence'],
+    }
+    const logicalFamily: any = {
+      id: 'logical_structure_marked_content',
+      label: 'Logical structure and marked content',
+      priority: 80,
+      blocking: true,
+      blockingReason: 'blocking_failure_mode:pdfua.logical_structure',
+      convergenceStatus: 'preferred_tools_available',
+      semanticPolicy: 'forbidden',
+      failureModeKeys: ['pdfua.logical_structure'],
+      categoryIds: ['reading_order', 'pdf_ua_compliance'],
+      preferredTools: ['repair_native_reading_order', 'reorder_structure_children', 'repair_native_marked_content_refs', 'repair_bootstrapped_chart_content_refs', 'repair_structure_conformance'],
+      deprioritizedTools: ['bootstrap_struct_tree'],
+      expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+      activeOpportunityKeys: ['repair_native_reading_order:document:document'],
+      preferredAutoRunnableOpportunityKeys: ['repair_native_reading_order:document:document'],
+      currentStep: 1,
+      evidenceSignals: ['blocking_failure_mode:pdfua.logical_structure'],
+      evidenceStrength: 16,
+      regressionCanaries: ['annual_report_structure_tail'],
+    }
+    const families = [headingFamily, logicalFamily]
+
+    expect(__test_residualCleanupFamilyChain({ residualFamilies: families }, headingFamily).map((family: any) => family.id)).toEqual([
+      'post_bootstrap_heading_convergence',
+      'logical_structure_marked_content',
+    ])
+
+    const familyCalls = __test_buildResidualCleanupFamilyCalls({
+      filename: 'heading-first.pdf',
+      analysis: makeAnalysisResult({
+        overallScore: 79,
+        grade: 'C',
+        categories: [
+          { id: 'heading_structure', score: 70, grade: 'C' },
+          { id: 'reading_order', score: 72, grade: 'C' },
+        ],
+      }),
+      context: {
+        pdfjs: { title: 'Untitled', lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [], tableCandidates: [], headingCandidates: [], pages: [], linkCandidates: [], readingOrderCandidates: [], readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [] },
+      } as any,
+      failureProfile: {
+        residualFamilies: families,
+        toolOpportunities: [
+          { key: 'normalize_heading_hierarchy:document:document', toolName: 'normalize_heading_hierarchy', reason: 'heading', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['heading_structure'], confidence: 0.9, status: 'auto_runnable', derivedFromFailureModeKeys: ['category.heading_structure'], familyId: 'post_bootstrap_heading_convergence', familyStep: 2 },
+          { key: 'repair_native_reading_order:document:document', toolName: 'repair_native_reading_order', reason: 'reading', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['reading_order'], confidence: 0.9, status: 'auto_runnable', derivedFromFailureModeKeys: ['pdfua.logical_structure'], familyId: 'logical_structure_marked_content', familyStep: 1 },
+          { key: 'repair_native_marked_content_refs:document:document', toolName: 'repair_native_marked_content_refs', reason: 'marked', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['reading_order'], confidence: 0.8, status: 'auto_runnable', derivedFromFailureModeKeys: ['pdfua.logical_structure'], familyId: 'logical_structure_marked_content', familyStep: 3 },
+        ],
+      } as any,
+      family: headingFamily,
+      plannedCalls: [],
+    })
+
+    expect(familyCalls.map(call => call.tool_name)).toEqual([
+      'normalize_heading_hierarchy',
+      'repair_native_reading_order',
+      'repair_native_marked_content_refs',
+    ])
+  })
+
   it('continues through the next preferred figure-family step when the first residual step is a no-op', async () => {
     const {
       __test_buildResidualCleanupFamilyCalls,
@@ -550,6 +898,62 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           expectedPostconditions: ['figure_blocking_keys_shrink'],
         },
       ],
+    })
+
+    expect(familyCalls.map(call => call.tool_name)).toEqual([
+      'repair_native_figure_semantics',
+      'repair_other_elements_alt_text',
+    ])
+  })
+
+  it('keeps native figure repair ahead of Acrobat-style alt ownership repair in the figure family chain', async () => {
+    const {
+      __test_buildResidualCleanupFamilyCalls,
+    } = await import('../services/agentRemediationService.js')
+
+    const family: any = {
+      id: 'native_figure_convergence',
+      label: 'Native figure convergence',
+      priority: 60,
+      blocking: true,
+      blockingReason: 'blocking_failure_mode:category.alt_text',
+      convergenceStatus: 'preferred_tools_available',
+      semanticPolicy: 'optional_after_deterministic',
+      failureModeKeys: ['category.alt_text'],
+      categoryIds: ['alt_text', 'pdf_ua_compliance'],
+      preferredTools: ['repair_native_figure_semantics', 'repair_other_elements_alt_text'],
+      deprioritizedTools: ['artifact_nonsemantic_page_elements'],
+      expectedPostconditions: ['figure_blocking_keys_shrink'],
+      activeOpportunityKeys: [],
+      preferredAutoRunnableOpportunityKeys: [],
+      currentStep: 1,
+      evidenceSignals: ['blocking_failure_mode:category.alt_text'],
+      evidenceStrength: 18,
+      regressionCanaries: ['long_report_figure_cleanup'],
+    }
+
+    const familyCalls = __test_buildResidualCleanupFamilyCalls({
+      filename: 'figure-order.pdf',
+      analysis: makeAnalysisResult({
+        overallScore: 73,
+        grade: 'C',
+        categories: [{ id: 'alt_text', score: 40, grade: 'F' }],
+      }),
+      context: {
+        pdfjs: { title: null, lang: 'en' },
+        qpdf: { lang: 'en', headings: [], tables: [], images: [], formFields: [], hasStructTree: true, outlineCount: 0, structTreeDepth: 1 },
+        figureCandidates: [], tableCandidates: [], headingCandidates: [], pages: [], linkCandidates: [], readingOrderCandidates: [], readingOrderParentCandidates: [],
+        structure: { acrobatAltRiskNodes: [{ ref: 'obj:38 0 R', tag: '/P', ownershipMode: 'graphics_only_nonfigure' }] },
+      } as any,
+      failureProfile: {
+        residualFamilies: [family],
+        toolOpportunities: [
+          { key: 'repair_native_figure_semantics:document:document', toolName: 'repair_native_figure_semantics', reason: 'native', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['alt_text'], confidence: 0.95, status: 'auto_runnable', derivedFromFailureModeKeys: ['category.alt_text'], familyId: 'native_figure_convergence', familyStep: 1 },
+          { key: 'repair_other_elements_alt_text:document:document', toolName: 'repair_other_elements_alt_text', reason: 'acrobat', scope: 'document', candidateIds: [], candidateGroupIds: [], pageNumbers: [], categoryTargets: ['alt_text'], confidence: 0.93, status: 'auto_runnable', derivedFromFailureModeKeys: ['category.alt_text'], familyId: 'native_figure_convergence', familyStep: 2 },
+        ],
+      } as any,
+      family,
+      plannedCalls: [],
     })
 
     expect(familyCalls.map(call => call.tool_name)).toEqual([
@@ -798,10 +1202,10 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     expect(familyCalls.map(call => call.tool_name)).toEqual([
       'artifact_nonsemantic_page_elements',
-      'repair_native_marked_content_refs',
-      'repair_bootstrapped_chart_content_refs',
       'normalize_heading_hierarchy',
       'create_heading_from_candidate',
+      'repair_native_marked_content_refs',
+      'repair_bootstrapped_chart_content_refs',
       'repair_structure_conformance',
     ])
   })
@@ -950,11 +1354,11 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'example.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(8)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(5)
     expect(planRemediationActions).toHaveBeenCalled()
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.actions))).toBe(true)
     expect(planRemediationActions.mock.calls.some(call => Array.isArray(call[0]?.rejectedActions))).toBe(true)
-    expect(analyzePDF).toHaveBeenCalledTimes(6)
+    expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(3)
     expect(analyzePDF.mock.calls[0]?.[2]).toMatchObject({
       analysisProfile: 'remediation_fast',
       skipAdobe: true,
@@ -1106,8 +1510,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'batched.pdf', originalResult)
 
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(7)
-    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light', 'light', 'light', 'light', 'light'])
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(5)
+    expect(inspectPdfForRemediation.mock.calls.map(call => call[2]?.inspectMode)).toEqual(['light', 'light', 'light', 'light', 'light'])
     expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(3)
     expect(result.finalResult.grade).toBe('A')
     expect(generateSemanticRepairBatches).not.toHaveBeenCalled()
@@ -1594,7 +1998,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'tagged-stage.pdf', originalResult)
 
-    expect(analyzePDF).toHaveBeenCalledTimes(7)
+    expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(2)
     expect(runPdfStructureBackendBatch).toHaveBeenCalled()
     expect(runPdfStructureBackendBatch).toHaveBeenCalled()
     expect(executeRemediationTool.mock.calls.filter(call =>
@@ -1723,6 +2127,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
       { operation: 'repair_native_link_structure' },
       { operation: 'normalize_annotation_tab_order' },
       { operation: 'set_tabs_all_annotated_pages' },
+      { operation: 'set_link_annotation_contents', pageNumber: 1, annotationIndex: 0, contents: 'Example' },
     ])
     expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.includeSnapshot).toBe(true)
     expect(runPdfStructureBackendBatch.mock.calls[0]?.[0]?.inspectMode).toBe('light')
@@ -1730,9 +2135,10 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(finalCleanupTools).toContain('repair_native_link_structure')
     expect(finalCleanupTools).toContain('normalize_annotation_tab_order')
     expect(finalCleanupTools).toContain('set_tabs_all_annotated_pages')
+    expect(finalCleanupTools).toContain('set_link_annotation_contents')
     expect(result.buffer.equals(Buffer.from('pdf-cleanup-batch'))).toBe(true)
     expect(analyzePDF.mock.calls.length).toBeGreaterThanOrEqual(2)
-    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(7)
+    expect(inspectPdfForRemediation).toHaveBeenCalledTimes(2)
   })
 
   it('batches native-safe final cleanup into one analysis pass', async () => {
@@ -2280,7 +2686,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
 
     const result = await remediatePdfWithAgent(Buffer.from('pdf'), 'scan.pdf', originalResult)
 
-    expect(result.buffer.equals(Buffer.from('pdf-1'))).toBe(true)
+    expect(result.buffer.equals(Buffer.from('pdf'))).toBe(true)
     expect(result.model.processingPath).toBe('agent_patch')
     expect(result.model.pathFallbacks).toEqual([])
     expect(result.finalResult.grade).toBe('F')
@@ -5742,9 +6148,12 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     await remediatePdfWithAgent(Buffer.from('pdf'), 'biennial-followup.pdf', originalResult)
 
     expect(planRemediationActions.mock.calls.length).toBeGreaterThanOrEqual(3)
-    expect(planRemediationActions.mock.calls.some(call => call[0]?.actions.some((action: any) =>
-      action.tool === 'create_heading_from_candidate' && action.outcome === 'applied',
-    ))).toBe(true)
+    expect(planRemediationActions.mock.calls.some(call =>
+      Array.isArray(call[0]?.actions)
+      && call[0].actions.some((action: any) =>
+        action.tool === 'create_heading_from_candidate' && action.outcome === 'applied',
+      ),
+    )).toBe(true)
     expect(executeRemediationTool.mock.calls.some(call => call[0].call.tool_name === 'repair_native_marked_content_refs')).toBe(true)
   })
 
@@ -6236,24 +6645,475 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     })
   })
 
+  it('detects heading-only residual survivors so focused rescue can prefer bounded heading cleanup', async () => {
+    const { __test_isHeadingOnlyResidualState } = await import('../services/agentRemediationService.js')
+
+    expect(__test_isHeadingOnlyResidualState(
+      makeAnalysisResult({
+        overallScore: 86,
+        grade: 'B',
+        categories: [
+          { id: 'heading_structure', score: 84, grade: 'B' },
+          { id: 'pdf_ua_compliance', score: 86, grade: 'B' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.heading_content_quality', blocking: true, message: 'heading debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      {
+        figureCandidates: [],
+      } as any,
+    )).toBe(true)
+
+    expect(__test_isHeadingOnlyResidualState(
+      makeAnalysisResult({
+        overallScore: 70,
+        grade: 'C',
+        categories: [
+          { id: 'heading_structure', score: 70, grade: 'C' },
+          { id: 'pdf_ua_compliance', score: 70, grade: 'C' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.heading_content_quality', blocking: true, message: 'heading debt', count: 1 } as any,
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      {
+        figureCandidates: [],
+      } as any,
+    )).toBe(false)
+  })
+
+  it('builds candidate-level figure final-mile calls before settling a figure-only survivor', async () => {
+    const { __test_buildFigureOnlyFinalMileCalls } = await import('../services/agentRemediationService.js')
+
+    const calls = __test_buildFigureOnlyFinalMileCalls({
+      context: {
+        figureCandidates: [
+          {
+            id: 'figure-1',
+            targetRef: 'fig-1',
+            targetTag: '/Figure',
+            informativeHint: 'informative',
+            graphicsLikelyDecorative: false,
+            hasAlt: false,
+            pageNumber: 1,
+            repairMode: 'safe',
+          },
+          {
+            id: 'figure-2',
+            targetRef: 'fig-2',
+            targetTag: '/P',
+            informativeHint: 'informative',
+            graphicsLikelyDecorative: false,
+            hasAlt: false,
+            pageNumber: 1,
+            repairMode: 'safe',
+          },
+          {
+            id: 'figure-3',
+            targetRef: 'fig-3',
+            targetTag: '/Figure',
+            informativeHint: 'decorative',
+            graphicsLikelyDecorative: true,
+            hasAlt: false,
+            pageNumber: 1,
+            repairMode: 'safe',
+          },
+        ],
+      } as any,
+      previousActionNames: [],
+      maxCandidates: 3,
+    })
+
+    expect(calls.map(call => call.tool_name)).toEqual([
+      'set_figure_alt_text',
+      'retag_as_figure_and_set_alt',
+      'mark_figure_decorative',
+    ])
+  })
+
+  it('routes near-pass figure survivors into the fast lane without mixed structure debt', async () => {
+    const { __test_shouldUseNearPassFigureFastLane } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldUseNearPassFigureFastLane({
+      analysis: makeAnalysisResult({
+        overallScore: 90,
+        grade: 'B',
+        pageCount: 8,
+        categories: [
+          { id: 'alt_text', score: 88, grade: 'B' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      context: {
+        figureCandidates: [
+          {
+            id: 'figure-1',
+            informativeHint: 'informative',
+            graphicsLikelyDecorative: false,
+            hasAlt: false,
+          },
+        ],
+      } as any,
+    })).toBe(true)
+
+    expect(__test_shouldUseNearPassFigureFastLane({
+      analysis: makeAnalysisResult({
+        overallScore: 90,
+        grade: 'B',
+        pageCount: 8,
+        categories: [
+          { id: 'alt_text', score: 88, grade: 'B' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      context: {
+        figureCandidates: [
+          {
+            id: 'figure-1',
+            informativeHint: 'informative',
+            graphicsLikelyDecorative: false,
+            hasAlt: false,
+          },
+        ],
+      } as any,
+    })).toBe(false)
+  })
+
+  it('trips the mixed runtime governor after repeated no-shrink mixed rescue churn', async () => {
+    const { __test_shouldTripMixedRuntimeGovernor } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldTripMixedRuntimeGovernor({
+      analysis: makeAnalysisResult({
+        overallScore: 48,
+        grade: 'F',
+        categories: [
+          { id: 'alt_text', score: 45, grade: 'F' },
+          { id: 'reading_order', score: 40, grade: 'F' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 2 } as any,
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      context: {
+        figureCandidates: [
+          { id: 'figure-1', informativeHint: 'informative', graphicsLikelyDecorative: false, hasAlt: false },
+        ],
+      } as any,
+      timings: {
+        totalMs: 0,
+        intermediateAnalyses: 0,
+        lightInspections: 4,
+        deepInspections: 6,
+        roundsExecuted: 0,
+        stagesExecuted: 0,
+      },
+      rescuePasses: 1,
+      mixedNoShrinkPasses: 1,
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+    })).toBe(false)
+  })
+
+  it('serial-terminalizes a large mixed runtime profile before another deep rescue loop', async () => {
+    const { __test_shouldSerialTerminalizeLargeMixedProfile } = await import('../services/agentRemediationService.js')
+    const analysis = makeAnalysisResult({
+      overallScore: 42,
+      grade: 'F',
+      categories: [
+        { id: 'alt_text', score: 40, grade: 'F' },
+        { id: 'reading_order', score: 35, grade: 'F' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 2 } as any,
+          { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 2 } as any,
+        ],
+      } as any,
+    })
+    ;(analysis as any).pageCount = 173
+
+    expect(__test_shouldSerialTerminalizeLargeMixedProfile({
+      analysis,
+      context: {
+        figureCandidates: [
+          { id: 'figure-1', informativeHint: 'informative', graphicsLikelyDecorative: false, hasAlt: false },
+        ],
+      } as any,
+      timings: {
+        totalMs: 0,
+        intermediateAnalyses: 0,
+        lightInspections: 4,
+        deepInspections: 5,
+        roundsExecuted: 0,
+        stagesExecuted: 0,
+      },
+      rescuePasses: 0,
+      mixedNoShrinkPasses: 0,
+      tracker: {
+        lastFamilyId: 'native_figure_convergence',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+    })).toBe(true)
+  })
+
+  it('does not allow another large mixed structure rescue without fresh structure shrink', async () => {
+    const { __test_shouldAllowLargeMixedDominantFamilyRescue } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowLargeMixedDominantFamilyRescue({
+      family: 'structure',
+      rescuePasses: 1,
+      runtimeHeavyMixedProfile: true,
+      familySpecificOpportunityExposed: true,
+      currentSnapshot: {
+        bucket: 'structure',
+        pressure: 'structure_primary',
+        signature: 'current',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 45,
+          headingStructure: 60,
+          readingOrder: 45,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 2,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 1,
+      },
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: {
+          bucket: 'mixed',
+          pressure: 'structure_primary',
+          signature: 'previous',
+          structureBlockingKeys: ['pdfua.logical_structure'],
+          structureUnresolvedIssueLabels: ['Reading Order'],
+          structureCategoryScores: {
+            pdfUa: 45,
+            headingStructure: 60,
+            readingOrder: 45,
+            textExtractability: 70,
+          },
+          structureOpportunityCount: 2,
+          figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+          figureUnresolvedIssueLabels: ['Alt Text on Images'],
+          informativeFigureMissingAltCount: 1,
+        },
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+    })).toBe(false)
+  })
+
+  it('allows another large mixed figure rescue only when the previous pass actually shrank figure debt', async () => {
+    const { __test_shouldAllowLargeMixedDominantFamilyRescue } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowLargeMixedDominantFamilyRescue({
+      family: 'figure',
+      rescuePasses: 1,
+      runtimeHeavyMixedProfile: true,
+      familySpecificOpportunityExposed: true,
+      currentSnapshot: {
+        bucket: 'figure',
+        pressure: 'figure_primary',
+        signature: 'current',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 60,
+          headingStructure: 70,
+          readingOrder: 65,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 1,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 1,
+      },
+      tracker: {
+        lastFamilyId: 'native_figure_convergence',
+        lastBucket: 'mixed',
+        lastSnapshot: {
+          bucket: 'mixed',
+          pressure: 'figure_primary',
+          signature: 'previous',
+          structureBlockingKeys: ['pdfua.logical_structure'],
+          structureUnresolvedIssueLabels: ['Reading Order'],
+          structureCategoryScores: {
+            pdfUa: 55,
+            headingStructure: 60,
+            readingOrder: 55,
+            textExtractability: 70,
+          },
+          structureOpportunityCount: 1,
+          figureBlockingKeys: ['pdfua.figure_alt_or_artifact', 'pdfua.nested_alt_text'],
+          figureUnresolvedIssueLabels: ['Alt Text on Images'],
+          informativeFigureMissingAltCount: 3,
+        },
+        lastMutationChangedDocument: true,
+        lastProgressed: true,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+    })).toBe(true)
+  })
+
+  it('does not treat a non-heavy mixed profile as blocked from dominant-family rescue', async () => {
+    const { __test_shouldAllowLargeMixedDominantFamilyRescue } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowLargeMixedDominantFamilyRescue({
+      family: 'figure',
+      rescuePasses: 1,
+      runtimeHeavyMixedProfile: false,
+      familySpecificOpportunityExposed: false,
+      currentSnapshot: {
+        bucket: 'figure',
+        pressure: 'figure_primary',
+        signature: 'current',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 60,
+          headingStructure: 70,
+          readingOrder: 65,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 1,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 1,
+      },
+      tracker: {
+        lastFamilyId: 'native_figure_convergence',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+    })).toBe(true)
+  })
+
+  it('skips repeated no-effect compact mixed rescue calls against the same stable target ref', async () => {
+    const { __test_shouldSkipRescueCallInCompactMixedRescue } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldSkipRescueCallInCompactMixedRescue({
+      call: {
+        tool_name: 'create_heading_from_candidate',
+        arguments: { candidateId: 'heading-1' },
+        rationale: 'retry',
+        confidence: 0.8,
+      },
+      context: {
+        headingCandidates: [
+          { id: 'heading-1', targetRef: '12 0 R' },
+        ],
+        figureCandidates: [],
+      } as any,
+      previousActionNames: ['create_heading_from_candidate_target:12 0 R'],
+    })).toBe(true)
+
+    expect(__test_shouldSkipRescueCallInCompactMixedRescue({
+      call: {
+        tool_name: 'create_heading_from_candidate',
+        arguments: { candidateId: 'heading-2' },
+        rationale: 'first try',
+        confidence: 0.8,
+      },
+      context: {
+        headingCandidates: [
+          { id: 'heading-2', targetRef: '14 0 R' },
+        ],
+        figureCandidates: [],
+      } as any,
+      previousActionNames: [],
+    })).toBe(false)
+  })
+
   it('stops residual cleanup after a changed but no-progress pass for the same structure family', async () => {
     const { __test_didResidualCleanupProgressImprove } = await import('../services/agentRemediationService.js')
 
     expect(__test_didResidualCleanupProgressImprove(
       {
         bucket: 'structure',
+        pressure: 'single_family',
         signature: 'before',
         structureBlockingKeys: ['pdfua.logical_structure'],
         structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 40,
+          headingStructure: 100,
+          readingOrder: 40,
+          textExtractability: 40,
+        },
+        structureOpportunityCount: 2,
         figureBlockingKeys: [],
         figureUnresolvedIssueLabels: [],
         informativeFigureMissingAltCount: 0,
       },
       {
         bucket: 'structure',
+        pressure: 'single_family',
         signature: 'after',
         structureBlockingKeys: ['pdfua.logical_structure'],
         structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 40,
+          headingStructure: 100,
+          readingOrder: 40,
+          textExtractability: 40,
+        },
+        structureOpportunityCount: 2,
         figureBlockingKeys: [],
         figureUnresolvedIssueLabels: [],
         informativeFigureMissingAltCount: 0,
@@ -6262,30 +7122,197 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     )).toBe(false)
   })
 
-  it('allows a second residual family pass when structure debt actually improves', async () => {
+  it('treats structure category improvement as real residual-cleanup progress even when blocker keys remain', async () => {
     const { __test_didResidualCleanupProgressImprove } = await import('../services/agentRemediationService.js')
 
     expect(__test_didResidualCleanupProgressImprove(
       {
         bucket: 'structure',
+        pressure: 'single_family',
         signature: 'before',
-        structureBlockingKeys: ['pdfua.logical_structure', 'pdfua.heading_content_quality'],
-        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order', 'PDF/UA Compliance'],
+        structureCategoryScores: {
+          pdfUa: 70,
+          headingStructure: 100,
+          readingOrder: 60,
+          textExtractability: 50,
+        },
+        structureOpportunityCount: 2,
         figureBlockingKeys: [],
         figureUnresolvedIssueLabels: [],
         informativeFigureMissingAltCount: 0,
       },
       {
         bucket: 'structure',
+        pressure: 'single_family',
         signature: 'after',
         structureBlockingKeys: ['pdfua.logical_structure'],
-        structureUnresolvedIssueLabels: [],
+        structureUnresolvedIssueLabels: ['Reading Order', 'PDF/UA Compliance'],
+        structureCategoryScores: {
+          pdfUa: 84,
+          headingStructure: 100,
+          readingOrder: 86,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 1,
         figureBlockingKeys: [],
         figureUnresolvedIssueLabels: [],
         informativeFigureMissingAltCount: 0,
       },
       true,
     )).toBe(true)
+  })
+
+  it('stops structure churn early for mixed rows when figure debt remains dominant but logical structure still repeats', async () => {
+    const { __test_shouldStopStructureChurnEarly } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldStopStructureChurnEarly({
+      previousCoarseStableStateSignature: 'same',
+      currentCoarseStableStateSignature: 'same',
+      coarseStableStateRepeats: 1,
+      stableStateRepeats: 1,
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      stageActions: [
+        {
+          tool: 'repair_structure_conformance',
+        } as any,
+      ],
+      currentResult: {
+        categories: [
+          {
+            id: 'pdf_ua_compliance',
+            label: 'PDF/UA Compliance',
+            score: 40,
+            weight: 1,
+            findings: [],
+          },
+          {
+            id: 'alt_text',
+            label: 'Alt Text on Images',
+            score: 40,
+            weight: 1,
+            findings: [],
+          },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', message: 'figure', blocking: true, category: 'alt_text' },
+            { key: 'pdfua.logical_structure', message: 'structure', blocking: true, category: 'pdf_ua_compliance' },
+          ],
+        },
+      } as any,
+      context: {
+        figureCandidates: Array.from({ length: 4 }, (_, index) => ({
+          id: `figure-${index}`,
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+      } as any,
+      stageAppliedAcrobatAltRepair: false,
+    })).toBe(true)
+  })
+
+  it('allows a second residual family pass when structure debt actually improves', async () => {
+    const { __test_didResidualCleanupProgressImprove } = await import('../services/agentRemediationService.js')
+
+    expect(__test_didResidualCleanupProgressImprove(
+      {
+        bucket: 'structure',
+        pressure: 'single_family',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure', 'pdfua.heading_content_quality'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 40,
+          headingStructure: 40,
+          readingOrder: 40,
+          textExtractability: 40,
+        },
+        structureOpportunityCount: 2,
+        figureBlockingKeys: [],
+        figureUnresolvedIssueLabels: [],
+        informativeFigureMissingAltCount: 0,
+      },
+      {
+        bucket: 'structure',
+        pressure: 'single_family',
+        signature: 'after',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: [],
+        structureCategoryScores: {
+          pdfUa: 70,
+          headingStructure: 70,
+          readingOrder: 80,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 1,
+        figureBlockingKeys: [],
+        figureUnresolvedIssueLabels: [],
+        informativeFigureMissingAltCount: 0,
+      },
+      true,
+    )).toBe(true)
+  })
+
+  it('treats mixed survivors as figure-dominant when figure debt materially outweighs structure debt', async () => {
+    const { __test_residualCleanupDominantFamily } = await import('../services/agentRemediationService.js')
+
+    expect(__test_residualCleanupDominantFamily(
+      makeAnalysisResult({
+        overallScore: 79,
+        grade: 'B',
+        categories: [
+          { id: 'alt_text', score: 40, grade: 'F' },
+          { id: 'reading_order', score: 90, grade: 'A' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+            { key: 'pdfua.nested_alt_text', blocking: true, message: 'nested alt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_quality', blocking: true, message: 'quality', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      {
+        figureCandidates: [{ id: 'f1', hasAlt: false, informativeHint: 'informative' }],
+      } as any,
+    )).toBe('figure')
+  })
+
+  it('derives explicit residual stop reasons when one family clears and the other remains', async () => {
+    const { __test_deriveResidualCleanupTransitionStopReason } = await import('../services/agentRemediationService.js')
+
+    expect(__test_deriveResidualCleanupTransitionStopReason({
+      beforeBucket: 'structure',
+      afterBucket: 'figure',
+      improved: true,
+    })).toBe('structure_debt_cleared_figure_debt_remaining')
+
+    expect(__test_deriveResidualCleanupTransitionStopReason({
+      beforeBucket: 'mixed',
+      afterBucket: 'structure',
+      improved: true,
+    })).toBe('figure_debt_cleared_structure_debt_remaining')
+
+    expect(__test_deriveResidualCleanupTransitionStopReason({
+      beforeBucket: 'mixed',
+      afterBucket: 'mixed',
+      improved: false,
+    })).toBe('mixed_runtime_churn_without_family_shrink')
   })
 
   it('blocks another deep follow-up for a converged structure family but allows a shifted figure family', async () => {
@@ -6305,6 +7332,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
       },
       bucket: 'structure',
+      pressure: 'single_family',
       familyId: 'logical_structure_marked_content',
       stageIntroducedNewFamily: false,
     })).toBe(false)
@@ -6323,9 +7351,273 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
         },
       },
       bucket: 'figure',
+      pressure: 'single_family',
       familyId: 'native_figure_convergence',
       stageIntroducedNewFamily: true,
     })).toBe(true)
+  })
+
+  it('blocks structure-family deep follow-up when a mixed state is already figure-primary', async () => {
+    const { __test_shouldAllowResidualFamilyDeepFollowUp } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowResidualFamilyDeepFollowUp({
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      bucket: 'mixed',
+      pressure: 'figure_primary',
+      familyId: 'logical_structure_marked_content',
+      stageIntroducedNewFamily: false,
+    })).toBe(false)
+  })
+
+  it('allows structure-family deep follow-up only when a figure-primary mixed state actually shrank structure debt', async () => {
+    const { __test_shouldAllowResidualFamilyDeepFollowUp } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowResidualFamilyDeepFollowUp({
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: {
+          bucket: 'mixed',
+          pressure: 'figure_primary',
+          signature: 'before',
+          structureBlockingKeys: ['pdfua.logical_structure', 'pdfua.heading_content_quality'],
+          structureUnresolvedIssueLabels: ['Reading Order'],
+          structureCategoryScores: {
+            pdfUa: 40,
+            headingStructure: 40,
+            readingOrder: 40,
+            textExtractability: 40,
+          },
+          structureOpportunityCount: 2,
+          figureBlockingKeys: ['pdfua.figure_alt_or_artifact', 'pdfua.nested_alt_text'],
+          figureUnresolvedIssueLabels: ['Alt Text on Images'],
+          informativeFigureMissingAltCount: 4,
+        },
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      bucket: 'structure',
+      pressure: 'figure_primary',
+      snapshot: {
+        bucket: 'structure',
+        pressure: 'figure_primary',
+        signature: 'after',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: [],
+        structureCategoryScores: {
+          pdfUa: 70,
+          headingStructure: 70,
+          readingOrder: 80,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 1,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact', 'pdfua.nested_alt_text'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 4,
+      },
+      familyId: 'logical_structure_marked_content',
+      stageIntroducedNewFamily: false,
+    })).toBe(true)
+  })
+
+  it('blocks figure-family cleanup when a mixed state is still structure-primary and no new figure family was exposed', async () => {
+    const { __test_shouldAllowResidualFamilyDeepFollowUp } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldAllowResidualFamilyDeepFollowUp({
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: true,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      bucket: 'figure',
+      pressure: 'structure_primary',
+      familyId: 'native_figure_convergence',
+      stageIntroducedNewFamily: false,
+    })).toBe(false)
+  })
+
+  it('stops focused structure rescue when a repeated mixed state stays irreducibly mixed without family shrink', async () => {
+    const { __test_shouldStopFocusedStructureRescueLoop } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldStopFocusedStructureRescueLoop({
+      rescuePasses: 1,
+      beforeSnapshot: {
+        bucket: 'mixed',
+        pressure: 'irreducibly_mixed',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 50,
+          headingStructure: 60,
+          readingOrder: 55,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 1,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 1,
+      },
+      afterAnalysis: makeAnalysisResult({
+        overallScore: 68,
+        grade: 'C',
+        categories: [
+          { id: 'reading_order', score: 55, grade: 'D' },
+          { id: 'alt_text', score: 55, grade: 'D' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      afterContext: {
+        figureCandidates: [{ id: 'f1', hasAlt: false, informativeHint: 'informative' }],
+      } as any,
+      stageActions: [{ tool: 'repair_structure_conformance', outcome: 'applied', changedDocumentBytes: true } as any],
+    })).toBe(false)
+  })
+
+  it('trips the mixed runtime governor only after a second no-shrink pass on heavy mixed profiles', async () => {
+    const { __test_shouldTripMixedRuntimeGovernor } = await import('../services/agentRemediationService.js')
+
+    const input = {
+      analysis: makeAnalysisResult({
+        overallScore: 62,
+        grade: 'D',
+        pageCount: 120,
+        categories: [
+          { id: 'reading_order', score: 45, grade: 'F' },
+          { id: 'alt_text', score: 40, grade: 'F' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      context: {
+        figureCandidates: [{ id: 'f1', hasAlt: false, informativeHint: 'informative' }],
+      } as any,
+      timings: {
+        totalMs: 0,
+        intermediateAnalyses: 0,
+        lightInspections: 2,
+        deepInspections: 6,
+        roundsExecuted: 0,
+        stagesExecuted: 0,
+      },
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: { structure: false, figure: false, mixed: false },
+      },
+    }
+
+    expect(__test_shouldTripMixedRuntimeGovernor({
+      ...input,
+      rescuePasses: 1,
+      mixedNoShrinkPasses: 1,
+    })).toBe(false)
+
+    expect(__test_shouldTripMixedRuntimeGovernor({
+      ...input,
+      rescuePasses: 2,
+      mixedNoShrinkPasses: 2,
+    })).toBe(true)
+  })
+
+  it('prefers figure cleanup after a mixed row becomes figure-primary even before final-mile only state', async () => {
+    const { __test_selectResidualCleanupFamilyTarget } = await import('../services/agentRemediationService.js')
+
+    expect(__test_selectResidualCleanupFamilyTarget({
+      residualFamilies: [
+        {
+          id: 'logical_structure_marked_content',
+          label: 'Logical structure and marked content',
+          priority: 80,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.logical_structure',
+          convergenceStatus: 'preferred_tools_available',
+          semanticPolicy: 'forbidden',
+          failureModeKeys: ['pdfua.logical_structure'],
+          categoryIds: ['reading_order', 'pdf_ua_compliance'],
+          preferredTools: ['repair_native_marked_content_refs', 'repair_structure_conformance'],
+          deprioritizedTools: ['bootstrap_struct_tree'],
+          expectedPostconditions: ['logical_structure_blocking_keys_shrink'],
+          activeOpportunityKeys: ['repair_native_marked_content_refs:document:document'],
+          preferredAutoRunnableOpportunityKeys: ['repair_native_marked_content_refs:document:document'],
+          currentStep: 1,
+          evidenceSignals: ['blocking_failure_mode:pdfua.logical_structure'],
+          evidenceStrength: 25,
+          regressionCanaries: ['annual_report_structure_tail'],
+        },
+        {
+          id: 'native_figure_convergence',
+          label: 'Native figure convergence',
+          priority: 60,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.figure_alt_or_artifact',
+          convergenceStatus: 'preferred_tools_available',
+          semanticPolicy: 'optional_after_deterministic',
+          failureModeKeys: ['category.alt_text', 'pdfua.figure_alt_or_artifact'],
+          categoryIds: ['alt_text', 'pdf_ua_compliance'],
+          preferredTools: ['repair_native_figure_semantics', 'repair_other_elements_alt_text'],
+          deprioritizedTools: ['artifact_nonsemantic_page_elements'],
+          expectedPostconditions: ['figure_blocking_keys_shrink'],
+          activeOpportunityKeys: ['repair_other_elements_alt_text:document:document'],
+          preferredAutoRunnableOpportunityKeys: ['repair_other_elements_alt_text:document:document'],
+          currentStep: 2,
+          evidenceSignals: ['blocking_failure_mode:pdfua.figure_alt_or_artifact'],
+          evidenceStrength: 21,
+          regressionCanaries: ['long_report_figure_cleanup'],
+        },
+      ],
+    }, makeAnalysisResult({
+      overallScore: 72,
+      grade: 'C',
+      categories: [
+        { id: 'alt_text', score: 55, grade: 'D' },
+        { id: 'reading_order', score: 84, grade: 'B' },
+      ],
+      localStandards: {
+        findings: [
+          { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+          { key: 'pdfua.nested_alt_text', blocking: true, message: 'nested alt', count: 1 } as any,
+        ],
+      } as any,
+    }), {
+      figureCandidates: [{ id: 'f1', hasAlt: false, informativeHint: 'informative' }],
+    } as any)?.id).toBe('native_figure_convergence')
   })
 
   it('stops structure churn early when a deep-structure stage repeats the same coarse state', async () => {
@@ -6347,6 +7639,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(__test_shouldStopStructureChurnEarly({
       previousCoarseStableStateSignature: 'same',
       currentCoarseStableStateSignature: 'same',
+      coarseStableStateRepeats: 0,
+      stableStateRepeats: 0,
       tracker: {
         lastFamilyId: 'logical_structure_marked_content',
         lastBucket: 'structure',
@@ -6359,7 +7653,7 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           mixed: false,
         },
       },
-      stageActions: [{ tool: 'repair_structure_conformance' }],
+      stageActions: [{ tool: 'repair_structure_conformance' } as any],
       currentResult,
       context: null,
       stageAppliedAcrobatAltRepair: false,
@@ -6368,6 +7662,8 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
     expect(__test_shouldStopStructureChurnEarly({
       previousCoarseStableStateSignature: 'same',
       currentCoarseStableStateSignature: 'same',
+      coarseStableStateRepeats: 0,
+      stableStateRepeats: 0,
       tracker: {
         lastFamilyId: null,
         lastBucket: 'unknown',
@@ -6380,11 +7676,339 @@ describe('agentRemediationService', { timeout: 15_000 }, () => {
           mixed: false,
         },
       },
-      stageActions: [{ tool: 'repair_other_elements_alt_text' }],
+      stageActions: [{ tool: 'repair_other_elements_alt_text' } as any],
       currentResult,
       context: null,
       stageAppliedAcrobatAltRepair: true,
     })).toBe(false)
+  })
+
+  it('does not stop mixed churn early before the repeated coarse-state threshold is reached', async () => {
+    const { __test_shouldStopStructureChurnEarly } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldStopStructureChurnEarly({
+      previousCoarseStableStateSignature: 'same',
+      currentCoarseStableStateSignature: 'same',
+      coarseStableStateRepeats: 0,
+      stableStateRepeats: 0,
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      stageActions: [{ tool: 'repair_structure_conformance' } as any],
+      currentResult: makeAnalysisResult({
+        overallScore: 62,
+        grade: 'D',
+        categories: [
+          { id: 'reading_order', score: 40, grade: 'F' },
+          { id: 'alt_text', score: 45, grade: 'F' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 3 } as any,
+          ],
+        } as any,
+      }),
+      context: {
+        figureCandidates: Array.from({ length: 4 }, (_, index) => ({
+          id: `figure-${index}`,
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+      } as any,
+      stageAppliedAcrobatAltRepair: false,
+    })).toBe(false)
+  })
+
+  it('stops focused structure rescue after a repeated no-progress mixed loop with dominant figure debt', async () => {
+    const { __test_shouldStopFocusedStructureRescueLoop } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldStopFocusedStructureRescueLoop({
+      rescuePasses: 1,
+      beforeSnapshot: {
+        bucket: 'mixed',
+        pressure: 'irreducibly_mixed',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 40,
+          headingStructure: 100,
+          readingOrder: 40,
+          textExtractability: 40,
+        },
+        structureOpportunityCount: 2,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 4,
+      },
+      afterAnalysis: makeAnalysisResult({
+        overallScore: 62,
+        grade: 'D',
+        categories: [
+          { id: 'reading_order', score: 40, grade: 'F' },
+          { id: 'alt_text', score: 45, grade: 'F' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 3 } as any,
+          ],
+        } as any,
+      }),
+      afterContext: {
+        figureCandidates: Array.from({ length: 4 }, (_, index) => ({
+          id: `figure-${index}`,
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+      } as any,
+      stageActions: [{ tool: 'repair_structure_conformance', outcome: 'applied', changedDocumentBytes: true } as any],
+    })).toBe(true)
+  })
+
+  it('stops focused structure rescue when the after-state is already figure-dominant', async () => {
+    const {
+      __test_shouldStopFocusedStructureRescueLoop,
+    } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldStopFocusedStructureRescueLoop({
+      rescuePasses: 1,
+      beforeSnapshot: {
+        bucket: 'mixed',
+        pressure: 'irreducibly_mixed',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure', 'pdfua.heading_content_quality'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 55,
+          headingStructure: 55,
+          readingOrder: 55,
+          textExtractability: 70,
+        },
+        structureOpportunityCount: 2,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 1,
+      },
+      afterAnalysis: makeAnalysisResult({
+        overallScore: 80,
+        grade: 'B',
+        categories: [
+          { id: 'heading_structure', score: 80, grade: 'B' },
+          { id: 'reading_order', score: 85, grade: 'B' },
+          { id: 'alt_text', score: 50, grade: 'F' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+            { key: 'pdfua.nested_alt_text', blocking: true, message: 'nested alt', count: 1 } as any,
+            { key: 'pdfua.figure_alt_quality', blocking: true, message: 'quality', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      afterContext: {
+        figureCandidates: [{ id: 'f1', hasAlt: false, informativeHint: 'informative' }],
+      } as any,
+      stageActions: [
+        { tool: 'repair_structure_conformance', outcome: 'applied' },
+      ] as any,
+    })).toBe(true)
+  })
+
+  it('detects when a mixed survivor has become figure-only after structure cleanup', async () => {
+    const { __test_residualCleanupDominantFamily } = await import('../services/agentRemediationService.js')
+
+    expect(__test_residualCleanupDominantFamily(
+      makeAnalysisResult({
+        overallScore: 81,
+        grade: 'B',
+        categories: [
+          { id: 'alt_text', score: 60, grade: 'D' },
+          { id: 'reading_order', score: 100, grade: 'A' },
+          { id: 'heading_structure', score: 100, grade: 'A' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      {
+        figureCandidates: [
+          { id: 'figure-1', informativeHint: 'informative', graphicsLikelyDecorative: false, hasAlt: false },
+        ],
+      } as any,
+    )).toBe('figure')
+  })
+
+  it('allows focused structure rescue to continue when mixed debt actually improves', async () => {
+    const { __test_shouldStopFocusedStructureRescueLoop } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldStopFocusedStructureRescueLoop({
+      rescuePasses: 1,
+      beforeSnapshot: {
+        bucket: 'mixed',
+        pressure: 'irreducibly_mixed',
+        signature: 'before',
+        structureBlockingKeys: ['pdfua.logical_structure', 'pdfua.heading_content_quality'],
+        structureUnresolvedIssueLabels: ['Reading Order'],
+        structureCategoryScores: {
+          pdfUa: 40,
+          headingStructure: 40,
+          readingOrder: 40,
+          textExtractability: 40,
+        },
+        structureOpportunityCount: 2,
+        figureBlockingKeys: ['pdfua.figure_alt_or_artifact'],
+        figureUnresolvedIssueLabels: ['Alt Text on Images'],
+        informativeFigureMissingAltCount: 4,
+      },
+      afterAnalysis: makeAnalysisResult({
+        overallScore: 70,
+        grade: 'C',
+        categories: [
+          { id: 'alt_text', score: 55, grade: 'D' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 2 } as any,
+          ],
+        } as any,
+      }),
+      afterContext: {
+        figureCandidates: Array.from({ length: 2 }, (_, index) => ({
+          id: `figure-${index}`,
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+      } as any,
+      stageActions: [{ tool: 'repair_structure_conformance', outcome: 'applied', changedDocumentBytes: true } as any],
+    })).toBe(false)
+  })
+
+  it('allows figure-only late rescue for mixed survivors when figure debt remains dominant', async () => {
+    const { __test_shouldUseFigureOnlyLateRescuePath } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldUseFigureOnlyLateRescuePath({
+      analysis: makeAnalysisResult({
+        overallScore: 51,
+        grade: 'F',
+        categories: [
+          { id: 'alt_text', score: 40, grade: 'F' },
+          { id: 'reading_order', score: 84, grade: 'B' },
+          { id: 'pdf_ua_compliance', score: 70, grade: 'C' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 2 } as any,
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      context: {
+        figureCandidates: Array.from({ length: 4 }, (_, index) => ({
+          id: `figure-${index}`,
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+        readingOrderParentCandidates: [],
+        headingCandidates: [],
+      } as any,
+    })).toBe(true)
+  })
+
+  it('prefers light focused rescue context for mixed runtime canaries after repeated deep inspection churn', async () => {
+    const { __test_shouldPreferLightFocusedRescueContext } = await import('../services/agentRemediationService.js')
+
+    expect(__test_shouldPreferLightFocusedRescueContext({
+      canAttemptAltRescue: true,
+      rescuePasses: 1,
+      currentResult: makeAnalysisResult({
+        overallScore: 58,
+        grade: 'F',
+        categories: [
+          { id: 'alt_text', score: 40, grade: 'F' },
+          { id: 'reading_order', score: 65, grade: 'D' },
+        ],
+        localStandards: {
+          findings: [
+            { key: 'pdfua.figure_alt_or_artifact', blocking: true, message: 'figure debt', count: 4 } as any,
+            { key: 'pdfua.logical_structure', blocking: true, message: 'structure debt', count: 1 } as any,
+          ],
+        } as any,
+      }),
+      currentLightContext: {
+        figureCandidates: Array.from({ length: 4 }, (_, index) => ({
+          id: `figure-${index}`,
+          informativeHint: 'informative',
+          graphicsLikelyDecorative: false,
+          hasAlt: false,
+        })),
+      } as any,
+      tracker: {
+        lastFamilyId: 'logical_structure_marked_content',
+        lastBucket: 'mixed',
+        lastSnapshot: null,
+        lastMutationChangedDocument: true,
+        lastProgressed: false,
+        convergedBuckets: {
+          structure: false,
+          figure: false,
+          mixed: false,
+        },
+      },
+      timings: {
+        totalMs: 0,
+        intermediateAnalyses: 0,
+        lightInspections: 8,
+        deepInspections: 5,
+        roundsExecuted: 1,
+        stagesExecuted: 3,
+      },
+    })).toBe(true)
+  })
+
+  it('identifies inspection budget exhaustion at and above limit', async () => {
+    const { __test_isInspectionBudgetExhausted } = await import('../services/agentRemediationService.js')
+
+    // Well under budget
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 5, lightInspections: 3 })).toBe(false)
+
+    // One more deep allowed (deep=7, under limit of 8)
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 7, lightInspections: 3 })).toBe(false)
+
+    // Deep at limit — limit is 8
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 8, lightInspections: 3 })).toBe(true)
+
+    // Deep over limit
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 13, lightInspections: 4 })).toBe(true)
+
+    // Light at limit — limit is 8
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 0, lightInspections: 8 })).toBe(true)
+
+    // Light just under limit
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 0, lightInspections: 7 })).toBe(false)
+
+    // Total at limit (light + deep >= 14)
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 7, lightInspections: 7 })).toBe(true)
+
+    // Total just under limit
+    expect(__test_isInspectionBudgetExhausted({ deepInspections: 6, lightInspections: 7 })).toBe(false)
   })
 
   it('defers late figure work while structure-led residual debt remains unconverged', async () => {

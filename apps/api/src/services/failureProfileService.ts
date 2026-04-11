@@ -1,6 +1,7 @@
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import type {
   FailureClassification,
+  FailureProfileDominantResidualFamily,
   FailureMode,
   FailureReportingCategory,
   FailureSourceDetail,
@@ -9,6 +10,7 @@ import type {
   RemediationActionRecord,
   RemediationIteration,
   RemediationToolName,
+  RetryDisposition,
   ToolOpportunity,
   ToolOpportunityScope,
   ToolOpportunityStatus,
@@ -53,10 +55,12 @@ const FONT_REMEDIATION_TOOLS = new Set<RemediationToolName>([
   'finalize_substituted_font_conformance',
 ])
 const FIGURE_REMEDIATION_TOOLS = new Set<RemediationToolName>([
+  'normalize_nested_figure_containers',
   'set_figure_alt_text',
   'retag_as_figure_and_set_alt',
   'mark_figure_decorative',
   'repair_native_figure_semantics',
+  'repair_other_elements_alt_text',
 ])
 const FONT_FAILURE_MODE_KEYS = new Set([
   'pdfua.font_embedding',
@@ -72,6 +76,17 @@ const FIGURE_ADVISORY_FAILURE_MODE_KEYS = new Set([
 ])
 const LONG_REPORT_HEADING_LIMIT = 3
 const LONG_REPORT_FIGURE_LIMIT = 5
+const FIGURE_DOMINANT_FAMILY_IDS = new Set([
+  'native_figure_convergence',
+  'pdfua.figure_alt_or_artifact',
+  'context.long_report_figure_residue',
+])
+const STRUCTURE_ONLY_TERMINAL_FINDING_KEYS = new Set([
+  'pdfua.logical_structure',
+  'pdfua.heading_content_quality',
+  'category.heading_structure',
+  'category.reading_order',
+])
 
 function isLongReportConvergenceContext(input: BuildFailureProfileInput): boolean {
   return input.analysis.pageCount >= 20
@@ -302,7 +317,7 @@ function weakNativeBootstrapNeeded(input: BuildFailureProfileInput): boolean {
   const hasNativeHeadings = (input.context.qpdf.headings?.length || 0) > 0
   const hasSafeHeadingTargets = input.context.headingCandidates.some(candidate => candidate.repairMode === 'safe')
   const hasRetaggableFigures = input.context.figureCandidates.some(candidate => candidate.repairMode !== 'defer')
-  const hasAccessibleImages = input.context.qpdf.images.some(image => image.hasAlt)
+  const hasAccessibleImages = (input.context.qpdf.images ?? []).some(image => image.hasAlt)
   const hasPdfImages = (input.context.qpdf.images?.length || 0) > 0
   const hasNativeFigureNodes = (input.context.structure.figures?.length || 0) > 0 || (input.context.structure.imageStructNodes?.length || 0) > 0
   const hasNativeTables = (input.context.structure.tables?.length || 0) > 0
@@ -496,7 +511,7 @@ function mapLocalStandardsFinding(finding: LocalStandardsFinding): FailureFamily
     return {
       key: finding.key,
       label: finding.label,
-      nativeToolFamilies: ['repair_other_elements_alt_text'],
+      nativeToolFamilies: ['normalize_nested_figure_containers', 'repair_other_elements_alt_text'],
       categoryIds: ['alt_text', 'pdf_ua_compliance'],
       classification: 'deterministic',
     }
@@ -976,9 +991,13 @@ function applyFontOpportunityPolicy(
   const attemptedEmbed = hasAttemptedFontStep(input.actions, 'embed_missing_fonts_in_place')
   const attemptedUnicode = hasAttemptedFontStep(input.actions, 'repair_font_unicode_maps')
   const attemptedType1 = hasAttemptedFontStep(input.actions, 'repair_type1_font_unicode_maps')
+  const attemptedTrueType = hasAttemptedFontStep(input.actions, 'repair_truetype_encoding_differences')
   const attemptedCidSymbol = hasAttemptedFontStep(input.actions, 'repair_cid_symbol_font_maps')
   const attemptedCidSet = hasAttemptedFontStep(input.actions, 'repair_cidset_consistency')
   const attemptedSubstitute = hasAttemptedFontStep(input.actions, 'substitute_legacy_fonts_in_place')
+  const genericUnicodeNoEffect = input.actions.some(action => action.tool === 'repair_font_unicode_maps' && action.outcome === 'no_effect')
+  const type1UnicodeNoEffect = input.actions.some(action => action.tool === 'repair_type1_font_unicode_maps' && action.outcome === 'no_effect')
+  const cidSymbolNoEffect = input.actions.some(action => action.tool === 'repair_cid_symbol_font_maps' && action.outcome === 'no_effect')
 
   for (const opportunity of opportunities.values()) {
     if (!FONT_REMEDIATION_TOOLS.has(opportunity.toolName)) continue
@@ -999,6 +1018,15 @@ function applyFontOpportunityPolicy(
           opportunity.blockedReason = 'No blocking text-font Unicode debt remains.'
         } else if ((qpdf.unembeddedFontCount ?? 0) > 0 && !attemptedEmbed) {
           opportunity.blockedReason = 'Run embedding before Unicode repair when fonts still lack embedded programs.'
+        } else if (
+          genericUnicodeNoEffect
+          && (
+            opportunitiesHasTool(opportunities, 'repair_type1_font_unicode_maps')
+            || opportunitiesHasTool(opportunities, 'repair_truetype_encoding_differences')
+            || opportunitiesHasTool(opportunities, 'repair_cid_symbol_font_maps')
+          )
+        ) {
+          opportunity.blockedReason = 'Generic Unicode repair already hit a no-effect ceiling; prefer the smallest remaining font-specific lane.'
         }
         break
       case 'repair_type1_font_unicode_maps':
@@ -1008,6 +1036,19 @@ function applyFontOpportunityPolicy(
           && (qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) > 0
         ) {
           opportunity.blockedReason = 'Run generic Unicode repair before the Type1/Type3-specific recovery pass.'
+        } else if (type1UnicodeNoEffect && opportunitiesHasTool(opportunities, 'repair_cid_symbol_font_maps')) {
+          opportunity.blockedReason = 'Type1/Type3 Unicode recovery already hit a no-effect ceiling; escalate to CID symbol-font recovery instead.'
+        }
+        break
+      case 'repair_truetype_encoding_differences':
+        if ((qpdf.unembeddedFontCount ?? 0) > 0 && !attemptedEmbed) {
+          opportunity.blockedReason = 'Run embedding before TrueType encoding-difference repair.'
+        } else if ((qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) > 0 && !attemptedUnicode) {
+          opportunity.blockedReason = 'Run generic Unicode repair before TrueType encoding-difference recovery.'
+        } else if (attemptedTrueType || genericUnicodeNoEffect) {
+          opportunity.blockedReason = genericUnicodeNoEffect
+            ? 'Prefer the next remaining font lane after a generic Unicode no-effect pass.'
+            : opportunity.blockedReason
         }
         break
       case 'repair_cidset_consistency':
@@ -1017,6 +1058,8 @@ function applyFontOpportunityPolicy(
           opportunity.blockedReason = 'Run embedding before CIDSet consistency repair.'
         } else if ((qpdf.fontsMissingToUnicodeBlocking ?? qpdf.fontsMissingToUnicode ?? 0) > 0 && !attemptedUnicode) {
           opportunity.blockedReason = 'Run Unicode repair before CIDSet consistency repair.'
+        } else if (opportunitiesHasTool(opportunities, 'repair_truetype_encoding_differences') && !hasAttemptedFontStep(input.actions, 'repair_truetype_encoding_differences')) {
+          opportunity.blockedReason = 'Run TrueType encoding-difference repair before CIDSet consistency repair.'
         } else if (opportunitiesHasTool(opportunities, 'repair_cid_symbol_font_maps') && !attemptedCidSymbol) {
           opportunity.blockedReason = 'Run CID symbol-font recovery before CIDSet consistency repair.'
         }
@@ -1034,6 +1077,8 @@ function applyFontOpportunityPolicy(
           && !attemptedCidSet
         ) {
           opportunity.blockedReason = 'Run CIDSet consistency repair before escalating to font substitution.'
+        } else if (cidSymbolNoEffect && opportunitiesHasTool(opportunities, 'finalize_substituted_font_conformance')) {
+          opportunity.blockedReason = 'Preserve substitution as the final bounded lane after deterministic Unicode and CID recovery are exhausted.'
         }
         break
       case 'finalize_substituted_font_conformance':
@@ -1043,6 +1088,118 @@ function applyFontOpportunityPolicy(
         break
       default:
         break
+    }
+  }
+}
+
+function applyStructureOpportunityPolicy(
+  opportunities: Map<string, Omit<ToolOpportunity, 'status'>>,
+  input: BuildFailureProfileInput,
+  failureModeByKey: Map<string, FailureMode>,
+): void {
+  const headingDebt = failureModeByKey.has('category.heading_structure') || failureModeByKey.has('pdfua.heading_content_quality')
+  const readingDebt = failureModeByKey.has('category.reading_order')
+  const markedContentDebt = failureModeByKey.has('pdfua.logical_structure')
+  const figureDebtDominant = input.actions.length > 0 && input.actions.some(action =>
+    (action.tool === 'repair_native_figure_semantics' || action.tool === 'repair_other_elements_alt_text')
+    && (action.outcome === 'applied' || action.outcome === 'no_effect'),
+  )
+    ? false
+    : input.actions.length === 0
+      && input.context.structure.acrobatAltRiskNodes?.some(node => !node.graphicsLikelyDecorative)
+      && input.context.figureCandidates.some(candidate => candidate.repairMode !== 'defer')
+  const attemptedHeadingNormalization = input.actions.some(action =>
+    action.tool === 'normalize_heading_hierarchy'
+    && (action.outcome === 'applied' || action.outcome === 'no_effect')
+  )
+  const attemptedReadingOrderRepair = input.actions.some(action =>
+    (action.tool === 'repair_native_reading_order' || action.tool === 'reorder_structure_children')
+    && (action.outcome === 'applied' || action.outcome === 'no_effect')
+  )
+  const attemptedMarkedContentRepair = input.actions.some(action =>
+    action.tool === 'repair_native_marked_content_refs'
+    && (action.outcome === 'applied' || action.outcome === 'no_effect')
+  )
+  const mixedStructureFigureConvergence =
+    (headingDebt || readingDebt || markedContentDebt)
+    && (
+      failureModeByKey.has('pdfua.figure_alt_or_artifact')
+      || failureModeByKey.has('pdfua.nested_alt_text')
+      || failureModeByKey.has('pdfua.untagged_rendered_images')
+      || failureModeByKey.has('category.alt_text')
+      || failureModeByKey.has('context.long_report_figure_residue')
+    )
+  const onlyStructureSpecificDebt = [...failureModeByKey.values()].every(mode =>
+    mode.key.startsWith('context.post_')
+    || STRUCTURE_ONLY_TERMINAL_FINDING_KEYS.has(mode.key)
+    || mode.categoryIds.every(categoryId => ['heading_structure', 'reading_order', 'pdf_ua_compliance'].includes(categoryId)),
+  )
+
+  for (const opportunity of opportunities.values()) {
+    if (!['normalize_heading_hierarchy', 'repair_native_reading_order', 'reorder_structure_children', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName)) {
+      continue
+    }
+
+    if (
+      figureDebtDominant
+      && !mixedStructureFigureConvergence
+      && ['normalize_heading_hierarchy', 'repair_native_reading_order', 'reorder_structure_children', 'repair_native_marked_content_refs', 'repair_structure_conformance'].includes(opportunity.toolName)
+    ) {
+      opportunity.blockedReason = 'Figure-family convergence still dominates the residual debt; keep structure cleanup behind figure closure.'
+      continue
+    }
+
+    if (opportunity.toolName === 'repair_native_reading_order' || opportunity.toolName === 'reorder_structure_children') {
+      if (headingDebt && opportunitiesHasTool(opportunities, 'normalize_heading_hierarchy') && !attemptedHeadingNormalization) {
+        opportunity.blockedReason = 'Normalize heading hierarchy before reading-order parent repair on post-bootstrap structure residue.'
+      }
+      continue
+    }
+
+    if (opportunity.toolName === 'repair_native_marked_content_refs') {
+      if (
+        !mixedStructureFigureConvergence
+        && headingDebt
+        && opportunitiesHasTool(opportunities, 'normalize_heading_hierarchy')
+        && !attemptedHeadingNormalization
+      ) {
+        opportunity.blockedReason = 'Normalize heading hierarchy before marked-content reference cleanup.'
+      } else if (
+        !mixedStructureFigureConvergence
+        && readingDebt
+        && (opportunitiesHasTool(opportunities, 'repair_native_reading_order') || opportunitiesHasTool(opportunities, 'reorder_structure_children'))
+        && !attemptedReadingOrderRepair
+      ) {
+        opportunity.blockedReason = 'Repair reading-order parents before marked-content reference cleanup.'
+      }
+      continue
+    }
+
+    if (opportunity.toolName === 'repair_structure_conformance') {
+      if (
+        !mixedStructureFigureConvergence
+        && headingDebt
+        && opportunitiesHasTool(opportunities, 'normalize_heading_hierarchy')
+        && !attemptedHeadingNormalization
+      ) {
+        opportunity.blockedReason = 'Run heading-content verification and hierarchy normalization before broad structure conformance.'
+      } else if (
+        !mixedStructureFigureConvergence
+        && readingDebt
+        && (opportunitiesHasTool(opportunities, 'repair_native_reading_order') || opportunitiesHasTool(opportunities, 'reorder_structure_children'))
+        && !attemptedReadingOrderRepair
+      ) {
+        opportunity.blockedReason = 'Run reading-order parent repair before broad structure conformance.'
+      } else if (
+        !mixedStructureFigureConvergence
+        && markedContentDebt
+        && opportunitiesHasTool(opportunities, 'repair_native_marked_content_refs')
+        && !attemptedMarkedContentRepair
+      ) {
+        opportunity.blockedReason = 'Run marked-content reference cleanup before broad structure conformance.'
+      } else if (!mixedStructureFigureConvergence && onlyStructureSpecificDebt) {
+        opportunity.blockedReason = 'Broad structure conformance is not indicated while only heading, reading-order, or marked-content residue remains.'
+      }
     }
   }
 }
@@ -1071,6 +1228,14 @@ function applyFigureOpportunityPolicy(
       && candidate.informativeHint !== 'decorative'
       && (candidate.imageEvidence === 'strong' || candidate.imageEvidence === 'vector'),
     )
+  const attemptedNestedFigureNormalization = input.actions.some(action =>
+    action.tool === 'normalize_nested_figure_containers'
+    && (action.outcome === 'applied' || action.outcome === 'no_effect')
+  )
+  const attemptedNativeFigureRepair = input.actions.some(action =>
+    action.tool === 'repair_native_figure_semantics'
+    && (action.outcome === 'applied' || action.outcome === 'no_effect')
+  )
 
   for (const opportunity of opportunities.values()) {
     if (!FIGURE_REMEDIATION_TOOLS.has(opportunity.toolName)) continue
@@ -1082,6 +1247,24 @@ function applyFigureOpportunityPolicy(
 
     if (blockingAltFailures.size === 0 && substantiveUnresolvedAltRiskCount === 0 && onlyAdvisoryFigureResidue) {
       opportunity.blockedReason = 'Only advisory figure alternate-text quality residue remains; do not keep figure remediation auto-runnable.'
+      continue
+    }
+
+    if (
+      opportunity.toolName === 'repair_native_figure_semantics'
+      && !attemptedNestedFigureNormalization
+      && opportunitiesHasTool(opportunities, 'normalize_nested_figure_containers')
+    ) {
+      opportunity.blockedReason = 'Normalize nested figure containers before native figure repair.'
+      continue
+    }
+
+    if (
+      opportunity.toolName === 'repair_other_elements_alt_text'
+      && !attemptedNativeFigureRepair
+      && opportunitiesHasTool(opportunities, 'repair_native_figure_semantics')
+    ) {
+      opportunity.blockedReason = 'Run native figure repair before Acrobat-style non-figure alternate-text repair.'
       continue
     }
 
@@ -1335,6 +1518,33 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
     })
   }
 
+  if (
+    issueIds.has('alt_text')
+    && (
+      failureModeByKey.has('pdfua.nested_alt_text')
+      || failureModeByKey.has('pdfua.untagged_rendered_images')
+      || failureModeByKey.has('pdfua.figure_alt_or_artifact')
+    )
+  ) {
+    addOpportunity(opportunities, {
+      toolName: 'normalize_nested_figure_containers',
+      reason: 'Normalize nested figure containers before native figure repair so figure ownership and alternate-text cleanup can converge deterministically.',
+      scope: 'document',
+      candidateIds: [],
+      candidateGroupIds: [],
+      pageNumbers: [],
+      categoryTargets: ['alt_text', 'pdf_ua_compliance'],
+      confidence: 0.84,
+      blockedReason: undefined,
+      derivedFromFailureModeKeys: derivedFailureKeys([
+        'pdfua.nested_alt_text',
+        'pdfua.untagged_rendered_images',
+        'pdfua.figure_alt_or_artifact',
+        'context.long_report_figure_residue',
+      ]),
+    })
+  }
+
   // Only schedule repair for nodes that are still unresolved:
   // - orphaned_alt_empty_element / nonfigure_with_alt: unresolved when /Alt IS present (needs removal)
   // - all other modes: unresolved when /Alt is NOT present (needs addition)
@@ -1552,7 +1762,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
 
   if (
     issueIds.has('heading_structure')
-    && input.context.qpdf.headings.some(heading => /^H\d+$/i.test(heading.level))
+    && (input.context.qpdf.headings ?? []).some(heading => /^H\d+$/i.test(heading.level))
   ) {
     addOpportunity(opportunities, {
       toolName: 'normalize_heading_hierarchy',
@@ -1769,6 +1979,7 @@ function buildToolOpportunities(input: BuildFailureProfileInput, failureModes: F
 
   applyFigureOpportunityPolicy(opportunities, input, failureModeByKey)
   applyFontOpportunityPolicy(opportunities, input, failureModeByKey)
+  applyStructureOpportunityPolicy(opportunities, input, failureModeByKey)
 
   return [...opportunities.values()]
     .map(opportunity => {
@@ -1819,6 +2030,13 @@ export function buildPlannerEvidenceSummary(input: {
   const noEffectOpportunityKeys = input.toolOpportunities
     .filter(opportunity => opportunity.status === 'no_effect')
     .map(opportunity => opportunity.key)
+  const dominantResidualFamily = dominantResidualFamilyForProfile(input.failureModes, input.residualFamilies || [])
+  const retryDisposition = retryDispositionForProfile({
+    failureModes: input.failureModes,
+    residualFamilies: input.residualFamilies || [],
+    toolOpportunities: input.toolOpportunities,
+  })
+  const mixedFamilyConvergencePath = hasMixedStructureFigureConvergencePath(input.failureModes, input.residualFamilies || [])
 
   return {
     topFailureModeKeys: input.failureModes.slice(0, 5).map(mode => mode.key),
@@ -1861,7 +2079,89 @@ export function buildPlannerEvidenceSummary(input: {
     reasonCodeCounts: [...reasonCodeCounts.entries()]
       .map(([reasonCode, count]) => ({ reasonCode, count }))
       .sort((a, b) => b.count - a.count || a.reasonCode.localeCompare(b.reasonCode)),
+    safeToRetry: retryDisposition === 'retryable_deterministic',
+    dominantResidualFamily,
+    lastStableNoEffectTool: lastStableNoEffectTool(input.actions),
+    retryDisposition,
+    mixedFamilyConvergencePath,
   }
+}
+
+function hasMixedStructureFigureConvergencePath(
+  failureModes: FailureMode[],
+  residualFamilies: FailureProfile['residualFamilies'],
+): boolean {
+  const blockingFailureKeys = new Set(
+    failureModes
+      .filter(mode => mode.blocking)
+      .map(mode => mode.key),
+  )
+  const hasStructureDebt =
+    blockingFailureKeys.has('pdfua.logical_structure')
+    || blockingFailureKeys.has('pdfua.heading_content_quality')
+    || blockingFailureKeys.has('category.heading_structure')
+    || residualFamilies.some(family =>
+      family.blocking
+      && (family.id === 'logical_structure_marked_content' || family.id === 'post_bootstrap_heading_convergence'),
+    )
+  const hasFigureDebt =
+    blockingFailureKeys.has('pdfua.figure_alt_or_artifact')
+    || blockingFailureKeys.has('pdfua.nested_alt_text')
+    || blockingFailureKeys.has('pdfua.untagged_rendered_images')
+    || blockingFailureKeys.has('category.alt_text')
+    || residualFamilies.some(family => family.blocking && family.id === 'native_figure_convergence')
+  return hasStructureDebt && hasFigureDebt
+}
+
+function dominantResidualFamilyForProfile(
+  failureModes: FailureMode[],
+  residualFamilies: FailureProfile['residualFamilies'],
+): FailureProfileDominantResidualFamily {
+  const rankedFamilies = [...residualFamilies].sort((left, right) => {
+    const blockingDelta = Number(right.blocking) - Number(left.blocking)
+    if (blockingDelta !== 0) return blockingDelta
+    const preferredDelta = (right.preferredAutoRunnableOpportunityKeys.length || 0) - (left.preferredAutoRunnableOpportunityKeys.length || 0)
+    if (preferredDelta !== 0) return preferredDelta
+    const activeDelta = (right.activeOpportunityKeys.length || 0) - (left.activeOpportunityKeys.length || 0)
+    if (activeDelta !== 0) return activeDelta
+    const evidenceDelta = (right.evidenceStrength || 0) - (left.evidenceStrength || 0)
+    if (evidenceDelta !== 0) return evidenceDelta
+    const priorityDelta = (right.priority || 0) - (left.priority || 0)
+    if (priorityDelta !== 0) return priorityDelta
+    return left.id.localeCompare(right.id)
+  })
+
+  if (rankedFamilies[0]?.id) return rankedFamilies[0].id
+
+  const hasManualOnly = failureModes.some(mode => mode.classification === 'manual_only')
+  const hasActionableFailure = failureModes.some(mode => mode.classification !== 'manual_only')
+  if (hasManualOnly && !hasActionableFailure) return 'manual'
+  return 'unknown'
+}
+
+function lastStableNoEffectTool(actions: RemediationActionRecord[]): RemediationToolName | null {
+  for (let index = actions.length - 1; index >= 0; index -= 1) {
+    if (actions[index]?.outcome === 'no_effect') return actions[index].tool
+  }
+  return null
+}
+
+function retryDispositionForProfile(input: {
+  failureModes: FailureMode[]
+  residualFamilies: FailureProfile['residualFamilies']
+  toolOpportunities: ToolOpportunity[]
+}): RetryDisposition {
+  const dominantResidualFamily = dominantResidualFamilyForProfile(input.failureModes, input.residualFamilies)
+  const autoRunnableOpportunityCount = input.toolOpportunities
+    .filter(opportunity => opportunity.status === 'auto_runnable')
+    .length
+  const hasManualOnly = input.failureModes.some(mode => mode.classification === 'manual_only')
+  const hasActionableFailure = input.failureModes.some(mode => mode.classification !== 'manual_only')
+
+  if (autoRunnableOpportunityCount > 0) return 'retryable_deterministic'
+  if (dominantResidualFamily === 'manual') return 'manual_residual'
+  if (hasManualOnly && !hasActionableFailure) return 'manual_residual'
+  return 'stable_hard_fail'
 }
 
 export function buildFailureProfile(input: BuildFailureProfileInput): FailureProfile {
@@ -1878,6 +2178,18 @@ export function buildFailureProfile(input: BuildFailureProfileInput): FailurePro
     toolOpportunities: rawToolOpportunities,
     residualFamilies,
   })
+  const deterministicIssueCount = failureModes.filter(mode => mode.classification === 'deterministic').length
+  const semanticIssueCount = failureModes.filter(mode => mode.classification === 'semantic').length
+  const manualOnlyIssueCount = failureModes.filter(mode => mode.classification === 'manual_only').length
+  const blockedOpportunityCount = toolOpportunities.filter(opportunity => opportunity.status === 'blocked' || opportunity.status === 'deferred').length
+  const autoRunnableOpportunityCount = toolOpportunities.filter(opportunity => opportunity.status === 'auto_runnable').length
+  const dominantResidualFamily = dominantResidualFamilyForProfile(failureModes, residualFamilies)
+  const retryDisposition = retryDispositionForProfile({
+    failureModes,
+    residualFamilies,
+    toolOpportunities,
+  })
+  const mixedFamilyConvergencePath = hasMixedStructureFigureConvergencePath(failureModes, residualFamilies)
 
   return {
     version: '2',
@@ -1892,11 +2204,16 @@ export function buildFailureProfile(input: BuildFailureProfileInput): FailurePro
     residualFamilies,
     toolOpportunities,
     summary: {
-      deterministicIssueCount: failureModes.filter(mode => mode.classification === 'deterministic').length,
-      semanticIssueCount: failureModes.filter(mode => mode.classification === 'semantic').length,
-      manualOnlyIssueCount: failureModes.filter(mode => mode.classification === 'manual_only').length,
-      blockedOpportunityCount: toolOpportunities.filter(opportunity => opportunity.status === 'blocked' || opportunity.status === 'deferred').length,
-      autoRunnableOpportunityCount: toolOpportunities.filter(opportunity => opportunity.status === 'auto_runnable').length,
+      deterministicIssueCount,
+      semanticIssueCount,
+      manualOnlyIssueCount,
+      blockedOpportunityCount,
+      autoRunnableOpportunityCount,
+      safeToRetry: retryDisposition === 'retryable_deterministic',
+      dominantResidualFamily,
+      lastStableNoEffectTool: lastStableNoEffectTool(input.actions),
+      retryDisposition,
+      mixedFamilyConvergencePath,
     },
   }
 }

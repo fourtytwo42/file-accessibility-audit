@@ -272,6 +272,16 @@ export type ToolOpportunityStatusReasonCode =
   | 'retry_exception'
   | 'deferred_document_scope'
 
+export type RetryDisposition =
+  | 'retryable_deterministic'
+  | 'stable_hard_fail'
+  | 'manual_residual'
+
+export type FailureProfileDominantResidualFamily =
+  | ResidualFamilyId
+  | 'manual'
+  | 'unknown'
+
 export interface ResidualFamilyDecision {
   id: ResidualFamilyId
   label: string
@@ -475,6 +485,11 @@ export interface PlannerEvidenceSummary {
   reasonCodeCounts?: Array<{ reasonCode: ToolOpportunityStatusReasonCode; count: number }>
   topBlockingFailureModeKeys?: string[]
   topManualOnlyFailureModeKeys?: string[]
+  safeToRetry?: boolean
+  dominantResidualFamily?: FailureProfileDominantResidualFamily
+  lastStableNoEffectTool?: RemediationToolName | null
+  retryDisposition?: RetryDisposition
+  mixedFamilyConvergencePath?: boolean
 }
 
 export interface FailureProfile {
@@ -495,6 +510,11 @@ export interface FailureProfile {
     manualOnlyIssueCount: number
     blockedOpportunityCount: number
     autoRunnableOpportunityCount: number
+    safeToRetry: boolean
+    dominantResidualFamily: FailureProfileDominantResidualFamily
+    lastStableNoEffectTool: RemediationToolName | null
+    retryDisposition: RetryDisposition
+    mixedFamilyConvergencePath: boolean
   }
 }
 
@@ -571,12 +591,51 @@ export interface DocumentModel {
         downgradedDeepAnalyses: number
         finalBlockingKeys: string[]
         lateConverged?: boolean
-        finalStopReason?: 'same_family_no_progress' | 'no_mutation' | 'family_shifted' | 'budget_exhausted' | 'completed'
+        finalStopReason?:
+          | 'same_family_no_progress'
+          | 'no_mutation'
+          | 'family_shifted'
+          | 'budget_exhausted'
+          | 'completed'
+          | 'structure_debt_cleared_figure_debt_remaining'
+          | 'figure_debt_cleared_structure_debt_remaining'
+          | 'mixed_figure_structure_separation_required'
+          | 'mixed_runtime_churn_without_family_shrink'
+          | 'mixed_large_runtime_profile_requires_serial_terminalization'
       }
     }
     residualCleanup?: {
       dominantFamily?: 'structure' | 'figure' | 'mixed' | 'unknown'
-      finalStopReason?: 'same_family_no_progress' | 'no_mutation' | 'family_shifted' | 'budget_exhausted' | 'completed'
+      finalStopReason?:
+        | 'same_family_no_progress'
+        | 'no_mutation'
+        | 'family_shifted'
+        | 'budget_exhausted'
+        | 'completed'
+        | 'structure_debt_cleared_figure_debt_remaining'
+        | 'figure_debt_cleared_structure_debt_remaining'
+        | 'mixed_figure_structure_separation_required'
+        | 'mixed_runtime_churn_without_family_shrink'
+        | 'mixed_large_runtime_profile_requires_serial_terminalization'
+    }
+    providerRouting?: {
+      byEndpointLabel: Record<string, number>
+      byService: Record<string, number>
+      livenessBypassCount: number
+    }
+    runtimeSummary?: {
+      lightInspectionCount?: number
+      deepInspectionCount?: number
+      semanticCallCount?: number
+      providerCallCount?: number
+      focusedRescuePassCount?: number
+      mixedRuntimeGovernorFired?: boolean
+      compactFinalRescueFallback?: boolean
+      authoritativeFinalScoringReached?: boolean
+      safeToRetry?: boolean
+      dominantResidualFamily?: FailureProfileDominantResidualFamily
+      lastStableNoEffectTool?: RemediationToolName | null
+      retryDisposition?: RetryDisposition
     }
   } | null
   promotionGate?: PromotionGateResult | null

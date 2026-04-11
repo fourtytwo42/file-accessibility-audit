@@ -122,6 +122,7 @@ export function deriveDeterministicCall(input: {
     case 'tag_unowned_annotations':
     case 'repair_bootstrapped_chart_content_refs':
     case 'repair_structure_conformance':
+    case 'normalize_nested_figure_containers':
     case 'embed_missing_fonts_in_place':
     case 'repair_font_unicode_maps':
     case 'repair_type1_font_unicode_maps':

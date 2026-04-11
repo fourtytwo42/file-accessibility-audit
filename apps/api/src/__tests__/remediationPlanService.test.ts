@@ -68,6 +68,138 @@ describe('remediationPlanService', () => {
     })
   })
 
+  it('prioritizes the full font-convergence lane in deterministic order', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'C',
+        analysisScore: 70,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 4,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [{
+          key: 'pdfua.font_unicode',
+          label: 'Font Unicode mapping',
+          source: 'local_standards',
+          count: 1,
+          categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+          blocking: true,
+          unmatched: false,
+          classification: 'deterministic',
+          nativeToolFamilies: [],
+          evidence: [],
+        }],
+        residualFamilies: [{
+          id: 'font_embedding_and_unicode',
+          label: 'Font embedding and Unicode',
+          priority: 30,
+          blocking: true,
+          blockingReason: 'blocking_failure_mode:pdfua.font_unicode',
+          convergenceStatus: 'preferred_tools_available',
+          semanticPolicy: 'forbidden',
+          failureModeKeys: ['pdfua.font_unicode'],
+          categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+          preferredTools: [
+            'embed_missing_fonts_in_place',
+            'repair_font_unicode_maps',
+            'repair_type1_font_unicode_maps',
+            'repair_truetype_encoding_differences',
+            'repair_cid_symbol_font_maps',
+            'repair_cidset_consistency',
+            'substitute_legacy_fonts_in_place',
+            'finalize_substituted_font_conformance',
+          ],
+          deprioritizedTools: [],
+          expectedPostconditions: ['font_blocking_keys_shrink', 'font_counters_shrink'],
+          activeOpportunityKeys: [],
+          preferredAutoRunnableOpportunityKeys: [],
+          currentStep: 1,
+          evidenceSignals: ['blocking_failure_mode:pdfua.font_unicode'],
+          evidenceStrength: 18,
+          regressionCanaries: ['processed_font_cluster'],
+        }],
+        toolOpportunities: [
+          'embed_missing_fonts_in_place',
+          'repair_font_unicode_maps',
+          'repair_type1_font_unicode_maps',
+          'repair_truetype_encoding_differences',
+          'repair_cid_symbol_font_maps',
+          'repair_cidset_consistency',
+          'substitute_legacy_fonts_in_place',
+          'finalize_substituted_font_conformance',
+        ].map((toolName, index) => ({
+          key: `${toolName}:document:document`,
+          toolName,
+          reason: toolName,
+          scope: 'document',
+          candidateIds: [],
+          candidateGroupIds: [],
+          pageNumbers: [],
+          categoryTargets: ['text_extractability'],
+          confidence: 0.9 - index * 0.01,
+          status: 'auto_runnable',
+          derivedFromFailureModeKeys: ['pdfua.font_unicode'],
+          familyId: 'font_embedding_and_unicode',
+          familyStep: index + 1,
+          expectedPostconditions: ['font_counters_shrink'],
+        })),
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 8,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: ['pdfua.font_unicode'],
+        topAutoRunnableOpportunityKeys: [],
+        topResidualFamilyIds: ['font_embedding_and_unicode'],
+        topBlockingResidualFamilyIds: ['font_embedding_and_unicode'],
+        topResidualFamilySummaries: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'fonts.pdf',
+      analysis: {
+        overallScore: 70,
+        grade: 'C',
+        isScanned: false,
+        categories: [{ id: 'text_extractability', label: 'Text Extractability', score: 40, severity: 'Critical' }],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 1, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual([
+      'embed_missing_fonts_in_place',
+      'repair_font_unicode_maps',
+      'repair_cid_symbol_font_maps',
+      'repair_cidset_consistency',
+    ])
+  })
+
   it('reorders deterministic opportunities using historical reliability', async () => {
     buildFailureProfileArtifacts.mockReturnValue({
       failureProfile: {
@@ -168,6 +300,194 @@ describe('remediationPlanService', () => {
     })
 
     expect(plan.actions[0]?.tool_name).toBe('set_document_language')
+  })
+
+  it('serializes the mixed structure and figure convergence path in the intended order', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'partially_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: true,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'unknown',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'D',
+        analysisScore: 65,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 3,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure',
+            source: 'local_standards',
+            count: 1,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+          {
+            key: 'pdfua.figure_alt_or_artifact',
+            label: 'Figure alt',
+            source: 'local_standards',
+            count: 1,
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: [],
+            evidence: [],
+          },
+        ],
+        residualFamilies: [
+          {
+            id: 'logical_structure_marked_content',
+            label: 'Logical structure',
+            priority: 80,
+            blocking: true,
+            convergenceStatus: 'preferred_tools_available',
+            semanticPolicy: 'forbidden',
+            failureModeKeys: ['pdfua.logical_structure'],
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            preferredTools: ['normalize_heading_hierarchy', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+            deprioritizedTools: [],
+            expectedPostconditions: [],
+            activeOpportunityKeys: [],
+            preferredAutoRunnableOpportunityKeys: [],
+            currentStep: 1,
+            evidenceSignals: [],
+            evidenceStrength: 10,
+            regressionCanaries: [],
+          },
+          {
+            id: 'native_figure_convergence',
+            label: 'Figure convergence',
+            priority: 60,
+            blocking: true,
+            convergenceStatus: 'preferred_tools_available',
+            semanticPolicy: 'optional_after_deterministic',
+            failureModeKeys: ['pdfua.figure_alt_or_artifact'],
+            categoryIds: ['alt_text', 'pdf_ua_compliance'],
+            preferredTools: ['normalize_nested_figure_containers', 'repair_native_figure_semantics', 'repair_other_elements_alt_text', 'set_figure_alt_text'],
+            deprioritizedTools: [],
+            expectedPostconditions: [],
+            activeOpportunityKeys: [],
+            preferredAutoRunnableOpportunityKeys: [],
+            currentStep: 1,
+            evidenceSignals: [],
+            evidenceStrength: 9,
+            regressionCanaries: [],
+          },
+        ],
+        toolOpportunities: [
+          'normalize_heading_hierarchy',
+          'repair_native_marked_content_refs',
+          'repair_structure_conformance',
+          'normalize_nested_figure_containers',
+          'repair_native_figure_semantics',
+          'repair_other_elements_alt_text',
+          'set_figure_alt_text',
+        ].map((toolName, index) => ({
+          key: `${toolName}:${index}`,
+          toolName,
+          reason: toolName,
+          scope: toolName === 'set_figure_alt_text' ? 'candidate' : 'document',
+          candidateIds: toolName === 'set_figure_alt_text' ? ['figure:1'] : [],
+          candidateGroupIds: [],
+          pageNumbers: [1],
+          categoryTargets: toolName.includes('figure') || toolName.includes('alt') ? ['alt_text'] : ['reading_order'],
+          confidence: 0.95 - (index * 0.01),
+          status: 'auto_runnable',
+          derivedFromFailureModeKeys: toolName.includes('figure') || toolName.includes('alt')
+            ? ['pdfua.figure_alt_or_artifact']
+            : ['pdfua.logical_structure'],
+          familyId: toolName.includes('figure') || toolName.includes('alt')
+            ? 'native_figure_convergence'
+            : 'logical_structure_marked_content',
+          familyStep: index + 1,
+        })),
+        summary: {
+          deterministicIssueCount: 2,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 7,
+          safeToRetry: true,
+          dominantResidualFamily: 'logical_structure_marked_content',
+          lastStableNoEffectTool: null,
+          retryDisposition: 'retryable_deterministic',
+          mixedFamilyConvergencePath: true,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: ['pdfua.logical_structure', 'pdfua.figure_alt_or_artifact'],
+        topResidualFamilyIds: ['logical_structure_marked_content', 'native_figure_convergence'],
+        topBlockingResidualFamilyIds: ['logical_structure_marked_content', 'native_figure_convergence'],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+        mixedFamilyConvergencePath: true,
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'mixed.pdf',
+      analysis: {
+        overallScore: 65,
+        grade: 'D',
+        isScanned: false,
+        pageCount: 12,
+        categories: [
+          { id: 'heading_structure', label: 'Heading', score: 65, severity: 'Moderate' },
+          { id: 'reading_order', label: 'Reading', score: 60, severity: 'Moderate' },
+          { id: 'alt_text', label: 'Alt', score: 50, severity: 'Critical' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: 'en', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [{ id: 'figure:1', pageNumber: 1, surroundingText: [], informativeHint: 'informative', repairMode: 'safe' }],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual([
+      'normalize_heading_hierarchy',
+      'repair_native_marked_content_refs',
+      'repair_structure_conformance',
+      'normalize_nested_figure_containers',
+      'repair_native_figure_semantics',
+      'repair_other_elements_alt_text',
+      'set_figure_alt_text',
+    ])
   })
 
   it('skips solved categories in round 2+ but preserves standards-only tools for unresolved compliance', async () => {
@@ -674,6 +994,330 @@ describe('remediationPlanService', () => {
 
     expect(plan.actions.map(action => action.tool_name)).toEqual(['repair_native_marked_content_refs'])
     expect(plan.actions.some(action => action.tool_name === 'repair_structure_conformance')).toBe(false)
+  })
+
+  it('prioritizes reading-order and group repairs before broad structure repair for Stage 4 survivors', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'adobe_acrobat',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 84,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 2,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure',
+            source: 'verapdf',
+            count: 1,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_native_reading_order', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+            evidence: [],
+          },
+          {
+            key: 'category.reading_order',
+            label: 'Reading order',
+            source: 'category',
+            count: 1,
+            categoryIds: ['reading_order'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_native_reading_order', 'reorder_structure_children'],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'repair-conformance',
+            toolName: 'repair_structure_conformance',
+            reason: 'Fix broad structure',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+          {
+            key: 'repair-native-marked',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair marked content',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order'],
+            confidence: 0.88,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+          {
+            key: 'repair-native-reading',
+            toolName: 'repair_native_reading_order',
+            reason: 'Repair reading order',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order'],
+            confidence: 0.87,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.reading_order', 'pdfua.logical_structure'],
+          },
+          {
+            key: 'reorder-group',
+            toolName: 'reorder_structure_children',
+            reason: 'Normalize reading-order group',
+            scope: 'candidate_group',
+            candidateIds: [],
+            candidateGroupIds: ['group-1'],
+            pageNumbers: [1],
+            categoryTargets: ['reading_order'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.reading_order'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 2,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 4,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'stage4-survivor.pdf',
+      analysis: {
+        overallScore: 84,
+        grade: 'B',
+        isScanned: false,
+        categories: [
+          { id: 'reading_order', label: 'Reading Order', score: 60, severity: 'Moderate' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 70, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [{ id: 'group-1', parentRef: '12 0 R', suggestedChildCandidateIds: ['a', 'b'], mutableKids: true, pageNumberHints: [1] }],
+        structure: { structuralNodes: [{ ref: '12 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name)).toEqual([
+      'repair_native_reading_order',
+      'reorder_structure_children',
+      'repair_native_marked_content_refs',
+    ])
+  })
+
+  it('skips low-reliability tools when a blocking alternative exists for the same failure family', async () => {
+    classifyPdfFull.mockReturnValue({
+      structuralClass: 'native_tagged',
+      contentProfile: {
+        textDensity: 'normal',
+        hasImages: false,
+        hasComplexTables: false,
+        hasSimpleTables: false,
+        hasForms: false,
+        hasLinks: false,
+        hasFootnotes: false,
+      },
+      authoringTool: 'adobe_acrobat',
+      fontProfile: 'clean',
+      scale: 'small',
+      remediationDepth: 'moderate',
+    })
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '1',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 84,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 2,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'pdfua.logical_structure',
+            label: 'Logical structure',
+            source: 'verapdf',
+            count: 1,
+            categoryIds: ['reading_order', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_native_reading_order', 'repair_native_marked_content_refs', 'repair_structure_conformance'],
+            evidence: [],
+          },
+          {
+            key: 'category.reading_order',
+            label: 'Reading order',
+            source: 'category',
+            count: 1,
+            categoryIds: ['reading_order'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_native_reading_order', 'reorder_structure_children'],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'repair-conformance',
+            toolName: 'repair_structure_conformance',
+            reason: 'Fix broad structure',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order', 'pdf_ua_compliance'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+          {
+            key: 'repair-native-marked',
+            toolName: 'repair_native_marked_content_refs',
+            reason: 'Repair marked content',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order'],
+            confidence: 0.88,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.logical_structure'],
+          },
+          {
+            key: 'repair-native-reading',
+            toolName: 'repair_native_reading_order',
+            reason: 'Repair reading order',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['reading_order'],
+            confidence: 0.87,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.reading_order', 'pdfua.logical_structure'],
+          },
+          {
+            key: 'reorder-group',
+            toolName: 'reorder_structure_children',
+            reason: 'Normalize reading-order group',
+            scope: 'candidate_group',
+            candidateIds: [],
+            candidateGroupIds: ['group-1'],
+            pageNumbers: [1],
+            categoryTargets: ['reading_order'],
+            confidence: 0.8,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['category.reading_order'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 2,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 4,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'stage4-survivor.pdf',
+      analysis: {
+        overallScore: 84,
+        grade: 'B',
+        isScanned: false,
+        categories: [
+          { id: 'reading_order', label: 'Reading Order', score: 60, severity: 'Moderate' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 70, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '' },
+        qpdf: { lang: '', hasStructTree: true, structTreeDepth: 4, formFields: [] },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [{ id: 'group-1', parentRef: '12 0 R', suggestedChildCandidateIds: ['a', 'b'], mutableKids: true, pageNumberHints: [1] }],
+        structure: { structuralNodes: [{ ref: '12 0 R' }] },
+      } as any,
+      iteration: 1,
+      actions: [],
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.map(action => action.tool_name).slice(0, 2)).toEqual([
+      'repair_native_reading_order',
+      'reorder_structure_children',
+    ])
+    expect(plan.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ tool_name: 'repair_native_marked_content_refs' }),
+    ]))
   })
 
   it('skips low-reliability tools when a blocking alternative exists for the same failure family', async () => {
@@ -2033,6 +2677,109 @@ describe('remediationPlanService', () => {
     })
 
     expect(plan.actions.some(action => action.tool_name === 'finalize_substituted_font_conformance')).toBe(false)
+  })
+
+  it('does not repeat generic font unicode repair after a no-effect attempt', async () => {
+    buildFailureProfileArtifacts.mockReturnValue({
+      failureProfile: {
+        version: '2',
+        generatedAt: new Date().toISOString(),
+        analysisGrade: 'B',
+        analysisScore: 84,
+        veraPdfStatus: 'failed',
+        veraPdfFailedChecks: 1,
+        adobeStatus: 'unavailable',
+        adobeIssueCount: 0,
+        failureModes: [
+          {
+            key: 'pdfua.font_unicode',
+            label: 'Font Unicode mapping',
+            source: 'local_standards',
+            count: 4,
+            categoryIds: ['text_extractability', 'pdf_ua_compliance'],
+            blocking: true,
+            unmatched: false,
+            classification: 'deterministic',
+            nativeToolFamilies: ['repair_font_unicode_maps'],
+            evidence: [],
+          },
+        ],
+        toolOpportunities: [
+          {
+            key: 'font-unicode',
+            toolName: 'repair_font_unicode_maps',
+            reason: 'Repair font Unicode maps',
+            scope: 'document',
+            candidateIds: [],
+            candidateGroupIds: [],
+            pageNumbers: [],
+            categoryTargets: ['text_extractability'],
+            confidence: 0.9,
+            status: 'auto_runnable',
+            derivedFromFailureModeKeys: ['pdfua.font_unicode'],
+          },
+        ],
+        summary: {
+          deterministicIssueCount: 1,
+          semanticIssueCount: 0,
+          manualOnlyIssueCount: 0,
+          blockedOpportunityCount: 0,
+          autoRunnableOpportunityCount: 1,
+        },
+      },
+      plannerEvidence: {
+        topFailureModeKeys: [],
+        topAutoRunnableOpportunityKeys: [],
+        skippedReasonCounts: [],
+        attemptedKeys: [],
+        rejectedKeys: [],
+        noEffectKeys: [],
+      },
+    })
+
+    const { planRemediationActions } = await import('../services/remediationPlanService.js')
+    const plan = await planRemediationActions({
+      filename: 'font-repeat.pdf',
+      analysis: {
+        overallScore: 84,
+        grade: 'B',
+        isScanned: false,
+        pageCount: 4,
+        verapdf: { failures: [] },
+        categories: [
+          { id: 'text_extractability', label: 'Text', score: 40, severity: 'Critical' },
+          { id: 'pdf_ua_compliance', label: 'PDF/UA', score: 70, severity: 'Moderate' },
+        ],
+      } as any,
+      context: {
+        pdfjs: { title: '', lang: '', links: [] },
+        qpdf: {
+          lang: '',
+          hasStructTree: true,
+          structTreeDepth: 2,
+          formFields: [],
+          unembeddedFontCount: 0,
+          fontsMissingToUnicode: 4,
+          type1FontsMissingToUnicode: 0,
+          legacyWidthRiskFontCount: 0,
+        },
+        headingCandidates: [],
+        figureCandidates: [],
+        tableCandidates: [],
+        pages: [],
+        linkCandidates: [],
+        readingOrderCandidates: [],
+        readingOrderParentCandidates: [],
+        structure: { structuralNodes: [{ ref: '1 0 R' }] },
+      } as any,
+      iteration: 2,
+      actions: [
+        { tool: 'repair_font_unicode_maps', outcome: 'no_effect' },
+      ] as any,
+      rejectedActions: [],
+    })
+
+    expect(plan.actions.some(action => action.tool_name === 'repair_font_unicode_maps')).toBe(false)
   })
 
   it('prioritizes residual family order ahead of raw tool stage ordering', async () => {

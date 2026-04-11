@@ -100,6 +100,7 @@ const RESIDUAL_FAMILY_DEFINITIONS: ResidualFamilyDefinition[] = [
       'embed_missing_fonts_in_place',
       'repair_font_unicode_maps',
       'repair_type1_font_unicode_maps',
+      'repair_truetype_encoding_differences',
       'repair_cid_symbol_font_maps',
       'repair_cidset_consistency',
       'substitute_legacy_fonts_in_place',
@@ -160,6 +161,7 @@ const RESIDUAL_FAMILY_DEFINITIONS: ResidualFamilyDefinition[] = [
     ],
     categoryIds: ['alt_text', 'pdf_ua_compliance'],
     preferredTools: [
+      'normalize_nested_figure_containers',
       'repair_native_figure_semantics',
       'repair_other_elements_alt_text',
       'set_figure_alt_text',
@@ -186,6 +188,8 @@ const RESIDUAL_FAMILY_DEFINITIONS: ResidualFamilyDefinition[] = [
       'artifact_nonsemantic_page_elements',
       'normalize_heading_hierarchy',
       'create_heading_from_candidate',
+      'repair_native_reading_order',
+      'reorder_structure_children',
       'repair_structure_conformance',
       'repair_native_marked_content_refs',
     ],
@@ -201,6 +205,8 @@ const RESIDUAL_FAMILY_DEFINITIONS: ResidualFamilyDefinition[] = [
     failureModeKeys: ['pdfua.logical_structure', 'pdfua.structure'],
     categoryIds: ['reading_order', 'text_extractability', 'pdf_ua_compliance'],
     preferredTools: [
+      'repair_native_reading_order',
+      'reorder_structure_children',
       'repair_native_marked_content_refs',
       'artifact_nonsemantic_page_elements',
       'repair_bootstrapped_chart_content_refs',
