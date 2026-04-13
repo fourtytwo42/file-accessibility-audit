@@ -30,6 +30,12 @@ This file is for operating instructions. Durable project facts and "don't forget
 
 ## Purpose
 
+- For a fresh Ubuntu 24.04 VM that needs the local API + Gemma stack, prefer:
+  - `bash ./scripts/provision-vm.sh`
+  - `bash ./scripts/start-stack.sh`
+- For that VM path, the repo-managed systemd units are the supported operational surface:
+  - `pdfaf-llm.service`
+  - `pdfaf-api.service`
 - Use the agency API to enumerate publication records.
 - Identify which publication records point to PDF files.
 - Verify authentication before any bulk operation.

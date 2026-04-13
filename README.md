@@ -10,18 +10,31 @@ A web tool that scores PDF accessibility readiness against [WCAG 2.1](https://ww
 
 ## Quick Start
 
-### Ubuntu 24.04 VM Bootstrap
+### Ubuntu 24.04 VM: API + Local AI
 
-For a fresh Ubuntu 24.04 VM, use the repo bootstrap instead of installing dependencies by hand:
+For a fresh Ubuntu 24.04 VM, the canonical setup path is:
 
 ```bash
 git clone https://github.com/ICJIA/file-accessibility-audit.git
 cd file-accessibility-audit
+bash ./scripts/provision-vm.sh
+bash ./scripts/start-stack.sh
+```
+
+This path installs the remediation runtime, a pinned llama.cpp bundle, repo-managed systemd units for the API and local Gemma service, and validates the local OpenAI-compatible tool-calling path.
+
+Default scope:
+
+- API on `http://localhost:6103`
+- local Gemma on `http://127.0.0.1:1234/v1`
+- no web process by default
+
+If you want the older development-oriented bootstrap path instead, use:
+
+```bash
 bash ./scripts/bootstrap-ubuntu.sh
 pnpm dev
 ```
-
-The bootstrap script installs the remediation runtime too: Python helper packages, qpdf, veraPDF, Java, Playwright Chromium, and the managed legacy font bundle under `.local-tools/`.
 
 Full Ubuntu instructions: [`docs/setup-ubuntu-vm.md`](docs/setup-ubuntu-vm.md)
 
@@ -71,14 +84,19 @@ That's it — the app works immediately with authentication disabled (the defaul
 ### Utility Scripts
 
 ```bash
-pnpm bootstrap:ubuntu  # Bootstrap a fresh Ubuntu 24.04 VM from the repo
-pnpm clean      # Remove .nuxt, .output, Vite cache, and build artifacts
-pnpm test       # Run all tests with summary
-pnpm dev        # Start API + Web dev servers
-pnpm build      # Type-check API + build Nuxt frontend
-pnpm verify:env # Verify the remediation runtime and managed font bundle
-pnpm start:all  # Start both production servers (kills stale ports, API :6103, Web :6102)
-pnpm rebrand    # Regenerate static files after changing BRANDING in audit.config.ts
+pnpm vm:provision      # Canonical Ubuntu 24.04 API + AI provisioning flow
+pnpm stack:start       # Start the systemd-managed API + local Gemma stack
+pnpm stack:stop        # Stop the systemd-managed API + local Gemma stack
+pnpm stack:status      # Show service state + health + tool smoke result
+pnpm stack:healthcheck # Verify runtime + LLM + vision + remediation smoke path
+pnpm bootstrap:ubuntu  # Legacy/bootstrap-only Ubuntu setup path
+pnpm clean             # Remove .nuxt, .output, Vite cache, and build artifacts
+pnpm test              # Run all tests with summary
+pnpm dev               # Start API + Web dev servers
+pnpm build             # Type-check API + build Nuxt frontend
+pnpm verify:env        # Verify the remediation runtime and managed font bundle
+pnpm start:all         # Start both production servers (kills stale ports, API :6103, Web :6102)
+pnpm rebrand           # Regenerate static files after changing BRANDING in audit.config.ts
 ```
 
 ## Authentication (Optional)

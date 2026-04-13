@@ -1,0 +1,22 @@
+[Unit]
+Description=PDFAF API service
+Wants=network-online.target
+After=network-online.target pdfaf-llm.service
+
+[Service]
+Type=simple
+User=__RUN_USER__
+Group=__RUN_GROUP__
+WorkingDirectory=__REPO_ROOT__/apps/api
+Environment=HOME=__HOME_DIR__
+Environment=NODE_ENV=production
+Environment=PORT=6103
+EnvironmentFile=__REPO_ROOT__/apps/api/.env
+ExecStart=__PNPM_BIN__ start
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

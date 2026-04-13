@@ -10,7 +10,20 @@ This project can bootstrap a fresh Ubuntu 24.04 LTS VM into a remediation-capabl
 
 If you need to run on another Ubuntu release, set `ALLOW_UNSUPPORTED_UBUNTU=1` and rerun the bootstrap. That bypasses the release check but is not the supported path.
 
-## One-Command Bootstrap
+## Canonical VM Path
+
+For a fresh Ubuntu 24.04 VM, the supported **API + local Gemma AI** path is:
+
+```bash
+git clone https://github.com/ICJIA/file-accessibility-audit.git
+cd file-accessibility-audit
+bash ./scripts/provision-vm.sh
+bash ./scripts/start-stack.sh
+```
+
+This path installs the remediation runtime, stages a pinned llama.cpp bundle under `.local-tools/`, writes the default local Gemma OpenAI-compatible env values into `apps/api/.env`, installs repo-managed systemd units, and verifies the stack with a full healthcheck.
+
+## Legacy Bootstrap-Only Path
 
 From the repo root:
 
@@ -21,7 +34,7 @@ bash ./scripts/bootstrap-ubuntu.sh
 pnpm dev
 ```
 
-The bootstrap leaves the VM ready for `pnpm dev`. It does not leave long-running services started.
+The bootstrap-only path leaves the VM ready for `pnpm dev`. It does not install or manage long-running services.
 
 ## What the Bootstrap Installs
 
@@ -88,8 +101,29 @@ bash ./scripts/verify-env.sh --json
 You can also run the package.json aliases:
 
 ```bash
+pnpm vm:provision
+pnpm stack:start
+pnpm stack:stop
+pnpm stack:status
+pnpm stack:healthcheck
 pnpm bootstrap:ubuntu
 pnpm verify:env
+```
+
+## systemd-managed stack
+
+The canonical VM path installs:
+
+- `pdfaf-llm.service`
+- `pdfaf-api.service`
+
+Operational commands:
+
+```bash
+bash ./scripts/start-stack.sh
+bash ./scripts/stop-stack.sh
+bash ./scripts/status-stack.sh
+bash ./scripts/healthcheck-stack.sh
 ```
 
 ## Overrides and Air-Gapped Prep

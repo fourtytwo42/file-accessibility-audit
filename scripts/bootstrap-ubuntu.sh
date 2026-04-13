@@ -150,6 +150,12 @@ find_one() {
   find "$root_dir" -type f -name "$filename" | head -n 1
 }
 
+find_one_ci() {
+  local root_dir="$1"
+  local filename="$2"
+  find "$root_dir" -type f -iname "$filename" | head -n 1
+}
+
 copy_font_file() {
   local source_file="$1"
   local target_name="$2"
@@ -166,12 +172,46 @@ copy_downloaded_font() {
   copy_font_file "$found" "$filename"
 }
 
+copy_downloaded_font_alias() {
+  local search_root="$1"
+  local target_name="$2"
+  shift 2
+  local source_name found=''
+  for source_name in "$@"; do
+    found="$(find_one_ci "$search_root" "$source_name")"
+    if [[ -n "$found" ]]; then
+      copy_font_file "$found" "$target_name"
+      return 0
+    fi
+  done
+  fail "Could not locate any of [$*] in $search_root"
+}
+
+copy_system_font_alias() {
+  local search_root="$1"
+  local target_name="$2"
+  shift 2
+  local source_name found=''
+  for source_name in "$@"; do
+    found="$(find_one_ci "$search_root" "$source_name")"
+    if [[ -n "$found" ]]; then
+      copy_font_file "$found" "$target_name"
+      return 0
+    fi
+  done
+  fail "Could not locate any of [$*] in $search_root"
+}
+
 install_system_packages() {
   log "Installing apt packages"
   sudo apt-get update
   apt_install software-properties-common ca-certificates curl gnupg unzip zip zstd fontconfig build-essential \
     python3 python3-pip python3-venv python3-dev libqpdf-dev qpdf openjdk-17-jre-headless \
-    cabextract xfonts-utils fonts-crosextra-carlito
+    cabextract xfonts-utils fonts-crosextra-carlito \
+    libasound2t64 libatk-bridge2.0-0 libatk1.0-0 libatspi2.0-0 libcairo2 libcups2t64 \
+    libdbus-1-3 libdrm2 libgbm1 libglib2.0-0 libgtk-3-0t64 libnspr4 libnss3 \
+    libpango-1.0-0 libx11-6 libxcb1 libxcomposite1 libxdamage1 libxext6 libxfixes3 \
+    libxkbcommon0 libxrandr2 xvfb
 
   sudo add-apt-repository -y multiverse >/dev/null
   sudo apt-get update
@@ -288,21 +328,21 @@ install_legacy_fonts() {
   ms_fonts_root="$(find /usr/share/fonts -type d -path '*msttcorefonts' | head -n 1 || true)"
   [[ -n "$ms_fonts_root" ]] || fail "Microsoft core fonts were not installed."
 
-  copy_font_file "$ms_fonts_root/arial.ttf" "arial.ttf"
-  copy_font_file "$ms_fonts_root/arialbd.ttf" "arialbd.ttf"
-  copy_font_file "$ms_fonts_root/ariali.ttf" "ariali.ttf"
-  copy_font_file "$ms_fonts_root/arialbi.ttf" "arialbi.ttf"
-  copy_font_file "$ms_fonts_root/verdana.ttf" "verdana.ttf"
-  copy_font_file "$ms_fonts_root/verdanab.ttf" "verdanab.ttf"
-  copy_font_file "$ms_fonts_root/times.ttf" "times.ttf"
-  copy_font_file "$ms_fonts_root/timesbd.ttf" "timesbd.ttf"
-  copy_font_file "$ms_fonts_root/timesi.ttf" "timesi.ttf"
-  copy_font_file "$ms_fonts_root/timesbi.ttf" "timesbi.ttf"
+  copy_system_font_alias "$ms_fonts_root" "arial.ttf" "arial.ttf" "Arial.ttf"
+  copy_system_font_alias "$ms_fonts_root" "arialbd.ttf" "arialbd.ttf" "Arial_Bold.ttf"
+  copy_system_font_alias "$ms_fonts_root" "ariali.ttf" "ariali.ttf" "Arial_Italic.ttf"
+  copy_system_font_alias "$ms_fonts_root" "arialbi.ttf" "arialbi.ttf" "Arial_Bold_Italic.ttf"
+  copy_system_font_alias "$ms_fonts_root" "verdana.ttf" "verdana.ttf" "Verdana.ttf"
+  copy_system_font_alias "$ms_fonts_root" "verdanab.ttf" "verdanab.ttf" "Verdana_Bold.ttf"
+  copy_system_font_alias "$ms_fonts_root" "times.ttf" "times.ttf" "Times_New_Roman.ttf"
+  copy_system_font_alias "$ms_fonts_root" "timesbd.ttf" "timesbd.ttf" "Times_New_Roman_Bold.ttf"
+  copy_system_font_alias "$ms_fonts_root" "timesi.ttf" "timesi.ttf" "Times_New_Roman_Italic.ttf"
+  copy_system_font_alias "$ms_fonts_root" "timesbi.ttf" "timesbi.ttf" "Times_New_Roman_Bold_Italic.ttf"
 
   carlito_root="$(find /usr/share/fonts -type d -iname '*carlito*' | head -n 1 || true)"
   [[ -n "$carlito_root" ]] || fail "Carlito fonts were not installed."
-  copy_font_file "$(find_one "$carlito_root" 'Carlito-Regular.ttf')" "calibri.ttf"
-  copy_font_file "$(find_one "$carlito_root" 'Carlito-Bold.ttf')" "calibrib.ttf"
+  copy_font_file "$(find_one_ci "$carlito_root" 'Carlito-Regular.ttf')" "calibri.ttf"
+  copy_font_file "$(find_one_ci "$carlito_root" 'Carlito-Bold.ttf')" "calibrib.ttf"
 
   local tmp_dir ibm_zip source_zip libre_zip libertinus_archive
   tmp_dir="$(mktemp -d)"
@@ -321,10 +361,10 @@ install_legacy_fonts() {
   extract_zip "$libre_zip" "$tmp_dir/libre"
   extract_tar_zst "$libertinus_archive" "$tmp_dir/libertinus"
 
-  copy_downloaded_font "$tmp_dir/ibm" "IBMPlexSans-Regular.otf"
-  copy_downloaded_font "$tmp_dir/ibm" "IBMPlexSans-Bold.otf"
-  copy_downloaded_font "$tmp_dir/ibm" "IBMPlexSans-Italic.otf"
-  copy_downloaded_font "$tmp_dir/ibm" "IBMPlexSans-Light.otf"
+  copy_downloaded_font_alias "$tmp_dir/ibm" "IBMPlexSans-Regular.otf" "IBMPlexSans-Regular.otf" "IBMPlexSans-Regular.ttf"
+  copy_downloaded_font_alias "$tmp_dir/ibm" "IBMPlexSans-Bold.otf" "IBMPlexSans-Bold.otf" "IBMPlexSans-Bold.ttf"
+  copy_downloaded_font_alias "$tmp_dir/ibm" "IBMPlexSans-Italic.otf" "IBMPlexSans-Italic.otf" "IBMPlexSans-Italic.ttf"
+  copy_downloaded_font_alias "$tmp_dir/ibm" "IBMPlexSans-Light.otf" "IBMPlexSans-Light.otf" "IBMPlexSans-Light.ttf"
 
   copy_downloaded_font "$tmp_dir/source" "SourceSans3-Regular.otf"
   copy_downloaded_font "$tmp_dir/source" "SourceSans3-It.otf"

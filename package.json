@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "bootstrap:ubuntu": "bash ./scripts/bootstrap-ubuntu.sh",
+    "vm:provision": "bash ./scripts/provision-vm.sh",
     "dev": "tsx scripts/dev.ts",
     "dev:api": "kill-port 6103 && pnpm --filter api dev",
     "dev:web": "kill-port 6102 && pnpm --filter web dev",
@@ -37,6 +38,10 @@
     "llm:gemma4-e2b": "bash ./scripts/run-local-llm-gemma4-e2b.sh",
     "llm:gemma4-e2b:bg": "bash ./scripts/start-llama-gemma4-background.sh",
     "probe:openai-compat": "pnpm --filter api exec tsx src/scripts/probeOpenAiCompat.ts",
+    "stack:start": "bash ./scripts/start-stack.sh",
+    "stack:stop": "bash ./scripts/stop-stack.sh",
+    "stack:status": "bash ./scripts/status-stack.sh",
+    "stack:healthcheck": "bash ./scripts/healthcheck-stack.sh",
     "agency:test": "tsx scripts/test-agency-strapi.ts",
     "agency:backup-pdfs": "tsx scripts/backup-icjia-pdfs.ts",
     "agency:build-replacement-map": "tsx scripts/build-icjia-replacement-map.ts",

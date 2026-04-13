@@ -1,5 +1,14 @@
 # 04 — Deployment Guide
 
+For a plain Ubuntu 24.04 VM running the **API + local Gemma AI** stack, prefer the repo-managed systemd path:
+
+```bash
+bash ./scripts/provision-vm.sh
+bash ./scripts/start-stack.sh
+```
+
+The PM2-based flow below remains an alternate deployment path for the broader app/web setup, but it is no longer the preferred local API + AI VM path.
+
 **Project:** `file-accessibility-audit`
 **Production URL:** https://audit.icjia.app
 **Target:** DigitalOcean droplet → Laravel Forge → PM2 → nginx reverse proxy
