@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.502Z",
+  "runtimeFigurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-figure-retry.json",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 52,
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 48,
+    "excludedLowConfidence": 0
+  },
+  "totalCandidates": 0,
+  "selectedPublicationIds": [],
+  "groupedPublicationIds": {
+    "figure": [],
+    "structure": [],
+    "font": [],
+    "mixed": [],
+    "unknown": []
+  },
+  "groupedCounts": {
+    "figure": 0,
+    "structure": 0,
+    "font": 0,
+    "mixed": 0,
+    "unknown": 0
+  },
+  "selectionSanity": {
+    "dominantFamilyCounts": {},
+    "inScopeBlockerKeyCounts": {},
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 48,
+    "excludedLowConfidence": 0
+  },
+  "targetedFindingKeys": [
+    "pdfua.figure_alt_or_artifact",
+    "category.alt_text"
+  ],
+  "targetedFamilyIds": [
+    "native_figure_convergence"
+  ]
+}

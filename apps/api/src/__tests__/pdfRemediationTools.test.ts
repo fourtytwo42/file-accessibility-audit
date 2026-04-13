@@ -1,6 +1,8 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+import os from 'node:os'
+import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFString, StandardFonts } from 'pdf-lib'
 import { REMEDIATION } from '#config'
@@ -35,6 +37,19 @@ import type { StructureBackendMutationResult } from '../services/pdfStructureBac
 const FIXTURES_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
 const DOWNLOADS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Processed/Before')
 const PROCESSED_AFTER_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Processed/After')
+const REPO_DOWNLOADS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Downloads')
+
+function hasDownloadFixture(name: string): boolean {
+  return fs.existsSync(path.join(DOWNLOADS_DIR, name))
+}
+
+function hasProcessedAfterFixture(name: string): boolean {
+  return fs.existsSync(path.join(PROCESSED_AFTER_DIR, name))
+}
+
+function hasRepoDownload(name: string): boolean {
+  return fs.existsSync(path.join(REPO_DOWNLOADS_DIR, name))
+}
 
 async function makePdf(): Promise<Buffer> {
   const doc = await PDFDocument.create()
@@ -216,7 +231,103 @@ async function loadProcessedAfterFixture(name: string): Promise<Buffer> {
 }
 
 async function loadRepoDownload(name: string): Promise<Buffer> {
-  return fs.promises.readFile(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../Downloads', name))
+  return fs.promises.readFile(path.join(REPO_DOWNLOADS_DIR, name))
+}
+
+async function stripFirstFigureAlt(buffer: Buffer): Promise<Buffer> {
+  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'pdfaf-figure-alt-'))
+  const inputPath = path.join(tempDir, 'input.pdf')
+  const outputPath = path.join(tempDir, 'output.pdf')
+  await fs.promises.writeFile(inputPath, buffer)
+
+  const pythonBin = process.env.PYTHON_PATH || 'python3'
+  execFileSync(
+    pythonBin,
+    [
+      '-c',
+      [
+        'from pathlib import Path',
+        'import pikepdf',
+        'pdf = pikepdf.Pdf.open(Path(__import__(\"sys\").argv[1]))',
+        'updated = False',
+        'def walk(node):',
+        '    global updated',
+        '    if updated or not isinstance(node, pikepdf.Dictionary):',
+        '        return',
+        '    if str(node.get(\"/S\", \"\")) == \"/Figure\" and node.get(\"/Alt\") is not None:',
+        '        del node[\"/Alt\"]',
+        '        updated = True',
+        '        return',
+        '    kids = node.get(\"/K\")',
+        '    if isinstance(kids, pikepdf.Array):',
+        '        for child in kids:',
+        '            if isinstance(child, pikepdf.Dictionary):',
+        '                walk(child)',
+        '                if updated:',
+        '                    return',
+        '    elif isinstance(kids, pikepdf.Dictionary):',
+        '        walk(kids)',
+        'walk(pdf.Root[\"/StructTreeRoot\"])',
+        'if not updated:',
+        '    raise SystemExit(\"No /Figure with /Alt found to strip\")',
+        'pdf.save(Path(__import__(\"sys\").argv[2]))',
+      ].join('\n'),
+      inputPath,
+      outputPath,
+    ],
+    { stdio: 'pipe' },
+  )
+
+  return fs.promises.readFile(outputPath)
+}
+
+async function setFirstFigureAlt(buffer: Buffer, nextAlt: string): Promise<Buffer> {
+  const tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'pdfaf-figure-alt-set-'))
+  const inputPath = path.join(tempDir, 'input.pdf')
+  const outputPath = path.join(tempDir, 'output.pdf')
+  await fs.promises.writeFile(inputPath, buffer)
+
+  const pythonBin = process.env.PYTHON_PATH || 'python3'
+  execFileSync(
+    pythonBin,
+    [
+      '-c',
+      [
+        'from pathlib import Path',
+        'import pikepdf, sys',
+        'pdf = pikepdf.Pdf.open(Path(sys.argv[1]))',
+        'next_alt = sys.argv[3]',
+        'updated = False',
+        'def walk(node):',
+        '    global updated',
+        '    if updated or not isinstance(node, pikepdf.Dictionary):',
+        '        return',
+        '    if str(node.get(\"/S\", \"\")) == \"/Figure\":',
+        '        node[\"/Alt\"] = pikepdf.String(next_alt)',
+        '        updated = True',
+        '        return',
+        '    kids = node.get(\"/K\")',
+        '    if isinstance(kids, pikepdf.Array):',
+        '        for child in kids:',
+        '            if isinstance(child, pikepdf.Dictionary):',
+        '                walk(child)',
+        '                if updated:',
+        '                    return',
+        '    elif isinstance(kids, pikepdf.Dictionary):',
+        '        walk(kids)',
+        'walk(pdf.Root[\"/StructTreeRoot\"])',
+        'if not updated:',
+        '    raise SystemExit(\"No /Figure found to update\")',
+        'pdf.save(Path(sys.argv[2]))',
+      ].join('\n'),
+      inputPath,
+      outputPath,
+      nextAlt,
+    ],
+    { stdio: 'pipe' },
+  )
+
+  return fs.promises.readFile(outputPath)
 }
 
 describe('buildHeadingCandidatesFromPageFacts', () => {
@@ -355,7 +466,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(needsAltTextDeepInspection(analysis)).toBe(true)
   })
 
-  it('does not enable deep alt-text inspection for minor non-Acrobat alt-text defects', () => {
+  it('enables deep alt-text inspection for minor non-Acrobat alt-text defects', () => {
     const analysis = {
       categories: [
         {
@@ -370,10 +481,10 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       },
     } as any
 
-    expect(needsAltTextDeepInspection(analysis)).toBe(false)
+    expect(needsAltTextDeepInspection(analysis)).toBe(true)
   })
 
-  it('does not enable deep alt-text inspection for low scores without Acrobat-risk evidence', () => {
+  it('enables deep alt-text inspection for low scores without Acrobat-risk evidence', () => {
     const analysis = {
       categories: [
         {
@@ -388,7 +499,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       },
     } as any
 
-    expect(needsAltTextDeepInspection(analysis)).toBe(false)
+    expect(needsAltTextDeepInspection(analysis)).toBe(true)
   })
 
   it('keeps deep alt-text inspection enabled for low scores with Acrobat-risk evidence', () => {
@@ -694,7 +805,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(__test_getInspectionResultCacheSize()).toBe(20)
   })
 
-  it('plans table header repair against table refs instead of individual cell refs', async () => {
+  it('does not invent table-header actions before deterministic opportunities exist', async () => {
     const analysis = {
       ...({
         filename: 'table.pdf',
@@ -817,9 +928,8 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       rejectedActions: [],
     })
 
-    const action = plan.actions.find(entry => entry.tool_name === 'set_table_header_cells')
-    expect(action).toBeTruthy()
-    expect(action?.arguments).toEqual({ targets: ['21 0 R'] })
+    expect(plan.actions.some(entry => entry.tool_name === 'set_table_header_cells')).toBe(false)
+    expect(plan.actions.some(entry => entry.tool_name === 'repair_native_table_headers')).toBe(false)
   })
 
   it('remaps section-backed heading candidates to the first safe descendant text node', () => {
@@ -1021,7 +1131,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(markInfo?.get(PDFName.of('Marked'))).toBeTruthy()
   }, 60_000)
 
-  it('splits mixed heading/logo MCIDs on the one-page chart fixture so Acrobat-risk nodes clear', async () => {
+  it.skipIf(!hasDownloadFixture('1total offenses_1999-2008.pdf'))('splits mixed heading/logo MCIDs on the one-page chart fixture so Acrobat-risk nodes clear', async () => {
     const buffer = await loadDownloadFixture('1total offenses_1999-2008.pdf')
     const analysis = await analyzePDF(buffer, '1total offenses_1999-2008.pdf')
     const remediated = await remediatePdfWithAgent(buffer, '1total offenses_1999-2008.pdf', analysis)
@@ -1045,7 +1155,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     // so no split-generated /Figure elements are created for this PDF.
   }, 600_000)
 
-  it('clears multi-page Acrobat-risk section ownership on the strategy fixture', async () => {
+  it.skipIf(!hasDownloadFixture('04-07MVStrategy.pdf'))('clears multi-page Acrobat-risk section ownership on the strategy fixture', async () => {
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
     const remediated = await remediatePdfWithAgent(buffer, '04-07MVStrategy.pdf', analysis)
@@ -1063,7 +1173,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     )).toBe(true)
   }, 600_000)
 
-  it('does not assign heading-derived alt text to split-generated figures on 99anreport', async () => {
+  it.skipIf(!hasDownloadFixture('99anreport.pdf'))('does not assign heading-derived alt text to split-generated figures on 99anreport', async () => {
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const analysis = await analyzePDF(buffer, '99anreport.pdf')
     const remediated = await remediatePdfWithAgent(buffer, '99anreport.pdf', analysis)
@@ -1084,7 +1194,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     )).toBe(true)
   }, 600_000)
 
-  it('brings the processed-after font-unicode cluster to 100/A through the full agent loop', async () => {
+  it.skipIf(!hasProcessedAfterFixture('11drug_seizures_1997-2007.pdf'))('brings the processed-after font-unicode cluster to 100/A through the full agent loop', async () => {
     const filenames = [
       '11drug_seizures_1997-2007.pdf',
       '12drug_submissions_1997-2007.pdf',
@@ -1113,7 +1223,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     }
   }, 600_000)
 
-  it('clears processed-after font-unicode blockers directly after repair_font_unicode_maps', async () => {
+  it.skipIf(!hasProcessedAfterFixture('11drug_seizures_1997-2007.pdf'))('clears processed-after font-unicode blockers directly after repair_font_unicode_maps', async () => {
     const filenames = [
       '11drug_seizures_1997-2007.pdf',
       '12drug_submissions_1997-2007.pdf',
@@ -1209,7 +1319,8 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(backendSpy).toHaveBeenCalledWith(expect.objectContaining({
       mutation: expect.objectContaining({
         operation: 'repair_other_elements_alt_text',
-        maxElapsedMs: 12_000,
+        maxElapsedMs: 45_000,
+        maxRepairsPerRun: 512,
       }),
     }))
     expect(result.action.outcome).toBe('applied')
@@ -1287,7 +1398,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.linkOperationSummary?.unresolvedWarningCount).toBeGreaterThanOrEqual(0)
   })
 
-  it('orders annotation ownership repair before annotation alt-text repair when both are planned', async () => {
+  it('does not schedule annotation alt-text cleanup before annotation ownership evidence exists', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => {
       throw new Error('offline')
     }))
@@ -1344,9 +1455,9 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const ownershipIndex = plan.actions.findIndex(action => action.tool_name === 'tag_unowned_annotations')
     const altTextIndex = plan.actions.findIndex(action => action.tool_name === 'repair_annotation_alt_text')
 
-    expect(ownershipIndex).toBeGreaterThanOrEqual(0)
-    expect(altTextIndex).toBeGreaterThanOrEqual(0)
-    expect(ownershipIndex).toBeLessThan(altTextIndex)
+    expect(ownershipIndex).toBe(-1)
+    expect(altTextIndex).toBe(-1)
+    expect(plan.actions.some(action => action.tool_name === 'set_link_annotation_contents')).toBe(true)
   })
 
   it('passes figure bootstrap candidates into bootstrap_struct_tree for weak native image documents', async () => {
@@ -1989,7 +2100,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(String(lang)).toContain('en')
   }, 30_000)
 
-  it('canonicalizes legacy uppercase language tags instead of treating them as already valid', async () => {
+  it.skipIf(!hasDownloadFixture('11drug seizures_1997-2007.pdf'))('canonicalizes legacy uppercase language tags instead of treating them as already valid', async () => {
     const buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
     const analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
@@ -2014,7 +2125,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(String(lang)).toContain('en-US')
   }, 120_000)
 
-  it('repairs structure conformance in place on mixed chart PDFs', async () => {
+  it.skipIf(!hasDownloadFixture('3violent offenses_1999-2008.pdf'))('repairs structure conformance in place on mixed chart PDFs', async () => {
     let buffer = await loadDownloadFixture('3violent offenses_1999-2008.pdf')
     const original = await analyzePDF(buffer, '3violent offenses_1999-2008.pdf')
     let context = await inspectPdfForRemediation(buffer, original, { inspectMode: 'light' })
@@ -2190,7 +2301,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect((inspect.acrobatAltRiskNodes || []).filter(node => node.ownershipMode === 'nonfigure_with_alt')).toEqual([])
   }, 60_000)
 
-  it('repairs missing ToUnicode maps in place on large mixed/native PDFs', async () => {
+  it.skipIf(!hasDownloadFixture('04-07MVStrategy.pdf'))('repairs missing ToUnicode maps in place on large mixed/native PDFs', async () => {
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const before = await analyzePDF(buffer, '04-07MVStrategy.pdf')
     const context = await inspectPdfForRemediation(buffer, before)
@@ -2221,7 +2332,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(fontHasToUnicode).toBe(true)
   }, 90_000)
 
-  it('repairs derivable Type1 ToUnicode maps on annual-report PDFs', async () => {
+  it.skipIf(!hasDownloadFixture('99anreport.pdf'))('repairs derivable Type1 ToUnicode maps on annual-report PDFs', async () => {
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const before = await analyzePDF(buffer, '99anreport.pdf')
     const context = await inspectPdfForRemediation(buffer, before)
@@ -2242,7 +2353,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(after.verapdf.failedChecks).toBeLessThanOrEqual(before.verapdf.failedChecks)
   }, 120_000)
 
-  it('repairs legacy Gxx subset glyph names in small Distiller PDFs', async () => {
+  it.skipIf(!hasRepoDownload('juv probation.pdf'))('repairs legacy Gxx subset glyph names in small Distiller PDFs', async () => {
     const buffer = await loadRepoDownload('juv probation.pdf')
     const beforeQpdf = await analyzeWithQpdf(buffer)
     const before = await analyzePDF(buffer, 'juv probation.pdf')
@@ -2267,7 +2378,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.fontsMissingToUnicode).toBeLessThan(beforeQpdf.fontsMissingToUnicode ?? 0)
   }, 120_000)
 
-  it('embeds legacy Type1 substitute fonts on small Gill Sans PDFs', async () => {
+  it.skipIf(!hasRepoDownload('SPTDVoga.pdf'))('embeds legacy Type1 substitute fonts on small Gill Sans PDFs', async () => {
     const buffer = await loadRepoDownload('SPTDVoga.pdf')
     const beforeQpdf = await analyzeWithQpdf(buffer)
     const before = await analyzePDF(buffer, 'SPTDVoga.pdf')
@@ -2291,7 +2402,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
   }, 120_000)
 
-  it('embeds Boton brochure fonts through legacy substitute fallbacks', async () => {
+  it.skipIf(!hasRepoDownload('bor_english.pdf'))('embeds Boton brochure fonts through legacy substitute fallbacks', async () => {
     const buffer = await loadRepoDownload('bor_english.pdf')
     const beforeQpdf = await analyzeWithQpdf(buffer)
     const before = await analyzePDF(buffer, 'bor_english.pdf')
@@ -2315,7 +2426,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
   }, 120_000)
 
-  it('repairs ToUnicode maps for WinAnsi dictionary TrueType fonts in small Acrobat PDFs', async () => {
+  it.skipIf(!hasRepoDownload('A Study Gun Addendum .pdf'))('repairs ToUnicode maps for WinAnsi dictionary TrueType fonts in small Acrobat PDFs', async () => {
     const filename = 'A Study Gun Addendum .pdf'
     const buffer = await loadRepoDownload(filename)
     const beforeQpdf = await analyzeWithQpdf(buffer)
@@ -2341,7 +2452,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.fontsMissingToUnicode).toBeLessThan(beforeQpdf.fontsMissingToUnicode ?? 0)
   }, 120_000)
 
-  it('embeds Tekton legacy fonts through substitute fallbacks', async () => {
+  it.skipIf(!hasRepoDownload('victim2.pdf'))('embeds Tekton legacy fonts through substitute fallbacks', async () => {
     const buffer = await loadRepoDownload('victim2.pdf')
     const beforeQpdf = await analyzeWithQpdf(buffer)
     const before = await analyzePDF(buffer, 'victim2.pdf')
@@ -2365,7 +2476,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(afterQpdf.unembeddedFontCount).toBeLessThan(beforeQpdf.unembeddedFontCount ?? 0)
   }, 120_000)
 
-  it('promotes strong image-backed paragraph figure candidates in recent tagged reports', async () => {
+  it.skipIf(!hasRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf'))('promotes strong image-backed paragraph figure candidates in recent tagged reports', async () => {
     const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
     const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
@@ -2377,7 +2488,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(candidate).toBeTruthy()
   }, 120_000)
 
-  it('retags strong image-backed paragraph figure candidates even when page image count is unavailable', async () => {
+  it.skipIf(!hasRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf'))('retags strong image-backed paragraph figure candidates even when page image count is unavailable', async () => {
     const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
     const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
@@ -2407,7 +2518,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(result.action.changedDocumentBytes).toBe(true)
   }, 120_000)
 
-  it('keeps strong paragraph figure candidates promotable even with long surrounding text', async () => {
+  it.skipIf(!hasRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf'))('keeps strong paragraph figure candidates promotable even with long surrounding text', async () => {
     const buffer = await loadRepoDownload('2025FirearmProhibitorsReport-250626T19175938.pdf')
     const analysis = await analyzePDF(buffer, '2025FirearmProhibitorsReport-250626T19175938.pdf')
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'alt_text_deep' })
@@ -2442,7 +2553,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     })).toBe(true)
   })
 
-  it('substitutes missing legacy annual-report fonts with metric-aware embedded fallbacks', async () => {
+  it.skipIf(!hasDownloadFixture('99anreport.pdf'))('substitutes missing legacy annual-report fonts with metric-aware embedded fallbacks', async () => {
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const before = await analyzePDF(buffer, '99anreport.pdf')
     const context = await inspectPdfForRemediation(buffer, before)
@@ -2465,7 +2576,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(after.verapdf.failedChecks).toBe(0)
   }, 120_000)
 
-  it('finalizes substituted annual-report fonts with per-font conformance cleanup', async () => {
+  it.skipIf(!hasDownloadFixture('99anreport.pdf'))('finalizes substituted annual-report fonts with per-font conformance cleanup', async () => {
     const buffer = await loadDownloadFixture('99anreport.pdf')
     const before = await analyzePDF(buffer, '99anreport.pdf')
     const context = await inspectPdfForRemediation(buffer, before)
@@ -2517,7 +2628,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(firstDecoded).toBe('https://example.com/top')
   })
 
-  it('repairs CID symbol font maps in place on large mixed/native PDFs', async () => {
+  it.skipIf(!hasDownloadFixture('04-07MVStrategy.pdf'))('repairs CID symbol font maps in place on large mixed/native PDFs', async () => {
     const buffer = await loadDownloadFixture('04-07MVStrategy.pdf')
     const analysis = await analyzePDF(buffer, '04-07MVStrategy.pdf')
     const context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
@@ -2543,7 +2654,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(backendInspect.warnings).toEqual([])
   }, 60_000)
 
-  it('repairs CIDSet consistency after in-place font repairs on one-page tagged chart PDFs', async () => {
+  it.skipIf(!hasDownloadFixture('11drug seizures_1997-2007.pdf'))('repairs CIDSet consistency after in-place font repairs on one-page tagged chart PDFs', async () => {
     let buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
     let analysis = await analyzePDF(buffer, '11drug seizures_1997-2007.pdf')
     let context = await inspectPdfForRemediation(buffer, analysis, { inspectMode: 'light' })
@@ -2585,7 +2696,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(after.verapdf.failedChecks).toBeLessThanOrEqual(beforeFailedChecks)
   }, 300_000)
 
-  it('reports CIDSet inspection coverage and returns no_effect when a second pass finds nothing new to rewrite', async () => {
+  it.skipIf(!hasDownloadFixture('11drug seizures_1997-2007.pdf'))('reports CIDSet inspection coverage and returns no_effect when a second pass finds nothing new to rewrite', async () => {
     let buffer = await loadDownloadFixture('11drug seizures_1997-2007.pdf')
     // Initial analysis needed for context; subsequent steps skip veraPDF since
     // font prep tools only use QPDF/PDF.js data and this test has no veraPDF assertions.
@@ -2920,7 +3031,7 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     expect(repairedQpdf.unmappedRoleMapTags).not.toContain('/Lbody')
   }, 60_000)
 
-  it('retags a safe figure candidate and restores alt text', async () => {
+  it('defers paragraph-backed figure candidates that are no longer safe to retag directly', async () => {
     const accessibleBuffer = await loadFixture('accessible.pdf')
     const inspect = await runPdfStructureBackend({
       buffer: accessibleBuffer,
@@ -2945,30 +3056,9 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
     const context = await inspectPdfForRemediation(degradedBuffer, degradedAnalysis)
     const figureCandidate = context.figureCandidates[0]
     expect(figureCandidate?.targetRef).toBeTruthy()
-    expect(figureCandidate?.repairMode).toBe('retag_then_set_alt')
-
-    const result = await executeRemediationTool({
-      buffer: degradedBuffer,
-      context,
-      call: {
-        tool_name: 'retag_as_figure_and_set_alt',
-        arguments: {
-          candidateId: figureCandidate.id,
-          altText: 'Accessible University logo',
-        },
-        rationale: 'Restore figure alt text.',
-        confidence: 0.8,
-      },
-    })
-
-    const next = await analyzePDF(result.buffer, 'accessible.pdf')
-    const nextAltScore = next.categories.find(category => category.id === 'alt_text')?.score ?? 0
-
-    expect(['applied', 'no_effect']).toContain(result.action.outcome)
-    expect(result.action.categoryTargets).toEqual(['alt_text'])
-    if (result.action.outcome === 'applied') {
-      expect(nextAltScore).toBeGreaterThan(degradedAltScore)
-    }
+    expect(figureCandidate?.repairMode).toBe('defer')
+    expect(figureCandidate?.unsafeReason).toBeTruthy()
+    expect(degradedAltScore).toBeLessThan(100)
   }, 30_000)
 
   it('auto-escalates safe non-Figure alt-text targets into retagging', async () => {
@@ -3131,6 +3221,97 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
       mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
     })
     expect(reInspect.structuralNodes.some(node => node.tag === '/Figure')).toBe(true)
+  })
+
+  it('backfills existing native /Figure elements that are missing alt placeholders', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const strippedBuffer = await stripFirstFigureAlt(accessibleBuffer)
+
+    const beforeInspect = await runPdfStructureBackend({
+      buffer: strippedBuffer,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+    expect(beforeInspect.figures.some(figure => figure.tag === '/Figure' && !figure.hasAlt)).toBe(true)
+
+    const repaired = await runPdfStructureBackend({
+      buffer: strippedBuffer,
+      mutation: {
+        operation: 'repair_native_figure_semantics',
+      },
+    })
+
+    expect(repaired.status).toBe('applied')
+    expect(repaired.changedDocumentBytes).toBe(true)
+    expect(repaired.figureOperationSummary?.figureAltPlaceholdersCreated).toBeGreaterThanOrEqual(1)
+    expect(
+      repaired.appliedMutations.some(mutation =>
+        mutation.details.includes('Added empty /Alt placeholder to existing native /Figure'),
+      ),
+    ).toBe(true)
+  })
+
+  it('normalizes junk or whitespace /Alt on existing native /Figure elements back to an empty placeholder', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const junkAltBuffer = await setFirstFigureAlt(accessibleBuffer, 'Figure')
+
+    const repaired = await runPdfStructureBackend({
+      buffer: junkAltBuffer,
+      mutation: {
+        operation: 'repair_native_figure_semantics',
+      },
+    })
+
+    expect(repaired.status).toBe('applied')
+    expect(repaired.changedDocumentBytes).toBe(true)
+    expect(
+      repaired.appliedMutations.some(mutation =>
+        mutation.details.includes('Normalized placeholder /Alt on existing native /Figure'),
+      ),
+    ).toBe(true)
+  })
+
+  it('normalizes multiple nested wrapper figure containers in a single pass', async () => {
+    const accessibleBuffer = await loadFixture('accessible.pdf')
+    const inspect = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: { operation: 'inspect', inspectMode: 'alt_text_deep' },
+    })
+    const figureRef = inspect.figures[0]?.ref
+    expect(figureRef).toBeTruthy()
+
+    const firstDegrade = await runPdfStructureBackend({
+      buffer: accessibleBuffer,
+      mutation: {
+        operation: 'retag_node',
+        targets: [figureRef!],
+        targetTag: 'Span',
+      },
+    })
+    expect(firstDegrade.status).toBe('applied')
+
+    const secondDegrade = await runPdfStructureBackend({
+      buffer: firstDegrade.outputBuffer!,
+      mutation: {
+        operation: 'retag_node',
+        targets: [figureRef!],
+        targetTag: 'Div',
+      },
+    })
+    expect(secondDegrade.status).toBe('applied')
+
+    const normalized = await runPdfStructureBackend({
+      buffer: secondDegrade.outputBuffer!,
+      mutation: {
+        operation: 'normalize_nested_figure_containers',
+        maxRepairsPerRun: 6,
+      },
+    })
+
+    expect(['applied', 'no_effect']).toContain(normalized.status)
+    if (normalized.status === 'applied') {
+      expect(normalized.changedDocumentBytes).toBe(true)
+      expect(normalized.outputBuffer).toBeDefined()
+    }
   })
 
   it('retags a safe Story figure candidate by wrapping it in a child /Figure', async () => {
@@ -3638,7 +3819,11 @@ describe('pdfRemediationTools', { timeout: 120_000 }, () => {
 
 })
 
-describe('remediationPlanService', { timeout: 60_000 }, () => {
+describe.skipIf(
+  !hasDownloadFixture('04-07MVStrategy.pdf')
+  || !hasDownloadFixture('99anreport.pdf')
+  || !hasDownloadFixture('11drug seizures_1997-2007.pdf')
+)('remediationPlanService', { timeout: 60_000 }, () => {
   let chartPdfPlanFixture: { buffer: Buffer; analysis: Awaited<ReturnType<typeof analyzePDF>>; context: PdfRemediationContext }
   let annualReportPlanFixture: { buffer: Buffer; analysis: Awaited<ReturnType<typeof analyzePDF>>; context: PdfRemediationContext }
   let cidsetPlanFixture: { buffer: Buffer; analysis: Awaited<ReturnType<typeof analyzePDF>>; context: PdfRemediationContext }

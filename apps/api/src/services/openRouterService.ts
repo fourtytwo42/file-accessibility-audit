@@ -1,9 +1,6 @@
 import type { BoundingBox, ModelReviewFlag } from './documentModel.js'
 import type { PageHeadingCandidate, PageImageCandidate, PageTableCandidate } from './documentModel.js'
-
-const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
-const OPENAI_COMPAT_API_KEY = process.env.OPENAI_COMPAT_API_KEY || process.env.OPENROUTER_API_KEY || 'hs_a9a29d90a35c4b1c8a709e17c8c76dcf'
-const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENROUTER_MODEL || 'gpt-5.1-codex-mini'
+import { callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
 const RECONSTRUCT_PAGE_TOOL = 'reconstruct_pdf_page'
 
 function clampBox(box?: Partial<BoundingBox> | null): BoundingBox {
@@ -117,17 +114,11 @@ export function normalizeAiPageReconstruction(parsed: any): AiPageReconstruction
   }
 }
 
-async function openRouterJsonResponse(messages: any[]): Promise<any> {
-  const response = await fetch(`${OPENAI_COMPAT_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${OPENAI_COMPAT_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: OPENAI_COMPAT_MODEL,
-      temperature: 0.1,
-      tools: [{
+function buildChatCompletionsBody(model: string, messages: any[]): string {
+  return JSON.stringify({
+    model,
+    temperature: 0.1,
+    tools: [{
         type: 'function',
         function: {
           name: RECONSTRUCT_PAGE_TOOL,
@@ -216,14 +207,19 @@ async function openRouterJsonResponse(messages: any[]): Promise<any> {
           },
         },
       }],
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: RECONSTRUCT_PAGE_TOOL,
-        },
-      },
+      tool_choice: 'required',
       messages,
-    }),
+    })
+}
+
+async function callChatCompletions(baseUrl: string, apiKey: string, model: string, messages: any[]): Promise<any> {
+  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: buildChatCompletionsBody(model, messages),
   })
 
   if (!response.ok) {
@@ -246,8 +242,16 @@ async function openRouterJsonResponse(messages: any[]): Promise<any> {
   }
 }
 
+async function openRouterJsonResponse(messages: any[]): Promise<any> {
+  return await callWithOpenAiCompatFallbacks({
+    serviceName: 'openRouterService',
+    preflightPrimary: true,
+    invoke: endpoint => callChatCompletions(endpoint.baseUrl, endpoint.apiKey, endpoint.model, messages),
+  })
+}
+
 export function hasOpenRouterConfig(): boolean {
-  return !!OPENAI_COMPAT_API_KEY
+  return hasOpenAiCompatConfig()
 }
 
 export function isRequestTooLargeError(error: unknown): boolean {
@@ -323,7 +327,7 @@ export async function reconstructPageWithOpenRouter(input: {
     maxLinks?: number
   }
 }): Promise<AiPageReconstruction> {
-  if (!OPENAI_COMPAT_API_KEY) {
+  if (!hasOpenAiCompatConfig()) {
     throw new Error('OpenAI-compatible endpoint is not configured.')
   }
 

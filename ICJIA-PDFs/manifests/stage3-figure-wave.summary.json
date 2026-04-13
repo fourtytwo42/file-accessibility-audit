@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-04-01T00:32:59.088Z",
+  "generatedAt": "2026-04-04T22:22:33.016Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-04-01T00:32:59.072Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-04T22:22:33.007Z",
   "totals": {
-    "eligibleRows": 376,
+    "eligibleRows": 427,
     "selectedRows": 8,
-    "skippedRows": 466,
+    "skippedRows": 520,
     "pendingRows": 0
   },
   "selectedPublicationIds": [
     "3614",
     "3794",
     "4185",
-    "4481",
     "4020",
+    "4598",
     "4551",
-    "3878",
-    "3886"
+    "3806",
+    "3878"
   ],
   "pendingPublicationIds": [],
   "selectedByTier": {

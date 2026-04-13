@@ -1,0 +1,198 @@
+{
+  "generatedAt": "2026-04-11T18:05:23.073Z",
+  "laneName": "sub79-tail-canary",
+  "executionPolicy": "active",
+  "executionPolicyReason": "target_tail_canary_one_blocker_near_pass_annotation_figure_and_figure_table_residue",
+  "sourceOutcomesPaths": [
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-sub79-recovery.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json"
+  ],
+  "totals": {
+    "scannedReportsConsidered": 748,
+    "selectedCandidates": 34,
+    "byTier": {
+      "highest": 9,
+      "high": 5,
+      "medium": 20
+    },
+    "plateauedCandidates": 20,
+    "nonPlateauedCandidates": 14,
+    "excludedNonTerminal": 253,
+    "excludedAbove79": 125,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0,
+    "excludedLaneMismatch": 0
+  },
+  "blockerSignatureCounts": {
+    "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact": 6,
+    "pdfua.figure_alt_or_artifact": 4,
+    "pdfua.figure_alt_or_artifact + pdfua.table_regularity": 7,
+    "pdfua.figure_alt_or_artifact + pdfua.font_embedding": 3,
+    "pdfua.annotation_alt_contents + pdfua.font_embedding + pdfua.font_unicode": 1,
+    "pdfua.figure_alt_or_artifact + pdfua.heading_content_quality": 1,
+    "pdfua.annotation_alt_contents + pdfua.heading_content_quality": 1,
+    "pdfua.font_embedding + pdfua.font_unicode": 1,
+    "pdfua.font_embedding": 4,
+    "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.table_regularity": 2,
+    "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.link_tagging": 2,
+    "pdfua.figure_alt_or_artifact + pdfua.link_tagging": 1,
+    "pdfua.figure_alt_or_artifact + pdfua.font_unicode + pdfua.table_regularity": 1
+  },
+  "plateauCounts": {
+    "plateaued": 20,
+    "nonPlateaued": 14
+  },
+  "topCandidates": [
+    {
+      "publicationId": "4485",
+      "publicationTitle": "Demystifying Program Evaluation in Criminal Justice: A Guide for Practitioners",
+      "overallScore": 77,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact",
+      "blockerFamilies": [
+        "annotation",
+        "figure"
+      ],
+      "scoreDeltaFromPrior": 25,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 1,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3644",
+      "publicationTitle": "Firearms",
+      "overallScore": 77,
+      "blockerSignature": "pdfua.figure_alt_or_artifact",
+      "blockerFamilies": [
+        "figure"
+      ],
+      "scoreDeltaFromPrior": 16,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 2,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4531",
+      "publicationTitle": "S.T.O.P. Violence Against Women In Illinois A Multi-Year Plan: FFY14-16",
+      "overallScore": 77,
+      "blockerSignature": "pdfua.figure_alt_or_artifact",
+      "blockerFamilies": [
+        "figure"
+      ],
+      "scoreDeltaFromPrior": 16,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 3,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3460",
+      "publicationTitle": "Community Policing in Chicago Year One An Interim Report",
+      "overallScore": 76,
+      "blockerSignature": "pdfua.figure_alt_or_artifact",
+      "blockerFamilies": [
+        "figure"
+      ],
+      "scoreDeltaFromPrior": 16,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 4,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4051",
+      "publicationTitle": "2005 Annual Report Motor Vehicle Theft Prevention Council",
+      "overallScore": 76,
+      "blockerSignature": "pdfua.figure_alt_or_artifact",
+      "blockerFamilies": [
+        "figure"
+      ],
+      "scoreDeltaFromPrior": 16,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 5,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4735",
+      "publicationTitle": "Evaluation of the Development of Choices, a Multijurisdictional Police-Led Deflection Program in Southwestern Illinois",
+      "overallScore": 77,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.table_regularity",
+      "blockerFamilies": [
+        "figure",
+        "table"
+      ],
+      "scoreDeltaFromPrior": 7,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 6,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4468",
+      "publicationTitle": "Examining the Recidivism of Firearm Offenders Using State Criminal History and Mortality Data",
+      "overallScore": 74,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.table_regularity",
+      "blockerFamilies": [
+        "figure",
+        "table"
+      ],
+      "scoreDeltaFromPrior": 7,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 7,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3787",
+      "publicationTitle": "Sex Offender Probation Programs in Lake DuPage and Winnebago Counties",
+      "overallScore": 70,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.font_embedding",
+      "blockerFamilies": [
+        "figure",
+        "font"
+      ],
+      "scoreDeltaFromPrior": 7,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 8,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "3790",
+      "publicationTitle": "Methamphetamine in Illinois An Examination of an Emerging Drug",
+      "overallScore": 70,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.font_embedding",
+      "blockerFamilies": [
+        "figure",
+        "font"
+      ],
+      "scoreDeltaFromPrior": 7,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 9,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "4004",
+      "publicationTitle": "The relationship between gang membership and inmate recidivism",
+      "overallScore": 71,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.font_embedding",
+      "blockerFamilies": [
+        "figure",
+        "font"
+      ],
+      "scoreDeltaFromPrior": 5,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 10,
+      "priorityTier": "high"
+    }
+  ]
+}

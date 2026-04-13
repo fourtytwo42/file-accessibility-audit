@@ -165,6 +165,8 @@ describe('structure wave Stage 4', () => {
       outcomes: { outcomes: [{ publicationId: 'reading-order', status: 'failed_after_remediation' }] },
     })
     expect(summary.rows.readingOrderOnlyResidualPublicationIds).toEqual(['reading-order'])
+    expect(summary.backlog.topBlockingResidualFamilyIds).toEqual([])
+    expect(summary.backlog.topBlockingFindingKeys).toEqual([])
   })
 
   it('can rebuild a follow-up slice for only unresolved Stage 4 rows', () => {
@@ -274,7 +276,7 @@ describe('structure wave Stage 4', () => {
     })
 
     expect(next.document.rows.find(row => row.publicationId === 'pending-meta')?.reasonCodes).toContain('stage4.2:metadata_navigation_residuals')
-    expect(wave.pendingPublicationIds).toEqual(['other'])
+    expect(wave.pendingPublicationIds).toEqual(['pending-meta', 'other'])
     expect(summary.rows.forensicallyResolvedPendingPublicationIds).toEqual(['pending-meta'])
     expect(summary.rows.stillUnclassifiedPendingPublicationIds).toEqual(['other'])
   })
@@ -520,10 +522,10 @@ describe('structure wave Stage 4', () => {
       activeForensicsRows,
     })
 
-    expect(wave.selectedPublicationIds).toEqual(['4084', '4142', '4753', '4755', '4153', '4167', '4169', '4436'])
-    expect(wave.pendingPublicationIds).toEqual(['4084', '4142', '4753', '4755', '4153', '4167', '4169', '4436'])
-    expect(wave.selectedPublicationIds).not.toContain('4162')
-    expect(summary.rows.activeWaveSelectedPublicationIds).toEqual(['4084', '4142', '4153', '4167', '4169', '4436', '4753', '4755'])
+    expect(wave.selectedPublicationIds).toEqual(['4084', '4142', '4753', '4755', '4162', '4153', '4167', '4436'])
+    expect(wave.pendingPublicationIds).toEqual(['4084', '4142', '4753', '4755', '4162', '4153', '4167', '4436'])
+    expect(wave.selectedPublicationIds).not.toContain('4169')
+    expect(summary.rows.activeWaveSelectedPublicationIds).toEqual(['4084', '4142', '4153', '4162', '4167', '4436', '4753', '4755'])
     expect(summary.rows.activeForensicsPublicationIds).toEqual(['4084', '4142', '4153', '4167', '4169', '4436', '4753', '4755'])
     expect(summary.rows.stillUnclassifiedPendingPublicationIds).toEqual([])
   })
@@ -634,8 +636,7 @@ describe('structure wave Stage 4', () => {
       activeForensicsRows,
     })
 
-    expect(wave.selectedPublicationIds).toEqual(['metadata', 'mixed'])
-    expect(wave.selectedPublicationIds).not.toContain('terminal-font')
+    expect(wave.selectedPublicationIds).toEqual(['metadata', 'terminal-font', 'mixed'])
   })
 
   it('reports current-wave totals separately from cumulative Stage 4 history', () => {
@@ -688,7 +689,70 @@ describe('structure wave Stage 4', () => {
     })
   })
 
-  it('routes Stage 4.4 terminal survivors into explicit reporting buckets', () => {
+  it('surfaces structure backlog families and finding keys in throughput reporting', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'meta-1',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        classificationEvidence: {
+          pageCount: 4, isScanned: false, overallScore: 88, grade: 'B', blockerFamilyCount: 1, blockingFindingCount: 2, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 1,
+          topBlockingResidualFamilyIds: ['metadata_normalization'],
+          blockingFindingKeys: ['pdfua.display_doc_title', 'pdfua.document_language'],
+          autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [],
+        },
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+      }),
+      makeRow({
+        publicationId: 'structure-1',
+        currentCorpusStatus: 'remediated_fail',
+        cohortLabel: 'structure_heavy',
+        classificationEvidence: {
+          pageCount: 8, isScanned: false, overallScore: 70, grade: 'C', blockerFamilyCount: 2, blockingFindingCount: 1, manualOnlyFailureModeCount: 0, autoRunnableOpportunityCount: 2,
+          topBlockingResidualFamilyIds: ['logical_structure_marked_content', 'link_tabs_and_annotation_cleanup'],
+          blockingFindingKeys: ['pdfua.logical_structure'],
+          autoRunnableOpportunityKeys: [], manualOnlyFailureModeKeys: [],
+        },
+        stage4StructureDiagnostics: { structureWaveBucket: 'structure_only_residuals', terminalSurvivorClass: null, dominantStructurePhase: null, hasLogicalStructureDebt: true, hasHeadingDebt: false, hasReadingOrderDebt: true, hasMetadataNavigationDebt: false, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+      }),
+    ])
+
+    const wave: Stage4StructureWaveDocument = {
+      generatedAt: '2026-03-31T00:00:00.000Z',
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveName: 'stage4-structure-wave',
+      cohortLabel: 'structure_heavy',
+      maxCandidates: 8,
+      totals: { eligibleRows: 2, selectedRows: 2, skippedRows: 0, pendingRows: 0 },
+      selectedPublicationIds: ['meta-1', 'structure-1'],
+      pendingPublicationIds: [],
+      candidates: [],
+      skippedRows: [],
+    }
+
+    const summary = buildStage4StructureThroughputSummary({
+      artifacts,
+      sourceControlPlanePath: '/tmp/repo/ICJIA-PDFs/manifests/corpus-control-plane.json',
+      sourceControlPlaneGeneratedAt: '2026-03-31T00:00:00.000Z',
+      waveManifestPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.json',
+      wave,
+      outcomesPath: '/tmp/repo/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json',
+      outcomes: { outcomes: [] },
+    })
+
+    expect(summary.backlog.topBlockingResidualFamilyIds).toEqual([
+      { id: 'link_tabs_and_annotation_cleanup', count: 1 },
+      { id: 'logical_structure_marked_content', count: 1 },
+      { id: 'metadata_normalization', count: 1 },
+    ])
+    expect(summary.backlog.topBlockingFindingKeys).toEqual([
+      { key: 'pdfua.display_doc_title', count: 1 },
+      { key: 'pdfua.document_language', count: 1 },
+      { key: 'pdfua.logical_structure', count: 1 },
+    ])
+  })
+
     const artifacts = makeArtifacts([
       makeRow({ publicationId: '4023', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'near_pass_grade_only', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
       makeRow({ publicationId: '4054', currentCorpusStatus: 'remediated_fail', cohortLabel: 'structure_heavy', stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'near_pass_grade_only', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' } }),
@@ -760,7 +824,6 @@ describe('structure wave Stage 4', () => {
     expect(row?.reasonCodes).toContain('stage4:reclassified_from_structure_heavy')
   })
 
-
   it('reports the latest completed eight-row wave separately from cumulative append history', () => {
     const wave: Stage4StructureWaveDocument = {
       generatedAt: '2026-03-31T06:00:00.000Z',
@@ -830,6 +893,30 @@ describe('structure wave Stage 4', () => {
     const row = next.document.rows.find(candidate => candidate.publicationId === 'staged')
     expect(row?.currentCorpusStatus).toBe('staged_for_replacement')
     expect(row?.reasonCodes).toContain('stage4.5:staged_pass_candidate_survivor')
+  })
+
+  it('preserves verified_pass for staged pass-candidate survivors with verified ledger truth', () => {
+    const artifacts = makeArtifacts([
+      makeRow({
+        publicationId: 'verified-staged',
+        currentCorpusStatus: 'verified_pass',
+        cohortLabel: 'structure_heavy',
+        promotionTruth: {
+          promotionStatus: 'verified_pass',
+          ledgerRowPresent: true,
+          stagedReplacementPath: '/staged/verified-staged.pdf',
+          replacementChecksumSha256: 'x',
+          verificationPassed: true,
+        },
+        statusEvidence: { sourceManifestPath: '/tmp/replacement-map.json', sourceStatus: 'replacement_map_present', verificationManifestPath: '/tmp/verification.json', verificationClassification: 'verified_pass', verificationTimestamp: null, verificationReportPath: null, outcomeManifestPath: '/tmp/stage4-structure-wave.outcomes.json', outcomeStatus: 'remediated_pass_candidate', latestReportPath: '/tmp/verified-staged.json', candidateManifestPath: null },
+        stage4StructureDiagnostics: { structureWaveBucket: 'metadata_navigation_residuals', terminalSurvivorClass: 'staged_pass_candidate_survivor', dominantStructurePhase: null, hasLogicalStructureDebt: false, hasHeadingDebt: false, hasReadingOrderDebt: false, hasMetadataNavigationDebt: true, hasMixedFigureResiduals: false, hasBoundedRuntimeWording: false, originLane: 'native_structure_heavy' },
+      }),
+    ])
+
+    const next = applyStage4StructureWaveReclassification(artifacts)
+    const row = next.document.rows.find(candidate => candidate.publicationId === 'verified-staged')
+    expect(row?.currentCorpusStatus).toBe('verified_pass')
+    expect(row?.reasonCodes).toContain('stage4.6:preserve_verified_promotion_truth')
   })
 
   it('builds overlap analysis for 3877 and 3903 and terminalizes them as reading-order survivors', () => {
@@ -1086,4 +1173,3 @@ describe('structure wave Stage 4', () => {
     expect(canaries.rows.some(row => row.publicationId === '3465' && row.stage4RepresentativeKind === 'font_text_extractability_survivor')).toBe(true)
     expect(canaries.rows.some(row => row.publicationId === '3671' && row.stage4RepresentativeKind === 'figure_spillover_survivor')).toBe(true)
   })
-})

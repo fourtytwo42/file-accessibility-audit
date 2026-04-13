@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-04-07T21:30:23.004Z",
+  "queueName": "manual-mcp-next-batch-v2",
+  "totalCandidates": 20,
+  "selectionRule": "failing_only_no_already_passing_locals_figure_heavy_light_runtime_prefiltered_full_final_excludes_prior_next_batch",
+  "selectedPublicationIds": [
+    "4632",
+    "4492",
+    "4495",
+    "4497",
+    "4585",
+    "4705",
+    "4514",
+    "4685",
+    "4485",
+    "4579",
+    "4624",
+    "4752",
+    "3654",
+    "3657",
+    "3662",
+    "3687",
+    "3772",
+    "3917",
+    "4493",
+    "4670"
+  ],
+  "skippedAlreadyPassingIds": [],
+  "preflightRowsExamined": 20,
+  "poolSizeBeforePreflight": 48,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/manual-mcp-next-batch-v2.json"
+}

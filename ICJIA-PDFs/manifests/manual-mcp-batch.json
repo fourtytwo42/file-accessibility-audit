@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-04-08T02:08:07.929Z",
+  "queueName": "manual-mcp-batch",
+  "sourceManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/publication-pdf-replacement-map.json",
+  "selectedPublicationIds": [
+    "3616"
+  ],
+  "skippedAlreadyPassingIds": [],
+  "candidates": [
+    {
+      "publicationId": "3616",
+      "publicationTitle": "GREENE County Profile",
+      "serverHost": "143.244.146.43",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3616-GREENE_County_Profile.pdf",
+      "rationale": "manual_mcp_batch",
+      "alreadyPassing": false
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "runId": "95de3d75-4819-4d20-947e-5cb4a129f087",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading.outcomes.json",
+  "firstStartedAt": "2026-04-11T22:27:35.220Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 6827131,
+  "lastHeartbeatAt": "2026-04-12T00:21:22.351Z",
+  "totalCandidates": 970,
+  "processed": 970,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": 80
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 312,
+    "keep_fail_80_to_89": 352,
+    "drop_fail_lt_80": 306,
+    "processing_error": 0,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "4774",
+    "publicationTitle": "Restore, Reinvest, and Renew (R3) Cohort One Scale and Reach Report",
+    "status": "graded",
+    "resultBand": "pass_ge_90",
+    "finalOverallScore": 94,
+    "processedAt": "2026-04-12T00:20:28.673Z",
+    "durationMs": 53662
+  }
+}

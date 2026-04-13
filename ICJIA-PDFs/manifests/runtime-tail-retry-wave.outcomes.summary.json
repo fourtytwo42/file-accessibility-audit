@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-04-06T07:26:29.265Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-retry-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 99,
+    "processed": 43,
+    "readyToReplace": 4,
+    "remediatedPassCandidates": 4,
+    "failedAfterRemediation": 35,
+    "sourceMissing": 0,
+    "processingError": 4,
+    "remaining": 56
+  },
+  "latestProcessed": {
+    "publicationId": "4557",
+    "publicationTitle": "ICJIA FY13 Annual Report",
+    "priorityRank": 43,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 62,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY13.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY13.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY13.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4557-ICJIA_FY13_Annual_Report.failure.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-06T07:26:29.265Z",
+    "durationMs": 1584823,
+    "original": {
+      "overallScore": 20,
+      "grade": "F",
+      "pageCount": 38,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 35,
+      "grade": "F",
+      "pageCount": 38,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is F, not A.",
+        "Final overall score is 35, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+        "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.metadata_identification",
+        "pdfua.bookmark_language"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Document Title & Language",
+        "Heading Structure",
+        "Bookmarks / Navigation",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4557-ICJIA_FY13_Annual_Report.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4557-ICJIA_FY13_Annual_Report.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4557-ICJIA_FY13_Annual_Report.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "5a9be3b430bd2c879d125880aebbbd86f4b0a445a8d47a1a32a11949f6566358",
+      "remediatedPdfSha256": "5a9be3b430bd2c879d125880aebbbd86f4b0a445a8d47a1a32a11949f6566358",
+      "stagedReplacementSha256": null
+    }
+  }
+}

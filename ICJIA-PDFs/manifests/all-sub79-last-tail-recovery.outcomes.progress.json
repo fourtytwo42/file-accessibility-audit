@@ -1,0 +1,35 @@
+{
+  "runId": "b04e4101-d900-422d-b19f-a2a043217a35",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-sub79-last-tail-recovery.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-sub79-last-tail-recovery.outcomes.json",
+  "firstStartedAt": "2026-04-11T18:23:05.653Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 11331081,
+  "lastHeartbeatAt": "2026-04-11T21:31:56.734Z",
+  "totalCandidates": 80,
+  "processed": 80,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 3,
+    "keep_fail_80_to_89": 0,
+    "drop_fail_lt_80": 76,
+    "processing_error": 1,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "4615",
+    "publicationTitle": "Illinois Helping Everyone Access Linked Systems Action Plan",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "finalOverallScore": 42,
+    "processedAt": "2026-04-11T21:31:56.730Z",
+    "durationMs": 177557
+  }
+}

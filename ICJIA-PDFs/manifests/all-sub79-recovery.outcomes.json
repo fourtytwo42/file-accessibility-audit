@@ -1,0 +1,283 @@
+{
+  "generatedAt": "2026-04-11T18:15:53.453Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-sub79-recovery.json",
+  "laneName": "all-sub79-recovery",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "totals": {
+    "targetCandidates": 370,
+    "processed": 3,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 3,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 367
+  },
+  "outcomes": [
+    {
+      "publicationId": "3460",
+      "publicationTitle": "Community Policing in Chicago Year One An Interim Report",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 76,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "caps",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.remediation.json",
+      "status": "failed_after_remediation",
+      "resultBand": "drop_fail_lt_80",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T18:13:07.321Z",
+      "durationMs": 343191,
+      "original": {
+        "overallScore": 76,
+        "grade": "C",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 76,
+        "grade": "C",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 60,
+        "priorGrade": "D",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T08:36:54.069Z"
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final overall score is 76, below relaxed threshold 90."
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-sub79-recovery/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "18cdfb566e10e12f55067b884d572cd320346b5fc989f19a8c738b64a572480d",
+        "remediatedPdfSha256": "18cdfb566e10e12f55067b884d572cd320346b5fc989f19a8c738b64a572480d",
+        "stagedReplacementSha256": null
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 76, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    },
+    {
+      "publicationId": "4051",
+      "publicationTitle": "2005 Annual Report Motor Vehicle Theft Prevention Council",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 76,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "ar",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/ar2005.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4051-2005_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/ar2005.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/4051-2005_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+      "status": "failed_after_remediation",
+      "resultBand": "drop_fail_lt_80",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T18:14:50.919Z",
+      "durationMs": 103596,
+      "original": {
+        "overallScore": 76,
+        "grade": "C",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 76,
+        "grade": "C",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 60,
+        "priorGrade": "D",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T08:30:44.562Z"
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final overall score is 76, below relaxed threshold 90."
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4051-2005_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/4051-2005_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-sub79-recovery/143.244.146.43/4051-2005_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cb9a75c9091b3d0bba1da018a500b567dc2e3a1b802fc8e96c7e550267a91912",
+        "remediatedPdfSha256": "cb9a75c9091b3d0bba1da018a500b567dc2e3a1b802fc8e96c7e550267a91912",
+        "stagedReplacementSha256": null
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 76, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 67,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "crimsentenclayout",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+      "status": "failed_after_remediation",
+      "resultBand": "drop_fail_lt_80",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T18:15:53.453Z",
+      "durationMs": 62533,
+      "original": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 59,
+        "priorGrade": "F",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T08:36:56.013Z"
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final overall score is 67, below relaxed threshold 90."
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "380cb19ac5909bf2013de8b7af10e3cab27c7b426897280f5188e536ca7c8930",
+        "remediatedPdfSha256": "380cb19ac5909bf2013de8b7af10e3cab27c7b426897280f5188e536ca7c8930",
+        "stagedReplacementSha256": null
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    }
+  ]
+}

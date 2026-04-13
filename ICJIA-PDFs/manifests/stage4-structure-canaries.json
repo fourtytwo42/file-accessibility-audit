@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.602Z",
+  "generatedAt": "2026-04-06T01:00:35.344Z",
   "summary": {
     "totalCanaries": 11,
     "bySource": {
@@ -26,9 +26,8 @@
       "structureWaveBucket": "structure_processing_error_retry",
       "originLane": "reclassified_from_short_high_likelihood",
       "hasGenericTimeoutWording": false,
-      "benchmarkTerminalState": "processing_error",
+      "benchmarkTerminalState": "hard_fail",
       "notes": [
-        "Inspection budget exceeded (light=4, deep=9, total=13).",
         "benchmark_category:structure"
       ]
     },
@@ -54,7 +53,7 @@
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage4RepresentativeKind": "staged_pass_candidate_survivor",
-      "currentCorpusStatus": "staged_for_replacement",
+      "currentCorpusStatus": "verified_pass",
       "currentCohortLabel": "structure_heavy",
       "structureWaveBucket": "metadata_navigation_residuals",
       "originLane": "native_structure_heavy",
@@ -161,8 +160,8 @@
       ]
     },
     {
-      "publicationId": "3483",
-      "publicationTitle": "Trends and Issues 1997",
+      "publicationId": "3778",
+      "publicationTitle": "REPORT TO THE GOVERNORS COMMISSION ON CAPITAL PUNISHMENTVictim and Survivor Issues in Homicide Cases Focus Group Report",
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage4RepresentativeKind": "figure_spillover_survivor",
@@ -173,7 +172,7 @@
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3778-REPORT_TO_THE_GOVERNORS_COMMISSION_ON_CAPITAL_PUNISHMENTVictim_and_Survivor_Issues_in_Homicide_Cases_Focus_Group_Report.remediation.json",
         "Figure spillover survivor representative."
       ]
     },

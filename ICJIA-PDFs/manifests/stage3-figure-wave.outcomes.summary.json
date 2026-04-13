@@ -1,76 +1,74 @@
 {
-  "generatedAt": "2026-03-31T00:46:42.602Z",
+  "generatedAt": "2026-04-04T22:58:55.303Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage3-figure-wave.json",
   "concurrency": 8,
   "totals": {
     "targetCandidates": 8,
-    "processed": 12,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 0,
-    "failedAfterRemediation": 8,
+    "processed": 70,
+    "readyToReplace": 4,
+    "remediatedPassCandidates": 4,
+    "failedAfterRemediation": 66,
     "sourceMissing": 0,
-    "processingError": 4,
+    "processingError": 0,
     "remaining": 0
   },
   "latestProcessed": {
-    "publicationId": "4186",
-    "publicationTitle": "Underreporting of violent victimization impedes justice services",
-    "priorityRank": 4,
+    "publicationId": "4551",
+    "publicationTitle": "Illinois Motor Vehicle Theft Prevention Council 2015 Annual Report",
+    "priorityRank": 6,
     "priorityTier": "high",
-    "passLikelihoodScore": 72,
+    "passLikelihoodScore": 71,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Disproportionate%20reporting%20March%202008.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+    "fileUrl": "https://archive.icjia.cloud/files/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Disproportionate_reporting_March_2008.pdf.json",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2015_Motor_Vehicle_Annual_Report.pdf.json",
     "status": "failed_after_remediation",
     "promotionStatus": null,
-    "processedAt": "2026-03-31T00:46:42.602Z",
-    "durationMs": 185818,
+    "processedAt": "2026-04-04T22:58:55.302Z",
+    "durationMs": 2181404,
     "original": {
-      "overallScore": 20,
+      "overallScore": 46,
       "grade": "F",
-      "pageCount": 4,
+      "pageCount": 19,
       "isScanned": false
     },
     "final": {
-      "overallScore": 54,
-      "grade": "F",
-      "pageCount": 4,
+      "overallScore": 71,
+      "grade": "C",
+      "pageCount": 19,
       "isScanned": false
     },
     "gate": {
       "passed": false,
       "reasons": [
-        "Final grade is F, not A.",
-        "Final overall score is 54, not 100.",
-        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
-        "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        "Final grade is C, not A.",
+        "Final overall score is 71, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.heading_content_quality",
+        "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
       ],
       "blockingLocalFindingKeys": [
         "pdfua.logical_structure",
-        "pdfua.untagged_rendered_images",
-        "pdfua.figure_alt_or_artifact"
+        "pdfua.heading_content_quality"
       ],
       "unresolvedCategoryLabels": [
         "Text Extractability",
         "Heading Structure",
-        "Alt Text on Images",
         "Reading Order",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.pdf",
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.failure.json"
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "3a5959cbeb451eb266639edfeb800b961a7d0dfd4c65adc6d1f9630e656c333d",
-      "remediatedPdfSha256": "3a5959cbeb451eb266639edfeb800b961a7d0dfd4c65adc6d1f9630e656c333d",
+      "gateEvaluatedBufferSha256": "867bcc394fbdabd50d5ac9249dcae66af99f96edbd809300c11937daa1c21692",
+      "remediatedPdfSha256": "867bcc394fbdabd50d5ac9249dcae66af99f96edbd809300c11937daa1c21692",
       "stagedReplacementSha256": null
     }
   }

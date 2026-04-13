@@ -1,0 +1,156 @@
+{
+  "generatedAt": "2026-04-07T14:35:50.238Z",
+  "sourcePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/figure-final-mile-closure.json",
+  "selectedPublicationIds": [
+    "4481",
+    "4186",
+    "4593"
+  ],
+  "candidates": [
+    {
+      "priorityRank": 2,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4481",
+      "publicationTitle": "Addressing Child Exposure to Violence",
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "storageKind": "researchhub_upload",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "figure_heavy",
+      "overallScore": 92,
+      "grade": "B",
+      "pageCount": 6,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 2,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "figure_final_mile_closure",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.remediation.json",
+      "selectionReasons": [
+        "figure_final_mile_closure",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "addressing_child_exposure_to_violence_final_t",
+      "latestObservedStatus": "failed_after_remediation",
+      "latestObservedProcessedAt": "2026-04-07T02:59:45.250Z",
+      "observedBlockingFindingShrink": false,
+      "candidateEngineSliceTag": "figure_final_mile_closure"
+    },
+    {
+      "priorityRank": 1,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4186",
+      "publicationTitle": "Underreporting of violent victimization impedes justice services",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Disproportionate%20reporting%20March%202008.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "figure_heavy",
+      "overallScore": 87,
+      "grade": "B",
+      "pageCount": 4,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "figure_final_mile_closure",
+        "observed_blocker_shrink",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
+      "selectionReasons": [
+        "figure_final_mile_closure",
+        "observed_blocker_shrink",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "disproportionate_reporting_march",
+      "latestObservedStatus": "failed_after_remediation",
+      "latestObservedProcessedAt": "2026-04-07T02:58:34.694Z",
+      "observedBlockingFindingShrink": true,
+      "candidateEngineSliceTag": "figure_final_mile_closure"
+    },
+    {
+      "priorityRank": 12,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "storageKind": "researchhub_upload",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "figure_heavy",
+      "overallScore": 83,
+      "grade": "B",
+      "pageCount": 20,
+      "isScanned": false,
+      "blockerFamilyCount": 1,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [
+        "pdfua.nested_alt_text"
+      ],
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "figure_final_mile_closure",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+      "selectionReasons": [
+        "figure_final_mile_closure",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "focused_deterrence_pdf_t",
+      "latestObservedStatus": "failed_after_remediation",
+      "latestObservedProcessedAt": "2026-04-07T03:33:13.098Z",
+      "observedBlockingFindingShrink": false,
+      "candidateEngineSliceTag": "figure_final_mile_closure"
+    }
+  ]
+}

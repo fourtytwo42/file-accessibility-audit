@@ -1,0 +1,35 @@
+{
+  "runId": "753511dd-ae5d-443b-b6a3-57758b9ee8c0",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json",
+  "firstStartedAt": "2026-04-09T13:40:54.830Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 50303215,
+  "lastHeartbeatAt": "2026-04-10T03:39:18.045Z",
+  "totalCandidates": 500,
+  "processed": 500,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 2,
+    "keep_fail_80_to_89": 1,
+    "drop_fail_lt_80": 493,
+    "processing_error": 4,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "3483",
+    "publicationTitle": "Trends and Issues 1997",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "finalOverallScore": 50,
+    "processedAt": "2026-04-10T03:39:18.017Z",
+    "durationMs": 996739
+  }
+}

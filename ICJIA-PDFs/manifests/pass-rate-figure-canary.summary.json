@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.462Z",
+  "figurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pass-rate-figure-canary.json",
+  "totals": {
+    "eligibleRows": 91,
+    "selectedRows": 8,
+    "skippedRows": 715
+  },
+  "totalCandidates": 8,
+  "selectedPublicationIds": [
+    "3709",
+    "3712",
+    "3716",
+    "4588",
+    "4562",
+    "3758",
+    "4643",
+    "4574"
+  ],
+  "selectionSanity": {
+    "dominantFamilyCounts": {
+      "figure": 8
+    },
+    "inScopeBlockerKeyCounts": {
+      "pdfua.figure_alt_or_artifact": 8,
+      "category.alt_text": 5
+    },
+    "excludedBecauseSecondary": 631,
+    "excludedNearPassAnomalies": 1
+  }
+}

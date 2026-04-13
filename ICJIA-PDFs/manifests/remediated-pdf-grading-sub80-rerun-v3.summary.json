@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-04-13T01:43:01.062Z",
+  "laneName": "remediated-pdf-grading-sub80-rerun-v3",
+  "sourceOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v2.outcomes.json",
+  "sourceOutcomesGeneratedAt": "2026-04-13T01:25:55.906Z",
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "totals": {
+    "scannedReportsConsidered": 216,
+    "selectedCandidates": 191,
+    "byTier": {
+      "highest": 21,
+      "medium": 154,
+      "high": 16
+    },
+    "excludedAbove79": 2,
+    "excludedNonTerminal": 23,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0
+  }
+}

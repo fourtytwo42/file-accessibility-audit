@@ -1,0 +1,35 @@
+{
+  "runId": "24177e6f-d324-485e-995e-8115d35f1c92",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v2.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v2.outcomes.json",
+  "firstStartedAt": "2026-04-12T18:35:58.001Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 23012990,
+  "lastHeartbeatAt": "2026-04-13T01:25:55.911Z",
+  "totalCandidates": 216,
+  "processed": 216,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 21,
+    "keep_fail_80_to_89": 2,
+    "drop_fail_lt_80": 191,
+    "processing_error": 2,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "4723",
+    "publicationTitle": "ICJIA State Fiscal Year 2023 Annual Report",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "finalOverallScore": 35,
+    "processedAt": "2026-04-13T01:25:55.900Z",
+    "durationMs": 822049
+  }
+}

@@ -1,0 +1,3581 @@
+{
+  "generatedAt": "2026-04-06T23:47:49.014Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/small-fast-pass.json",
+  "laneName": "small-fast-pass",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "remediation_fast",
+  "concurrency": 10,
+  "totals": {
+    "targetCandidates": 48,
+    "processed": 48,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 48,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3794",
+      "publicationTitle": "Extended Jurisdiction Juvenile Prosecutions in Illinois",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "ejjoga",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/EJJOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/EJJOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/EJJOGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:07.120Z",
+      "durationMs": 49962,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 55,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 55, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "37dd87fa7862d56fa445ab7956945d1856a83115262ff2c11e8e9fec8a2df923",
+        "remediatedPdfSha256": "37dd87fa7862d56fa445ab7956945d1856a83115262ff2c11e8e9fec8a2df923",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3465",
+      "publicationTitle": "Are you a Victim of Domestic Violence",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "ruvictim",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/ruvictim.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/ruvictim.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/ruvictim.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:08.264Z",
+      "durationMs": 51105,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3465-Are_you_a_Victim_of_Domestic_Violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "766addc9f5827dba5a6fd4a0141b0913c0a508c7bf70482154a7c20f29106335",
+        "remediatedPdfSha256": "766addc9f5827dba5a6fd4a0141b0913c0a508c7bf70482154a7c20f29106335",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3651",
+      "publicationTitle": "McGruff You can fight crime in your neighborhood",
+      "priorityRank": 10,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "mgneigh",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgneigh.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgneigh.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgneigh.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:10.114Z",
+      "durationMs": 52955,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3651-McGruff_You_can_fight_crime_in_your_neighborhood.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0daa265c969319cc97c2d481891cfa4fd2431ca3e3234d872ed45a01b280ba14",
+        "remediatedPdfSha256": "0daa265c969319cc97c2d481891cfa4fd2431ca3e3234d872ed45a01b280ba14",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3550",
+      "publicationTitle": "McGruff Will Your Familys Car be Stolen This Year",
+      "priorityRank": 9,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "mgmotor",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mcgruff/mgmotor.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mcgruff/mgmotor.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mcgruff/mgmotor.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:14.105Z",
+      "durationMs": 56946,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3550-McGruff_Will_Your_Familys_Car_be_Stolen_This_Year.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a003e1e95a24174b92a18475be03a6a53d32e72771420fec8d7860af5e60964d",
+        "remediatedPdfSha256": "a003e1e95a24174b92a18475be03a6a53d32e72771420fec8d7860af5e60964d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4054",
+      "publicationTitle": "Juvenile commitment rates reveal significant racial disparity",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "dmccommitments",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/DMCcommitments.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:37.844Z",
+      "durationMs": 80686,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4054-Juvenile_commitment_rates_reveal_significant_racial_disparity.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0d695dff1a47c7b8e971b508fa0e21eb55fc6dee1465a0e6e3c13baf9b3e1b83",
+        "remediatedPdfSha256": "0d695dff1a47c7b8e971b508fa0e21eb55fc6dee1465a0e6e3c13baf9b3e1b83",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4023",
+      "publicationTitle": "A Profile of the KaneCook Auto Theft Task Force (KCAT)",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "kcat",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/KCAT03.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/KCAT03.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:54.401Z",
+      "durationMs": 97242,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4023-A_Profile_of_the_KaneCook_Auto_Theft_Task_Force_KCAT.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a1fde4611dc58adf81dd92150a0d7932a2dcad147c59fb66fd1a9431cf1ff09d",
+        "remediatedPdfSha256": "a1fde4611dc58adf81dd92150a0d7932a2dcad147c59fb66fd1a9431cf1ff09d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4067",
+      "publicationTitle": "A guide for juvenile corrections",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "icjia_corrections",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/BARJ/ICJIA Corrections.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4067-A_guide_for_juvenile_corrections.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:29:57.271Z",
+      "durationMs": 100112,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 68,
+        "grade": "D",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 68, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4067-A_guide_for_juvenile_corrections.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4067-A_guide_for_juvenile_corrections.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4067-A_guide_for_juvenile_corrections.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "adf5c24f9a88644550ed727e505ee3e88d30cc8b6b854383ab065c2eff0e3854",
+        "remediatedPdfSha256": "adf5c24f9a88644550ed727e505ee3e88d30cc8b6b854383ab065c2eff0e3854",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3767",
+      "publicationTitle": "Safety Plan for Domestic Violence Victims",
+      "priorityRank": 11,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "safetyplan",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/SafetyPlan.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/SafetyPlan.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/SafetyPlan.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:30:00.268Z",
+      "durationMs": 53147,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding, pdfua.font_unicode",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "10b2b1656dc50b8886e95a6e12b4f8ece901dc4c226ec2b9884d959e9e913776",
+        "remediatedPdfSha256": "10b2b1656dc50b8886e95a6e12b4f8ece901dc4c226ec2b9884d959e9e913776",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3771",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Spanish)",
+      "priorityRank": 12,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "bor_spanish",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_spanish.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_spanish.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_spanish.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:30:03.235Z",
+      "durationMs": 54971,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_unicode",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_unicode"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3771-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Spanish.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "2d138c2cea588d7cfdc603d9d3c29e82c4d4835fd4b37c2a0f2cc2b952fee54a",
+        "remediatedPdfSha256": "2d138c2cea588d7cfdc603d9d3c29e82c4d4835fd4b37c2a0f2cc2b952fee54a",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3981",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (Polish)",
+      "priorityRank": 14,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "bor_polish",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_polish.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_polish.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_polish.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:30:13.319Z",
+      "durationMs": 59213,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3981-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_Polish.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b7014b91d59b5261af6841b57f21f75f078ada857ba09a4c07353c342e6bd585",
+        "remediatedPdfSha256": "b7014b91d59b5261af6841b57f21f75f078ada857ba09a4c07353c342e6bd585",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3964",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (English)",
+      "priorityRank": 13,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "bor_english",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/bor_english.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/bor_english.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/bor_english.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:30:15.820Z",
+      "durationMs": 65706,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 79,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 79, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3964-Illinois_Bill_of_Rights_for_Victims_and_Witnesses_of_Violent_Crime_English.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ccae137ef7b828eff0cac26a72f0ef74e81d0389b95b7d6b16b8fb3941a1dc45",
+        "remediatedPdfSha256": "ccae137ef7b828eff0cac26a72f0ef74e81d0389b95b7d6b16b8fb3941a1dc45",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4046",
+      "publicationTitle": "Chicago Homicide Dataset Series Childrens risk of homicide victimization records 31year increase",
+      "priorityRank": 15,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "child_homicide_final",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Child homicide final.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:31:10.554Z",
+      "durationMs": 92709,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4046-Chicago_Homicide_Dataset_Series_Childrens_risk_of_homicide_victimization_records_31year_increase.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "e9a74145263c9dfe9fb479c2db15ad6ac3a892a4bfc6d37dce37f6ae4c413053",
+        "remediatedPdfSha256": "e9a74145263c9dfe9fb479c2db15ad6ac3a892a4bfc6d37dce37f6ae4c413053",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3610",
+      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "priorityRank": 21,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "collaboration_a",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/cwhrs/collaboration-3a.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:31:12.734Z",
+      "durationMs": 56913,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3610-Collaboration_in_the_Chicago_Womens_Health_Risk_Study.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "e1906815f18df155277b5b0ee7b9991dd52408ae858fe5af951c54666b370637",
+        "remediatedPdfSha256": "e1906815f18df155277b5b0ee7b9991dd52408ae858fe5af951c54666b370637",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4050",
+      "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+      "priorityRank": 16,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "mrt",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/MRT.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/MRT.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/MRT.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:31:18.923Z",
+      "durationMs": 84521,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4050-Meth_response_teams_easing_burden_on_localized_drug_task_forces.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8e13f911d355bba917e4333d6dc33500a07cb925c098179e75badd541ed5ce9e",
+        "remediatedPdfSha256": "8e13f911d355bba917e4333d6dc33500a07cb925c098179e75badd541ed5ce9e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4135",
+      "publicationTitle": "Juvenile arrest rates reveal significant racial disparity",
+      "priorityRank": 17,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "arrests",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Arrests.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Arrests.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Arrests.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:31:21.715Z",
+      "durationMs": 84443,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 64,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 64, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4135-Juvenile_arrest_rates_reveal_significant_racial_disparity.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4466798159bc8be5e8f913e1d945672549d7b0e93919bed28e1ce17314acd0bf",
+        "remediatedPdfSha256": "4466798159bc8be5e8f913e1d945672549d7b0e93919bed28e1ce17314acd0bf",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4481",
+      "publicationTitle": "Addressing Child Exposure to Violence",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "addressing_child_exposure_to_violence_final_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.nested_alt_text",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:03.348Z",
+      "durationMs": 226189,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4180e7bcb7571749acf0ea2eaa5d17d3f7ddc72735c912e9b502e6a91504fbfb",
+        "remediatedPdfSha256": "4180e7bcb7571749acf0ea2eaa5d17d3f7ddc72735c912e9b502e6a91504fbfb",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3653",
+      "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
+      "priorityRank": 22,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "ogav_n",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/ogav3n1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/ogav3n1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:15.283Z",
+      "durationMs": 64728,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "45ff3c9c14e618b61f8379c539813e944920c34553d6a7a5c3fc7a2193419e59",
+        "remediatedPdfSha256": "45ff3c9c14e618b61f8379c539813e944920c34553d6a7a5c3fc7a2193419e59",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3663",
+      "publicationTitle": "Juvenile Probation Programs Evaluated",
+      "priorityRank": 23,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "juvdayreport",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvdayreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvdayreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvdayreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:15.288Z",
+      "durationMs": 62553,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3663-Juvenile_Probation_Programs_Evaluated.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1e6cec48159d8468702fcd7a2a89816350aeba16a81cb6b000af21f6dee612c6",
+        "remediatedPdfSha256": "1e6cec48159d8468702fcd7a2a89816350aeba16a81cb6b000af21f6dee612c6",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3761",
+      "publicationTitle": "Combating gang violence in Chicagos Little Village neighborhood",
+      "priorityRank": 24,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "gvrp",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/GVRP.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/GVRP.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/GVRP.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3761-Combating_gang_violence_in_Chicagos_Little_Village_neighborhood.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:20.111Z",
+      "durationMs": 61187,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3761-Combating_gang_violence_in_Chicagos_Little_Village_neighborhood.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3761-Combating_gang_violence_in_Chicagos_Little_Village_neighborhood.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3761-Combating_gang_violence_in_Chicagos_Little_Village_neighborhood.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "46b266c6c9a48d0d78f7b3ae126fb5de787abf4ca8ac8d31c424c47529d7b082",
+        "remediatedPdfSha256": "46b266c6c9a48d0d78f7b3ae126fb5de787abf4ca8ac8d31c424c47529d7b082",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3762",
+      "publicationTitle": "Outcomes of the Gang Violence Reduction Project",
+      "priorityRank": 25,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "outcomes",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/outcomes.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/outcomes.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/outcomes.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3762-Outcomes_of_the_Gang_Violence_Reduction_Project.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:24.605Z",
+      "durationMs": 62889,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3762-Outcomes_of_the_Gang_Violence_Reduction_Project.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3762-Outcomes_of_the_Gang_Violence_Reduction_Project.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3762-Outcomes_of_the_Gang_Violence_Reduction_Project.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1deb5f3febb083341acc189dc5d9e63cf6bb965b24de4965d33ab3f628ec2334",
+        "remediatedPdfSha256": "1deb5f3febb083341acc189dc5d9e63cf6bb965b24de4965d33ab3f628ec2334",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4167",
+      "publicationTitle": "Juvenile court",
+      "priorityRank": 19,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "get_the_facts_juvenile_court",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/Get the Facts Juvenile court.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/Get the Facts Juvenile court.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/Get%20the%20Facts%20Juvenile%20court.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4167-Juvenile_court.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:26.486Z",
+      "durationMs": 143250,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4167-Juvenile_court.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4167-Juvenile_court.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4167-Juvenile_court.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4d7ae1df1adacd71316bf648e4729ebdbd91ab42f902fab18832c28323320898",
+        "remediatedPdfSha256": "4d7ae1df1adacd71316bf648e4729ebdbd91ab42f902fab18832c28323320898",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4153",
+      "publicationTitle": "Juvenile corrections and parole",
+      "priorityRank": 18,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "gtf_juvenilecorrections",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF-juvenilecorrections.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF-juvenilecorrections.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF-juvenilecorrections.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4153-Juvenile_corrections_and_parole.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:30.441Z",
+      "durationMs": 150172,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4153-Juvenile_corrections_and_parole.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4153-Juvenile_corrections_and_parole.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4153-Juvenile_corrections_and_parole.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f7e1cf298ec764bc06a4b4e804c0a985ccc51c520336d14dedea593c47b31ef1",
+        "remediatedPdfSha256": "f7e1cf298ec764bc06a4b4e804c0a985ccc51c520336d14dedea593c47b31ef1",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
+      "priorityRank": 26,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "treatment",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/treatment.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/treatment.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/treatment.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:32:49.344Z",
+      "durationMs": 45995,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "71f6ead4c91aae920a830f0f83df0e514f898edf8b10d4d2fb4be24367fa1994",
+        "remediatedPdfSha256": "71f6ead4c91aae920a830f0f83df0e514f898edf8b10d4d2fb4be24367fa1994",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4169",
+      "publicationTitle": "Juvenile sentencing",
+      "priorityRank": 20,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "gtf_juvenilesentencing",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4169-Juvenile_sentencing.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:15.534Z",
+      "durationMs": 182214,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4169-Juvenile_sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4169-Juvenile_sentencing.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4169-Juvenile_sentencing.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cadd91224f03646ffe20a2b1419007cb29a8e8b04b5a0d1a923c27b4b853b059",
+        "remediatedPdfSha256": "cadd91224f03646ffe20a2b1419007cb29a8e8b04b5a0d1a923c27b4b853b059",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3859",
+      "publicationTitle": "Cook County Day Reporting Center Serves as an Alternative to Incarceration",
+      "priorityRank": 27,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "final_revised_cookdrc_oga",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/final revised CookDRC.OGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/final revised CookDRC.OGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/final%20revised%20CookDRC.OGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3859-Cook_County_Day_Reporting_Center_Serves_as_an_Alternative_to_Incarceration.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:17.163Z",
+      "durationMs": 61879,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3859-Cook_County_Day_Reporting_Center_Serves_as_an_Alternative_to_Incarceration.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3859-Cook_County_Day_Reporting_Center_Serves_as_an_Alternative_to_Incarceration.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3859-Cook_County_Day_Reporting_Center_Serves_as_an_Alternative_to_Incarceration.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "3f030e994471b4240e74ba53190995443ac68cd8772c72d47e939611431c8678",
+        "remediatedPdfSha256": "3f030e994471b4240e74ba53190995443ac68cd8772c72d47e939611431c8678",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3866",
+      "publicationTitle": "Juvenile Sex Offender Treatment Program Provides Residential Aftercare Services",
+      "priorityRank": 28,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "juvenile_pdf",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/juvenile.pdf.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/juvenile.pdf.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/juvenile.pdf.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3866-Juvenile_Sex_Offender_Treatment_Program_Provides_Residential_Aftercare_Services.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:19.754Z",
+      "durationMs": 64465,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 64,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 64, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3866-Juvenile_Sex_Offender_Treatment_Program_Provides_Residential_Aftercare_Services.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3866-Juvenile_Sex_Offender_Treatment_Program_Provides_Residential_Aftercare_Services.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3866-Juvenile_Sex_Offender_Treatment_Program_Provides_Residential_Aftercare_Services.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "50885ca6289da27b834a9c2abdac3b48196792ad804e7fbbacef72ddc91c5dee",
+        "remediatedPdfSha256": "50885ca6289da27b834a9c2abdac3b48196792ad804e7fbbacef72ddc91c5dee",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3877",
+      "publicationTitle": "Family Group Conferences Offer Promise for Juvenile Cases",
+      "priorityRank": 31,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "family_conf",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/family conf.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/family conf.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/family conf.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:25.321Z",
+      "durationMs": 58834,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3877-Family_Group_Conferences_Offer_Promise_for_Juvenile_Cases.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "17530941d5aadaac393b6f0e1586284c1c03d3adac297b042bef5cb1c22a2e49",
+        "remediatedPdfSha256": "17530941d5aadaac393b6f0e1586284c1c03d3adac297b042bef5cb1c22a2e49",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3872",
+      "publicationTitle": "Authority Adopts State Criminal Justice Plan",
+      "priorityRank": 29,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "cjplan",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/cjplan2.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/cjplan2.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/cjplan2.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3872-Authority_Adopts_State_Criminal_Justice_Plan.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:26.834Z",
+      "durationMs": 66722,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3872-Authority_Adopts_State_Criminal_Justice_Plan.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3872-Authority_Adopts_State_Criminal_Justice_Plan.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3872-Authority_Adopts_State_Criminal_Justice_Plan.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f61210a08cc227041bbbc1d8704e2530f4d5cd1faf29030ca38b5c8193584579",
+        "remediatedPdfSha256": "f61210a08cc227041bbbc1d8704e2530f4d5cd1faf29030ca38b5c8193584579",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3875",
+      "publicationTitle": "Specialized Sex Offender Probation in Cook County Links Supervision Treatment",
+      "priorityRank": 30,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "ccaso",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/CCASo.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/CCASo.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CCASo.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3875-Specialized_Sex_Offender_Probation_in_Cook_County_Links_Supervision_Treatment.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:32.204Z",
+      "durationMs": 67594,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3875-Specialized_Sex_Offender_Probation_in_Cook_County_Links_Supervision_Treatment.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3875-Specialized_Sex_Offender_Probation_in_Cook_County_Links_Supervision_Treatment.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3875-Specialized_Sex_Offender_Probation_in_Cook_County_Links_Supervision_Treatment.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "3fdf87a926df09238de2c7c49aa93df8d79b8229303ea7bcdfa00c4c185e38e5",
+        "remediatedPdfSha256": "3fdf87a926df09238de2c7c49aa93df8d79b8229303ea7bcdfa00c4c185e38e5",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3899",
+      "publicationTitle": "Domestic Violence Probation in Lake Winnebago and Kankakee Counties",
+      "priorityRank": 32,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "dvproboga",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/DVprobOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/DVprobOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/DVprobOGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3899-Domestic_Violence_Probation_in_Lake_Winnebago_and_Kankakee_Counties.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:39.329Z",
+      "durationMs": 68888,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3899-Domestic_Violence_Probation_in_Lake_Winnebago_and_Kankakee_Counties.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3899-Domestic_Violence_Probation_in_Lake_Winnebago_and_Kankakee_Counties.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3899-Domestic_Violence_Probation_in_Lake_Winnebago_and_Kankakee_Counties.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8d83447839753b12ff1a163c39052071a95648b4f17c66ef89a3207b48522706",
+        "remediatedPdfSha256": "8d83447839753b12ff1a163c39052071a95648b4f17c66ef89a3207b48522706",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3903",
+      "publicationTitle": "The Impact of Domestic Violence Probation Programs",
+      "priorityRank": 33,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "sptdvoga",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/SPTDVoga.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/SPTDVoga.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/SPTDVoga.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:33:47.744Z",
+      "durationMs": 58399,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3903-The_Impact_of_Domestic_Violence_Probation_Programs.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4af006572f3637059dcecb226f32f6c875d0c4df4e7ff63c47e9fdac9db5c584",
+        "remediatedPdfSha256": "4af006572f3637059dcecb226f32f6c875d0c4df4e7ff63c47e9fdac9db5c584",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4039",
+      "publicationTitle": "Decade of trends shows continual decrease in Illinois crime",
+      "priorityRank": 35,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "crimetrends",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Crimetrends.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Crimetrends.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Crimetrends.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4039-Decade_of_trends_shows_continual_decrease_in_Illinois_crime.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:03.502Z",
+      "durationMs": 46338,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4039-Decade_of_trends_shows_continual_decrease_in_Illinois_crime.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4039-Decade_of_trends_shows_continual_decrease_in_Illinois_crime.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4039-Decade_of_trends_shows_continual_decrease_in_Illinois_crime.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "770a6b82d407193962a9b5bb90861115c70f3221d0a018d852bc7b7c78b5f617",
+        "remediatedPdfSha256": "770a6b82d407193962a9b5bb90861115c70f3221d0a018d852bc7b7c78b5f617",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4055",
+      "publicationTitle": "CLEAR offers enhanced police efficiencies increased accountability",
+      "priorityRank": 36,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "clear",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/CLEAR.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/CLEAR.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/CLEAR.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4055-CLEAR_offers_enhanced_police_efficiencies_increased_accountability.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:04.029Z",
+      "durationMs": 44274,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4055-CLEAR_offers_enhanced_police_efficiencies_increased_accountability.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4055-CLEAR_offers_enhanced_police_efficiencies_increased_accountability.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4055-CLEAR_offers_enhanced_police_efficiencies_increased_accountability.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "9064d568ec4e35a4b0cc63fa3aa58b380ecf0116285ae107445c867bb768859d",
+        "remediatedPdfSha256": "9064d568ec4e35a4b0cc63fa3aa58b380ecf0116285ae107445c867bb768859d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4196",
+      "publicationTitle": "Screening for serious mental illness among offenders",
+      "priorityRank": 37,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "mental_illness",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/mental illness.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/mental illness.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/mental illness.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4196-Screening_for_serious_mental_illness_among_offenders.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:09.042Z",
+      "durationMs": 43720,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4196-Screening_for_serious_mental_illness_among_offenders.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4196-Screening_for_serious_mental_illness_among_offenders.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4196-Screening_for_serious_mental_illness_among_offenders.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d36be28aa2baa3a73560f10c2c4c0feb11d074cea0080c6200aa37f51d648daf",
+        "remediatedPdfSha256": "d36be28aa2baa3a73560f10c2c4c0feb11d074cea0080c6200aa37f51d648daf",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3933",
+      "publicationTitle": "A comparison of local and multijurisdictional drug enforcement efforts in Illinois",
+      "priorityRank": 34,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "megtf",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/MEGTF2.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/MEGTF2.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/MEGTF2.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3933-A_comparison_of_local_and_multijurisdictional_drug_enforcement_efforts_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:09.196Z",
+      "durationMs": 53658,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3933-A_comparison_of_local_and_multijurisdictional_drug_enforcement_efforts_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3933-A_comparison_of_local_and_multijurisdictional_drug_enforcement_efforts_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3933-A_comparison_of_local_and_multijurisdictional_drug_enforcement_efforts_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "19d4bd3221fb430582d497848898284717f4622759162e28233c724b089f23b1",
+        "remediatedPdfSha256": "19d4bd3221fb430582d497848898284717f4622759162e28233c724b089f23b1",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3599",
+      "publicationTitle": "Probation Trends in Illinois",
+      "priorityRank": 38,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "probation",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.font_widths",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/probation.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/probation.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/probation.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3599-Probation_Trends_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:24.368Z",
+      "durationMs": 57533,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 5,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 5,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3599-Probation_Trends_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3599-Probation_Trends_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3599-Probation_Trends_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0f6cb68e1bdd775349115d946e61d66c7086a864f4a5325d56f2a3fc94dce711",
+        "remediatedPdfSha256": "0f6cb68e1bdd775349115d946e61d66c7086a864f4a5325d56f2a3fc94dce711",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4544",
+      "publicationTitle": "Transitional housing for victims of intimate partner violence",
+      "priorityRank": 40,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "transitional_housing_for_victims_of_intimate_partner_violence_final_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Transitional_Housing_for_Victims_of_Intimate_Partner_Violence_final-191011T20090371.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Transitional_Housing_for_Victims_of_Intimate_Partner_Violence_final-191011T20090371.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Transitional_Housing_for_Victims_of_Intimate_Partner_Violence_final-191011T20090371.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4544-Transitional_housing_for_victims_of_intimate_partner_violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:33.752Z",
+      "durationMs": 54422,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 7,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 62,
+        "grade": "D",
+        "pageCount": 7,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 62, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/157.230.3.215/4544-Transitional_housing_for_victims_of_intimate_partner_violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/157.230.3.215/4544-Transitional_housing_for_victims_of_intimate_partner_violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/157.230.3.215/4544-Transitional_housing_for_victims_of_intimate_partner_violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "63f217bf8f56e2e064cb72f10128e8381f65732d86882fdbb41da1025c7fba22",
+        "remediatedPdfSha256": "63f217bf8f56e2e064cb72f10128e8381f65732d86882fdbb41da1025c7fba22",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4032",
+      "publicationTitle": "Returning Home Illinois Policy Brief Health and Prisoner Reentry",
+      "priorityRank": 39,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "health_prisoner_reentry",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/health_prisoner_reentry1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/health_prisoner_reentry1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/health_prisoner_reentry1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4032-Returning_Home_Illinois_Policy_Brief_Health_and_Prisoner_Reentry.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:34:33.780Z",
+      "durationMs": 61575,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4032-Returning_Home_Illinois_Policy_Brief_Health_and_Prisoner_Reentry.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4032-Returning_Home_Illinois_Policy_Brief_Health_and_Prisoner_Reentry.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4032-Returning_Home_Illinois_Policy_Brief_Health_and_Prisoner_Reentry.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "88942ca275927920831957e38c73c72a94bb420fac958f9b349578b6b12c6780",
+        "remediatedPdfSha256": "88942ca275927920831957e38c73c72a94bb420fac958f9b349578b6b12c6780",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3833",
+      "publicationTitle": "Disproportionate incarceration of African Americans for drug offenses in the US",
+      "priorityRank": 43,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "disprop",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/disprop.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/disprop.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/disprop.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3833-Disproportionate_incarceration_of_African_Americans_for_drug_offenses_in_the_US.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:35:06.882Z",
+      "durationMs": 62852,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3833-Disproportionate_incarceration_of_African_Americans_for_drug_offenses_in_the_US.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3833-Disproportionate_incarceration_of_African_Americans_for_drug_offenses_in_the_US.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3833-Disproportionate_incarceration_of_African_Americans_for_drug_offenses_in_the_US.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "e4be4fbab669228e16aec0152ca1fd8ea8ce74156b33c6dbc454ed832eb83edd",
+        "remediatedPdfSha256": "e4be4fbab669228e16aec0152ca1fd8ea8ce74156b33c6dbc454ed832eb83edd",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3821",
+      "publicationTitle": "Integrated Justice Information System Survey Findings",
+      "priorityRank": 42,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "iijissurveys",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/IIJISSurveys.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/IIJISSurveys.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/IIJISSurveys.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3821-Integrated_Justice_Information_System_Survey_Findings.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:35:15.865Z",
+      "durationMs": 72362,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3821-Integrated_Justice_Information_System_Survey_Findings.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3821-Integrated_Justice_Information_System_Survey_Findings.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3821-Integrated_Justice_Information_System_Survey_Findings.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "dcd7a5e657acf1a0934de3fbe2879782a871d3056051830b99993da800a5432c",
+        "remediatedPdfSha256": "dcd7a5e657acf1a0934de3fbe2879782a871d3056051830b99993da800a5432c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3835",
+      "publicationTitle": "Sharing criminal history record informationthe Interstate Identification Index",
+      "priorityRank": 44,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "interstateindex",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/interstateIndex.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/interstateIndex.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/interstateIndex.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3835-Sharing_criminal_history_record_informationthe_Interstate_Identification_Index.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:35:22.538Z",
+      "durationMs": 73496,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3835-Sharing_criminal_history_record_informationthe_Interstate_Identification_Index.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3835-Sharing_criminal_history_record_informationthe_Interstate_Identification_Index.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3835-Sharing_criminal_history_record_informationthe_Interstate_Identification_Index.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1a0354519ec18829c0ce4d4710f4e7328b6a87c56b32429ce3ca4484851bd11f",
+        "remediatedPdfSha256": "1a0354519ec18829c0ce4d4710f4e7328b6a87c56b32429ce3ca4484851bd11f",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4755",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Committee Biennial Report",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "structure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "dvfr_biennial_report_final_published_d_bf_bffd_b_a_d",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.heading_content_quality"
+      ],
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-canary-rerun-v3/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:35:36.435Z",
+      "durationMs": 439277,
+      "original": {
+        "overallScore": 42,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 86,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 86, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f408de1c0513f323fad633ddaf28b2b1fc516081c2261b82952dc4c7ccae6075",
+        "remediatedPdfSha256": "f408de1c0513f323fad633ddaf28b2b1fc516081c2261b82952dc4c7ccae6075",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4034",
+      "publicationTitle": "The Rise in Reported Elder Abuse A Review of State and National Data",
+      "priorityRank": 47,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "elderabuse",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Elderabuse2.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Elderabuse2.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Elderabuse2.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4034-The_Rise_in_Reported_Elder_Abuse_A_Review_of_State_and_National_Data.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:35:36.815Z",
+      "durationMs": 63062,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/4034-The_Rise_in_Reported_Elder_Abuse_A_Review_of_State_and_National_Data.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4034-The_Rise_in_Reported_Elder_Abuse_A_Review_of_State_and_National_Data.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/4034-The_Rise_in_Reported_Elder_Abuse_A_Review_of_State_and_National_Data.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b4a2224efee7978ceca8205e04b472295a286d6baee51872238a02ff4e6a5c17",
+        "remediatedPdfSha256": "b4a2224efee7978ceca8205e04b472295a286d6baee51872238a02ff4e6a5c17",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3783",
+      "publicationTitle": "Three Years After Sweeping Reform Whats Different in the Juvenile Justice System",
+      "priorityRank": 41,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "compiler_spring",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/compiler_spring02.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/compiler_spring02.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/compiler_spring02.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3783-Three_Years_After_Sweeping_Reform_Whats_Different_in_the_Juvenile_Justice_System.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:35:44.882Z",
+      "durationMs": 117137,
+      "original": {
+        "overallScore": 29,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 55,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 55, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding, pdfua.font_unicode, pdfua.untagged_rendered_images",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3783-Three_Years_After_Sweeping_Reform_Whats_Different_in_the_Juvenile_Justice_System.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3783-Three_Years_After_Sweeping_Reform_Whats_Different_in_the_Juvenile_Justice_System.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3783-Three_Years_After_Sweeping_Reform_Whats_Different_in_the_Juvenile_Justice_System.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8d234f586359f81fa293a7ccf50b3b312a6f39ca22c6776e4d4e193b60bd8f6e",
+        "remediatedPdfSha256": "8d234f586359f81fa293a7ccf50b3b312a6f39ca22c6776e4d4e193b60bd8f6e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3972",
+      "publicationTitle": "Minority overrepresentation in the criminal and juvenile justice systems",
+      "priorityRank": 45,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "summer",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/summer2003.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/summer2003.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/summer2003.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3972-Minority_overrepresentation_in_the_criminal_and_juvenile_justice_systems.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:36:04.249Z",
+      "durationMs": 115052,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3972-Minority_overrepresentation_in_the_criminal_and_juvenile_justice_systems.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3972-Minority_overrepresentation_in_the_criminal_and_juvenile_justice_systems.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3972-Minority_overrepresentation_in_the_criminal_and_juvenile_justice_systems.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "568b4956869ba7c85613451e3929da09998b342ead759e98b2d73b0fc60384ae",
+        "remediatedPdfSha256": "568b4956869ba7c85613451e3929da09998b342ead759e98b2d73b0fc60384ae",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3998",
+      "publicationTitle": "The Festering Problem of Methamphetamine in Illinois",
+      "priorityRank": 46,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "winter_spring",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/winter.spring 04.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/winter.spring 04.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/winter.spring%2004.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:36:22.529Z",
+      "durationMs": 118160,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/143.244.146.43/3998-The_Festering_Problem_of_Methamphetamine_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8f256ab31ce0cce406f7517af41166080f1327cbed44b13d642db1c871b85381",
+        "remediatedPdfSha256": "8f256ab31ce0cce406f7517af41166080f1327cbed44b13d642db1c871b85381",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4659",
+      "publicationTitle": "Civil Rights Policy 2019",
+      "priorityRank": 48,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "civil_rights_policy_afd_b",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.heading_structure",
+        "category.link_quality",
+        "pdfua.annotation_alt_contents",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode"
+      ],
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/Civil_Rights_Policy_2019_98afd9b363.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/Civil_Rights_Policy_2019_98afd9b363.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/Civil_Rights_Policy_2019_98afd9b363.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4659-Civil_Rights_Policy_2019.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:36:28.761Z",
+      "durationMs": 114980,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 79,
+        "grade": "C",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 79, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents, pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/192.241.146.85/4659-Civil_Rights_Policy_2019.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/192.241.146.85/4659-Civil_Rights_Policy_2019.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/192.241.146.85/4659-Civil_Rights_Policy_2019.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "630d066c6ca7d5fe87206431179adc125c7a3a3643e7eaad9dddafc06f9fc890",
+        "remediatedPdfSha256": "630d066c6ca7d5fe87206431179adc125c7a3a3643e7eaad9dddafc06f9fc890",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "focused_deterrence_pdf_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T23:47:49.013Z",
+      "durationMs": 1171854,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 83, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8c300b2bb0c63959f3302112bba00aaddc3c59518609b043b66406c970d40113",
+        "remediatedPdfSha256": "8c300b2bb0c63959f3302112bba00aaddc3c59518609b043b66406c970d40113",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

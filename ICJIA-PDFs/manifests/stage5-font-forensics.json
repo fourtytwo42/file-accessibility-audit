@@ -1,0 +1,360 @@
+{
+  "generatedAt": "2026-04-01T20:10:10.149Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T20:10:10.124Z",
+  "cohortLabel": "font_heavy",
+  "includePublicationIds": [],
+  "summaryPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-forensics.summary.json",
+  "rows": [
+    {
+      "publicationId": "3838",
+      "publicationTitle": "2004 Summary of Drug Enforcement Activities Across Illinois Multijurisdictional Enforcement Groups and Task Forces",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4099",
+      "publicationTitle": "2006 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4144",
+      "publicationTitle": "Illinois Court Trends  Criminal Case Filings 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4151",
+      "publicationTitle": "Illinois Court Trends  Adult Probation Caseload 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4156",
+      "publicationTitle": "2009 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_terminal_survivor",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_terminal_survivor",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage5-font-wave/143.244.146.43/4156-2009_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4156-2009_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json"
+      ]
+    },
+    {
+      "publicationId": "4166",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Violent Index Arrests 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4168",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported and Indicated Child Abuse and Neglect 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4168-Illinois_Crime_Victim_Trends_Reported_and_Indicated_Child_Abuse_and_Neglect_19972007.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4168-Illinois_Crime_Victim_Trends_Reported_and_Indicated_Child_Abuse_and_Neglect_19972007.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4172",
+      "publicationTitle": "Illinois Drug Trends  Drug Crime Lab Submissions 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4172-Illinois_Drug_Trends_Drug_Crime_Lab_Submissions_19972007.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4172-Illinois_Drug_Trends_Drug_Crime_Lab_Submissions_19972007.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4173",
+      "publicationTitle": "Illinois Crime Victim Trends  Domestic Offenses 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4174",
+      "publicationTitle": "Illinois Drug Trends  Drug Seizures 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4174-Illinois_Drug_Trends_Drug_Seizures_19972007.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4174-Illinois_Drug_Trends_Drug_Seizures_19972007.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4176",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Arrests 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4199",
+      "publicationTitle": "Illinois Drug Trends  Drug Treatment Admissions 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4211",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Offenses 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4211-Illinois_Offense_and_Arrest_Trends_Property_Index_Offenses_19992008.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4211-Illinois_Offense_and_Arrest_Trends_Property_Index_Offenses_19992008.failure.json"
+      ]
+    },
+    {
+      "publicationId": "4214",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported Elder Abuse 20002009",
+      "currentCorpusStatus": "remediated_fail",
+      "currentCohortLabel": "font_heavy",
+      "forensicsDisposition": "font_unicode_manual_residual",
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:font_heavy",
+        "stage5:font_unicode_manual_residual",
+        "verification_hard_fail"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4214-Illinois_Crime_Victim_Trends_Reported_Elder_Abuse_20002009.failure.json",
+      "fontUnicodeCount": 0,
+      "fontEmbeddingCount": 0,
+      "type1UnicodeCount": 0,
+      "cidsetConsistencyCount": 0,
+      "recommendedRepairOrder": [],
+      "notes": [
+        "latest_report:4214-Illinois_Crime_Victim_Trends_Reported_Elder_Abuse_20002009.failure.json"
+      ]
+    }
+  ]
+}

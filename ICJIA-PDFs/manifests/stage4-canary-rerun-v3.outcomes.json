@@ -1,0 +1,338 @@
+{
+  "generatedAt": "2026-04-05T05:31:36.267Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-canary-rerun.priority.json",
+  "concurrency": 4,
+  "totals": {
+    "targetCandidates": 6,
+    "processed": 6,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 2,
+    "sourceMissing": 0,
+    "processingError": 4,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "4755",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Committee Biennial Report",
+      "priorityRank": 1,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/DVFR_Biennial_Report_2024_FINAL_PUBLISHED_d01bf7bffd_b7889a939d.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-05T04:56:24.999Z",
+      "durationMs": 167723,
+      "original": {
+        "overallScore": 36,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 79,
+        "grade": "C",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 79, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-canary-rerun-v3/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-canary-rerun-v3/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/192.241.146.85/4755-2024_Domestic_Violence_Fatality_Review_Committee_Biennial_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "03aaf76f67d040e1994d40f53577742172ff2fcbd52d55927cf14278a12742f5",
+        "remediatedPdfSha256": "03aaf76f67d040e1994d40f53577742172ff2fcbd52d55927cf14278a12742f5",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4078",
+      "publicationTitle": "Community reentry challenges daunt exoffenders quest for a fresh start",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Community re-entry challenges daunt ex-offenders.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Community%20re-entry%20challenges%20daunt%20ex-offenders.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-05T04:59:43.921Z",
+      "durationMs": 366645,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 48,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 48, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-canary-rerun-v3/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-canary-rerun-v3/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4078-Community_reentry_challenges_daunt_exoffenders_quest_for_a_fresh_start.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "90d455b42cfbb1b596c09e081e75871a381524c8612bb2a509d990618e764a60",
+        "remediatedPdfSha256": "90d455b42cfbb1b596c09e081e75871a381524c8612bb2a509d990618e764a60",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4188",
+      "publicationTitle": "Corrections data illustrate juvenile incarceration trends in Illinois",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Corrections%20data%20illustrate%20juvenile%20incarceration%20trends%20in%20Illinois.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.remediation.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-05T05:03:50.425Z",
+      "durationMs": 445425,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=9, deep=12, total=21)."
+      }
+    },
+    {
+      "publicationId": "4551",
+      "publicationTitle": "Illinois Motor Vehicle Theft Prevention Council 2015 Annual Report",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+      "fileUrl": "https://archive.icjia.cloud/files/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.remediation.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-05T05:25:00.382Z",
+      "durationMs": 1883106,
+      "original": {
+        "overallScore": 46,
+        "grade": "F",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 30-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 1800000ms"
+      }
+    },
+    {
+      "publicationId": "4162",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2010 Annual Report",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY10.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY10.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY10.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4162-Illinois_Criminal_Justice_Information_Authority_2010_Annual_Report.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-05T05:25:48.511Z",
+      "durationMs": 1931235,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 44,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 30-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4162-Illinois_Criminal_Justice_Information_Authority_2010_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 1800000ms"
+      }
+    },
+    {
+      "publicationId": "4183",
+      "publicationTitle": "Juvenile reform specialized services help fuel fight against probationer recidivism",
+      "priorityRank": 6,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.remediation.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-05T05:31:36.266Z",
+      "durationMs": 1912345,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 30-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 1800000ms"
+      }
+    }
+  ]
+}

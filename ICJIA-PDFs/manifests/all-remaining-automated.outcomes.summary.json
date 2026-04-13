@@ -1,0 +1,109 @@
+{
+  "generatedAt": "2026-04-09T10:22:41.910Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.json",
+  "laneName": "all-remaining-automated",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": 80
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 51,
+    "keep_fail_80_to_89": 65,
+    "drop_fail_lt_80": 500,
+    "processing_error": 74,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 690,
+    "processed": 690,
+    "readyToReplace": 51,
+    "remediatedPassCandidates": 51,
+    "failedAfterRemediation": 565,
+    "sourceMissing": 0,
+    "processingError": 74,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 690,
+    "pdfsPerHour": 5.7,
+    "terminalOutcomesPerHour": 5.7,
+    "passCandidatesPerHour": 0.42
+  },
+  "quality": {
+    "passCandidates": 51,
+    "rowsWithBlockingFindingShrink": 585,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3993",
+    "publicationTitle": "Community Policing in Chicago Year Ten An Evaluation of Chicagos Alternative Policing Strategy",
+    "priorityRank": 688,
+    "priorityTier": "high",
+    "passLikelihoodScore": 64,
+    "currentCorpusStatus": "processing_error",
+    "dominantSelectionFamily": "font",
+    "runtimeWeightBucket": "heavy",
+    "runtimeProfileKey": "caps",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "category.alt_text",
+      "category.bookmarks",
+      "category.heading_structure",
+      "category.pdf_ua_compliance",
+      "category.reading_order",
+      "pdfua.bookmark_language",
+      "pdfua.display_doc_title",
+      "pdfua.document_language",
+      "pdfua.font_embedding",
+      "pdfua.font_unicode",
+      "pdfua.logical_structure"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS_10.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS_10.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS_10.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3993-Community_Policing_in_Chicago_Year_Ten_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy.failure.json",
+    "status": "processing_error",
+    "resultBand": "processing_error",
+    "processedAt": "2026-04-09T10:22:41.889Z",
+    "durationMs": 1619214,
+    "original": {
+      "overallScore": 26,
+      "grade": "F",
+      "pageCount": 170,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-remaining-automated/143.244.146.43/3993-Community_Policing_in_Chicago_Year_Ten_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Inspection budget exceeded (light=6, deep=13, total=19)."
+    }
+  }
+}

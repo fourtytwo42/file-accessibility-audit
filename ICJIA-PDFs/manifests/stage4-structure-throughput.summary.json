@@ -1,36 +1,207 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.598Z",
+  "generatedAt": "2026-04-06T01:00:35.343Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-04-01T02:35:32.557Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-06T01:00:35.316Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "cohortLabel": "structure_heavy",
   "totals": {
-    "totalStructureHeavyRows": 338,
-    "verifiedPassRowsInCohort": 42,
+    "totalStructureHeavyRows": 340,
+    "verifiedPassRowsInCohort": 59,
     "newlyVerifiedPassRowsFromWave": 0,
-    "remainingStructureHeavyRows": 296,
+    "remainingStructureHeavyRows": 281,
     "processingErrorsInWave": 0,
     "hardFailsInWave": 0,
-    "metadataNavigationResidualRows": 8,
+    "metadataNavigationResidualRows": 7,
     "structureOnlyResidualRows": 1,
-    "mixedStructureFigureResidualRows": 191,
+    "mixedStructureFigureResidualRows": 190,
     "structureProcessingErrorRetryRows": 5,
-    "pendingWaveRows": 1,
-    "reclassifiedOutOfStructureHeavyRows": 4,
+    "pendingWaveRows": 8,
+    "reclassifiedOutOfStructureHeavyRows": 3,
     "genericTimeoutRows": 0
+  },
+  "backlog": {
+    "topBlockingResidualFamilyIds": [
+      {
+        "id": "metadata_normalization",
+        "count": 268
+      },
+      {
+        "id": "font_embedding_and_unicode",
+        "count": 237
+      },
+      {
+        "id": "post_bootstrap_heading_convergence",
+        "count": 218
+      },
+      {
+        "id": "bookmark_language_outline_cleanup",
+        "count": 194
+      },
+      {
+        "id": "native_figure_convergence",
+        "count": 169
+      },
+      {
+        "id": "logical_structure_marked_content",
+        "count": 95
+      },
+      {
+        "id": "link_tabs_and_annotation_cleanup",
+        "count": 67
+      },
+      {
+        "id": "table_structure_recovery",
+        "count": 39
+      },
+      {
+        "id": "pdfua.logical_structure",
+        "count": 1
+      }
+    ],
+    "topBlockingFindingKeys": [
+      {
+        "key": "pdfua.logical_structure",
+        "count": 274
+      },
+      {
+        "key": "category.pdf_ua_compliance",
+        "count": 268
+      },
+      {
+        "key": "pdfua.display_doc_title",
+        "count": 267
+      },
+      {
+        "key": "pdfua.document_language",
+        "count": 256
+      },
+      {
+        "key": "pdfua.font_unicode",
+        "count": 241
+      },
+      {
+        "key": "category.heading_structure",
+        "count": 227
+      },
+      {
+        "key": "pdfua.font_embedding",
+        "count": 226
+      },
+      {
+        "key": "category.reading_order",
+        "count": 196
+      },
+      {
+        "key": "category.alt_text",
+        "count": 184
+      },
+      {
+        "key": "category.bookmarks",
+        "count": 158
+      },
+      {
+        "key": "pdfua.cid_symbol_fonts",
+        "count": 101
+      },
+      {
+        "key": "category.title_language",
+        "count": 90
+      },
+      {
+        "key": "pdfua.metadata_identification",
+        "count": 82
+      },
+      {
+        "key": "pdfua.page_tabs",
+        "count": 62
+      },
+      {
+        "key": "pdfua.bookmark_language",
+        "count": 41
+      },
+      {
+        "key": "pdfua.figure_alt_or_artifact",
+        "count": 41
+      },
+      {
+        "key": "pdfua.annotation_alt_contents",
+        "count": 40
+      },
+      {
+        "key": "context.table_candidates_blocked",
+        "count": 39
+      },
+      {
+        "key": "pdfua.heading_content_quality",
+        "count": 35
+      },
+      {
+        "key": "pdfua.note_tag_id",
+        "count": 34
+      },
+      {
+        "key": "pdfua.link_tagging",
+        "count": 30
+      },
+      {
+        "key": "context.long_report_figure_residue",
+        "count": 26
+      },
+      {
+        "key": "pdfua.table_regularity",
+        "count": 19
+      },
+      {
+        "key": "pdfua.tagged_annotations",
+        "count": 16
+      },
+      {
+        "key": "pdfua.font_widths",
+        "count": 13
+      },
+      {
+        "key": "pdfua.untagged_rendered_images",
+        "count": 11
+      },
+      {
+        "key": "category.link_quality",
+        "count": 4
+      },
+      {
+        "key": "pdfua.nested_alt_text",
+        "count": 2
+      },
+      {
+        "key": "category.color_contrast",
+        "count": 1
+      },
+      {
+        "key": "pdfua.link_text_quality",
+        "count": 1
+      }
+    ]
   },
   "rows": {
     "newlyVerifiedPassPublicationIds": [],
     "stagedPassCandidatePublicationIds": [
       "3597",
       "3608",
+      "3643",
       "3645",
       "3656",
+      "3780",
+      "3906",
+      "3921",
       "3936",
       "4037",
       "4047",
-      "4061"
+      "4061",
+      "4156",
+      "4185",
+      "4189",
+      "4598",
+      "4744"
     ],
     "metadataTitleSurvivorPublicationIds": [
       "3598",
@@ -38,13 +209,8 @@
       "3654",
       "3657",
       "3662",
-      "3665",
-      "3670",
-      "3683",
       "3687",
       "3696",
-      "3768",
-      "3770",
       "3772",
       "3866",
       "3871",
@@ -59,45 +225,32 @@
     "remainingPublicationIds": [
       "3465",
       "3468",
+      "3483",
       "3550",
+      "3567",
+      "3575",
       "3584",
-      "3597",
       "3599",
       "3604",
       "3605",
-      "3606",
-      "3608",
       "3610",
       "3635",
       "3640",
       "3641",
-      "3643",
       "3644",
-      "3645",
       "3651",
       "3653",
       "3655",
-      "3656",
       "3663",
-      "3665",
-      "3670",
-      "3683",
-      "3685",
       "3697",
       "3759",
       "3763",
       "3765",
       "3767",
-      "3768",
-      "3769",
-      "3770",
       "3771",
       "3774",
-      "3778",
-      "3780",
       "3781",
       "3783",
-      "3784",
       "3785",
       "3787",
       "3788",
@@ -180,7 +333,6 @@
       "3930",
       "3933",
       "3935",
-      "3936",
       "3937",
       "3938",
       "3940",
@@ -233,23 +385,21 @@
       "4028",
       "4032",
       "4034",
-      "4037",
       "4038",
       "4039",
       "4043",
       "4045",
       "4046",
-      "4047",
       "4048",
       "4050",
       "4051",
       "4054",
       "4055",
       "4059",
-      "4061",
       "4066",
       "4067",
       "4068",
+      "4069",
       "4075",
       "4076",
       "4077",
@@ -288,13 +438,12 @@
       "4153",
       "4157",
       "4159",
-      "4161",
       "4162",
       "4167",
       "4169",
       "4171",
       "4181",
-      "4188",
+      "4187",
       "4191",
       "4194",
       "4196",
@@ -316,9 +465,10 @@
       "4435",
       "4436",
       "4437",
-      "4457",
       "4466",
       "4477",
+      "4480",
+      "4481",
       "4489",
       "4490",
       "4491",
@@ -333,6 +483,7 @@
       "4615",
       "4627",
       "4631",
+      "4633",
       "4638",
       "4676",
       "4677",
@@ -355,16 +506,31 @@
       "4773"
     ],
     "activeWaveSelectedPublicationIds": [
-      "4726"
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
     ],
     "activeWavePendingPublicationIds": [
-      "4726"
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
     ],
     "activeWaveAttemptedButUnterminalizedPublicationIds": [],
     "processingErrorPublicationIds": [],
     "hardFailPublicationIds": [],
     "readingOrderOnlyResidualPublicationIds": [
       "3550",
+      "3567",
       "3606",
       "3610",
       "3663",
@@ -377,8 +543,7 @@
       "4059"
     ],
     "metadataNavigationResidualPublicationIds": [
-      "3769",
-      "3784",
+      "3483",
       "4076",
       "4084",
       "4094",
@@ -390,18 +555,16 @@
       "4753"
     ],
     "mixedStructureFigureResidualPublicationIds": [
+      "3575",
       "3584",
       "3604",
       "3605",
       "3635",
       "3641",
-      "3643",
       "3644",
       "3697",
       "3759",
       "3774",
-      "3778",
-      "3780",
       "3795",
       "3796",
       "3797",
@@ -450,7 +613,6 @@
       "3892",
       "3893",
       "3894",
-      "3921",
       "3925",
       "3930",
       "3935",
@@ -496,9 +658,9 @@
       "4012",
       "4028",
       "4038",
-      "4043",
       "4051",
       "4066",
+      "4069",
       "4075",
       "4077",
       "4080",
@@ -527,12 +689,11 @@
       "4153",
       "4157",
       "4159",
-      "4161",
       "4167",
       "4169",
       "4171",
       "4181",
-      "4188",
+      "4187",
       "4191",
       "4201",
       "4203",
@@ -550,9 +711,10 @@
       "4435",
       "4436",
       "4437",
-      "4457",
       "4466",
       "4477",
+      "4480",
+      "4481",
       "4489",
       "4490",
       "4491",
@@ -565,6 +727,7 @@
       "4615",
       "4627",
       "4631",
+      "4633",
       "4638",
       "4676",
       "4677",
@@ -579,6 +742,7 @@
       "4731",
       "4740",
       "4745",
+      "4755",
       "4771",
       "4773"
     ],
@@ -586,15 +750,21 @@
       "3653",
       "3912",
       "3965",
-      "4739",
-      "4755"
+      "4162",
+      "4739"
     ],
     "pendingPublicationIds": [
-      "4726"
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
     ],
     "nextWaveStructureOnlyPublicationIds": [
-      "3769",
-      "3784",
+      "3483",
       "4076",
       "4084",
       "4094",
@@ -604,18 +774,16 @@
       "4753"
     ],
     "mixedFollowupPublicationIds": [
+      "3575",
       "3584",
       "3604",
       "3605",
       "3635",
       "3641",
-      "3643",
       "3644",
       "3697",
       "3759",
       "3774",
-      "3778",
-      "3780",
       "3795",
       "3796",
       "3797",
@@ -664,7 +832,6 @@
       "3892",
       "3893",
       "3894",
-      "3921",
       "3925",
       "3930",
       "3935",
@@ -710,9 +877,9 @@
       "4012",
       "4028",
       "4038",
-      "4043",
       "4051",
       "4066",
+      "4069",
       "4075",
       "4077",
       "4080",
@@ -741,12 +908,11 @@
       "4153",
       "4157",
       "4159",
-      "4161",
       "4167",
       "4169",
       "4171",
       "4181",
-      "4188",
+      "4187",
       "4191",
       "4201",
       "4203",
@@ -764,9 +930,10 @@
       "4435",
       "4436",
       "4437",
-      "4457",
       "4466",
       "4477",
+      "4480",
+      "4481",
       "4489",
       "4490",
       "4491",
@@ -779,6 +946,7 @@
       "4615",
       "4627",
       "4631",
+      "4633",
       "4638",
       "4676",
       "4677",
@@ -793,6 +961,7 @@
       "4731",
       "4740",
       "4745",
+      "4755",
       "4771",
       "4773"
     ],
@@ -800,14 +969,13 @@
       "3653",
       "3912",
       "3965",
-      "4739",
-      "4755"
+      "4162",
+      "4739"
     ],
     "reclassifiedOutOfStructureHeavyPublicationIds": [
-      "3483",
-      "3567",
-      "3671",
-      "4506"
+      "3778",
+      "4161",
+      "4457"
     ],
     "forensicallyResolvedPendingPublicationIds": [
       "3465",
@@ -816,9 +984,25 @@
       "4054",
       "4067"
     ],
-    "stillUnclassifiedPendingPublicationIds": [],
+    "stillUnclassifiedPendingPublicationIds": [
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
+    ],
     "activeUnresolvedPublicationIds": [
-      "4726"
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
     ],
     "stalledForensicPublicationIds": [
       "3866",
@@ -853,30 +1037,15 @@
       "3903"
     ],
     "activeForensicsPublicationIds": [
-      "3567",
-      "4162",
-      "4501",
-      "4506",
-      "4627",
-      "4720",
-      "4726",
-      "4731"
+      "4726"
     ],
     "activeForensicsByDisposition": {
       "metadata_title_survivor": [],
       "metadata_navigation_residuals": [],
-      "font_text_extractability_survivor": [
-        "4162"
-      ],
+      "font_text_extractability_survivor": [],
       "reading_order_only_survivor": [],
       "mixed_structure_figure_residuals": [
-        "3567",
-        "4501",
-        "4506",
-        "4627",
-        "4720",
-        "4726",
-        "4731"
+        "4726"
       ],
       "structure_processing_error_retry": []
     },
@@ -911,6 +1080,7 @@
       "3864",
       "4020",
       "4023",
+      "4043",
       "4046",
       "4050",
       "4054",
@@ -985,7 +1155,6 @@
       "4126",
       "4132",
       "4140",
-      "4162",
       "4164",
       "4170",
       "4194",
@@ -1004,16 +1173,44 @@
       "4754"
     ],
     "figureSpilloverSurvivorPublicationIds": [
-      "3483",
-      "3567",
+      "3585",
       "3614",
       "3671",
       "3682",
-      "4506"
+      "3691",
+      "3694",
+      "3698",
+      "3700",
+      "3703",
+      "3705",
+      "3706",
+      "3707",
+      "3709",
+      "3710",
+      "3712",
+      "3716",
+      "3755",
+      "3778",
+      "3839",
+      "3844",
+      "3873",
+      "3996",
+      "4150",
+      "4161",
+      "4457",
+      "4506",
+      "4593"
     ],
     "currentWaveProcessedPublicationIds": [],
     "currentWaveRemainingPublicationIds": [
-      "4726"
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
     ],
     "genericTimeoutPublicationIds": []
   }

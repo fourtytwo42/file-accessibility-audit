@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.544Z",
+  "replacementLikelihoodPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/replacement-likelihood.json",
+  "laneIntent": "pass_rate_conversion",
+  "executionPolicy": "dormant",
+  "recommendedConcurrency": 3,
+  "initialAnalysisProfile": "remediation_fast",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 861
+  },
+  "totalCandidates": 0,
+  "selectedPublicationIds": [],
+  "selectionSanity": {
+    "dominantFamilyCounts": {},
+    "runtimeWeightCounts": {},
+    "excludedHeavyMixed": 691,
+    "excludedManualOrScanned": 170,
+    "excludedRuntimeTail": 0
+  }
+}

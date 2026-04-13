@@ -1,0 +1,103 @@
+{
+  "generatedAt": "2026-04-12T18:21:24.646Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun.json",
+  "laneName": "remediated-pdf-grading-sub80-rerun",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 37,
+    "keep_fail_80_to_89": 31,
+    "drop_fail_lt_80": 216,
+    "processing_error": 15,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 299,
+    "processed": 299,
+    "readyToReplace": 37,
+    "remediatedPassCandidates": 37,
+    "failedAfterRemediation": 247,
+    "sourceMissing": 0,
+    "processingError": 15,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 299,
+    "pdfsPerHour": 6.71,
+    "terminalOutcomesPerHour": 6.71,
+    "passCandidatesPerHour": 0.83
+  },
+  "quality": {
+    "passCandidates": 37,
+    "rowsWithBlockingFindingShrink": 51,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4075",
+    "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey Final Report",
+    "priorityRank": 299,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 28,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": null,
+    "runtimeWeightBucket": null,
+    "runtimeProfileKey": null,
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/ICJIA Needs Assessment Survey Final Report Feb 2007.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4075-Illinois_Criminal_Justice_Information_Authority_Needs_Assessment_Survey_Final_Report.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/ICJIA%20Needs%20Assessment%20Survey%20Final%20Report%20Feb%202007.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4075-Illinois_Criminal_Justice_Information_Authority_Needs_Assessment_Survey_Final_Report.remediation.json",
+    "status": "processing_error",
+    "resultBand": "processing_error",
+    "processedAt": "2026-04-12T18:21:24.639Z",
+    "durationMs": 1821837,
+    "original": {
+      "overallScore": 28,
+      "grade": "F",
+      "pageCount": 186,
+      "isScanned": false
+    },
+    "final": null,
+    "seed": {
+      "priorOverallScore": 28,
+      "priorGrade": "F",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-11T23:11:43.844Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 30-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediated-pdf-grading-sub80-rerun/143.244.146.43/4075-Illinois_Criminal_Justice_Information_Authority_Needs_Assessment_Survey_Final_Report.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded runtime limit of 1800000ms"
+    }
+  }
+}

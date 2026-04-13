@@ -2,12 +2,10 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { execFile } from 'node:child_process'
-import { promisify } from 'node:util'
+import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import dotenv from 'dotenv'
 
-const execFileAsync = promisify(execFile)
 const moduleDir = path.dirname(fileURLToPath(import.meta.url))
 const apiRoot = path.resolve(moduleDir, '../..')
 dotenv.config({ path: path.resolve(apiRoot, '.env'), override: false })
@@ -220,11 +218,261 @@ export interface StructureBackendBatchResult extends StructureBackendMutationRes
   operationResults: StructureBackendOperationResult[]
 }
 
+type StructureHelperCommandInput = {
+  inputPath: string
+  requestPath: string
+  outputPath: string
+  timeoutMs: number
+  signal?: AbortSignal
+  maxBuffer?: number
+}
+
+type StructureHelperCommandResult = {
+  stdout: string
+  stderr: string
+}
+
+type StructureHelperCommandDeps = {
+  spawnImpl?: typeof spawn
+  processKillImpl?: (pid: number, signal?: string | number) => boolean
+  setTimeoutImpl?: (callback: (...args: any[]) => void, delay?: number) => ReturnType<typeof setTimeout>
+  clearTimeoutImpl?: typeof clearTimeout
+}
+
+type StructureHelperRegisteredChild = {
+  pid: number
+}
+
+type StructureBackendFailureReason = 'process_error' | 'timeout' | 'abort' | 'unknown'
+
 function ensureHelperExists(): void {
   if (!fs.existsSync(HELPER_PATH)) {
     throw new Error(`PDF structure helper not found at ${HELPER_PATH}`)
   }
 }
+
+function normalizeStructureBackendError(error: any, fallbackMessage: string): {
+  message: string
+  reason: StructureBackendFailureReason
+  recoverable: boolean
+} {
+  const message = error?.message || fallbackMessage
+  if (error?.code === 'ETIMEDOUT') {
+    return { message, reason: 'timeout', recoverable: true }
+  }
+  if (error?.code === 'ABORT_ERR') {
+    return { message, reason: 'abort', recoverable: true }
+  }
+  if (typeof message === 'string' && /timed out|timeout/i.test(message)) {
+    return { message, reason: 'timeout', recoverable: true }
+  }
+  if (typeof message === 'string' && /abort/i.test(message)) {
+    return { message, reason: 'abort', recoverable: true }
+  }
+  if (typeof message === 'string' && /failed|error/i.test(message)) {
+    return { message, reason: 'process_error', recoverable: false }
+  }
+  return { message, reason: 'unknown', recoverable: false }
+}
+
+function makeStructureHelperError(message: string, code?: string): Error & { code?: string } {
+  const error = new Error(message) as Error & { code?: string }
+  if (code) error.code = code
+  return error
+}
+
+function killStructureHelperProcessTree(
+  pid: number | undefined,
+  processKillImpl: (pid: number, signal?: string | number) => boolean = process.kill as (pid: number, signal?: string | number) => boolean,
+  signal: NodeJS.Signals = 'SIGKILL',
+): void {
+  if (!pid || pid <= 0) return
+  try {
+    processKillImpl(pid, signal)
+  } catch {}
+}
+
+const activeStructureHelpers = new Map<number, StructureHelperRegisteredChild>()
+let structureHelperShutdownHooksInstalled = false
+
+function registerStructureHelperChild(pid: number | undefined): void {
+  if (!pid || pid <= 0) return
+  activeStructureHelpers.set(pid, { pid })
+}
+
+function unregisterStructureHelperChild(pid: number | undefined): void {
+  if (!pid || pid <= 0) return
+  activeStructureHelpers.delete(pid)
+}
+
+function killAllRegisteredStructureHelpers(
+  processKillImpl: (pid: number, signal?: string | number) => boolean = process.kill as (pid: number, signal?: string | number) => boolean,
+  signal: NodeJS.Signals = 'SIGKILL',
+): void {
+  for (const child of activeStructureHelpers.values()) {
+    try {
+      processKillImpl(child.pid, signal)
+    } catch {}
+  }
+}
+
+function installStructureHelperShutdownHooks(
+  processKillImpl: (pid: number, signal?: string | number) => boolean = process.kill as (pid: number, signal?: string | number) => boolean,
+): void {
+  if (structureHelperShutdownHooksInstalled) return
+  structureHelperShutdownHooksInstalled = true
+  const forceShutdownHelpers = (): void => {
+    killAllRegisteredStructureHelpers(processKillImpl, 'SIGTERM')
+    killAllRegisteredStructureHelpers(processKillImpl, 'SIGKILL')
+  }
+  process.on('exit', () => killAllRegisteredStructureHelpers(processKillImpl, 'SIGKILL'))
+  process.on('SIGINT', forceShutdownHelpers)
+  process.on('SIGTERM', forceShutdownHelpers)
+}
+
+export async function runPdfStructureHelperCommand(
+  input: StructureHelperCommandInput,
+  deps: StructureHelperCommandDeps = {},
+): Promise<StructureHelperCommandResult> {
+  ensureHelperExists()
+  const spawnImpl = deps.spawnImpl || spawn
+  const processKillImpl = deps.processKillImpl || process.kill
+  const setTimeoutImpl: (...args: Parameters<typeof setTimeout>) => ReturnType<typeof setTimeout> | number = deps.setTimeoutImpl || setTimeout
+  const clearTimeoutImpl = deps.clearTimeoutImpl || clearTimeout
+  const maxBuffer = input.maxBuffer || 10 * 1024 * 1024
+  installStructureHelperShutdownHooks(processKillImpl)
+
+  return new Promise((resolve, reject) => {
+    let settled = false
+    let stdout = ''
+    let stderr = ''
+    let child: ChildProcessWithoutNullStreams | null = null
+    let timeoutHandle: ReturnType<typeof setTimeout> | number | null = null
+    const cleanupCallbacks: Array<() => void> = []
+
+    const cleanup = (): void => {
+      if (timeoutHandle) {
+        clearTimeoutImpl(timeoutHandle)
+        timeoutHandle = null
+      }
+      unregisterStructureHelperChild(child?.pid)
+      while (cleanupCallbacks.length) {
+        const callback = cleanupCallbacks.pop()
+        try {
+          callback?.()
+        } catch {}
+      }
+    }
+
+    const finalize = (handler: () => void): void => {
+      if (settled) return
+      settled = true
+      cleanup()
+      handler()
+    }
+
+    const killChildTree = (): void => {
+      if (!child) return
+      killStructureHelperProcessTree(child.pid, processKillImpl, 'SIGTERM')
+      setTimeoutImpl(() => {
+        killStructureHelperProcessTree(child?.pid, processKillImpl, 'SIGKILL')
+      }, 250)
+    }
+
+    const attachParentCleanup = (event: 'exit' | 'SIGINT' | 'SIGTERM'): void => {
+      const callback = () => {
+        if (!child) return
+        killStructureHelperProcessTree(child.pid, processKillImpl, 'SIGTERM')
+        killStructureHelperProcessTree(child.pid, processKillImpl, 'SIGKILL')
+      }
+      process.once(event, callback)
+      cleanupCallbacks.push(() => process.removeListener(event, callback))
+    }
+
+    try {
+      child = spawnImpl(PYTHON_BIN, [
+        HELPER_PATH,
+        '--input',
+        input.inputPath,
+        '--request',
+        input.requestPath,
+        '--output',
+        input.outputPath,
+      ], {
+        detached: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+      }) as unknown as ChildProcessWithoutNullStreams
+      registerStructureHelperChild(child.pid)
+    } catch (error) {
+      finalize(() => reject(error))
+      return
+    }
+
+    attachParentCleanup('exit')
+    attachParentCleanup('SIGINT')
+    attachParentCleanup('SIGTERM')
+
+    if (input.signal) {
+      const abortHandler = () => {
+        killChildTree()
+        finalize(() => reject(makeStructureHelperError('Structure helper aborted.', 'ABORT_ERR')))
+      }
+      if (input.signal.aborted) {
+        abortHandler()
+        return
+      }
+      input.signal.addEventListener('abort', abortHandler, { once: true })
+      cleanupCallbacks.push(() => input.signal?.removeEventListener('abort', abortHandler))
+    }
+
+    timeoutHandle = setTimeoutImpl(() => {
+      killChildTree()
+      finalize(() => reject(makeStructureHelperError(`Structure helper timed out after ${input.timeoutMs}ms.`, 'ETIMEDOUT')))
+    }, input.timeoutMs)
+
+    child.stdout.setEncoding('utf8')
+    child.stderr.setEncoding('utf8')
+
+    child.stdout.on('data', chunk => {
+      stdout += String(chunk)
+      if (Buffer.byteLength(stdout, 'utf8') > maxBuffer) {
+        killChildTree()
+        finalize(() => reject(makeStructureHelperError('Structure helper stdout exceeded maxBuffer.', 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER')))
+      }
+    })
+
+    child.stderr.on('data', chunk => {
+      stderr += String(chunk)
+      if (Buffer.byteLength(stderr, 'utf8') > maxBuffer) {
+        killChildTree()
+        finalize(() => reject(makeStructureHelperError('Structure helper stderr exceeded maxBuffer.', 'ERR_CHILD_PROCESS_STDIO_MAXBUFFER')))
+      }
+    })
+
+    child.once('error', error => {
+      killChildTree()
+      finalize(() => reject(error))
+    })
+
+    child.once('close', (code, signal) => {
+      if (signal) {
+        finalize(() => reject(makeStructureHelperError(`Structure helper exited via signal ${signal}.`, signal)))
+        return
+      }
+      if (code !== 0) {
+        const message = stderr.trim() || `Structure helper exited with code ${code}.`
+        finalize(() => reject(makeStructureHelperError(message, code == null ? undefined : String(code))))
+        return
+      }
+      finalize(() => resolve({ stdout, stderr }))
+    })
+  })
+}
+
+export const __test_killStructureHelperProcessTree = killStructureHelperProcessTree
+export const __test_runPdfStructureHelperCommand = runPdfStructureHelperCommand
+export const __test_killAllRegisteredStructureHelpers = killAllRegisteredStructureHelpers
 
 export async function runPdfStructureBackend(input: {
   buffer: Buffer
@@ -246,19 +494,11 @@ export async function runPdfStructureBackend(input: {
     }
     await fs.promises.writeFile(requestPath, JSON.stringify(requestPayload, null, 2))
 
-    const { stdout, stderr } = await execFileAsync(PYTHON_BIN, [
-      HELPER_PATH,
-      '--input',
+    const { stdout, stderr } = await runPdfStructureHelperCommand({
       inputPath,
-      '--request',
       requestPath,
-      '--output',
       outputPath,
-    ], {
-      timeout: timeoutMs,
-      maxBuffer: 10 * 1024 * 1024,
-      encoding: 'utf-8',
-      windowsHide: true,
+      timeoutMs,
     })
 
     const parsed = JSON.parse(stdout) as StructureBackendMutationResult
@@ -270,14 +510,15 @@ export async function runPdfStructureBackend(input: {
     }
     return parsed
   } catch (error: any) {
+    const normalized = normalizeStructureBackendError(error, 'Structure backend failed.')
     return {
-      status: 'failed',
+      status: normalized.recoverable ? 'no_effect' : 'failed',
       changedDocumentBytes: false,
       fontOperationSummary: undefined,
       figureOperationSummary: undefined,
       linkOperationSummary: undefined,
       appliedMutations: [],
-      warnings: [error?.message || 'Structure backend failed.'],
+      warnings: [normalized.message],
       headings: [],
       structuralNodes: [],
       tables: [],
@@ -331,16 +572,11 @@ export async function runPdfStructureBackendBatch(input: {
     }
     await fs.promises.writeFile(requestPath, JSON.stringify(requestPayload, null, 2))
 
-    const { stdout, stderr } = await execFileAsync(PYTHON_BIN, [
-      HELPER_PATH,
-      '--input', inputPath,
-      '--request', requestPath,
-      '--output', outputPath,
-    ], {
-      timeout: 120_000,
-      maxBuffer: 10 * 1024 * 1024,
-      encoding: 'utf-8',
-      windowsHide: true,
+    const { stdout, stderr } = await runPdfStructureHelperCommand({
+      inputPath,
+      requestPath,
+      outputPath,
+      timeoutMs: 120_000,
     })
 
     const parsed = JSON.parse(stdout) as StructureBackendBatchResult
@@ -353,14 +589,15 @@ export async function runPdfStructureBackendBatch(input: {
     parsed.operationResults = parsed.operationResults ?? []
     return parsed
   } catch (error: any) {
+    const normalized = normalizeStructureBackendError(error, 'Structure backend batch failed.')
     return {
-      status: 'failed',
+      status: normalized.recoverable ? 'no_effect' : 'failed',
       changedDocumentBytes: false,
       fontOperationSummary: undefined,
       figureOperationSummary: undefined,
       linkOperationSummary: undefined,
       appliedMutations: [],
-      warnings: [error?.message || 'Structure backend batch failed.'],
+      warnings: [normalized.message],
       headings: [],
       structuralNodes: [],
       tables: [],

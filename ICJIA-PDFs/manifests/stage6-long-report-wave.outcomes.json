@@ -1,0 +1,365 @@
+{
+  "generatedAt": "2026-04-02T01:00:22.019Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-wave.json",
+  "concurrency": 1,
+  "totals": {
+    "targetCandidates": 5,
+    "processed": 6,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 6,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3513",
+      "publicationTitle": "Trends and Issues 90 Criminal and Juvenile Justice in Illinois",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Trends and Issues 90.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage2-short-cohort-wave/143.244.146.43/3513-Trends_and_Issues_90_Criminal_and_Juvenile_Justice_in_Illinois.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T20:43:25.983Z",
+      "durationMs": 863040,
+      "original": {
+        "overallScore": 9,
+        "grade": "F",
+        "pageCount": 143,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 143,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3513-Trends_and_Issues_90_Criminal_and_Juvenile_Justice_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3513-Trends_and_Issues_90_Criminal_and_Juvenile_Justice_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3513-Trends_and_Issues_90_Criminal_and_Juvenile_Justice_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1dfc4320ab12124bc71792844aeaf3a86738a318111df61d500e31aecbcbc077",
+        "remediatedPdfSha256": "1dfc4320ab12124bc71792844aeaf3a86738a318111df61d500e31aecbcbc077",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3703",
+      "publicationTitle": "CHAMPAIGN County Profile",
+      "priorityRank": 1,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Champaign.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Champaign.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Champaign.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Champaign.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-02T00:44:26.155Z",
+      "durationMs": 392594,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3703-CHAMPAIGN_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3703-CHAMPAIGN_County_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3703-CHAMPAIGN_County_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f8459137fe6c3024aa80946cd93f7c825e0894d23e246942ef3d564e65b02eef",
+        "remediatedPdfSha256": "f8459137fe6c3024aa80946cd93f7c825e0894d23e246942ef3d564e65b02eef",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3710",
+      "publicationTitle": "BOONE County Profile",
+      "priorityRank": 2,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Boone.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Boone.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Boone.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Boone.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-02T00:50:53.491Z",
+      "durationMs": 387335,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3710-BOONE_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3710-BOONE_County_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3710-BOONE_County_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "03d8c523c44cf108517de8c18976674863f0f42198798c88382a7d71e30bc796",
+        "remediatedPdfSha256": "03d8c523c44cf108517de8c18976674863f0f42198798c88382a7d71e30bc796",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3518",
+      "publicationTitle": "Working for the Criminal Justice System in Illinois",
+      "priorityRank": 3,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/1988-1989 Biennial Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/1988-1989 Biennial Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/1988-1989 Biennial Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/1988-1989_Biennial_Report.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-02T00:55:48.805Z",
+      "durationMs": 295313,
+      "original": {
+        "overallScore": 8,
+        "grade": "F",
+        "pageCount": 52,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 51,
+        "grade": "F",
+        "pageCount": 52,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 51, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "19afc9098098eb7a20c7037d96a227108c290ee43745b0ce86a17a829a1baed2",
+        "remediatedPdfSha256": "19afc9098098eb7a20c7037d96a227108c290ee43745b0ce86a17a829a1baed2",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3755",
+      "publicationTitle": "ICJIA 1999 Annual Report",
+      "priorityRank": 4,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/99anreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/99anreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/99anreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/99anreport.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-02T00:57:38.072Z",
+      "durationMs": 109267,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 85,
+        "grade": "B",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 85, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3755-ICJIA_1999_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3755-ICJIA_1999_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3755-ICJIA_1999_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "20a1be6e1a37c187c39cf28d171d3bef412a143f44dd40e2d2ebd40e32cc43c0",
+        "remediatedPdfSha256": "20a1be6e1a37c187c39cf28d171d3bef412a143f44dd40e2d2ebd40e32cc43c0",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3873",
+      "publicationTitle": "ICJIA 1998 Annual Report",
+      "priorityRank": 5,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/98anreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/98anreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/98anreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/98anreport.pdf.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-02T01:00:22.018Z",
+      "durationMs": 163945,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 83, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ccc87695f5c01dc4b508d23bca7f28bc6d3f4a5910968dc953769122618a6cbc",
+        "remediatedPdfSha256": "ccc87695f5c01dc4b508d23bca7f28bc6d3f4a5910968dc953769122618a6cbc",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 type VerificationResult = {
   key: string
@@ -22,6 +23,11 @@ type VerificationResult = {
     blockingLocalFindingKeys: string[]
     unresolvedCategoryLabels: string[]
   }
+  visualApproval?: {
+    required: boolean
+    approved: boolean
+    reasonCodes: string[]
+  }
   artifacts: {
     reportPath: string
   }
@@ -41,9 +47,16 @@ type PublicationVerificationRow = {
   verificationPassed: boolean
   verificationMissing: boolean
   verificationError: string | null
+  visualApproval?: {
+    required: boolean
+    status: 'required' | 'approved'
+    reasonCodes: string[]
+    sourceManifest: string | null
+    notes: string[]
+  }
 }
 
-type Classification = 'verified_pass' | 'soft_fail_advisory' | 'hard_fail'
+type Classification = 'verified_pass' | 'held_visual_review' | 'soft_fail_advisory' | 'hard_fail'
 
 const repoRoot = '/home/hendo420/pdfaf'
 const manifestsRoot = path.join(repoRoot, 'ICJIA-PDFs', 'manifests')
@@ -59,12 +72,30 @@ function writeJson(filePath: string, value: unknown): void {
   fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + '\n')
 }
 
-function classifyResult(result: VerificationResult): Classification {
+type VerificationDocument = {
+  generatedAt: string
+  scorePolicy?: {
+    minPassOverallScore?: number | null
+  }
+  summary: Record<string, number>
+  verificationResults: VerificationResult[]
+  publicationRows: PublicationVerificationRow[]
+}
+
+export function classifyResult(
+  result: VerificationResult,
+  options?: {
+    minPassOverallScore?: number | null
+  },
+): Classification {
+  if (result.visualApproval?.required && !result.visualApproval?.approved) return 'held_visual_review'
   if (result.passed) return 'verified_pass'
 
+  const minPassOverallScore = options?.minPassOverallScore
   const hardFail = (
-    result.summary.grade !== 'A' ||
-    result.summary.overallScore !== 100 ||
+    (minPassOverallScore == null
+      ? (result.summary.grade !== 'A' || result.summary.overallScore !== 100)
+      : (typeof result.summary.overallScore !== 'number' || result.summary.overallScore < minPassOverallScore)) ||
     (result.gate.blockingLocalFindingKeys || []).length > 0 ||
     Boolean(result.error) ||
     result.missing
@@ -73,24 +104,20 @@ function classifyResult(result: VerificationResult): Classification {
   return hardFail ? 'hard_fail' : 'soft_fail_advisory'
 }
 
-function main(): void {
-  const doc = readJson<{
-    generatedAt: string
-    summary: Record<string, number>
-    verificationResults: VerificationResult[]
-    publicationRows: PublicationVerificationRow[]
-  }>(sourcePath)
+export function main(): void {
+  const doc = readJson<VerificationDocument>(sourcePath)
+  const minPassOverallScore = doc.scorePolicy?.minPassOverallScore ?? 90
 
   const resultMap = new Map(doc.verificationResults.map(result => [result.key, result]))
 
   const classifiedResults = doc.verificationResults.map(result => ({
     ...result,
-    classification: classifyResult(result),
+    classification: classifyResult(result, { minPassOverallScore }),
   }))
 
   const classifiedRows = doc.publicationRows.map(row => {
     const result = resultMap.get(row.verificationKey)
-    const classification = result ? classifyResult(result) : 'hard_fail'
+    const classification = result ? classifyResult(result, { minPassOverallScore }) : 'hard_fail'
     return {
       ...row,
       classification,
@@ -100,13 +127,18 @@ function main(): void {
   const summary = {
     generatedAt: new Date().toISOString(),
     basedOn: sourcePath,
+    scorePolicy: {
+      minPassOverallScore,
+    },
     totals: {
       publicationRows: classifiedRows.length,
       uniqueTargets: classifiedResults.length,
       verifiedPassTargets: classifiedResults.filter(result => result.classification === 'verified_pass').length,
+      heldVisualReviewTargets: classifiedResults.filter(result => result.classification === 'held_visual_review').length,
       softFailAdvisoryTargets: classifiedResults.filter(result => result.classification === 'soft_fail_advisory').length,
       hardFailTargets: classifiedResults.filter(result => result.classification === 'hard_fail').length,
       verifiedPassPublicationRows: classifiedRows.filter(row => row.classification === 'verified_pass').length,
+      heldVisualReviewPublicationRows: classifiedRows.filter(row => row.classification === 'held_visual_review').length,
       softFailAdvisoryPublicationRows: classifiedRows.filter(row => row.classification === 'soft_fail_advisory').length,
       hardFailPublicationRows: classifiedRows.filter(row => row.classification === 'hard_fail').length,
     },
@@ -116,6 +148,7 @@ function main(): void {
         return [sourceKind, {
           total: rows.length,
           verifiedPass: rows.filter(row => row.classification === 'verified_pass').length,
+          heldVisualReview: rows.filter(row => row.classification === 'held_visual_review').length,
           softFailAdvisory: rows.filter(row => row.classification === 'soft_fail_advisory').length,
           hardFail: rows.filter(row => row.classification === 'hard_fail').length,
         }]
@@ -149,4 +182,6 @@ function main(): void {
   console.log(JSON.stringify(summary, null, 2))
 }
 
-main()
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+}

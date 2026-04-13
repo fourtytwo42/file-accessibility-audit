@@ -257,9 +257,129 @@ describe('buildCorpusControlPlaneArtifactsFromSources', () => {
     expect(artifacts.document.rows[0].currentCorpusStatus).toBe('discovered')
     expect(artifacts.document.rows[0].cohortLabel).toBe('manual_tail')
   })
-})
 
-describe('corpus control plane regression', () => {
+  it('summarizes backlog families, finding keys, and runtime-deferral rows', () => {
+    const sources = makeSources({
+      replacementMap: [
+        {
+          publicationId: '300',
+          title: 'Backlog Structure',
+          slug: 'backlog-structure',
+          fileUrl: 'https://example.test/backlog-structure.pdf',
+          fileHost: 'example.test',
+          storageKind: 'legacy_archive',
+          replaceVia: 'sftp',
+          serverHost: 'host-3',
+          sshTarget: 'forge@host-3',
+          remotePath: '/remote/backlog-structure.pdf',
+          remoteDir: '/remote',
+          localWorkingPath: null,
+          localBackupPath: null,
+          localServerMirrorPath: null,
+          expectedPresence: 'present',
+          notes: null,
+          checksumState: { checksumRecordedAt: null, localCurrentFilePath: '/cache/backlog-structure.pdf', localCurrentFileMd5: 'abc' },
+        },
+        {
+          publicationId: '301',
+          title: 'Backlog Runtime',
+          slug: 'backlog-runtime',
+          fileUrl: 'https://example.test/backlog-runtime.pdf',
+          fileHost: 'example.test',
+          storageKind: 'legacy_archive',
+          replaceVia: 'sftp',
+          serverHost: 'host-3',
+          sshTarget: 'forge@host-3',
+          remotePath: '/remote/backlog-runtime.pdf',
+          remoteDir: '/remote',
+          localWorkingPath: null,
+          localBackupPath: null,
+          localServerMirrorPath: null,
+          expectedPresence: 'present',
+          notes: null,
+          checksumState: { checksumRecordedAt: null, localCurrentFilePath: '/cache/backlog-runtime.pdf', localCurrentFileMd5: 'def' },
+        },
+      ],
+      candidateManifests: [{
+        path: '/tmp/candidates.json',
+        candidates: [
+          {
+            publicationId: '300',
+            passLikelihoodScore: 90,
+            priorityRank: 1,
+            pageCount: 12,
+            isScanned: false,
+            blockerFamilyCount: 2,
+            blockingFindingCount: 2,
+            autoRunnableOpportunityCount: 2,
+            topBlockingResidualFamilyIds: ['logical_structure_marked_content', 'metadata_normalization'],
+            blockingFindingKeys: ['pdfua.logical_structure', 'pdfua.display_doc_title'],
+            autoRunnableOpportunityKeys: ['repair_structure_conformance:document:document'],
+            manualOnlyFailureModeCount: 0,
+          },
+          {
+            publicationId: '301',
+            passLikelihoodScore: 70,
+            priorityRank: 2,
+            pageCount: 9,
+            isScanned: false,
+            blockerFamilyCount: 1,
+            blockingFindingCount: 1,
+            autoRunnableOpportunityCount: 1,
+            topBlockingResidualFamilyIds: ['link_tabs_and_annotation_cleanup'],
+            blockingFindingKeys: ['pdfua.page_tabs'],
+            autoRunnableOpportunityKeys: ['set_tabs_all_annotated_pages:document:document'],
+            manualOnlyFailureModeCount: 0,
+          },
+        ],
+      }],
+      outcomeManifests: [{
+        path: '/tmp/stage4-structure-wave.outcomes.json',
+        outcomes: [{
+          publicationId: '301',
+          status: 'processing_error',
+          processedAt: '2026-03-31T12:00:00.000Z',
+          gate: {
+            passed: false,
+            reasons: [
+              'Processing exceeded the 60-minute runtime limit.',
+              'Marked as excessive runtime and deferred so the batch can continue.',
+            ],
+            blockingLocalFindingKeys: ['pdfua.page_tabs'],
+            unresolvedCategoryLabels: ['Reading Order'],
+            criticalManualReviewFlagCodes: [],
+          },
+          final: null,
+          original: { overallScore: 30, grade: 'F', pageCount: 9, isScanned: false },
+          artifacts: { detailedReportPath: null, failureReportPath: '/reports/301.failure.json', stagedReplacementPath: null, remediatedPdfPath: null },
+        }],
+      }],
+    })
+
+    const artifacts = buildCorpusControlPlaneArtifactsFromSources(sources)
+    expect(artifacts.document.summary.blockerFamilyBacklog).toEqual({
+      link_tabs_and_annotation_cleanup: 1,
+      logical_structure_marked_content: 1,
+      metadata_normalization: 1,
+    })
+    expect(artifacts.document.summary.blockingFindingBacklog).toEqual({
+      'pdfua.display_doc_title': 1,
+      'pdfua.logical_structure': 1,
+      'pdfua.page_tabs': 1,
+    })
+    expect(artifacts.document.summary.runtimeDeferredRows).toEqual({
+      total: 1,
+      byCohortLabel: {
+        short_high_likelihood: 0,
+        figure_heavy: 0,
+        structure_heavy: 1,
+        font_heavy: 0,
+        long_report: 0,
+        manual_tail: 0,
+      },
+    })
+  })
+
   it('classifies title-only Stage 4 hard fails as metadata title survivors', () => {
     const sources = makeSources({
       replacementMap: [{
@@ -333,11 +453,11 @@ describe('corpus control plane regression', () => {
     expect(validation.ok).toBe(true)
     expect(artifacts.document.rows).toHaveLength(sources.replacementMap.length)
     expect(artifacts.document.summary.totalRows).toBe(1056)
-    expect(artifacts.document.summary.verifiedPassRowsFromLedger).toBe(90)
-    expect(sources.promotionLedgerRows).toHaveLength(90)
-    expect(sources.classifiedRows.filter(row => row.classification === 'verified_pass')).toHaveLength(90)
-    expect(sources.classifiedRows.filter(row => row.classification === 'soft_fail_advisory')).toHaveLength(2)
-    expect(sources.classifiedRows.filter(row => row.classification === 'hard_fail')).toHaveLength(300)
+    expect(artifacts.document.summary.verifiedPassRowsFromLedger).toBe(120)
+    expect(sources.promotionLedgerRows).toHaveLength(120)
+    expect(sources.classifiedRows.filter(row => row.classification === 'verified_pass')).toHaveLength(120)
+    expect(sources.classifiedRows.filter(row => row.classification === 'soft_fail_advisory')).toHaveLength(0)
+    expect(sources.classifiedRows.filter(row => row.classification === 'hard_fail')).toHaveLength(303)
     expect(artifacts.document.rows.every(row => !!row.currentCorpusStatus && !!row.cohortLabel)).toBe(true)
     expect(artifacts.document.rows.filter(row => row.currentCorpusStatus === 'verified_pass').every(row => row.promotionTruth.ledgerRowPresent)).toBe(true)
   })

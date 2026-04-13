@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-04-07T03:43:15.399Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/medium-figure-conversion.json",
+  "laneName": "medium-figure-conversion",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "remediation_fast",
+  "concurrency": 5,
+  "totals": {
+    "targetCandidates": 32,
+    "processed": 32,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 32,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 32,
+    "pdfsPerHour": 9.06,
+    "terminalOutcomesPerHour": 9.06,
+    "passCandidatesPerHour": 0
+  },
+  "quality": {
+    "passCandidates": 0,
+    "rowsWithBlockingFindingShrink": 13,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4534",
+    "publicationTitle": "Safe From the Start Year 13: 2001-2014",
+    "priorityRank": 24,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 100,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "font",
+    "runtimeWeightBucket": "light",
+    "runtimeProfileKey": "safe_from_the_start_year_report",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "category.alt_text",
+      "context.table_candidates_blocked",
+      "pdfua.display_doc_title",
+      "pdfua.document_language",
+      "pdfua.font_embedding",
+      "pdfua.font_unicode",
+      "pdfua.table_regularity"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf",
+    "fileUrl": "https://archive.icjia.cloud/files/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.remediation.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-07T03:43:15.398Z",
+    "durationMs": 1519636,
+    "original": {
+      "overallScore": 49,
+      "grade": "F",
+      "pageCount": 48,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 78,
+      "grade": "C",
+      "pageCount": 48,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is C, not A.",
+        "Final overall score is 78, not 100.",
+        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Alt Text on Images",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "8c794f37509bf307bd7021865992f258273bc331350b1156377e15b6262cc984",
+      "remediatedPdfSha256": "8c794f37509bf307bd7021865992f258273bc331350b1156377e15b6262cc984",
+      "stagedReplacementSha256": null
+    }
+  }
+}

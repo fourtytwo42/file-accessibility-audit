@@ -2,19 +2,15 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
-import { execFile } from 'node:child_process'
-import { promisify } from 'node:util'
 import { fileURLToPath } from 'node:url'
 import dotenv from 'dotenv'
 import { ANALYSIS } from '#config'
+import { runPdfStructureHelperCommand } from './pdfStructureBackend.js'
 
-const execFileAsync = promisify(execFile)
 const moduleDir = path.dirname(fileURLToPath(import.meta.url))
 const apiRoot = path.resolve(moduleDir, '../..')
 dotenv.config({ path: path.resolve(apiRoot, '.env'), override: false })
 dotenv.config({ path: path.resolve(apiRoot, '../../.env'), override: false })
-const PYTHON_BIN = process.env.PYTHON_PATH || 'python'
-const HELPER_PATH = path.resolve(moduleDir, '../../scripts/pdf_structure_helper.py')
 
 export interface ReadingOrderResult {
   status: 'ok' | 'unavailable' | 'timeout' | 'error'
@@ -48,16 +44,11 @@ export async function analyzeReadingOrder(
       maxPages: ANALYSIS.PDFMINER_MAX_PAGES,
     }))
 
-    const { stdout, stderr } = await execFileAsync(PYTHON_BIN, [
-      HELPER_PATH,
-      '--input', inputPath,
-      '--request', requestPath,
-      '--output', outputPath,
-    ], {
-      timeout: ANALYSIS.PDFMINER_TIMEOUT_MS,
-      maxBuffer: 10 * 1024 * 1024,
-      encoding: 'utf-8',
-      windowsHide: true,
+    const { stdout, stderr } = await runPdfStructureHelperCommand({
+      inputPath,
+      requestPath,
+      outputPath,
+      timeoutMs: ANALYSIS.PDFMINER_TIMEOUT_MS,
       signal: options?.signal,
     })
 

@@ -1,37 +1,51 @@
 {
-  "generatedAt": "2026-03-31T06:56:08.630Z",
+  "generatedAt": "2026-04-10T05:45:35.311Z",
   "basedOn": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/ready-to-replace-verification.json",
+  "scorePolicy": {
+    "minPassOverallScore": 90
+  },
   "totals": {
-    "publicationRows": 392,
-    "uniqueTargets": 383,
-    "verifiedPassTargets": 88,
-    "softFailAdvisoryTargets": 2,
-    "hardFailTargets": 293,
-    "verifiedPassPublicationRows": 90,
-    "softFailAdvisoryPublicationRows": 2,
-    "hardFailPublicationRows": 300
+    "publicationRows": 412,
+    "uniqueTargets": 405,
+    "verifiedPassTargets": 139,
+    "heldVisualReviewTargets": 1,
+    "softFailAdvisoryTargets": 15,
+    "hardFailTargets": 250,
+    "verifiedPassPublicationRows": 144,
+    "heldVisualReviewPublicationRows": 1,
+    "softFailAdvisoryPublicationRows": 15,
+    "hardFailPublicationRows": 252
   },
   "breakdownBySourceKind": {
     "already_replaced_remote": {
       "total": 1,
-      "verifiedPass": 0,
+      "verifiedPass": 1,
+      "heldVisualReview": 0,
       "softFailAdvisory": 0,
-      "hardFail": 1
+      "hardFail": 0
     },
     "batch_ready": {
-      "total": 285,
-      "verifiedPass": 61,
-      "softFailAdvisory": 1,
-      "hardFail": 223
+      "total": 310,
+      "verifiedPass": 111,
+      "heldVisualReview": 1,
+      "softFailAdvisory": 4,
+      "hardFail": 194
     },
     "complete_seed": {
-      "total": 106,
-      "verifiedPass": 29,
-      "softFailAdvisory": 1,
-      "hardFail": 76
+      "total": 101,
+      "verifiedPass": 32,
+      "heldVisualReview": 0,
+      "softFailAdvisory": 11,
+      "hardFail": 58
     }
   },
   "advisoryReasons": {
-    "Categories still below 100: Reading Order": 2
+    "Final grade is B, not A.": 15,
+    "Final overall score is 99, not 100.": 10,
+    "Categories still below 100: Table Markup": 5,
+    "Categories still below 100: Alt Text on Images": 3,
+    "Final overall score is 97, not 100.": 2,
+    "Final overall score is 90, not 100.": 2,
+    "Final overall score is 94, not 100.": 1
   }
 }

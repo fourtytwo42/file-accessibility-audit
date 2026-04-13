@@ -116,6 +116,10 @@ export interface Stage4StructureThroughputSummaryDocument {
     reclassifiedOutOfStructureHeavyRows: number
     genericTimeoutRows: number
   }
+  backlog: {
+    topBlockingResidualFamilyIds: Array<{ id: string; count: number }>
+    topBlockingFindingKeys: Array<{ key: string; count: number }>
+  }
   rows: {
     newlyVerifiedPassPublicationIds: string[]
     stagedPassCandidatePublicationIds: string[]
@@ -476,12 +480,29 @@ function buildSummary(rows: CorpusControlPlaneRow[], ledgerRowCount: number): Co
     long_report: emptyStatusCounts(),
     manual_tail: emptyStatusCounts(),
   }
+  const blockerFamilyBacklog: Record<string, number> = {}
+  const blockingFindingBacklog: Record<string, number> = {}
+  const runtimeDeferredRowsByCohort = emptyCohortCounts()
+  let runtimeDeferredRowsTotal = 0
 
   for (const row of rows) {
     byCurrentCorpusStatus[row.currentCorpusStatus] += 1
     byCohortLabel[row.cohortLabel] += 1
     byStorageKind[row.storageKind || 'unknown'] = (byStorageKind[row.storageKind || 'unknown'] || 0) + 1
     statusByCohort[row.cohortLabel][row.currentCorpusStatus] += 1
+
+    if (row.currentCorpusStatus === 'verified_pass') continue
+
+    for (const familyId of row.classificationEvidence.topBlockingResidualFamilyIds) {
+      blockerFamilyBacklog[familyId] = (blockerFamilyBacklog[familyId] || 0) + 1
+    }
+    for (const findingKey of row.classificationEvidence.blockingFindingKeys) {
+      blockingFindingBacklog[findingKey] = (blockingFindingBacklog[findingKey] || 0) + 1
+    }
+    if (row.stage3FigureDiagnostics.hasGenericTimeoutWording || row.stage4StructureDiagnostics.hasBoundedRuntimeWording) {
+      runtimeDeferredRowsTotal += 1
+      runtimeDeferredRowsByCohort[row.cohortLabel] += 1
+    }
   }
 
   return {
@@ -492,6 +513,12 @@ function buildSummary(rows: CorpusControlPlaneRow[], ledgerRowCount: number): Co
     statusByCohort,
     verifiedPassRowsFromLedger: ledgerRowCount,
     remainingRowsExcludingVerifiedPass: rows.filter(row => row.currentCorpusStatus !== 'verified_pass').length,
+    blockerFamilyBacklog: Object.fromEntries(Object.entries(blockerFamilyBacklog).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))),
+    blockingFindingBacklog: Object.fromEntries(Object.entries(blockingFindingBacklog).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))),
+    runtimeDeferredRows: {
+      total: runtimeDeferredRowsTotal,
+      byCohortLabel: runtimeDeferredRowsByCohort,
+    },
   }
 }
 
@@ -1701,8 +1728,13 @@ function applyStage4RoutingToRow(
       nextReasonCodes.push('stage4.4:figure_spillover_survivor', 'stage4:reclassified_from_structure_heavy', 'stage4:figure_dominant_after_structure_wave')
       nextNotes.push('Stage 4.4 reclassified this terminal Stage 4 survivor back to figure_heavy because the latest truthful blocker is figure debt.')
     } else if (nextDiagnostics.terminalSurvivorClass === 'staged_pass_candidate_survivor') {
-      nextStatus = 'staged_for_replacement'
-      nextReasonCodes.push('stage4.5:staged_pass_candidate_survivor')
+      if (row.promotionTruth.ledgerRowPresent && row.promotionTruth.promotionStatus === 'verified_pass') {
+        nextStatus = 'verified_pass'
+        nextReasonCodes.push('stage4.5:staged_pass_candidate_survivor', 'stage4.6:preserve_verified_promotion_truth')
+      } else {
+        nextStatus = 'staged_for_replacement'
+        nextReasonCodes.push('stage4.5:staged_pass_candidate_survivor')
+      }
     } else if (nextDiagnostics.terminalSurvivorClass === 'near_pass_grade_only') {
       nextReasonCodes.push('stage4.4:near_pass_grade_only')
     } else if (nextDiagnostics.terminalSurvivorClass === 'metadata_title_survivor') {
@@ -2063,9 +2095,11 @@ export function buildStage4StructureWaveArtifacts(input: {
   )
   const existingUnresolvedPublicationIds = pendingPublicationIdsFromExistingArtifacts(existingWave, existingOutcomes)
     .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
-    .filter(publicationId => activeAnalysisIds.has(publicationId) || !forensicallyResolvedPendingIds.has(publicationId))
+    .filter(publicationId => !terminalOutcomeIds.has(publicationId))
     .filter(publicationId => !homogeneousAnalysisPublicationIds.includes(publicationId))
-  const continuationPublicationIds = unresolvedActiveForensicsPublicationIds.length > 0
+  const continuationPublicationIds = existingUnresolvedPublicationIds.length > 0
+    ? existingUnresolvedPublicationIds
+    : unresolvedActiveForensicsPublicationIds.length > 0
     ? unresolvedActiveForensicsPublicationIds
       .filter(publicationId => activeEligiblePublicationIds.has(publicationId))
       .filter(publicationId => !terminalOutcomeIds.has(publicationId))
@@ -2283,7 +2317,13 @@ export function buildStage4StructureThroughputSummary(input: {
   }
   const pendingPublicationIds = activeWavePendingPublicationIds
   const activeUnresolvedPublicationIds = activeWavePendingPublicationIds
-  const stillUnclassifiedPendingPublicationIds = activeWavePendingPublicationIds.filter(publicationId => !activeAnalysisPublicationIds.includes(publicationId) && !stalledForensicPublicationIds.includes(publicationId) && !overlapAnalysisPublicationIds.includes(publicationId) && !activeForensicsPublicationIds.includes(publicationId) && !homogeneousAnalysisPublicationIds.includes(publicationId))
+  const stillUnclassifiedPendingPublicationIds = activeWavePendingPublicationIds.filter(publicationId =>
+    !forensicResolvedPublicationIds.includes(publicationId)
+    && !activeAnalysisPublicationIds.includes(publicationId)
+    && !stalledForensicPublicationIds.includes(publicationId)
+    && !overlapAnalysisPublicationIds.includes(publicationId)
+    && !activeForensicsPublicationIds.includes(publicationId)
+    && !homogeneousAnalysisPublicationIds.includes(publicationId))
 
   const readingOrderOnlyResidualPublicationIds = uniqueStrings(allRows
     .filter(row => terminalSurvivorClassFromRow(row) === 'reading_order_only_survivor')
@@ -2313,6 +2353,30 @@ export function buildStage4StructureThroughputSummary(input: {
     mixed_structure_figure_residuals: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'mixed_structure_figure_residuals' && row.currentCorpusStatus !== 'verified_pass' && !terminalSurvivorClassFromRow(row)).map(row => row.publicationId).sort(),
     structure_processing_error_retry: structureRows.filter(row => row.stage4StructureDiagnostics.structureWaveBucket === 'structure_processing_error_retry' && row.currentCorpusStatus !== 'verified_pass' && !terminalSurvivorClassFromRow(row)).map(row => row.publicationId).sort(),
   }
+  const topBlockingResidualFamilyIds = Object.entries(
+    structureRows
+      .filter(row => row.currentCorpusStatus !== 'verified_pass')
+      .reduce((counts, row) => {
+        for (const familyId of row.classificationEvidence.topBlockingResidualFamilyIds) {
+          counts[familyId] = (counts[familyId] || 0) + 1
+        }
+        return counts
+      }, {} as Record<string, number>),
+  )
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([id, count]) => ({ id, count }))
+  const topBlockingFindingKeys = Object.entries(
+    structureRows
+      .filter(row => row.currentCorpusStatus !== 'verified_pass')
+      .reduce((counts, row) => {
+        for (const key of row.classificationEvidence.blockingFindingKeys) {
+          counts[key] = (counts[key] || 0) + 1
+        }
+        return counts
+      }, {} as Record<string, number>),
+  )
+    .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))
+    .map(([key, count]) => ({ key, count }))
 
   const nextWaveStructureOnlyPublicationIds = uniqueStrings([
     ...bucketIds.metadata_navigation_residuals,
@@ -2346,6 +2410,10 @@ export function buildStage4StructureThroughputSummary(input: {
       pendingWaveRows: activeWavePendingPublicationIds.length,
       reclassifiedOutOfStructureHeavyRows: reclassifiedOutOfStructureHeavyPublicationIds.length,
       genericTimeoutRows: 0,
+    },
+    backlog: {
+      topBlockingResidualFamilyIds,
+      topBlockingFindingKeys,
     },
     rows: {
       newlyVerifiedPassPublicationIds,

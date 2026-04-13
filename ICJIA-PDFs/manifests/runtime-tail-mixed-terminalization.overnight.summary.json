@@ -1,0 +1,39 @@
+{
+  "startedAt": "2026-04-07T14:20:06.284Z",
+  "sliceName": "runtime-tail-mixed-terminalization",
+  "chunkSize": 8,
+  "thresholds": {
+    "processingErrorRateThreshold": 0.35,
+    "consecutiveLowYieldChunks": 2
+  },
+  "processedPublicationIds": [],
+  "chunkSummaries": [
+    {
+      "chunkId": 1,
+      "chunkManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.chunk-001.json",
+      "selectedPublicationIds": [
+        "3425",
+        "3427",
+        "3431",
+        "3435"
+      ],
+      "runtimeWeightBucket": "medium",
+      "chunkSizeCap": 4,
+      "remediationConcurrency": 2,
+      "isolatedHeavyProfileKeys": [],
+      "exitCode": 1,
+      "signal": null,
+      "recommendation": "stop_and_replan_engine"
+    }
+  ],
+  "totals": {
+    "processedRows": 0,
+    "passCandidates": 0,
+    "failedAfterRemediation": 0,
+    "processingError": 0,
+    "processingErrorToStableHardFail": 0,
+    "remainingRetryWorthyRows": 49
+  },
+  "finalRecommendation": "stop_and_replan_engine",
+  "finishedAt": "2026-04-07T14:26:26.106Z"
+}

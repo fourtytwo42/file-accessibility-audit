@@ -1,0 +1,257 @@
+{
+  "generatedAt": "2026-04-06T19:48:34.559Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.chunk-001.json",
+  "concurrency": 2,
+  "totals": {
+    "targetCandidates": 4,
+    "processed": 4,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 4,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3556",
+      "publicationTitle": "McGruff Winners Dont Use Drugs",
+      "priorityRank": 1,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 39,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/brochures/Winners dont use Drugs.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/brochures/Winners dont use Drugs.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/brochures/Winners%20dont%20use%20Drugs.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3556-McGruff_Winners_Dont_Use_Drugs.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T19:38:43.213Z",
+      "durationMs": 128419,
+      "original": {
+        "overallScore": 9,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 43,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 43, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3556-McGruff_Winners_Dont_Use_Drugs.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3556-McGruff_Winners_Dont_Use_Drugs.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3556-McGruff_Winners_Dont_Use_Drugs.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "5408d77191654879fb8bf1314e957dddbab319f1736139565cb0579af32fd0a5",
+        "remediatedPdfSha256": "5408d77191654879fb8bf1314e957dddbab319f1736139565cb0579af32fd0a5",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3590",
+      "publicationTitle": "An Overview and Assessment of Domestic Violence ChildAbuse and Elder Abuse Data in Illinois",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 39,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/OverviewDVChildAbuseElderAbuse.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/OverviewDVChildAbuseElderAbuse.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/OverviewDVChildAbuseElderAbuse.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3590-An_Overview_and_Assessment_of_Domestic_Violence_ChildAbuse_and_Elder_Abuse_Data_in_Illinois.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T19:44:59.560Z",
+      "durationMs": 504766,
+      "original": {
+        "overallScore": 8,
+        "grade": "F",
+        "pageCount": 87,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 87,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3590-An_Overview_and_Assessment_of_Domestic_Violence_ChildAbuse_and_Elder_Abuse_Data_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3590-An_Overview_and_Assessment_of_Domestic_Violence_ChildAbuse_and_Elder_Abuse_Data_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3590-An_Overview_and_Assessment_of_Domestic_Violence_ChildAbuse_and_Elder_Abuse_Data_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "3ac4f5969cd4a9626c563771de619478f81f88a9af2e9978a33e72cf8f7e2521",
+        "remediatedPdfSha256": "3ac4f5969cd4a9626c563771de619478f81f88a9af2e9978a33e72cf8f7e2521",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3421",
+      "publicationTitle": "Murder in Illinois 1973 to 1982",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 38,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Murder in Illinois 1973 to 1982.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Murder in Illinois 1973 to 1982.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Murder in Illinois 1973 to 1982.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3421-Murder_in_Illinois_1973_to_1982.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T19:45:02.246Z",
+      "durationMs": 379033,
+      "original": {
+        "overallScore": 8,
+        "grade": "F",
+        "pageCount": 43,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 43,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3421-Murder_in_Illinois_1973_to_1982.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3421-Murder_in_Illinois_1973_to_1982.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3421-Murder_in_Illinois_1973_to_1982.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "371ef0d1e0a96cfe8e0e9978147e4bbc0d07e676372f7cf0e01ff87263af9916",
+        "remediatedPdfSha256": "371ef0d1e0a96cfe8e0e9978147e4bbc0d07e676372f7cf0e01ff87263af9916",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3424",
+      "publicationTitle": "Female Criminality 1970 1980 The US and Illinois April 1983",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 38,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Female Criminality.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Female Criminality.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Female Criminality.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T19:48:34.558Z",
+      "durationMs": 214997,
+      "original": {
+        "overallScore": 8,
+        "grade": "F",
+        "pageCount": 47,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 50,
+        "grade": "F",
+        "pageCount": 47,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 50, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8f16010e692686e177a077db0508058946560871c962dea32f682c917f929d06",
+        "remediatedPdfSha256": "8f16010e692686e177a077db0508058946560871c962dea32f682c917f929d06",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

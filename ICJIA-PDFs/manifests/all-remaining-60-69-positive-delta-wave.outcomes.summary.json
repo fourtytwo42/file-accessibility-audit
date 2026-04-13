@@ -1,0 +1,126 @@
+{
+  "generatedAt": "2026-04-11T03:03:11.849Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.json",
+  "laneName": "all-remaining-60-69-positive-delta-wave",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 2,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 2,
+    "keep_fail_80_to_89": 1,
+    "drop_fail_lt_80": 2,
+    "processing_error": 0,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 5,
+    "processed": 5,
+    "readyToReplace": 2,
+    "remediatedPassCandidates": 2,
+    "failedAfterRemediation": 3,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 5,
+    "pdfsPerHour": 11.23,
+    "terminalOutcomesPerHour": 11.23,
+    "passCandidatesPerHour": 4.49
+  },
+  "quality": {
+    "passCandidates": 2,
+    "rowsWithBlockingFindingShrink": 3,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4495",
+    "publicationTitle": "Provider-Reported Challenges and Opportunities in Supporting Young Victims of Crime",
+    "priorityRank": 3,
+    "priorityTier": "high",
+    "passLikelihoodScore": 68,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "font",
+    "runtimeWeightBucket": "light",
+    "runtimeProfileKey": "provider_reported_challenges_opportunities_in_supporting_victims_of_crime_t",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.annotation_alt_contents",
+      "pdfua.figure_alt_or_artifact",
+      "pdfua.heading_content_quality"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Provider_reported_challenges_&_opportunities_in_supporting_victims_of_crime-191015T19261497.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun-v2/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Provider_reported_challenges_&_opportunities_in_supporting_victims_of_crime-191015T19261497.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun-v2/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.remediation.json",
+    "status": "remediated_pass_candidate",
+    "resultBand": "pass_ge_90",
+    "promotionStatus": null,
+    "processedAt": "2026-04-11T03:03:11.848Z",
+    "durationMs": 420682,
+    "original": {
+      "overallScore": 93,
+      "grade": "B",
+      "pageCount": 10,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 93,
+      "grade": "B",
+      "pageCount": 10,
+      "isScanned": false
+    },
+    "seed": {
+      "priorOverallScore": 64,
+      "priorGrade": "D",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-10T09:43:28.169Z"
+    },
+    "gate": {
+      "passed": true,
+      "reasons": [],
+      "blockingLocalFindingKeys": [
+        "pdfua.annotation_alt_contents"
+      ],
+      "unresolvedCategoryLabels": [
+        "Link & URL Quality",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.pdf",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Provider_reported_challenges_&_opportunities_in_supporting_victims_of_crime-191015T19261497.pdf",
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.remediation.json",
+      "failureReportPath": null
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "6b2606081f1a187755a345087a00c92e3d10d18e95e39701284af219d33b2d83",
+      "remediatedPdfSha256": "6b2606081f1a187755a345087a00c92e3d10d18e95e39701284af219d33b2d83",
+      "stagedReplacementSha256": "6b2606081f1a187755a345087a00c92e3d10d18e95e39701284af219d33b2d83"
+    },
+    "strictPromotionGate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 93, not 100.",
+        "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+        "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.annotation_alt_contents"
+      ],
+      "unresolvedCategoryLabels": [
+        "Link & URL Quality",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    }
+  }
+}

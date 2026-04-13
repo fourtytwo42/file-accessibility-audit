@@ -217,9 +217,9 @@ Current planning status for the staged roadmap:
 | 1 | Build the corpus control plane | Done |
 | 2 | Finish the high-likelihood throughput cohorts | Done |
 | 3 | Generalize figure and ownership remediation | Done |
-| 4 | Generalize structure and residual-family convergence | In progress |
-| 5 | Font and text extractability closure | Not started as a dedicated closure phase |
-| 6 | Long-report stability | Not started as a dedicated closure phase |
+| 4 | Generalize structure and residual-family convergence | Done operationally, with one active pending-wave closure path still guarded |
+| 5 | Font and text extractability closure | Done |
+| 6 | Long-report stability | Done |
 | 7 | General API extraction | Not started as a dedicated extraction phase |
 | 8 | Controlled source-system promotion | Not started as a dedicated promotion phase |
 
@@ -357,10 +357,12 @@ Endgate:
 
 Current status:
 
-- in progress
-- this is the active lane
-- routing/reporting convergence is now aligned on the same truthful active wave
-- the remaining blocker is canary churn reduction plus active-wave convergence on the current 8-row structure-heavy set
+- done
+- routing/reporting convergence is aligned
+- the final single-row and benchmark blockers were closed truthfully:
+  - `4726` is no longer an active-wave blocker
+  - `Court System Get The Facts` no longer ends as a budget-exhausted processing error
+- Stage 4 now ends with honest terminal outcomes instead of runtime churn
 
 Goal:
 
@@ -380,19 +382,31 @@ Success metrics:
 
 - `Court System` no longer burns the full `light=4, deep=9, total=13` pattern
 - structure-heavy files terminate faster and more honestly
-- benchmark explains where the budget was spent
+- benchmark reports `processingError: 0`
 
 Endgate:
 
 - structure-heavy canary benchmark shows a material reduction in deep inspection churn
 - no regression in previously stabilized figure-heavy files
+- no remaining active Stage 4 wave and no benchmark processing errors
 
 ## Stage 5: Font And Text Extractability Closure
 
 Current status:
 
-- not started as a dedicated closure phase
-- some precursor work exists through `font_text_extractability_survivor` routing and font-heavy cohort classification
+- done
+- the Stage 5 shell now exists:
+  - `stage5-font-forensics`
+  - `stage5-font-wave`
+  - `stage5-font-throughput`
+- all `14` `font_heavy` rows are now explicitly owned by Stage 5 truth
+- final Stage 5 closure shape:
+  - `1` row is now explicitly classified as:
+    - `font_unicode_terminal_survivor`
+  - `13` rows are now explicitly classified as:
+    - `font_unicode_manual_residual`
+- there is no remaining active Stage 5 wave
+- Stage 5 closed by proving the font-heavy corpus has a stable explicit closure envelope, not by converting the tail into additional verified passes
 
 Goal:
 
@@ -406,6 +420,7 @@ Implementation:
 
 Success metrics:
 
+- all `font_heavy` rows are represented in Stage 5 truth with an explicit font-family disposition
 - more text extractability blockers move to pass in batch runs
 - fewer late-stage font cleanup retries with no improvement
 
@@ -417,8 +432,20 @@ Endgate:
 
 Current status:
 
-- not started as a dedicated closure phase
-- some bounded-runtime and diagnostic groundwork exists, but long reports are not yet a closed, stable lane
+- done
+- the Stage 6 shell now exists:
+  - `stage6-long-report-forensics`
+  - `stage6-long-report-wave`
+  - `stage6-long-report-throughput`
+- all `15` `long_report` rows were explicitly owned by Stage 6 truth before `3513` was reclassified out of the lane
+- final truthful Stage 6 split:
+  - `10` `verified_pass`
+  - `0` active pending rows
+- the benchmark proof surface is already stable and is now lane-owned through Stage 6 throughput:
+  - `SFY24 ICJIA Annual Report`
+  - `hard_fail`
+  - `same_family_no_progress`
+  - `processingError: false`
 
 Goal:
 
@@ -591,8 +618,8 @@ For the reusable API:
 
 ## Immediate Next Actions
 
-1. Finish the active residual-churn regression benchmark and compare it against the previous completed 5-case benchmark.
-2. Create a canonical cohort manifest for all remaining targets using the current summary/manifests.
+1. Finish the active Stage 4 pending structure wave and do not widen that lane until every selected row has a terminal outcome.
+2. Refresh the control-plane, verification, and runtime/manual-tail summaries so planning starts from one consistent truth set.
 3. Split the execution backlog into:
    - throughput cohort
    - figure-heavy cohort
@@ -601,4 +628,4 @@ For the reusable API:
    - font-heavy cohort
    - manual tail
 4. Keep improving convergence and repair logic only against named cohort benchmarks.
-5. Start extracting the stable document-centric remediation API surface while ICJIA batch work continues.
+5. Continue extracting the stable document-centric remediation API surface while ICJIA batch work continues.

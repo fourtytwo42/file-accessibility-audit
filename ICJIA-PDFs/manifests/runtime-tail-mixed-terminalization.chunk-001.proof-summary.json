@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-04-06T21:21:15.045Z",
+  "sliceName": "runtime-tail-mixed-terminalization",
+  "selectedPublicationIds": [
+    "3556",
+    "3590",
+    "3421",
+    "3424"
+  ],
+  "before": {
+    "byStatus": {
+      "processing_error": 4
+    },
+    "targetedFindingCounts": {
+      "pdfua.figure_alt_or_artifact": 0,
+      "pdfua.logical_structure": 4
+    },
+    "targetedFamilyCounts": {
+      "native_figure_convergence": 4,
+      "post_bootstrap_heading_convergence": 4
+    }
+  },
+  "after": {
+    "byStatus": {
+      "remediated_fail": 4
+    },
+    "targetedFindingCounts": {
+      "pdfua.figure_alt_or_artifact": 4,
+      "pdfua.logical_structure": 4
+    },
+    "targetedFamilyCounts": {
+      "native_figure_convergence": 4,
+      "post_bootstrap_heading_convergence": 4
+    }
+  },
+  "deltas": {
+    "verifiedPass": 0,
+    "processingError": -4,
+    "targetedFindingCounts": {
+      "pdfua.figure_alt_or_artifact": 4,
+      "pdfua.logical_structure": 0
+    },
+    "targetedFamilyCounts": {
+      "native_figure_convergence": 0,
+      "post_bootstrap_heading_convergence": 0
+    }
+  },
+  "unchangedRows": [],
+  "worsenedRows": [],
+  "sliceIntent": "truth_hardening_terminalization",
+  "runtimeTransitions": {
+    "processingErrorToVerifiedPass": [],
+    "processingErrorToStableHardFail": [
+      "3421",
+      "3424",
+      "3556",
+      "3590"
+    ],
+    "unchangedProcessingError": [],
+    "dominantFamilyShifts": []
+  }
+}

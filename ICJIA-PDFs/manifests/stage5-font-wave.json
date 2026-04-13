@@ -1,0 +1,145 @@
+{
+  "generatedAt": "2026-04-01T20:10:10.150Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T20:10:10.124Z",
+  "waveName": "stage5-font-wave",
+  "cohortLabel": "font_heavy",
+  "maxCandidates": 8,
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 14,
+    "pendingRows": 0
+  },
+  "selectedPublicationIds": [],
+  "pendingPublicationIds": [],
+  "candidates": [],
+  "skippedRows": [
+    {
+      "publicationId": "3838",
+      "publicationTitle": "2004 Summary of Drug Enforcement Activities Across Illinois Multijurisdictional Enforcement Groups and Task Forces",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4099",
+      "publicationTitle": "2006 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4144",
+      "publicationTitle": "Illinois Court Trends  Criminal Case Filings 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4151",
+      "publicationTitle": "Illinois Court Trends  Adult Probation Caseload 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4156",
+      "publicationTitle": "2009 Annual Report Motor Vehicle Theft Prevention Council",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_terminal_survivor",
+      "skipReasons": [
+        "stage5:terminal_survivor_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4166",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Violent Index Arrests 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4168",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported and Indicated Child Abuse and Neglect 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4172",
+      "publicationTitle": "Illinois Drug Trends  Drug Crime Lab Submissions 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4173",
+      "publicationTitle": "Illinois Crime Victim Trends  Domestic Offenses 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4174",
+      "publicationTitle": "Illinois Drug Trends  Drug Seizures 19972007",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4176",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Arrests 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4199",
+      "publicationTitle": "Illinois Drug Trends  Drug Treatment Admissions 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4211",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Offenses 19992008",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    },
+    {
+      "publicationId": "4214",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported Elder Abuse 20002009",
+      "currentCorpusStatus": "remediated_fail",
+      "stage5FontDisposition": "font_unicode_manual_residual",
+      "skipReasons": [
+        "stage5:manual_residual_not_selected"
+      ]
+    }
+  ]
+}

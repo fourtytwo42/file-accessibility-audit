@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-04-01T20:10:10.149Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T20:10:10.124Z",
+  "forensicsManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-forensics.json",
+  "cohortLabel": "font_heavy",
+  "totals": {
+    "totalFontHeavyRows": 14,
+    "analyzedRows": 14,
+    "stillUnclassifiedRows": 0
+  },
+  "publicationIdsByDisposition": {
+    "embedded_font_repairable": [],
+    "deterministic_unicode_map_repair_available": [],
+    "type1_unicode_fallback_candidate": [],
+    "font_unicode_terminal_survivor": [
+      "4156"
+    ],
+    "font_processing_error_retry": [],
+    "font_unicode_manual_residual": [
+      "3838",
+      "4099",
+      "4144",
+      "4151",
+      "4166",
+      "4168",
+      "4172",
+      "4173",
+      "4174",
+      "4176",
+      "4199",
+      "4211",
+      "4214"
+    ]
+  },
+  "includePublicationIds": [],
+  "stillUnclassifiedPublicationIds": []
+}

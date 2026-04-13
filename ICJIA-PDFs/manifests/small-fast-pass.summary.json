@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.514Z",
+  "smallFastPassPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/small-fast-pass.json",
+  "laneIntent": "pass_rate_conversion",
+  "executionPolicy": "dormant",
+  "recommendedConcurrency": 10,
+  "initialAnalysisProfile": "remediation_fast",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 326
+  },
+  "totalCandidates": 0,
+  "selectedPublicationIds": [],
+  "selectionSanity": {
+    "dominantFamilyCounts": {},
+    "runtimeWeightCounts": {},
+    "excludedHeavyMixed": 326,
+    "excludedManualOrScanned": 0,
+    "excludedRuntimeTail": 0
+  }
+}

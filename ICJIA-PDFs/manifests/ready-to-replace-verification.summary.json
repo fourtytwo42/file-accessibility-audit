@@ -1,52 +1,59 @@
 {
-  "generatedAt": "2026-03-31T06:56:07.959Z",
+  "generatedAt": "2026-04-10T05:45:23.082Z",
+  "scorePolicy": {
+    "minPassOverallScore": 90
+  },
   "totals": {
-    "publicationRows": 392,
-    "uniqueTargets": 383,
-    "passedTargets": 88,
-    "failedTargets": 295,
+    "publicationRows": 412,
+    "uniqueTargets": 405,
+    "passedTargets": 140,
+    "failedTargets": 265,
     "erroredTargets": 0,
     "missingTargets": 0,
-    "passedPublicationRows": 90,
-    "failedPublicationRows": 302,
+    "passedPublicationRows": 144,
+    "failedPublicationRows": 268,
     "erroredPublicationRows": 0,
     "missingPublicationRows": 0,
-    "verifiedPromotionLedgerRows": 90
+    "verifiedPromotionLedgerRows": 144,
+    "visualApprovalHeldPublicationRows": 1
   },
   "latestVerifiedTarget": {
-    "key": "local:/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
+    "key": "local:/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
     "mode": "local_staged",
-    "sourcePathOrUrl": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
-    "filename": "PPRS-251003T13340815.pdf",
-    "verifiedAt": "2026-03-31T06:56:02.038Z",
-    "durationMs": 193353,
-    "passed": false,
+    "sourcePathOrUrl": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Racial legislation white paper PDF for posting-201010T14045325.pdf",
+    "filename": "Racial legislation white paper PDF for posting-201010T14045325.pdf",
+    "verifiedAt": "2026-04-10T05:45:23.081Z",
+    "durationMs": 22762,
+    "passed": true,
     "missing": false,
     "error": null,
     "summary": {
-      "overallScore": 89,
+      "overallScore": 92,
       "grade": "B",
-      "pageCount": 10,
+      "pageCount": 20,
       "isScanned": false
     },
     "gate": {
-      "reasons": [
-        "Final grade is B, not A.",
-        "Final overall score is 89, not 100.",
-        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
-        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
-      ],
+      "reasons": [],
       "blockingLocalFindingKeys": [
-        "pdfua.figure_alt_or_artifact"
+        "pdfua.link_tagging"
       ],
       "unresolvedCategoryLabels": [
-        "Alt Text on Images",
+        "Link & URL Quality",
+        "Reading Order",
         "PDF/UA Compliance"
       ],
       "criticalManualReviewFlagCodes": []
     },
+    "visualApproval": {
+      "required": true,
+      "approved": false,
+      "reasonCodes": [
+        "visual_parity_material_change"
+      ]
+    },
     "artifacts": {
-      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/PPRS-251003T13340815.pdf.json"
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Racial_legislation_white_paper_PDF_for_posting-201010T14045325.pdf.json"
     }
   },
   "promotionLedgerPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/verified-promotion-ledger.json"

@@ -2809,7 +2809,9 @@ describe('scoreDocument — veraPDF integration', () => {
 
     expect(findCategory(result, 'color_contrast').score).toBe(95)
     expect(findCategory(result, 'color_contrast').grade).toBe('A')
-    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('advisory display-text styling'))).toBe(true)
+    expect(findCategory(result, 'color_contrast').findings.some(
+      finding => finding.includes('advisory contrast warning')
+    )).toBe(true)
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })
@@ -2856,7 +2858,9 @@ describe('scoreDocument — veraPDF integration', () => {
 
     expect(findCategory(result, 'color_contrast').score).toBe(95)
     expect(findCategory(result, 'color_contrast').grade).toBe('A')
-    expect(findCategory(result, 'color_contrast').findings.some(finding => finding.includes('advisory display-text styling'))).toBe(true)
+    expect(findCategory(result, 'color_contrast').findings.some(
+      finding => finding.includes('advisory contrast warning')
+    )).toBe(true)
     expect(result.overallScore).toBe(100)
     expect(result.grade).toBe('A')
   })

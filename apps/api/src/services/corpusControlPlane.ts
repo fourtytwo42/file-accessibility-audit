@@ -22,7 +22,7 @@ export type CohortLabel =
   | 'manual_tail'
 
 export type SourceKind = 'legacy_archive' | 'agency_upload' | 'researchhub_upload'
-export type VerificationClassification = 'verified_pass' | 'soft_fail_advisory' | 'hard_fail'
+export type VerificationClassification = 'verified_pass' | 'held_visual_review' | 'soft_fail_advisory' | 'hard_fail'
 export type FigureWaveBucket = 'ownership_cleared_figure_debt_remains' | 'mixed_figure_structure_debt' | 'mass_unresolved_figure_debt' | 'figure_processing_error_retry'
 export type StructureWaveBucket = 'structure_only_residuals' | 'mixed_structure_figure_residuals' | 'metadata_navigation_residuals' | 'structure_processing_error_retry'
 export type Stage4TerminalSurvivorClass =
@@ -504,6 +504,12 @@ export interface CorpusControlPlaneSummary {
   statusByCohort: Record<CohortLabel, Record<CorpusStatus, number>>
   verifiedPassRowsFromLedger: number
   remainingRowsExcludingVerifiedPass: number
+  blockerFamilyBacklog?: Record<string, number>
+  blockingFindingBacklog?: Record<string, number>
+  runtimeDeferredRows?: {
+    total: number
+    byCohortLabel: Record<CohortLabel, number>
+  }
 }
 
 export interface CorpusControlPlaneByCohortDocument {
@@ -609,6 +615,15 @@ function uniqueStrings(values: Array<string | null | undefined>): string[] {
   return Array.from(new Set(values.filter((value): value is string => Boolean(value)))).sort()
 }
 
+function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(entry => stableStringify(entry)).join(',')}]`
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>).sort((left, right) => left[0].localeCompare(right[0]))
+    return `{${entries.map(([key, entry]) => `${JSON.stringify(key)}:${stableStringify(entry)}`).join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
 function emptyStatusCounts(): Record<CorpusStatus, number> {
   return Object.fromEntries(ALL_STATUSES.map(status => [status, 0])) as Record<CorpusStatus, number>
 }
@@ -639,7 +654,12 @@ function deriveStatusFromOutcomeStatus(status: string | null | undefined): Corpu
       return 'remediated_fail'
     case 'remediated_pass_candidate':
     case 'ready_to_replace':
+    case 'manual_ready_to_replace':
       return 'staged_for_replacement'
+    case 'manual_terminalized':
+    case 'manual_in_progress':
+    case 'manual_deferred':
+      return 'deferred_manual'
     default:
       return null
   }
@@ -978,6 +998,11 @@ function chooseCorpusStatus(input: {
       notes.push('Verification passed without a corresponding verified-promotion ledger row.')
       return { status: 'staged_for_replacement', reasonCodes, notes }
     }
+    if (input.classifiedRow.classification === 'held_visual_review') {
+      reasonCodes.push('verification_held_visual_review')
+      notes.push('Verification passed technically but replacement is held for manual visual approval.')
+      return { status: 'staged_for_replacement', reasonCodes, notes }
+    }
     reasonCodes.push(input.classifiedRow.classification === 'soft_fail_advisory' ? 'verification_soft_fail' : 'verification_hard_fail')
     return { status: 'remediated_fail', reasonCodes, notes }
   }
@@ -1012,12 +1037,29 @@ function buildSummary(rows: CorpusControlPlaneRow[], ledgerRowCount: number): Co
   const statusByCohort = Object.fromEntries(
     ALL_COHORTS.map(cohort => [cohort, emptyStatusCounts()]),
   ) as Record<CohortLabel, Record<CorpusStatus, number>>
+  const blockerFamilyBacklog: Record<string, number> = {}
+  const blockingFindingBacklog: Record<string, number> = {}
+  const runtimeDeferredRowsByCohort = emptyCohortCounts()
+  let runtimeDeferredRowsTotal = 0
 
   for (const row of rows) {
     byCurrentCorpusStatus[row.currentCorpusStatus] += 1
     byCohortLabel[row.cohortLabel] += 1
     byStorageKind[row.storageKind || 'unknown'] = (byStorageKind[row.storageKind || 'unknown'] || 0) + 1
     statusByCohort[row.cohortLabel][row.currentCorpusStatus] += 1
+
+    if (row.currentCorpusStatus === 'verified_pass') continue
+
+    for (const familyId of row.classificationEvidence.topBlockingResidualFamilyIds) {
+      blockerFamilyBacklog[familyId] = (blockerFamilyBacklog[familyId] || 0) + 1
+    }
+    for (const findingKey of row.classificationEvidence.blockingFindingKeys) {
+      blockingFindingBacklog[findingKey] = (blockingFindingBacklog[findingKey] || 0) + 1
+    }
+    if (row.stage3FigureDiagnostics.hasGenericTimeoutWording || row.stage4StructureDiagnostics.hasBoundedRuntimeWording) {
+      runtimeDeferredRowsTotal += 1
+      runtimeDeferredRowsByCohort[row.cohortLabel] += 1
+    }
   }
 
   return {
@@ -1028,6 +1070,12 @@ function buildSummary(rows: CorpusControlPlaneRow[], ledgerRowCount: number): Co
     statusByCohort,
     verifiedPassRowsFromLedger: ledgerRowCount,
     remainingRowsExcludingVerifiedPass: rows.filter(row => row.currentCorpusStatus !== 'verified_pass').length,
+    blockerFamilyBacklog: Object.fromEntries(Object.entries(blockerFamilyBacklog).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))),
+    blockingFindingBacklog: Object.fromEntries(Object.entries(blockingFindingBacklog).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))),
+    runtimeDeferredRows: {
+      total: runtimeDeferredRowsTotal,
+      byCohortLabel: runtimeDeferredRowsByCohort,
+    },
   }
 }
 
@@ -1139,7 +1187,7 @@ export function validateCorpusControlPlaneArtifacts(artifacts: CorpusControlPlan
   }
 
   const recomputedSummary = buildSummary(rows, artifacts.document.summary.verifiedPassRowsFromLedger)
-  if (JSON.stringify(recomputedSummary) !== JSON.stringify(artifacts.document.summary)) {
+  if (stableStringify(recomputedSummary) !== stableStringify(artifacts.document.summary)) {
     errors.push('Canonical summary does not match the rows used to build it.')
   }
 

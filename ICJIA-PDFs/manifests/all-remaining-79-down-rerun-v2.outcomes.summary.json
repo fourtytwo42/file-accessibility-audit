@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-04-11T02:01:01.075Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.json",
+  "laneName": "all-remaining-79-down-rerun-v2",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 9,
+    "keep_fail_80_to_89": 4,
+    "drop_fail_lt_80": 378,
+    "processing_error": 3,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 394,
+    "processed": 394,
+    "readyToReplace": 9,
+    "remediatedPassCandidates": 9,
+    "failedAfterRemediation": 382,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 394,
+    "pdfsPerHour": 15.14,
+    "terminalOutcomesPerHour": 15.14,
+    "passCandidatesPerHour": 0.35
+  },
+  "quality": {
+    "passCandidates": 9,
+    "rowsWithBlockingFindingShrink": 20,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4702",
+    "publicationTitle": "2022 Victim Needs Assessment",
+    "priorityRank": 394,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 52,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "figure",
+    "runtimeWeightBucket": "heavy",
+    "runtimeProfileKey": "victim_needs_assessment_t",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.logical_structure",
+      "pdfua.annotation_alt_contents",
+      "pdfua.figure_alt_or_artifact"
+    ],
+    "serverHost": "157.230.3.215",
+    "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/2022 Victim Needs Assessment-230306T13210736.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun/157.230.3.215/4702-2022_Victim_Needs_Assessment.pdf",
+    "fileUrl": "https://researchhub.icjia-api.cloud/uploads/2022%20Victim%20Needs%20Assessment-230306T13210736.pdf",
+    "storageKind": "researchhub_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun/157.230.3.215/4702-2022_Victim_Needs_Assessment.remediation.json",
+    "status": "processing_error",
+    "resultBand": "processing_error",
+    "processedAt": "2026-04-11T02:01:01.063Z",
+    "durationMs": 1858190,
+    "original": {
+      "overallScore": 78,
+      "grade": "C",
+      "pageCount": 165,
+      "isScanned": false
+    },
+    "final": null,
+    "seed": {
+      "priorOverallScore": 52,
+      "priorGrade": "F",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-10T11:36:19.838Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 30-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-remaining-79-down-rerun-v2/157.230.3.215/4702-2022_Victim_Needs_Assessment.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded runtime limit of 1800000ms"
+    }
+  }
+}

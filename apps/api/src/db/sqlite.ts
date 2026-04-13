@@ -17,6 +17,7 @@ if (!fs.existsSync(dbDir)) {
 }
 
 const db: InstanceType<typeof Database> = new Database(dbPath)
+let dbClosed = false
 
 // Enable WAL mode for concurrent reads during writes
 db.pragma('journal_mode = WAL')
@@ -242,5 +243,11 @@ ensureColumn('queue_items', 'promotion_rejection_reason', 'TEXT')
 ensureColumn('queue_items', 'blocker_report_json', 'TEXT')
 ensureColumn('tool_outcomes', 'playbook_id', 'TEXT')
 ensureColumn('tool_outcomes', 'playbook_run_id', 'TEXT')
+
+export function closeAuditDb(): void {
+  if (dbClosed) return
+  db.close()
+  dbClosed = true
+}
 
 export default db

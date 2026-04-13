@@ -1,0 +1,469 @@
+{
+  "generatedAt": "2026-04-11T03:03:11.849Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.json",
+  "laneName": "all-remaining-60-69-positive-delta-wave",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 2,
+  "totals": {
+    "targetCandidates": 5,
+    "processed": 5,
+    "readyToReplace": 2,
+    "remediatedPassCandidates": 2,
+    "failedAfterRemediation": 3,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "4492",
+      "publicationTitle": "Provider-Reported Challenges & Opportunities in Supporting Young Victims of Crime",
+      "priorityRank": 2,
+      "priorityTier": "high",
+      "passLikelihoodScore": 68,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "baldo_provider_reported_challenges_opportunities_in_supporting_victims_of_crime",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.annotation_alt_contents",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Baldo_2019_Provider reported challenges & opportunities in supporting victims of crime_09262019.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun-v2/143.244.146.43/4492-Provider-Reported_Challenges_Opportunities_in_Supporting_Young_Victims_of_Crime.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Baldo_2019_Provider%20reported%20challenges%20&%20opportunities%20in%20supporting%20victims%20of%20crime_09262019.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun-v2/143.244.146.43/4492-Provider-Reported_Challenges_Opportunities_in_Supporting_Young_Victims_of_Crime.remediation.json",
+      "status": "remediated_pass_candidate",
+      "resultBand": "pass_ge_90",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T02:56:11.164Z",
+      "durationMs": 405879,
+      "original": {
+        "overallScore": 93,
+        "grade": "B",
+        "pageCount": 10,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 93,
+        "grade": "B",
+        "pageCount": 10,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 64,
+        "priorGrade": "D",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T09:39:20.526Z"
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4492-Provider-Reported_Challenges_Opportunities_in_Supporting_Young_Victims_of_Crime.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Baldo_2019_Provider reported challenges & opportunities in supporting victims of crime_09262019.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4492-Provider-Reported_Challenges_Opportunities_in_Supporting_Young_Victims_of_Crime.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "4ab9c70a53222f6186641ec593f048d472887657b208f78c25bccd50d8450b79",
+        "remediatedPdfSha256": "4ab9c70a53222f6186641ec593f048d472887657b208f78c25bccd50d8450b79",
+        "stagedReplacementSha256": "4ab9c70a53222f6186641ec593f048d472887657b208f78c25bccd50d8450b79"
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 93, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    },
+    {
+      "publicationId": "4507",
+      "publicationTitle": "Developing, Enhancing, and Supporting Local Economic Conditions to Address Risk Factors for Crime",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 72,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "developing_enhancing_and_supporting_local_economic_conditions_to_address_risk_factors_for_crime_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Developing Enhancing and Supporting Local Economic Conditions to Address Risk Factors for Crime-200514T15065426.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun-v2/143.244.146.43/4507-Developing_Enhancing_and_Supporting_Local_Economic_Conditions_to_Address_Risk_Factors_for_Crime.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Developing Enhancing and Supporting Local Economic Conditions to Address Risk Factors for Crime-200514T15065426.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun-v2/143.244.146.43/4507-Developing_Enhancing_and_Supporting_Local_Economic_Conditions_to_Address_Risk_Factors_for_Crime.remediation.json",
+      "status": "failed_after_remediation",
+      "resultBand": "keep_fail_80_to_89",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T02:56:35.299Z",
+      "durationMs": 430015,
+      "original": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B",
+        "pageCount": 14,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 66,
+        "priorGrade": "D",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T06:11:08.090Z"
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final overall score is 88, below relaxed threshold 90."
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4507-Developing_Enhancing_and_Supporting_Local_Economic_Conditions_to_Address_Risk_Factors_for_Crime.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4507-Developing_Enhancing_and_Supporting_Local_Economic_Conditions_to_Address_Risk_Factors_for_Crime.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-remaining-60-69-positive-delta-wave/143.244.146.43/4507-Developing_Enhancing_and_Supporting_Local_Economic_Conditions_to_Address_Risk_Factors_for_Crime.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d30dd504213f3542f2f4145ab53dc57f012067fb604c6b6c942be1d5ea12f254",
+        "remediatedPdfSha256": "d30dd504213f3542f2f4145ab53dc57f012067fb604c6b6c942be1d5ea12f254",
+        "stagedReplacementSha256": null
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    },
+    {
+      "publicationId": "4117",
+      "publicationTitle": "Program Completion Behavioral Change and Rearrest for the Batterer Intervention System of Cook County Illinois",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 84,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "medium",
+      "runtimeProfileKey": "cookcountydvint",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CookCountyDVInt.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun-v2/143.244.146.43/4117-Program_Completion_Behavioral_Change_and_Rearrest_for_the_Batterer_Intervention_System_of_Cook_County_Illinois.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CookCountyDVInt.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun-v2/143.244.146.43/4117-Program_Completion_Behavioral_Change_and_Rearrest_for_the_Batterer_Intervention_System_of_Cook_County_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "resultBand": "drop_fail_lt_80",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T02:57:28.095Z",
+      "durationMs": 52796,
+      "original": {
+        "overallScore": 68,
+        "grade": "D",
+        "pageCount": 90,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 68,
+        "grade": "D",
+        "pageCount": 90,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 52,
+        "priorGrade": "F",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T10:54:59.950Z"
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final overall score is 68, below relaxed threshold 90."
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4117-Program_Completion_Behavioral_Change_and_Rearrest_for_the_Batterer_Intervention_System_of_Cook_County_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4117-Program_Completion_Behavioral_Change_and_Rearrest_for_the_Batterer_Intervention_System_of_Cook_County_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-remaining-60-69-positive-delta-wave/143.244.146.43/4117-Program_Completion_Behavioral_Change_and_Rearrest_for_the_Batterer_Intervention_System_of_Cook_County_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ba9b5e5b7307764b0388b576ba594490d6e22c50fe555a0bc8aa280cd5fd58e2",
+        "remediatedPdfSha256": "ba9b5e5b7307764b0388b576ba594490d6e22c50fe555a0bc8aa280cd5fd58e2",
+        "stagedReplacementSha256": null
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 68, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    },
+    {
+      "publicationId": "4031",
+      "publicationTitle": "CLEAR and ICLEAR A Status Report on New Information Technology and its Impact on Management the Organization and CrimeFighting Strategies",
+      "priorityRank": 5,
+      "priorityTier": "high",
+      "passLikelihoodScore": 71,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "medium",
+      "runtimeProfileKey": "clear",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CLEAR2004.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun-v2/143.244.146.43/4031-CLEAR_and_ICLEAR_A_Status_Report_on_New_Information_Technology_and_its_Impact_on_Management_the_Organization_and_CrimeFighting_Strategies.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CLEAR2004.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun-v2/143.244.146.43/4031-CLEAR_and_ICLEAR_A_Status_Report_on_New_Information_Technology_and_its_Impact_on_Management_the_Organization_and_CrimeFighting_Strategies.remediation.json",
+      "status": "failed_after_remediation",
+      "resultBand": "drop_fail_lt_80",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T03:02:21.630Z",
+      "durationMs": 293534,
+      "original": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 114,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 114,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 63,
+        "priorGrade": "D",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T11:02:47.177Z"
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final overall score is 67, below relaxed threshold 90."
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Form Accessibility",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4031-CLEAR_and_ICLEAR_A_Status_Report_on_New_Information_Technology_and_its_Impact_on_Management_the_Organization_and_CrimeFighting_Strategies.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4031-CLEAR_and_ICLEAR_A_Status_Report_on_New_Information_Technology_and_its_Impact_on_Management_the_Organization_and_CrimeFighting_Strategies.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-remaining-60-69-positive-delta-wave/143.244.146.43/4031-CLEAR_and_ICLEAR_A_Status_Report_on_New_Information_Technology_and_its_Impact_on_Management_the_Organization_and_CrimeFighting_Strategies.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "86c041b7e2a158c4cd2231db6105e236f4deb2f227cb25c28e752bf74de7f752",
+        "remediatedPdfSha256": "86c041b7e2a158c4cd2231db6105e236f4deb2f227cb25c28e752bf74de7f752",
+        "stagedReplacementSha256": null
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.font_unicode, pdfua.untagged_rendered_images",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Form Accessibility, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Form Accessibility",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    },
+    {
+      "publicationId": "4495",
+      "publicationTitle": "Provider-Reported Challenges and Opportunities in Supporting Young Victims of Crime",
+      "priorityRank": 3,
+      "priorityTier": "high",
+      "passLikelihoodScore": 68,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "provider_reported_challenges_opportunities_in_supporting_victims_of_crime_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.annotation_alt_contents",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Provider_reported_challenges_&_opportunities_in_supporting_victims_of_crime-191015T19261497.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun-v2/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Provider_reported_challenges_&_opportunities_in_supporting_victims_of_crime-191015T19261497.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun-v2/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.remediation.json",
+      "status": "remediated_pass_candidate",
+      "resultBand": "pass_ge_90",
+      "promotionStatus": null,
+      "processedAt": "2026-04-11T03:03:11.848Z",
+      "durationMs": 420682,
+      "original": {
+        "overallScore": 93,
+        "grade": "B",
+        "pageCount": 10,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 93,
+        "grade": "B",
+        "pageCount": 10,
+        "isScanned": false
+      },
+      "seed": {
+        "priorOverallScore": 64,
+        "priorGrade": "D",
+        "priorResultBand": "drop_fail_lt_80",
+        "priorProcessedAt": "2026-04-10T09:43:28.169Z"
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/Provider_reported_challenges_&_opportunities_in_supporting_victims_of_crime-191015T19261497.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-60-69-positive-delta-wave/143.244.146.43/4495-Provider-Reported_Challenges_and_Opportunities_in_Supporting_Young_Victims_of_Crime.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "6b2606081f1a187755a345087a00c92e3d10d18e95e39701284af219d33b2d83",
+        "remediatedPdfSha256": "6b2606081f1a187755a345087a00c92e3d10d18e95e39701284af219d33b2d83",
+        "stagedReplacementSha256": "6b2606081f1a187755a345087a00c92e3d10d18e95e39701284af219d33b2d83"
+      },
+      "strictPromotionGate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 93, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      }
+    }
+  ]
+}

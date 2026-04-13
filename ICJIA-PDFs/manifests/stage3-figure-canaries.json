@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-01T00:32:59.092Z",
+  "generatedAt": "2026-04-04T22:22:33.018Z",
   "summary": {
     "totalCanaries": 7,
     "bySource": {
@@ -8,9 +8,9 @@
     },
     "byFigureWaveBucket": {
       "ownership_cleared_figure_debt_remains": 2,
-      "mixed_figure_structure_debt": 1,
-      "mass_unresolved_figure_debt": 2,
-      "figure_processing_error_retry": 2
+      "mixed_figure_structure_debt": 2,
+      "mass_unresolved_figure_debt": 3,
+      "figure_processing_error_retry": 0
     },
     "withGenericTimeoutWording": 0
   },
@@ -25,7 +25,7 @@
       "currentCohortLabel": "figure_heavy",
       "figureWaveBucket": "ownership_cleared_figure_debt_remains",
       "hasGenericTimeoutWording": false,
-      "benchmarkTerminalState": "pass",
+      "benchmarkTerminalState": "hard_fail",
       "notes": [
         "benchmark_category:ownership"
       ]
@@ -97,13 +97,13 @@
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage3RepresentativeKind": "figure_processing_error_retry",
-      "currentCorpusStatus": "processing_error",
+      "currentCorpusStatus": "remediated_fail",
       "currentCohortLabel": "figure_heavy",
-      "figureWaveBucket": "figure_processing_error_retry",
+      "figureWaveBucket": "mixed_figure_structure_debt",
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage3-figure-wave/143.244.146.43/4487-Collaboration_in_Action_Overview_and_Lessons_from_Data_Planning_and_Impact_A_Joint_Adult_Redeploy_Illinois_and_Criminal_Justice_Coordinating_Councils_Summit.failure.json",
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/ARI-CJCC_summit_report_050818.pdf.json",
         "Bounded-runtime retry representative from the latest figure wave."
       ]
     },
@@ -113,13 +113,13 @@
       "source": "cohort_representative",
       "benchmarkName": null,
       "stage3RepresentativeKind": "short_flyer_or_infographic",
-      "currentCorpusStatus": "processing_error",
+      "currentCorpusStatus": "remediated_fail",
       "currentCohortLabel": "figure_heavy",
-      "figureWaveBucket": "figure_processing_error_retry",
+      "figureWaveBucket": "mass_unresolved_figure_debt",
       "hasGenericTimeoutWording": false,
       "benchmarkTerminalState": null,
       "notes": [
-        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3585-Juvenile_Justice.failure.json",
+        "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3585-Juvenile_Justice.remediation.json",
         "Short figure-heavy representative for flyers/infographics."
       ]
     }

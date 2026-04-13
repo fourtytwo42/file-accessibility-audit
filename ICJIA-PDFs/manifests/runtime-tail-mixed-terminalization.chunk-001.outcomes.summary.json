@@ -1,0 +1,75 @@
+{
+  "generatedAt": "2026-04-06T19:48:34.559Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.chunk-001.json",
+  "concurrency": 2,
+  "totals": {
+    "targetCandidates": 4,
+    "processed": 4,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 4,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3424",
+    "publicationTitle": "Female Criminality 1970 1980 The US and Illinois April 1983",
+    "priorityRank": 4,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 38,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Female Criminality.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Female Criminality.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Female Criminality.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.failure.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-06T19:48:34.558Z",
+    "durationMs": 214997,
+    "original": {
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 47,
+      "isScanned": true
+    },
+    "final": {
+      "overallScore": 50,
+      "grade": "F",
+      "pageCount": 47,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is F, not A.",
+        "Final overall score is 50, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/chunk-001/143.244.146.43/3424-Female_Criminality_1970_1980_The_US_and_Illinois_April_1983.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "8f16010e692686e177a077db0508058946560871c962dea32f682c917f929d06",
+      "remediatedPdfSha256": "8f16010e692686e177a077db0508058946560871c962dea32f682c917f929d06",
+      "stagedReplacementSha256": null
+    }
+  }
+}

@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.590Z",
+  "generatedAt": "2026-04-06T21:21:13.603Z",
   "cohorts": {
     "short_high_likelihood": {
-      "totalRows": 20,
+      "totalRows": 25,
       "byCurrentCorpusStatus": {
-        "verified_pass": 20,
+        "verified_pass": 25,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
@@ -15,9 +15,9 @@
         "replaced_remote": 0
       },
       "samplePublicationIds": [
-        "3530",
         "3659",
         "3669",
+        "3685",
         "3907",
         "3915",
         "4052",
@@ -28,118 +28,113 @@
       ]
     },
     "figure_heavy": {
-      "totalRows": 494,
+      "totalRows": 490,
       "byCurrentCorpusStatus": {
-        "verified_pass": 19,
+        "verified_pass": 47,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 422,
-        "processing_error": 53,
+        "remediated_fail": 438,
+        "processing_error": 5,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
         "3460",
-        "3483",
         "3485",
         "3487",
         "3489",
         "3494",
         "3495",
-        "3539",
-        "3567",
-        "3569"
+        "3513",
+        "3518",
+        "3530",
+        "3539"
       ]
     },
     "structure_heavy": {
-      "totalRows": 338,
+      "totalRows": 348,
       "byCurrentCorpusStatus": {
-        "verified_pass": 42,
+        "verified_pass": 60,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 283,
-        "processing_error": 5,
+        "remediated_fail": 285,
+        "processing_error": 2,
         "deferred_manual": 0,
-        "staged_for_replacement": 8,
+        "staged_for_replacement": 1,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
         "3465",
         "3468",
+        "3483",
         "3496",
         "3550",
         "3566",
+        "3567",
+        "3575",
         "3579",
-        "3584",
-        "3591",
-        "3592",
-        "3595"
+        "3584"
       ]
     },
     "font_heavy": {
-      "totalRows": 14,
+      "totalRows": 5,
       "byCurrentCorpusStatus": {
         "verified_pass": 0,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 14,
+        "remediated_fail": 5,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
-        "3838",
-        "4099",
-        "4144",
-        "4151",
-        "4156",
-        "4166",
         "4168",
         "4172",
-        "4173",
-        "4174"
+        "4174",
+        "4211",
+        "4214"
       ]
     },
     "long_report": {
-      "totalRows": 15,
+      "totalRows": 13,
       "byCurrentCorpusStatus": {
-        "verified_pass": 9,
+        "verified_pass": 10,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 5,
-        "processing_error": 1,
+        "remediated_fail": 3,
+        "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "samplePublicationIds": [
-        "3513",
-        "3518",
-        "3703",
-        "3710",
-        "3755",
         "3829",
         "3840",
         "3865",
-        "3873",
-        "3900"
+        "3900",
+        "3906",
+        "4010",
+        "4085",
+        "4086",
+        "4091",
+        "4103"
       ]
     },
     "manual_tail": {
       "totalRows": 175,
       "byCurrentCorpusStatus": {
-        "verified_pass": 0,
+        "verified_pass": 2,
         "discovered": 3,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 117,
-        "processing_error": 55,
+        "remediated_fail": 123,
+        "processing_error": 47,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0

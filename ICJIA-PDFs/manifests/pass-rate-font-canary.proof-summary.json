@@ -1,0 +1,63 @@
+{
+  "generatedAt": "2026-04-06T04:23:49.680Z",
+  "sliceName": "pass-rate-font-canary",
+  "selectedPublicationIds": [
+    "3838",
+    "4099",
+    "4144",
+    "4151",
+    "4166",
+    "4173",
+    "4176",
+    "4199"
+  ],
+  "before": {
+    "byStatus": {
+      "remediated_fail": 8
+    },
+    "targetedFindingCounts": {
+      "pdfua.font_unicode": 8,
+      "pdfua.cid_symbol_fonts": 0,
+      "pdfua.font_embedding": 0
+    },
+    "targetedFamilyCounts": {
+      "font_embedding_and_unicode": 0
+    }
+  },
+  "after": {
+    "byStatus": {
+      "remediated_fail": 8
+    },
+    "targetedFindingCounts": {
+      "pdfua.font_unicode": 8,
+      "pdfua.cid_symbol_fonts": 0,
+      "pdfua.font_embedding": 0
+    },
+    "targetedFamilyCounts": {
+      "font_embedding_and_unicode": 0
+    }
+  },
+  "deltas": {
+    "verifiedPass": 0,
+    "processingError": 0,
+    "targetedFindingCounts": {
+      "pdfua.font_unicode": 0,
+      "pdfua.cid_symbol_fonts": 0,
+      "pdfua.font_embedding": 0
+    },
+    "targetedFamilyCounts": {
+      "font_embedding_and_unicode": 0
+    }
+  },
+  "unchangedRows": [
+    "3838",
+    "4099",
+    "4144",
+    "4151",
+    "4166",
+    "4173",
+    "4176",
+    "4199"
+  ],
+  "worsenedRows": []
+}

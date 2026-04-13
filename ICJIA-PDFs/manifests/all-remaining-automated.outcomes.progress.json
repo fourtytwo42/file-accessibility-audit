@@ -1,0 +1,35 @@
+{
+  "runId": "73d7061c-df6a-4508-90ec-f94ade082f04",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json",
+  "firstStartedAt": "2026-04-08T04:01:14.547Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 109287377,
+  "lastHeartbeatAt": "2026-04-09T10:22:41.924Z",
+  "totalCandidates": 690,
+  "processed": 690,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": 80
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 51,
+    "keep_fail_80_to_89": 65,
+    "drop_fail_lt_80": 500,
+    "processing_error": 74,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "3993",
+    "publicationTitle": "Community Policing in Chicago Year Ten An Evaluation of Chicagos Alternative Policing Strategy",
+    "status": "processing_error",
+    "resultBand": "processing_error",
+    "finalOverallScore": null,
+    "processedAt": "2026-04-09T10:22:41.889Z",
+    "durationMs": 1619214
+  }
+}

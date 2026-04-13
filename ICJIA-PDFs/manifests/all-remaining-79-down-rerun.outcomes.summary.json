@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2026-04-10T11:48:39.728Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun.json",
+  "laneName": "all-remaining-79-down-rerun",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 56,
+    "keep_fail_80_to_89": 42,
+    "drop_fail_lt_80": 394,
+    "processing_error": 1,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 493,
+    "processed": 493,
+    "readyToReplace": 56,
+    "remediatedPassCandidates": 56,
+    "failedAfterRemediation": 436,
+    "sourceMissing": 0,
+    "processingError": 1,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 493,
+    "pdfsPerHour": 16.09,
+    "terminalOutcomesPerHour": 16.09,
+    "passCandidatesPerHour": 1.83
+  },
+  "quality": {
+    "passCandidates": 56,
+    "rowsWithBlockingFindingShrink": 142,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3483",
+    "publicationTitle": "Trends and Issues 1997",
+    "priorityRank": 493,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 50,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "structure",
+    "runtimeWeightBucket": "heavy",
+    "runtimeProfileKey": "t_i",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.logical_structure",
+      "pdfua.font_embedding",
+      "pdfua.font_unicode",
+      "pdfua.figure_alt_or_artifact"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/T&I 1997.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-dropped-rerun/143.244.146.43/3483-Trends_and_Issues_1997.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/T&I%201997.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-dropped-rerun/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "promotionStatus": null,
+    "processedAt": "2026-04-10T11:48:39.711Z",
+    "durationMs": 1478899,
+    "original": {
+      "overallScore": 50,
+      "grade": "F",
+      "pageCount": 235,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 60,
+      "grade": "D",
+      "pageCount": 235,
+      "isScanned": false
+    },
+    "seed": {
+      "priorOverallScore": 50,
+      "priorGrade": "F",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-10T03:39:18.017Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final overall score is 60, below relaxed threshold 90."
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Alt Text on Images",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-remaining-79-down-rerun/143.244.146.43/3483-Trends_and_Issues_1997.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-remaining-79-down-rerun/143.244.146.43/3483-Trends_and_Issues_1997.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-remaining-79-down-rerun/143.244.146.43/3483-Trends_and_Issues_1997.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "1e38d7d080fb33ca9a1530d051e1468ef10808e6bbb9e9f5ea8e5f48035c562a",
+      "remediatedPdfSha256": "1e38d7d080fb33ca9a1530d051e1468ef10808e6bbb9e9f5ea8e5f48035c562a",
+      "stagedReplacementSha256": null
+    },
+    "strictPromotionGate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is D, not A.",
+        "Final overall score is 60, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Alt Text on Images",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    }
+  }
+}

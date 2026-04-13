@@ -215,6 +215,7 @@ export async function main(): Promise<void> {
     sourceControlPlaneGeneratedAt: artifacts.document.generatedAt,
     fallbackPublicationIds: (sources.stage4ActiveAnalysisRows || []).map(row => row.publicationId),
   })
+  const activeWaveGated = Boolean(waveArtifacts.wave.pendingPublicationIds.length)
 
   const throughputSummary = buildStage4StructureThroughputSummary({
     artifacts,
@@ -255,6 +256,7 @@ export async function main(): Promise<void> {
     totals: waveArtifacts.wave.totals,
     selectedPublicationIds: waveArtifacts.wave.selectedPublicationIds,
     reportingWaveSelectedPublicationIds: reportingWave.selectedPublicationIds,
+    activeWaveGated,
     throughput: throughputSummary.totals,
     canaries: canaries.summary,
   }, null, 2))

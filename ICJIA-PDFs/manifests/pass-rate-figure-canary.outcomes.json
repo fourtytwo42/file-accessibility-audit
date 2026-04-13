@@ -1,0 +1,482 @@
+{
+  "generatedAt": "2026-04-06T05:15:30.451Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pass-rate-figure-canary.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 8,
+    "readyToReplace": 1,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 7,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3873",
+      "publicationTitle": "ICJIA 1998 Annual Report",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/98anreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/98anreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/98anreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:03:42.825Z",
+      "durationMs": 94101,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 59,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 59, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/3873-ICJIA_1998_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3873-ICJIA_1998_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/3873-ICJIA_1998_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "fb7fde930833e5b1d921054a3b392e20582f4c2d45742cec181a7177f3951ec7",
+        "remediatedPdfSha256": "fb7fde930833e5b1d921054a3b392e20582f4c2d45742cec181a7177f3951ec7",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4020",
+      "publicationTitle": "A Profile of the DuPage County Auto Theft Task Force (BATTLE)",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/BATTLE03.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/BATTLE03.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/BATTLE03.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:03:57.477Z",
+      "durationMs": 108753,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 12,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/4020-A_Profile_of_the_DuPage_County_Auto_Theft_Task_Force_BATTLE.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b64b441ff586d645e1a3ce7061d49902d3660defa1b0ae9e455415d155ecc85b",
+        "remediatedPdfSha256": "b64b441ff586d645e1a3ce7061d49902d3660defa1b0ae9e455415d155ecc85b",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3755",
+      "publicationTitle": "ICJIA 1999 Annual Report",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/99anreport.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/99anreport.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/99anreport.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3755-ICJIA_1999_Annual_Report.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:04:04.403Z",
+      "durationMs": 115679,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 62,
+        "grade": "D",
+        "pageCount": 36,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 62, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/3755-ICJIA_1999_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3755-ICJIA_1999_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/3755-ICJIA_1999_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "06cf31868a1067afad4517be2835f31938f17a6f11341d2edc47b199ffd8e2bc",
+        "remediatedPdfSha256": "06cf31868a1067afad4517be2835f31938f17a6f11341d2edc47b199ffd8e2bc",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3839",
+      "publicationTitle": "Profile of the Blackhawk Area Task Force",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/megprofiles/Blackhawk Area Task Force.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/megprofiles/Blackhawk Area Task Force.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/megprofiles/Blackhawk Area Task Force.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:04:41.660Z",
+      "durationMs": 152936,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f26efede59587e3e8534a3e4f0cccab5655ead85f14083a7a1e178bf4bf9e7bb",
+        "remediatedPdfSha256": "f26efede59587e3e8534a3e4f0cccab5655ead85f14083a7a1e178bf4bf9e7bb",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3844",
+      "publicationTitle": "Profile fo the East Central Illinois Task Force",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/megprofiles/East Central Illinois Task Force.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/megprofiles/East Central Illinois Task Force.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/megprofiles/East Central Illinois Task Force.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:06:29.261Z",
+      "durationMs": 260537,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "50f947f22b1b74d725489f9b7cfc7c30b43404dcadffbdd34dc047f6fca21f34",
+        "remediatedPdfSha256": "50f947f22b1b74d725489f9b7cfc7c30b43404dcadffbdd34dc047f6fca21f34",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3996",
+      "publicationTitle": "Profile of the Kankakee Area Metropolitan Enforcement Group",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/megprofiles/Kankakee Area Metropolitan Enforcement Group.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/megprofiles/Kankakee Area Metropolitan Enforcement Group.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/megprofiles/Kankakee%20Area%20Metropolitan%20Enforcement%20Group.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:06:34.292Z",
+      "durationMs": 265568,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "49de3cc550010aec94229bd284c0f356103bd4ebfdecd98da5d6fef1d89893f9",
+        "remediatedPdfSha256": "49de3cc550010aec94229bd284c0f356103bd4ebfdecd98da5d6fef1d89893f9",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3614-KENDALL_County_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:08:49.987Z",
+      "durationMs": 401264,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/143.244.146.43/3614-KENDALL_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3614-KENDALL_County_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-figure-canary/143.244.146.43/3614-KENDALL_County_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "35a6618b78d6e9cea7e0bc8576522d8a4fc0e0f21a83dca5cc0eda955b733dd9",
+        "remediatedPdfSha256": "35a6618b78d6e9cea7e0bc8576522d8a4fc0e0f21a83dca5cc0eda955b733dd9",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4700",
+      "publicationTitle": "R3 2022 Annual Report",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/R3_Report_Final_c3f12abc60.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/R3_Report_Final_c3f12abc60.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/R3_Report_Final_c3f12abc60.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4700-R3_2022_Annual_Report.remediation.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:15:30.450Z",
+      "durationMs": 801726,
+      "original": {
+        "overallScore": 75,
+        "grade": "C",
+        "pageCount": 23,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 23,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/192.241.146.85/4700-R3_2022_Annual_Report.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/192.241.146.85/R3_Report_Final_c3f12abc60.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/192.241.146.85/4700-R3_2022_Annual_Report.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "40a9278b2f51aedb5c8b065b4107b6ed9dcbd04e1e479e4598054cf22db69d5b",
+        "remediatedPdfSha256": "40a9278b2f51aedb5c8b065b4107b6ed9dcbd04e1e479e4598054cf22db69d5b",
+        "stagedReplacementSha256": "40a9278b2f51aedb5c8b065b4107b6ed9dcbd04e1e479e4598054cf22db69d5b"
+      }
+    }
+  ]
+}

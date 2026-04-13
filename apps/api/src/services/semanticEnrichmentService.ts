@@ -1,4 +1,5 @@
 import { cropDataUrlRegion, renderPdfPageToDataUrl } from './pdfRenderService.js'
+import { callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import type { ModelReviewFlag } from './documentModel.js'
 import { draftFigureAltText } from './altTextDraftingService.js'
@@ -12,9 +13,6 @@ import type {
 
 type PdfjsLib = typeof import('pdfjs-dist/legacy/build/pdf.mjs')
 
-const OPENAI_COMPAT_BASE_URL = process.env.OPENAI_COMPAT_BASE_URL || process.env.OPENROUTER_BASE_URL || 'http://192.168.50.239:51824/v1'
-const OPENAI_COMPAT_API_KEY = process.env.OPENAI_COMPAT_API_KEY || process.env.OPENROUTER_API_KEY || 'hs_a9a29d90a35c4b1c8a709e17c8c76dcf'
-const OPENAI_COMPAT_MODEL = process.env.OPENAI_COMPAT_MODEL || process.env.OPENROUTER_MODEL || 'gpt-5.1-codex-mini'
 const PROPOSE_SEMANTIC_REPAIRS_TOOL = 'propose_semantic_repairs'
 const HEADING_BATCH_SIZE = 8
 const LINK_BATCH_SIZE = 8
@@ -22,7 +20,7 @@ const FIGURE_BATCH_SIZE = 4
 const TABLE_BATCH_SIZE = 3
 const BOOKMARK_BATCH_SIZE = 10
 const MAX_SEMANTIC_LINK_TARGETS = 32
-const SEMANTIC_REQUEST_CONCURRENCY = 3
+const SEMANTIC_REQUEST_CONCURRENCY = Math.max(1, Number(process.env.SEMANTIC_REQUEST_CONCURRENCY || 3))
 const SEMANTIC_REQUEST_TIMEOUT_MS = Number(process.env.SEMANTIC_REQUEST_TIMEOUT_MS || 45_000)
 const MAX_TEXT = 240
 const MAX_ALT_TEXT = 180
@@ -239,7 +237,7 @@ function summarizeDocument(filename: string, title: string | null, language: str
 }
 
 export function hasSemanticRepairConfig(): boolean {
-  return !!OPENAI_COMPAT_API_KEY
+  return hasOpenAiCompatConfig()
 }
 
 function buildPrompt(input: {
@@ -273,115 +271,114 @@ function buildPrompt(input: {
   ].join('\n')
 }
 
-async function openAiCompatJsonResponse(messages: any[]): Promise<any> {
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(new Error(`semantic request timed out after ${SEMANTIC_REQUEST_TIMEOUT_MS}ms`)), SEMANTIC_REQUEST_TIMEOUT_MS)
-  let response: Response
-  try {
-    response = await fetch(`${OPENAI_COMPAT_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${OPENAI_COMPAT_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model: OPENAI_COMPAT_MODEL,
-        temperature: 0.1,
-        tools: [{
-          type: 'function',
-          function: {
-            name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
-            description: 'Return semantic accessibility repair proposals for specific PDF targets.',
-            parameters: {
-              type: 'object',
-              additionalProperties: false,
-              properties: {
-                headings: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['candidateId', 'level', 'confidence', 'rationale'],
-                    properties: {
-                      candidateId: { type: 'string' },
-                      level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
-                      confidence: { type: 'number' },
-                      rationale: { type: 'string' },
-                    },
-                  },
+function buildSemanticRequestBody(model: string, messages: any[]): string {
+  return JSON.stringify({
+    model,
+    temperature: 0.1,
+    tools: [{
+      type: 'function',
+      function: {
+        name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
+        description: 'Return semantic accessibility repair proposals for specific PDF targets.',
+        parameters: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            headings: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['candidateId', 'level', 'confidence', 'rationale'],
+                properties: {
+                  candidateId: { type: 'string' },
+                  level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
+                  confidence: { type: 'number' },
+                  rationale: { type: 'string' },
                 },
-                figures: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['candidateId', 'decorative', 'altText', 'confidence', 'rationale'],
-                    properties: {
-                      candidateId: { type: 'string' },
-                      decorative: { type: 'boolean' },
-                      altText: { type: 'string' },
-                      confidence: { type: 'number' },
-                      rationale: { type: 'string' },
-                    },
-                  },
+              },
+            },
+            figures: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['candidateId', 'decorative', 'altText', 'confidence', 'rationale'],
+                properties: {
+                  candidateId: { type: 'string' },
+                  decorative: { type: 'boolean' },
+                  altText: { type: 'string' },
+                  confidence: { type: 'number' },
+                  rationale: { type: 'string' },
                 },
-                tables: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['candidateId', 'useFirstRowAsHeader', 'confidence', 'rationale'],
-                    properties: {
-                      candidateId: { type: 'string' },
-                      useFirstRowAsHeader: { type: 'boolean' },
-                      confidence: { type: 'number' },
-                      rationale: { type: 'string' },
-                    },
-                  },
+              },
+            },
+            tables: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['candidateId', 'useFirstRowAsHeader', 'confidence', 'rationale'],
+                properties: {
+                  candidateId: { type: 'string' },
+                  useFirstRowAsHeader: { type: 'boolean' },
+                  confidence: { type: 'number' },
+                  rationale: { type: 'string' },
                 },
-                links: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['candidateId', 'replacementText', 'annotationContents', 'confidence', 'rationale'],
-                    properties: {
-                      candidateId: { type: 'string' },
-                      replacementText: { type: 'string' },
-                      annotationContents: { type: 'string' },
-                      confidence: { type: 'number' },
-                      rationale: { type: 'string' },
-                    },
-                  },
+              },
+            },
+            links: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['candidateId', 'replacementText', 'annotationContents', 'confidence', 'rationale'],
+                properties: {
+                  candidateId: { type: 'string' },
+                  replacementText: { type: 'string' },
+                  annotationContents: { type: 'string' },
+                  confidence: { type: 'number' },
+                  rationale: { type: 'string' },
                 },
-                bookmarks: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['candidateId', 'title', 'level', 'confidence', 'rationale'],
-                    properties: {
-                      candidateId: { type: 'string' },
-                      title: { type: 'string' },
-                      level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
-                      confidence: { type: 'number' },
-                      rationale: { type: 'string' },
-                    },
-                  },
+              },
+            },
+            bookmarks: {
+              type: 'array',
+              items: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['candidateId', 'title', 'level', 'confidence', 'rationale'],
+                properties: {
+                  candidateId: { type: 'string' },
+                  title: { type: 'string' },
+                  level: { type: 'string', enum: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'] },
+                  confidence: { type: 'number' },
+                  rationale: { type: 'string' },
                 },
               },
             },
           },
-        }],
-        tool_choice: {
-          type: 'function',
-          function: {
-            name: PROPOSE_SEMANTIC_REPAIRS_TOOL,
-          },
         },
-        messages,
-      }),
+      },
+    }],
+    tool_choice: 'required',
+    messages,
+  })
+}
+
+async function callSemanticEndpoint(baseUrl: string, apiKey: string, model: string, messages: any[]): Promise<any> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(new Error(`semantic request timed out after ${SEMANTIC_REQUEST_TIMEOUT_MS}ms`)), SEMANTIC_REQUEST_TIMEOUT_MS)
+  let response: Response
+  try {
+    response = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      signal: controller.signal,
+      body: buildSemanticRequestBody(model, messages),
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error || '')
@@ -405,6 +402,14 @@ async function openAiCompatJsonResponse(messages: any[]): Promise<any> {
     throw new Error('OpenAI-compatible endpoint did not return semantic repair tool arguments.')
   }
   return JSON.parse(rawArguments)
+}
+
+async function openAiCompatJsonResponse(messages: any[]): Promise<any> {
+  return await callWithOpenAiCompatFallbacks({
+    serviceName: 'semanticEnrichmentService',
+    preflightPrimary: true,
+    invoke: endpoint => callSemanticEndpoint(endpoint.baseUrl, endpoint.apiKey, endpoint.model, messages),
+  })
 }
 
 function isSemanticPayloadTooLargeError(error: unknown): boolean {

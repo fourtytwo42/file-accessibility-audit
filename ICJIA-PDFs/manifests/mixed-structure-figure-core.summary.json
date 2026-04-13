@@ -1,0 +1,189 @@
+{
+  "generatedAt": "2026-04-11T03:43:05.821Z",
+  "laneName": "mixed-structure-figure-core",
+  "executionPolicy": "active",
+  "executionPolicyReason": "target_exact_structure_plus_figure_core_residue",
+  "sourceOutcomesPaths": [
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json"
+  ],
+  "totals": {
+    "scannedReportsConsidered": 748,
+    "selectedCandidates": 279,
+    "byTier": {
+      "highest": 1,
+      "high": 11,
+      "medium": 267
+    },
+    "plateauedCandidates": 262,
+    "nonPlateauedCandidates": 17,
+    "excludedNonTerminal": 247,
+    "excludedAbove79": 124,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0,
+    "excludedLaneMismatch": 98
+  },
+  "blockerSignatureCounts": {
+    "pdfua.figure_alt_or_artifact + pdfua.logical_structure": 279
+  },
+  "plateauCounts": {
+    "plateaued": 262,
+    "nonPlateaued": 17
+  },
+  "topCandidates": [
+    {
+      "publicationId": "4074",
+      "publicationTitle": "Audit shows improvement in record accuracy timeliness completeness",
+      "overallScore": 72,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 1,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3902",
+      "publicationTitle": "A Grant Proposal Guidebook Planning Writing and Submitting a Grant Proposal",
+      "overallScore": 66,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 2,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "3947",
+      "publicationTitle": "Alexander County Juvenile Profile",
+      "overallScore": 66,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 3,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "4509",
+      "publicationTitle": "Criminal Justice System Utilization in Rural Areas",
+      "overallScore": 66,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 4,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "3567",
+      "publicationTitle": "McGruff Rural Residents Protect Yourself from Crime!",
+      "overallScore": 62,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 5,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4531",
+      "publicationTitle": "S.T.O.P. Violence Against Women In Illinois A Multi-Year Plan: FFY14-16",
+      "overallScore": 61,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 6,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4740",
+      "publicationTitle": "2024 Task Force on Missing and Murdered Chicago Women Annual Report",
+      "overallScore": 61,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 7,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "3460",
+      "publicationTitle": "Community Policing in Chicago Year One An Interim Report",
+      "overallScore": 60,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 8,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "3811",
+      "publicationTitle": "Henderson County Juvenile Profile",
+      "overallScore": 66,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "medium",
+      "priorityRank": 9,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "3830",
+      "publicationTitle": "Schuyler County Juvenile Profile",
+      "overallScore": 66,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "medium",
+      "priorityRank": 10,
+      "priorityTier": "high"
+    }
+  ]
+}

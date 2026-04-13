@@ -1,0 +1,714 @@
+{
+  "generatedAt": "2026-04-01T19:59:33.243Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 6,
+    "processed": 14,
+    "readyToReplace": 1,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 0,
+    "sourceMissing": 0,
+    "processingError": 13,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "4144",
+      "publicationTitle": "Illinois Court Trends  Criminal Case Filings 19992008",
+      "priorityRank": 1,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Court Trends/1999-2008/14felony and misdemeanor filings_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Court Trends/1999-2008/14felony and misdemeanor filings_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Court%20Trends/1999-2008/14felony%20and%20misdemeanor%20filings_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/14felony_and_misdemeanor_filings_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:08.863Z",
+      "durationMs": 125761,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4199",
+      "publicationTitle": "Illinois Drug Trends  Drug Treatment Admissions 19992008",
+      "priorityRank": 4,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Drug Trends/1999-2008/13drug treatment_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Drug Trends/1999-2008/13drug treatment_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Drug%20Trends/1999-2008/13drug%20treatment_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/13drug_treatment_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:09.052Z",
+      "durationMs": 125949,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4166",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Violent Index Arrests 19992008",
+      "priorityRank": 2,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/4violent arrests_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/4violent arrests_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/4violent%20arrests_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/4violent_arrests_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:09.060Z",
+      "durationMs": 125957,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4151",
+      "publicationTitle": "Illinois Court Trends  Adult Probation Caseload 19992008",
+      "priorityRank": 6,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Court Trends/1999-2008/15adult probation_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Court Trends/1999-2008/15adult probation_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Court%20Trends/1999-2008/15adult%20probation_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/15adult_probation_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:09.069Z",
+      "durationMs": 125966,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4168",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported and Indicated Child Abuse and Neglect 19972007",
+      "priorityRank": 3,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Child Abuse Trends/1997-2007/8child abuse_1997-2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Child Abuse Trends/1997-2007/8child abuse_1997-2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Child%20Abuse%20Trends/1997-2007/8child%20abuse_1997-2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/8child_abuse_1997-2007.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:09.499Z",
+      "durationMs": 126396,
+      "original": {
+        "overallScore": 36,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4168-Illinois_Crime_Victim_Trends_Reported_and_Indicated_Child_Abuse_and_Neglect_19972007.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4214",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported Elder Abuse 20002009",
+      "priorityRank": 5,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Elder Abuse Trends/2000-2009/9elder abuse_2000-2009.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Elder Abuse Trends/2000-2009/9elder abuse_2000-2009.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Elder%20Abuse%20Trends/2000-2009/9elder%20abuse_2000-2009.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/9elder_abuse_2000-2009.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:14.383Z",
+      "durationMs": 131280,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4214-Illinois_Crime_Victim_Trends_Reported_Elder_Abuse_20002009.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4172",
+      "publicationTitle": "Illinois Drug Trends  Drug Crime Lab Submissions 19972007",
+      "priorityRank": 7,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Drug Trends/1997-2007/12drug submissions_1997-2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Drug Trends/1997-2007/12drug submissions_1997-2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Drug%20Trends/1997-2007/12drug%20submissions_1997-2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/12drug_submissions_1997-2007.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:14.914Z",
+      "durationMs": 131811,
+      "original": {
+        "overallScore": 36,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4172-Illinois_Drug_Trends_Drug_Crime_Lab_Submissions_19972007.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4174",
+      "publicationTitle": "Illinois Drug Trends  Drug Seizures 19972007",
+      "priorityRank": 8,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Drug Trends/1997-2007/11drug seizures_1997-2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Drug Trends/1997-2007/11drug seizures_1997-2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Drug%20Trends/1997-2007/11drug%20seizures_1997-2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/11drug_seizures_1997-2007.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:39:15.360Z",
+      "durationMs": 132257,
+      "original": {
+        "overallScore": 36,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4174-Illinois_Drug_Trends_Drug_Seizures_19972007.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4156",
+      "publicationTitle": "2009 Annual Report Motor Vehicle Theft Prevention Council",
+      "priorityRank": 6,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/2009 MV Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/2009 MV Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/2009%20MV%20Annual%20Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2009_MV_Annual_Report.pdf.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-04-01T19:58:58.688Z",
+      "durationMs": 100291,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 24,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage5-font-wave/143.244.146.43/4156-2009_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/mvtpc/2009 MV Annual Report.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage5-font-wave/143.244.146.43/4156-2009_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a2e42b2fdbde4cb51dec0a85f7a9691bfa69505b95334fa3047816ac6a802792",
+        "remediatedPdfSha256": "a2e42b2fdbde4cb51dec0a85f7a9691bfa69505b95334fa3047816ac6a802792",
+        "stagedReplacementSha256": "a2e42b2fdbde4cb51dec0a85f7a9691bfa69505b95334fa3047816ac6a802792"
+      }
+    },
+    {
+      "publicationId": "4176",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Arrests 19992008",
+      "priorityRank": 2,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/6property%20arrests_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/6property_arrests_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:59:24.182Z",
+      "durationMs": 125785,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4211",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Offenses 19992008",
+      "priorityRank": 3,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/5property offenses_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/5property offenses_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/5property%20offenses_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/5property_offenses_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:59:25.572Z",
+      "durationMs": 127175,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4211-Illinois_Offense_and_Arrest_Trends_Property_Index_Offenses_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4173",
+      "publicationTitle": "Illinois Crime Victim Trends  Domestic Offenses 19992008",
+      "priorityRank": 1,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Domestic Violence Trends/1999-2008/7domestic offenses_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Domestic Violence Trends/1999-2008/7domestic offenses_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Domestic%20Violence%20Trends/1999-2008/7domestic%20offenses_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/7domestic_offenses_1999-2008.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:59:25.573Z",
+      "durationMs": 127176,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "4099",
+      "publicationTitle": "2006 Annual Report Motor Vehicle Theft Prevention Council",
+      "priorityRank": 5,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/2006 Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/2006 Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/2006%20Annual%20Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2006_Annual_Report.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:59:27.711Z",
+      "durationMs": 129314,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    },
+    {
+      "publicationId": "3838",
+      "publicationTitle": "2004 Summary of Drug Enforcement Activities Across Illinois Multijurisdictional Enforcement Groups and Task Forces",
+      "priorityRank": 4,
+      "priorityTier": "high",
+      "passLikelihoodScore": 0,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2004MEGTFSummary.pdf.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-01T19:59:33.242Z",
+      "durationMs": 134845,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 102,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 2-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 120000ms"
+      }
+    }
+  ]
+}

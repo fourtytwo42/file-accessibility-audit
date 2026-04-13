@@ -1,0 +1,2501 @@
+{
+  "generatedAt": "2026-04-06T07:26:29.265Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-retry-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 99,
+    "processed": 43,
+    "readyToReplace": 4,
+    "remediatedPassCandidates": 4,
+    "failedAfterRemediation": 35,
+    "sourceMissing": 0,
+    "processingError": 4,
+    "remaining": 56
+  },
+  "outcomes": [
+    {
+      "publicationId": "3965",
+      "publicationTitle": "A Study of Disproportionate Minority Representation in the Cook County Juvenile Justice System Part II Assessment of Disproportionate Minority Representation Through IndividualLevel Analyses and Surveys of Juvenile Justice Professionals",
+      "priorityRank": 6,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 66,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Cook County DMR_Part II.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Cook County DMR_Part II.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Cook County DMR_Part II.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3965-A_Study_of_Disproportionate_Minority_Representation_in_the_Cook_County_Juvenile_Justice_System_Part_II_Assessment_of_Disproportionate_Minority_Representation_Through_IndividualLevel_Analyses_and_Surveys_of_Juvenile_Justice_Professionals.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-06T05:39:45.999Z",
+      "durationMs": 221056,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 176,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Error: ENAMETOOLONG: name too long, open '/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3965-A_Study_of_Disproportionate_Minority_Representation_in_the_Cook_County_Juvenile_Justice_System_Part_II_Assessment_of_Disproportionate_Minority_Representation_Through_IndividualLevel_Analyses_and_Surveys_of_Juvenile_Justice_Professionals.remediation.json'\n    at Object.writeFileSync (node:fs:2430:20)\n    at writeJson (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:143:6)\n    at processCandidate (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:541:5)\n    at async worker (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:673:25)\n    at async Promise.all (index 5)\n    at async main (/home/hendo420/pdfaf/scripts/run-priority-remediation-batch.ts:680:5)"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3965-A_Study_of_Disproportionate_Minority_Representation_in_the_Cook_County_Juvenile_Justice_System_Part_II_Assessment_of_Disproportionate_Minority_Representation_Through_IndividualLevel_Analyses_and_Surveys_of_Juvenile_Justice_Professionals.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4092",
+      "publicationTitle": "Analysis of InfoNet Data from Domestic Violence Agencies Full Report",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Analysis%20of%20InfoNet%20Data%20from%20Domestic%20Violence%20Agencies.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4092-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Full_Report.failure.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:43:18.834Z",
+      "durationMs": 433891,
+      "original": {
+        "overallScore": 42,
+        "grade": "F",
+        "pageCount": 165,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 165,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4092-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Full_Report.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/ResearchReports/Analysis of InfoNet Data from Domestic Violence Agencies.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4092-Analysis_of_InfoNet_Data_from_Domestic_Violence_Agencies_Full_Report.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "09a6b40e432066ccd7f0d1413c006ec0be0bb0b6d070ad6d4cc98e7dccd74372",
+        "remediatedPdfSha256": "09a6b40e432066ccd7f0d1413c006ec0be0bb0b6d070ad6d4cc98e7dccd74372",
+        "stagedReplacementSha256": "09a6b40e432066ccd7f0d1413c006ec0be0bb0b6d070ad6d4cc98e7dccd74372"
+      }
+    },
+    {
+      "publicationId": "4470",
+      "publicationTitle": "Co-occurring Mental Health and Substance Use Disorders of Women in Prison: An Evaluation of the WestCare Foundation’s Dual Diagnosis Program in Illinois",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Co-occuring_mental_health_and_substance_use_disorders_of_women_in_prison_FULL_REPORT_100318.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-benchmark/143.244.146.43/4470-Co-occurring_Mental_Health_and_Substance_Use_Disorders_of_Women_in_Prison_An_Evaluation_of_the_WestCare_Foundation_s_Dual_Diagnosis_Program_in_Illinois.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:50:24.678Z",
+      "durationMs": 859735,
+      "original": {
+        "overallScore": 45,
+        "grade": "F",
+        "pageCount": 53,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 84,
+        "grade": "B",
+        "pageCount": 53,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 84, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4470-Co-occurring_Mental_Health_and_Substance_Use_Disorders_of_Women_in_Prison_An_Evaluation_of_the_WestCare_Foundation_s_Dual_Diagnosis_Program_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4470-Co-occurring_Mental_Health_and_Substance_Use_Disorders_of_Women_in_Prison_An_Evaluation_of_the_WestCare_Foundation_s_Dual_Diagnosis_Program_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4470-Co-occurring_Mental_Health_and_Substance_Use_Disorders_of_Women_in_Prison_An_Evaluation_of_the_WestCare_Foundation_s_Dual_Diagnosis_Program_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "eeceba44a30f493a24a739fa65654d3ca8da0b3f6887c3409356c719adb2fade",
+        "remediatedPdfSha256": "eeceba44a30f493a24a739fa65654d3ca8da0b3f6887c3409356c719adb2fade",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4551",
+      "publicationTitle": "Illinois Motor Vehicle Theft Prevention Council 2015 Annual Report",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+      "fileUrl": "https://archive.icjia.cloud/files/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.failure.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:56:29.687Z",
+      "durationMs": 1224744,
+      "original": {
+        "overallScore": 53,
+        "grade": "F",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/news/2015_Motor_Vehicle_Annual_Report.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4551-Illinois_Motor_Vehicle_Theft_Prevention_Council_2015_Annual_Report.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "26c46dbc02c4d34a4a3e3b917b819ed552e095f003f780d66cc3f7d0c0e2199c",
+        "remediatedPdfSha256": "26c46dbc02c4d34a4a3e3b917b819ed552e095f003f780d66cc3f7d0c0e2199c",
+        "stagedReplacementSha256": "26c46dbc02c4d34a4a3e3b917b819ed552e095f003f780d66cc3f7d0c0e2199c"
+      }
+    },
+    {
+      "publicationId": "4655",
+      "publicationTitle": "A Preliminary Outcome Evaluation of Lake County's Police Referral to Substance Use Disorder Treatment Program",
+      "priorityRank": 9,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 66,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/PDF version of article-210601T21360320.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/PDF version of article-210601T21360320.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/PDF%20version%20of%20article-210601T21360320.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4655-A_Preliminary_Outcome_Evaluation_of_Lake_County_s_Police_Referral_to_Substance_Use_Disorder_Treatment_Program.failure.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:56:32.763Z",
+      "durationMs": 1006763,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/157.230.3.215/4655-A_Preliminary_Outcome_Evaluation_of_Lake_County_s_Police_Referral_to_Substance_Use_Disorder_Treatment_Program.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PDF version of article-210601T21360320.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/157.230.3.215/4655-A_Preliminary_Outcome_Evaluation_of_Lake_County_s_Police_Referral_to_Substance_Use_Disorder_Treatment_Program.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cc5c868e5763b67fff5957096300e83411c3c8cb0ef4a23689b046d2a024eed1",
+        "remediatedPdfSha256": "cc5c868e5763b67fff5957096300e83411c3c8cb0ef4a23689b046d2a024eed1",
+        "stagedReplacementSha256": "cc5c868e5763b67fff5957096300e83411c3c8cb0ef4a23689b046d2a024eed1"
+      }
+    },
+    {
+      "publicationId": "4035",
+      "publicationTitle": "Comparison of official and unofficial sources of criminal history record information",
+      "priorityRank": 11,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 77,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/IIJIS_CHRIcomparisons.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/IIJIS_CHRIcomparisons.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/IIJIS_CHRIcomparisons.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4035-Comparison_of_official_and_unofficial_sources_of_criminal_history_record_information.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:59:32.131Z",
+      "durationMs": 547452,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 7,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 7,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4035-Comparison_of_official_and_unofficial_sources_of_criminal_history_record_information.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4035-Comparison_of_official_and_unofficial_sources_of_criminal_history_record_information.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4035-Comparison_of_official_and_unofficial_sources_of_criminal_history_record_information.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "127542bd57175247af66b488c6681203f44a2cc8855a00de481064e6f8016f53",
+        "remediatedPdfSha256": "127542bd57175247af66b488c6681203f44a2cc8855a00de481064e6f8016f53",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4761",
+      "publicationTitle": "Statewide Violence Prevention Plan 2020-2024: Review of Programs and Strategies, Needs Assessment of Violence in Illinois, and Recommendations for Funding",
+      "priorityRank": 10,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 58,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/FullReport_ICJIAStatewideVPPlan2020-2024_5mb-250603T16593231.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/FullReport_ICJIAStatewideVPPlan2020-2024_5mb-250603T16593231.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/FullReport_ICJIAStatewideVPPlan2020-2024_5mb-250603T16593231.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4761-Statewide_Violence_Prevention_Plan_2020-2024_Review_of_Programs_and_Strategies_Needs_Assessment_of_Violence_in_Illinois_and_Recommendations_for_Funding.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:03:02.282Z",
+      "durationMs": 1183448,
+      "original": {
+        "overallScore": 30,
+        "grade": "F",
+        "pageCount": 45,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 62,
+        "grade": "D",
+        "pageCount": 45,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 62, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents, pdfua.table_regularity, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, Table Markup, Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents",
+          "pdfua.table_regularity",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/157.230.3.215/4761-Statewide_Violence_Prevention_Plan_2020-2024_Review_of_Programs_and_Strategies_Needs_Assessment_of_Violence_in_Illinois_and_Recommendations_for_Funding.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/157.230.3.215/4761-Statewide_Violence_Prevention_Plan_2020-2024_Review_of_Programs_and_Strategies_Needs_Assessment_of_Violence_in_Illinois_and_Recommendations_for_Funding.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/157.230.3.215/4761-Statewide_Violence_Prevention_Plan_2020-2024_Review_of_Programs_and_Strategies_Needs_Assessment_of_Violence_in_Illinois_and_Recommendations_for_Funding.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "afb01afbd1359e5eb383d10a2afd5c483d98b61fa4ce33c2eb3d30370cb36c68",
+        "remediatedPdfSha256": "afb01afbd1359e5eb383d10a2afd5c483d98b61fa4ce33c2eb3d30370cb36c68",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4614",
+      "publicationTitle": "An Evaluation of Transitional Housing Programs in Illinois for Victims of Domestic Violence and/or Human Trafficking",
+      "priorityRank": 8,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 66,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/FULL REPORT of TH 100319.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/FULL REPORT of TH 100319.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/FULL%20REPORT%20of%20TH%20100319.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4614-An_Evaluation_of_Transitional_Housing_Programs_in_Illinois_for_Victims_of_Domestic_Violence_and_or_Human_Trafficking.failure.json",
+      "status": "remediated_pass_candidate",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:04:57.180Z",
+      "durationMs": 1732236,
+      "original": {
+        "overallScore": 28,
+        "grade": "F",
+        "pageCount": 49,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A",
+        "pageCount": 49,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": true,
+        "reasons": [],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4614-An_Evaluation_of_Transitional_Housing_Programs_in_Illinois_for_Victims_of_Domestic_Violence_and_or_Human_Trafficking.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/articles/FULL REPORT of TH 100319.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4614-An_Evaluation_of_Transitional_Housing_Programs_in_Illinois_for_Victims_of_Domestic_Violence_and_or_Human_Trafficking.remediation.json",
+        "failureReportPath": null
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "64f7845e60f3ed799e0c1615e66e005f035daab92a075027d2e61a682b43b9cc",
+        "remediatedPdfSha256": "64f7845e60f3ed799e0c1615e66e005f035daab92a075027d2e61a682b43b9cc",
+        "stagedReplacementSha256": "64f7845e60f3ed799e0c1615e66e005f035daab92a075027d2e61a682b43b9cc"
+      }
+    },
+    {
+      "publicationId": "4158",
+      "publicationTitle": "Analysis of Shelter Utilization by Victims of Domestic Violence  Qualitative and Quantitative Analysis",
+      "priorityRank": 13,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 65,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Analysis of Shelter Utilization by Victims of Domestic Violence 0210.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Analysis of Shelter Utilization by Victims of Domestic Violence 0210.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Analysis%20of%20Shelter%20Utilization%20by%20Victims%20of%20Domestic%20Violence%200210.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4158-Analysis_of_Shelter_Utilization_by_Victims_of_Domestic_Violence_Qualitative_and_Quantitative_Analysis.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:11:57.709Z",
+      "durationMs": 924945,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 230,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 230,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4158-Analysis_of_Shelter_Utilization_by_Victims_of_Domestic_Violence_Qualitative_and_Quantitative_Analysis.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4158-Analysis_of_Shelter_Utilization_by_Victims_of_Domestic_Violence_Qualitative_and_Quantitative_Analysis.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4158-Analysis_of_Shelter_Utilization_by_Victims_of_Domestic_Violence_Qualitative_and_Quantitative_Analysis.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c19bc6aa4a99afb593b60aac9c82f8f9fb3c42a9f6382b8cf4f3cc8e9c678dd7",
+        "remediatedPdfSha256": "c19bc6aa4a99afb593b60aac9c82f8f9fb3c42a9f6382b8cf4f3cc8e9c678dd7",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4606",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2018 Annual Report",
+      "priorityRank": 15,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY18.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY18.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY18.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4606-Illinois_Criminal_Justice_Information_Authority_2018_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:17:44.864Z",
+      "durationMs": 882581,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 68,
+        "grade": "D",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 68, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4606-Illinois_Criminal_Justice_Information_Authority_2018_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4606-Illinois_Criminal_Justice_Information_Authority_2018_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4606-Illinois_Criminal_Justice_Information_Authority_2018_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ba80e6b1c83742b77518c436457a5949236e7449851ee85943d26203fc880a0c",
+        "remediatedPdfSha256": "ba80e6b1c83742b77518c436457a5949236e7449851ee85943d26203fc880a0c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4573",
+      "publicationTitle": "Ad Hoc Victim Services Committee Research Report",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 83,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/ICJIA_FINAL_AdHocReport_VictimServices_012717.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4573-Ad_Hoc_Victim_Services_Committee_Research_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:17:57.907Z",
+      "durationMs": 2512964,
+      "original": {
+        "overallScore": 45,
+        "grade": "F",
+        "pageCount": 145,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 145,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.font_unicode, pdfua.annotation_alt_contents, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.annotation_alt_contents",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4573-Ad_Hoc_Victim_Services_Committee_Research_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4573-Ad_Hoc_Victim_Services_Committee_Research_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4573-Ad_Hoc_Victim_Services_Committee_Research_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a68ab03df8d6ce86ccb9817a1fb084bde5a25b2d055e191779a62d3f5a10de9f",
+        "remediatedPdfSha256": "a68ab03df8d6ce86ccb9817a1fb084bde5a25b2d055e191779a62d3f5a10de9f",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4736",
+      "publicationTitle": "Police Use of Discretion in Encounters with People with Opioid Use Disorder: A Study of Illinois Police Officers",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 70,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Use of Discretion PDF for POSTING-231128T20591887.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Use of Discretion PDF for POSTING-231128T20591887.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Use%20of%20Discretion%20PDF%20for%20POSTING-231128T20591887.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4736-Police_Use_of_Discretion_in_Encounters_with_People_with_Opioid_Use_Disorder_A_Study_of_Illinois_Police_Officers.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:19:34.404Z",
+      "durationMs": 2609461,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 25,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 54,
+        "grade": "F",
+        "pageCount": 25,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 54, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.link_tagging, pdfua.table_regularity, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Table Markup, Link & URL Quality, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.link_tagging",
+          "pdfua.table_regularity",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Table Markup",
+          "Link & URL Quality",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/157.230.3.215/4736-Police_Use_of_Discretion_in_Encounters_with_People_with_Opioid_Use_Disorder_A_Study_of_Illinois_Police_Officers.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/157.230.3.215/4736-Police_Use_of_Discretion_in_Encounters_with_People_with_Opioid_Use_Disorder_A_Study_of_Illinois_Police_Officers.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/157.230.3.215/4736-Police_Use_of_Discretion_in_Encounters_with_People_with_Opioid_Use_Disorder_A_Study_of_Illinois_Police_Officers.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "7be44ecb5d53bdbde52bfe5d4ec34e3efe3a8c5cd4b369964cdfc998edf05c31",
+        "remediatedPdfSha256": "7be44ecb5d53bdbde52bfe5d4ec34e3efe3a8c5cd4b369964cdfc998edf05c31",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4629",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2019 Annual Report",
+      "priorityRank": 16,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/FY19 ICJIA Annual Report Final.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/FY19 ICJIA Annual Report Final.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/FY19%20ICJIA%20Annual%20Report%20Final.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4629-Illinois_Criminal_Justice_Information_Authority_2019_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:20:08.902Z",
+      "durationMs": 911721,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 68,
+        "grade": "D",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 68, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4629-Illinois_Criminal_Justice_Information_Authority_2019_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4629-Illinois_Criminal_Justice_Information_Authority_2019_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4629-Illinois_Criminal_Justice_Information_Authority_2019_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a092d83ffcdc6d4b016887ff074f585cfdab6aacdb238f1699ee531a4573a35a",
+        "remediatedPdfSha256": "a092d83ffcdc6d4b016887ff074f585cfdab6aacdb238f1699ee531a4573a35a",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4574",
+      "publicationTitle": "Juvenile Justice in Illinois, 2015",
+      "priorityRank": 14,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Juvenile_Justice_in_Illinois_2015_Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Juvenile_Justice_in_Illinois_2015_Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Juvenile_Justice_in_Illinois_2015_Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4574-Juvenile_Justice_in_Illinois_2015.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:20:39.834Z",
+      "durationMs": 1267702,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4574-Juvenile_Justice_in_Illinois_2015.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4574-Juvenile_Justice_in_Illinois_2015.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4574-Juvenile_Justice_in_Illinois_2015.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "469c070a871208be540084ff3b237b835bcc765bda5c251256b36970c87fdab8",
+        "remediatedPdfSha256": "469c070a871208be540084ff3b237b835bcc765bda5c251256b36970c87fdab8",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4044",
+      "publicationTitle": "Illinois Integrated Justice Information System (IIJIS) 2006 Annual Report",
+      "priorityRank": 7,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 78,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/IIJIS2006.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/IIJIS2006.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/IIJIS2006.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4044-Illinois_Integrated_Justice_Information_System_IIJIS_2006_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:24:01.068Z",
+      "durationMs": 2876124,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 75,
+        "grade": "C",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 75, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4044-Illinois_Integrated_Justice_Information_System_IIJIS_2006_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4044-Illinois_Integrated_Justice_Information_System_IIJIS_2006_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4044-Illinois_Integrated_Justice_Information_System_IIJIS_2006_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "776130507b9ce66e0a6a0b6d7311f6e8c1ee00fba50dd6cd94c0875cb30683c7",
+        "remediatedPdfSha256": "776130507b9ce66e0a6a0b6d7311f6e8c1ee00fba50dd6cd94c0875cb30683c7",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4073",
+      "publicationTitle": "An Evaluation of Redeploy Illinois St Clair County and Peoria County",
+      "priorityRank": 12,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 77,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/An Evaluation of Redeploy Illinois - St. Clair County and Peoria County.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/An%20Evaluation%20of%20Redeploy%20Illinois%20-%20St.%20Clair%20County%20and%20Peoria%20County.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4073-An_Evaluation_of_Redeploy_Illinois_St_Clair_County_and_Peoria_County.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:25:09.730Z",
+      "durationMs": 1720043,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 123,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 77,
+        "grade": "C",
+        "pageCount": 123,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 77, not 100.",
+          "Blocking local standards findings remain: pdfua.table_regularity, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.table_regularity",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4073-An_Evaluation_of_Redeploy_Illinois_St_Clair_County_and_Peoria_County.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4073-An_Evaluation_of_Redeploy_Illinois_St_Clair_County_and_Peoria_County.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4073-An_Evaluation_of_Redeploy_Illinois_St_Clair_County_and_Peoria_County.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b6c56a1054da56049723fef480a71de6f4cc95a2a28ebb4f91f1178539444abb",
+        "remediatedPdfSha256": "b6c56a1054da56049723fef480a71de6f4cc95a2a28ebb4f91f1178539444abb",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4650",
+      "publicationTitle": "Programs and Practices to Prevent School Violence and Improve School Safety",
+      "priorityRank": 17,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 65,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/ProgramsAndPractices-201123T19333170.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/ProgramsAndPractices-201123T19333170.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/ProgramsAndPractices-201123T19333170.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4650-Programs_and_Practices_to_Prevent_School_Violence_and_Improve_School_Safety.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:28:39.697Z",
+      "durationMs": 1001988,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 67,
+        "grade": "D",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 67, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents, pdfua.figure_alt_or_artifact, pdfua.link_text_quality",
+          "Categories still below 100: Heading Structure, Alt Text on Images, Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.link_text_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4650-Programs_and_Practices_to_Prevent_School_Violence_and_Improve_School_Safety.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4650-Programs_and_Practices_to_Prevent_School_Violence_and_Improve_School_Safety.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4650-Programs_and_Practices_to_Prevent_School_Violence_and_Improve_School_Safety.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "9b0eadcb88bd077d02463365444e84701ace530ba9934d82fd45a91cf3d275a0",
+        "remediatedPdfSha256": "9b0eadcb88bd077d02463365444e84701ace530ba9934d82fd45a91cf3d275a0",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3993",
+      "publicationTitle": "Community Policing in Chicago Year Ten An Evaluation of Chicagos Alternative Policing Strategy",
+      "priorityRank": 21,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 64,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS_10.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS_10.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS_10.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3993-Community_Policing_in_Chicago_Year_Ten_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-06T06:30:09.014Z",
+      "durationMs": 600112,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 170,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3993-Community_Policing_in_Chicago_Year_Ten_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=5, deep=13, total=18)."
+      }
+    },
+    {
+      "publicationId": "4681",
+      "publicationTitle": "An Overview of Police Use of Force Policies and Research",
+      "priorityRank": 19,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 65,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/PoliceUseofForce-full-220815T16432351.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/PoliceUseofForce-full-220815T16432351.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/PoliceUseofForce-full-220815T16432351.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4681-An_Overview_of_Police_Use_of_Force_Policies_and_Research.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:32:32.313Z",
+      "durationMs": 874405,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 18,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B",
+        "pageCount": 18,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/157.230.3.215/4681-An_Overview_of_Police_Use_of_Force_Policies_and_Research.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/157.230.3.215/4681-An_Overview_of_Police_Use_of_Force_Policies_and_Research.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/157.230.3.215/4681-An_Overview_of_Police_Use_of_Force_Policies_and_Research.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b0d76f14c1b5d57452bbf1b48091d3c63d2cba9a40ae9a215050e215f5470cc3",
+        "remediatedPdfSha256": "b0d76f14c1b5d57452bbf1b48091d3c63d2cba9a40ae9a215050e215f5470cc3",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4652",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2020 Annual Report",
+      "priorityRank": 18,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 57,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/FY20 ICJIA Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/FY20 ICJIA Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/FY20%20ICJIA%20Annual%20Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4652-Illinois_Criminal_Justice_Information_Authority_2020_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:33:55.541Z",
+      "durationMs": 970677,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 55,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 55, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Table Markup, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4652-Illinois_Criminal_Justice_Information_Authority_2020_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4652-Illinois_Criminal_Justice_Information_Authority_2020_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4652-Illinois_Criminal_Justice_Information_Authority_2020_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "90eeaf81571c905a5905c122cbf4185e0647681b2b1bca64ebf6e39b1285a519",
+        "remediatedPdfSha256": "90eeaf81571c905a5905c122cbf4185e0647681b2b1bca64ebf6e39b1285a519",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4588",
+      "publicationTitle": "Illinois Criminal Justice Information Authority Fiscal Year 2017 Annual Report",
+      "priorityRank": 22,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 56,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/FY17_AR.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/FY17_AR.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/FY17_AR.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4588-Illinois_Criminal_Justice_Information_Authority_Fiscal_Year_2017_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:35:01.010Z",
+      "durationMs": 861175,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 64,
+        "grade": "D",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 64, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4588-Illinois_Criminal_Justice_Information_Authority_Fiscal_Year_2017_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4588-Illinois_Criminal_Justice_Information_Authority_Fiscal_Year_2017_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4588-Illinois_Criminal_Justice_Information_Authority_Fiscal_Year_2017_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "068db312eb5557ee9b79e859b38288f482a037febaec059eecae0b0d6776dfdf",
+        "remediatedPdfSha256": "068db312eb5557ee9b79e859b38288f482a037febaec059eecae0b0d6776dfdf",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4703",
+      "publicationTitle": "FY22 ICJIA Annual Report",
+      "priorityRank": 20,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 57,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/FY_22_ICJIA_Annual_Report_7c7ba4f4f0.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4703-FY22_ICJIA_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:36:16.487Z",
+      "durationMs": 1002082,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 30,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 30,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/192.241.146.85/4703-FY22_ICJIA_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/192.241.146.85/4703-FY22_ICJIA_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/192.241.146.85/4703-FY22_ICJIA_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "2153046a1fcd8a27402f32f85497cbd56446ec2b2c7db38f54f2a445298c035d",
+        "remediatedPdfSha256": "2153046a1fcd8a27402f32f85497cbd56446ec2b2c7db38f54f2a445298c035d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3460",
+      "publicationTitle": "Community Policing in Chicago Year One An Interim Report",
+      "priorityRank": 26,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:36:27.826Z",
+      "durationMs": 378810,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 60,
+        "grade": "D",
+        "pageCount": 37,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 60, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3460-Community_Policing_in_Chicago_Year_One_An_Interim_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1b9fab18731e476503c1d4a5e054658caf7f46a3a07b74e4983f057d7e81d27a",
+        "remediatedPdfSha256": "1b9fab18731e476503c1d4a5e054658caf7f46a3a07b74e4983f057d7e81d27a",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4033",
+      "publicationTitle": "An Evaluation of the Moral Reconation Therapy of the FranklinJefferson County Evening Reporting Center Program",
+      "priorityRank": 30,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 74,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/moralreconation.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/moralreconation.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/moralreconation.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4033-An_Evaluation_of_the_Moral_Reconation_Therapy_of_the_FranklinJefferson_County_Evening_Reporting_Center_Program.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:39:36.845Z",
+      "durationMs": 200357,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 174,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 174,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4033-An_Evaluation_of_the_Moral_Reconation_Therapy_of_the_FranklinJefferson_County_Evening_Reporting_Center_Program.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4033-An_Evaluation_of_the_Moral_Reconation_Therapy_of_the_FranklinJefferson_County_Evening_Reporting_Center_Program.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4033-An_Evaluation_of_the_Moral_Reconation_Therapy_of_the_FranklinJefferson_County_Evening_Reporting_Center_Program.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "a1a3ea42b7167414e488edebe99be56d49b476307d582bcf42608a6dff380203",
+        "remediatedPdfSha256": "a1a3ea42b7167414e488edebe99be56d49b476307d582bcf42608a6dff380203",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3773",
+      "publicationTitle": "An Implementation Evaluation of the Specialized Sex Offender Probation Projects in Coles Madison and Vermilion Counties",
+      "priorityRank": 27,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPSEvaluationSexOffender.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPSEvaluationSexOffender.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPSEvaluationSexOffender.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3773-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Probation_Projects_in_Coles_Madison_and_Vermilion_Counties.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:42:34.404Z",
+      "durationMs": 602090,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 256,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 55,
+        "grade": "F",
+        "pageCount": 256,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 55, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/3773-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Probation_Projects_in_Coles_Madison_and_Vermilion_Counties.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3773-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Probation_Projects_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3773-An_Implementation_Evaluation_of_the_Specialized_Sex_Offender_Probation_Projects_in_Coles_Madison_and_Vermilion_Counties.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cb2d7e6c5967007aa489e98d6e085a353e03cd95e5d5fc9adaece5177c2742f6",
+        "remediatedPdfSha256": "cb2d7e6c5967007aa489e98d6e085a353e03cd95e5d5fc9adaece5177c2742f6",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3782",
+      "publicationTitle": "An Impact Evaluation of the Juvenile Probation Projects in Christian Peoria and Winnebago Counties",
+      "priorityRank": 28,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPSImpact EvaluationWinnebago.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPSImpact EvaluationWinnebago.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPSImpact EvaluationWinnebago.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3782-An_Impact_Evaluation_of_the_Juvenile_Probation_Projects_in_Christian_Peoria_and_Winnebago_Counties.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:43:36.142Z",
+      "durationMs": 580600,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 234,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 53,
+        "grade": "F",
+        "pageCount": 234,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 53, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_widths, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_widths",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/3782-An_Impact_Evaluation_of_the_Juvenile_Probation_Projects_in_Christian_Peoria_and_Winnebago_Counties.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3782-An_Impact_Evaluation_of_the_Juvenile_Probation_Projects_in_Christian_Peoria_and_Winnebago_Counties.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3782-An_Impact_Evaluation_of_the_Juvenile_Probation_Projects_in_Christian_Peoria_and_Winnebago_Counties.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1e7717729b40390aed69f2e1ad820bde00c12f70c866025e2d6e262a0ec541a3",
+        "remediatedPdfSha256": "1e7717729b40390aed69f2e1ad820bde00c12f70c866025e2d6e262a0ec541a3",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4671",
+      "publicationTitle": "Illinois Criminal Justice Information Authority FY21 Annual Report",
+      "priorityRank": 23,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 56,
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/FY_21_ICJIA_Annual_Report_e999274dcb.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/FY_21_ICJIA_Annual_Report_e999274dcb.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/FY_21_ICJIA_Annual_Report_e999274dcb.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4671-Illinois_Criminal_Justice_Information_Authority_FY21_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:45:37.745Z",
+      "durationMs": 1296676,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 41,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 55,
+        "grade": "F",
+        "pageCount": 41,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 55, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/192.241.146.85/4671-Illinois_Criminal_Justice_Information_Authority_FY21_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/192.241.146.85/4671-Illinois_Criminal_Justice_Information_Authority_FY21_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/192.241.146.85/4671-Illinois_Criminal_Justice_Information_Authority_FY21_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d1e333cd2d6fc2594e7e0280dec95379bbbc840c1842cd85b0bf3c4c9a5edc66",
+        "remediatedPdfSha256": "d1e333cd2d6fc2594e7e0280dec95379bbbc840c1842cd85b0bf3c4c9a5edc66",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4473",
+      "publicationTitle": "Factors Influencing the Sentencing of Convicted Felons in Illinois",
+      "priorityRank": 24,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 63,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/Factors_Influencing_the_Sentencing-191011T20093012.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4473-Factors_Influencing_the_Sentencing_of_Convicted_Felons_in_Illinois.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:49:34.677Z",
+      "durationMs": 1464946,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 31,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 57,
+        "grade": "F",
+        "pageCount": 31,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 57, not 100.",
+          "Blocking local standards findings remain: pdfua.font_unicode, pdfua.table_regularity, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_unicode",
+          "pdfua.table_regularity",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4473-Factors_Influencing_the_Sentencing_of_Convicted_Felons_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4473-Factors_Influencing_the_Sentencing_of_Convicted_Felons_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4473-Factors_Influencing_the_Sentencing_of_Convicted_Felons_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "702f73903f42b57e3840ec99a86cd035bf69d4f3cd1d8424483066fea367ee68",
+        "remediatedPdfSha256": "702f73903f42b57e3840ec99a86cd035bf69d4f3cd1d8424483066fea367ee68",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4502",
+      "publicationTitle": "An Overview of Evidence-Based Practices and Programs in Prison Reentry",
+      "priorityRank": 25,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 63,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/overviewofreentry-191218T22484765.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/articles/overviewofreentry-191218T22484765.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/overviewofreentry-191218T22484765.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4502-An_Overview_of_Evidence-Based_Practices_and_Programs_in_Prison_Reentry.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:50:37.042Z",
+      "durationMs": 1317345,
+      "original": {
+        "overallScore": 25,
+        "grade": "F",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B",
+        "pageCount": 19,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents",
+          "Categories still below 100: Link & URL Quality, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4502-An_Overview_of_Evidence-Based_Practices_and_Programs_in_Prison_Reentry.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4502-An_Overview_of_Evidence-Based_Practices_and_Programs_in_Prison_Reentry.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4502-An_Overview_of_Evidence-Based_Practices_and_Programs_in_Prison_Reentry.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ef9c7cb965cdaa591027049406d6e39fb7847447883cd9101b35ec90ce866e88",
+        "remediatedPdfSha256": "ef9c7cb965cdaa591027049406d6e39fb7847447883cd9101b35ec90ce866e88",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4179",
+      "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey APPENDIX",
+      "priorityRank": 31,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 74,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/ICJIA Needs Assessment Survey APPENDIX Feb 2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/ICJIA Needs Assessment Survey APPENDIX Feb 2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/ICJIA%20Needs%20Assessment%20Survey%20APPENDIX%20Feb%202007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4179-Illinois_Criminal_Justice_Information_Authority_Needs_Assessment_Survey_APPENDIX.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-06T06:54:21.935Z",
+      "durationMs": 1074108,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 86,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4179-Illinois_Criminal_Justice_Information_Authority_Needs_Assessment_Survey_APPENDIX.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=5, deep=13, total=18)."
+      }
+    },
+    {
+      "publicationId": "4716",
+      "publicationTitle": "2022 Victim Service Planning Research Report",
+      "priorityRank": 35,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 53,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/2022 Victim Service Planning Research Report -230817T20035755.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/2022 Victim Service Planning Research Report -230817T20035755.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/2022%20Victim%20Service%20Planning%20Research%20Report%20-230817T20035755.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4716-2022_Victim_Service_Planning_Research_Report.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-06T06:54:53.874Z",
+      "durationMs": 556128,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 213,
+        "isScanned": false
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing hit the remediation inspection budget after repeated ownership/structure verification without reaching a stable passing result.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/157.230.3.215/4716-2022_Victim_Service_Planning_Research_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Inspection budget exceeded (light=5, deep=13, total=18)."
+      }
+    },
+    {
+      "publicationId": "4702",
+      "publicationTitle": "2022 Victim Needs Assessment",
+      "priorityRank": 33,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 54,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/2022 Victim Needs Assessment-230306T13210736.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/2022 Victim Needs Assessment-230306T13210736.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/2022%20Victim%20Needs%20Assessment-230306T13210736.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4702-2022_Victim_Needs_Assessment.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:55:06.222Z",
+      "durationMs": 751816,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 165,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 165,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.annotation_alt_contents, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Link & URL Quality, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.annotation_alt_contents",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Link & URL Quality",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/157.230.3.215/4702-2022_Victim_Needs_Assessment.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/157.230.3.215/4702-2022_Victim_Needs_Assessment.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/157.230.3.215/4702-2022_Victim_Needs_Assessment.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ccbdc37e0ef4ed5d6dce6071c07cea36f8717a0874d5d033eaeaf24d11c8792c",
+        "remediatedPdfSha256": "ccbdc37e0ef4ed5d6dce6071c07cea36f8717a0874d5d033eaeaf24d11c8792c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3653",
+      "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
+      "priorityRank": 38,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 61,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/ogav3n1.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/ogav3n1.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/ogav3n1.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:55:42.275Z",
+      "durationMs": 80338,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3653-Juvenile_Work_Program_Provides_Alternative_to_Detention.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "48e1228a27d100dffa2b33d0b287114dd9314fdb8afa909209c6b8b4b34f2b20",
+        "remediatedPdfSha256": "48e1228a27d100dffa2b33d0b287114dd9314fdb8afa909209c6b8b4b34f2b20",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3926",
+      "publicationTitle": "Community Policing in Chicago Years Eight and Nine An Evaluation of Chicagos Alternative Policing Strategy and Information Technology Initiative",
+      "priorityRank": 29,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 74,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Community Policing in Chicago Years 8 and 9.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Community Policing in Chicago Years 8 and 9.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Community%20Policing%20in%20Chicago%20Years%208%20and%209.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3926-Community_Policing_in_Chicago_Years_Eight_and_Nine_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy_and_Information_Technology_Initiative.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T06:55:58.217Z",
+      "durationMs": 1257206,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 171,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 59,
+        "grade": "F",
+        "pageCount": 171,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 59, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/3926-Community_Policing_in_Chicago_Years_Eight_and_Nine_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy_and_Information_Technology_Initiative.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/3926-Community_Policing_in_Chicago_Years_Eight_and_Nine_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy_and_Information_Technology_Initiative.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3926-Community_Policing_in_Chicago_Years_Eight_and_Nine_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy_and_Information_Technology_Initiative.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "2815e32102cc25cabe1ab8fa9406adf307e0cb9242dfb8b94ca9146e4648ec89",
+        "remediatedPdfSha256": "2815e32102cc25cabe1ab8fa9406adf307e0cb9242dfb8b94ca9146e4648ec89",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4030",
+      "publicationTitle": "The Extent and Nature of Adult Crime Victimization in Illinois 2002 A Report on the Findings from the Illinois Crime Victimization Survey2002",
+      "priorityRank": 36,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 72,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/ILCVS.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/ILCVS.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/ILCVS.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4030-The_Extent_and_Nature_of_Adult_Crime_Victimization_in_Illinois_2002_A_Report_on_the_Findings_from_the_Illinois_Crime_Victimization_Survey2002.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:00:04.441Z",
+      "durationMs": 629763,
+      "original": {
+        "overallScore": 22,
+        "grade": "F",
+        "pageCount": 152,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 152,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4030-The_Extent_and_Nature_of_Adult_Crime_Victimization_in_Illinois_2002_A_Report_on_the_Findings_from_the_Illinois_Crime_Victimization_Survey2002.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4030-The_Extent_and_Nature_of_Adult_Crime_Victimization_in_Illinois_2002_A_Report_on_the_Findings_from_the_Illinois_Crime_Victimization_Survey2002.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4030-The_Extent_and_Nature_of_Adult_Crime_Victimization_in_Illinois_2002_A_Report_on_the_Findings_from_the_Illinois_Crime_Victimization_Survey2002.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c1662e1add2c9b7b8f854bc7936d67d629df410b4e64d724bbbf19c7c59647b2",
+        "remediatedPdfSha256": "c1662e1add2c9b7b8f854bc7936d67d629df410b4e64d724bbbf19c7c59647b2",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4188",
+      "publicationTitle": "Corrections data illustrate juvenile incarceration trends in Illinois",
+      "priorityRank": 39,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/Corrections data illustrate juvenile incarceration trends in Illinois.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/Corrections%20data%20illustrate%20juvenile%20incarceration%20trends%20in%20Illinois.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:06:57.804Z",
+      "durationMs": 723928,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 64,
+        "grade": "D",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 64, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images, pdfua.nested_alt_text, pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images",
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4188-Corrections_data_illustrate_juvenile_incarceration_trends_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "645d9b7eec8793c83c97662afe165a554f053c81ed2dad03a2fcf9c886e801ef",
+        "remediatedPdfSha256": "645d9b7eec8793c83c97662afe165a554f053c81ed2dad03a2fcf9c886e801ef",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4183",
+      "publicationTitle": "Juvenile reform specialized services help fuel fight against probationer recidivism",
+      "priorityRank": 37,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 52,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun-v3/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:07:37.596Z",
+      "durationMs": 1020552,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 99,
+        "grade": "B",
+        "pageCount": 8,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 99, not 100.",
+          "Categories still below 100: Table Markup"
+        ],
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [
+          "Table Markup"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "dcedde1663a7b6d8b837917d69256312bf15a08038faebc1aa5d6b7be157ed1c",
+        "remediatedPdfSha256": "dcedde1663a7b6d8b837917d69256312bf15a08038faebc1aa5d6b7be157ed1c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4204",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2011 Annual Report",
+      "priorityRank": 40,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY11.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY11.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY11.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4204-Illinois_Criminal_Justice_Information_Authority_2011_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:11:34.286Z",
+      "durationMs": 988062,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 68,
+        "grade": "D",
+        "pageCount": 40,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 68, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4204-Illinois_Criminal_Justice_Information_Authority_2011_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4204-Illinois_Criminal_Justice_Information_Authority_2011_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4204-Illinois_Criminal_Justice_Information_Authority_2011_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "fe6106982802d72b09721557c7a7afeb678f5fd3caebde6b75f78faa159b1cfc",
+        "remediatedPdfSha256": "fe6106982802d72b09721557c7a7afeb678f5fd3caebde6b75f78faa159b1cfc",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4465",
+      "publicationTitle": "An Examination of Illinois and National Pretrial Practices, Detention, and Reform Efforts",
+      "priorityRank": 34,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 61,
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Pretrial_Article_060718-191011T20093352.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Pretrial_Article_060718-191011T20093352.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Pretrial_Article_060718-191011T20093352.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4465-An_Examination_of_Illinois_and_National_Pretrial_Practices_Detention_and_Reform_Efforts.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:14:42.604Z",
+      "durationMs": 1866461,
+      "original": {
+        "overallScore": 27,
+        "grade": "F",
+        "pageCount": 17,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 86,
+        "grade": "B",
+        "pageCount": 17,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 86, not 100.",
+          "Blocking local standards findings remain: pdfua.annotation_alt_contents, pdfua.link_tagging",
+          "Categories still below 100: Link & URL Quality, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.annotation_alt_contents",
+          "pdfua.link_tagging"
+        ],
+        "unresolvedCategoryLabels": [
+          "Link & URL Quality",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/157.230.3.215/4465-An_Examination_of_Illinois_and_National_Pretrial_Practices_Detention_and_Reform_Efforts.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/157.230.3.215/4465-An_Examination_of_Illinois_and_National_Pretrial_Practices_Detention_and_Reform_Efforts.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/157.230.3.215/4465-An_Examination_of_Illinois_and_National_Pretrial_Practices_Detention_and_Reform_Efforts.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "629636995babbc4da9eb794b14fc38cb0897b019744fd994164af9a71bca0438",
+        "remediatedPdfSha256": "629636995babbc4da9eb794b14fc38cb0897b019744fd994164af9a71bca0438",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4540",
+      "publicationTitle": "ICJIA FY14 Annual Report",
+      "priorityRank": 42,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY14.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY14.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY14.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4540-ICJIA_FY14_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:14:43.245Z",
+      "durationMs": 1125027,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 39,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 70,
+        "grade": "C",
+        "pageCount": 39,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 70, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4540-ICJIA_FY14_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4540-ICJIA_FY14_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4540-ICJIA_FY14_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "b119bd95b6c28776c5089766fba05fe8740297603716004264bc0cfa16c768f6",
+        "remediatedPdfSha256": "b119bd95b6c28776c5089766fba05fe8740297603716004264bc0cfa16c768f6",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4526",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2012 Annual Report",
+      "priorityRank": 41,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY12.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY12.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY12.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4526-Illinois_Criminal_Justice_Information_Authority_2012_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:14:43.508Z",
+      "durationMs": 1141232,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 76,
+        "grade": "C",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 76, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Heading Structure, Alt Text on Images, Table Markup, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "Table Markup",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4526-Illinois_Criminal_Justice_Information_Authority_2012_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4526-Illinois_Criminal_Justice_Information_Authority_2012_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4526-Illinois_Criminal_Justice_Information_Authority_2012_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "846cdf47994e560196f24e3c66d891bd7649979a534dcc5bedfb5fde3dbea028",
+        "remediatedPdfSha256": "846cdf47994e560196f24e3c66d891bd7649979a534dcc5bedfb5fde3dbea028",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4427",
+      "publicationTitle": "Juvenile recidivism in Illinois Exploring youth rearrest and reincarceration",
+      "priorityRank": 32,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/IDJJ_Recidivism_Delinquents_082012.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/IDJJ_Recidivism_Delinquents_082012.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/IDJJ_Recidivism_Delinquents_082012.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4427-Juvenile_recidivism_in_Illinois_Exploring_youth_rearrest_and_reincarceration.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:18:38.192Z",
+      "durationMs": 2341346,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 34,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 34, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language, pdfua.annotation_alt_contents, pdfua.link_tagging",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Link & URL Quality, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.bookmark_language",
+          "pdfua.annotation_alt_contents",
+          "pdfua.link_tagging"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Link & URL Quality",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4427-Juvenile_recidivism_in_Illinois_Exploring_youth_rearrest_and_reincarceration.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4427-Juvenile_recidivism_in_Illinois_Exploring_youth_rearrest_and_reincarceration.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4427-Juvenile_recidivism_in_Illinois_Exploring_youth_rearrest_and_reincarceration.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f1fe361e2103f80544809764789d02578536e4dd765ad3571611351bbb79cac8",
+        "remediatedPdfSha256": "f1fe361e2103f80544809764789d02578536e4dd765ad3571611351bbb79cac8",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4557",
+      "publicationTitle": "ICJIA FY13 Annual Report",
+      "priorityRank": 43,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 62,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY13.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY13.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY13.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4557-ICJIA_FY13_Annual_Report.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T07:26:29.265Z",
+      "durationMs": 1584823,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 35,
+        "grade": "F",
+        "pageCount": 38,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 35, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.bookmark_language"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-retry-wave/143.244.146.43/4557-ICJIA_FY13_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-retry-wave/143.244.146.43/4557-ICJIA_FY13_Annual_Report.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4557-ICJIA_FY13_Annual_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "5a9be3b430bd2c879d125880aebbbd86f4b0a445a8d47a1a32a11949f6566358",
+        "remediatedPdfSha256": "5a9be3b430bd2c879d125880aebbbd86f4b0a445a8d47a1a32a11949f6566358",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

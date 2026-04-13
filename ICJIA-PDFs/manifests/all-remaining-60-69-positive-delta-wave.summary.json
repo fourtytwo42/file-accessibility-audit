@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-04-11T02:49:24.398Z",
+  "laneName": "all-remaining-60-69-positive-delta-wave",
+  "sourceOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+  "sourceOutcomesGeneratedAt": "2026-04-11T02:01:01.075Z",
+  "executionPolicyReason": "run_only_current_60_69_rows_that_still_show_positive_score_delta",
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "totals": {
+    "scannedReportsConsidered": 394,
+    "selectedCandidates": 5,
+    "byTier": {
+      "highest": 2,
+      "high": 3
+    },
+    "excludedOutsideBand": 89,
+    "excludedNonTerminal": 12,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0,
+    "excludedFlatOrNegativeDelta": 288
+  }
+}

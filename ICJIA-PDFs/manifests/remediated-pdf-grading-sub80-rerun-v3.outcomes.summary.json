@@ -1,0 +1,141 @@
+{
+  "generatedAt": "2026-04-13T04:31:36.322Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v3.json",
+  "laneName": "remediated-pdf-grading-sub80-rerun-v3",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 0,
+    "keep_fail_80_to_89": 0,
+    "drop_fail_lt_80": 56,
+    "processing_error": 0,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 191,
+    "processed": 56,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 56,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 135
+  },
+  "throughput": {
+    "processedRows": 56,
+    "pdfsPerHour": 6.52,
+    "terminalOutcomesPerHour": 6.52,
+    "passCandidatesPerHour": 0
+  },
+  "quality": {
+    "passCandidates": 0,
+    "rowsWithBlockingFindingShrink": 0,
+    "remainingRetryWorthyRows": 135
+  },
+  "latestProcessed": {
+    "publicationId": "4660",
+    "publicationTitle": "Civil Rights Discrimination Complaint Form",
+    "priorityRank": 55,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 75,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": null,
+    "runtimeWeightBucket": null,
+    "runtimeProfileKey": null,
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.font_embedding",
+      "pdfua.font_unicode"
+    ],
+    "serverHost": "192.241.146.85",
+    "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/Discrimination_Complaint_Form_PDF_for_Download_010819_5e563524e7.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/remediated-pdf-grading-sub80-rerun-v2/192.241.146.85/4660-Civil_Rights_Discrimination_Complaint_Form.pdf",
+    "fileUrl": "https://agency.icjia-api.cloud/uploads/Discrimination_Complaint_Form_PDF_for_Download_010819_5e563524e7.pdf",
+    "storageKind": "agency_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediated-pdf-grading-sub80-rerun-v2/192.241.146.85/4660-Civil_Rights_Discrimination_Complaint_Form.remediation.json",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "promotionStatus": null,
+    "processedAt": "2026-04-13T04:31:36.322Z",
+    "durationMs": 516519,
+    "original": {
+      "overallScore": 59,
+      "grade": "F",
+      "pageCount": 7,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 57,
+      "grade": "F",
+      "pageCount": 7,
+      "isScanned": false
+    },
+    "seed": {
+      "priorOverallScore": 75,
+      "priorGrade": "C",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-12T23:46:28.135Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final overall score is 57, below relaxed threshold 90."
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "Alt Text on Images",
+        "Form Accessibility",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/remediated-pdf-grading-sub80-rerun-v3/192.241.146.85/4660-Civil_Rights_Discrimination_Complaint_Form.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediated-pdf-grading-sub80-rerun-v3/192.241.146.85/4660-Civil_Rights_Discrimination_Complaint_Form.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediated-pdf-grading-sub80-rerun-v3/192.241.146.85/4660-Civil_Rights_Discrimination_Complaint_Form.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "a72861db576955aba6aba1ad864aa9f7f79598ea827cc635f66c380f7aef0ebb",
+      "remediatedPdfSha256": "a72861db576955aba6aba1ad864aa9f7f79598ea827cc635f66c380f7aef0ebb",
+      "stagedReplacementSha256": null
+    },
+    "strictPromotionGate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is F, not A.",
+        "Final overall score is 57, not 100.",
+        "Blocking local standards findings remain: pdfua.font_embedding, pdfua.font_unicode, pdfua.nested_alt_text, pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+        "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Form Accessibility, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "Alt Text on Images",
+        "Form Accessibility",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    }
+  }
+}

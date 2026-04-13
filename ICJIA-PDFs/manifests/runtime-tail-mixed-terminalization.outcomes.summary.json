@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-04-07T15:32:25.928Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.json",
+  "laneName": null,
+  "laneIntent": null,
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 49,
+    "processed": 10,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 2,
+    "sourceMissing": 0,
+    "processingError": 8,
+    "remaining": 39
+  },
+  "throughput": {
+    "processedRows": 10,
+    "pdfsPerHour": 1.14,
+    "terminalOutcomesPerHour": 1.14,
+    "passCandidatesPerHour": 0
+  },
+  "quality": {
+    "passCandidates": 0,
+    "rowsWithBlockingFindingShrink": 2,
+    "remainingRetryWorthyRows": 39
+  },
+  "latestProcessed": {
+    "publicationId": "3558",
+    "publicationTitle": "A Review of Incarcerated Illinois Class 4 Felony Offenders Are Alternative Sanctions Appropriate",
+    "priorityRank": 9,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 46,
+    "currentCorpusStatus": "processing_error",
+    "dominantSelectionFamily": null,
+    "runtimeWeightBucket": "heavy",
+    "runtimeProfileKey": "caps",
+    "laneIntent": null,
+    "blockingFindingKeys": [
+      "category.alt_text",
+      "category.bookmarks",
+      "category.heading_structure",
+      "category.pdf_ua_compliance",
+      "category.reading_order",
+      "category.text_extractability",
+      "pdfua.display_doc_title",
+      "pdfua.document_language",
+      "pdfua.logical_structure"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3558-A_Review_of_Incarcerated_Illinois_Class_4_Felony_Offenders_Are_Alternative_Sanctions_Appropriate.failure.json",
+    "status": "processing_error",
+    "processedAt": "2026-04-07T15:32:25.928Z",
+    "durationMs": 3668203,
+    "original": {
+      "overallScore": 16,
+      "grade": "F",
+      "pageCount": 127,
+      "isScanned": true
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 60-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3558-A_Review_of_Incarcerated_Illinois_Class_4_Felony_Offenders_Are_Alternative_Sanctions_Appropriate.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded runtime limit of 3600000ms"
+    }
+  }
+}

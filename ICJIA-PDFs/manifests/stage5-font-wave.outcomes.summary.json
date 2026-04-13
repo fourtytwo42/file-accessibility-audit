@@ -1,0 +1,65 @@
+{
+  "generatedAt": "2026-04-01T19:59:33.243Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-wave.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 6,
+    "processed": 14,
+    "readyToReplace": 1,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 0,
+    "sourceMissing": 0,
+    "processingError": 13,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3838",
+    "publicationTitle": "2004 Summary of Drug Enforcement Activities Across Illinois Multijurisdictional Enforcement Groups and Task Forces",
+    "priorityRank": 4,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2004MEGTFSummary.pdf.json",
+    "status": "processing_error",
+    "processedAt": "2026-04-01T19:59:33.242Z",
+    "durationMs": 134845,
+    "original": {
+      "overallScore": 24,
+      "grade": "F",
+      "pageCount": 102,
+      "isScanned": false
+    },
+    "final": null,
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Processing exceeded the 2-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
+      ],
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
+    },
+    "promotionStatus": null,
+    "artifacts": {
+      "remediatedPdfPath": null,
+      "stagedReplacementPath": null,
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
+      "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded runtime limit of 120000ms"
+    }
+  }
+}

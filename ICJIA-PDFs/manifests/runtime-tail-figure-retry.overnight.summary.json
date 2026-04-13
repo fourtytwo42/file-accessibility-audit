@@ -1,0 +1,29 @@
+{
+  "startedAt": "2026-04-06T18:42:19.894Z",
+  "sliceName": "runtime-tail-figure-retry",
+  "chunkSize": 8,
+  "thresholds": {
+    "processingErrorRateThreshold": 0.35,
+    "consecutiveLowYieldChunks": 2
+  },
+  "processedPublicationIds": [],
+  "chunkSummaries": [
+    {
+      "chunkId": 1,
+      "skipped": true,
+      "reason": "Runtime slice runtime-tail-figure-retry is dormant by policy.",
+      "executionPolicy": "dormant",
+      "executionPolicyReason": "runtime_conversion_dormant_until_engine_change"
+    }
+  ],
+  "totals": {
+    "processedRows": 0,
+    "passCandidates": 0,
+    "failedAfterRemediation": 0,
+    "processingError": 0,
+    "processingErrorToStableHardFail": 0,
+    "remainingRetryWorthyRows": 0
+  },
+  "finalRecommendation": "stop_and_replan_engine",
+  "finishedAt": "2026-04-06T18:42:20.479Z"
+}

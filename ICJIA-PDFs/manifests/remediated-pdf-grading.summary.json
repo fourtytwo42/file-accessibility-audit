@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-04-11T22:27:35.183Z",
+  "artifactRoot": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs",
+  "sourceManifestCount": 38,
+  "totals": {
+    "rawArtifactFiles": 3232,
+    "totalCandidates": 970,
+    "withHistoricalRecord": 969,
+    "withHistoricalScore": 969,
+    "withoutHistoricalRecord": 1
+  },
+  "byWave": {
+    "ADAM2.remediated.pdf": 1,
+    "all-remaining-60-69-positive-delta-wave": 2,
+    "all-remaining-79-down-rerun": 83,
+    "all-remaining-79-down-rerun-v2": 24,
+    "all-remaining-automated": 76,
+    "all-remaining-dropped-rerun": 3,
+    "all-sub79-last-tail-recovery": 41,
+    "manual-figure-final-mile": 2,
+    "manual-mcp-batch": 20,
+    "pass-rate-figure-canary": 1,
+    "priority-batch": 629,
+    "runtime-tail-mixed-terminalization": 6,
+    "runtime-tail-retry-wave": 10,
+    "stage3-figure-wave": 35,
+    "stage4-structure-wave": 29,
+    "stage5-font-wave": 1,
+    "title-patch": 7
+  }
+}

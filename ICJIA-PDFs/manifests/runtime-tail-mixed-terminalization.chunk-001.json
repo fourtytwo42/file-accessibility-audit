@@ -1,0 +1,438 @@
+{
+  "generatedAt": "2026-04-07T14:20:07.208Z",
+  "sliceName": "runtime-tail-mixed-terminalization",
+  "sliceIntent": "truth_hardening_terminalization",
+  "executionPolicy": "active",
+  "executionPolicyReason": "truth_hardening_active_lane",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-07T14:20:07.106Z",
+  "totals": {
+    "eligibleRows": 4,
+    "selectedRows": 4,
+    "skippedRows": 0,
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 1,
+    "excludedLowConfidence": 0
+  },
+  "selectedPublicationIds": [
+    "3425",
+    "3427",
+    "3431",
+    "3435"
+  ],
+  "candidates": [
+    {
+      "publicationId": "3431",
+      "publicationTitle": "1985 Annual Report",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "manual_tail",
+      "disposition": "retryable_deterministic",
+      "dominantFamily": "mixed",
+      "safeToRetry": true,
+      "reasonCode": "runtime_tail:retry_mixed",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "native_figure_convergence",
+        "post_bootstrap_heading_convergence"
+      ],
+      "notes": [
+        "bounded_runtime_detected",
+        "cohort:manual_tail",
+        "deterministic_surface_present",
+        "outcome:processing_error"
+      ],
+      "priorityRank": 1,
+      "passLikelihoodScore": 38,
+      "priorityTier": "medium",
+      "recommendedAction": "fix_first",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/ICJIA 1985 Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/ICJIA 1985 Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/ICJIA 1985 Annual Report.pdf",
+      "storageKind": "legacy_archive",
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 34,
+      "isScanned": true,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "manualOnlyFailureModeCount": 1,
+      "autoRunnableOpportunityCount": 11,
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "mark_figure_decorative:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "retag_as_figure_and_set_alt:document:document",
+        "set_document_language:document:document",
+        "set_document_title:document:document",
+        "set_figure_alt_text:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [
+        "category.text_extractability"
+      ],
+      "heuristicReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3431-1985_Annual_Report.failure.json",
+      "selectionReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "targetLane": "mixed",
+      "runtimeWeightBucket": "medium",
+      "runtimeProfileKey": "icjia_annual_report"
+    },
+    {
+      "publicationId": "3425",
+      "publicationTitle": "Is Crime Seasonal",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "manual_tail",
+      "disposition": "retryable_deterministic",
+      "dominantFamily": "mixed",
+      "safeToRetry": true,
+      "reasonCode": "runtime_tail:retry_mixed",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "native_figure_convergence",
+        "post_bootstrap_heading_convergence"
+      ],
+      "notes": [
+        "bounded_runtime_detected",
+        "cohort:manual_tail",
+        "deterministic_surface_present",
+        "outcome:processing_error"
+      ],
+      "priorityRank": 2,
+      "passLikelihoodScore": 38,
+      "priorityTier": "medium",
+      "recommendedAction": "fix_first",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/IsCrimeSeasonal1984.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/IsCrimeSeasonal1984.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/IsCrimeSeasonal1984.pdf",
+      "storageKind": "legacy_archive",
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 53,
+      "isScanned": true,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "manualOnlyFailureModeCount": 1,
+      "autoRunnableOpportunityCount": 11,
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "mark_figure_decorative:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "retag_as_figure_and_set_alt:document:document",
+        "set_document_language:document:document",
+        "set_document_title:document:document",
+        "set_figure_alt_text:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [
+        "category.text_extractability"
+      ],
+      "heuristicReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3425-Is_Crime_Seasonal.failure.json",
+      "selectionReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "targetLane": "mixed",
+      "runtimeWeightBucket": "medium",
+      "runtimeProfileKey": "iscrimeseasonal"
+    },
+    {
+      "publicationId": "3435",
+      "publicationTitle": "The Pretrial Process in Cook County An Analysis of Bond Decisions Made in Felony Cases During 198283",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "manual_tail",
+      "disposition": "retryable_deterministic",
+      "dominantFamily": "mixed",
+      "safeToRetry": true,
+      "reasonCode": "runtime_tail:retry_mixed",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "native_figure_convergence",
+        "post_bootstrap_heading_convergence"
+      ],
+      "notes": [
+        "bounded_runtime_detected",
+        "cohort:manual_tail",
+        "deterministic_surface_present",
+        "outcome:processing_error"
+      ],
+      "priorityRank": 3,
+      "passLikelihoodScore": 38,
+      "priorityTier": "medium",
+      "recommendedAction": "fix_first",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Pretrial Process in Cook County.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Pretrial Process in Cook County.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Pretrial Process in Cook County.pdf",
+      "storageKind": "legacy_archive",
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 94,
+      "isScanned": true,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "manualOnlyFailureModeCount": 1,
+      "autoRunnableOpportunityCount": 11,
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "mark_figure_decorative:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "retag_as_figure_and_set_alt:document:document",
+        "set_document_language:document:document",
+        "set_document_title:document:document",
+        "set_figure_alt_text:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [
+        "category.text_extractability"
+      ],
+      "heuristicReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3435-The_Pretrial_Process_in_Cook_County_An_Analysis_of_Bond_Decisions_Made_in_Felony_Cases_During_198283.failure.json",
+      "selectionReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "targetLane": "mixed",
+      "runtimeWeightBucket": "medium",
+      "runtimeProfileKey": "pretrial_process_in_cook_county"
+    },
+    {
+      "publicationId": "3427",
+      "publicationTitle": "Specification of Patterns over Time in Chicago Homicide Increases and Decreases 1965 1981",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "manual_tail",
+      "disposition": "retryable_deterministic",
+      "dominantFamily": "mixed",
+      "safeToRetry": true,
+      "reasonCode": "runtime_tail:retry_mixed",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "native_figure_convergence",
+        "post_bootstrap_heading_convergence"
+      ],
+      "notes": [
+        "bounded_runtime_detected",
+        "cohort:manual_tail",
+        "deterministic_surface_present",
+        "outcome:processing_error"
+      ],
+      "priorityRank": 4,
+      "passLikelihoodScore": 38,
+      "priorityTier": "medium",
+      "recommendedAction": "fix_first",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Specifications in Patterns Over Time in Chicago Homicide.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Specifications in Patterns Over Time in Chicago Homicide.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Specifications%20in%20Patterns%20Over%20Time%20in%20Chicago%20Homicide.pdf",
+      "storageKind": "legacy_archive",
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 112,
+      "isScanned": true,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "manualOnlyFailureModeCount": 1,
+      "autoRunnableOpportunityCount": 11,
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "mark_figure_decorative:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "retag_as_figure_and_set_alt:document:document",
+        "set_document_language:document:document",
+        "set_document_title:document:document",
+        "set_figure_alt_text:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [
+        "category.text_extractability"
+      ],
+      "heuristicReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3427-Specification_of_Patterns_over_Time_in_Chicago_Homicide_Increases_and_Decreases_1965_1981.failure.json",
+      "selectionReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "truth_hardening_lane"
+      ],
+      "targetLane": "mixed",
+      "runtimeWeightBucket": "medium",
+      "runtimeProfileKey": "specifications_in_patterns_over_time_in_chicago_homicide"
+    }
+  ],
+  "groupedPublicationIds": {
+    "figure": [],
+    "structure": [
+      "3519"
+    ],
+    "font": [],
+    "mixed": [
+      "3931",
+      "4730",
+      "3527",
+      "3475",
+      "3476",
+      "3469",
+      "3470",
+      "3473",
+      "3558",
+      "3561",
+      "3766",
+      "3439",
+      "3517",
+      "3449",
+      "3632",
+      "3508",
+      "3647",
+      "3642",
+      "3664",
+      "3553",
+      "3431",
+      "3500",
+      "3522",
+      "3574",
+      "3777",
+      "3512",
+      "3425",
+      "3438",
+      "3581",
+      "3593",
+      "3521",
+      "3570",
+      "3576",
+      "3501",
+      "3462",
+      "3445",
+      "3435",
+      "3510",
+      "3427",
+      "3543",
+      "3463",
+      "3546",
+      "3571",
+      "3452",
+      "3789",
+      "3580",
+      "3638",
+      "3544"
+    ],
+    "unknown": []
+  },
+  "groupedCounts": {
+    "figure": 0,
+    "structure": 1,
+    "font": 0,
+    "mixed": 48,
+    "unknown": 0
+  },
+  "selectionSanity": {
+    "dominantFamilyCounts": {
+      "mixed": 48,
+      "structure": 1
+    },
+    "inScopeBlockerKeyCounts": {
+      "pdfua.logical_structure": 49
+    },
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 1,
+    "excludedLowConfidence": 0
+  },
+  "targetedFindingKeys": [
+    "pdfua.figure_alt_or_artifact",
+    "pdfua.logical_structure"
+  ],
+  "targetedFamilyIds": [
+    "native_figure_convergence",
+    "post_bootstrap_heading_convergence"
+  ]
+}

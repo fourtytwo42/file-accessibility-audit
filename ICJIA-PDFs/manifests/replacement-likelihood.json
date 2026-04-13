@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.544Z",
+  "laneName": "replacement-likelihood",
+  "laneIntent": "pass_rate_conversion",
+  "executionPolicy": "dormant",
+  "executionPolicyReason": "replacement_likelihood_empty_until_engine_change",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-08T04:01:13.428Z",
+  "recommendedConcurrency": 3,
+  "initialAnalysisProfile": "remediation_fast",
+  "verificationPolicy": "terminal_candidates_only",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 861
+  },
+  "selectedPublicationIds": [],
+  "candidates": [],
+  "selectionSanity": {
+    "dominantFamilyCounts": {},
+    "runtimeWeightCounts": {},
+    "excludedHeavyMixed": 691,
+    "excludedManualOrScanned": 170,
+    "excludedRuntimeTail": 0
+  }
+}

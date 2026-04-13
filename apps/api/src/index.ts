@@ -11,6 +11,7 @@ import reportsRoutes from './routes/reports.js'
 import logsRoutes from './routes/logs.js'
 import playbooksRoutes from './routes/playbooks.js'
 import queueRoutes from './routes/queue.js'
+import engineRoutes from './routes/engine.js'
 import { recoverInterruptedProcessing } from './services/queueManager.js'
 import { cleanupExpiredQueueItems, failStaleUploads } from './services/queueStore.js'
 
@@ -71,6 +72,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoutes)
 app.use('/api', queueRoutes)
 app.use('/api', analyzeRoutes)
+app.use('/api', engineRoutes)
 app.use('/api', reportsRoutes)
 app.use('/api', logsRoutes)
 app.use('/api', playbooksRoutes)

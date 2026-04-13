@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.502Z",
+  "sliceName": "runtime-tail-figure-retry",
+  "sliceIntent": "pass_rate_conversion",
+  "executionPolicy": "dormant",
+  "executionPolicyReason": "runtime_conversion_dormant_until_engine_change",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-08T04:01:13.428Z",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 52,
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 48,
+    "excludedLowConfidence": 0
+  },
+  "selectedPublicationIds": [],
+  "candidates": [],
+  "groupedPublicationIds": {
+    "figure": [],
+    "structure": [],
+    "font": [],
+    "mixed": [],
+    "unknown": []
+  },
+  "groupedCounts": {
+    "figure": 0,
+    "structure": 0,
+    "font": 0,
+    "mixed": 0,
+    "unknown": 0
+  },
+  "selectionSanity": {
+    "dominantFamilyCounts": {},
+    "inScopeBlockerKeyCounts": {},
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 48,
+    "excludedLowConfidence": 0
+  },
+  "targetedFindingKeys": [
+    "pdfua.figure_alt_or_artifact",
+    "category.alt_text"
+  ],
+  "targetedFamilyIds": [
+    "native_figure_convergence"
+  ]
+}

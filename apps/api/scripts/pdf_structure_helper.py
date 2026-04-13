@@ -4270,10 +4270,11 @@ def mutate_repair_structure_conformance(pdf, mutation):
     ensure_mark_info(catalog)
     document = ensure_document_struct_elem(pdf, root)
     role_map_changed, role_map_applied = ensure_common_role_map_aliases(root)
+    dynamic_changed, dynamic_applied = ensure_dynamic_role_map_aliases(root, pdf)
     parent_tree, nums = ensure_parent_tree(root, pdf)
     next_key = int(root.get("/ParentTreeNextKey", 0) or 0)
-    applied = list(role_map_applied)
-    changed = role_map_changed
+    applied = list(role_map_applied) + list(dynamic_applied)
+    changed = role_map_changed or dynamic_changed
 
     for page in pdf.pages:
         page_obj = page.obj
@@ -4370,7 +4371,8 @@ def ensure_common_role_map_aliases(struct_root):
         role_map = pikepdf.Dictionary()
         struct_root["/RoleMap"] = role_map
     aliases = [
-        ("/Lbody", "/LBody", "Mapped legacy /Lbody structure type to standard /LBody."),
+        ("/Lbody",        "/LBody",    "Mapped legacy /Lbody structure type to standard /LBody."),
+        ("/Transparency", "/Artifact", "Mapped vendor /Transparency structure type to /Artifact."),
     ]
     applied = []
     changed = False
@@ -4387,6 +4389,94 @@ def ensure_common_role_map_aliases(struct_root):
         })
         changed = True
     return changed, applied
+
+
+_PDF17_STANDARD_TAGS = {
+    "/Document", "/Part", "/Art", "/Sect", "/Div", "/BlockQuote", "/Caption",
+    "/TOC", "/TOCI", "/Index", "/NonStruct", "/Private",
+    "/P", "/H", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6",
+    "/L", "/LI", "/LBody",
+    "/Table", "/TR", "/TH", "/TD", "/THead", "/TBody", "/TFoot",
+    "/Span", "/Quote", "/Note", "/Reference", "/BibEntry", "/Code",
+    "/Link", "/Annot", "/Ruby", "/RB", "/RT", "/RP", "/Warichu", "/WT", "/WP",
+    "/Figure", "/Formula", "/Form",
+    "/Artifact",
+}
+
+_VENDOR_TAG_PATTERNS = re.compile(
+    r"^/(Page\d+|Background|Watermark|Header|Footer|Sidebar|Banner|Logo|Stamp|Overlay|Redaction)$",
+    re.IGNORECASE,
+)
+_FIGURE_ALT_JUNK_PLACEHOLDERS = {
+    "figure",
+    "image",
+    "graphic",
+    "photo",
+    "logo",
+    "chart",
+    "illustration",
+    "decorative image",
+    "decorative graphic",
+    "placeholder",
+}
+
+
+def ensure_dynamic_role_map_aliases(struct_root, pdf):
+    """Map unknown vendor-injected structure tags to /Artifact in the RoleMap.
+
+    Walks all PDF objects looking for /S values not in the PDF 1.7 standard tag
+    set. For vendor tags matching known patterns (e.g. /Page1, /Background), adds
+    a RoleMap entry to /Artifact so pdfua.logical_structure does not fire on
+    unmapped role counts.
+    """
+    if not isinstance(struct_root, pikepdf.Dictionary):
+        return False, []
+    role_map = struct_root.get("/RoleMap")
+    if not isinstance(role_map, pikepdf.Dictionary):
+        role_map = pikepdf.Dictionary()
+        struct_root["/RoleMap"] = role_map
+
+    # Collect all /S values used in the document
+    used_tags = set()
+    for obj in pdf.objects:
+        try:
+            if isinstance(obj, pikepdf.Dictionary) and "/S" in obj:
+                tag = str(obj.get("/S", ""))
+                if tag:
+                    used_tags.add(tag)
+        except Exception:
+            continue
+
+    applied = []
+    changed = False
+    for tag in sorted(used_tags):
+        if tag in _PDF17_STANDARD_TAGS:
+            continue
+        # Already mapped in the RoleMap — leave it alone
+        if role_map.get(tag) is not None:
+            continue
+        # Only auto-alias tags that match known vendor patterns or have no mapping
+        if not _VENDOR_TAG_PATTERNS.match(tag):
+            continue
+        role_map[pikepdf.Name(tag)] = pikepdf.Name("/Artifact")
+        applied.append({
+            "ref": ref_string(struct_root),
+            "before": None,
+            "after": "/Artifact",
+            "details": f"Mapped vendor structure tag {tag} to /Artifact in RoleMap.",
+        })
+        changed = True
+    return changed, applied
+
+
+def normalize_figure_alt_placeholder(value):
+    text = str(value or "").replace("u:", "").strip()
+    if not text:
+        return "", "empty"
+    canonical = re.sub(r"\s+", " ", text).strip().lower()
+    if canonical in _FIGURE_ALT_JUNK_PLACEHOLDERS:
+        return "", "junk"
+    return text, "descriptive"
 
 
 def mutate_repair_native_marked_content_refs(pdf, mutation):
@@ -4996,6 +5086,45 @@ def mutate_repair_native_figure_semantics(pdf, mutation):
         if ref:
             risks_by_ref[ref] = risk
 
+    # Before promoting non-Figure owners, backfill any existing leaf /Figure elements
+    # that already own page-backed content but still lack /Alt. This keeps native
+    # figure repair from skipping pre-existing figure semantics that are otherwise
+    # invisible to the ownership-promotion path.
+    for figure in figure_candidates(pdf):
+        ref = figure.get("ref")
+        if not ref:
+            continue
+        if int(figure.get("childFigureCount") or 0) > 0:
+            continue
+        mcids = figure.get("mcids") or []
+        has_page_backed_content = bool(figure.get("hasPageBackedDescendantContent")) or bool(mcids)
+        if not has_page_backed_content:
+            continue
+        obj = resolve_obj(pdf, ref)
+        if not isinstance(obj, pikepdf.Dictionary):
+            continue
+
+        existing_alt = obj.get("/Alt")
+        raw_alt = existing_alt if existing_alt is not None else figure.get("altText")
+        normalized_alt, alt_kind = normalize_figure_alt_placeholder(raw_alt)
+        if alt_kind == "descriptive":
+            continue
+        if existing_alt is not None and alt_kind == "empty":
+            continue
+
+        obj["/Alt"] = pikepdf.String("")
+        applied.append({
+            "ref": ref_string(obj),
+            "before": str(existing_alt) if existing_alt is not None else None,
+            "after": "",
+            "details": (
+                f"Normalized placeholder /Alt on existing native /Figure {ref_string(obj)} to an empty placeholder."
+                if alt_kind == "junk"
+                else f"Added empty /Alt placeholder to existing native /Figure {ref_string(obj)}."
+            ),
+        })
+        changed = True
+
     candidates = []
     for candidate in image_struct_candidates(pdf):
         ref = candidate.get("ref")
@@ -5045,6 +5174,28 @@ def mutate_repair_native_figure_semantics(pdf, mutation):
         graphics_dominant = bool(candidate.get("graphicsDominant")) or bool(risk.get("graphicsDominant"))
 
         if ownership_mode == "mixed_text_graphics_same_mcid" or has_text:
+            # Special case: decorative graphics with no text content can be safely retagged
+            # as /Artifact to clear the qpdf image-ownership flag without creating a
+            # misleading /Figure description. Only applies when graphicsLikelyDecorative is
+            # confirmed (borders, underlines, rule lines — not raster images).
+            graphics_likely_decorative = bool(risk.get("graphicsLikelyDecorative", False))
+            if (
+                graphics_likely_decorative
+                and not has_text
+                and not has_unsafe_ancestry
+                and before_tag in SAFE_FIGURE_RETAG_TAGS
+                and ownership_mode == "mixed_text_graphics_same_mcid"
+            ):
+                obj["/S"] = pikepdf.Name("/Artifact")
+                applied.append({
+                    "ref": ref_string(ref) if not isinstance(ref, str) else ref,
+                    "before": before_tag,
+                    "after": "/Artifact",
+                    "details": f"Retagged decorative mixed-MCID struct element {before_tag} as /Artifact to clear figure ownership flag.",
+                })
+                changed = True
+                promoted_refs.add(ref)
+                continue
             mixed_owner_count += 1
             record_skip(
                 f"{before_tag} {ref} still mixes text and graphics ownership; skipping native figure promotion."
@@ -5067,6 +5218,22 @@ def mutate_repair_native_figure_semantics(pdf, mutation):
             record_skip(
                 f"{before_tag} {ref} did not expose strong enough native graphics ownership for deterministic figure promotion."
             )
+            continue
+        graphics_likely_decorative = bool(risk.get("graphicsLikelyDecorative", False))
+        if (
+            ownership_mode == "graphics_only_nonfigure"
+            and graphics_likely_decorative
+            and before_tag in SAFE_FIGURE_RETAG_TAGS
+        ):
+            obj["/S"] = pikepdf.Name("/Artifact")
+            applied.append({
+                "ref": ref_string(obj),
+                "before": before_tag,
+                "after": "/Artifact",
+                "details": f"Retagged decorative graphics-only native owner {ref_string(obj)} from {before_tag} to /Artifact instead of promoting it to /Figure.",
+            })
+            changed = True
+            promoted_refs.add(ref)
             continue
 
         existing_alt = obj.get("/Alt")
@@ -5331,11 +5498,28 @@ def mutate_repair_native_reading_order(pdf, mutation):
     )
     if not selected:
         return False, [], ["Tagged reading-order containers are already stable or not safely mutable."]
-    return mutate_reorder_structure_children(pdf, {
-        "orderedTargets": selected[0]["suggestedChildRefs"],
-        "parentRef": selected[0]["parentRef"],
-        "expectedDisorderBefore": selected[0]["mcidDisorderBefore"],
-    })
+
+    applied = []
+    warnings = []
+    changed = False
+    max_repairs = int(mutation.get("maxRepairsPerRun") or 3)
+
+    for parent in selected[:max(1, max_repairs)]:
+        op_changed, op_applied, op_warnings = mutate_reorder_structure_children(pdf, {
+            "orderedTargets": parent["suggestedChildRefs"],
+            "parentRef": parent["parentRef"],
+            "expectedDisorderBefore": parent["mcidDisorderBefore"],
+        })
+        if op_changed:
+            changed = True
+        applied.extend(op_applied)
+        warnings.extend(op_warnings)
+        if changed and len(applied) >= max(1, max_repairs):
+            break
+
+    if changed:
+        return True, applied, warnings[:8]
+    return False, applied, warnings[:8] or ["Tagged reading-order containers are already stable or not safely mutable."]
 
 
 def create_font_descriptor(pdf, font_name, font_path=None):
@@ -7022,10 +7206,12 @@ def mutate_artifact_nonsemantic_page_elements(pdf, mutation):
         text = raw.decode("latin-1", "ignore")
         if not has_struct and "BMC" not in text and "BDC" not in text:
             continue
-        # Restrict this generic cleanup pass to graphics-only orphan groups. Mixed or
-        # text-bearing groups often represent real content that needs structural repair,
-        # not artifacting.
-        page_changed, page_applied = artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=False)
+        # Restrict this generic cleanup pass to graphics-only orphan groups by default.
+        # Mixed or text-bearing groups often represent real content that needs structural
+        # repair, not artifacting. Pass includeTextGroups=True in the mutation to extend
+        # coverage to text-bearing groups when a struct tree is already confirmed present.
+        include_text_groups = bool(mutation.get("includeTextGroups", False))
+        page_changed, page_applied = artifact_orphan_top_level_content_groups(pdf, page_obj, include_text_groups=include_text_groups)
         if page_changed:
             applied.extend(page_applied)
             changed = True
@@ -7853,7 +8039,11 @@ def mutate_normalize_nested_figure_containers(pdf, mutation):
         return figures
 
     applied = []
+    normalized_count = 0
+    max_repairs = int(mutation.get("maxRepairsPerRun") or 6)
     for obj in iter_struct_elems(pdf):
+        if normalized_count >= max(1, max_repairs):
+            break
         if str(obj.get("/S")) != "/Figure":
             continue
 
@@ -7910,6 +8100,7 @@ def mutate_normalize_nested_figure_containers(pdf, mutation):
             "after": "/Sect",
             "details": f"Retagged empty wrapper figure container {ref_string(obj)} as /Sect because it contains {child_figures} child /Figure element(s) and no direct marked content.",
         })
+        normalized_count += 1
 
     if not applied:
         return False, [], ["No nested wrapper figure containers required normalization."]

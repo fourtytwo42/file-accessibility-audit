@@ -1,160 +1,10 @@
 {
-  "generatedAt": "2026-04-01T02:26:24.493Z",
+  "generatedAt": "2026-04-01T04:22:18.907Z",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-04-01T02:26:24.459Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T04:22:18.890Z",
   "sourceWaveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceWaveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.outcomes.json",
   "rows": [
-    {
-      "publicationId": "3567",
-      "publicationTitle": "McGruff Rural Residents Protect Yourself from Crime!",
-      "priorStructureWaveBucket": "mixed_structure_figure_residuals",
-      "forensicsDisposition": "mixed_structure_figure_residuals",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3567-McGruff_Rural_Residents_Protect_Yourself_from_Crime.remediation.json",
-        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3567-McGruff_Rural_Residents_Protect_Yourself_from_Crime.failure.json",
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:figure_heavy",
-        "outcome:failed_after_remediation",
-        "stage3:reclassified_from_figure_heavy",
-        "stage3:structure_dominant_after_figure_wave",
-        "stage4.10:mixed_structure_figure_residuals",
-        "stage4:mixed_structure_figure_after_wave"
-      ],
-      "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
-        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
-      ]
-    },
-    {
-      "publicationId": "4162",
-      "publicationTitle": "Illinois Criminal Justice Information Authority 2010 Annual Report",
-      "priorStructureWaveBucket": "structure_only_residuals",
-      "forensicsDisposition": "font_text_extractability_survivor",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/AnnualReportFY10.pdf.json",
-        "latestStage4FailurePath": null,
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:structure_heavy",
-        "stage4.10:font_text_extractability_survivor",
-        "stage4:structure_only_after_wave",
-        "verification_hard_fail"
-      ],
-      "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 4.10 classified this active row as a font/text-extractability survivor from prior remediation evidence."
-      ]
-    },
-    {
-      "publicationId": "4501",
-      "publicationTitle": "Justice-Involved Girls",
-      "priorStructureWaveBucket": "mixed_structure_figure_residuals",
-      "forensicsDisposition": "mixed_structure_figure_residuals",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4501-Justice-Involved_Girls.remediation.json",
-        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4501-Justice-Involved_Girls.failure.json",
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:figure_heavy",
-        "outcome:failed_after_remediation",
-        "stage3:reclassified_from_figure_heavy",
-        "stage3:structure_dominant_after_figure_wave",
-        "stage4.10:mixed_structure_figure_residuals",
-        "stage4:mixed_structure_figure_after_wave"
-      ],
-      "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
-        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
-      ]
-    },
-    {
-      "publicationId": "4506",
-      "publicationTitle": "Issues in Policing Rural Areas: A Review of the Literature",
-      "priorStructureWaveBucket": "mixed_structure_figure_residuals",
-      "forensicsDisposition": "mixed_structure_figure_residuals",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4506-Issues_in_Policing_Rural_Areas_A_Review_of_the_Literature.remediation.json",
-        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4506-Issues_in_Policing_Rural_Areas_A_Review_of_the_Literature.failure.json",
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:structure_heavy",
-        "outcome:failed_after_remediation",
-        "stage4.10:mixed_structure_figure_residuals",
-        "stage4:mixed_structure_figure_after_wave"
-      ],
-      "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
-      ]
-    },
-    {
-      "publicationId": "4627",
-      "publicationTitle": "FY2015 Freedom from Drones Annual report",
-      "priorStructureWaveBucket": "mixed_structure_figure_residuals",
-      "forensicsDisposition": "mixed_structure_figure_residuals",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
-        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.failure.json",
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:figure_heavy",
-        "outcome:failed_after_remediation",
-        "stage3:reclassified_from_figure_heavy",
-        "stage3:structure_dominant_after_figure_wave",
-        "stage4.10:mixed_structure_figure_residuals",
-        "stage4:mixed_structure_figure_after_wave"
-      ],
-      "notes": [
-        "Legacy archive PDF backed by archive.icjia-api.cloud filesystem.",
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
-        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence."
-      ]
-    },
-    {
-      "publicationId": "4720",
-      "publicationTitle": "SEED: A Diversion Program for Young Adults, An Alternative to Incarceration",
-      "priorStructureWaveBucket": "mixed_structure_figure_residuals",
-      "forensicsDisposition": "mixed_structure_figure_residuals",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4720-SEED_A_Diversion_Program_for_Young_Adults_An_Alternative_to_Incarceration.remediation.json",
-        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4720-SEED_A_Diversion_Program_for_Young_Adults_An_Alternative_to_Incarceration.failure.json",
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:figure_heavy",
-        "outcome:failed_after_remediation",
-        "stage3:reclassified_from_figure_heavy",
-        "stage3:structure_dominant_after_figure_wave",
-        "stage4.10:mixed_structure_figure_residuals",
-        "stage4:mixed_structure_figure_after_wave"
-      ],
-      "notes": [
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
-        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence.",
-        "Strapi-managed upload served from the researchhub uploads store."
-      ]
-    },
     {
       "publicationId": "4726",
       "publicationTitle": "InfoNet: State Fiscal Year 2023 Highlights",
@@ -164,7 +14,7 @@
       "evidencePaths": {
         "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.remediation.json",
         "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.failure.json",
-        "latestStage4AttemptPath": null,
+        "latestStage4AttemptPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediation-attempts/stage4-structure-wave/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights/alt-text-sidecar.json",
         "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
       },
       "reasonCodes": [
@@ -179,32 +29,6 @@
         "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
         "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence.",
         "Strapi-managed upload served from the researchhub uploads store."
-      ]
-    },
-    {
-      "publicationId": "4731",
-      "publicationTitle": "State Fiscal Year 2024 Illinois Freedom from Drone Surveillance Act Report (without Appendices)",
-      "priorStructureWaveBucket": "mixed_structure_figure_residuals",
-      "forensicsDisposition": "mixed_structure_figure_residuals",
-      "evidenceStrength": "terminal_report",
-      "evidencePaths": {
-        "latestStage4ReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4731-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_without_Appendices.remediation.json",
-        "latestStage4FailurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4731-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_without_Appendices.failure.json",
-        "latestStage4AttemptPath": null,
-        "controlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json"
-      },
-      "reasonCodes": [
-        "cohort:figure_heavy",
-        "outcome:failed_after_remediation",
-        "stage3:reclassified_from_figure_heavy",
-        "stage3:structure_dominant_after_figure_wave",
-        "stage4.10:mixed_structure_figure_residuals",
-        "stage4:mixed_structure_figure_after_wave"
-      ],
-      "notes": [
-        "Stage 3 reclassified this row from figure_heavy to structure_heavy after a structure-only first-wave outcome.",
-        "Stage 4.10 classified this active row as mixed structure+figure residual debt from prior remediation evidence.",
-        "Strapi-managed upload served from the agency uploads store."
       ]
     }
   ]

@@ -1,15 +1,30 @@
 {
-  "generatedAt": "2026-03-27T20:27:38.000Z",
+  "generatedAt": "2026-04-08T03:07:10.351Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json",
-  "concurrency": 8,
+  "laneName": null,
+  "laneIntent": null,
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
   "totals": {
     "targetCandidates": 259,
     "processed": 259,
     "readyToReplace": 67,
+    "remediatedPassCandidates": 67,
     "failedAfterRemediation": 191,
     "sourceMissing": 0,
     "processingError": 1,
     "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 259,
+    "pdfsPerHour": 1.04,
+    "terminalOutcomesPerHour": 1.04,
+    "passCandidatesPerHour": 0.27
+  },
+  "quality": {
+    "passCandidates": 67,
+    "rowsWithBlockingFindingShrink": 67,
+    "remainingRetryWorthyRows": 0
   },
   "latestProcessed": {
     "publicationId": "4573",

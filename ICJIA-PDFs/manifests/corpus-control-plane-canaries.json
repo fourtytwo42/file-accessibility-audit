@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.591Z",
+  "generatedAt": "2026-04-06T21:21:13.603Z",
   "summary": {
     "totalCanaries": 5,
     "matchedPublicationIds": 5,
     "unmatchedCanaries": 0,
     "byCohortLabel": {
       "short_high_likelihood": 0,
-      "figure_heavy": 3,
-      "structure_heavy": 2,
+      "figure_heavy": 4,
+      "structure_heavy": 1,
       "font_heavy": 0,
       "long_report": 0,
       "manual_tail": 0
@@ -20,7 +20,7 @@
       "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
       "benchmarkName": "Kendall County Profile",
       "benchmarkCategory": "ownership",
-      "benchmarkTerminalState": "pass",
+      "benchmarkTerminalState": "hard_fail",
       "cohortLabel": "figure_heavy",
       "currentCorpusStatus": "remediated_fail"
     },
@@ -40,7 +40,7 @@
       "filePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF_CourtSystem.pdf",
       "benchmarkName": "Court System Get The Facts",
       "benchmarkCategory": "structure",
-      "benchmarkTerminalState": "processing_error",
+      "benchmarkTerminalState": "hard_fail",
       "cohortLabel": "structure_heavy",
       "currentCorpusStatus": "processing_error"
     },
@@ -51,8 +51,8 @@
       "benchmarkName": "SFY24 ICJIA Annual Report",
       "benchmarkCategory": "long_report",
       "benchmarkTerminalState": "hard_fail",
-      "cohortLabel": "structure_heavy",
-      "currentCorpusStatus": "processing_error"
+      "cohortLabel": "figure_heavy",
+      "currentCorpusStatus": "remediated_fail"
     },
     {
       "publicationId": "3682",

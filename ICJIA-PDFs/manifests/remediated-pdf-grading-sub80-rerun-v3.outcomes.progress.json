@@ -1,0 +1,35 @@
+{
+  "runId": "c38e318a-b218-453a-8782-5891f4445962",
+  "state": "running",
+  "pid": 21854,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v3.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v3.outcomes.json",
+  "firstStartedAt": "2026-04-13T01:43:02.021Z",
+  "currentSessionStartedAt": "2026-04-13T03:51:39.632Z",
+  "accumulatedActiveRuntimeMs": 6791317,
+  "lastHeartbeatAt": "2026-04-13T04:37:23.580Z",
+  "totalCandidates": 191,
+  "processed": 56,
+  "remaining": 135,
+  "activeWorkers": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 0,
+    "keep_fail_80_to_89": 0,
+    "drop_fail_lt_80": 56,
+    "processing_error": 0,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "4660",
+    "publicationTitle": "Civil Rights Discrimination Complaint Form",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "finalOverallScore": 57,
+    "processedAt": "2026-04-13T04:31:36.322Z",
+    "durationMs": 516519
+  }
+}

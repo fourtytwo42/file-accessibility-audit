@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-04-06T05:24:09.238Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pass-rate-font-canary.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 8,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 8,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4176",
+    "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Arrests 19992008",
+    "priorityRank": 7,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 100,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/6property%20arrests_1999-2008.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-06T05:24:09.237Z",
+    "durationMs": 297708,
+    "original": {
+      "overallScore": 33,
+      "grade": "F",
+      "pageCount": 1,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 87,
+      "grade": "B",
+      "pageCount": 1,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 87, not 100.",
+        "Blocking local standards findings remain: pdfua.heading_content_quality",
+        "Categories still below 100: Heading Structure, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.heading_content_quality"
+      ],
+      "unresolvedCategoryLabels": [
+        "Heading Structure",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "df41a976dc132dee70aa3eef9e1468e48082296b788a1917dc880bfd5ce650c5",
+      "remediatedPdfSha256": "df41a976dc132dee70aa3eef9e1468e48082296b788a1917dc880bfd5ce650c5",
+      "stagedReplacementSha256": null
+    }
+  }
+}

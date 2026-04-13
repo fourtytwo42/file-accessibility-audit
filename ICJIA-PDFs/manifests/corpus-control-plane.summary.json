@@ -1,24 +1,24 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.561Z",
+  "generatedAt": "2026-04-06T21:21:13.586Z",
   "summary": {
     "totalRows": 1056,
     "byCurrentCorpusStatus": {
-      "verified_pass": 90,
+      "verified_pass": 144,
       "discovered": 3,
       "analyzed": 0,
       "queued_for_remediation": 0,
-      "remediated_fail": 841,
-      "processing_error": 114,
+      "remediated_fail": 854,
+      "processing_error": 54,
       "deferred_manual": 0,
-      "staged_for_replacement": 8,
+      "staged_for_replacement": 1,
       "replaced_remote": 0
     },
     "byCohortLabel": {
-      "short_high_likelihood": 20,
-      "figure_heavy": 494,
-      "structure_heavy": 338,
-      "font_heavy": 14,
-      "long_report": 15,
+      "short_high_likelihood": 25,
+      "figure_heavy": 490,
+      "structure_heavy": 348,
+      "font_heavy": 5,
+      "long_report": 13,
       "manual_tail": 175
     },
     "byStorageKind": {
@@ -28,7 +28,7 @@
     },
     "statusByCohort": {
       "short_high_likelihood": {
-        "verified_pass": 20,
+        "verified_pass": 25,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
@@ -39,25 +39,25 @@
         "replaced_remote": 0
       },
       "figure_heavy": {
-        "verified_pass": 19,
+        "verified_pass": 47,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 422,
-        "processing_error": 53,
+        "remediated_fail": 438,
+        "processing_error": 5,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "structure_heavy": {
-        "verified_pass": 42,
+        "verified_pass": 60,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 283,
-        "processing_error": 5,
+        "remediated_fail": 285,
+        "processing_error": 2,
         "deferred_manual": 0,
-        "staged_for_replacement": 8,
+        "staged_for_replacement": 1,
         "replaced_remote": 0
       },
       "font_heavy": {
@@ -65,37 +65,97 @@
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 14,
+        "remediated_fail": 5,
         "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "long_report": {
-        "verified_pass": 9,
+        "verified_pass": 10,
         "discovered": 0,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 5,
-        "processing_error": 1,
+        "remediated_fail": 3,
+        "processing_error": 0,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       },
       "manual_tail": {
-        "verified_pass": 0,
+        "verified_pass": 2,
         "discovered": 3,
         "analyzed": 0,
         "queued_for_remediation": 0,
-        "remediated_fail": 117,
-        "processing_error": 55,
+        "remediated_fail": 123,
+        "processing_error": 47,
         "deferred_manual": 0,
         "staged_for_replacement": 0,
         "replaced_remote": 0
       }
     },
-    "verifiedPassRowsFromLedger": 90,
-    "remainingRowsExcludingVerifiedPass": 966
+    "verifiedPassRowsFromLedger": 156,
+    "remainingRowsExcludingVerifiedPass": 912,
+    "blockerFamilyBacklog": {
+      "metadata_normalization": 832,
+      "bookmark_language_outline_cleanup": 646,
+      "font_embedding_and_unicode": 633,
+      "native_figure_convergence": 599,
+      "post_bootstrap_heading_convergence": 592,
+      "link_tabs_and_annotation_cleanup": 290,
+      "logical_structure_marked_content": 288,
+      "table_structure_recovery": 165,
+      "unresolved_manual_family": 45,
+      "pdfua.logical_structure": 4,
+      "pdfua.untagged_rendered_images": 4,
+      "pdfua.nested_alt_text": 2,
+      "pdfua.heading_content_quality": 1
+    },
+    "blockingFindingBacklog": {
+      "pdfua.display_doc_title": 829,
+      "category.pdf_ua_compliance": 825,
+      "pdfua.logical_structure": 800,
+      "pdfua.document_language": 779,
+      "category.alt_text": 681,
+      "category.heading_structure": 675,
+      "pdfua.font_unicode": 649,
+      "pdfua.font_embedding": 589,
+      "category.reading_order": 548,
+      "category.bookmarks": 485,
+      "category.title_language": 398,
+      "pdfua.page_tabs": 240,
+      "pdfua.figure_alt_or_artifact": 228,
+      "pdfua.annotation_alt_contents": 225,
+      "pdfua.untagged_rendered_images": 173,
+      "pdfua.bookmark_language": 171,
+      "context.table_candidates_blocked": 165,
+      "pdfua.link_tagging": 161,
+      "category.text_extractability": 156,
+      "pdfua.metadata_identification": 150,
+      "pdfua.cid_symbol_fonts": 146,
+      "pdfua.note_tag_id": 128,
+      "pdfua.table_regularity": 112,
+      "pdfua.heading_content_quality": 94,
+      "context.long_report_figure_residue": 81,
+      "pdfua.tagged_annotations": 46,
+      "pdfua.nested_alt_text": 28,
+      "category.link_quality": 23,
+      "pdfua.font_widths": 22,
+      "pdfua.link_text_quality": 9,
+      "category.form_accessibility": 3,
+      "category.color_contrast": 1
+    },
+    "runtimeDeferredRows": {
+      "total": 60,
+      "byCohortLabel": {
+        "short_high_likelihood": 0,
+        "figure_heavy": 5,
+        "structure_heavy": 2,
+        "font_heavy": 5,
+        "long_report": 1,
+        "manual_tail": 47
+      }
+    }
   },
   "validation": {
     "ok": true,
@@ -114,7 +174,7 @@
     "stage4OverlapAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-overlap-analysis.json",
     "stage4ActiveForensicsPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-active-forensics.json",
     "stage4HomogeneousAnalysisPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-homogeneous-analysis.json",
-    "outcomeManifestCount": 16,
+    "outcomeManifestCount": 26,
     "candidateManifestCount": 17
   }
 }

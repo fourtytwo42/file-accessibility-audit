@@ -1,0 +1,711 @@
+{
+  "generatedAt": "2026-04-07T15:32:25.928Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/runtime-tail-mixed-terminalization.json",
+  "laneName": null,
+  "laneIntent": null,
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 49,
+    "processed": 10,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 2,
+    "sourceMissing": 0,
+    "processingError": 8,
+    "remaining": 39
+  },
+  "outcomes": [
+    {
+      "publicationId": "3931",
+      "publicationTitle": "A Crime Analysts Guide to Mapping",
+      "priorityRank": 1,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 54,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "a_crime_analysts_guide_to_mapping",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/A Crime Analysts Guide to Mapping.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/A Crime Analysts Guide to Mapping.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/A Crime Analysts Guide to Mapping.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3931-A_Crime_Analysts_Guide_to_Mapping.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T14:31:17.715Z",
+      "durationMs": 953490,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 173,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 42,
+        "grade": "F",
+        "pageCount": 173,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 42, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/143.244.146.43/3931-A_Crime_Analysts_Guide_to_Mapping.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/143.244.146.43/3931-A_Crime_Analysts_Guide_to_Mapping.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3931-A_Crime_Analysts_Guide_to_Mapping.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d264b5867136678f19ce2402fa89a978bafdd8e17a1f55e4ce8ee3c91296bf93",
+        "remediatedPdfSha256": "d264b5867136678f19ce2402fa89a978bafdd8e17a1f55e4ce8ee3c91296bf93",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4730",
+      "publicationTitle": "State Fiscal Year 2024 Illinois Freedom from Drone Surveillance Act Report (with Appendices)",
+      "priorityRank": 2,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 50,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "sfy_drone_report_with_appendices_dfa",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.annotation_alt_contents",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.link_tagging",
+        "pdfua.link_text_quality",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification",
+        "pdfua.page_tabs",
+        "pdfua.tagged_annotations"
+      ],
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_24_Drone_Report_with_Appendices_491dfa4810.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/SFY_24_Drone_Report_with_Appendices_491dfa4810.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_24_Drone_Report_with_Appendices_491dfa4810.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/192.241.146.85/4730-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_with_Appendices.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T14:49:11.739Z",
+      "durationMs": 2027513,
+      "original": {
+        "overallScore": 20,
+        "grade": "F",
+        "pageCount": 1144,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 50,
+        "grade": "F",
+        "pageCount": 1144,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 50, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.font_embedding, pdfua.font_unicode, pdfua.tagged_annotations, pdfua.link_tagging, pdfua.figure_alt_or_artifact, pdfua.link_text_quality",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Bookmarks / Navigation, Link & URL Quality, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.tagged_annotations",
+          "pdfua.link_tagging",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.link_text_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Link & URL Quality",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/runtime-tail-mixed-terminalization/192.241.146.85/4730-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_with_Appendices.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/runtime-tail-mixed-terminalization/192.241.146.85/4730-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_with_Appendices.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/192.241.146.85/4730-State_Fiscal_Year_2024_Illinois_Freedom_from_Drone_Surveillance_Act_Report_with_Appendices.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d41457606c3b6fcc7f4d3266646dc3606c4be5b53d59a3be01153e112b334413",
+        "remediatedPdfSha256": "d41457606c3b6fcc7f4d3266646dc3606c4be5b53d59a3be01153e112b334413",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3476",
+      "publicationTitle": "The Implementation and Impact of Illinois PreStart Program A Final Report",
+      "priorityRank": 5,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 48,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3476-The_Implementation_and_Impact_of_Illinois_PreStart_Program_A_Final_Report.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:16:43.478Z",
+      "durationMs": 3679252,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3476-The_Implementation_and_Impact_of_Illinois_PreStart_Program_A_Final_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    },
+    {
+      "publicationId": "3473",
+      "publicationTitle": "East St Louis AntiDrug Initiative Evaluation Final Report",
+      "priorityRank": 8,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 46,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3473-East_St_Louis_AntiDrug_Initiative_Evaluation_Final_Report.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:16:55.781Z",
+      "durationMs": 3691555,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3473-East_St_Louis_AntiDrug_Initiative_Evaluation_Final_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    },
+    {
+      "publicationId": "3470",
+      "publicationTitle": "Results of the 1995 Illinois Drug Use Forecasting Study",
+      "priorityRank": 7,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 46,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3470-Results_of_the_1995_Illinois_Drug_Use_Forecasting_Study.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:17:42.814Z",
+      "durationMs": 3738588,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3470-Results_of_the_1995_Illinois_Drug_Use_Forecasting_Study.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    },
+    {
+      "publicationId": "3475",
+      "publicationTitle": "Community Policing in Chicago Year Three",
+      "priorityRank": 4,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 48,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3475-Community_Policing_in_Chicago_Year_Three.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:17:42.821Z",
+      "durationMs": 3738595,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3475-Community_Policing_in_Chicago_Year_Three.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    },
+    {
+      "publicationId": "3469",
+      "publicationTitle": "Illinois Probation Intake Study",
+      "priorityRank": 6,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 46,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3469-Illinois_Probation_Intake_Study.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:17:59.479Z",
+      "durationMs": 3755253,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3469-Illinois_Probation_Intake_Study.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    },
+    {
+      "publicationId": "3527",
+      "publicationTitle": "Community Policing in Chicago Year Two An Interim Report",
+      "priorityRank": 3,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 48,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS2.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS2.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS2.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3527-Community_Policing_in_Chicago_Year_Two_An_Interim_Report.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:21:33.231Z",
+      "durationMs": 3969005,
+      "original": {
+        "overallScore": 18,
+        "grade": "F",
+        "pageCount": 100,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3527-Community_Policing_in_Chicago_Year_Two_An_Interim_Report.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    },
+    {
+      "publicationId": "3561",
+      "publicationTitle": "Chicago Homicide Code Book Coding Instructions",
+      "priorityRank": 10,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 46,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3561-Chicago_Homicide_Code_Book_Coding_Instructions.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:29:51.319Z",
+      "durationMs": 2439578,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Error: Command failed: tesseract /home/hendo420/pdfaf/.tmp/pdf-ocr-Pbrds9/pages/0045.png /home/hendo420/pdfaf/.tmp/pdf-ocr-Pbrds9/ocr/0045 -l eng --dpi 300 pdf quiet\n\n    at genericNodeError (node:internal/errors:983:15)\n    at wrappedFn (node:internal/errors:537:14)\n    at ChildProcess.exithandler (node:child_process:417:12)\n    at ChildProcess.emit (node:events:519:28)\n    at maybeClose (node:internal/child_process:1101:16)\n    at ChildProcess._handle.onexit (node:internal/child_process:304:5)"
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3561-Chicago_Homicide_Code_Book_Coding_Instructions.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3558",
+      "publicationTitle": "A Review of Incarcerated Illinois Class 4 Felony Offenders Are Alternative Sanctions Appropriate",
+      "priorityRank": 9,
+      "priorityTier": "medium",
+      "passLikelihoodScore": 46,
+      "currentCorpusStatus": "processing_error",
+      "dominantSelectionFamily": null,
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "caps",
+      "laneIntent": null,
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS3.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3558-A_Review_of_Incarcerated_Illinois_Class_4_Felony_Offenders_Are_Alternative_Sanctions_Appropriate.failure.json",
+      "status": "processing_error",
+      "processedAt": "2026-04-07T15:32:25.928Z",
+      "durationMs": 3668203,
+      "original": {
+        "overallScore": 16,
+        "grade": "F",
+        "pageCount": 127,
+        "isScanned": true
+      },
+      "final": null,
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Processing exceeded the 60-minute runtime limit.",
+          "Marked as excessive runtime and deferred so the batch can continue."
+        ],
+        "blockingLocalFindingKeys": [],
+        "criticalManualReviewFlagCodes": [],
+        "unresolvedCategoryLabels": []
+      },
+      "promotionStatus": null,
+      "artifacts": {
+        "remediatedPdfPath": null,
+        "stagedReplacementPath": null,
+        "detailedReportPath": null,
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-mixed-terminalization/143.244.146.43/3558-A_Review_of_Incarcerated_Illinois_Class_4_Felony_Offenders_Are_Alternative_Sanctions_Appropriate.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": null,
+        "remediatedPdfSha256": null,
+        "stagedReplacementSha256": null
+      },
+      "deferred": {
+        "reasonCode": "excessive_runtime_loop",
+        "skipNextBatch": true,
+        "notes": "Processing exceeded runtime limit of 3600000ms"
+      }
+    }
+  ]
+}

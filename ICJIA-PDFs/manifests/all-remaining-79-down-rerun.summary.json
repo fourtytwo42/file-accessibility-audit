@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-04-10T03:55:45.175Z",
+  "basedOn": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json",
+  "laneName": "all-remaining-79-down-rerun",
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "totals": {
+    "scannedReportsConsidered": 500,
+    "selectedCandidates": 493,
+    "byTier": {
+      "highest": 471,
+      "high": 19,
+      "medium": 3
+    },
+    "excludedAbove79": 1,
+    "excludedNonTerminal": 6,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0
+  },
+  "priorScoreBands": {
+    "70-79": 79,
+    "60-69": 320,
+    "50-59": 81,
+    "40-49": 11,
+    "<40": 2
+  }
+}

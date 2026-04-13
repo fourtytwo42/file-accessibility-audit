@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.520Z",
+  "mediumFigureConversionPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/medium-figure-conversion.json",
+  "laneIntent": "pass_rate_conversion",
+  "executionPolicy": "dormant",
+  "recommendedConcurrency": 5,
+  "initialAnalysisProfile": "remediation_fast",
+  "totals": {
+    "eligibleRows": 32,
+    "selectedRows": 32,
+    "skippedRows": 399
+  },
+  "totalCandidates": 32,
+  "selectedPublicationIds": [
+    "3794",
+    "3806",
+    "3878",
+    "3886",
+    "3891",
+    "3923",
+    "3932",
+    "3939",
+    "3947",
+    "3948",
+    "3985",
+    "3990",
+    "3934",
+    "3839",
+    "3844",
+    "3996",
+    "4081",
+    "4182",
+    "4193",
+    "4035",
+    "4660",
+    "4752",
+    "4097",
+    "4636",
+    "4493",
+    "4492",
+    "4495",
+    "4514",
+    "4585",
+    "4485",
+    "4632",
+    "4637"
+  ],
+  "selectionSanity": {
+    "dominantFamilyCounts": {
+      "mixed": 17,
+      "figure": 4,
+      "font": 11
+    },
+    "runtimeWeightCounts": {
+      "light": 32
+    },
+    "excludedHeavyMixed": 266,
+    "excludedManualOrScanned": 133,
+    "excludedRuntimeTail": 0
+  }
+}

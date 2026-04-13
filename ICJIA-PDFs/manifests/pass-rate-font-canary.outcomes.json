@@ -1,0 +1,479 @@
+{
+  "generatedAt": "2026-04-06T05:24:09.238Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pass-rate-font-canary.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 8,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 8,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "4099",
+      "publicationTitle": "2006 Annual Report Motor Vehicle Theft Prevention Council",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/mvtpc/2006 Annual Report.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/mvtpc/2006 Annual Report.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/mvtpc/2006%20Annual%20Report.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:20:25.170Z",
+      "durationMs": 73641,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4099-2006_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "25f227fe611afa0a68c453afdc3eca3e44c2d58fd510e366ef2123f0c26ccead",
+        "remediatedPdfSha256": "25f227fe611afa0a68c453afdc3eca3e44c2d58fd510e366ef2123f0c26ccead",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4151",
+      "publicationTitle": "Illinois Court Trends  Adult Probation Caseload 19992008",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Court Trends/1999-2008/15adult probation_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Court Trends/1999-2008/15adult probation_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Court%20Trends/1999-2008/15adult%20probation_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:23:31.717Z",
+      "durationMs": 260188,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 86,
+        "grade": "B",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 86, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4151-Illinois_Court_Trends_Adult_Probation_Caseload_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "fbaf9a5c31fc6ca99a43d508fa55dc7b727f09c058e60d87b4ed7c040fd1ca9d",
+        "remediatedPdfSha256": "fbaf9a5c31fc6ca99a43d508fa55dc7b727f09c058e60d87b4ed7c040fd1ca9d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4166",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Violent Index Arrests 19992008",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/4violent arrests_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/4violent arrests_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/4violent%20arrests_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:23:33.813Z",
+      "durationMs": 262284,
+      "original": {
+        "overallScore": 32,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4166-Illinois_Offense_and_Arrest_Trends_Violent_Index_Arrests_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "2d20fe9417013ae49c897a45b04ad42dd373afef74220addb34288f72b9913a5",
+        "remediatedPdfSha256": "2d20fe9417013ae49c897a45b04ad42dd373afef74220addb34288f72b9913a5",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4144",
+      "publicationTitle": "Illinois Court Trends  Criminal Case Filings 19992008",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Court Trends/1999-2008/14felony and misdemeanor filings_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Court Trends/1999-2008/14felony and misdemeanor filings_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Court%20Trends/1999-2008/14felony%20and%20misdemeanor%20filings_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:23:38.217Z",
+      "durationMs": 266688,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4144-Illinois_Court_Trends_Criminal_Case_Filings_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ccc00c7bd5ea81308a3f995c7fcd7aecef992d58720c8a11d2634248670dc2bc",
+        "remediatedPdfSha256": "ccc00c7bd5ea81308a3f995c7fcd7aecef992d58720c8a11d2634248670dc2bc",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3838",
+      "publicationTitle": "2004 Summary of Drug Enforcement Activities Across Illinois Multijurisdictional Enforcement Groups and Task Forces",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/2004MEGTFSummary.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:23:44.926Z",
+      "durationMs": 273398,
+      "original": {
+        "overallScore": 24,
+        "grade": "F",
+        "pageCount": 102,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 102,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/3838-2004_Summary_of_Drug_Enforcement_Activities_Across_Illinois_Multijurisdictional_Enforcement_Groups_and_Task_Forces.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "07f67df16ac1b7e8f09f178ed14ba5140c45515f73d0cd02a43591c52f924a0c",
+        "remediatedPdfSha256": "07f67df16ac1b7e8f09f178ed14ba5140c45515f73d0cd02a43591c52f924a0c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4199",
+      "publicationTitle": "Illinois Drug Trends  Drug Treatment Admissions 19992008",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Drug Trends/1999-2008/13drug treatment_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Drug Trends/1999-2008/13drug treatment_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Drug%20Trends/1999-2008/13drug%20treatment_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:23:45.971Z",
+      "durationMs": 274442,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 86,
+        "grade": "B",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 86, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4199-Illinois_Drug_Trends_Drug_Treatment_Admissions_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "5679687bf50898e2d7a24ee8e340c8a64ba9f068e2202e5cff22fa44bb19167f",
+        "remediatedPdfSha256": "5679687bf50898e2d7a24ee8e340c8a64ba9f068e2202e5cff22fa44bb19167f",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4173",
+      "publicationTitle": "Illinois Crime Victim Trends  Domestic Offenses 19992008",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Domestic Violence Trends/1999-2008/7domestic offenses_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Domestic Violence Trends/1999-2008/7domestic offenses_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Domestic%20Violence%20Trends/1999-2008/7domestic%20offenses_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:24:09.035Z",
+      "durationMs": 297506,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4173-Illinois_Crime_Victim_Trends_Domestic_Offenses_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "ecf9a62dca7216012f90a272d01cd1d324a3c1eaf480ba0ad3c5014836600c3d",
+        "remediatedPdfSha256": "ecf9a62dca7216012f90a272d01cd1d324a3c1eaf480ba0ad3c5014836600c3d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4176",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Arrests 19992008",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/6property arrests_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/6property%20arrests_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-06T05:24:09.237Z",
+      "durationMs": 297708,
+      "original": {
+        "overallScore": 33,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-font-canary/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-font-canary/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/pass-rate-font-canary/143.244.146.43/4176-Illinois_Offense_and_Arrest_Trends_Property_Index_Arrests_19992008.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "df41a976dc132dee70aa3eef9e1468e48082296b788a1917dc880bfd5ce650c5",
+        "remediatedPdfSha256": "df41a976dc132dee70aa3eef9e1468e48082296b788a1917dc880bfd5ce650c5",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

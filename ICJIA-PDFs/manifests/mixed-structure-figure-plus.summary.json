@@ -1,0 +1,199 @@
+{
+  "generatedAt": "2026-04-11T03:43:06.286Z",
+  "laneName": "mixed-structure-figure-plus",
+  "executionPolicy": "active",
+  "executionPolicyReason": "target_structure_plus_figure_residue_with_annotation_nested_or_heading_tail",
+  "sourceOutcomesPaths": [
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json"
+  ],
+  "totals": {
+    "scannedReportsConsidered": 748,
+    "selectedCandidates": 14,
+    "byTier": {
+      "medium": 13,
+      "high": 1
+    },
+    "plateauedCandidates": 10,
+    "nonPlateauedCandidates": 4,
+    "excludedNonTerminal": 247,
+    "excludedAbove79": 124,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0,
+    "excludedLaneMismatch": 363
+  },
+  "blockerSignatureCounts": {
+    "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure": 6,
+    "pdfua.figure_alt_or_artifact + pdfua.heading_content_quality + pdfua.logical_structure + pdfua.nested_alt_text": 1,
+    "pdfua.figure_alt_or_artifact + pdfua.logical_structure + pdfua.nested_alt_text": 4,
+    "pdfua.figure_alt_or_artifact + pdfua.heading_content_quality + pdfua.logical_structure": 1,
+    "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure + pdfua.nested_alt_text + pdfua.untagged_rendered_images": 1,
+    "pdfua.figure_alt_or_artifact + pdfua.heading_content_quality + pdfua.logical_structure + pdfua.nested_alt_text + pdfua.untagged_rendered_images": 1
+  },
+  "plateauCounts": {
+    "plateaued": 10,
+    "nonPlateaued": 4
+  },
+  "topCandidates": [
+    {
+      "publicationId": "4466",
+      "publicationTitle": "Victim Need Report: Service Providers’ Perspectives on the Needs of Crime Victims and Service Gaps",
+      "overallScore": 64,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "annotation",
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 1,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4082",
+      "publicationTitle": "State survey results quantify crime victimization patterns",
+      "overallScore": 57,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.heading_content_quality + pdfua.logical_structure + pdfua.nested_alt_text",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 2,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4184",
+      "publicationTitle": "Child sex exploitation study probes extent of victimization in Illinois",
+      "overallScore": 66,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure + pdfua.nested_alt_text",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": -8,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 3,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "4081",
+      "publicationTitle": "Redeploy Illinois program decreases incarceration rates among juveniles",
+      "overallScore": 62,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.logical_structure + pdfua.nested_alt_text",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": -10,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 4,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4078",
+      "publicationTitle": "Community reentry challenges daunt exoffenders quest for a fresh start",
+      "overallScore": 58,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.heading_content_quality + pdfua.logical_structure",
+      "blockerFamilies": [
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": true,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 5,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4478",
+      "publicationTitle": "How Illinois Service Providers Support Young Victims of Crime: Findings from an Illinois HEALS Survey",
+      "overallScore": 52,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "annotation",
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": true,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 6,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4485",
+      "publicationTitle": "Demystifying Program Evaluation in Criminal Justice: A Guide for Practitioners",
+      "overallScore": 52,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure + pdfua.nested_alt_text + pdfua.untagged_rendered_images",
+      "blockerFamilies": [
+        "annotation",
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": true,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 7,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4609",
+      "publicationTitle": "Domestic Violence Trends in Illinois: Victimization Characteristics, Help-Seeking, and Service Utilization",
+      "overallScore": 52,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "annotation",
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": true,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 8,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4625",
+      "publicationTitle": "Alcohol-Impaired Driving in Illinois",
+      "overallScore": 52,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "annotation",
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": true,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 9,
+      "priorityTier": "medium"
+    },
+    {
+      "publicationId": "4769",
+      "publicationTitle": "Process Evaluation of a Rural, Police-Initiated Deflection Program in Southern Illinois: Leadership Team Feedback",
+      "overallScore": 52,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.figure_alt_or_artifact + pdfua.logical_structure",
+      "blockerFamilies": [
+        "annotation",
+        "figure",
+        "structure"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": true,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 10,
+      "priorityTier": "medium"
+    }
+  ]
+}

@@ -1,0 +1,2295 @@
+{
+  "generatedAt": "2026-04-07T03:43:15.399Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/medium-figure-conversion.json",
+  "laneName": "medium-figure-conversion",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "remediation_fast",
+  "concurrency": 5,
+  "totals": {
+    "targetCandidates": 32,
+    "processed": 32,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 32,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "outcomes": [
+    {
+      "publicationId": "3794",
+      "publicationTitle": "Extended Jurisdiction Juvenile Prosecutions in Illinois",
+      "priorityRank": 1,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "ejjoga",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/oga/EJJOGA.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/oga/EJJOGA.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/EJJOGA.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T02:57:01.906Z",
+      "durationMs": 63448,
+      "original": {
+        "overallScore": 17,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 55,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 55, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3794-Extended_Jurisdiction_Juvenile_Prosecutions_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "9390042dfb0f31ef5c7feef47ca1c2a70414f215452306258cf21a7977cc36c6",
+        "remediatedPdfSha256": "9390042dfb0f31ef5c7feef47ca1c2a70414f215452306258cf21a7977cc36c6",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4186",
+      "publicationTitle": "Underreporting of violent victimization impedes justice services",
+      "priorityRank": 2,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "disproportionate_reporting_march",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/Bulletins/Disproportionate reporting March 2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/Bulletins/Disproportionate%20reporting%20March%202008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T02:58:34.694Z",
+      "durationMs": 156235,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "e5c1bd9b0486b1538f08180ee0a1e4be8a01f2e3032155f08d8d2ada88db7095",
+        "remediatedPdfSha256": "e5c1bd9b0486b1538f08180ee0a1e4be8a01f2e3032155f08d8d2ada88db7095",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3806",
+      "publicationTitle": "Boone County Juvenile Profile",
+      "priorityRank": 4,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "boone",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Boone.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3806-Boone_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T02:59:03.659Z",
+      "durationMs": 185200,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 117,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 117,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3806-Boone_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3806-Boone_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3806-Boone_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1dac53e88c1ef9c3bb12a330769121dde8fcfd9afccdca7d113db11b9ecaeb0e",
+        "remediatedPdfSha256": "1dac53e88c1ef9c3bb12a330769121dde8fcfd9afccdca7d113db11b9ecaeb0e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4481",
+      "publicationTitle": "Addressing Child Exposure to Violence",
+      "priorityRank": 3,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "addressing_child_exposure_to_violence_final_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Addressing_Child_Exposure_to_Violence_final-191011T20090231.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T02:59:45.250Z",
+      "durationMs": 226791,
+      "original": {
+        "overallScore": 31,
+        "grade": "F",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B",
+        "pageCount": 6,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "f4bfd84892e782be19326bc9b3a0a9a64f26d9a6eeaa3b4b78762c7ab8951259",
+        "remediatedPdfSha256": "f4bfd84892e782be19326bc9b3a0a9a64f26d9a6eeaa3b4b78762c7ab8951259",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3878",
+      "publicationTitle": "Jefferson County Juvenile Profile",
+      "priorityRank": 5,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "jefferson",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Jefferson.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Jefferson.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Jefferson.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3878-Jefferson_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:00:09.692Z",
+      "durationMs": 251233,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 123,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 123,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3878-Jefferson_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3878-Jefferson_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3878-Jefferson_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d9640c7e0559f3c62e03e6a1cb178eba2404181a2e0f6292a95152defd9acaf7",
+        "remediatedPdfSha256": "d9640c7e0559f3c62e03e6a1cb178eba2404181a2e0f6292a95152defd9acaf7",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3886",
+      "publicationTitle": "Brown County Juvenile Profile",
+      "priorityRank": 6,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "brown",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Brown.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Brown.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Brown.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3886-Brown_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:01:19.068Z",
+      "durationMs": 257162,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 107,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 107,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3886-Brown_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3886-Brown_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3886-Brown_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c78796b1e3dd4726e757d43cdfcc8a6f143d4641c193ff2b315ef552be60dd6b",
+        "remediatedPdfSha256": "c78796b1e3dd4726e757d43cdfcc8a6f143d4641c193ff2b315ef552be60dd6b",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3891",
+      "publicationTitle": "Calhoun County Juvenile Profile",
+      "priorityRank": 7,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "calhoun",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Calhoun.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Calhoun.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Calhoun.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3891-Calhoun_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:03:16.109Z",
+      "durationMs": 281414,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 106,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 106,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3891-Calhoun_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3891-Calhoun_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3891-Calhoun_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "64d5d8ddd3bbacf1158dca9b89f5570c071231c473a30cb43bed6854afb00b91",
+        "remediatedPdfSha256": "64d5d8ddd3bbacf1158dca9b89f5570c071231c473a30cb43bed6854afb00b91",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3923",
+      "publicationTitle": "Carroll County Juvenile Profile",
+      "priorityRank": 8,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "carroll",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Carroll.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Carroll.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Carroll.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3923-Carroll_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:04:02.332Z",
+      "durationMs": 298672,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 114,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 114,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3923-Carroll_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3923-Carroll_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3923-Carroll_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "9c78f807f4b3c8a10d722d93b8a422f9716933c6da6e6dc89191bb0dae92b57c",
+        "remediatedPdfSha256": "9c78f807f4b3c8a10d722d93b8a422f9716933c6da6e6dc89191bb0dae92b57c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3939",
+      "publicationTitle": "Champaign County Juvenile Profile",
+      "priorityRank": 10,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "champaign",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Champaign.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Champaign.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Champaign.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3939-Champaign_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:04:39.641Z",
+      "durationMs": 269948,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 118,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 118,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3939-Champaign_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3939-Champaign_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3939-Champaign_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "dfc08fce0281f99a336625aa509a2d2d8b3e1a4801ae73ed4b4a478965ee6a7c",
+        "remediatedPdfSha256": "dfc08fce0281f99a336625aa509a2d2d8b3e1a4801ae73ed4b4a478965ee6a7c",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3932",
+      "publicationTitle": "Bureau County Juvenile Profile",
+      "priorityRank": 9,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "bureau",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Bureau.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Bureau.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Bureau.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3932-Bureau_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:05:11.887Z",
+      "durationMs": 326636,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 121,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 121,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3932-Bureau_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3932-Bureau_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3932-Bureau_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "609f79ba9436288988a82d053114948174c50831a6ff4fbcb34082cfed9437c5",
+        "remediatedPdfSha256": "609f79ba9436288988a82d053114948174c50831a6ff4fbcb34082cfed9437c5",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3947",
+      "publicationTitle": "Alexander County Juvenile Profile",
+      "priorityRank": 11,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "alexander",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Alexander.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Alexander.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Alexander.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3947-Alexander_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:05:40.220Z",
+      "durationMs": 261152,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 117,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 59,
+        "grade": "F",
+        "pageCount": 117,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 59, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.untagged_rendered_images, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.untagged_rendered_images",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3947-Alexander_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3947-Alexander_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3947-Alexander_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "beaaf6e0d3383ed66fa865dacb7660de091dba3d54da435e9070b7f072543496",
+        "remediatedPdfSha256": "beaaf6e0d3383ed66fa865dacb7660de091dba3d54da435e9070b7f072543496",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3948",
+      "publicationTitle": "Douglas County Juvenile Profile",
+      "priorityRank": 12,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "douglas",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Douglas.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Douglas.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Douglas.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3948-Douglas_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:07:58.959Z",
+      "durationMs": 282850,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 112,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 112,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3948-Douglas_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3948-Douglas_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3948-Douglas_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d28f9b177d1fbb04702ac0a8904093789eaa8b89fc506430778a7076bd906676",
+        "remediatedPdfSha256": "d28f9b177d1fbb04702ac0a8904093789eaa8b89fc506430778a7076bd906676",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3985",
+      "publicationTitle": "Cass County Juvenile Profile",
+      "priorityRank": 13,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "cass",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Cass.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Cass.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Cass.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3985-Cass_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:08:28.612Z",
+      "durationMs": 266279,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 112,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 112,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3985-Cass_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3985-Cass_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3985-Cass_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "eb4faeb75db13da21fd24fa8e6c1f4c303cd98d270f31b23102fc921aba4dc49",
+        "remediatedPdfSha256": "eb4faeb75db13da21fd24fa8e6c1f4c303cd98d270f31b23102fc921aba4dc49",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3839",
+      "publicationTitle": "Profile of the Blackhawk Area Task Force",
+      "priorityRank": 16,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "blackhawk_area_task_force",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/megprofiles/Blackhawk Area Task Force.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/megprofiles/Blackhawk Area Task Force.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/megprofiles/Blackhawk Area Task Force.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:08:55.685Z",
+      "durationMs": 195464,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3839-Profile_of_the_Blackhawk_Area_Task_Force.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "da6d432eb425e17c8db5a96d595096745bd004f2b696b274bb5ac31923ea319b",
+        "remediatedPdfSha256": "da6d432eb425e17c8db5a96d595096745bd004f2b696b274bb5ac31923ea319b",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3990",
+      "publicationTitle": "Bond County Juvenile Profile",
+      "priorityRank": 14,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "bond",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Bond.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Bond.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Bond.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3990-Bond_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:09:21.926Z",
+      "durationMs": 282284,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 114,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 114,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3990-Bond_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3990-Bond_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3990-Bond_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0c3aac5c834255844f88d27a35ec126f1dd7b2022a76cb0b7ab93a0d8763e306",
+        "remediatedPdfSha256": "0c3aac5c834255844f88d27a35ec126f1dd7b2022a76cb0b7ab93a0d8763e306",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3934",
+      "publicationTitle": "Cook County Juvenile Profile",
+      "priorityRank": 15,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "cook",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JuvenileCounty/Cook.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JuvenileCounty/Cook.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JuvenileCounty/Cook.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3934-Cook_County_Juvenile_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:09:33.089Z",
+      "durationMs": 261202,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 173,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 173,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3934-Cook_County_Juvenile_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3934-Cook_County_Juvenile_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3934-Cook_County_Juvenile_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d92bd90417cb3fa381a7d5d64d91a81e872793b3250c00bf4afbf18df390ed30",
+        "remediatedPdfSha256": "d92bd90417cb3fa381a7d5d64d91a81e872793b3250c00bf4afbf18df390ed30",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3844",
+      "publicationTitle": "Profile fo the East Central Illinois Task Force",
+      "priorityRank": 17,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "east_central_illinois_task_force",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/megprofiles/East Central Illinois Task Force.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/megprofiles/East Central Illinois Task Force.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/megprofiles/East Central Illinois Task Force.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:13:50.939Z",
+      "durationMs": 351979,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3844-Profile_fo_the_East_Central_Illinois_Task_Force.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "5e4575132fd34624ce4c601bccffe67e99f1151c30a3fe14affa1bdc9662983d",
+        "remediatedPdfSha256": "5e4575132fd34624ce4c601bccffe67e99f1151c30a3fe14affa1bdc9662983d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3996",
+      "publicationTitle": "Profile of the Kankakee Area Metropolitan Enforcement Group",
+      "priorityRank": 18,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "kankakee_area_metropolitan_enforcement_group",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/megprofiles/Kankakee Area Metropolitan Enforcement Group.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/megprofiles/Kankakee Area Metropolitan Enforcement Group.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/megprofiles/Kankakee%20Area%20Metropolitan%20Enforcement%20Group.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:14:09.096Z",
+      "durationMs": 340483,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 69,
+        "grade": "D",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 69, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3996-Profile_of_the_Kankakee_Area_Metropolitan_Enforcement_Group.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cf057ed53b361ad7687d028b89038446274c110bbaa24539ae44ebdce1449c03",
+        "remediatedPdfSha256": "cf057ed53b361ad7687d028b89038446274c110bbaa24539ae44ebdce1449c03",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4169",
+      "publicationTitle": "Juvenile sentencing",
+      "priorityRank": 23,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "gtf_juvenilesentencing",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF-juvenilesentencing.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/143.244.146.43/4169-Juvenile_sentencing.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:17:55.761Z",
+      "durationMs": 226664,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4169-Juvenile_sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4169-Juvenile_sentencing.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4169-Juvenile_sentencing.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "aa505b051b9d14a502c8cadb18e9d74980f6181222b5aead7999abfae0e00f1a",
+        "remediatedPdfSha256": "aa505b051b9d14a502c8cadb18e9d74980f6181222b5aead7999abfae0e00f1a",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3494",
+      "publicationTitle": "The 1996 Criminal History Records Audit",
+      "priorityRank": 19,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "chriaudit",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/1996CHRIAudit.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/1996CHRIAudit.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/1996CHRIAudit.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:18:24.689Z",
+      "durationMs": 569003,
+      "original": {
+        "overallScore": 3,
+        "grade": "F",
+        "pageCount": 71,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 44,
+        "grade": "F",
+        "pageCount": 71,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 44, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8f57834b8b3f97b718b5bf5b93a78ebaa1bb829a5938cdd2f94bc406bb135ff7",
+        "remediatedPdfSha256": "8f57834b8b3f97b718b5bf5b93a78ebaa1bb829a5938cdd2f94bc406bb135ff7",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3495",
+      "publicationTitle": "Orders of Protection Reported on ISP LEADS 19911995 A Measure of Domestic Violence in Illinois",
+      "priorityRank": 20,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "chriaudit",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/1996CHRIAudit.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/1996CHRIAudit.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/1996CHRIAudit.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:18:49.871Z",
+      "durationMs": 567944,
+      "original": {
+        "overallScore": 3,
+        "grade": "F",
+        "pageCount": 71,
+        "isScanned": true
+      },
+      "final": {
+        "overallScore": 44,
+        "grade": "F",
+        "pageCount": 71,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 44, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d26e5424a3190b8d4986f8b86de88d41be3b39a2fceb611705a3aee1a863e74e",
+        "remediatedPdfSha256": "d26e5424a3190b8d4986f8b86de88d41be3b39a2fceb611705a3aee1a863e74e",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "priorityRank": 22,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "kendall",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/CountyProfiles/Kendall.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/143.244.146.43/3614-KENDALL_County_Profile.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:21:35.433Z",
+      "durationMs": 464493,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D",
+        "pageCount": 32,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3614-KENDALL_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3614-KENDALL_County_Profile.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3614-KENDALL_County_Profile.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "aa9b4764f39cc29d818cf3d5a1016b6487dfe0ef7e27a2487690d396f9a1a1dc",
+        "remediatedPdfSha256": "aa9b4764f39cc29d818cf3d5a1016b6487dfe0ef7e27a2487690d396f9a1a1dc",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4590",
+      "publicationTitle": "Research at a Glance Impacts of Probationer Screening and Services on Probation Success and Future Arrests",
+      "priorityRank": 25,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "icjia_research_at_a_glance_river_valley",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/ICJIA_Research_at_a_Glance_River_Valley_122014.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:29:13.713Z",
+      "durationMs": 649023,
+      "original": {
+        "overallScore": 26,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 72,
+        "grade": "C",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 72, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "db3d7601ec150b21195629d63f0392f7b7345090f21f6670538ef002d7d88f04",
+        "remediatedPdfSha256": "db3d7601ec150b21195629d63f0392f7b7345090f21f6670538ef002d7d88f04",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3585",
+      "publicationTitle": "Juvenile Justice",
+      "priorityRank": 27,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "gtf_juvenilejustice",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/GTF_JuvenileJustice.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/GTF_JuvenileJustice.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/GTF_JuvenileJustice.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3585-Juvenile_Justice.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:31:48.719Z",
+      "durationMs": 613285,
+      "original": {
+        "overallScore": 13,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3585-Juvenile_Justice.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3585-Juvenile_Justice.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3585-Juvenile_Justice.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "33f193d3ffb08daf258468157c49a70775f1f1e4b6a1742d4857d86dba2fde82",
+        "remediatedPdfSha256": "33f193d3ffb08daf258468157c49a70775f1f1e4b6a1742d4857d86dba2fde82",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "priorityRank": 21,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "focused_deterrence_pdf_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.nested_alt_text"
+      ],
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:33:13.098Z",
+      "durationMs": 1420009,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B",
+        "pageCount": 20,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 83, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "df9df39fc4fda512caf85634b20b5ef92ee2a3275f1cab0b915914a2d469869d",
+        "remediatedPdfSha256": "df9df39fc4fda512caf85634b20b5ef92ee2a3275f1cab0b915914a2d469869d",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4726",
+      "publicationTitle": "InfoNet: State Fiscal Year 2023 Highlights",
+      "priorityRank": 26,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "sfy_infonet_infographic_t",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.pdf_ua_compliance",
+        "pdfua.annotation_alt_contents",
+        "pdfua.display_doc_title",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.link_tagging",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs"
+      ],
+      "serverHost": "157.230.3.215",
+      "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/SFY23 InfoNet Infographic-240305T20320674.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/SFY23 InfoNet Infographic-240305T20320674.pdf",
+      "fileUrl": "https://researchhub.icjia-api.cloud/uploads/SFY23%20InfoNet%20Infographic-240305T20320674.pdf",
+      "storageKind": "researchhub_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:33:55.401Z",
+      "durationMs": 905529,
+      "original": {
+        "overallScore": 51,
+        "grade": "F",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 78,
+        "grade": "C",
+        "pageCount": 1,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 78, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "cae96cad31d5d21ba553a2f7cc492f1d9c986c663a459c2125f498e2fef81552",
+        "remediatedPdfSha256": "cae96cad31d5d21ba553a2f7cc492f1d9c986c663a459c2125f498e2fef81552",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "3682",
+      "publicationTitle": "Criminal Sentencing",
+      "priorityRank": 28,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "mixed",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "crimsentenclayout",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:34:17.105Z",
+      "durationMs": 303391,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 59,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 59, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3682-Criminal_Sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/3682-Criminal_Sentencing.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "c8e43226f18452fa51aeaa6ace40df63434d6148b5fc9722ba2e42321a90dfff",
+        "remediatedPdfSha256": "c8e43226f18452fa51aeaa6ace40df63434d6148b5fc9722ba2e42321a90dfff",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4661",
+      "publicationTitle": "Limited Release of Information Form",
+      "priorityRank": 30,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "limited_release_of_information_form_pdf_for_download_c_f_c",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "pdfua.annotation_alt_contents",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.page_tabs",
+        "pdfua.tagged_annotations"
+      ],
+      "serverHost": "192.241.146.85",
+      "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/Limited_Release_of_Information_Form_PDF_for_Download_010719_070c948f6c.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/Limited_Release_of_Information_Form_PDF_for_Download_010719_070c948f6c.pdf",
+      "fileUrl": "https://agency.icjia-api.cloud/uploads/Limited_Release_of_Information_Form_PDF_for_Download_010719_070c948f6c.pdf",
+      "storageKind": "agency_upload",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4661-Limited_Release_of_Information_Form.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:34:47.788Z",
+      "durationMs": 94689,
+      "original": {
+        "overallScore": 47,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.font_embedding, pdfua.font_unicode, pdfua.heading_content_quality",
+          "Categories still below 100: Text Extractability, Heading Structure, Form Accessibility, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Form Accessibility",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/192.241.146.85/4661-Limited_Release_of_Information_Form.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/192.241.146.85/4661-Limited_Release_of_Information_Form.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/192.241.146.85/4661-Limited_Release_of_Information_Form.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "afe00b6bc1c8a948b63c0a07e357280cf709d9cb1bdd2178b18bb590aed05a28",
+        "remediatedPdfSha256": "afe00b6bc1c8a948b63c0a07e357280cf709d9cb1bdd2178b18bb590aed05a28",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4079",
+      "publicationTitle": "Peoria St Clair counties initiate Redeploy Illinois youth programs",
+      "priorityRank": 31,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "peoria_st_clair_counties_initiate_redeploy_illinois_youth_programs",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.title_language",
+        "context.table_candidates_blocked",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Peoria, St. Clair counties initiate Redeploy Illinois youth programs.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Peoria, St. Clair counties initiate Redeploy Illinois youth programs.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Peoria,%20St.%20Clair%20counties%20initiate%20Redeploy%20Illinois%20youth%20programs.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:37:47.577Z",
+      "durationMs": 232175,
+      "original": {
+        "overallScore": 37,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 75,
+        "grade": "C",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 75, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure",
+          "Categories still below 100: Text Extractability, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "0c3e09f0cc3a7d22841f04b673a991aef2762389dab1e00ac114bbad38951131",
+        "remediatedPdfSha256": "0c3e09f0cc3a7d22841f04b673a991aef2762389dab1e00ac114bbad38951131",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4192",
+      "publicationTitle": "InfoNet database reveals Illinois domestic violence victim demographics trends",
+      "priorityRank": 29,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "infonet_july",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.title_language",
+        "context.table_candidates_blocked",
+        "pdfua.cid_symbol_fonts",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_unicode",
+        "pdfua.heading_content_quality",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AtAGlance/INFONET July 2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AtAGlance/INFONET July 2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AtAGlance/INFONET%20July%202008.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:37:58.698Z",
+      "durationMs": 369978,
+      "original": {
+        "overallScore": 23,
+        "grade": "F",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C",
+        "pageCount": 2,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images, pdfua.nested_alt_text, pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images",
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "d1470f9eddfc84c2baa9bbe5306bf02846123b1d8d299f027ea5e7095e645234",
+        "remediatedPdfSha256": "d1470f9eddfc84c2baa9bbe5306bf02846123b1d8d299f027ea5e7095e645234",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4081",
+      "publicationTitle": "Redeploy Illinois program decreases incarceration rates among juveniles",
+      "priorityRank": 32,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "figure",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "redeploy_illinois_program_decreases_incarceration_rates_among_juveniles",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure",
+        "pdfua.page_tabs"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ProgEvalSummary/Redeploy Illinois program decreases incarceration rates among juveniles.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ProgEvalSummary/Redeploy%20Illinois%20program%20decreases%20incarceration%20rates%20among%20juveniles.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4081-Redeploy_Illinois_program_decreases_incarceration_rates_among_juveniles.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:38:00.588Z",
+      "durationMs": 223483,
+      "original": {
+        "overallScore": 21,
+        "grade": "F",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 65,
+        "grade": "D",
+        "pageCount": 4,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 65, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4081-Redeploy_Illinois_program_decreases_incarceration_rates_among_juveniles.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4081-Redeploy_Illinois_program_decreases_incarceration_rates_among_juveniles.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4081-Redeploy_Illinois_program_decreases_incarceration_rates_among_juveniles.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "1969aec8c44e37f998ad53c72090440102117139584015143f093bdfa1b6f560",
+        "remediatedPdfSha256": "1969aec8c44e37f998ad53c72090440102117139584015143f093bdfa1b6f560",
+        "stagedReplacementSha256": null
+      }
+    },
+    {
+      "publicationId": "4534",
+      "publicationTitle": "Safe From the Start Year 13: 2001-2014",
+      "priorityRank": 24,
+      "priorityTier": "highest",
+      "passLikelihoodScore": 100,
+      "currentCorpusStatus": "remediated_fail",
+      "dominantSelectionFamily": "font",
+      "runtimeWeightBucket": "light",
+      "runtimeProfileKey": "safe_from_the_start_year_report",
+      "laneIntent": "pass_rate_conversion",
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "context.table_candidates_blocked",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.table_regularity"
+      ],
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf",
+      "fileUrl": "https://archive.icjia.cloud/files/icjia/pdf/news/Safe_From_the_Start_Year13_Report_070615.pdf",
+      "storageKind": "legacy_archive",
+      "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.remediation.json",
+      "status": "failed_after_remediation",
+      "promotionStatus": null,
+      "processedAt": "2026-04-07T03:43:15.398Z",
+      "durationMs": 1519636,
+      "original": {
+        "overallScore": 49,
+        "grade": "F",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "final": {
+        "overallScore": 78,
+        "grade": "C",
+        "pageCount": 48,
+        "isScanned": false
+      },
+      "gate": {
+        "passed": false,
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 78, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ],
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": []
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/medium-figure-conversion/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.remediation.json",
+        "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/medium-figure-conversion/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.failure.json"
+      },
+      "checksums": {
+        "gateEvaluatedBufferSha256": "8c794f37509bf307bd7021865992f258273bc331350b1156377e15b6262cc984",
+        "remediatedPdfSha256": "8c794f37509bf307bd7021865992f258273bc331350b1156377e15b6262cc984",
+        "stagedReplacementSha256": null
+      }
+    }
+  ]
+}

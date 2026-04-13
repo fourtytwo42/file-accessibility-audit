@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-04-02T01:02:20.024Z",
+  "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-wave.json",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-02T01:02:20.003Z",
+  "totals": {
+    "eligibleRows": 0,
+    "selectedRows": 0,
+    "skippedRows": 9,
+    "pendingRows": 0
+  },
+  "selectedPublicationIds": [],
+  "pendingPublicationIds": [],
+  "selectedByTier": {
+    "highest": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "selectedByStatus": {
+    "verified_pass": 0,
+    "discovered": 0,
+    "analyzed": 0,
+    "queued_for_remediation": 0,
+    "remediated_fail": 0,
+    "processing_error": 0,
+    "deferred_manual": 0,
+    "staged_for_replacement": 0,
+    "replaced_remote": 0
+  },
+  "selectedByDisposition": {
+    "long_report_verified_pass": 0,
+    "long_report_stable_hard_fail": 0,
+    "long_report_processing_retry": 0,
+    "long_report_mixed_residual": 0,
+    "long_report_remediation_candidate": 0
+  }
+}

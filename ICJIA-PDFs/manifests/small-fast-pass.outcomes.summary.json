@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-04-06T23:47:49.014Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/small-fast-pass.json",
+  "laneName": "small-fast-pass",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "remediation_fast",
+  "concurrency": 10,
+  "totals": {
+    "targetCandidates": 48,
+    "processed": 48,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 48,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 48,
+    "pdfsPerHour": 33.25,
+    "terminalOutcomesPerHour": 33.25,
+    "passCandidatesPerHour": 0
+  },
+  "quality": {
+    "passCandidates": 0,
+    "rowsWithBlockingFindingShrink": 42,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4593",
+    "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+    "priorityRank": 7,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 100,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "figure",
+    "runtimeWeightBucket": "light",
+    "runtimeProfileKey": "focused_deterrence_pdf_t",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.figure_alt_or_artifact",
+      "pdfua.nested_alt_text"
+    ],
+    "serverHost": "157.230.3.215",
+    "remotePath": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+    "fileUrl": "https://researchhub.icjia-api.cloud/uploads/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+    "storageKind": "researchhub_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage3-figure-wave/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-06T23:47:49.013Z",
+    "durationMs": 1171854,
+    "original": {
+      "overallScore": 23,
+      "grade": "F",
+      "pageCount": 20,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 83,
+      "grade": "B",
+      "pageCount": 20,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 83, not 100.",
+        "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Alt Text on Images",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/small-fast-pass/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "8c300b2bb0c63959f3302112bba00aaddc3c59518609b043b66406c970d40113",
+      "remediatedPdfSha256": "8c300b2bb0c63959f3302112bba00aaddc3c59518609b043b66406c970d40113",
+      "stagedReplacementSha256": null
+    }
+  }
+}

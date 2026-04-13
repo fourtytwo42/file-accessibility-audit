@@ -18,6 +18,13 @@ type ReadyRow = {
   sourceKind: 'complete_seed' | 'batch_ready' | 'already_replaced_remote'
   sourceManifest: string
   sourceStatus: string
+  visualApproval: {
+    required: boolean
+    status: 'required' | 'approved'
+    reasonCodes: string[]
+    sourceManifest: string | null
+    notes: string[]
+  }
 }
 
 type VerificationTarget = {
@@ -26,6 +33,8 @@ type VerificationTarget = {
   sourcePathOrUrl: string
   filename: string
   criticalManualReviewFlagCodes: string[]
+  visualApprovalRequired: boolean
+  visualApprovalReasonCodes: string[]
 }
 
 type VerificationResult = {
@@ -50,6 +59,11 @@ type VerificationResult = {
     unresolvedCategoryLabels: string[]
     criticalManualReviewFlagCodes: string[]
   }
+  visualApproval: {
+    required: boolean
+    approved: boolean
+    reasonCodes: string[]
+  }
   artifacts: {
     reportPath: string
   }
@@ -60,6 +74,16 @@ type PublicationVerificationRow = ReadyRow & {
   verificationPassed: boolean
   verificationMissing: boolean
   verificationError: string | null
+}
+
+type VisualApprovalHoldManifest = {
+  generatedAt?: string
+  rows?: Array<{
+    publicationId?: string | number | null
+    status?: string | null
+    reasonCodes?: string[] | null
+    notes?: string[] | null
+  }>
 }
 
 type PromotionLedgerManifest = {
@@ -79,8 +103,40 @@ const verificationManifestPath = path.join(manifestsRoot, 'ready-to-replace-veri
 const verificationSummaryPath = path.join(manifestsRoot, 'ready-to-replace-verification.summary.json')
 const promotionLedgerPath = path.join(manifestsRoot, 'verified-promotion-ledger.json')
 const promotionLedgerSummaryPath = path.join(manifestsRoot, 'verified-promotion-ledger.summary.json')
+const visualApprovalHoldPath = path.join(manifestsRoot, 'visual-approval-holds.json')
 
 const concurrency = Number(process.env.ICJIA_VERIFY_CONCURRENCY || 8)
+export const DEFAULT_VERIFY_MIN_PASS_SCORE = 90
+const includePublicationIds = new Set(
+  String(process.env.ICJIA_VERIFY_INCLUDE_PUBLICATION_IDS || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean),
+)
+
+function parseOptionalThreshold(envKey: string, fallback: number | null = null): number | null {
+  const raw = process.env[envKey]
+  if (raw == null || raw === '') return fallback
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : fallback
+}
+
+const verificationMinPassOverallScore = parseOptionalThreshold('ICJIA_VERIFY_MIN_PASS_SCORE', DEFAULT_VERIFY_MIN_PASS_SCORE)
+
+export function getVerificationScorePolicy(): { minPassOverallScore: number | null } {
+  return {
+    minPassOverallScore: verificationMinPassOverallScore,
+  }
+}
+
+export function evaluateVerificationGate(input: {
+  analysisResult: any
+  criticalManualReviewFlagCodes?: string[] | null
+}) {
+  return verificationMinPassOverallScore != null
+    ? evaluatePromotionGate(input, { minOverallScore: verificationMinPassOverallScore })
+    : evaluatePromotionGate(input)
+}
 
 function ensureDir(dirPath: string): void {
   fs.mkdirSync(dirPath, { recursive: true })
@@ -95,19 +151,55 @@ function writeJson(filePath: string, value: unknown): void {
   fs.writeFileSync(filePath, JSON.stringify(value, null, 2) + '\n')
 }
 
+function readJsonIfExists<T>(filePath: string): T | null {
+  if (!fs.existsSync(filePath)) return null
+  return readJson<T>(filePath)
+}
+
 function safeStem(value: string): string {
   return value.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '') || 'item'
 }
 
+function defaultVisualApproval(): ReadyRow['visualApproval'] {
+  return {
+    required: false,
+    status: 'approved',
+    reasonCodes: [],
+    sourceManifest: null,
+    notes: [],
+  }
+}
+
+function loadVisualApprovalHoldMap(): Map<string, ReadyRow['visualApproval']> {
+  const doc = readJsonIfExists<VisualApprovalHoldManifest>(visualApprovalHoldPath)
+  const holds = new Map<string, ReadyRow['visualApproval']>()
+  for (const row of doc?.rows || []) {
+    if (row?.publicationId == null) continue
+    const publicationId = String(row.publicationId)
+    const status = row.status === 'approved' ? 'approved' : 'required'
+    holds.set(publicationId, {
+      required: status !== 'approved',
+      status,
+      reasonCodes: Array.isArray(row.reasonCodes) ? row.reasonCodes.map(String) : [],
+      sourceManifest: visualApprovalHoldPath,
+      notes: Array.isArray(row.notes) ? row.notes.map(String) : [],
+    })
+  }
+  return holds
+}
+
 function loadReadyRows(): ReadyRow[] {
   const rows: ReadyRow[] = []
+  const visualApprovalHolds = loadVisualApprovalHoldMap()
 
   const completeStatusPath = path.join(manifestsRoot, 'complete-passing-publication-status.json')
   const completeRows = readJson<Array<any>>(completeStatusPath)
   for (const row of completeRows) {
     if (!row?.publicationId) continue
+    const publicationId = String(row.publicationId)
+    const visualApproval = visualApprovalHolds.get(publicationId) || defaultVisualApproval()
     rows.push({
-      publicationId: String(row.publicationId),
+      publicationId,
       publicationTitle: row.publicationTitle ? String(row.publicationTitle) : null,
       fileUrl: row.fileUrl ? String(row.fileUrl) : null,
       serverHost: row.serverHost ? String(row.serverHost) : null,
@@ -118,34 +210,39 @@ function loadReadyRows(): ReadyRow[] {
       sourceKind: row.status === 'replaced_on_remote' ? 'already_replaced_remote' : 'complete_seed',
       sourceManifest: completeStatusPath,
       sourceStatus: String(row.status || 'passing_from_complete'),
+      visualApproval,
     })
   }
 
   for (const name of fs.readdirSync(manifestsRoot)) {
-    if (!name.endsWith('-outcomes.json')) continue
+    if (!name.endsWith('-outcomes.json') && !name.endsWith('.outcomes.json')) continue
     const manifestPath = path.join(manifestsRoot, name)
     const doc = readJson<{ outcomes?: Array<any> }>(manifestPath)
     for (const outcome of doc.outcomes || []) {
       const outcomeStatus = String(outcome?.status || '')
-      if (!(outcomeStatus === 'ready_to_replace' || outcomeStatus === 'remediated_pass_candidate') || !outcome.publicationId) continue
+      if (!(outcomeStatus === 'ready_to_replace' || outcomeStatus === 'remediated_pass_candidate' || outcomeStatus === 'manual_ready_to_replace') || !outcome.publicationId) continue
+      const publicationId = String(outcome.publicationId)
+      const visualApproval = visualApprovalHolds.get(publicationId) || defaultVisualApproval()
       rows.push({
-        publicationId: String(outcome.publicationId),
+        publicationId,
         publicationTitle: outcome.publicationTitle ? String(outcome.publicationTitle) : null,
         fileUrl: outcome.fileUrl ? String(outcome.fileUrl) : null,
         serverHost: outcome.serverHost ? String(outcome.serverHost) : null,
         remotePath: outcome.remotePath ? String(outcome.remotePath) : null,
-        stagedReplacementPath: outcome.artifacts?.stagedReplacementPath ? String(outcome.artifacts.stagedReplacementPath) : null,
-        localFinalArtifactPath: outcome.artifacts?.remediatedPdfPath ? String(outcome.artifacts.remediatedPdfPath) : null,
+        stagedReplacementPath: outcome.artifacts?.stagedReplacementPath ? String(outcome.artifacts.stagedReplacementPath) : (outcome.stagedReplacementPath ? String(outcome.stagedReplacementPath) : null),
+        localFinalArtifactPath: outcome.artifacts?.remediatedPdfPath ? String(outcome.artifacts.remediatedPdfPath) : (outcome.outputPath ? String(outcome.outputPath) : null),
         criticalManualReviewFlagCodes: Array.isArray(outcome.gate?.criticalManualReviewFlagCodes) ? outcome.gate.criticalManualReviewFlagCodes.map(String) : [],
         sourceKind: 'batch_ready',
         sourceManifest: manifestPath,
         sourceStatus: outcomeStatus,
+        visualApproval,
       })
     }
   }
 
   rows.sort((a, b) => a.publicationId.localeCompare(b.publicationId))
-  return rows
+  if (!includePublicationIds.size) return rows
+  return rows.filter(row => includePublicationIds.has(row.publicationId))
 }
 
 function buildTargets(rows: ReadyRow[]): Map<string, VerificationTarget> {
@@ -161,12 +258,19 @@ function buildTargets(rows: ReadyRow[]): Map<string, VerificationTarget> {
           sourcePathOrUrl: row.fileUrl,
           filename: path.basename(row.fileUrl),
           criticalManualReviewFlagCodes: [...row.criticalManualReviewFlagCodes],
+          visualApprovalRequired: row.visualApproval.required,
+          visualApprovalReasonCodes: [...row.visualApproval.reasonCodes],
         })
       } else {
         const existing = targets.get(key)!
         existing.criticalManualReviewFlagCodes = Array.from(new Set([
           ...existing.criticalManualReviewFlagCodes,
           ...row.criticalManualReviewFlagCodes,
+        ]))
+        existing.visualApprovalRequired = existing.visualApprovalRequired || row.visualApproval.required
+        existing.visualApprovalReasonCodes = Array.from(new Set([
+          ...existing.visualApprovalReasonCodes,
+          ...row.visualApproval.reasonCodes,
         ]))
       }
       continue
@@ -181,12 +285,19 @@ function buildTargets(rows: ReadyRow[]): Map<string, VerificationTarget> {
         sourcePathOrUrl: row.stagedReplacementPath,
         filename: path.basename(row.stagedReplacementPath),
         criticalManualReviewFlagCodes: [...row.criticalManualReviewFlagCodes],
+        visualApprovalRequired: row.visualApproval.required,
+        visualApprovalReasonCodes: [...row.visualApproval.reasonCodes],
       })
     } else {
       const existing = targets.get(key)!
       existing.criticalManualReviewFlagCodes = Array.from(new Set([
         ...existing.criticalManualReviewFlagCodes,
         ...row.criticalManualReviewFlagCodes,
+      ]))
+      existing.visualApprovalRequired = existing.visualApprovalRequired || row.visualApproval.required
+      existing.visualApprovalReasonCodes = Array.from(new Set([
+        ...existing.visualApprovalReasonCodes,
+        ...row.visualApproval.reasonCodes,
       ]))
     }
   }
@@ -239,7 +350,7 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
       skipVeraPdf: true,
     })
 
-    const gate = evaluatePromotionGate({
+    const gate = evaluateVerificationGate({
       analysisResult: result,
       criticalManualReviewFlagCodes: target.criticalManualReviewFlagCodes,
     })
@@ -265,6 +376,11 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
         unresolvedCategoryLabels: gate.unresolvedCategoryLabels,
         criticalManualReviewFlagCodes: gate.criticalManualReviewFlagCodes,
       },
+      visualApproval: {
+        required: target.visualApprovalRequired,
+        approved: !target.visualApprovalRequired,
+        reasonCodes: [...target.visualApprovalReasonCodes],
+      },
       artifacts: {
         reportPath,
       },
@@ -282,6 +398,7 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
         categories: result.categories,
       },
       gate,
+      visualApproval: record.visualApproval,
       verifiedAt: record.verifiedAt,
       durationMs: record.durationMs,
     })
@@ -311,6 +428,11 @@ async function verifyTarget(target: VerificationTarget): Promise<VerificationRes
         blockingLocalFindingKeys: [],
         unresolvedCategoryLabels: [],
         criticalManualReviewFlagCodes: [],
+      },
+      visualApproval: {
+        required: target.visualApprovalRequired,
+        approved: !target.visualApprovalRequired,
+        reasonCodes: [...target.visualApprovalReasonCodes],
       },
       artifacts: {
         reportPath,
@@ -349,7 +471,7 @@ async function main(): Promise<void> {
     return {
       ...row,
       verificationKey,
-      verificationPassed: Boolean(result?.passed),
+      verificationPassed: Boolean(result?.passed) && !row.visualApproval.required,
       verificationMissing: Boolean(result?.missing),
       verificationError: result?.error ?? null,
     }
@@ -409,6 +531,7 @@ async function main(): Promise<void> {
 
   const summary = {
     generatedAt: new Date().toISOString(),
+    scorePolicy: getVerificationScorePolicy(),
     totals: {
       publicationRows: publicationRows.length,
       uniqueTargets: verificationResults.length,
@@ -421,37 +544,95 @@ async function main(): Promise<void> {
       erroredPublicationRows: publicationRows.filter(row => Boolean(row.verificationError) && !row.verificationMissing).length,
       missingPublicationRows: publicationRows.filter(row => row.verificationMissing).length,
       verifiedPromotionLedgerRows: promotionLedgerRows.length,
+      visualApprovalHeldPublicationRows: publicationRows.filter(row => row.visualApproval.required).length,
     },
     latestVerifiedTarget: verificationResults.at(-1) || null,
     promotionLedgerPath,
   }
 
+  const mergedVerificationResults = (() => {
+    if (!includePublicationIds.size) return verificationResults
+    const existing = readJsonIfExists<{
+      verificationResults?: VerificationResult[]
+    }>(verificationManifestPath)
+    const merged = new Map<string, VerificationResult>()
+    for (const result of existing?.verificationResults || []) merged.set(result.key, result)
+    for (const result of verificationResults) merged.set(result.key, result)
+    return Array.from(merged.values()).sort((a, b) => a.key.localeCompare(b.key))
+  })()
+
+  const mergedPublicationRows = (() => {
+    if (!includePublicationIds.size) return publicationRows
+    const existing = readJsonIfExists<{
+      publicationRows?: PublicationVerificationRow[]
+    }>(verificationManifestPath)
+    const merged = new Map<string, PublicationVerificationRow>()
+    for (const row of existing?.publicationRows || []) merged.set(row.publicationId, row)
+    for (const row of publicationRows) merged.set(row.publicationId, row)
+    return Array.from(merged.values())
+      .map(row => ({
+        ...row,
+        visualApproval: row.visualApproval || defaultVisualApproval(),
+      }))
+      .sort((a, b) => a.publicationId.localeCompare(b.publicationId))
+  })()
+
+  const mergedPromotionLedgerRows = (() => {
+    if (!includePublicationIds.size) return promotionLedgerRows
+    const existing = readJsonIfExists<PromotionLedgerManifest>(promotionLedgerPath)
+    const merged = new Map<string, PromotionLedgerManifest['rows'][number]>()
+    for (const row of existing?.rows || []) merged.set(row.publicationId, row)
+    for (const row of promotionLedgerRows) merged.set(row.publicationId, row)
+    return Array.from(merged.values()).sort((a, b) => a.publicationId.localeCompare(b.publicationId))
+  })()
+
+  const mergedSummary = {
+    ...summary,
+    totals: {
+      publicationRows: mergedPublicationRows.length,
+      uniqueTargets: mergedVerificationResults.length,
+      passedTargets: mergedVerificationResults.filter(result => result.passed).length,
+      failedTargets: mergedVerificationResults.filter(result => !result.passed && !result.missing && !result.error).length,
+      erroredTargets: mergedVerificationResults.filter(result => Boolean(result.error) && !result.missing).length,
+      missingTargets: mergedVerificationResults.filter(result => result.missing).length,
+      passedPublicationRows: mergedPublicationRows.filter(row => row.verificationPassed).length,
+      failedPublicationRows: mergedPublicationRows.filter(row => !row.verificationPassed && !row.verificationMissing && !row.verificationError).length,
+      erroredPublicationRows: mergedPublicationRows.filter(row => Boolean(row.verificationError) && !row.verificationMissing).length,
+      missingPublicationRows: mergedPublicationRows.filter(row => row.verificationMissing).length,
+      verifiedPromotionLedgerRows: mergedPromotionLedgerRows.length,
+      visualApprovalHeldPublicationRows: mergedPublicationRows.filter(row => row.visualApproval?.required).length,
+    },
+    latestVerifiedTarget: verificationResults.at(-1) || summary.latestVerifiedTarget,
+  }
+
   writeJson(verificationManifestPath, {
-    generatedAt: summary.generatedAt,
-    summary: summary.totals,
-    verificationResults,
-    publicationRows,
+    generatedAt: mergedSummary.generatedAt,
+    scorePolicy: mergedSummary.scorePolicy,
+    summary: mergedSummary.totals,
+    verificationResults: mergedVerificationResults,
+    publicationRows: mergedPublicationRows,
   })
-  writeJson(verificationSummaryPath, summary)
+  writeJson(verificationSummaryPath, mergedSummary)
   const promotionLedgerManifest: PromotionLedgerManifest = {
-    generatedAt: summary.generatedAt,
+    generatedAt: mergedSummary.generatedAt,
     summary: {
-      verifiedPassRows: promotionLedgerRows.length,
-      byPromotionStatus: promotionLedgerRows.reduce<Record<string, number>>((acc, row) => {
+      verifiedPassRows: mergedPromotionLedgerRows.length,
+      byPromotionStatus: mergedPromotionLedgerRows.reduce<Record<string, number>>((acc, row) => {
         acc[row.promotionStatus] = (acc[row.promotionStatus] || 0) + 1
         return acc
       }, {}),
     },
-    rows: promotionLedgerRows,
+    rows: mergedPromotionLedgerRows,
   }
   writeJson(promotionLedgerPath, promotionLedgerManifest)
   writeJson(promotionLedgerSummaryPath, {
     generatedAt: promotionLedgerManifest.generatedAt,
+    scorePolicy: mergedSummary.scorePolicy,
     summary: promotionLedgerManifest.summary,
-    latestVerifiedPromotion: promotionLedgerRows.at(-1) || null,
+    latestVerifiedPromotion: mergedPromotionLedgerRows.at(-1) || null,
   })
 
-  console.log(JSON.stringify(summary, null, 2))
+  console.log(JSON.stringify(mergedSummary, null, 2))
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

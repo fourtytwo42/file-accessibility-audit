@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2026-04-11T21:31:56.733Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-sub79-last-tail-recovery.json",
+  "laneName": "all-sub79-last-tail-recovery",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 3,
+    "keep_fail_80_to_89": 0,
+    "drop_fail_lt_80": 76,
+    "processing_error": 1,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 80,
+    "processed": 80,
+    "readyToReplace": 3,
+    "remediatedPassCandidates": 3,
+    "failedAfterRemediation": 76,
+    "sourceMissing": 0,
+    "processingError": 1,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 80,
+    "pdfsPerHour": 6.37,
+    "terminalOutcomesPerHour": 6.37,
+    "passCandidatesPerHour": 0.24
+  },
+  "quality": {
+    "passCandidates": 3,
+    "rowsWithBlockingFindingShrink": 3,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4615",
+    "publicationTitle": "Illinois Helping Everyone Access Linked Systems Action Plan",
+    "priorityRank": 78,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 42,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "figure",
+    "runtimeWeightBucket": "medium",
+    "runtimeProfileKey": "llinois_heals_action_plan_icjia_t",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.figure_alt_or_artifact",
+      "pdfua.logical_structure"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/articles/llinois_HEALS_Action_Plan_ICJIA_07292019-191011T20095084.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4615-Illinois_Helping_Everyone_Access_Linked_Systems_Action_Plan.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/articles/llinois_HEALS_Action_Plan_ICJIA_07292019-191011T20095084.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/4615-Illinois_Helping_Everyone_Access_Linked_Systems_Action_Plan.remediation.json",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "promotionStatus": null,
+    "processedAt": "2026-04-11T21:31:56.730Z",
+    "durationMs": 177557,
+    "original": {
+      "overallScore": 42,
+      "grade": "F",
+      "pageCount": 82,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 42,
+      "grade": "F",
+      "pageCount": 82,
+      "isScanned": false
+    },
+    "seed": {
+      "priorOverallScore": 42,
+      "priorGrade": "F",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-10T10:57:59.949Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final overall score is 42, below relaxed threshold 90."
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "Alt Text on Images",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-last-tail-recovery/143.244.146.43/4615-Illinois_Helping_Everyone_Access_Linked_Systems_Action_Plan.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-last-tail-recovery/143.244.146.43/4615-Illinois_Helping_Everyone_Access_Linked_Systems_Action_Plan.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-sub79-last-tail-recovery/143.244.146.43/4615-Illinois_Helping_Everyone_Access_Linked_Systems_Action_Plan.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "074d825a536e6afe3b1bbb7d271863719b385a27854752db37e6cd4daedf413d",
+      "remediatedPdfSha256": "074d825a536e6afe3b1bbb7d271863719b385a27854752db37e6cd4daedf413d",
+      "stagedReplacementSha256": null
+    },
+    "strictPromotionGate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is F, not A.",
+        "Final overall score is 42, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Heading Structure",
+        "Alt Text on Images",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    }
+  }
+}

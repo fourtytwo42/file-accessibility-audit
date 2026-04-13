@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-04-06T05:15:30.451Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pass-rate-figure-canary.json",
+  "concurrency": 8,
+  "totals": {
+    "targetCandidates": 8,
+    "processed": 8,
+    "readyToReplace": 1,
+    "remediatedPassCandidates": 1,
+    "failedAfterRemediation": 7,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4700",
+    "publicationTitle": "R3 2022 Annual Report",
+    "priorityRank": 4,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 100,
+    "serverHost": "192.241.146.85",
+    "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/R3_Report_Final_c3f12abc60.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/192.241.146.85/R3_Report_Final_c3f12abc60.pdf",
+    "fileUrl": "https://agency.icjia-api.cloud/uploads/R3_Report_Final_c3f12abc60.pdf",
+    "storageKind": "agency_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/192.241.146.85/4700-R3_2022_Annual_Report.remediation.json",
+    "status": "remediated_pass_candidate",
+    "promotionStatus": null,
+    "processedAt": "2026-04-06T05:15:30.450Z",
+    "durationMs": 801726,
+    "original": {
+      "overallScore": 75,
+      "grade": "C",
+      "pageCount": 23,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 100,
+      "grade": "A",
+      "pageCount": 23,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": true,
+      "reasons": [],
+      "blockingLocalFindingKeys": [],
+      "unresolvedCategoryLabels": [],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/pass-rate-figure-canary/192.241.146.85/4700-R3_2022_Annual_Report.pdf",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/192.241.146.85/R3_Report_Final_c3f12abc60.pdf",
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/pass-rate-figure-canary/192.241.146.85/4700-R3_2022_Annual_Report.remediation.json",
+      "failureReportPath": null
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "40a9278b2f51aedb5c8b065b4107b6ed9dcbd04e1e479e4598054cf22db69d5b",
+      "remediatedPdfSha256": "40a9278b2f51aedb5c8b065b4107b6ed9dcbd04e1e479e4598054cf22db69d5b",
+      "stagedReplacementSha256": "40a9278b2f51aedb5c8b065b4107b6ed9dcbd04e1e479e4598054cf22db69d5b"
+    }
+  }
+}

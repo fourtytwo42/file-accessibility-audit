@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-04-02T01:02:20.023Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-02T01:02:20.003Z",
+  "forensicsManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-forensics.json",
+  "cohortLabel": "long_report",
+  "totals": {
+    "totalLongReportRows": 9,
+    "analyzedRows": 9,
+    "stillUnclassifiedRows": 0
+  },
+  "publicationIdsByDisposition": {
+    "long_report_verified_pass": [
+      "3829",
+      "3840",
+      "3865",
+      "3900",
+      "4010",
+      "4085",
+      "4091",
+      "4103",
+      "4552"
+    ],
+    "long_report_stable_hard_fail": [],
+    "long_report_processing_retry": [],
+    "long_report_mixed_residual": [],
+    "long_report_remediation_candidate": []
+  },
+  "includePublicationIds": [],
+  "stillUnclassifiedPublicationIds": []
+}

@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-04-12T00:21:22.352Z",
+  "sourceManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading.json",
+  "analysisProfile": "full_final",
+  "concurrency": 4,
+  "totals": {
+    "targetCandidates": 970,
+    "processed": 970,
+    "graded": 970,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 312,
+    "keep_fail_80_to_89": 352,
+    "drop_fail_lt_80": 306,
+    "processing_error": 0,
+    "source_missing": 0
+  },
+  "comparisons": {
+    "withHistoricalScore": 969,
+    "exactScoreMatch": 423,
+    "scoreDrift": 546,
+    "scoredHigherThanHistorical": 57,
+    "scoredLowerThanHistorical": 489,
+    "withHistoricalGrade": 969,
+    "exactGradeMatch": 651,
+    "gradeDrift": 318
+  }
+}

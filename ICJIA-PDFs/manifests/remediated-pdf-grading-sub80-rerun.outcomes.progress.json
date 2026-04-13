@@ -1,0 +1,35 @@
+{
+  "runId": "81204a51-1ba1-4b9b-90cb-9f2734536b81",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun.outcomes.json",
+  "firstStartedAt": "2026-04-12T00:28:23.234Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 41411655,
+  "lastHeartbeatAt": "2026-04-12T18:21:24.653Z",
+  "totalCandidates": 299,
+  "processed": 299,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 37,
+    "keep_fail_80_to_89": 31,
+    "drop_fail_lt_80": 216,
+    "processing_error": 15,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "4075",
+    "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey Final Report",
+    "status": "processing_error",
+    "resultBand": "processing_error",
+    "finalOverallScore": null,
+    "processedAt": "2026-04-12T18:21:24.639Z",
+    "durationMs": 1821837
+  }
+}

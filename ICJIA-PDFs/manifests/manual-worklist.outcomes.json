@@ -1,0 +1,2712 @@
+{
+  "generatedAt": "2026-04-08T02:30:36.643Z",
+  "queueName": "manual-worklist",
+  "outcomes": [
+    {
+      "publicationId": "3494",
+      "publicationTitle": "The 1996 Criminal History Records Audit",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T23:21:42.209Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 44,
+      "afterScore": 44,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_rebuild_required_not_patchable",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T23:21:42.209Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 44, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 44,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 44,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3494-The_1996_Criminal_History_Records_Audit.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3495",
+      "publicationTitle": "Orders of Protection Reported on ISP LEADS 19911995 A Measure of Domestic Violence in Illinois",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T23:23:03.907Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 44,
+      "afterScore": 44,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_rebuild_required_not_patchable",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T23:23:03.907Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 44, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 44,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 44,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3495-Orders_of_Protection_Reported_on_ISP_LEADS_19911995_A_Measure_of_Domestic_Violence_in_Illinois.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3518",
+      "publicationTitle": "Working for the Criminal Justice System in Illinois",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T23:29:08.139Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 51,
+      "afterScore": 51,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_rebuild_required_not_patchable",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T23:29:08.139Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 51, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 51,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 51,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3518-Working_for_the_Criminal_Justice_System_in_Illinois.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3569",
+      "publicationTitle": "1998 Statewide Motor Vehicle Theft Prevention Strategy",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T23:37:01.246Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/3569-1998_Statewide_Motor_Vehicle_Theft_Prevention_Strategy.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3569-1998_Statewide_Motor_Vehicle_Theft_Prevention_Strategy.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3569-1998_Statewide_Motor_Vehicle_Theft_Prevention_Strategy.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 52,
+      "afterScore": 36,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.metadata_identification",
+        "pdfua.bookmark_language"
+      ],
+      "manualResolutionReason": "manual_runtime_cost_not_worth_continuing",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 5 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T23:37:01.246Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.metadata_identification",
+          "pdfua.bookmark_language"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 36, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 52,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 36,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3569-1998_Statewide_Motor_Vehicle_Theft_Prevention_Strategy.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3569-1998_Statewide_Motor_Vehicle_Theft_Prevention_Strategy.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3575",
+      "publicationTitle": "1998 Annual Report Motor Vehicle Theft Prevention Council",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:02:17.719Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/3575-1998_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3575-1998_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3575-1998_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 40,
+      "afterScore": 40,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_runtime_cost_not_worth_continuing",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:02:17.719Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 40, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 40,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 40,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3575-1998_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3575-1998_Annual_Report_Motor_Vehicle_Theft_Prevention_Council.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3577",
+      "publicationTitle": "An Evaluation of the Madison County Assessment and Treatment and Alternative Court",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:04:25.772Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/3577-An_Evaluation_of_the_Madison_County_Assessment_and_Treatment_and_Alternative_Court.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3577-An_Evaluation_of_the_Madison_County_Assessment_and_Treatment_and_Alternative_Court.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3577-An_Evaluation_of_the_Madison_County_Assessment_and_Treatment_and_Alternative_Court.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 52,
+      "afterScore": 52,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_runtime_cost_not_worth_continuing",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:04:25.772Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Heading Structure",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 52, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Heading Structure, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 52,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 52,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3577-An_Evaluation_of_the_Madison_County_Assessment_and_Treatment_and_Alternative_Court.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3577-An_Evaluation_of_the_Madison_County_Assessment_and_Treatment_and_Alternative_Court.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3585",
+      "publicationTitle": "Juvenile Justice",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:42:35.435Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3585-Juvenile_Justice.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3585-Juvenile_Justice.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3585-Juvenile_Justice.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 55,
+      "afterScore": 74,
+      "beforeGrade": "F",
+      "afterGrade": "C",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:42:35.435Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 74, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 55,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 74,
+        "grade": "C"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3585-Juvenile_Justice.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3585-Juvenile_Justice.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3614",
+      "publicationTitle": "KENDALL County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:06:16.806Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/3614-KENDALL_County_Profile.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3614-KENDALL_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3614-KENDALL_County_Profile.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 66,
+      "afterScore": 66,
+      "beforeGrade": "D",
+      "afterGrade": "D",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_rebuild_required_not_patchable",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:06:16.806Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is D, not A.",
+          "Final overall score is 66, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 66,
+        "grade": "D"
+      },
+      "final": {
+        "overallScore": 66,
+        "grade": "D"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3614-KENDALL_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3614-KENDALL_County_Profile.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3616",
+      "publicationTitle": "GREENE County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T02:30:36.643Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3616-GREENE_County_Profile.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3616-GREENE_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3616-GREENE_County_Profile.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 81,
+      "afterScore": 81,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T02:30:36.643Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3616-GREENE_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3616-GREENE_County_Profile.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3617",
+      "publicationTitle": "KANE County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:12:17.585Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3617-KANE_County_Profile.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3617-KANE_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3617-KANE_County_Profile.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 81,
+      "afterScore": 81,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:12:17.585Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3617-KANE_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3617-KANE_County_Profile.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3618",
+      "publicationTitle": "IROQUOIS County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:15:18.223Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3618-IROQUOIS_County_Profile.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3618-IROQUOIS_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3618-IROQUOIS_County_Profile.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 81,
+      "afterScore": 81,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:15:18.223Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3618-IROQUOIS_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3618-IROQUOIS_County_Profile.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3619",
+      "publicationTitle": "JO DAVIESS County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:18:21.914Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3619-JO_DAVIESS_County_Profile.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3619-JO_DAVIESS_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3619-JO_DAVIESS_County_Profile.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 81,
+      "afterScore": 81,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:18:21.914Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3619-JO_DAVIESS_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3619-JO_DAVIESS_County_Profile.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3620",
+      "publicationTitle": "GRUNDY County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-08T01:21:23.538Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3620-GRUNDY_County_Profile.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3620-GRUNDY_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3620-GRUNDY_County_Profile.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 81,
+      "afterScore": 81,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-08T01:21:23.538Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3620-GRUNDY_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3620-GRUNDY_County_Profile.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3671",
+      "publicationTitle": "ICJIA 1997 Annual Report",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T19:50:31.759Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+      "beforeScore": 87,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T19:50:31.759Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 87,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3671-ICJIA_1997_Annual_Report.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "3691",
+      "publicationTitle": "JEFFERSON County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T16:58:39.769Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Jefferson.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3691-JEFFERSON_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3691-JEFFERSON_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T16:58:39.769Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3691-JEFFERSON_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3691-JEFFERSON_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3694",
+      "publicationTitle": "CASS County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T17:00:32.602Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Cass.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3694-CASS_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3694-CASS_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T17:00:32.602Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3694-CASS_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3694-CASS_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3698",
+      "publicationTitle": "CARROLL County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T16:59:54.814Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Carroll.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3698-CARROLL_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3698-CARROLL_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T16:59:54.814Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3698-CARROLL_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3698-CARROLL_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3700",
+      "publicationTitle": "CALHOUN County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T17:01:10.025Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Calhoun.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3700-CALHOUN_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3700-CALHOUN_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T17:01:10.025Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3700-CALHOUN_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3700-CALHOUN_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3703",
+      "publicationTitle": "CHAMPAIGN County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T16:59:16.993Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Champaign.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3703-CHAMPAIGN_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3703-CHAMPAIGN_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T16:59:16.993Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3703-CHAMPAIGN_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3703-CHAMPAIGN_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3705",
+      "publicationTitle": "BUREAU County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T16:58:58.360Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Bureau.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3705-BUREAU_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3705-BUREAU_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T16:58:58.360Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3705-BUREAU_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3705-BUREAU_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3706",
+      "publicationTitle": "BROWN County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T17:00:51.378Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Brown.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3706-BROWN_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3706-BROWN_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T17:00:51.378Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3706-BROWN_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3706-BROWN_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3707",
+      "publicationTitle": "BOND County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T17:00:14.215Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Bond.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3707-BOND_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3707-BOND_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T17:00:14.215Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3707-BOND_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3707-BOND_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3710",
+      "publicationTitle": "BOONE County Profile",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T16:59:35.358Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/CountyProfiles/Boone.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3710-BOONE_County_Profile.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3710-BOONE_County_Profile.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 21,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 6 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T16:59:35.358Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.font_embedding, pdfua.font_unicode, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 21,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/3710-BOONE_County_Profile.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/3710-BOONE_County_Profile.manual.json"
+      }
+    },
+    {
+      "publicationId": "3778",
+      "publicationTitle": "REPORT TO THE GOVERNORS COMMISSION ON CAPITAL PUNISHMENTVictim and Survivor Issues in Homicide Cases Focus Group Report",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:49:11.897Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3778-REPORT_TO_THE_GOVERNORS_COMMISSION_ON_CAPITAL_PUNISHMENTVictim_and_Survivor_Issues_in_Homicide_Cases_Focus_Group_Report.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3778-REPORT_TO_THE_GOVERNORS_COMMISSION_ON_CAPITAL_PUNISHMENTVictim_and_Survivor_Issues_in_Homicide_Cases_Focus_Group_Report.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3778-REPORT_TO_THE_GOVERNORS_COMMISSION_ON_CAPITAL_PUNISHMENTVictim_and_Survivor_Issues_in_Homicide_Cases_Focus_Group_Report.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 88,
+      "afterScore": 92,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:49:11.897Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 92, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 88,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/3778-REPORT_TO_THE_GOVERNORS_COMMISSION_ON_CAPITAL_PUNISHMENTVictim_and_Survivor_Issues_in_Homicide_Cases_Focus_Group_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/3778-REPORT_TO_THE_GOVERNORS_COMMISSION_ON_CAPITAL_PUNISHMENTVictim_and_Survivor_Issues_in_Homicide_Cases_Focus_Group_Report.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4015",
+      "publicationTitle": "A Profile of the Metro East Auto Theft Task Force",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:46:47.825Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.pdf",
+      "beforeScore": 92,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:46:47.825Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4015-A_Profile_of_the_Metro_East_Auto_Theft_Task_Force.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4019",
+      "publicationTitle": "A Profile of the Secretary of State Special Audit Teams",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:47:11.943Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.pdf",
+      "beforeScore": 92,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:47:11.943Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4019-A_Profile_of_the_Secretary_of_State_Special_Audit_Teams.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4072",
+      "publicationTitle": "Forensic DNA evidence 21st century criminal justice tool",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:51:15.474Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.pdf",
+      "beforeScore": 91,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:51:15.474Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 91,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4072-Forensic_DNA_evidence_21st_century_criminal_justice_tool.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4079",
+      "publicationTitle": "Peoria St Clair counties initiate Redeploy Illinois youth programs",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:26:37.947Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.pdf",
+      "beforeScore": 83,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:26:37.947Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 83,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4079-Peoria_St_Clair_counties_initiate_Redeploy_Illinois_youth_programs.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4098",
+      "publicationTitle": "Prescription drug abuse drug treatment needs on rise in Illinois",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:55:13.841Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.pdf",
+      "beforeScore": 89,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:55:13.841Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 89,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4098-Prescription_drug_abuse_drug_treatment_needs_on_rise_in_Illinois.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4100",
+      "publicationTitle": "Lake County probation program addresses womenspecific needs",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:45:13.570Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.pdf",
+      "beforeScore": 92,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:45:13.570Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4100-Lake_County_probation_program_addresses_womenspecific_needs.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4121",
+      "publicationTitle": "Prescription drug abuse accidental overdose on rise in Illinois",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T21:00:45.675Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.pdf",
+      "beforeScore": 87,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T21:00:45.675Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 87,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4121-Prescription_drug_abuse_accidental_overdose_on_rise_in_Illinois.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4150",
+      "publicationTitle": "ICJIA 2009 Annual Report",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T19:49:50.096Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage3-figure-wave/143.244.146.43/4150-ICJIA_2009_Annual_Report.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4150-ICJIA_2009_Annual_Report.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4150-ICJIA_2009_Annual_Report.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 92,
+      "afterScore": 92,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T19:49:50.096Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 92, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4150-ICJIA_2009_Annual_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4150-ICJIA_2009_Annual_Report.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4169",
+      "publicationTitle": "Juvenile sentencing",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T19:50:47.583Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4169-Juvenile_sentencing.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4169-Juvenile_sentencing.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4169-Juvenile_sentencing.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 81,
+      "afterScore": 83,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T19:50:47.583Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 83, not 100.",
+          "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 83,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4169-Juvenile_sentencing.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4169-Juvenile_sentencing.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4186",
+      "publicationTitle": "Underreporting of violent victimization impedes justice services",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T14:37:29.253Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 78,
+      "afterScore": 91,
+      "beforeGrade": "C",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-object repair improved the score but left one blocking /Figure object unresolved in full_final validation.",
+      "lastValidatedAt": "2026-04-07T14:37:29.253Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final score is 91, not 100.",
+          "Blocking findings remain after manual remediation."
+        ]
+      },
+      "original": {
+        "overallScore": 78,
+        "grade": "C"
+      },
+      "final": {
+        "overallScore": 91,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/143.244.146.43/4186-Underreporting_of_violent_victimization_impedes_justice_services.manual.json"
+      }
+    },
+    {
+      "publicationId": "4192",
+      "publicationTitle": "InfoNet database reveals Illinois domestic violence victim demographics trends",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:28:21.959Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 74,
+      "afterScore": 81,
+      "beforeGrade": "C",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images",
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 3 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:28:21.959Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact",
+          "pdfua.heading_content_quality"
+        ],
+        "unresolvedCategoryLabels": [
+          "Heading Structure",
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 81, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
+          "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 74,
+        "grade": "C"
+      },
+      "final": {
+        "overallScore": 81,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4192-InfoNet_database_reveals_Illinois_domestic_violence_victim_demographics_trends.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4481",
+      "publicationTitle": "Addressing Child Exposure to Violence",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T14:39:14.324Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 100,
+      "afterScore": 89,
+      "beforeGrade": "A",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual replay plus full_final validation still found nested alternate text and unresolved figure treatment, so this file is removed from automatic retry until deeper object-level surgery is attempted.",
+      "lastValidatedAt": "2026-04-07T14:39:14.324Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final score is 89, not 100.",
+          "Blocking findings remain after manual remediation."
+        ]
+      },
+      "original": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/157.230.3.215/4481-Addressing_Child_Exposure_to_Violence.manual.json"
+      }
+    },
+    {
+      "publicationId": "4565",
+      "publicationTitle": "Procedural Justice in Policing: How the Process of Justice Impacts Public Attitudes and Law Enforcement Outcomes",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T20:48:52.636Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.pdf",
+      "beforeScore": 92,
+      "afterScore": 100,
+      "beforeGrade": "B",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "MCP-driven manual repair cleared the replacement gate.",
+      "lastValidatedAt": "2026-04-07T20:48:52.636Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4565-Procedural_Justice_in_Policing_How_the_Process_of_Justice_Impacts_Public_Attitudes_and_Law_Enforcement_Outcomes.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4590",
+      "publicationTitle": "Research at a Glance Impacts of Probationer Screening and Services on Probation Success and Future Arrests",
+      "status": "manual_ready_to_replace",
+      "processedAt": "2026-04-07T19:55:33.716Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.manual-mcp.json",
+      "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+      "beforeScore": 100,
+      "afterScore": 100,
+      "beforeGrade": "A",
+      "afterGrade": "A",
+      "beforeBlockingFindingKeys": [],
+      "afterBlockingFindingKeys": [],
+      "manualResolutionReason": "cleared_final_blockers",
+      "manualResolutionNotes": "Baseline full_final already satisfied the replacement gate.",
+      "lastValidatedAt": "2026-04-07T19:55:33.716Z",
+      "gate": {
+        "passed": true,
+        "blockingLocalFindingKeys": [],
+        "unresolvedCategoryLabels": [],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": []
+      },
+      "original": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "final": {
+        "overallScore": 100,
+        "grade": "A"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.pdf",
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4590-Research_at_a_Glance_Impacts_of_Probationer_Screening_and_Services_on_Probation_Success_and_Future_Arrests.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4593",
+      "publicationTitle": "Focused Deterrence: A Policing Strategy to Combat Gun Violence",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T16:58:21.267Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/157.230.3.215/Focused_deterrence_PDF_062218-191011T20091388.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.manual.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 23,
+      "afterScore": 24,
+      "beforeGrade": "F",
+      "afterGrade": "F",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.bookmark_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.page_tabs",
+        "pdfua.annotation_alt_contents",
+        "pdfua.note_tag_id",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.bookmark_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.page_tabs",
+        "pdfua.annotation_alt_contents",
+        "pdfua.note_tag_id",
+        "pdfua.untagged_rendered_images",
+        "pdfua.nested_alt_text"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "Manual figure-final-mile repair stopped with 11 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T16:58:21.267Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.document_language",
+          "pdfua.display_doc_title",
+          "pdfua.bookmark_language",
+          "pdfua.font_embedding",
+          "pdfua.font_unicode",
+          "pdfua.page_tabs",
+          "pdfua.annotation_alt_contents",
+          "pdfua.note_tag_id",
+          "pdfua.untagged_rendered_images",
+          "pdfua.nested_alt_text"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Document Title & Language",
+          "Heading Structure",
+          "Alt Text on Images",
+          "Bookmarks / Navigation",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is F, not A.",
+          "Final overall score is 24, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.bookmark_language, pdfua.font_embedding, pdfua.font_unicode, pdfua.page_tabs, pdfua.annotation_alt_contents, pdfua.note_tag_id, pdfua.untagged_rendered_images, pdfua.nested_alt_text",
+          "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Alt Text on Images, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 23,
+        "grade": "F"
+      },
+      "final": {
+        "overallScore": 24,
+        "grade": "F"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-figure-final-mile/157.230.3.215/4593-Focused_Deterrence_A_Policing_Strategy_to_Combat_Gun_Violence.manual.json"
+      }
+    },
+    {
+      "publicationId": "4607",
+      "publicationTitle": "The Victim-Offender Overlap: Examining the Relationship Between Victimization and Offending",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T21:13:07.661Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4607-The_Victim-Offender_Overlap_Examining_the_Relationship_Between_Victimization_and_Offending.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4607-The_Victim-Offender_Overlap_Examining_the_Relationship_Between_Victimization_and_Offending.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4607-The_Victim-Offender_Overlap_Examining_the_Relationship_Between_Victimization_and_Offending.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 83,
+      "afterScore": 87,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T21:13:07.661Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 87, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 83,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 87,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4607-The_Victim-Offender_Overlap_Examining_the_Relationship_Between_Victimization_and_Offending.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4607-The_Victim-Offender_Overlap_Examining_the_Relationship_Between_Victimization_and_Offending.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4634",
+      "publicationTitle": "A Review of Literature on Mental Health Court Goals, Effectiveness, and Future Implications",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T21:16:09.168Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4634-A_Review_of_Literature_on_Mental_Health_Court_Goals_Effectiveness_and_Future_Implications.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4634-A_Review_of_Literature_on_Mental_Health_Court_Goals_Effectiveness_and_Future_Implications.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4634-A_Review_of_Literature_on_Mental_Health_Court_Goals_Effectiveness_and_Future_Implications.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 83,
+      "afterScore": 89,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images",
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T21:16:09.168Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 83,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4634-A_Review_of_Literature_on_Mental_Health_Court_Goals_Effectiveness_and_Future_Implications.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4634-A_Review_of_Literature_on_Mental_Health_Court_Goals_Effectiveness_and_Future_Implications.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4639",
+      "publicationTitle": "Adjusting Work Conditions During the COVID-19 Pandemic: A Survey of Illinois Mental Health Court Staff",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:58:45.138Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 88,
+      "afterScore": 88,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:58:45.138Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 88,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4639-Adjusting_Work_Conditions_During_the_COVID-19_Pandemic_A_Survey_of_Illinois_Mental_Health_Court_Staff.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4651",
+      "publicationTitle": "Understanding Intimate Partner Violence: Definitions and Risk Factors",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T21:07:40.006Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/4651-Understanding_Intimate_Partner_Violence_Definitions_and_Risk_Factors.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4651-Understanding_Intimate_Partner_Violence_Definitions_and_Risk_Factors.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4651-Understanding_Intimate_Partner_Violence_Definitions_and_Risk_Factors.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 84,
+      "afterScore": 84,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T21:07:40.006Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 84, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 84,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 84,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/143.244.146.43/4651-Understanding_Intimate_Partner_Violence_Definitions_and_Risk_Factors.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/143.244.146.43/4651-Understanding_Intimate_Partner_Violence_Definitions_and_Risk_Factors.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4688",
+      "publicationTitle": "A Profile of Latinx Participants in Adult Redeploy Illinois",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T21:21:49.044Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4688-A_Profile_of_Latinx_Participants_in_Adult_Redeploy_Illinois.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4688-A_Profile_of_Latinx_Participants_in_Adult_Redeploy_Illinois.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4688-A_Profile_of_Latinx_Participants_in_Adult_Redeploy_Illinois.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 82,
+      "afterScore": 82,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images",
+        "pdfua.nested_alt_text"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images",
+        "pdfua.nested_alt_text"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T21:21:49.044Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.untagged_rendered_images",
+          "pdfua.nested_alt_text"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 82, not 100.",
+          "Blocking local standards findings remain: pdfua.untagged_rendered_images, pdfua.nested_alt_text",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 82,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 82,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4688-A_Profile_of_Latinx_Participants_in_Adult_Redeploy_Illinois.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4688-A_Profile_of_Latinx_Participants_in_Adult_Redeploy_Illinois.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4726",
+      "publicationTitle": "InfoNet: State Fiscal Year 2023 Highlights",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:36:24.580Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/medium-figure-conversion/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 67,
+      "afterScore": 78,
+      "beforeGrade": "D",
+      "afterGrade": "C",
+      "beforeBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.untagged_rendered_images",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:36:24.580Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.logical_structure",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Text Extractability",
+          "Alt Text on Images",
+          "Reading Order",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is C, not A.",
+          "Final overall score is 78, not 100.",
+          "Blocking local standards findings remain: pdfua.logical_structure, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Text Extractability, Alt Text on Images, Reading Order, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 67,
+        "grade": "D"
+      },
+      "final": {
+        "overallScore": 78,
+        "grade": "C"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4726-InfoNet_State_Fiscal_Year_2023_Highlights.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4750",
+      "publicationTitle": "2024-2025 Illinois Traffic and Pedestrian Stop Data Use and Collection Task Force Findings",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:59:47.279Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4750-2024-2025_Illinois_Traffic_and_Pedestrian_Stop_Data_Use_and_Collection_Task_Force_Findings.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4750-2024-2025_Illinois_Traffic_and_Pedestrian_Stop_Data_Use_and_Collection_Task_Force_Findings.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4750-2024-2025_Illinois_Traffic_and_Pedestrian_Stop_Data_Use_and_Collection_Task_Force_Findings.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 88,
+      "afterScore": 88,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 2 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:59:47.279Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text",
+          "pdfua.figure_alt_or_artifact"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 88, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text, pdfua.figure_alt_or_artifact",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 88,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 88,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4750-2024-2025_Illinois_Traffic_and_Pedestrian_Stop_Data_Use_and_Collection_Task_Force_Findings.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4750-2024-2025_Illinois_Traffic_and_Pedestrian_Stop_Data_Use_and_Collection_Task_Force_Findings.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4756",
+      "publicationTitle": "Mental Health Professionals' Experiences of Burnout and Vicarious Traumatization: Illinois HEALS Evaluation Study Findings",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T21:18:33.677Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4756-Mental_Health_Professionals_Experiences_of_Burnout_and_Vicarious_Traumatization_Illinois_HEALS_Evaluation_Study_Findings.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4756-Mental_Health_Professionals_Experiences_of_Burnout_and_Vicarious_Traumatization_Illinois_HEALS_Evaluation_Study_Findings.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4756-Mental_Health_Professionals_Experiences_of_Burnout_and_Vicarious_Traumatization_Illinois_HEALS_Evaluation_Study_Findings.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 82,
+      "afterScore": 92,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.untagged_rendered_images",
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T21:18:33.677Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 92, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 82,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 92,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4756-Mental_Health_Professionals_Experiences_of_Burnout_and_Vicarious_Traumatization_Illinois_HEALS_Evaluation_Study_Findings.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4756-Mental_Health_Professionals_Experiences_of_Burnout_and_Vicarious_Traumatization_Illinois_HEALS_Evaluation_Study_Findings.manual-mcp.json"
+      }
+    },
+    {
+      "publicationId": "4758",
+      "publicationTitle": "Firearm Prohibitors and Records Improvement Task Force 2025 Report",
+      "status": "manual_terminalized",
+      "processedAt": "2026-04-07T20:53:59.473Z",
+      "inputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4758-Firearm_Prohibitors_and_Records_Improvement_Task_Force_2025_Report.pdf",
+      "outputPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4758-Firearm_Prohibitors_and_Records_Improvement_Task_Force_2025_Report.pdf",
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4758-Firearm_Prohibitors_and_Records_Improvement_Task_Force_2025_Report.manual-mcp.json",
+      "stagedReplacementPath": null,
+      "beforeScore": 89,
+      "afterScore": 89,
+      "beforeGrade": "B",
+      "afterGrade": "B",
+      "beforeBlockingFindingKeys": [
+        "pdfua.nested_alt_text",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "afterBlockingFindingKeys": [
+        "pdfua.nested_alt_text"
+      ],
+      "manualResolutionReason": "manual_object_level_repair_exhausted",
+      "manualResolutionNotes": "MCP-driven manual repair stopped with 1 blocking finding(s) remaining.",
+      "lastValidatedAt": "2026-04-07T20:53:59.473Z",
+      "gate": {
+        "passed": false,
+        "blockingLocalFindingKeys": [
+          "pdfua.nested_alt_text"
+        ],
+        "unresolvedCategoryLabels": [
+          "Alt Text on Images",
+          "PDF/UA Compliance"
+        ],
+        "criticalManualReviewFlagCodes": [],
+        "reasons": [
+          "Final grade is B, not A.",
+          "Final overall score is 89, not 100.",
+          "Blocking local standards findings remain: pdfua.nested_alt_text",
+          "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+        ]
+      },
+      "original": {
+        "overallScore": 89,
+        "grade": "B"
+      },
+      "final": {
+        "overallScore": 89,
+        "grade": "B"
+      },
+      "artifacts": {
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/157.230.3.215/4758-Firearm_Prohibitors_and_Records_Improvement_Task_Force_2025_Report.pdf",
+        "stagedReplacementPath": null,
+        "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/manual-mcp-batch/157.230.3.215/4758-Firearm_Prohibitors_and_Records_Improvement_Task_Force_2025_Report.manual-mcp.json"
+      }
+    }
+  ]
+}

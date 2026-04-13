@@ -1,0 +1,166 @@
+{
+  "generatedAt": "2026-04-11T18:23:04.857Z",
+  "laneName": "all-sub79-last-tail-recovery",
+  "executionPolicyReason": "recover_exact_last_tail_from_completed_87_file_sub79_run",
+  "totals": {
+    "scannedReportsConsidered": 80,
+    "selectedCandidates": 80,
+    "byTier": {
+      "highest": 11,
+      "high": 6,
+      "medium": 63
+    },
+    "plateauedCandidates": 0,
+    "nonPlateauedCandidates": 80,
+    "excludedNonTerminal": 0,
+    "excludedAbove79": 7,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0,
+    "excludedLaneMismatch": 0
+  },
+  "topCandidates": [
+    {
+      "publicationId": "4518",
+      "publicationTitle": "Safe From the Start Year 12 Report 2001-2013",
+      "overallScore": 79,
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.table_regularity"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4518-Safe_From_the_Start_Year_12_Report_2001-2013.pdf"
+    },
+    {
+      "publicationId": "3775",
+      "publicationTitle": "Criminal Justice Plan for the State of Illinois",
+      "overallScore": 79,
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3775-Criminal_Justice_Plan_for_the_State_of_Illinois.pdf"
+    },
+    {
+      "publicationId": "4659",
+      "publicationTitle": "Civil Rights Policy 2019",
+      "overallScore": 79,
+      "blockingFindingKeys": [
+        "pdfua.annotation_alt_contents",
+        "pdfua.heading_content_quality"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/192.241.146.85/4659-Civil_Rights_Policy_2019.pdf"
+    },
+    {
+      "publicationId": "4685",
+      "publicationTitle": "Firearm Prohibitors and Records Improvement Task Force 2022 Report",
+      "overallScore": 79,
+      "blockingFindingKeys": [
+        "pdfua.annotation_alt_contents",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/157.230.3.215/4685-Firearm_Prohibitors_and_Records_Improvement_Task_Force_2022_Report.pdf"
+    },
+    {
+      "publicationId": "3767",
+      "publicationTitle": "Safety Plan for Domestic Violence Victims",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.font_unicode"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3767-Safety_Plan_for_Domestic_Violence_Victims.pdf"
+    },
+    {
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.font_embedding"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3836-The_use_of_probationer_alcohol_and_substance_abuse_treatment_services_in_Illinois.pdf"
+    },
+    {
+      "publicationId": "3972",
+      "publicationTitle": "Minority overrepresentation in the criminal and juvenile justice systems",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.font_embedding"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3972-Minority_overrepresentation_in_the_criminal_and_juvenile_justice_systems.pdf"
+    },
+    {
+      "publicationId": "4034",
+      "publicationTitle": "The Rise in Reported Elder Abuse A Review of State and National Data",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.font_embedding"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4034-The_Rise_in_Reported_Elder_Abuse_A_Review_of_State_and_National_Data.pdf"
+    },
+    {
+      "publicationId": "4055",
+      "publicationTitle": "CLEAR offers enhanced police efficiencies increased accountability",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.font_embedding"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4055-CLEAR_offers_enhanced_police_efficiencies_increased_accountability.pdf"
+    },
+    {
+      "publicationId": "4196",
+      "publicationTitle": "Screening for serious mental illness among offenders",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.font_embedding"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4196-Screening_for_serious_mental_illness_among_offenders.pdf"
+    },
+    {
+      "publicationId": "4502",
+      "publicationTitle": "An Overview of Evidence-Based Practices and Programs in Prison Reentry",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.annotation_alt_contents",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4502-An_Overview_of_Evidence-Based_Practices_and_Programs_in_Prison_Reentry.pdf"
+    },
+    {
+      "publicationId": "4515",
+      "publicationTitle": "Juvenile recidivism in Illinois Examining rearrest and reincarceration of youth committed for a court evaluation",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.heading_content_quality"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4515-Juvenile_recidivism_in_Illinois_Examining_rearrest_and_reincarceration_of_youth_committed_for_a_court_evaluation.pdf"
+    },
+    {
+      "publicationId": "4534",
+      "publicationTitle": "Safe From the Start Year 13: 2001-2014",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4534-Safe_From_the_Start_Year_13_2001-2014.pdf"
+    },
+    {
+      "publicationId": "4728",
+      "publicationTitle": "Violence Interrupters: A Review of the Literature",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.annotation_alt_contents",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/157.230.3.215/4728-Violence_Interrupters_A_Review_of_the_Literature.pdf"
+    },
+    {
+      "publicationId": "4057",
+      "publicationTitle": "2006 Criminal History Records (CHRI) Audit Report",
+      "overallScore": 78,
+      "blockingFindingKeys": [
+        "pdfua.figure_alt_or_artifact",
+        "pdfua.table_regularity"
+      ],
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/4057-2006_Criminal_History_Records_CHRI_Audit_Report.pdf"
+    }
+  ]
+}

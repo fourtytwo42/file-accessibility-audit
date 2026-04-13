@@ -223,6 +223,12 @@ Runtime controls:
   - mark it:
     - `skipNextBatch: true`
   - then continue to the next PDF instead of letting the batch stall
+- `ICJIA_REMEDIATION_MIN_PASS_SCORE` (optional)
+  - when set (e.g. `90`), the batch uses the relaxed promotion gate from `evaluatePromotionGate` with `minOverallScore` (not scanned, no critical manual-review flags) for pass/staging and outcome `remediated_pass_candidate`, instead of strict grade **A** / score **100**
+  - unset keeps the engine default strict gate for that batch
+- `ICJIA_REMEDIATION_MIN_KEEP_SCORE` (optional)
+  - when set (e.g. `80`), remediated PDF bytes under the batch artifact root are deleted after the row finishes if the final overall score is **below** this value (`<` threshold), unless the row **passes** the effective gate; scores **≥** the threshold are kept (so `80` keeps **80+** on failures)
+  - unset keeps every remediated PDF on disk (current default)
 
 Current output locations:
 
@@ -243,13 +249,14 @@ Current output locations:
 
 Pass/ready rule:
 
-- mark `ready_to_replace` only when the remediated result has:
+- default (strict): mark `remediated_pass_candidate` / stage only when the remediated result has:
   - grade `A`
   - score `100`
   - no blocking local-standards findings
   - no critical manual-review flags
   - no scored categories below `100`, except:
     - `Color Contrast`
+- optional: set `ICJIA_REMEDIATION_MIN_PASS_SCORE` to use a minimum overall score (and the same not-scanned / no-critical-flags rules as manual MCP relaxed mode) instead of strict **A**/**100** for this batch only
 - otherwise record as `failed_after_remediation` with detailed reasons and artifacts
 
 Operational rule:
@@ -259,6 +266,81 @@ Operational rule:
 - stage only the PDFs that are confirmed `ready_to_replace`
 - keep detailed JSON evidence for failures so similar problems can be grouped and fixed later
 - if a PDF exceeds the runtime timeout, treat it as broken/deferred for the current wave and do not let it block the batch
+
+## Manual Figure Final-Mile Lane
+
+Use this lane for hard-but-salvageable PDFs that are already close to passing after automation and should be pulled out of automatic retry waves.
+
+Current helper commands:
+
+- build the durable manual queue:
+  - `pnpm agency:build-manual-worklist`
+- compatibility alias:
+  - `pnpm agency:build-manual-fix-candidates`
+- run a local manual figure-final-mile pass for one publication:
+  - `pnpm agency:manual-figure-final-mile <publicationId>`
+- run the MCP-driven manual batch:
+  - `pnpm agency:run-manual-mcp-batch`
+  - with no arguments, loads the legacy four-id figure-canary cohort (`4150`, `3671`, `4169`, `4590`) from `ICJIA-PDFs/manifests/pass-rate-figure-canary.json` (same as before).
+  - manifest-driven next wave (recommended):
+    - `pnpm agency:run-manual-mcp-batch -- --manifest` uses `ICJIA-PDFs/manifests/manual-mcp-next-batch.json` for ids, titles, and rationales, and merges `ICJIA-PDFs/manifests/publication-pdf-replacement-map.json` for `serverHost` and cache paths.
+    - optional explicit manifest path: `pnpm agency:run-manual-mcp-batch -- --manifest ICJIA-PDFs/manifests/manual-mcp-next-batch.json`
+    - optional subset (tranche order preserved): `pnpm agency:run-manual-mcp-batch -- --manifest 4079 4192 4726`
+  - map-only ids (no batch manifest): `pnpm agency:run-manual-mcp-batch -- 4192` resolves the publication from the replacement map and remediated tree only.
+  - resolve candidates and run `full_final` prefilter without MCP: `pnpm agency:run-manual-mcp-batch -- --manifest --dry-run` (add numeric ids after `--manifest` to filter).
+  - optional single-file rerun:
+    - `pnpm agency:run-manual-mcp-batch <publicationId>`
+- build the following manual MCP wave manifest (after the current next batch is closed):
+  - `pnpm agency:build-manual-mcp-next-batch-v2`
+  - writes `ICJIA-PDFs/manifests/manual-mcp-next-batch-v2.json` and `manual-mcp-next-batch-v2.summary.json` using the corpus control plane, manual outcome ledger, replacement map, `full_final` preflight, and excludes ids still listed on `manual-mcp-next-batch.json`.
+
+Current manual queue artifacts:
+
+- manual queue manifest:
+  - `ICJIA-PDFs/manifests/manual-worklist.json`
+- manual queue summary:
+  - `ICJIA-PDFs/manifests/manual-worklist.summary.json`
+- manual outcome ledger:
+  - `ICJIA-PDFs/manifests/manual-worklist.outcomes.json`
+- manual outcome summary:
+  - `ICJIA-PDFs/manifests/manual-worklist.outcomes.summary.json`
+- per-file manual reports:
+  - `ICJIA-PDFs/reports/manual-figure-final-mile/`
+- per-file manual output PDFs:
+  - `ICJIA-PDFs/artifacts/remediated-pdfs/manual-figure-final-mile/`
+- staged manual replacements:
+  - `ICJIA-PDFs/staging/to-replace/manual-worklist/`
+- MCP manual batch manifest:
+  - `ICJIA-PDFs/manifests/manual-mcp-batch.json`
+- MCP manual batch summary:
+  - `ICJIA-PDFs/manifests/manual-mcp-batch.summary.json`
+- MCP per-file manual reports:
+  - `ICJIA-PDFs/reports/manual-mcp-batch/`
+- MCP per-file manual output PDFs:
+  - `ICJIA-PDFs/artifacts/remediated-pdfs/manual-mcp-batch/`
+- MCP staged manual replacements:
+  - `ICJIA-PDFs/staging/to-replace/manual-mcp-batch/`
+
+Manual statuses:
+
+- `manual_ready_to_replace`
+- `manual_terminalized`
+- `manual_in_progress`
+- `manual_deferred`
+
+Manual-lane operating rules:
+
+- start from the best local remediated artifact, not from live replacement paths
+- use the fixed 12-row manual wave as the first hard queue and work it in priority order
+- judge manual completion by `full_final`, not `remediation_fast`
+- `remediation_fast` may be used for iteration, but never as the final decision surface
+- when using the PDF MCP server, treat MCP as the mutation/inspection surface and still validate the final decision with the normal `full_final` gate
+- do not send already-passing PDFs into the MCP manual batch; exclude them up front by checking the best local input with `full_final`
+- if a supposedly hard candidate is already passing locally, treat that as a selection mistake and fix the selector instead of processing it
+- keep explicit manual reasons in the outcomes ledger so the control plane can explain why a PDF was manually mitigated
+- `manual_terminalized` is a valid success state when it removes a PDF from automation retry budgets with a recorded reason
+- do not let manually mitigated rows drift back into throughput lanes, runtime retry lanes, or replacement-likelihood selection
+- `manual_ready_to_replace` should remain visible to normal verification/replacement flow as distinct from automated-ready rows
 
 ## Default Rule
 

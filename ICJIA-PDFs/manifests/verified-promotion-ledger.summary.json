@@ -1,28 +1,31 @@
 {
-  "generatedAt": "2026-03-31T06:56:07.959Z",
+  "generatedAt": "2026-04-10T05:45:23.082Z",
+  "scorePolicy": {
+    "minPassOverallScore": 90
+  },
   "summary": {
-    "verifiedPassRows": 90,
+    "verifiedPassRows": 144,
     "byPromotionStatus": {
-      "verified_pass": 90
+      "verified_pass": 144
     }
   },
   "latestVerifiedPromotion": {
-    "publicationId": "4742",
-    "publicationTitle": "Illinois Juvenile Justice System Data Trends Pre- and Post-COVID-19",
+    "publicationId": "4766",
+    "publicationTitle": "Illinois K-12 Public School Personnel Readiness for Supporting Student Mental Health",
     "sourceKind": "batch_ready",
-    "sourcePathOrUrl": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/IJJC Data Trends article-250331T16235728.pdf",
-    "sourceFileUrl": "https://researchhub.icjia-api.cloud/uploads/IJJC%20Data%20Trends%20article-250331T16235728.pdf",
-    "localFinalArtifactPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4742-Illinois_Juvenile_Justice_System_Data_Trends_Pre-_and_Post-COVID-19.pdf",
-    "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/IJJC Data Trends article-250331T16235728.pdf",
-    "currentSourceChecksumSha256": "be1e1387ffff1cf6e39278f2c6777f3ae486287c8939281090897414ae0b7a15",
-    "replacementChecksumSha256": "3190c0c1df36fb215af020bb77a68459205ea57a429cce8a6f0b56449a0e161d",
-    "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/IJJC_Data_Trends_article-250331T16235728.pdf.json",
-    "verificationTimestamp": "2026-03-31T06:52:48.595Z",
+    "sourcePathOrUrl": "/home/forge/researchhub.icjia-api.cloud/researchhub/public/uploads/PPRS-251003T13340815.pdf",
+    "sourceFileUrl": "https://researchhub.icjia-api.cloud/uploads/PPRS-251003T13340815.pdf",
+    "localFinalArtifactPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/157.230.3.215/4766-Illinois_K-12_Public_School_Personnel_Readiness_for_Supporting_Student_Mental_Health.pdf",
+    "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/157.230.3.215/PPRS-251003T13340815.pdf",
+    "currentSourceChecksumSha256": "b22fc444e9cfad759e7eab4d63ef0c8d935f9432ebef3f53d326592acff8b948",
+    "replacementChecksumSha256": "4f81349c0359461874604c01db664ca03c38051135e24b090d102cbe51f12c86",
+    "verificationReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/PPRS-251003T13340815.pdf.json",
+    "verificationTimestamp": "2026-04-06T21:21:01.470Z",
     "verificationSummary": {
       "passed": true,
       "overallScore": 100,
       "grade": "A",
-      "pageCount": 26,
+      "pageCount": 10,
       "isScanned": false,
       "reasons": [],
       "blockingLocalFindingKeys": [],

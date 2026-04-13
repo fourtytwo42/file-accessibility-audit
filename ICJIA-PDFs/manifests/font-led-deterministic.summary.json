@@ -1,0 +1,188 @@
+{
+  "generatedAt": "2026-04-11T03:43:06.744Z",
+  "laneName": "font-led-deterministic",
+  "executionPolicy": "active",
+  "executionPolicyReason": "target_remaining_font_led_residue_without_structure_debt",
+  "sourceOutcomesPaths": [
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-dropped-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-60-69-positive-delta-wave.outcomes.json",
+    "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-batch-outcomes.json"
+  ],
+  "totals": {
+    "scannedReportsConsidered": 748,
+    "selectedCandidates": 15,
+    "byTier": {
+      "highest": 10,
+      "high": 2,
+      "medium": 3
+    },
+    "plateauedCandidates": 3,
+    "nonPlateauedCandidates": 12,
+    "excludedNonTerminal": 247,
+    "excludedAbove79": 124,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0,
+    "excludedLaneMismatch": 362
+  },
+  "blockerSignatureCounts": {
+    "pdfua.annotation_alt_contents + pdfua.font_embedding + pdfua.font_unicode": 2,
+    "pdfua.font_embedding + pdfua.font_unicode": 1,
+    "pdfua.font_embedding": 6,
+    "pdfua.figure_alt_or_artifact + pdfua.font_embedding + pdfua.nested_alt_text": 1,
+    "pdfua.figure_alt_or_artifact + pdfua.font_embedding": 2,
+    "pdfua.font_embedding + pdfua.font_unicode + pdfua.untagged_rendered_images": 1,
+    "pdfua.figure_alt_or_artifact + pdfua.font_unicode + pdfua.table_regularity": 2
+  },
+  "plateauCounts": {
+    "plateaued": 3,
+    "nonPlateaued": 12
+  },
+  "topCandidates": [
+    {
+      "publicationId": "4500",
+      "publicationTitle": "Logic Models: Practical Planning to Reach Program Goals",
+      "overallScore": 77,
+      "blockerSignature": "pdfua.annotation_alt_contents + pdfua.font_embedding + pdfua.font_unicode",
+      "blockerFamilies": [
+        "annotation",
+        "font"
+      ],
+      "scoreDeltaFromPrior": 21,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 1,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3767",
+      "publicationTitle": "Safety Plan for Domestic Violence Victims",
+      "overallScore": 78,
+      "blockerSignature": "pdfua.font_embedding + pdfua.font_unicode",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 2,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3836",
+      "publicationTitle": "The use of probationer alcohol and substance abuse treatment services in Illinois",
+      "overallScore": 78,
+      "blockerSignature": "pdfua.font_embedding",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 3,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3972",
+      "publicationTitle": "Minority overrepresentation in the criminal and juvenile justice systems",
+      "overallScore": 78,
+      "blockerSignature": "pdfua.font_embedding",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 4,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4034",
+      "publicationTitle": "The Rise in Reported Elder Abuse A Review of State and National Data",
+      "overallScore": 78,
+      "blockerSignature": "pdfua.font_embedding",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 5,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4055",
+      "publicationTitle": "CLEAR offers enhanced police efficiencies increased accountability",
+      "overallScore": 78,
+      "blockerSignature": "pdfua.font_embedding",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 6,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4196",
+      "publicationTitle": "Screening for serious mental illness among offenders",
+      "overallScore": 78,
+      "blockerSignature": "pdfua.font_embedding",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 7,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "4039",
+      "publicationTitle": "Decade of trends shows continual decrease in Illinois crime",
+      "overallScore": 77,
+      "blockerSignature": "pdfua.font_embedding",
+      "blockerFamilies": [
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 8,
+      "priorityTier": "highest"
+    },
+    {
+      "publicationId": "3869",
+      "publicationTitle": "Community Policing Police and community problem solving in Chicago",
+      "overallScore": 71,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.font_embedding + pdfua.nested_alt_text",
+      "blockerFamilies": [
+        "figure",
+        "font"
+      ],
+      "scoreDeltaFromPrior": 0,
+      "plateaued": false,
+      "runtimeWeightBucket": "light",
+      "priorityRank": 9,
+      "priorityTier": "high"
+    },
+    {
+      "publicationId": "4117",
+      "publicationTitle": "Program Completion Behavioral Change and Rearrest for the Batterer Intervention System of Cook County Illinois",
+      "overallScore": 68,
+      "blockerSignature": "pdfua.figure_alt_or_artifact + pdfua.font_embedding",
+      "blockerFamilies": [
+        "figure",
+        "font"
+      ],
+      "scoreDeltaFromPrior": 16,
+      "plateaued": false,
+      "runtimeWeightBucket": "medium",
+      "priorityRank": 10,
+      "priorityTier": "highest"
+    }
+  ]
+}

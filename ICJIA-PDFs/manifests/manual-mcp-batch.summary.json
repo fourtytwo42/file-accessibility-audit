@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-04-08T02:08:07.929Z",
+  "queueName": "manual-mcp-batch",
+  "totalCandidates": 1,
+  "selectedPublicationIds": [
+    "3616"
+  ],
+  "skippedAlreadyPassingIds": [],
+  "verificationPreflightPassedIds": [],
+  "verificationNoInput": [],
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/manual-mcp-batch.json"
+}

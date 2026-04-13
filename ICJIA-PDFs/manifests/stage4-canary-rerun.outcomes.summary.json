@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-04-05T01:47:07.451Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-canary-rerun.priority.json",
+  "concurrency": 4,
+  "totals": {
+    "targetCandidates": 6,
+    "processed": 6,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 3,
+    "sourceMissing": 0,
+    "processingError": 3,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4183",
+    "publicationTitle": "Juvenile reform specialized services help fuel fight against probationer recidivism",
+    "priorityRank": 6,
+    "priorityTier": "medium",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/compiler/CompilerSummer2007.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/compiler/CompilerSummer2007.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.remediation.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-05T01:47:07.450Z",
+    "durationMs": 1804995,
+    "original": {
+      "overallScore": 22,
+      "grade": "F",
+      "pageCount": 8,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 90,
+      "grade": "B",
+      "pageCount": 8,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 90, not 100.",
+        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Alt Text on Images, Table Markup, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Alt Text on Images",
+        "Table Markup",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-canary-rerun/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-canary-rerun/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-canary-rerun/143.244.146.43/4183-Juvenile_reform_specialized_services_help_fuel_fight_against_probationer_recidivism.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "a9f934be533f75e01388e6d6f564911c63cc992ec1e4f5cf38373e8c39c0b3b2",
+      "remediatedPdfSha256": "a9f934be533f75e01388e6d6f564911c63cc992ec1e4f5cf38373e8c39c0b3b2",
+      "stagedReplacementSha256": null
+    }
+  }
+}

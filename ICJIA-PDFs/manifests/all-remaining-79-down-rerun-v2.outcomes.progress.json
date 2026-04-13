@@ -1,0 +1,35 @@
+{
+  "runId": "23718f2b-bef9-49e4-873f-9e3069a6758d",
+  "state": "completed",
+  "pid": null,
+  "manifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.json",
+  "outcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+  "firstStartedAt": "2026-04-10T19:11:55.524Z",
+  "currentSessionStartedAt": null,
+  "accumulatedActiveRuntimeMs": 24545560,
+  "lastHeartbeatAt": "2026-04-11T02:01:01.084Z",
+  "totalCandidates": 394,
+  "processed": 394,
+  "remaining": 0,
+  "activeWorkers": 0,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 9,
+    "keep_fail_80_to_89": 4,
+    "drop_fail_lt_80": 378,
+    "processing_error": 3,
+    "source_missing": 0
+  },
+  "lastCompleted": {
+    "publicationId": "4702",
+    "publicationTitle": "2022 Victim Needs Assessment",
+    "status": "processing_error",
+    "resultBand": "processing_error",
+    "finalOverallScore": null,
+    "processedAt": "2026-04-11T02:01:01.063Z",
+    "durationMs": 1858190
+  }
+}

@@ -317,12 +317,29 @@ function buildSummary(rows: CorpusControlPlaneRow[], ledgerRowCount: number): Co
     long_report: emptyStatusCounts(),
     manual_tail: emptyStatusCounts(),
   }
+  const blockerFamilyBacklog: Record<string, number> = {}
+  const blockingFindingBacklog: Record<string, number> = {}
+  const runtimeDeferredRowsByCohort = emptyCohortCounts()
+  let runtimeDeferredRowsTotal = 0
 
   for (const row of rows) {
     byCurrentCorpusStatus[row.currentCorpusStatus] += 1
     byCohortLabel[row.cohortLabel] += 1
     byStorageKind[row.storageKind || 'unknown'] = (byStorageKind[row.storageKind || 'unknown'] || 0) + 1
     statusByCohort[row.cohortLabel][row.currentCorpusStatus] += 1
+
+    if (row.currentCorpusStatus === 'verified_pass') continue
+
+    for (const familyId of row.classificationEvidence.topBlockingResidualFamilyIds) {
+      blockerFamilyBacklog[familyId] = (blockerFamilyBacklog[familyId] || 0) + 1
+    }
+    for (const findingKey of row.classificationEvidence.blockingFindingKeys) {
+      blockingFindingBacklog[findingKey] = (blockingFindingBacklog[findingKey] || 0) + 1
+    }
+    if (row.stage3FigureDiagnostics.hasGenericTimeoutWording || row.stage4StructureDiagnostics.hasBoundedRuntimeWording) {
+      runtimeDeferredRowsTotal += 1
+      runtimeDeferredRowsByCohort[row.cohortLabel] += 1
+    }
   }
 
   return {
@@ -333,6 +350,12 @@ function buildSummary(rows: CorpusControlPlaneRow[], ledgerRowCount: number): Co
     statusByCohort,
     verifiedPassRowsFromLedger: ledgerRowCount,
     remainingRowsExcludingVerifiedPass: rows.filter(row => row.currentCorpusStatus !== 'verified_pass').length,
+    blockerFamilyBacklog: Object.fromEntries(Object.entries(blockerFamilyBacklog).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))),
+    blockingFindingBacklog: Object.fromEntries(Object.entries(blockingFindingBacklog).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))),
+    runtimeDeferredRows: {
+      total: runtimeDeferredRowsTotal,
+      byCohortLabel: runtimeDeferredRowsByCohort,
+    },
   }
 }
 

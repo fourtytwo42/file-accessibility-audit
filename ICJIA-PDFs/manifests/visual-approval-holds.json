@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2026-04-10T05:30:00.000Z",
+  "rows": [
+    {
+      "publicationId": "3783",
+      "status": "required",
+      "reasonCodes": [
+        "visual_parity_material_change"
+      ],
+      "notes": [
+        "Render-based visual parity audit flagged broader layout drift on pages 4, 6, and 7. Manual visual approval required before any remote replacement."
+      ]
+    },
+    {
+      "publicationId": "4641",
+      "status": "required",
+      "reasonCodes": [
+        "visual_parity_material_change"
+      ],
+      "notes": [
+        "Render-based visual parity audit flagged concentrated material changes on pages 14, 16, and 17. Manual visual approval required before any remote replacement."
+      ]
+    }
+  ]
+}

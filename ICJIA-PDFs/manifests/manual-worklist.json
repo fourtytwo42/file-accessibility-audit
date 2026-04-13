@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.562Z",
+  "queueName": "manual-worklist",
+  "queueIntent": "manual_remediation",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-08T04:01:13.428Z",
+  "sourceFigureFinalMileClosurePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/figure-final-mile-closure.json",
+  "totals": {
+    "selectedRows": 0
+  },
+  "selectedPublicationIds": [],
+  "candidates": []
+}

@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-04-02T01:02:20.024Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-02T01:02:20.003Z",
+  "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-wave.json",
+  "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-wave.outcomes.json",
+  "forensicsManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-forensics.json",
+  "cohortLabel": "long_report",
+  "benchmarkLeadCase": {
+    "name": "SFY24 ICJIA Annual Report",
+    "category": "long_report",
+    "terminalState": "hard_fail",
+    "durationMs": 5460186,
+    "dominantFamily": "mixed",
+    "finalStopReason": "same_family_no_progress",
+    "processingError": false
+  },
+  "totals": {
+    "totalLongReportRows": 9,
+    "verifiedPassRowsInCohort": 9,
+    "remainingLongReportRows": 0,
+    "newlyVerifiedPassRowsFromWave": 0,
+    "processingErrorsInWave": 0,
+    "hardFailsInWave": 0,
+    "pendingWaveRows": 0,
+    "verifiedPassDispositionRows": 9,
+    "stableHardFailRows": 0,
+    "processingRetryRows": 0,
+    "mixedResidualRows": 0,
+    "remediationCandidateRows": 0,
+    "stillUnclassifiedRows": 0
+  },
+  "rows": {
+    "newlyVerifiedPassPublicationIds": [],
+    "remainingPublicationIds": [],
+    "processingErrorPublicationIds": [],
+    "hardFailPublicationIds": [],
+    "pendingPublicationIds": [],
+    "activeWaveSelectedPublicationIds": [],
+    "verifiedPassDispositionPublicationIds": [
+      "3829",
+      "3840",
+      "3865",
+      "3900",
+      "4010",
+      "4085",
+      "4091",
+      "4103",
+      "4552"
+    ],
+    "stableHardFailPublicationIds": [],
+    "processingRetryPublicationIds": [],
+    "mixedResidualPublicationIds": [],
+    "remediationCandidatePublicationIds": [],
+    "stillUnclassifiedPublicationIds": []
+  }
+}

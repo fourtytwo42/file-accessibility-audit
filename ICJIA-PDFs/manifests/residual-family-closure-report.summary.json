@@ -1,0 +1,266 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.559Z",
+  "residualFamilyClosureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/residual-family-closure-report.json",
+  "totals": {
+    "remainingNonPassRows": 864,
+    "rowsWithObservedOutcomes": 233,
+    "rowsWithObservedBlockingShrink": 55
+  },
+  "manualMitigation": {
+    "manualReadyCount": 10,
+    "manualTerminalizedCount": 38,
+    "manualInProgressCount": 0,
+    "manualDeferredCount": 0,
+    "reasonsByFrequency": {
+      "manual_rebuild_required_not_patchable": 4,
+      "manual_runtime_cost_not_worth_continuing": 3,
+      "manual_object_level_repair_exhausted": 31,
+      "cleared_final_blockers": 10
+    },
+    "excludedPublicationIds": [
+      "3494",
+      "3495",
+      "3518",
+      "3569",
+      "3575",
+      "3577",
+      "3585",
+      "3614",
+      "3616",
+      "3617",
+      "3618",
+      "3619",
+      "3620",
+      "3671",
+      "3691",
+      "3694",
+      "3698",
+      "3700",
+      "3703",
+      "3705",
+      "3706",
+      "3707",
+      "3710",
+      "3778",
+      "4015",
+      "4019",
+      "4072",
+      "4079",
+      "4098",
+      "4100",
+      "4121",
+      "4150",
+      "4169",
+      "4186",
+      "4192",
+      "4481",
+      "4565",
+      "4590",
+      "4593",
+      "4607",
+      "4634",
+      "4639",
+      "4651",
+      "4688",
+      "4726",
+      "4750",
+      "4756",
+      "4758"
+    ]
+  },
+  "recommendedNextEngineSlice": "mixed_figure_structure_separation",
+  "rankedCohorts": [
+    {
+      "candidateEngineSliceTag": "font_symbol_closure",
+      "rowCount": 336,
+      "observedOutcomeCount": 71,
+      "observedShrinkCount": 2,
+      "dominantResidualFamilies": {
+        "font": 336
+      },
+      "topBlockingKeys": [
+        {
+          "key": "category.pdf_ua_compliance",
+          "count": 320
+        },
+        {
+          "key": "category.alt_text",
+          "count": 281
+        },
+        {
+          "key": "category.heading_structure",
+          "count": 204
+        },
+        {
+          "key": "category.bookmarks",
+          "count": 177
+        },
+        {
+          "key": "category.reading_order",
+          "count": 137
+        }
+      ]
+    },
+    {
+      "candidateEngineSliceTag": "mixed_figure_structure_separation",
+      "rowCount": 224,
+      "observedOutcomeCount": 92,
+      "observedShrinkCount": 40,
+      "dominantResidualFamilies": {
+        "structure": 127,
+        "mixed": 94,
+        "metadata": 3
+      },
+      "topBlockingKeys": [
+        {
+          "key": "category.pdf_ua_compliance",
+          "count": 191
+        },
+        {
+          "key": "category.heading_structure",
+          "count": 187
+        },
+        {
+          "key": "category.reading_order",
+          "count": 165
+        },
+        {
+          "key": "category.alt_text",
+          "count": 106
+        },
+        {
+          "key": "category.bookmarks",
+          "count": 98
+        }
+      ]
+    },
+    {
+      "candidateEngineSliceTag": "manual_scanned_deferred",
+      "rowCount": 173,
+      "observedOutcomeCount": 16,
+      "observedShrinkCount": 8,
+      "dominantResidualFamilies": {
+        "manual": 173
+      },
+      "topBlockingKeys": [
+        {
+          "key": "category.pdf_ua_compliance",
+          "count": 170
+        },
+        {
+          "key": "category.alt_text",
+          "count": 169
+        },
+        {
+          "key": "category.heading_structure",
+          "count": 159
+        },
+        {
+          "key": "category.reading_order",
+          "count": 156
+        },
+        {
+          "key": "category.bookmarks",
+          "count": 120
+        }
+      ]
+    },
+    {
+      "candidateEngineSliceTag": "figure_final_mile_closure",
+      "rowCount": 87,
+      "observedOutcomeCount": 41,
+      "observedShrinkCount": 4,
+      "dominantResidualFamilies": {
+        "figure": 87
+      },
+      "topBlockingKeys": [
+        {
+          "key": "category.alt_text",
+          "count": 80
+        },
+        {
+          "key": "category.pdf_ua_compliance",
+          "count": 80
+        },
+        {
+          "key": "category.heading_structure",
+          "count": 66
+        },
+        {
+          "key": "category.bookmarks",
+          "count": 47
+        },
+        {
+          "key": "category.reading_order",
+          "count": 44
+        }
+      ]
+    },
+    {
+      "candidateEngineSliceTag": "large_mixed_runtime_reduction",
+      "rowCount": 44,
+      "observedOutcomeCount": 13,
+      "observedShrinkCount": 1,
+      "dominantResidualFamilies": {
+        "structure": 38,
+        "mixed": 6
+      },
+      "topBlockingKeys": [
+        {
+          "key": "category.pdf_ua_compliance",
+          "count": 38
+        },
+        {
+          "key": "category.heading_structure",
+          "count": 36
+        },
+        {
+          "key": "category.bookmarks",
+          "count": 34
+        },
+        {
+          "key": "category.reading_order",
+          "count": 34
+        },
+        {
+          "key": "category.alt_text",
+          "count": 18
+        }
+      ]
+    }
+  ],
+  "figureFinalMileRows": [
+    "4534",
+    "4081",
+    "3682",
+    "3931",
+    "3718",
+    "3627",
+    "3628",
+    "3673",
+    "3684",
+    "3699",
+    "3713",
+    "3728",
+    "3730",
+    "3733",
+    "3740",
+    "3746",
+    "3752",
+    "3779",
+    "3853",
+    "3855",
+    "3856",
+    "3862",
+    "3863",
+    "3910",
+    "3676",
+    "3724",
+    "3747",
+    "3748",
+    "4562",
+    "4161",
+    "3758",
+    "3709"
+  ]
+}

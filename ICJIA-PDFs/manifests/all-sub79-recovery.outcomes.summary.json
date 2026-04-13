@@ -1,0 +1,131 @@
+{
+  "generatedAt": "2026-04-11T18:15:53.453Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-sub79-recovery.json",
+  "laneName": "all-sub79-recovery",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 0,
+    "keep_fail_80_to_89": 0,
+    "drop_fail_lt_80": 3,
+    "processing_error": 0,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 370,
+    "processed": 3,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 3,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 367
+  },
+  "throughput": {
+    "processedRows": 3,
+    "pdfsPerHour": 21.2,
+    "terminalOutcomesPerHour": 21.2,
+    "passCandidatesPerHour": 0
+  },
+  "quality": {
+    "passCandidates": 0,
+    "rowsWithBlockingFindingShrink": 0,
+    "remainingRetryWorthyRows": 367
+  },
+  "latestProcessed": {
+    "publicationId": "3682",
+    "publicationTitle": "Criminal Sentencing",
+    "priorityRank": 6,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 67,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": "mixed",
+    "runtimeWeightBucket": "light",
+    "runtimeProfileKey": "crimsentenclayout",
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.figure_alt_or_artifact",
+      "pdfua.font_embedding"
+    ],
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/GetTheFacts/CrimSentencLayout.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "promotionStatus": null,
+    "processedAt": "2026-04-11T18:15:53.453Z",
+    "durationMs": 62533,
+    "original": {
+      "overallScore": 67,
+      "grade": "D",
+      "pageCount": 2,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 67,
+      "grade": "D",
+      "pageCount": 2,
+      "isScanned": false
+    },
+    "seed": {
+      "priorOverallScore": 59,
+      "priorGrade": "F",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-10T08:36:56.013Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final overall score is 67, below relaxed threshold 90."
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Alt Text on Images",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/all-sub79-recovery/143.244.146.43/3682-Criminal_Sentencing.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "380cb19ac5909bf2013de8b7af10e3cab27c7b426897280f5188e536ca7c8930",
+      "remediatedPdfSha256": "380cb19ac5909bf2013de8b7af10e3cab27c7b426897280f5188e536ca7c8930",
+      "stagedReplacementSha256": null
+    },
+    "strictPromotionGate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is D, not A.",
+        "Final overall score is 67, not 100.",
+        "Blocking local standards findings remain: pdfua.font_embedding, pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Text Extractability, Alt Text on Images, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.font_embedding",
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Alt Text on Images",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    }
+  }
+}

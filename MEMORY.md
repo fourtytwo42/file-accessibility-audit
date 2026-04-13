@@ -4582,3 +4582,115 @@ First confirmed in-flight files:
 - Interpretation:
   - the lane is implemented correctly, but current corpus truth does not contain any rows that meet a genuinely strict replacement-likelihood threshold
   - this confirms the present bottleneck is not “we haven’t isolated the likely winners yet”; it is that the remaining backlog still carries too much residual debt for a clean pass-only lane
+
+## 2026-04-11 Remediated PDF Grading Audit
+
+- A corpus-wide verification lane now exists for grading every PDF under `ICJIA-PDFs/artifacts/remediated-pdfs/` and comparing the current grade against the latest historical score recorded for that same remediated artifact path.
+- Commands:
+  - build manifest:
+    - `pnpm agency:build-remediated-pdf-grading`
+  - run or resume grading:
+    - `pnpm agency:run-remediated-pdf-grading`
+  - status / watch:
+    - `pnpm agency:remediated-pdf-grading-status`
+    - supports `--json`
+- Outputs:
+  - manifest:
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.json`
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.summary.json`
+  - outcomes:
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.outcomes.json`
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.outcomes.summary.json`
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.drift-report.json`
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.outcomes.progress.json`
+  - per-file detailed grading reports:
+    - `ICJIA-PDFs/reports/test-runs/remediated-pdf-grading/`
+- Defaults:
+  - analysis profile: `full_final`
+  - concurrency: `4`
+  - timeout per PDF: `1800000` ms
+- Status output is intentionally aligned with remediation lanes:
+  - `processed/total`
+  - score-band counts
+  - exact historical score matches vs drift
+  - throughput / ETA
+  - last-completed row
+- Finished 2026-04-12 on the corrected scope of best-known remediated artifact per publication:
+  - `970` graded
+  - score bands:
+    - `90+`: `312`
+    - `80-89`: `352`
+    - `<80`: `306`
+  - comparison vs historical:
+    - `969` with historical score
+    - `423` exact score matches
+    - `546` score drifts
+    - `57` scored higher than historical
+    - `489` scored lower than historical
+    - `651` exact grade matches
+    - `318` grade drifts
+- Follow-on rerun lane for the freshly verified sub-80 remediated artifacts:
+  - build:
+    - `pnpm agency:build-remediated-pdf-grading-sub80-rerun`
+  - run:
+    - `pnpm agency:run-remediated-pdf-grading-sub80-rerun`
+  - status:
+    - `pnpm agency:remediated-pdf-grading-sub80-rerun-status`
+  - source:
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading.outcomes.json`
+  - selection:
+    - currently `306` graded remediated artifacts with fresh score `<80`
+    - uses the graded remediated PDF itself as the next `localCachePath`
+    - keeps all outputs on disk (`ICJIA_REMEDIATION_MIN_KEEP_SCORE` unset)
+- Second rerun lane from the retained failed outputs of that grading-sub80 pass:
+  - build:
+    - `pnpm agency:build-remediated-pdf-grading-sub80-rerun-v2`
+  - run:
+    - `pnpm agency:run-remediated-pdf-grading-sub80-rerun-v2`
+  - status:
+    - `pnpm agency:remediated-pdf-grading-sub80-rerun-v2-status`
+  - source:
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun.outcomes.json`
+  - selection:
+    - `216` retained sub-80 failed outputs
+    - excludes rows that rose to `80+` and non-terminal processing-error style rows
+  - current campaign state on 2026-04-12:
+    - run id: `24177e6f-d324-485e-995e-8115d35f1c92`
+    - completed on 2026-04-13 with `216/216`
+    - results:
+      - `21` scored `90+`
+      - `2` scored `80-89`
+      - `191` remained `<80`
+      - `2` processing errors
+    - safe to resume without losing prior progress
+- Third rerun lane from the retained failed outputs of the grading-sub80 v2 pass:
+  - build:
+    - `pnpm agency:build-remediated-pdf-grading-sub80-rerun-v3`
+  - run:
+    - `pnpm agency:run-remediated-pdf-grading-sub80-rerun-v3`
+  - status:
+    - `pnpm agency:remediated-pdf-grading-sub80-rerun-v3-status`
+  - source:
+    - `ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v2.outcomes.json`
+  - selection:
+    - `191` retained sub-80 failed outputs
+    - excludes `2` rows that rose above `79`
+    - excludes `23` non-terminal / processing-error rows
+  - current campaign state on 2026-04-13:
+    - run id: `c38e318a-b218-453a-8782-5891f4445962`
+    - started with `0/191`
+- LM Studio provider switch (2026-04-12):
+  - default primary provider in `apps/api/.env` now points to LM Studio on `http://192.168.50.238:1234/v1`
+  - model: `google/gemma-4-26b-a4b`
+  - `OPENAI_COMPAT_TOOL_CHOICE_MODE=required` is required for LM Studio/Gemma tool calling because the planner’s prior named-function object format is rejected there
+  - direct `/v1/chat/completions` verification against LM Studio confirmed `google/gemma-4-26b-a4b` returns valid `tool_calls` when called with `tool_choice: "required"`
+  - `openAiCompatService.isEndpointAlive` now sends auth on the `/models` preflight and treats `401/403` as reachable, which is required for auth-protected LM Studio servers; before this fix the app falsely marked LM Studio as unreachable and fell through to fallback providers
+  - focused regression coverage:
+    - `src/__tests__/openAiCompatService.test.ts`
+    - `src/__tests__/remediationPlanService.test.ts`
+  - provider-selection smoke after the fix:
+    - `callWithOpenAiCompatFallbacks(..., preflightPrimary: true)` selected `primary`
+    - base URL: `http://192.168.50.238:1234/v1`
+    - model: `google/gemma-4-26b-a4b`
+  - operational conclusion from live remediation logs: although Gemma 4 could return simple tool calls, it frequently truncated the real `propose_semantic_repairs` tool payload under remediation load, causing LM Studio to drop the tool call and the batch to receive `tool_calls: []`
+  - on 2026-04-12 the default primary provider was switched back to the LAN hotspot (`http://192.168.50.238:51824/v1`, `gpt-5.1-codex-mini`) for actual remediation runs; the paused `remediated-pdf-grading-sub80-rerun-v2` campaign should resume on that provider rather than Gemma 4

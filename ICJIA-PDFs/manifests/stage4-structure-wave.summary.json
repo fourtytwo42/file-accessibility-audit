@@ -1,33 +1,68 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.594Z",
+  "generatedAt": "2026-04-06T01:00:35.341Z",
   "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
-  "sourceControlPlaneGeneratedAt": "2026-04-01T02:35:32.557Z",
+  "sourceControlPlaneGeneratedAt": "2026-04-06T01:00:35.316Z",
   "totals": {
-    "eligibleRows": 1,
-    "selectedRows": 1,
+    "eligibleRows": 8,
+    "selectedRows": 8,
     "skippedRows": 0,
-    "pendingRows": 1
+    "pendingRows": 8
   },
   "selectedPublicationIds": [
-    "4726"
+    "4187",
+    "4028",
+    "4003",
+    "4051",
+    "4115",
+    "4201",
+    "4722",
+    "4171"
   ],
   "pendingPublicationIds": [
-    "4726"
+    "4187",
+    "4028",
+    "4003",
+    "4051",
+    "4115",
+    "4201",
+    "4722",
+    "4171"
   ],
   "activeWaveSelectedPublicationIds": [
-    "4726"
+    "4187",
+    "4028",
+    "4003",
+    "4051",
+    "4115",
+    "4201",
+    "4722",
+    "4171"
   ],
   "activeWavePendingPublicationIds": [
-    "4726"
+    "4187",
+    "4028",
+    "4003",
+    "4051",
+    "4115",
+    "4201",
+    "4722",
+    "4171"
   ],
   "activeWaveAttemptedButUnterminalizedPublicationIds": [
-    "4726"
+    "4187",
+    "4028",
+    "4003",
+    "4051",
+    "4115",
+    "4201",
+    "4722",
+    "4171"
   ],
   "selectedByTier": {
     "highest": 0,
     "high": 0,
-    "medium": 1,
+    "medium": 8,
     "low": 0
   },
   "selectedByStatus": {
@@ -35,7 +70,7 @@
     "discovered": 0,
     "analyzed": 0,
     "queued_for_remediation": 0,
-    "remediated_fail": 1,
+    "remediated_fail": 8,
     "processing_error": 0,
     "deferred_manual": 0,
     "staged_for_replacement": 0,
@@ -44,7 +79,7 @@
   "selectedByStructureWaveBucket": {
     "metadata_navigation_residuals": 0,
     "structure_only_residuals": 0,
-    "mixed_structure_figure_residuals": 1,
+    "mixed_structure_figure_residuals": 8,
     "structure_processing_error_retry": 0
   }
 }

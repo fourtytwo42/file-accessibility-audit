@@ -1,0 +1,135 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.507Z",
+  "sliceName": "runtime-tail-structure-retry",
+  "sliceIntent": "pass_rate_conversion",
+  "executionPolicy": "dormant",
+  "executionPolicyReason": "runtime_conversion_dormant_until_engine_change",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-08T04:01:13.428Z",
+  "totals": {
+    "eligibleRows": 1,
+    "selectedRows": 1,
+    "skippedRows": 51,
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 47,
+    "excludedLowConfidence": 0
+  },
+  "selectedPublicationIds": [
+    "3519"
+  ],
+  "candidates": [
+    {
+      "publicationId": "3519",
+      "publicationTitle": "Trends and Issues 90 Criminal Justice Financing",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "manual_tail",
+      "disposition": "retryable_deterministic",
+      "dominantFamily": "structure",
+      "safeToRetry": true,
+      "reasonCode": "runtime_tail:retry_structure",
+      "blockingFindingKeys": [
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "category.text_extractability",
+        "category.title_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.logical_structure",
+        "pdfua.metadata_identification"
+      ],
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence",
+        "unresolved_manual_family"
+      ],
+      "notes": [
+        "bounded_runtime_detected",
+        "cohort:manual_tail",
+        "deterministic_surface_present",
+        "outcome:processing_error"
+      ],
+      "priorityRank": 1,
+      "passLikelihoodScore": 47,
+      "priorityTier": "high",
+      "recommendedAction": "fix_first",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/TIUpdate/T&I 1990.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/TIUpdate/T&I 1990.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/TIUpdate/T&I 1990.pdf",
+      "storageKind": "legacy_archive",
+      "overallScore": 8,
+      "grade": "F",
+      "pageCount": 294,
+      "isScanned": true,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 10,
+      "manualOnlyFailureModeCount": 1,
+      "autoRunnableOpportunityCount": 8,
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "set_document_language:document:document",
+        "set_document_title:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [
+        "category.text_extractability"
+      ],
+      "heuristicReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "runtime_conversion_lane"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3519-Trends_and_Issues_90_Criminal_Justice_Financing.failure.json",
+      "selectionReasons": [
+        "bounded_runtime_structure_retry",
+        "pdfua.logical_structure",
+        "runtime_conversion_lane"
+      ],
+      "targetLane": "structure",
+      "runtimeWeightBucket": "heavy",
+      "runtimeProfileKey": "t_i"
+    }
+  ],
+  "groupedPublicationIds": {
+    "figure": [],
+    "structure": [
+      "3519"
+    ],
+    "font": [],
+    "mixed": [],
+    "unknown": []
+  },
+  "groupedCounts": {
+    "figure": 0,
+    "structure": 1,
+    "font": 0,
+    "mixed": 0,
+    "unknown": 0
+  },
+  "selectionSanity": {
+    "dominantFamilyCounts": {
+      "structure": 1
+    },
+    "inScopeBlockerKeyCounts": {
+      "pdfua.logical_structure": 1
+    },
+    "excludedPriorProcessed": 4,
+    "excludedSecondary": 47,
+    "excludedLowConfidence": 0
+  },
+  "targetedFindingKeys": [
+    "pdfua.logical_structure",
+    "pdfua.heading_content_quality"
+  ],
+  "targetedFamilyIds": [
+    "post_bootstrap_heading_convergence"
+  ]
+}

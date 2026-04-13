@@ -1,90 +1,88 @@
 {
-  "generatedAt": "2026-04-01T02:35:32.598Z",
+  "generatedAt": "2026-04-06T01:00:35.343Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage4-structure-wave.json",
   "concurrency": 8,
   "totals": {
-    "targetCandidates": 1,
+    "targetCandidates": 8,
     "processed": 0,
     "readyToReplace": 0,
     "remediatedPassCandidates": 0,
     "failedAfterRemediation": 0,
     "sourceMissing": 0,
     "processingError": 0,
-    "remaining": 1
+    "remaining": 8
   },
   "currentWave": {
     "processedPublicationIds": [],
     "remainingPublicationIds": [
-      "4726"
+      "4003",
+      "4028",
+      "4051",
+      "4115",
+      "4171",
+      "4187",
+      "4201",
+      "4722"
     ],
     "failedAfterRemediationPublicationIds": [],
     "processingErrorPublicationIds": []
   },
   "cumulativeTotals": {
-    "processed": 55,
-    "readyToReplace": 0,
-    "remediatedPassCandidates": 8,
-    "failedAfterRemediation": 46,
+    "processed": 142,
+    "readyToReplace": 7,
+    "remediatedPassCandidates": 12,
+    "failedAfterRemediation": 122,
     "sourceMissing": 0,
     "processingError": 1
   },
   "latestProcessed": {
-    "publicationId": "4627",
-    "publicationTitle": "FY2015 Freedom from Drones Annual report",
-    "priorityRank": 5,
-    "priorityTier": "medium",
-    "passLikelihoodScore": 38,
+    "publicationId": "4162",
+    "publicationTitle": "Illinois Criminal Justice Information Authority 2010 Annual Report",
+    "priorityRank": 2,
+    "priorityTier": "high",
+    "passLikelihoodScore": 72,
     "serverHost": "143.244.146.43",
-    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/drone/Drone_Report_2015.pdf",
-    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/drone/Drone_Report_2015.pdf",
-    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/drone/Drone_Report_2015.pdf",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/AnnualReportFY10.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/AnnualReportFY10.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/AnnualReportFY10.pdf",
     "storageKind": "legacy_archive",
-    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
-    "status": "failed_after_remediation",
-    "promotionStatus": null,
-    "processedAt": "2026-04-01T02:32:04.376Z",
-    "durationMs": 235241,
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/AnnualReportFY10.pdf.json",
+    "status": "processing_error",
+    "processedAt": "2026-04-05T00:07:26.711Z",
+    "durationMs": 3808412,
     "original": {
-      "overallScore": 30,
+      "overallScore": 20,
       "grade": "F",
-      "pageCount": 1,
+      "pageCount": 44,
       "isScanned": false
     },
-    "final": {
-      "overallScore": 72,
-      "grade": "C",
-      "pageCount": 1,
-      "isScanned": false
-    },
+    "final": null,
     "gate": {
       "passed": false,
       "reasons": [
-        "Final grade is C, not A.",
-        "Final overall score is 72, not 100.",
-        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact, pdfua.heading_content_quality",
-        "Categories still below 100: Heading Structure, Alt Text on Images, PDF/UA Compliance"
+        "Processing exceeded the 60-minute runtime limit.",
+        "Marked as excessive runtime and deferred so the batch can continue."
       ],
-      "blockingLocalFindingKeys": [
-        "pdfua.figure_alt_or_artifact",
-        "pdfua.heading_content_quality"
-      ],
-      "unresolvedCategoryLabels": [
-        "Heading Structure",
-        "Alt Text on Images",
-        "PDF/UA Compliance"
-      ],
-      "criticalManualReviewFlagCodes": []
+      "blockingLocalFindingKeys": [],
+      "criticalManualReviewFlagCodes": [],
+      "unresolvedCategoryLabels": []
     },
+    "promotionStatus": null,
     "artifacts": {
-      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.pdf",
+      "remediatedPdfPath": null,
       "stagedReplacementPath": null,
-      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.remediation.json",
-      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4627-FY2015_Freedom_from_Drones_Annual_report.failure.json"
+      "detailedReportPath": null,
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage4-structure-wave/143.244.146.43/4162-Illinois_Criminal_Justice_Information_Authority_2010_Annual_Report.failure.json"
     },
     "checksums": {
-      "gateEvaluatedBufferSha256": "61fa1ed1c78b7437115ad3623f77d8cf2f87a3b288899373bf336362b9697240",
-      "remediatedPdfSha256": "61fa1ed1c78b7437115ad3623f77d8cf2f87a3b288899373bf336362b9697240",
+      "gateEvaluatedBufferSha256": null,
+      "remediatedPdfSha256": null,
       "stagedReplacementSha256": null
+    },
+    "deferred": {
+      "reasonCode": "excessive_runtime_loop",
+      "skipNextBatch": true,
+      "notes": "Processing exceeded runtime limit of 3600000ms"
     }
   }
 }

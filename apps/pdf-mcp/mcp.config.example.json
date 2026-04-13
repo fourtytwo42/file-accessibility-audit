@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "pdfaf-pdf": {
+      "command": "pnpm",
+      "args": ["--filter", "pdf-mcp", "exec", "tsx", "src/index.ts"],
+      "cwd": "/absolute/path/to/pdfaf"
+    }
+  }
+}

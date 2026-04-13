@@ -18,7 +18,7 @@ import { buildPipelineConfig, classifyPdfFull } from './pdfClassificationService
 import { classifyPdf, getToolReliabilityMap } from './toolReliabilityService.js'
 import { deriveDeterministicCall, hasMeaningfulMetadataTitle, heuristicFigureAltText } from './remediationCallDerivationService.js'
 import { needsLanguageTagNormalization } from './languageTags.js'
-import { callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
+import { buildOpenAiCompatToolChoice, callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
 const PLAN_REMEDIATION_TOOL = 'plan_pdf_remediation'
 const MAX_ACTIONS = 32
 const RESERVED_HEADING_ACTIONS = 8
@@ -1197,10 +1197,10 @@ async function openAiPlan(messages: any[]): Promise<Pick<RemediationPlanResult, 
               },
             },
           }],
-          tool_choice: {
-            type: 'function',
-            function: { name: PLAN_REMEDIATION_TOOL },
-          },
+          tool_choice: buildOpenAiCompatToolChoice({
+            endpoint,
+            functionName: PLAN_REMEDIATION_TOOL,
+          }),
           messages,
         }),
       })

@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-04-13T01:25:55.906Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediated-pdf-grading-sub80-rerun-v2.json",
+  "laneName": "remediated-pdf-grading-sub80-rerun-v2",
+  "laneIntent": "pass_rate_conversion",
+  "initialAnalysisProfile": "full_final",
+  "concurrency": 4,
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "countsByResultBand": {
+    "pass_ge_90": 21,
+    "keep_fail_80_to_89": 2,
+    "drop_fail_lt_80": 191,
+    "processing_error": 2,
+    "source_missing": 0
+  },
+  "totals": {
+    "targetCandidates": 216,
+    "processed": 216,
+    "readyToReplace": 21,
+    "remediatedPassCandidates": 21,
+    "failedAfterRemediation": 193,
+    "sourceMissing": 0,
+    "processingError": 2,
+    "remaining": 0
+  },
+  "throughput": {
+    "processedRows": 216,
+    "pdfsPerHour": 9.7,
+    "terminalOutcomesPerHour": 9.7,
+    "passCandidatesPerHour": 0.94
+  },
+  "quality": {
+    "passCandidates": 21,
+    "rowsWithBlockingFindingShrink": 23,
+    "remainingRetryWorthyRows": 0
+  },
+  "latestProcessed": {
+    "publicationId": "4723",
+    "publicationTitle": "ICJIA State Fiscal Year 2023 Annual Report",
+    "priorityRank": 216,
+    "priorityTier": "highest",
+    "passLikelihoodScore": 35,
+    "currentCorpusStatus": "remediated_fail",
+    "dominantSelectionFamily": null,
+    "runtimeWeightBucket": null,
+    "runtimeProfileKey": null,
+    "laneIntent": "pass_rate_conversion",
+    "blockingFindingKeys": [
+      "pdfua.logical_structure",
+      "pdfua.document_language",
+      "pdfua.display_doc_title",
+      "pdfua.metadata_identification",
+      "pdfua.bookmark_language"
+    ],
+    "serverHost": "192.241.146.85",
+    "remotePath": "/home/forge/agency.icjia-api.cloud/agency-api/public/uploads/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/remediated-pdf-grading-sub80-rerun/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.pdf",
+    "fileUrl": "https://agency.icjia-api.cloud/uploads/SFY_23_Annual_Report_Final_7bd1581d53.pdf",
+    "storageKind": "agency_upload",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediated-pdf-grading-sub80-rerun/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
+    "status": "failed_after_remediation",
+    "resultBand": "drop_fail_lt_80",
+    "promotionStatus": null,
+    "processedAt": "2026-04-13T01:25:55.900Z",
+    "durationMs": 822049,
+    "original": {
+      "overallScore": 35,
+      "grade": "F",
+      "pageCount": 34,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 35,
+      "grade": "F",
+      "pageCount": 34,
+      "isScanned": false
+    },
+    "seed": {
+      "priorOverallScore": 35,
+      "priorGrade": "F",
+      "priorResultBand": "drop_fail_lt_80",
+      "priorProcessedAt": "2026-04-12T18:07:54.505Z"
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final overall score is 35, below relaxed threshold 90."
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.metadata_identification",
+        "pdfua.bookmark_language"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Document Title & Language",
+        "Heading Structure",
+        "Bookmarks / Navigation",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/remediated-pdf-grading-sub80-rerun-v2/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediated-pdf-grading-sub80-rerun-v2/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediated-pdf-grading-sub80-rerun-v2/192.241.146.85/4723-ICJIA_State_Fiscal_Year_2023_Annual_Report.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "8c383d4194ae9ff6d3b8aa83ec0073986ae8221ff5ba37d835c688f5443a3e64",
+      "remediatedPdfSha256": "8c383d4194ae9ff6d3b8aa83ec0073986ae8221ff5ba37d835c688f5443a3e64",
+      "stagedReplacementSha256": null
+    },
+    "strictPromotionGate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is F, not A.",
+        "Final overall score is 35, not 100.",
+        "Blocking local standards findings remain: pdfua.logical_structure, pdfua.document_language, pdfua.display_doc_title, pdfua.metadata_identification, pdfua.bookmark_language",
+        "Categories still below 100: Text Extractability, Document Title & Language, Heading Structure, Bookmarks / Navigation, Reading Order, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.logical_structure",
+        "pdfua.document_language",
+        "pdfua.display_doc_title",
+        "pdfua.metadata_identification",
+        "pdfua.bookmark_language"
+      ],
+      "unresolvedCategoryLabels": [
+        "Text Extractability",
+        "Document Title & Language",
+        "Heading Structure",
+        "Bookmarks / Navigation",
+        "Reading Order",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    }
+  }
+}

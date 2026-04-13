@@ -1,0 +1,205 @@
+{
+  "generatedAt": "2026-04-09T13:40:54.020Z",
+  "basedOn": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-automated.outcomes.json",
+  "laneName": "all-remaining-dropped-rerun",
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "totals": {
+    "scannedReportsConsidered": 690,
+    "selectedCandidates": 500,
+    "byTier": {
+      "highest": 478,
+      "high": 19,
+      "medium": 3
+    },
+    "excludedNonDropRows": 190,
+    "excludedMissingSource": 0,
+    "excludedMissingRemote": 0
+  },
+  "priorScoreBands": {
+    "70-79": 80,
+    "60-69": 323,
+    "50-59": 84,
+    "40-49": 11,
+    "<40": 2
+  },
+  "topSingleBlockerRows": [
+    {
+      "publicationId": "3964",
+      "publicationTitle": "Illinois Bill of Rights for Victims and Witnesses of Violent Crime (English)",
+      "priorOverallScore": 79,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4755",
+      "publicationTitle": "2024 Domestic Violence Fatality Review Committee Biennial Report",
+      "priorOverallScore": 79,
+      "blocker": "pdfua.heading_content_quality",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4534",
+      "publicationTitle": "Safe From the Start Year 13: 2001-2014",
+      "priorOverallScore": 78,
+      "blocker": "pdfua.figure_alt_or_artifact",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4773",
+      "publicationTitle": "2025 ILLINOIS DEATH IN CUSTODY ANNUAL REPORT",
+      "priorOverallScore": 77,
+      "blocker": "pdfua.figure_alt_or_artifact",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4526",
+      "publicationTitle": "Illinois Criminal Justice Information Authority 2012 Annual Report",
+      "priorOverallScore": 76,
+      "blocker": "pdfua.figure_alt_or_artifact",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "3696",
+      "publicationTitle": "A Comparison of Evaluation findings on Sex Offender Probation Projects in Six Illinois Counties",
+      "priorOverallScore": 75,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4643",
+      "publicationTitle": "Who are Underserved Victims of Domestic Violence and Sexual Assault? Underrepresented Victim Populations and Barriers to Service Seeking",
+      "priorOverallScore": 75,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4178",
+      "publicationTitle": "Victim and Household Characteristics Reporting Violence to the Police Illinois Crime Victimization Survey 2002 Data Analysis",
+      "priorOverallScore": 75,
+      "blocker": "pdfua.table_regularity",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4207",
+      "publicationTitle": "Families and Reentry Unpacking How Social Support Matters",
+      "priorOverallScore": 75,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "3825",
+      "publicationTitle": "The Efficacy of Illinois Sexual Assault Nurse Examiner (SANE) Pilot Program",
+      "priorOverallScore": 75,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4557",
+      "publicationTitle": "ICJIA FY13 Annual Report",
+      "priorOverallScore": 75,
+      "blocker": "pdfua.figure_alt_or_artifact",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4046",
+      "publicationTitle": "Chicago Homicide Dataset Series Childrens risk of homicide victimization records 31year increase",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4050",
+      "publicationTitle": "Meth response teams easing burden on localized drug task forces",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4054",
+      "publicationTitle": "Juvenile commitment rates reveal significant racial disparity",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4020",
+      "publicationTitle": "A Profile of the DuPage County Auto Theft Task Force (BATTLE)",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4023",
+      "publicationTitle": "A Profile of the KaneCook Auto Theft Task Force (KCAT)",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4095",
+      "publicationTitle": "A Profile of the Northeast Metro Auto Theft Task Force (NEMAT)",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4113",
+      "publicationTitle": "A Profile of the TriCounty Auto Theft Task Force",
+      "priorOverallScore": 74,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4035",
+      "publicationTitle": "Comparison of official and unofficial sources of criminal history record information",
+      "priorOverallScore": 73,
+      "blocker": "pdfua.figure_alt_or_artifact",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4153",
+      "publicationTitle": "Juvenile corrections and parole",
+      "priorOverallScore": 72,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "4167",
+      "publicationTitle": "Juvenile court",
+      "priorOverallScore": 72,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "3610",
+      "publicationTitle": "Collaboration in the Chicago Womens Health Risk Study",
+      "priorOverallScore": 72,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "3653",
+      "publicationTitle": "Juvenile Work Program Provides Alternative to Detention",
+      "priorOverallScore": 72,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "3654",
+      "publicationTitle": "Trends in Illinois Drug Arrests",
+      "priorOverallScore": 72,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    },
+    {
+      "publicationId": "3657",
+      "publicationTitle": "Sentencing Felony Offenders in Illinois",
+      "priorOverallScore": 72,
+      "blocker": "pdfua.logical_structure",
+      "runtimeWeightBucket": "light"
+    }
+  ]
+}

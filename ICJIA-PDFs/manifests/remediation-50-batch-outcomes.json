@@ -553,7 +553,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CCH.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/CCH.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:08.708Z",
       "durationMs": 57012,
       "original": {
@@ -586,11 +586,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/CCH.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3665-Only_Half_of_Reportable_Cook_County_Court_Dispositions_on_Rap_Sheets.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3670",
@@ -604,7 +605,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/VCTFOGA.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/VCTFOGA.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:09.371Z",
       "durationMs": 53837,
       "original": {
@@ -637,11 +638,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/VCTFOGA.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3670-Violent_Crime_Task_Force_Cracks_Tough_Homicide_Cases_in_Kankakee_County.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3686",
@@ -737,7 +739,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/abateOGA.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/abateOGA.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:15.833Z",
       "durationMs": 60216,
       "original": {
@@ -770,11 +772,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/abateOGA.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3683-Controlling_Gang_and_Drug_House_Nuisances_in_Chicago.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3756",
@@ -870,7 +873,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/sexoffogaPDF.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/sexoffogaPDF.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:55.901Z",
       "durationMs": 47192,
       "original": {
@@ -903,11 +906,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/sexoffogaPDF.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3768-Supervising_sex_offenders_in_DuPage_Lake_and_Winnebago_counties.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3769",
@@ -921,7 +925,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/CMVoga.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/CMVoga.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:57.168Z",
       "durationMs": 47796,
       "original": {
@@ -954,11 +958,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/CMVoga.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3769-Supervising_Sex_Offenders_in_Coles_Madison_and_Vermilion_Counties.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3770",
@@ -972,7 +977,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/kmegoga.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/kmegoga.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:57.199Z",
       "durationMs": 46558,
       "original": {
@@ -1005,11 +1010,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/kmegoga.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3770-Specialized_Unit_Takes_a_Problemsolving_Approachto_Crime_in_Kankakee.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3784",
@@ -1023,7 +1029,7 @@
       "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/oga/probation.pdf",
       "storageKind": "legacy_archive",
       "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/source-scan/143.244.146.43/icjia/pdf/oga/probation.json",
-      "status": "failed_after_remediation",
+      "status": "ready_to_replace",
       "processedAt": "2026-03-28T00:00:59.904Z",
       "durationMs": 46035,
       "original": {
@@ -1056,11 +1062,12 @@
         ]
       },
       "artifacts": {
-        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/priority-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.pdf",
-        "stagedReplacementPath": null,
+        "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/title-patch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.pdf",
+        "stagedReplacementPath": "/home/hendo420/pdfaf/ICJIA-PDFs/staging/to-replace/143.244.146.43/icjia/pdf/oga/probation.pdf",
         "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/remediation-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.remediation.json",
         "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/remediation-batch/143.244.146.43/3784-Probation_Research_Results_of_the_2000_Illinois_Probation_Outcome_Study.failure.json"
-      }
+      },
+      "promotionStatus": "staged_for_replacement"
     },
     {
       "publicationId": "3859",

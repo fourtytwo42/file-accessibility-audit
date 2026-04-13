@@ -1,0 +1,183 @@
+{
+  "generatedAt": "2026-04-02T01:02:20.023Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-02T01:02:20.003Z",
+  "cohortLabel": "long_report",
+  "includePublicationIds": [],
+  "summaryPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-forensics.summary.json",
+  "rows": [
+    {
+      "publicationId": "3829",
+      "publicationTitle": "Criminal History Records Information Audit Report",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [
+        "pdfua.cidset_consistency"
+      ],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2003CHRIAudit.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "3840",
+      "publicationTitle": "Female Delinquents Committed to the Illinois Department of Corrections A Profile",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/FemaleDel_IDOC.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "3865",
+      "publicationTitle": "ICJIA 2000 Annual Report",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2000AnnualReport.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "3900",
+      "publicationTitle": "Results from the 2000 Illinois Adult Probation Outcome Study",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2000Probation_Outcome_Study.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "4010",
+      "publicationTitle": "20042007 Statewide Motor Vehicle Theft Prevention Strategy",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [
+        "pdfua.cidset_consistency",
+        "pdfua.figure_alt_quality"
+      ],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/04-07MVStrategy.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "4085",
+      "publicationTitle": "ICJIA 2006 Annual Report",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/AnnualReportFY06.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "4091",
+      "publicationTitle": "From Corrections to Community The Juvenile Reentry Experience as Characterized by Multiple Systems Involvement",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [
+        "pdfua.cidset_consistency"
+      ],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Juvenile_Reentry_Experience_as_Characterized_by_Multiple_Systems_Involvement.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "4103",
+      "publicationTitle": "Juvenile Justice System and Risk Factor Data 2007 Annual Report Appendix H Data Tables",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [
+        "pdfua.cidset_consistency"
+      ],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/Juvenile_Justice_System_and_Risk_Factor_Data_2007_Appendix_H_Data_Tables.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    },
+    {
+      "publicationId": "4552",
+      "publicationTitle": "Victim Needs Assessment",
+      "currentCorpusStatus": "verified_pass",
+      "currentCohortLabel": "long_report",
+      "forensicsDisposition": "long_report_verified_pass",
+      "blockingFindingKeys": [],
+      "reportFindingKeys": [
+        "pdfua.cidset_consistency"
+      ],
+      "reasonCodes": [
+        "cohort:long_report",
+        "stage6:long_report_verified_pass",
+        "verified_promotion_ledger"
+      ],
+      "latestReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/2016_ICJIA_Victim_Needs_Assessment_Summary_Report-191011T20092564.pdf.json",
+      "notes": [
+        "verification:verified_pass"
+      ]
+    }
+  ]
+}

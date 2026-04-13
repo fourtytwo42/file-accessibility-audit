@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.489Z",
+  "fontPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/pass-rate-font-canary.json",
+  "totals": {
+    "eligibleRows": 527,
+    "selectedRows": 8,
+    "skippedRows": 621
+  },
+  "totalCandidates": 8,
+  "selectedPublicationIds": [
+    "4211",
+    "4214",
+    "4168",
+    "4172",
+    "4174",
+    "3965",
+    "3993",
+    "4179"
+  ],
+  "selectionSanity": {
+    "dominantFamilyCounts": {
+      "font": 8
+    },
+    "inScopeBlockerKeyCounts": {
+      "pdfua.font_unicode": 8,
+      "pdfua.font_embedding": 3,
+      "pdfua.cid_symbol_fonts": 1
+    },
+    "excludedBecauseSecondary": 101,
+    "excludedNearPassAnomalies": 1
+  }
+}

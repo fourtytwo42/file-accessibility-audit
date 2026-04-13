@@ -3185,4 +3185,35 @@ describe('remediationPlanService', () => {
 
     expect(plan.actions.some(action => action.tool_name === 'repair_native_table_headers')).toBe(true)
   })
+
+  it('uses required tool_choice mode for LM Studio style endpoints', async () => {
+    const previousEnv = {
+      OPENAI_COMPAT_TOOL_CHOICE_MODE: process.env.OPENAI_COMPAT_TOOL_CHOICE_MODE,
+    }
+
+    delete process.env.OPENAI_COMPAT_TOOL_CHOICE_MODE
+
+    try {
+      const { buildOpenAiCompatToolChoice } = await import('../services/openAiCompatService.js')
+      const toolChoice = buildOpenAiCompatToolChoice({
+        endpoint: {
+          label: 'primary',
+          baseUrl: 'http://192.168.50.238:1234/v1',
+          apiKey: 'lm-studio-test',
+          model: 'google/gemma-4-26b-a4b',
+        },
+        functionName: 'plan_pdf_remediation',
+      })
+
+      expect(toolChoice).toBe('required')
+    } finally {
+      Object.entries(previousEnv).forEach(([key, value]) => {
+        if (value == null) {
+          delete process.env[key]
+        } else {
+          process.env[key] = value
+        }
+      })
+    }
+  })
 })

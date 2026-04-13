@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-04-11T02:35:59.715Z",
+  "laneName": "all-remaining-60-69-material-wave",
+  "sourceOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/all-remaining-79-down-rerun-v2.outcomes.json",
+  "sourceOutcomesGeneratedAt": "2026-04-11T02:01:01.075Z",
+  "executionPolicyReason": "focus_only_on_current_60_69_band_and_prior_positive_delta_ordering",
+  "scorePolicy": {
+    "minPassOverallScore": 90,
+    "minKeepOverallScore": null
+  },
+  "totals": {
+    "scannedReportsConsidered": 394,
+    "selectedCandidates": 293,
+    "byTier": {
+      "highest": 37,
+      "high": 233,
+      "medium": 23
+    },
+    "withPositiveDelta": 5,
+    "withFlatOrNegativeDelta": 288,
+    "excludedOutsideBand": 89,
+    "excludedNonTerminal": 12,
+    "excludedMissingArtifact": 0,
+    "excludedMissingRemote": 0
+  }
+}

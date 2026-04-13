@@ -1,0 +1,444 @@
+{
+  "generatedAt": "2026-04-08T04:01:13.489Z",
+  "sliceName": "pass-rate-font-canary",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-08T04:01:13.428Z",
+  "maxCandidates": 8,
+  "totals": {
+    "eligibleRows": 527,
+    "selectedRows": 8,
+    "skippedRows": 621
+  },
+  "selectedPublicationIds": [
+    "4211",
+    "4214",
+    "4168",
+    "4172",
+    "4174",
+    "3965",
+    "3993",
+    "4179"
+  ],
+  "candidates": [
+    {
+      "priorityRank": 1,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4211",
+      "publicationTitle": "Illinois Offense and Arrest Trends  Property Index Offenses 19992008",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Crime Trends/1999-2008/5property offenses_1999-2008.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Crime Trends/1999-2008/5property offenses_1999-2008.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Crime%20Trends/1999-2008/5property%20offenses_1999-2008.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "font_heavy",
+      "overallScore": 83,
+      "grade": "B",
+      "pageCount": 1,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4211-Illinois_Offense_and_Arrest_Trends_Property_Index_Offenses_19992008.failure.json",
+      "selectionReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 2,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4214",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported Elder Abuse 20002009",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Elder Abuse Trends/2000-2009/9elder abuse_2000-2009.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Elder Abuse Trends/2000-2009/9elder abuse_2000-2009.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Elder%20Abuse%20Trends/2000-2009/9elder%20abuse_2000-2009.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "font_heavy",
+      "overallScore": 83,
+      "grade": "B",
+      "pageCount": 1,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4214-Illinois_Crime_Victim_Trends_Reported_Elder_Abuse_20002009.failure.json",
+      "selectionReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 3,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4168",
+      "publicationTitle": "Illinois Crime Victim Trends  Reported and Indicated Child Abuse and Neglect 19972007",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Child Abuse Trends/1997-2007/8child abuse_1997-2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Child Abuse Trends/1997-2007/8child abuse_1997-2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Child%20Abuse%20Trends/1997-2007/8child%20abuse_1997-2007.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "font_heavy",
+      "overallScore": 78,
+      "grade": "C",
+      "pageCount": 1,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4168-Illinois_Crime_Victim_Trends_Reported_and_Indicated_Child_Abuse_and_Neglect_19972007.failure.json",
+      "selectionReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 4,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4172",
+      "publicationTitle": "Illinois Drug Trends  Drug Crime Lab Submissions 19972007",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Drug Trends/1997-2007/12drug submissions_1997-2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Drug Trends/1997-2007/12drug submissions_1997-2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Drug%20Trends/1997-2007/12drug%20submissions_1997-2007.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "font_heavy",
+      "overallScore": 78,
+      "grade": "C",
+      "pageCount": 1,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4172-Illinois_Drug_Trends_Drug_Crime_Lab_Submissions_19972007.failure.json",
+      "selectionReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 5,
+      "passLikelihoodScore": 100,
+      "priorityTier": "highest",
+      "recommendedAction": "fix_first",
+      "publicationId": "4174",
+      "publicationTitle": "Illinois Drug Trends  Drug Seizures 19972007",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/JFacts/Drug Trends/1997-2007/11drug seizures_1997-2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/JFacts/Drug Trends/1997-2007/11drug seizures_1997-2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/JFacts/Drug%20Trends/1997-2007/11drug%20seizures_1997-2007.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "remediated_fail",
+      "cohortLabel": "font_heavy",
+      "overallScore": 78,
+      "grade": "C",
+      "pageCount": 1,
+      "isScanned": false,
+      "blockerFamilyCount": 0,
+      "blockingFindingCount": 1,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 0,
+      "topBlockingResidualFamilyIds": [],
+      "blockingFindingKeys": [
+        "pdfua.font_unicode"
+      ],
+      "autoRunnableOpportunityKeys": [],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage5-font-wave/143.244.146.43/4174-Illinois_Drug_Trends_Drug_Seizures_19972007.failure.json",
+      "selectionReasons": [
+        "font_pass_rate_candidate",
+        "pdfua.font_unicode"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 6,
+      "passLikelihoodScore": 66,
+      "priorityTier": "high",
+      "recommendedAction": "fix_first",
+      "publicationId": "3965",
+      "publicationTitle": "A Study of Disproportionate Minority Representation in the Cook County Juvenile Justice System Part II Assessment of Disproportionate Minority Representation Through IndividualLevel Analyses and Surveys of Juvenile Justice Professionals",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/Cook County DMR_Part II.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/Cook County DMR_Part II.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/Cook County DMR_Part II.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "structure_heavy",
+      "overallScore": 28,
+      "grade": "F",
+      "pageCount": 176,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 9,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 10,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "logical_structure_marked_content",
+        "metadata_normalization",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "bootstrap_struct_tree:document:document",
+        "create_heading_from_candidate:document:document",
+        "embed_missing_fonts_in_place:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "set_document_language:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_embedding_and_unicode",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "runtime_tail_font_followup"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3965-A_Study_of_Disproportionate_Minority_Representation_in_the_Cook_County_Juvenile_Justice_System_Part_II_Assessment_of_Disproportionate_Minority_Representation_Through_IndividualLevel_Analyses_and_Surveys_of_Juvenile_Justice_Professionals.failure.json",
+      "selectionReasons": [
+        "font_embedding_and_unicode",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "runtime_tail_font_followup"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 7,
+      "passLikelihoodScore": 64,
+      "priorityTier": "high",
+      "recommendedAction": "fix_first",
+      "publicationId": "3993",
+      "publicationTitle": "Community Policing in Chicago Year Ten An Evaluation of Chicagos Alternative Policing Strategy",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/CAPS_10.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/CAPS_10.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/CAPS_10.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "figure_heavy",
+      "overallScore": 26,
+      "grade": "F",
+      "pageCount": 170,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 11,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "metadata_normalization",
+        "native_figure_convergence",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.bookmark_language",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "bootstrap_struct_tree:document:document",
+        "create_heading_from_candidate:document:document",
+        "embed_missing_fonts_in_place:document:document",
+        "mark_figure_decorative:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "set_document_language:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_embedding_and_unicode",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "runtime_tail_font_followup"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/3993-Community_Policing_in_Chicago_Year_Ten_An_Evaluation_of_Chicagos_Alternative_Policing_Strategy.failure.json",
+      "selectionReasons": [
+        "font_embedding_and_unicode",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "runtime_tail_font_followup"
+      ],
+      "dominantSelectionFamily": "font"
+    },
+    {
+      "priorityRank": 8,
+      "passLikelihoodScore": 74,
+      "priorityTier": "high",
+      "recommendedAction": "fix_first",
+      "publicationId": "4179",
+      "publicationTitle": "Illinois Criminal Justice Information Authority Needs Assessment Survey APPENDIX",
+      "serverHost": "143.244.146.43",
+      "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/ResearchReports/ICJIA Needs Assessment Survey APPENDIX Feb 2007.pdf",
+      "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/ResearchReports/ICJIA Needs Assessment Survey APPENDIX Feb 2007.pdf",
+      "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/ResearchReports/ICJIA%20Needs%20Assessment%20Survey%20APPENDIX%20Feb%202007.pdf",
+      "storageKind": "legacy_archive",
+      "currentCorpusStatus": "processing_error",
+      "cohortLabel": "figure_heavy",
+      "overallScore": 24,
+      "grade": "F",
+      "pageCount": 86,
+      "isScanned": false,
+      "blockerFamilyCount": 5,
+      "blockingFindingCount": 11,
+      "manualOnlyFailureModeCount": 0,
+      "autoRunnableOpportunityCount": 12,
+      "topBlockingResidualFamilyIds": [
+        "bookmark_language_outline_cleanup",
+        "font_embedding_and_unicode",
+        "metadata_normalization",
+        "native_figure_convergence",
+        "post_bootstrap_heading_convergence"
+      ],
+      "blockingFindingKeys": [
+        "category.alt_text",
+        "category.bookmarks",
+        "category.heading_structure",
+        "category.pdf_ua_compliance",
+        "category.reading_order",
+        "pdfua.cid_symbol_fonts",
+        "pdfua.display_doc_title",
+        "pdfua.document_language",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "pdfua.logical_structure"
+      ],
+      "autoRunnableOpportunityKeys": [
+        "artifact_nonsemantic_page_elements:document:document",
+        "bootstrap_struct_tree:document:document",
+        "create_heading_from_candidate:document:document",
+        "embed_missing_fonts_in_place:document:document",
+        "mark_figure_decorative:document:document",
+        "normalize_document_metadata:document:document",
+        "repair_bootstrapped_chart_content_refs:document:document",
+        "repair_cid_symbol_font_maps:document:document",
+        "repair_native_marked_content_refs:document:document",
+        "repair_structure_conformance:document:document",
+        "set_document_language:document:document",
+        "set_pdfua_identification:document:document"
+      ],
+      "manualOnlyFailureModeKeys": [],
+      "heuristicReasons": [
+        "font_embedding_and_unicode",
+        "pdfua.cid_symbol_fonts",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "runtime_tail_font_followup"
+      ],
+      "reportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/runtime-tail-retry-wave/143.244.146.43/4179-Illinois_Criminal_Justice_Information_Authority_Needs_Assessment_Survey_APPENDIX.failure.json",
+      "selectionReasons": [
+        "font_embedding_and_unicode",
+        "pdfua.cid_symbol_fonts",
+        "pdfua.font_embedding",
+        "pdfua.font_unicode",
+        "runtime_tail_font_followup"
+      ],
+      "dominantSelectionFamily": "font"
+    }
+  ],
+  "selectionSanity": {
+    "dominantFamilyCounts": {
+      "font": 8
+    },
+    "inScopeBlockerKeyCounts": {
+      "pdfua.font_unicode": 8,
+      "pdfua.font_embedding": 3,
+      "pdfua.cid_symbol_fonts": 1
+    },
+    "excludedBecauseSecondary": 101,
+    "excludedNearPassAnomalies": 1
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "generatedAt": "2026-04-01T20:10:10.151Z",
+  "sourceControlPlanePath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/corpus-control-plane.json",
+  "sourceControlPlaneGeneratedAt": "2026-04-01T20:10:10.124Z",
+  "waveManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-wave.json",
+  "waveOutcomesPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-wave.outcomes.json",
+  "forensicsManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage5-font-forensics.json",
+  "cohortLabel": "font_heavy",
+  "totals": {
+    "totalFontHeavyRows": 14,
+    "verifiedPassRowsInCohort": 0,
+    "remainingFontHeavyRows": 14,
+    "newlyVerifiedPassRowsFromWave": 0,
+    "processingErrorsInWave": 0,
+    "hardFailsInWave": 0,
+    "pendingWaveRows": 0,
+    "embeddedFontRepairableRows": 0,
+    "deterministicUnicodeRepairRows": 0,
+    "type1FallbackRows": 0,
+    "terminalSurvivorRows": 1,
+    "processingRetryRows": 0,
+    "manualResidualRows": 13,
+    "stillUnclassifiedRows": 0
+  },
+  "rows": {
+    "newlyVerifiedPassPublicationIds": [],
+    "remainingPublicationIds": [
+      "3838",
+      "4099",
+      "4144",
+      "4151",
+      "4156",
+      "4166",
+      "4168",
+      "4172",
+      "4173",
+      "4174",
+      "4176",
+      "4199",
+      "4211",
+      "4214"
+    ],
+    "processingErrorPublicationIds": [],
+    "hardFailPublicationIds": [],
+    "pendingPublicationIds": [],
+    "activeWaveSelectedPublicationIds": [],
+    "embeddedFontRepairablePublicationIds": [],
+    "deterministicUnicodeRepairPublicationIds": [],
+    "type1FallbackPublicationIds": [],
+    "terminalSurvivorPublicationIds": [
+      "4156"
+    ],
+    "processingRetryPublicationIds": [],
+    "manualResidualPublicationIds": [
+      "3838",
+      "4099",
+      "4144",
+      "4151",
+      "4166",
+      "4168",
+      "4172",
+      "4173",
+      "4174",
+      "4176",
+      "4199",
+      "4211",
+      "4214"
+    ],
+    "stillUnclassifiedPublicationIds": []
+  }
+}

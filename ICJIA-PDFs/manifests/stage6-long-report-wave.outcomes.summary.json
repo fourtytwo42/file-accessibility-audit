@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-04-02T01:00:22.019Z",
+  "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/stage6-long-report-wave.json",
+  "concurrency": 1,
+  "totals": {
+    "targetCandidates": 5,
+    "processed": 6,
+    "readyToReplace": 0,
+    "remediatedPassCandidates": 0,
+    "failedAfterRemediation": 6,
+    "sourceMissing": 0,
+    "processingError": 0,
+    "remaining": 0
+  },
+  "latestProcessed": {
+    "publicationId": "3873",
+    "publicationTitle": "ICJIA 1998 Annual Report",
+    "priorityRank": 5,
+    "priorityTier": "high",
+    "passLikelihoodScore": 0,
+    "serverHost": "143.244.146.43",
+    "remotePath": "/home/forge/archive.icjia-api.cloud/root/files/icjia/pdf/AnnualReport/98anreport.pdf",
+    "localCachePath": "/home/hendo420/pdfaf/ICJIA-PDFs/backups/server-cache/143.244.146.43/icjia/pdf/AnnualReport/98anreport.pdf",
+    "fileUrl": "https://archive.icjia-api.cloud/files/icjia/pdf/AnnualReport/98anreport.pdf",
+    "storageKind": "legacy_archive",
+    "originalReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/ready-verification/local-staged/98anreport.pdf.json",
+    "status": "failed_after_remediation",
+    "promotionStatus": null,
+    "processedAt": "2026-04-02T01:00:22.018Z",
+    "durationMs": 163945,
+    "original": {
+      "overallScore": 21,
+      "grade": "F",
+      "pageCount": 36,
+      "isScanned": false
+    },
+    "final": {
+      "overallScore": 83,
+      "grade": "B",
+      "pageCount": 36,
+      "isScanned": false
+    },
+    "gate": {
+      "passed": false,
+      "reasons": [
+        "Final grade is B, not A.",
+        "Final overall score is 83, not 100.",
+        "Blocking local standards findings remain: pdfua.figure_alt_or_artifact",
+        "Categories still below 100: Alt Text on Images, PDF/UA Compliance"
+      ],
+      "blockingLocalFindingKeys": [
+        "pdfua.figure_alt_or_artifact"
+      ],
+      "unresolvedCategoryLabels": [
+        "Alt Text on Images",
+        "PDF/UA Compliance"
+      ],
+      "criticalManualReviewFlagCodes": []
+    },
+    "artifacts": {
+      "remediatedPdfPath": "/home/hendo420/pdfaf/ICJIA-PDFs/artifacts/remediated-pdfs/stage6-long-report-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.pdf",
+      "stagedReplacementPath": null,
+      "detailedReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/test-runs/stage6-long-report-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.remediation.json",
+      "failureReportPath": "/home/hendo420/pdfaf/ICJIA-PDFs/reports/failures/stage6-long-report-wave/143.244.146.43/3873-ICJIA_1998_Annual_Report.failure.json"
+    },
+    "checksums": {
+      "gateEvaluatedBufferSha256": "ccc87695f5c01dc4b508d23bca7f28bc6d3f4a5910968dc953769122618a6cbc",
+      "remediatedPdfSha256": "ccc87695f5c01dc4b508d23bca7f28bc6d3f4a5910968dc953769122618a6cbc",
+      "stagedReplacementSha256": null
+    }
+  }
+}

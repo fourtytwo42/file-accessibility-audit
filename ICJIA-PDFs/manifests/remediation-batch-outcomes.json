@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-03-27T20:27:38.000Z",
+  "generatedAt": "2026-04-08T03:07:10.351Z",
   "sourcePriorityManifestPath": "/home/hendo420/pdfaf/ICJIA-PDFs/manifests/remediation-priority-candidates.json",
-  "concurrency": 8,
+  "concurrency": 4,
   "totals": {
     "targetCandidates": 259,
     "processed": 259,
     "readyToReplace": 67,
+    "remediatedPassCandidates": 67,
     "failedAfterRemediation": 191,
     "sourceMissing": 0,
     "processingError": 1,
@@ -12619,5 +12620,8 @@
         "notes": "Runner was manually stopped after more than five hours of repeated light-inspection and remediation_fast loops without terminalizing."
       }
     }
-  ]
+  ],
+  "laneName": null,
+  "laneIntent": null,
+  "initialAnalysisProfile": "full_final"
 }
