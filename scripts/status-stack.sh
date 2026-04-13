@@ -3,23 +3,15 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/systemd-stack-common.sh"
-
-status_of() {
-  local unit_name="$1"
-  local active enabled
-  active="$(pdfaf_systemctl is-active "$unit_name" 2>/dev/null || true)"
-  enabled="$(pdfaf_systemctl is-enabled "$unit_name" 2>/dev/null || true)"
-  printf '%s\tactive=%s\tenabled=%s\n' "$unit_name" "${active:-unknown}" "${enabled:-unknown}"
-}
+source "$SCRIPT_DIR/stack-common.sh"
 
 main() {
-  pdfaf_require_systemd
+  pdfaf_require_pm2
   local stderr_file
   stderr_file="$(mktemp)"
-  trap 'rm -f "$stderr_file"' EXIT
-  status_of "$PDFAF_LLM_UNIT_NAME"
-  status_of "$PDFAF_API_UNIT_NAME"
+  trap "rm -f '$stderr_file'" EXIT
+
+  pm2 status "$PDFAF_PM2_LLM_APP_NAME" "$PDFAF_PM2_API_APP_NAME" || true
 
   if curl -fsS "$PDFAF_LLM_URL" >/dev/null 2>&1; then
     printf 'llm\tready=yes\turl=%s\n' "$PDFAF_LLM_URL"

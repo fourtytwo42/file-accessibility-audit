@@ -9,7 +9,7 @@ INACCESSIBLE_FIXTURE="$ROOT_DIR/apps/api/src/__tests__/fixtures/inaccessible.pdf
 OPTIONAL_ADAM_FIXTURE="$ROOT_DIR/ICJIA-PDFs/downloads/source-pdfs/ADAM/ADAM2.pdf"
 
 # shellcheck disable=SC1091
-source "$SCRIPT_DIR/systemd-stack-common.sh"
+source "$SCRIPT_DIR/stack-common.sh"
 
 plain_chat_smoke() {
   pdfaf_source_api_env

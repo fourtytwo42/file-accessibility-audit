@@ -1,13 +1,13 @@
 # 04 — Deployment Guide
 
-For a plain Ubuntu 24.04 VM running the **API + local Gemma AI** stack, prefer the repo-managed systemd path:
+For a plain Ubuntu 24.04 VM running the **API + local Gemma AI** stack, prefer the repo-managed PM2 path:
 
 ```bash
 bash ./scripts/provision-vm.sh
 bash ./scripts/start-stack.sh
 ```
 
-The PM2-based flow below remains an alternate deployment path for the broader app/web setup, but it is no longer the preferred local API + AI VM path.
+This guide's default `ecosystem.config.cjs` path now targets the **API + local Gemma AI** stack. If you also want to run the web app under PM2, treat that as a separate deployment surface.
 
 **Project:** `file-accessibility-audit`
 **Production URL:** https://audit.icjia.app
@@ -138,11 +138,26 @@ pm2 startup   # ensures PM2 restarts on server reboot
 
 ## 3. PM2 Configuration
 
-The `ecosystem.config.cjs` in the project root manages both processes:
+The `ecosystem.config.cjs` in the project root manages the local AI stack:
 
 ```javascript
 module.exports = {
   apps: [
+    {
+      name: 'file-audit-llm',
+      cwd: '.',
+      script: 'bash',
+      args: './scripts/run-local-llm-gemma4-e2b.sh',
+      interpreter: 'none',
+      env: {
+        LLAMA_SERVER_HOST: '127.0.0.1',
+        LLAMA_SERVER_PORT: 1234,
+      },
+      watch: false,
+      kill_timeout: 15000,
+      restart_delay: 5000,
+      exp_backoff_restart_delay: 250,
+    },
     {
       name: 'file-audit-api',
       cwd: './apps/api',
@@ -158,21 +173,6 @@ module.exports = {
       restart_delay: 3000,
       exp_backoff_restart_delay: 100,
     },
-    {
-      name: 'file-audit-web',
-      cwd: './apps/web',
-      script: 'pnpm',
-      args: 'start',           // runs: node .output/server/index.mjs
-      interpreter: 'none',
-      env: {
-        NODE_ENV: 'production',
-        PORT: 6102,
-      },
-      watch: false,
-      max_memory_restart: '512M',
-      restart_delay: 3000,
-      exp_backoff_restart_delay: 100,
-    },
   ],
 }
 ```
@@ -181,20 +181,20 @@ module.exports = {
 
 | Service | Port | Listens on |
 |---------|------|------------|
-| Nuxt frontend (SSR) | 6102 | localhost only |
+| llama.cpp OpenAI-compatible server | 1234 | localhost only |
 | Express API | 6103 | localhost only |
-| nginx (public) | 80 / 443 | 0.0.0.0 |
+| nginx (public, optional) | 80 / 443 | 0.0.0.0 |
 
-Both Node processes listen on localhost only — nginx proxies all public traffic.
+Both local services listen on localhost only. Add nginx and a separate web process only if you are deploying the broader app surface.
 
 ### What each `start` script runs
 
 | App | `pnpm start` runs | Notes |
 |-----|-------------------|-------|
+| LLM | `bash ./scripts/run-local-llm-gemma4-e2b.sh` | Runs `llama-server` with local Gemma defaults and no-thinking flags |
 | API | `node --import tsx src/index.ts` | tsx runs TypeScript directly — no build output needed at runtime |
-| Web | `node .output/server/index.mjs` | Nuxt builds to `.output/` — this is the production SSR server |
 
-The `pnpm --filter api build` step runs `tsc --noEmit` (type check only). The API runs from source via tsx in production. The `pnpm --filter web build` step runs `nuxt build` which generates the `.output/` directory.
+The `pnpm --filter api build` step runs `tsc --noEmit` (type check only). The API runs from source via tsx in production.
 
 ---
 
@@ -434,9 +434,9 @@ sudo ufw enable
 pm2 status                    # Check process status
 pm2 logs                      # Tail all logs
 pm2 logs file-audit-api       # Tail API logs only
-pm2 logs file-audit-web       # Tail web logs only
+pm2 logs file-audit-llm       # Tail llama.cpp logs only
 pm2 monit                     # Real-time resource monitoring
-pm2 restart all               # Restart both processes
+pm2 restart all               # Restart both PM2-managed processes
 pm2 reload ecosystem.config.cjs --update-env  # Zero-downtime restart
 ```
 

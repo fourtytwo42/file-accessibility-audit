@@ -21,7 +21,10 @@ bash ./scripts/provision-vm.sh
 bash ./scripts/start-stack.sh
 ```
 
-This path installs the remediation runtime, a pinned llama.cpp bundle, repo-managed systemd units for the API and local Gemma service, and validates the local OpenAI-compatible tool-calling path.
+This path installs the remediation runtime, a pinned llama.cpp bundle, PM2, and the default local Gemma OpenAI-compatible API configuration. `bash ./scripts/start-stack.sh` then brings up two PM2 apps:
+
+- `file-audit-llm`
+- `file-audit-api`
 
 Default scope:
 
@@ -85,9 +88,9 @@ That's it — the app works immediately with authentication disabled (the defaul
 
 ```bash
 pnpm vm:provision      # Canonical Ubuntu 24.04 API + AI provisioning flow
-pnpm stack:start       # Start the systemd-managed API + local Gemma stack
-pnpm stack:stop        # Stop the systemd-managed API + local Gemma stack
-pnpm stack:status      # Show service state + health + tool smoke result
+pnpm stack:start       # Start or reload the PM2-managed API + local Gemma stack
+pnpm stack:stop        # Stop and remove the PM2-managed API + local Gemma stack
+pnpm stack:status      # Show PM2 process state + health + tool smoke result
 pnpm stack:healthcheck # Verify runtime + LLM + vision + remediation smoke path
 pnpm bootstrap:ubuntu  # Legacy/bootstrap-only Ubuntu setup path
 pnpm clean             # Remove .nuxt, .output, Vite cache, and build artifacts

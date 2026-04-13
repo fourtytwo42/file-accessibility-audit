@@ -250,11 +250,11 @@ Upload a test PDF and verify the full analysis flow works.
 pm2 status                    # Check both processes
 pm2 logs                      # Tail all logs
 pm2 logs file-audit-api       # API logs only
-pm2 logs file-audit-web       # Web logs only
+pm2 logs file-audit-llm       # Local Gemma / llama.cpp logs only
 pm2 restart ecosystem.config.cjs              # Restart all services at once
 pm2 reload ecosystem.config.cjs --update-env  # Zero-downtime restart (picks up env changes)
 pm2 restart file-audit-api    # Restart API only
-pm2 restart file-audit-web    # Restart web only
+pm2 restart file-audit-llm    # Restart llama.cpp only
 pm2 monit                     # Real-time CPU/memory
 ```
 

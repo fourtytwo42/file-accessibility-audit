@@ -3,8 +3,9 @@ set -euo pipefail
 
 PDFAF_ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PDFAF_API_ENV_FILE="$PDFAF_ROOT_DIR/apps/api/.env"
-PDFAF_LLM_UNIT_NAME="${PDFAF_LLM_UNIT_NAME:-pdfaf-llm.service}"
-PDFAF_API_UNIT_NAME="${PDFAF_API_UNIT_NAME:-pdfaf-api.service}"
+PDFAF_ECOSYSTEM_FILE="$PDFAF_ROOT_DIR/ecosystem.config.cjs"
+PDFAF_PM2_LLM_APP_NAME="${PDFAF_PM2_LLM_APP_NAME:-file-audit-llm}"
+PDFAF_PM2_API_APP_NAME="${PDFAF_PM2_API_APP_NAME:-file-audit-api}"
 PDFAF_LLM_URL="${PDFAF_LLM_URL:-http://127.0.0.1:1234/v1/models}"
 PDFAF_API_HEALTH_URL="${PDFAF_API_HEALTH_URL:-http://127.0.0.1:6103/api/health}"
 
@@ -21,22 +22,9 @@ pdfaf_require_cmd() {
   command -v "$1" >/dev/null 2>&1 || pdfaf_fail "Required command not found: $1"
 }
 
-pdfaf_require_systemd() {
-  pdfaf_require_cmd systemctl
-  [[ -d /run/systemd/system ]] || pdfaf_fail 'systemd does not appear to be the active init system on this host.'
-}
-
-pdfaf_run_as_root() {
-  if [[ "$(id -u)" -eq 0 ]]; then
-    "$@"
-  else
-    pdfaf_require_cmd sudo
-    sudo "$@"
-  fi
-}
-
-pdfaf_systemctl() {
-  pdfaf_run_as_root systemctl "$@"
+pdfaf_require_pm2() {
+  pdfaf_require_cmd pm2
+  [[ -f "$PDFAF_ECOSYSTEM_FILE" ]] || pdfaf_fail "Missing PM2 ecosystem file: $PDFAF_ECOSYSTEM_FILE"
 }
 
 pdfaf_wait_for_url() {
@@ -63,4 +51,9 @@ pdfaf_source_api_env() {
   # shellcheck disable=SC1090
   source "$PDFAF_API_ENV_FILE"
   set +a
+}
+
+pdfaf_pm2_app_exists() {
+  local app_name="$1"
+  pm2 describe "$app_name" >/dev/null 2>&1
 }

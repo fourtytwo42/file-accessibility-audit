@@ -24,10 +24,10 @@ Pnpm monorepo (Node 22, pnpm 9+):
 
 ```bash
 # Canonical Ubuntu VM path (API + local Gemma)
-pnpm vm:provision      # Install runtime, local AI defaults, and systemd units
-pnpm stack:start       # Start the systemd-managed API + local Gemma stack
-pnpm stack:stop        # Stop the systemd-managed API + local Gemma stack
-pnpm stack:status      # Show unit status + health summary + tool smoke result
+pnpm vm:provision      # Install runtime, local AI defaults, PM2, and llama.cpp bundle
+pnpm stack:start       # Start or reload the PM2-managed API + local Gemma stack
+pnpm stack:stop        # Stop and remove the PM2-managed API + local Gemma stack
+pnpm stack:status      # Show PM2 app status + health summary + tool smoke result
 pnpm stack:healthcheck # Verify runtime + LLM + vision + remediation smoke path
 
 # Dev
@@ -66,7 +66,7 @@ Text Extractability 17.5%, Title & Language 13%, Heading Structure 13%, Alt Text
 
 ### Remediation Engine
 
-`apps/api/src/services/agentRemediationService.ts` + `remediationOrchestrator.ts` — multi-stage LLM-assisted repair. LLM traffic goes through an **OpenAI-compatible** provider chain (`OPENAI_COMPAT_*` in `apps/api/.env`, see `openAiCompatService.ts`). For a fully on-VM setup, prefer `pnpm vm:provision` then `pnpm stack:start`; that path installs the local Gemma + llama.cpp systemd service and configures the API for local tool-calling by default. Semantic figure alt-text batches use OpenAI-style `image_url` parts; optional `SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES=1` restores legacy base64-in-JSON. Deterministic fixes run first; LLM only called when heuristics are insufficient.
+`apps/api/src/services/agentRemediationService.ts` + `remediationOrchestrator.ts` — multi-stage LLM-assisted repair. LLM traffic goes through an **OpenAI-compatible** provider chain (`OPENAI_COMPAT_*` in `apps/api/.env`, see `openAiCompatService.ts`). For a fully on-VM setup, prefer `pnpm vm:provision` then `pnpm stack:start`; that path configures the API for local tool-calling by default and runs local Gemma as a separate PM2-managed `llama-server` process. Semantic figure alt-text batches use OpenAI-style `image_url` parts; optional `SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES=1` restores legacy base64-in-JSON. Deterministic fixes run first; LLM only called when heuristics are insufficient.
 
 **Important:** Do NOT add `repair_other_elements_alt_text` to `finalCleanupCalls` — it regresses grades for non-native-tagged PDFs.
 

@@ -21,7 +21,7 @@ bash ./scripts/provision-vm.sh
 bash ./scripts/start-stack.sh
 ```
 
-This path installs the remediation runtime, stages a pinned llama.cpp bundle under `.local-tools/`, writes the default local Gemma OpenAI-compatible env values into `apps/api/.env`, installs repo-managed systemd units, and verifies the stack with a full healthcheck.
+This path installs the remediation runtime, stages a pinned llama.cpp bundle under `.local-tools/`, writes the default local Gemma OpenAI-compatible env values into `apps/api/.env`, installs PM2 when missing, and verifies the stack with a full healthcheck.
 
 ## Legacy Bootstrap-Only Path
 
@@ -110,12 +110,12 @@ pnpm bootstrap:ubuntu
 pnpm verify:env
 ```
 
-## systemd-managed stack
+## PM2-managed stack
 
-The canonical VM path installs:
+The canonical VM path manages these PM2 apps:
 
-- `pdfaf-llm.service`
-- `pdfaf-api.service`
+- `file-audit-llm`
+- `file-audit-api`
 
 Operational commands:
 
@@ -124,6 +124,7 @@ bash ./scripts/start-stack.sh
 bash ./scripts/stop-stack.sh
 bash ./scripts/status-stack.sh
 bash ./scripts/healthcheck-stack.sh
+pm2 save
 ```
 
 ## Overrides and Air-Gapped Prep

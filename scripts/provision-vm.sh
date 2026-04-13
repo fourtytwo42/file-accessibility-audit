@@ -3,7 +3,6 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BOOTSTRAP_SCRIPT="$ROOT_DIR/scripts/bootstrap-ubuntu.sh"
-INSTALL_SYSTEMD_SCRIPT="$ROOT_DIR/scripts/install-systemd-services.sh"
 START_STACK_SCRIPT="$ROOT_DIR/scripts/start-stack.sh"
 STOP_STACK_SCRIPT="$ROOT_DIR/scripts/stop-stack.sh"
 HEALTHCHECK_SCRIPT="$ROOT_DIR/scripts/healthcheck-stack.sh"
@@ -41,6 +40,15 @@ fail() {
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || fail "Required command not found: $1"
+}
+
+run_as_root() {
+  if [[ "$(id -u)" -eq 0 ]]; then
+    "$@"
+  else
+    require_cmd sudo
+    sudo "$@"
+  fi
 }
 
 upsert_env_value() {
@@ -113,6 +121,17 @@ validate_llama_prereqs() {
   ) || fail 'llama-server is present but did not execute cleanly.'
 }
 
+ensure_pm2() {
+  if command -v pm2 >/dev/null 2>&1; then
+    log "PM2 already installed: $(command -v pm2)"
+    return
+  fi
+
+  require_cmd npm
+  log 'Installing PM2 globally'
+  run_as_root npm install -g pm2
+}
+
 main() {
   local bootstrap_args=()
   while [[ $# -gt 0 ]]; do
@@ -139,10 +158,10 @@ main() {
 
   log 'Running Ubuntu bootstrap'
   "$BOOTSTRAP_SCRIPT" "${bootstrap_args[@]}"
+  ensure_pm2
   install_llama_bundle_if_missing
   configure_local_ai_env
   validate_llama_prereqs
-  "$INSTALL_SYSTEMD_SCRIPT"
 
   if (( SKIP_HEALTHCHECK == 0 )); then
     log 'Running temporary stack start + healthcheck'
@@ -154,7 +173,7 @@ main() {
   fi
 
   log 'Provisioning complete.'
-  printf '\nNext command:\n  bash %s\n' "$START_STACK_SCRIPT"
+  printf '\nNext commands:\n  bash %s\n  pm2 save\n' "$START_STACK_SCRIPT"
 }
 
 main "$@"
