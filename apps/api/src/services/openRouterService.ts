@@ -1,6 +1,11 @@
 import type { BoundingBox, ModelReviewFlag } from './documentModel.js'
 import type { PageHeadingCandidate, PageImageCandidate, PageTableCandidate } from './documentModel.js'
-import { callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
+import {
+  buildOpenAiCompatToolChoice,
+  callWithOpenAiCompatFallbacks,
+  hasOpenAiCompatConfig,
+  type OpenAiCompatEndpoint,
+} from './openAiCompatService.js'
 const RECONSTRUCT_PAGE_TOOL = 'reconstruct_pdf_page'
 
 function clampBox(box?: Partial<BoundingBox> | null): BoundingBox {
@@ -114,9 +119,9 @@ export function normalizeAiPageReconstruction(parsed: any): AiPageReconstruction
   }
 }
 
-function buildChatCompletionsBody(model: string, messages: any[]): string {
+function buildChatCompletionsBody(endpoint: OpenAiCompatEndpoint, messages: any[]): string {
   return JSON.stringify({
-    model,
+    model: endpoint.model,
     temperature: 0.1,
     tools: [{
         type: 'function',
@@ -207,19 +212,22 @@ function buildChatCompletionsBody(model: string, messages: any[]): string {
           },
         },
       }],
-      tool_choice: 'required',
+      tool_choice: buildOpenAiCompatToolChoice({
+        endpoint,
+        functionName: RECONSTRUCT_PAGE_TOOL,
+      }),
       messages,
     })
 }
 
-async function callChatCompletions(baseUrl: string, apiKey: string, model: string, messages: any[]): Promise<any> {
-  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
+async function callChatCompletions(endpoint: OpenAiCompatEndpoint, messages: any[]): Promise<any> {
+  const response = await fetch(`${endpoint.baseUrl.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${endpoint.apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: buildChatCompletionsBody(model, messages),
+    body: buildChatCompletionsBody(endpoint, messages),
   })
 
   if (!response.ok) {
@@ -246,7 +254,7 @@ async function openRouterJsonResponse(messages: any[]): Promise<any> {
   return await callWithOpenAiCompatFallbacks({
     serviceName: 'openRouterService',
     preflightPrimary: true,
-    invoke: endpoint => callChatCompletions(endpoint.baseUrl, endpoint.apiKey, endpoint.model, messages),
+    invoke: endpoint => callChatCompletions(endpoint, messages),
   })
 }
 

@@ -78,6 +78,24 @@ function endpointFromEnv(input: {
   }
 }
 
+export function openAiCompatFallbacksDisabled(): boolean {
+  return /^1|true|yes$/i.test(envValue('OPENAI_COMPAT_DISABLE_FALLBACKS'))
+}
+
+export interface OpenAiCompatEndpointSummary {
+  label: string
+  baseUrl: string
+  model: string
+}
+
+export function listOpenAiCompatEndpointSummaries(): OpenAiCompatEndpointSummary[] {
+  return getOpenAiCompatEndpoints().map(endpoint => ({
+    label: endpoint.label,
+    baseUrl: endpoint.baseUrl,
+    model: endpoint.model,
+  }))
+}
+
 export function getOpenAiCompatEndpoints(): OpenAiCompatEndpoint[] {
   const endpoints = [
     endpointFromEnv({
@@ -105,7 +123,12 @@ export function getOpenAiCompatEndpoints(): OpenAiCompatEndpoint[] {
     return true
   })
 
-  if (uniqueEndpoints.length > 0) return uniqueEndpoints
+  const disableFallbacks = openAiCompatFallbacksDisabled()
+  const chain = disableFallbacks && uniqueEndpoints.length > 0
+    ? uniqueEndpoints.slice(0, 1)
+    : uniqueEndpoints
+
+  if (chain.length > 0) return chain
 
   if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
     return [{

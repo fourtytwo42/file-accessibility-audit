@@ -59,7 +59,7 @@ Text Extractability 17.5%, Title & Language 13%, Heading Structure 13%, Alt Text
 
 ### Remediation Engine
 
-`apps/api/src/services/agentRemediationService.ts` + `remediationOrchestrator.ts` — multi-stage LLM-assisted repair. Primary: OpenRouter (Claude 3.5 Sonnet). Fallback: local LM Studio at `192.168.50.238:1234` (Gemma). Deterministic fixes run first; LLM only called when heuristics are insufficient.
+`apps/api/src/services/agentRemediationService.ts` + `remediationOrchestrator.ts` — multi-stage LLM-assisted repair. LLM traffic goes through an **OpenAI-compatible** provider chain (`OPENAI_COMPAT_*` in `apps/api/.env`, see `openAiCompatService.ts`). For a fully on-VM setup, run Gemma 4 E2B Q4 with `pnpm llm:gemma4-e2b` (llama.cpp; loads mmproj for vision) and set `OPENAI_COMPAT_DISABLE_FALLBACKS=1` plus `OPENAI_COMPAT_TOOL_CHOICE_MODE=required`. Semantic figure alt-text batches use OpenAI-style `image_url` parts; optional `SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES=1` restores legacy base64-in-JSON. Deterministic fixes run first; LLM only called when heuristics are insufficient.
 
 **Important:** Do NOT add `repair_other_elements_alt_text` to `finalCleanupCalls` — it regresses grades for non-native-tagged PDFs.
 

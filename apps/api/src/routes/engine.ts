@@ -4,6 +4,15 @@ import { authMiddleware, type AuthRequest } from '../middleware/authMiddleware.j
 import { uploadMiddleware } from '../middleware/uploadMiddleware.js'
 import { FILENAME } from '#config'
 import { analyzePdf, remediatePdf, verifyPdf, explainFailure, type AnalysisResult, type EngineRequestPolicy } from '../engine/index.js'
+import {
+  buildOpenAiCompatToolChoice,
+  callWithOpenAiCompatFallbacks,
+  getOpenAiCompatEndpoints,
+  hasOpenAiCompatConfig,
+  isEndpointAlive,
+  listOpenAiCompatEndpointSummaries,
+  openAiCompatFallbacksDisabled,
+} from '../services/openAiCompatService.js'
 
 const router: IRouter = Router()
 
@@ -48,6 +57,143 @@ async function withOptionalTimeout<T>(maxRuntimeMs: number | null, task: (signal
     clearTimeout(timeout)
   }
 }
+
+// ─── GET /api/engine/llm-provider ─────────────────────────────────────────────
+// Summarizes the configured OpenAI-compatible provider chain (no secrets).
+// Optional: ?probe=1 hits each endpoint’s /v1/models with a short timeout.
+
+router.get(
+  '/engine/llm-provider',
+  authMiddleware,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const probe = req.query.probe === '1' || req.query.probe === 'true'
+      const endpoints = listOpenAiCompatEndpointSummaries()
+      const payload: {
+        configured: boolean
+        fallbacksDisabled: boolean
+        endpoints: typeof endpoints
+        probes?: Array<{ label: string; baseUrl: string; model: string; reachable: boolean }>
+      } = {
+        configured: hasOpenAiCompatConfig(),
+        fallbacksDisabled: openAiCompatFallbacksDisabled(),
+        endpoints,
+      }
+
+      if (probe) {
+        const full = getOpenAiCompatEndpoints()
+        payload.probes = await Promise.all(full.map(async endpoint => ({
+          label: endpoint.label,
+          baseUrl: endpoint.baseUrl,
+          model: endpoint.model,
+          reachable: await isEndpointAlive({
+            baseUrl: endpoint.baseUrl,
+            apiKey: endpoint.apiKey,
+            timeoutMs: 2500,
+          }),
+        })))
+      }
+
+      res.json(payload)
+    } catch (err: any) {
+      console.error('[engine/llm-provider]', err)
+      res.status(500).json({ error: 'Internal server error' })
+    }
+  },
+)
+
+// ─── POST /api/engine/llm-tool-smoke ──────────────────────────────────────────
+// Minimal tool-calling round-trip against the same provider chain as remediation.
+
+router.post(
+  '/engine/llm-tool-smoke',
+  authMiddleware,
+  async (_req: AuthRequest, res: Response) => {
+    const SMOKE_TOOL = 'pdfaf_smoke_ping'
+    try {
+      if (!hasOpenAiCompatConfig()) {
+        res.status(503).json({ error: 'OpenAI-compatible provider is not configured.' })
+        return
+      }
+
+      const data = await callWithOpenAiCompatFallbacks({
+        serviceName: 'engineLlmToolSmoke',
+        invoke: async endpoint => {
+          const response = await fetch(`${endpoint.baseUrl.replace(/\/$/, '')}/chat/completions`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${endpoint.apiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: endpoint.model,
+              temperature: 0,
+              tools: [{
+                type: 'function',
+                function: {
+                  name: SMOKE_TOOL,
+                  description: 'Return a short ok payload.',
+                  parameters: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['ok'],
+                    properties: {
+                      ok: { type: 'boolean' },
+                    },
+                  },
+                },
+              }],
+              tool_choice: buildOpenAiCompatToolChoice({
+                endpoint,
+                functionName: SMOKE_TOOL,
+              }),
+              messages: [{
+                role: 'user',
+                content: 'Call pdfaf_smoke_ping with ok true.',
+              }],
+            }),
+          })
+
+          if (!response.ok) {
+            const bodyText = await response.text().catch(() => '')
+            throw new Error(`HTTP ${response.status}${bodyText ? ` ${bodyText.slice(0, 500)}` : ''}`)
+          }
+
+          return await response.json() as {
+            choices?: Array<{ message?: { tool_calls?: Array<{ function?: { name?: string; arguments?: string } }> } }>
+          }
+        },
+      })
+
+      const toolCall = data?.choices?.[0]?.message?.tool_calls?.find(entry => entry?.function?.name === SMOKE_TOOL)
+      const raw = toolCall?.function?.arguments
+      if (!raw || typeof raw !== 'string') {
+        res.status(502).json({
+          error: 'Provider did not return the expected tool call.',
+          hint: 'For llama.cpp / LM Studio, set OPENAI_COMPAT_TOOL_CHOICE_MODE=required',
+        })
+        return
+      }
+
+      let parsed: { ok?: boolean } | null = null
+      try {
+        parsed = JSON.parse(raw) as { ok?: boolean }
+      } catch {
+        parsed = null
+      }
+
+      res.json({
+        ok: parsed?.ok === true,
+        toolArguments: raw,
+      })
+    } catch (err: any) {
+      console.error('[engine/llm-tool-smoke]', err)
+      res.status(502).json({
+        error: err instanceof Error ? err.message : 'Tool smoke request failed.',
+      })
+    }
+  },
+)
 
 // ─── POST /api/engine/analyze ────────────────────────────────────────────────
 

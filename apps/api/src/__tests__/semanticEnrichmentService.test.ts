@@ -21,6 +21,17 @@ vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({
   })),
 }))
 
+function semanticUserPromptText(content: unknown): string {
+  if (typeof content === 'string') return content
+  if (Array.isArray(content)) {
+    return content
+      .filter((p: { type?: string }) => p?.type === 'text')
+      .map((p: { text?: string }) => String(p?.text ?? ''))
+      .join('\n')
+  }
+  return ''
+}
+
 function makeVeraPdfResult(overrides: Partial<VeraPdfResult> = {}): VeraPdfResult {
   return {
     status: 'failed',
@@ -172,6 +183,7 @@ describe('semanticEnrichmentService', () => {
     vi.resetAllMocks()
     vi.resetModules()
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
     renderPdfPageToDataUrl.mockResolvedValue({
       width: 100,
       height: 100,
@@ -346,10 +358,15 @@ describe('semanticEnrichmentService', () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const fetchMock = vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const rawContent = body.messages?.[0]?.content
+      expect(Array.isArray(rawContent)).toBe(true)
+      const prompt = semanticUserPromptText(rawContent)
       expect(prompt).toContain('Batch type: figures')
-      expect(prompt).toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
+      expect(prompt).toContain('"imageAttachmentIndex":0')
       expect((prompt.match(/"candidateId":"figure:/g) || []).length).toBe(4)
+      const imageParts = (rawContent as any[]).filter(p => p?.type === 'image_url')
+      expect(imageParts).toHaveLength(4)
+      expect(String(imageParts[0]?.image_url?.url || '')).toContain('data:image/png;base64,Y3JvcA==')
       return {
         ok: true,
         json: async () => ({
@@ -396,6 +413,53 @@ describe('semanticEnrichmentService', () => {
       expect.objectContaining({ x: 0, y: 0, width: 1, height: 1 }),
       expect.objectContaining({ maxDimension: 768, maxBytes: 90000 }),
     )
+  })
+
+  it('embeds figure crops as base64 inside JSON when SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES is set', async () => {
+    vi.stubEnv('SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES', '1')
+    vi.resetModules()
+    const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        choices: [{
+          message: {
+            tool_calls: [{
+              function: {
+                name: 'propose_semantic_repairs',
+                arguments: JSON.stringify({
+                  figures: [
+                    { candidateId: 'figure:1', decorative: false, altText: 'A', confidence: 0.9, rationale: 'ok' },
+                    { candidateId: 'figure:2', decorative: false, altText: 'B', confidence: 0.9, rationale: 'ok' },
+                    { candidateId: 'figure:3', decorative: false, altText: 'C', confidence: 0.9, rationale: 'ok' },
+                    { candidateId: 'figure:4', decorative: false, altText: 'D', confidence: 0.9, rationale: 'ok' },
+                  ],
+                }),
+              },
+            }],
+          },
+        }],
+      }),
+    }))
+    vi.stubGlobal('fetch', fetchMock as any)
+
+    await generateSemanticRepairBatches({
+      buffer: Buffer.from('pdf'),
+      filename: 'test.pdf',
+      title: 'Test',
+      language: 'en',
+      analysis: makeAnalysisResult(),
+      context: {
+        ...makeContext(),
+        headingCandidates: [],
+        tableCandidates: [],
+        linkCandidates: [],
+      },
+    })
+
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))
+    expect(typeof body.messages?.[0]?.content).toBe('string')
+    expect(String(body.messages?.[0]?.content)).toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
   })
 
   it('falls back to deterministic figure alt text when the model returns an empty alt string', async () => {
@@ -489,7 +553,7 @@ describe('semanticEnrichmentService', () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const fetchMock = vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const prompt = semanticUserPromptText(body.messages?.[0]?.content)
       expect(prompt).toContain('Batch type: bookmarks')
       expect(prompt).toContain('Council members')
       expect(prompt).not.toContain('Heading 1')
@@ -546,7 +610,7 @@ describe('semanticEnrichmentService', () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const fetchMock = vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const prompt = semanticUserPromptText(body.messages?.[0]?.content)
       expect(prompt).toContain('Batch type: bookmarks')
       expect(prompt).toContain('"text":"Council members"')
       expect(prompt).not.toContain('Council members .............. 6')
@@ -604,7 +668,7 @@ describe('semanticEnrichmentService', () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const fetchMock = vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const prompt = semanticUserPromptText(body.messages?.[0]?.content)
       expect(prompt).toContain('"text":"2007 trust fund contributors"')
       expect(prompt).not.toContain('8383')
       expect(prompt).not.toContain(' 18"')
@@ -662,7 +726,7 @@ describe('semanticEnrichmentService', () => {
     const { generateSemanticRepairBatches } = await import('../services/semanticEnrichmentService.js')
     const fetchMock = vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const prompt = semanticUserPromptText(body.messages?.[0]?.content)
       expect(prompt).toContain('"candidateId":"bookmark:outline:1"')
       expect(prompt).toContain('"pageNumber":6')
       expect(prompt).toContain('"text":"2008 Council members"')
@@ -849,10 +913,14 @@ describe('semanticEnrichmentService', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
     const firstRequestBody = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))
     const secondRequestBody = JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))
-    const firstPrompt = String(firstRequestBody.messages?.[0]?.content || '')
-    const secondPrompt = String(secondRequestBody.messages?.[0]?.content || '')
-    expect(firstPrompt).toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
-    expect(secondPrompt).not.toContain('"imageDataUrl":"data:image/png;base64,Y3JvcA=="')
+    const firstContent = firstRequestBody.messages?.[0]?.content
+    expect(Array.isArray(firstContent)).toBe(true)
+    expect((firstContent as any[]).filter(p => p?.type === 'image_url')).toHaveLength(1)
+    const firstPrompt = semanticUserPromptText(firstContent)
+    expect(firstPrompt).toContain('"imageAttachmentIndex":0')
+    expect(typeof secondRequestBody.messages?.[0]?.content).toBe('string')
+    const secondPrompt = semanticUserPromptText(secondRequestBody.messages?.[0]?.content)
+    expect(secondPrompt).not.toContain('image/png;base64')
     expect(generated.batches.flatMap(batch => batch.figures.map(item => item.candidateId))).toEqual(['figure:1'])
     expect(generated.reviewFlags).toEqual([])
   })
@@ -924,7 +992,7 @@ describe('semanticEnrichmentService', () => {
     expect(fetchMock).toHaveBeenCalledTimes(3)
     const promptSizes = fetchMock.mock.calls.map(call => {
       const body = JSON.parse(String(call[1]?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const prompt = semanticUserPromptText(body.messages?.[0]?.content)
       return (prompt.match(/"candidateId":"figure:/g) || []).length
     })
     expect(promptSizes).toEqual([4, 2, 2])
@@ -941,7 +1009,7 @@ describe('semanticEnrichmentService', () => {
     const resolveOrder: string[] = []
     vi.stubGlobal('fetch', vi.fn(async (_url, init: any) => {
       const body = JSON.parse(String(init?.body || '{}'))
-      const prompt = String(body.messages?.[0]?.content || '')
+      const prompt = semanticUserPromptText(body.messages?.[0]?.content)
       const batchType = /Batch type: (\w+)/.exec(prompt)?.[1] || 'unknown'
       const delayMs = batchType === 'figures' ? 40 : batchType === 'tables' ? 20 : 0
       await new Promise(resolve => setTimeout(resolve, delayMs))

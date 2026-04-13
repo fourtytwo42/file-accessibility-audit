@@ -1,5 +1,10 @@
 import { cropDataUrlRegion, renderPdfPageToDataUrl } from './pdfRenderService.js'
-import { callWithOpenAiCompatFallbacks, hasOpenAiCompatConfig } from './openAiCompatService.js'
+import {
+  buildOpenAiCompatToolChoice,
+  callWithOpenAiCompatFallbacks,
+  hasOpenAiCompatConfig,
+  type OpenAiCompatEndpoint,
+} from './openAiCompatService.js'
 import type { AnalysisResult } from './pdfAnalyzer.js'
 import type { ModelReviewFlag } from './documentModel.js'
 import { draftFigureAltText } from './altTextDraftingService.js'
@@ -33,6 +38,66 @@ const IMAGE_BATCH_SOFT_BUDGET = 180_000
 const SEMANTIC_PAGE_RENDER_SCALE = 1.0
 const SEMANTIC_FIGURE_MAX_DIMENSION = 768
 const SEMANTIC_FIGURE_MAX_BYTES = 90_000
+
+/** When true, figure crops stay embedded as base64 inside the JSON blob (legacy). Default false sends OpenAI-style image_url parts for vision models (Gemma 4, GPT-4V, etc.). */
+function useInlineFigureImagesInSemanticPrompt(): boolean {
+  return /^1|true|yes$/i.test(String(process.env.SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES || '').trim())
+}
+
+/** Wire-format figure row: either legacy inline imageDataUrl or imageAttachmentIndex for multimodal messages. */
+type SemanticFigurePromptRow = Omit<SemanticFigureTarget, 'imageDataUrl'> & {
+  imageDataUrl?: string | null
+  imageAttachmentIndex?: number | null
+}
+
+function buildFigureRowsForPrompt(figures: SemanticFigureTarget[]): {
+  rows: SemanticFigurePromptRow[]
+  attachmentImageUrls: string[]
+} {
+  if (useInlineFigureImagesInSemanticPrompt()) {
+    return {
+      rows: figures.map(f => ({
+        candidateId: f.candidateId,
+        pageNumber: f.pageNumber,
+        surroundingText: f.surroundingText,
+        informativeHint: f.informativeHint,
+        repairMode: f.repairMode,
+        targetTag: f.targetTag,
+        imageDataUrl: f.imageDataUrl,
+      })),
+      attachmentImageUrls: [],
+    }
+  }
+
+  const rows: SemanticFigurePromptRow[] = []
+  const attachmentImageUrls: string[] = []
+  for (const f of figures) {
+    if (!f.imageDataUrl) {
+      rows.push({
+        candidateId: f.candidateId,
+        pageNumber: f.pageNumber,
+        surroundingText: f.surroundingText,
+        informativeHint: f.informativeHint,
+        repairMode: f.repairMode,
+        targetTag: f.targetTag,
+        imageAttachmentIndex: null,
+      })
+      continue
+    }
+    const imageAttachmentIndex = attachmentImageUrls.length
+    attachmentImageUrls.push(f.imageDataUrl)
+    rows.push({
+      candidateId: f.candidateId,
+      pageNumber: f.pageNumber,
+      surroundingText: f.surroundingText,
+      informativeHint: f.informativeHint,
+      repairMode: f.repairMode,
+      targetTag: f.targetTag,
+      imageAttachmentIndex,
+    })
+  }
+  return { rows, attachmentImageUrls }
+}
 
 type SemanticRepairBatch = ReturnType<typeof buildSemanticRepairBatches>[number]
 
@@ -244,18 +309,33 @@ function buildPrompt(input: {
   document: SemanticDocumentSummary
   batchType: SemanticBatchResult['batchType']
   headings: SemanticHeadingTarget[]
-  figures: SemanticFigureTarget[]
+  figures: SemanticFigurePromptRow[]
   tables: SemanticTableTarget[]
   links: SemanticLinkTarget[]
   bookmarks: SemanticBookmarkTarget[]
 }): string {
+  const figureHints = (() => {
+    if (input.batchType !== 'figures') return [] as string[]
+    if (input.figures.some(f => typeof f.imageAttachmentIndex === 'number')) {
+      return [
+        'For figures: if decorative is true, altText should be empty.',
+        'For figures with imageAttachmentIndex set, use the image part at that index (0 = first image after this text block) as the primary evidence; use nearby text as supporting context.',
+        'For figures with imageAttachmentIndex null, rely on surrounding text only (no image crop was available).',
+        'For figures: avoid generic labels like "Image related to..." or "Image on page...". Describe the figure content or purpose specifically and concisely.',
+      ]
+    }
+    return [
+      'For figures: if decorative is true, altText should be empty.',
+      'For figures: use the cropped image as the primary evidence and use nearby text only as supporting context.',
+      'For figures: avoid generic labels like "Image related to..." or "Image on page...". Describe the figure content or purpose specifically and concisely.',
+    ]
+  })()
+
   return [
     'You are proposing semantic accessibility repairs for an existing native PDF.',
     'Do not rewrite the whole document. Only return semantic decisions for the provided targets.',
     'Prefer conservative outputs. If a target is ambiguous, lower confidence and keep text short.',
-    'For figures: if decorative is true, altText should be empty.',
-    'For figures: use the cropped image as the primary evidence and use nearby text only as supporting context.',
-    'For figures: avoid generic labels like "Image related to..." or "Image on page...". Describe the figure content or purpose specifically and concisely.',
+    ...figureHints,
     'For links: replacementText should be short visible text, annotationContents can be a slightly longer accessible label.',
     'For tables: only set useFirstRowAsHeader when the first row clearly behaves like column headers.',
     'For bookmarks: return concise, section-like sidebar labels. Clean up noisy OCR or fragmented heading text. Do not invent sections.',
@@ -271,9 +351,43 @@ function buildPrompt(input: {
   ].join('\n')
 }
 
-function buildSemanticRequestBody(model: string, messages: any[]): string {
+function buildSemanticUserMessage(input: {
+  document: SemanticDocumentSummary
+  batchType: SemanticBatchResult['batchType']
+  headings: SemanticHeadingTarget[]
+  figures: SemanticFigureTarget[]
+  tables: SemanticTableTarget[]
+  links: SemanticLinkTarget[]
+  bookmarks: SemanticBookmarkTarget[]
+}): { role: 'user'; content: string | Array<{ type: string; text?: string; image_url?: { url: string } }> } {
+  const multimodalFigures = input.batchType === 'figures'
+    && !useInlineFigureImagesInSemanticPrompt()
+    && input.figures.some(f => Boolean(f.imageDataUrl))
+
+  if (!multimodalFigures) {
+    const figureRows = input.batchType === 'figures'
+      ? buildFigureRowsForPrompt(input.figures).rows
+      : input.figures
+    return {
+      role: 'user',
+      content: buildPrompt({ ...input, figures: figureRows }),
+    }
+  }
+
+  const { rows, attachmentImageUrls } = buildFigureRowsForPrompt(input.figures)
+  const text = buildPrompt({ ...input, figures: rows })
+  return {
+    role: 'user',
+    content: [
+      { type: 'text', text },
+      ...attachmentImageUrls.map(url => ({ type: 'image_url', image_url: { url } })),
+    ],
+  }
+}
+
+function buildSemanticRequestBody(endpoint: OpenAiCompatEndpoint, messages: any[]): string {
   return JSON.stringify({
-    model,
+    model: endpoint.model,
     temperature: 0.1,
     tools: [{
       type: 'function',
@@ -361,24 +475,27 @@ function buildSemanticRequestBody(model: string, messages: any[]): string {
         },
       },
     }],
-    tool_choice: 'required',
+    tool_choice: buildOpenAiCompatToolChoice({
+      endpoint,
+      functionName: PROPOSE_SEMANTIC_REPAIRS_TOOL,
+    }),
     messages,
   })
 }
 
-async function callSemanticEndpoint(baseUrl: string, apiKey: string, model: string, messages: any[]): Promise<any> {
+async function callSemanticEndpoint(endpoint: OpenAiCompatEndpoint, messages: any[]): Promise<any> {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(new Error(`semantic request timed out after ${SEMANTIC_REQUEST_TIMEOUT_MS}ms`)), SEMANTIC_REQUEST_TIMEOUT_MS)
   let response: Response
   try {
-    response = await fetch(`${baseUrl.replace(/\/$/, '')}/chat/completions`, {
+    response = await fetch(`${endpoint.baseUrl.replace(/\/$/, '')}/chat/completions`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${endpoint.apiKey}`,
         'Content-Type': 'application/json',
       },
       signal: controller.signal,
-      body: buildSemanticRequestBody(model, messages),
+      body: buildSemanticRequestBody(endpoint, messages),
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error || '')
@@ -408,7 +525,7 @@ async function openAiCompatJsonResponse(messages: any[]): Promise<any> {
   return await callWithOpenAiCompatFallbacks({
     serviceName: 'semanticEnrichmentService',
     preflightPrimary: true,
-    invoke: endpoint => callSemanticEndpoint(endpoint.baseUrl, endpoint.apiKey, endpoint.model, messages),
+    invoke: endpoint => callSemanticEndpoint(endpoint, messages),
   })
 }
 
@@ -895,7 +1012,18 @@ function estimateBatchSize(input: {
   links: SemanticLinkTarget[]
   bookmarks: SemanticBookmarkTarget[]
 }): number {
-  const promptBytes = JSON.stringify(input).length
+  const figureRows = input.batchType === 'figures'
+    ? buildFigureRowsForPrompt(input.figures).rows
+    : input.figures
+  const promptBytes = JSON.stringify({
+    document: input.document,
+    batchType: input.batchType,
+    headings: input.headings,
+    figures: figureRows,
+    tables: input.tables,
+    links: input.links,
+    bookmarks: input.bookmarks,
+  }).length
   const imageBytes = input.figures.reduce((total, figure) => total + (figure.imageDataUrl?.length || 0), 0)
     + input.tables.reduce((total, table) => total + (table.imageDataUrl?.length || 0), 0)
   return promptBytes + imageBytes
@@ -965,18 +1093,15 @@ async function resolveBatchWithFallbacks(input: {
     const bookmarkTargetsById = new Map(
       prepared.bookmarks.map(item => [item.candidateId, { pageNumber: item.pageNumber, targetRef: item.targetRef || null }]),
     )
-    const payload = await openAiCompatJsonResponse([{
-      role: 'user',
-      content: buildPrompt({
-        document: input.document,
-        batchType: input.batch.batchType,
-        headings: prepared.headings,
-        figures: prepared.figures,
-        tables: prepared.tables,
-        links: prepared.links,
-        bookmarks: prepared.bookmarks,
-      }),
-    }])
+    const payload = await openAiCompatJsonResponse([buildSemanticUserMessage({
+      document: input.document,
+      batchType: input.batch.batchType,
+      headings: prepared.headings,
+      figures: prepared.figures,
+      tables: prepared.tables,
+      links: prepared.links,
+      bookmarks: prepared.bookmarks,
+    })])
     return {
       results: [normalizeBatchResult(input.batch.batchType, payload, prepared.allowedIds, figureTargetsById, bookmarkTargetsById)],
       reviewFlags: [],

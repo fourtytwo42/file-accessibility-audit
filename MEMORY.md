@@ -859,6 +859,16 @@
   - semantic rollback accounting
   - long-report inspection-budget exhaustion
 
+## Local Gemma 4 E2B Q4 (on-VM, 2026-04-13)
+
+- Remediation already uses **OpenAI-compatible** `/v1/chat/completions` with **tool calling** via `apps/api/src/services/openAiCompatService.ts` (planner fallback, semantic repair, page reconstruction).
+- **Run the model:** `pnpm llm:gemma4-e2b` (foreground) or `pnpm llm:gemma4-e2b:bg` → logs `.tmp/llama-server.log`, pid `.tmp/llama-server.pid`. Defaults: HF repo **`unsloth/gemma-4-E2B-it-GGUF`** + **`gemma-4-E2B-it-Q4_K_M.gguf`** (the `ggml-org` snapshot may only offer Q8_0/bf16). Bundled binary: extract `llama-b*-bin-ubuntu-x64.tar.gz` to `.local-tools/llama-b*/` (script auto-sets `LD_LIBRARY_PATH`). The background launcher now truncates stale logs and uses `setsid` when available so the server survives `pnpm`/parent-shell exit. Port `1234`. Override with `GEMMA4_HF_REPO`, `GEMMA4_GGUF_FILE`, `LLAMA_SERVER_PORT`, `LLAMA_SERVER_BIN`.
+- **Disable thinking:** the launcher now passes `--reasoning-budget 0`, `--chat-template-kwargs '{"enable_thinking": false}'`, and `--reasoning-format deepseek`. Verified with a plain local chat completion returning exact `content: "OK"` and no reasoning block.
+- **App env:** `OPENAI_COMPAT_BASE_URL=http://127.0.0.1:1234/v1`, non-empty `OPENAI_COMPAT_API_KEY`, `OPENAI_COMPAT_MODEL` can remain the GGUF basename (`gemma-4-E2B-it-Q4_K_M.gguf`) even though `/v1/models` reports repo id `unsloth/gemma-4-E2B-it-GGUF`, `OPENAI_COMPAT_TOOL_CHOICE_MODE=required`, `OPENAI_COMPAT_DISABLE_FALLBACKS=1` to skip cloud fallbacks.
+- **Probe:** `pnpm probe:openai-compat` or `pnpm probe:openai-compat -- --tool-smoke`. **API (auth):** `GET /api/engine/llm-provider?probe=1`, `POST /api/engine/llm-tool-smoke`.
+- **Vision / alt text:** Semantic figure batches now send crops as OpenAI **`image_url`** content parts (plus text with `imageAttachmentIndex` mapping) so local multimodal models (Gemma 4 E2B + llama.cpp mmproj) actually see pixels. Page reconstruction already used `image_url`. Legacy: `SEMANTIC_REPAIR_INLINE_FIGURE_IMAGES=1` embeds base64 inside the JSON blob again.
+- **Verified 2026-04-13:** `pnpm --filter api test src/__tests__/semanticEnrichmentService.test.ts src/__tests__/openAiCompatService.test.ts` passed; live local smoke checks passed for `GET http://127.0.0.1:1234/v1/models` and `pnpm probe:openai-compat -- --tool-smoke`; direct chat completions with `image_url` content parts are accepted by the running Gemma/llama.cpp server. End-to-end remediation smoke checks: `inaccessible.pdf` exercised `semanticEnrichmentService` successfully 4 times against the local provider and improved `35/F -> 44/F`; `ADAM2.pdf` improved `32/F -> 66/D` on deterministic passes with the same local server configuration.
+
 ## 2026-04-04 AI Provider Chain Refresh
 
 - The API’s OpenAI-compatible provider routing now uses an ordered provider chain instead of a single primary plus one fallback.

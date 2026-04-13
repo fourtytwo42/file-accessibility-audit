@@ -31,7 +31,8 @@
     "trace:font-cluster": "tsx src/scripts/traceProcessedFontCluster.ts",
     "verify:processed:capability": "pnpm baseline:processed:capability",
     "verify:processed:font-capability": "pnpm baseline:processed:font-capability",
-    "verify:regressions": "pnpm test:regressions && pnpm baseline:phase0:compare"
+    "verify:regressions": "pnpm test:regressions && pnpm baseline:phase0:compare",
+    "probe:openai-compat": "tsx src/scripts/probeOpenAiCompat.ts"
   },
   "dependencies": {
     "@adobe/pdfservices-node-sdk": "^4.1.0",
